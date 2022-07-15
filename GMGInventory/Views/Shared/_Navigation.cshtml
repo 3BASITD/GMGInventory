@@ -1,0 +1,440 @@
+﻿<div class="form-inline">
+    <div class="input-group" data-widget="sidebar-search">
+        <input class="form-control form-control-sidebar" type="search" placeholder="Search Menu" aria-label="Search">
+        <div class="input-group-append">
+            <button class="btn btn-sidebar">
+                <i class="fas fa-search fa-fw"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column nav-flat" data-widget="treeview" role="menu" data-accordion="false">
+        <li class="nav-header">SALES</li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "CustomerPurchaseHistory" ? "active" : "")"
+                    asp-area="" asp-controller="CustomerPuchaseHistory" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Customer Purchase History</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "PackListing" ? "active" : "")"
+                    asp-area="" asp-controller="PackListing" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Pack Listing</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesInvoice" ? "active" : "")"
+                    asp-area="" asp-controller="SalesInvoice" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Sales Invoice</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesOrder" ? "active" : "")"
+                    asp-area="" asp-controller="SalesOrder" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Sales Order</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesOrderDelivery" ? "active" : "")"
+                    asp-area="" asp-controller="SalesOrderDelivery" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Sales Order Delivery</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesReturn" ? "active" : "")"
+                    asp-area="" asp-controller="SalesReturn" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Sales Return</p>
+            </a>
+        </li>
+        
+        <li class="nav-header">INVENTORY</li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Forwarder" ? "active" : "")"
+                    asp-area="" asp-controller="Forwarder" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Forwarder</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Item" ? "active" : "")"
+                    asp-area="" asp-controller="Item" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Item</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "PriceList" ? "active" : "")"
+                    asp-area="" asp-controller="PriceList" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Price List</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "PriceUpdate" ? "active" : "")"
+                    asp-area="" asp-controller="PriceUpdate" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Price Update</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "PurchaseReturn" ? "active" : "")"
+                    asp-area="" asp-controller="PurchaseReturn" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Purchase Return</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Replenish" ? "active" : "")"
+                    asp-area="" asp-controller="Replenish" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Replenish</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Warehouse" ? "active" : "")"
+                    asp-area="" asp-controller="Warehouse" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Warehouse</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Transfer" ? "active" : "")"
+                    asp-area="" asp-controller="Transfer" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Warehouse Transfer</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Unserved" ? "active" : "")"
+                    asp-area="" asp-controller="Unserved" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Unserved Item</p>
+            </a>
+        </li>
+
+        <li class="nav-header">CREDITS &amp; COLLECTIONS</li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Customer" ? "active" : "")"
+                    asp-area="" asp-controller="Customer" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Customer</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Payment" ? "active" : "")"
+                    asp-area="" asp-controller="Payment" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Payment</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Soacr" ? "active" : "")"
+                    asp-area="" asp-controller="Soacr" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>SOA / Counter Receipt</p>
+            </a>
+        </li>
+        
+        <li class="nav-header">ADMINISTRATION</li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Agent" ? "active" : "")"
+                    asp-area="" asp-controller="Agent" asp-action="Index">
+                <i class="nav-icon fas fa-user-secret"></i>
+                <p>Agents</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Area" ? "active" : "")"
+                    asp-area="" asp-controller="Area" asp-action="Index">
+                <i class="nav-icon fas fa-map-marker-alt"></i>
+                <p>Areas</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Brand" ? "active" : "")"
+                    asp-area="" asp-controller="Brand" asp-action="Index">
+                <i class="nav-icon fas fa-trademark"></i>
+                <p>Brands</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Category" ? "active" : "")"
+                    asp-area="" asp-controller="Category" asp-action="Index">
+                <i class="nav-icon fas fa-network-wired"></i>
+                <p>Categories</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "ItemType" ? "active" : "")"
+                    asp-area="" asp-controller="ItemType" asp-action="Index">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>Item Types</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "User" ? "active" : "")"
+                    asp-area="" asp-controller="User" asp-action="Index">
+                <i class="nav-icon fas fa-user-cog"></i>
+                <p>Users</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Supplier" ? "active" : "")"
+                    asp-area="" asp-controller="Supplier" asp-action="Index">
+                <i class="nav-icon fas fa-handshake"></i>
+                <p>Suppliers</p>
+            </a>
+        </li>
+        
+        <li class="nav-header">REPORTS</li>
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>
+                    SALES REPORTS
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "AgentSalesPerItem" ? "active" : "")"
+                    asp-area="" asp-controller="AgentSalesPerItem" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Agent Sales per Items</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "BrandSalesReport" ? "active" : "")"
+                    asp-area="" asp-controller="BrandSalesReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Brand Sales Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "BestSellingItem" ? "active" : "")"
+                    asp-area="" asp-controller="BestSellingItem" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Best Selling Item</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "BestSellingItemInvoice" ? "active" : "")"
+                    asp-area="" asp-controller="BestSellingItemInvoice" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Best Selling Item (Invoice)</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "CommissionReport" ? "active" : "")"
+                    asp-area="" asp-controller="CommissionReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Commission Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "CustomerSalesAnalysisReport" ? "active" : "")"
+                    asp-area="" asp-controller="CustomerSalesAnalysisReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Customer Sales Analysis Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "CustomerSalesReport" ? "active" : "")"
+                    asp-area="" asp-controller="CustomerSalesReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Customer Sales Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "DailySalesReport" ? "active" : "")"
+                    asp-area="" asp-controller="DailySalesReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Daily Sales Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "DailySalesMarginReport" ? "active" : "")"
+                    asp-area="" asp-controller="DailySalesMarginReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Daily Sales Margin Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesInvoiceListingReport" ? "active" : "")"
+                    asp-area="" asp-controller="SalesInvoiceListingReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Sales Invoice Listing Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesAgentArea" ? "active" : "")"
+                    asp-area="" asp-controller="SalesAgentArea" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Sales by Agent / Area</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesMarginItem" ? "active" : "")"
+                    asp-area="" asp-controller="SalesMarginItem" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Sales Margin Item</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesReportBasis" ? "active" : "")"
+                    asp-area="" asp-controller="SalesReportBasis" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Sales Report Basis</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "SalesReturnListingReport" ? "active" : "")"
+                    asp-area="" asp-controller="SalesReturnListingReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Sales Return Listing Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "UnservedItem" ? "active" : "")"
+                    asp-area="" asp-controller="UnservedItem" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Unserved Item</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>
+                    INVENTORY REPORTS
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "BelowMaintainingItem" ? "active" : "")"
+                    asp-area="" asp-controller="BelowMaintainingItem" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Below Maintaining Item</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "ReceivingListing" ? "active" : "")"
+                    asp-area="" asp-controller="ReceivingListing" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Receiving Listing</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "ReceivingListingSupplier" ? "active" : "")"
+                    asp-area="" asp-controller="ReceivingListingSupplier" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Receiving Listing Supplier</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "ReceivingSummary" ? "active" : "")"
+                    asp-area="" asp-controller="ReceivingSummary" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Receiving Summary</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "StockCard" ? "active" : "")"
+                    asp-area="" asp-controller="StockCard" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Stock Card</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "StockStatusReport" ? "active" : "")"
+                    asp-area="" asp-controller="StockStatusReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Stock Status Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "SupplierPurchaseHistory" ? "active" : "")"
+                    asp-area="" asp-controller="SupplierPurchaseHistory" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Supplier Purchase History</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>
+                    ACCOUNTING REPORTS
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "CreditMemoListingReport" ? "active" : "")"
+                    asp-area="" asp-controller="CreditMemoListingReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Credit Memo Listing Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "DebitMemoListingReport" ? "active" : "")"
+                    asp-area="" asp-controller="DebitMemoListingReport" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Debit Memo Listing Report</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-circle"></i>
+                <p>
+                    MANAGEMENT REPORTS
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "CheckRegisterDate" ? "active" : "")"
+                    asp-area="" asp-controller="CheckRegisterDate" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Check Register by Date</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "CheckRegisterCustomer" ? "active" : "")"
+                    asp-area="" asp-controller="CheckRegisterCustomer" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Check Register by Customer</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+            <a class="nav-link @(currentController == "CheckRegisterSummary" ? "active" : "")"
+                    asp-area="" asp-controller="CheckRegisterSummary" asp-action="Index">
+                        <i class="nav-icon fas fa-dot-circle"></i>
+                        <p>Check Register Summary</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</nav>

@@ -1,0 +1,97 @@
+﻿@model IEnumerable<GenericAuditVM>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                <span class="fas fa-plus"></span> New Category
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Code)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.IsActive)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserCreated)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserModified)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateModified)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Code</td>
+                        <td>@item.Name</td>
+                        <td>@item.IsActive</td>
+                        <td>@item.UserCreated</td>
+                        <td>@item.DateCreated</td>
+                        <td>@item.UserModified</td>
+                        <td>@item.DateModified</td>
+                        <td>
+
+                            <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@item.Id">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.Id">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                            <button data-id="@item.Id" class="btn btn-danger btn-sm deleteBtn" type="button">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form id="deleteCategoryForm" asp-action="Delete">
+    <input type="hidden" id="deleteCategoryId" name="Id" />
+</form>
+
+@section Scripts {
+    <script>
+        $('.deleteBtn').click(function(e) {
+            swal({
+                title: "Delete Category",
+                text: "Are you sure you want to delete this record?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((confirm) => {
+                if (confirm) {
+                    var btn = $(this);
+                    var id = btn.data("id");
+                    $('#deleteCategoryId').val(id);
+                    $('#deleteCategoryForm').submit();
+                }
+            });
+        });
+    </script>
+}
