@@ -16,9 +16,5 @@ namespace GMGInventory.Common.Models
         [MinLength(5)]
         [Display(Name = "Name")]
         public string Name { get; set; }
-
-        [Required]
-        [Display(Name = "Is Active")]
-        public bool IsActive { get; set; }
     }
 }

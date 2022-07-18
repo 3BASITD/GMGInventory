@@ -12,58 +12,65 @@
         <div class="card-header">
             <span class="card-title">@ViewData["Title"]</span>
             <div class="card-tools">
+                @if (Model?.IsActive == true)
+            {
                 <a class="btn btn-primary btn-sm float-right" asp-action="Edit" asp-route-id="@Model?.Id">
                     <span class="fas fa-edit"></span> Edit Category
                 </a>
-                <a class="btn btn-light btn-sm float-right mr-2" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
-            </div>
-        </div>
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.Code)
-                </dt>
-                <dd class="col-sm-10">
-                    @Model?.Code
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.Name)
-                </dt>
-                <dd class="col-sm-10">
-                    @Model?.Name
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.IsActive)
-                </dt>
-                <dd class="col-sm-10">
-                    @Model?.IsActive
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.UserCreated)
-                </dt>
-                <dd class="col-sm-10">
-                    @Model?.UserCreated
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.DateCreated)
-                </dt>
-                <dd class="col-sm-10">
-                    @Model?.DateCreated
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.UserModified)
-                </dt>
-                <dd class="col-sm-10">
-                    @Model?.UserModified
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.DateModified)
-                </dt>
-                <dd class="col-sm-10">
-                    @Model?.DateModified
-                </dd>
-            </dl>
+            }
+            <a class="btn btn-light btn-sm float-right mr-2" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
         </div>
     </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Code)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.Code
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.Name
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.IsActive)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.IsActive
+                @if (Model?.IsActive == false)
+                {
+                    <span class="fas fa-question-circle text-primary" data-bs-toggle="tooltip" title="This was deleted but instead marked as Inactive because it was used in other records."></span>
+                }
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.UserCreated)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.UserCreated
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.DateCreated
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.UserModified)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.UserModified
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DateModified)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.DateModified
+            </dd>
+        </dl>
+    </div>
+</div>

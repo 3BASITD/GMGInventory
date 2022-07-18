@@ -9,7 +9,11 @@ namespace GMGInventory.Application.Configurations
         public MapperConfig()
         {
             CreateMap<Category, GenericAuditVM>().ReverseMap();
+            CreateMap<ItemType, GenericAuditVM>().ReverseMap();
             CreateMap<Category, CategoryVM>().ReverseMap();
+            CreateMap<ItemType, ItemTypeVM>().ReverseMap();
+            CreateMap<ItemType, ItemTypeViewVM>().ReverseMap();
+            CreateMap<User, UserInformationVM>().ReverseMap();
 
         }
     }

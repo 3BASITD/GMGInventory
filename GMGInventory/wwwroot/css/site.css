@@ -1,0 +1,6 @@
+.text-sm .select2-container--default .select2-selection--single .select2-selection__arrow, select.form-control-sm~.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 0.12rem;
+}
+.select2-container--default .select2-selection--single {
+    padding: 0.46875rem 0rem;
+}
