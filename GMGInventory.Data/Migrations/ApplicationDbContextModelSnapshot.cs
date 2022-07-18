@@ -17,7 +17,7 @@ namespace GMGInventory.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.6")
+                .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -123,6 +123,50 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("RegionId");
 
                     b.ToTable("Areas");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("AffectedColumns")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrimaryKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
@@ -1042,7 +1086,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("itemPrices");
+                    b.ToTable("ItemPrices");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemType", b =>
@@ -2836,42 +2880,42 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            ConcurrencyStamp = "66fe2b86-254c-4d96-aa51-052f68ecc3a3",
+                            ConcurrencyStamp = "cef493f9-7e9d-4447-ab21-ffb91f2e1327",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            ConcurrencyStamp = "87339da9-24b2-4c2c-96ba-39a5154f8d06",
+                            ConcurrencyStamp = "67959ac1-cd22-4878-a9a7-d6abf4d695e5",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            ConcurrencyStamp = "813c2e62-9ab0-4a86-a09f-69b5bee34994",
+                            ConcurrencyStamp = "27ae3f9d-d17d-4363-9b1a-ba52bf8cca15",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            ConcurrencyStamp = "20ae1ef7-4db6-4483-8bf4-4486e5e7df02",
+                            ConcurrencyStamp = "2f1a2601-3f5b-4c9b-91e9-c478e42574d5",
                             Name = "Sales Manager",
                             NormalizedName = "SALES MANAGER"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            ConcurrencyStamp = "35ed9899-8963-4b47-8f39-027724190625",
+                            ConcurrencyStamp = "ee117075-aa51-48ec-ba30-3fddd44c542c",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            ConcurrencyStamp = "d2ce12e4-90f5-4a41-b2e1-9b3d8485c809",
+                            ConcurrencyStamp = "7f041e9f-ed3b-43b6-9d66-8a5bb2d1128e",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER"
                         });
@@ -3077,18 +3121,31 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDarkMode")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Nickname")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasDiscriminator().HasValue("User");
 
@@ -3097,39 +3154,43 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "160eed35-4015-44bf-819e-a861e4aaa04b",
+                            ConcurrencyStamp = "ead3b30a-45fb-40d8-a950-139a56108c93",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAEAACcQAAAAELhWh6ZEH5p4PxN5jz7jmQIFr1XvIJPqBLhrbpu0qaY0rC5H2qPWxmmgSxY1nk6fCw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEK0MrKHm0tPcc6W8KCkyFVc4Zh3NyuU9QcsstC1o9ECXJz94vNIa3I9Nkk8clnDgVg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9d34b76f-4153-490a-92df-ea8c537b512c",
+                            SecurityStamp = "11c0ccfe-9f9a-4c45-8b67-d92d51329d0d",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2022, 7, 14, 14, 45, 41, 247, DateTimeKind.Local).AddTicks(8970),
+                            DateCreated = new DateTime(2022, 7, 20, 4, 18, 48, 807, DateTimeKind.Local).AddTicks(848),
                             FirstName = "MISNet",
+                            IsActive = true,
                             IsDarkMode = false,
                             LastName = "Administrator",
-                            Nickname = "MISNet"
+                            Nickname = "MISNet",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f2d2fae9-fb73-43fc-bf36-00c5d7a9cb5d",
+                            ConcurrencyStamp = "20acbed1-352a-4d46-8645-80457a481b1c",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAEAACcQAAAAEMhx5Iaqg4dadgkWCTw/BUCIJ0WTqoWBDhfoLAjuSTG/6pp3CSpIOMDGZGPjKk919Q==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEOyXL4h3EdvKsN7N0NqLcgPjLENSYAtJxLGMO2cvQiN0eeXzmInWwo5Wu3Ep0kfk8A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7ba07b90-12af-4ef5-8581-d05c3a566997",
+                            SecurityStamp = "a9820aa9-ab1c-4220-ac53-61aecbaeec82",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2022, 7, 14, 14, 45, 41, 255, DateTimeKind.Local).AddTicks(5548),
+                            DateCreated = new DateTime(2022, 7, 20, 4, 18, 48, 815, DateTimeKind.Local).AddTicks(3826),
                             FirstName = "GMG",
+                            IsActive = true,
                             IsDarkMode = false,
                             LastName = "Administrator",
-                            Nickname = "GMG"
+                            Nickname = "GMG",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 

@@ -11,38 +11,25 @@ namespace GMGInventory.Controllers
     [Authorize]
     public class CategoryController : Controller
     {
-        private readonly IGenericRepository<Category> categoryRepository;
-        private readonly IMapper mapper;
+        private readonly ICategoryRepository categoryRepository;
 
-        public CategoryController(IGenericRepository<Category> categoryRepository
-            , IMapper mapper)
+        public CategoryController(ICategoryRepository categoryRepository)
         {
             this.categoryRepository = categoryRepository;
-            this.mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
         {
-            var categories = await categoryRepository.GetAllAsync();
-            var categoriesVM = mapper.Map<List<GenericAuditVM>>(categories);
-            foreach(GenericAuditVM cvm in categoriesVM)
-            {
-                cvm.UserCreated = await categoryRepository.GetUserName(cvm.UserCreated);
-                cvm.UserModified = await categoryRepository.GetUserName(cvm.UserModified);
-            }
-            return View(categoriesVM);
+            return View(await categoryRepository.GetAllGenericVMAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
         {
-            var category = await categoryRepository.GetAsync(id);
-            if (category == null)
+            var categoryVM = await categoryRepository.GetGenericVMAsync(id);
+            if (categoryVM == null)
             {
                 return NotFound();
             }
-            var categoryVM = mapper.Map<GenericAuditVM>(category);
-            categoryVM.UserCreated = await categoryRepository.GetUserName(categoryVM.UserCreated);
-            categoryVM.UserModified = await categoryRepository.GetUserName(categoryVM.UserModified);
             return View(categoryVM);
         }
 
@@ -57,21 +44,28 @@ namespace GMGInventory.Controllers
         {
             if (ModelState.IsValid)
             {
-                var category = mapper.Map<Category>(categoryVM);
-                await categoryRepository.AddAsync(category);
-                return RedirectToAction(nameof(Index));
+                if (await categoryRepository.IsCategoryCodeExist(categoryVM.Code))
+                {
+                    //ModelState.AddModelError(string.Empty, "Category code already in use.");
+                    TempData["ErrorMessage"] = "Category code already in use";
+                }
+                else
+                {
+                    await categoryRepository.AddAsync(categoryVM);
+                    TempData["SuccessMessage"] = "Category successfully added";
+                    return RedirectToAction(nameof(Index));
+                }
             }
             return View(categoryVM);
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
-            var category = await categoryRepository.GetAsync(id);
-            if (category == null)
+            var categoryVM = await categoryRepository.GetCategoryVMAsync(id);
+            if (categoryVM == null)
             {
                 return NotFound();
             }
-            var categoryVM = mapper.Map<CategoryVM>(category);
             return View(categoryVM);
         }
 
@@ -88,9 +82,7 @@ namespace GMGInventory.Controllers
             {
                 try
                 {
-                    var category = await categoryRepository.GetAsync(id);
-                    mapper.Map(categoryVM, category);
-                    await categoryRepository.UpdateAsync(category);
+                    await categoryRepository.UpdateAsync(id, categoryVM);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -105,34 +97,45 @@ namespace GMGInventory.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            TempData["SuccessMessage"] = "Category successfully updated";
             return View(categoryVM);
         }
 
-        public async Task<IActionResult> Delete(int? id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            var category = categoryRepository.GetAsync(id);
+            var category = await categoryRepository.GetAsync(id);
             if (category == null)
             {
                 return NotFound();
             }
-            var categoryVM = mapper.Map<CategoryVM>(category);
-            return View(categoryVM);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (await categoryRepository.GetAllAsync() == null)
+            if (await categoryRepository.IsCategoryInUse(id))
             {
-                return Problem("Entity set 'GMGInventoryContext.Category'  is null.");
+                category.IsActive = false;
+                await categoryRepository.UpdateAsync(category);
+                TempData["WarningMessage"] = "Category has been deactivated";
             }
-            var category = await categoryRepository.GetAsync(id);
-            if (category != null)
+            else
             {
                 await categoryRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Category successfully deleted";
             }
+            return RedirectToAction(nameof(Index));
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reactivate(int id)
+        {
+            var category = await categoryRepository.GetAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            category.IsActive = true;
+            await categoryRepository.UpdateAsync(category);
+            TempData["SuccessMessage"] = "Category successfully reactivated";
             return RedirectToAction(nameof(Index));
         }
     }

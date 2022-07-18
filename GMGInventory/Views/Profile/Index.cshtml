@@ -1,0 +1,131 @@
+﻿@using GMGInventory.Data
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> userManager
+
+@model List<AuditLog>
+
+@{
+    ViewData["Title"] = "Profile";
+    var activeUser = userManager.FindByNameAsync(User.Identity?.Name).Result;
+}
+
+<div class="row">
+    <div class="col-6">
+        <div class="card card-default">
+            <div class="card-header">
+                <span class="card-title">@ViewData["Title"]</span>
+                @if (activeUser.IsActive)
+                {
+                    <div class="card-tools">
+                        <a class="btn btn-secondary btn-sm float-right" asp-action="Password">
+                            <span class="fas fa-edit"></span> Change Password
+                        </a>
+                        <a class="btn btn-primary btn-sm float-right mr-2" asp-action="Update">
+                            <span class="fas fa-edit"></span> Update Information
+                        </a>
+                    </div>
+                }
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">
+                        First Name
+                    </dt>
+                    <dd class="col-sm-7">
+                        @(activeUser.FirstName ?? "-")
+                    </dd>
+                    <dt class="col-sm-5">
+                        Last Name
+                    </dt>
+                    <dd class="col-sm-7">
+                        @(activeUser.LastName ?? "-")
+                    </dd>
+                    <dt class="col-sm-5">
+                        Nickname
+                    </dt>
+                    <dd class="col-sm-7">
+                        @activeUser.Nickname
+                    </dd>
+                    <dt class="col-sm-5">
+                        Account Creation
+                    </dt>
+                    <dd class="col-sm-7">
+                        @activeUser.DateCreated
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        @if (activeUser.IsActive)
+        {
+            <div class="card card-default">
+                <div class="card-header">
+                    <span class="card-title">Theme</span>
+                </div>
+                <div class="card-body">
+                    <form id="themeForm" asp-action="ChangeTheme">
+                        <input type="hidden" name="Id" value="@activeUser.Id" />
+                        <input type="checkbox" id="themeCheckbox" name="IsDarkMode"
+                           value="@(activeUser.IsDarkMode ? "off" : "on")" @(activeUser.IsDarkMode ? "checked" : "")
+                           data-toggle="toggle" data-width="150" data-height="35"
+                           data-on="Dark Mode" data-onstyle="danger"
+                           data-off="Light Mode" data-offstyle="info" />
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-default">
+            <div class="card-header">
+                <span class="card-title">Audit Logs</span>
+            </div>
+            <div class="card-body">
+                <table class="table table-head-fixed">
+                    <thead>
+                        <tr>
+                            <th>Date Time</th>
+                            <th>Action Type</th>
+                            <th>Table Name</th>
+                            <th>Affected Columns</th>
+                            <th>Old Values</th>
+                            <th>New Values</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.DateTime.ToString("yyyy/MM/dd hh:mm:ss tt")</td>
+                                <td>@item.Type</td>
+                                <td>@item.TableName</td>
+                                <td><pre>@item.AffectedColumns</pre></td>
+                                <td>
+                                    <pre>@item.OldValues.Replace("{", "").Replace("}", "").Replace(",\"",",\n\"")</pre>
+                                </td>
+                                <td>
+                                    <pre>@item.NewValues.Replace("{", "").Replace("}", "").Replace(",\"",",\n\"")</pre>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $('.table').DataTable({
+            order: [[0, "desc"]]
+        });
+
+        $("#themeCheckbox").on("change", function(e) {
+            $("#themeForm").submit();
+        });
+    </script>
+}   

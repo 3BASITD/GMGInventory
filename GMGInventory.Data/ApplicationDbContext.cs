@@ -30,26 +30,111 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new UserRoleSeedConfiguration());
         }
 
+        public DbSet<AuditLog> AuditLogs { get; set; }
+
         public virtual Task<int> SaveChangesAsync(string user)
         {
+            OnBeforeSaveChanges(user);
+            //foreach (var entry in base.ChangeTracker
+            //            .Entries<BaseEntity>()
+            //            .Where(s =>
+            //                s.State == EntityState.Added ||
+            //                s.State == EntityState.Modified))
+            //{
+            //    if (entry.State == EntityState.Added)
+            //    {
+            //        entry.Entity.UserCreated = user;
+            //        entry.Entity.DateCreated = DateTime.Now;
+            //    }
+            //    if (entry.State == EntityState.Modified)
+            //    {
+            //        entry.Entity.UserModified = user;
+            //        entry.Entity.DateModified = DateTime.Now;
+            //    }
+            //}
             foreach (var entry in base.ChangeTracker
-                        .Entries<BaseEntity>()
-                        .Where(s => 
-                            s.State == EntityState.Added || 
+                        .Entries()
+                        .Where(s =>
+                            s.State == EntityState.Added ||
                             s.State == EntityState.Modified))
             {
-                if (entry.State == EntityState.Added) {
-                    entry.Entity.UserCreated = user;
-                    entry.Entity.DateCreated = DateTime.Now;
-                }
-                if (entry.State == EntityState.Modified)
+                foreach (var property in entry.Properties
+                    .Where(s => s.Metadata.Name == "UserCreated" || s.Metadata.Name == "DateCreated"
+                    || s.Metadata.Name == "UserModified" || s.Metadata.Name == "DateModified"))
                 {
-                    entry.Entity.UserModified = user;
-                    entry.Entity.DateModified = DateTime.Now;
+                    var propertyName = property.Metadata.Name;
+                    if (entry.State == EntityState.Added)
+                    {
+                        if (propertyName == "UserCreated") { property.CurrentValue = user; }
+                        if (propertyName == "DateCreated") { property.CurrentValue = DateTime.Now; }
+                    }
+                    if (entry.State == EntityState.Modified)
+                    {
+                        if (propertyName == "UserModified") { property.CurrentValue = user; }
+                        if (propertyName == "DateModified") { property.CurrentValue = DateTime.Now; }
+                    }
                 }
             }
             return base.SaveChangesAsync();
         }
+
+        private void OnBeforeSaveChanges(string user)
+        {
+            ChangeTracker.DetectChanges();
+            var auditEntries = new List<AuditEntry>();
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+                    continue;
+                var auditEntry = new AuditEntry(entry);
+                auditEntry.TableName = entry.Entity.GetType().Name;
+                auditEntry.UserId = user;
+                auditEntries.Add(auditEntry);
+                foreach (var property in entry.Properties)
+                {
+                    string propertyName = property.Metadata.Name;
+                    if ((auditEntry.TableName != "User" 
+                        && propertyName != "UserCreated" && propertyName != "UserModified"
+                        && propertyName != "DateCreated" && propertyName != "DateModified")
+                      ||(auditEntry.TableName == "User"
+                        && (propertyName == "Id" || propertyName == "UserName" || propertyName == "FirstName" || propertyName == "IsActive" || propertyName == "IsDarkMode" || propertyName == "LastName" || propertyName == "Nickname" || propertyName == "PasswordHash")))
+                    {
+                        var currentValue = propertyName == "PasswordHash" ? "*****" : property.CurrentValue;
+                        var originalValue = propertyName == "PasswordHash" ? "*****" : property.OriginalValue;
+                        if (property.Metadata.IsPrimaryKey())
+                        {
+                            auditEntry.KeyValues[propertyName] = currentValue;
+                            continue;
+                        }
+                        switch (entry.State)
+                        {
+                            case EntityState.Added:
+                                auditEntry.AuditType = Common.Constants.AuditType.Create;
+                                auditEntry.NewValues[propertyName] = currentValue;
+                                break;
+                            case EntityState.Deleted:
+                                auditEntry.AuditType = Common.Constants.AuditType.Delete;
+                                auditEntry.OldValues[propertyName] = originalValue;
+                                break;
+                            case EntityState.Modified:
+                                if (property.IsModified && (originalValue.Equals(currentValue) == false || property.CurrentValue.Equals(property.OriginalValue) == false))
+                                {
+                                    auditEntry.ChangedColumns.Add(propertyName);
+                                    auditEntry.AuditType = Common.Constants.AuditType.Update;
+                                    auditEntry.OldValues[propertyName] = originalValue;
+                                    auditEntry.NewValues[propertyName] = currentValue;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+            foreach (var auditEntry in auditEntries)
+            {
+                AuditLogs.Add(auditEntry.ToAudit());
+            }
+        }
+
 
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Area> Areas { get; set; }
@@ -72,7 +157,7 @@ namespace GMGInventory.Data
         public DbSet<InvoiceType> InvoiceTypes { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemInventory> ItemInventories { get; set; }
-        public DbSet<ItemPrice> itemPrices { get; set; }
+        public DbSet<ItemPrice> ItemPrices { get; set; }
         public DbSet<ItemType> ItemTypes { get; set; }
         public DbSet<Pack> Packs { get; set; }
         public DbSet<PackLineItem> PackLineItems { get; set; }
