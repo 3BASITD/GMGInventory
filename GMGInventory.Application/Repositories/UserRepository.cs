@@ -237,7 +237,11 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<List<AuditLog>> GetAuditLogAsync(string Id)
         {
-            return context.AuditLogs.Where(s => s.UserId == Id).ToList();
+            return await context.AuditLogs
+                .Where(s => s.UserId == Id)
+                .OrderByDescending(s=>s.DateTime)
+                .Take(100)
+                .ToListAsync();
         }
 
         public async Task<string> GetUserIdByNameAsync(string name)

@@ -168,13 +168,6 @@
 
             $("form").attr("autocomplete", "off");
 
-            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
-            $('.select2').select2();
-
-            $("form").attr("autocomplete", "off");
-
             $('#logout-link').click(function(e) {
                 //swal({
                 //    title: "Logging out",

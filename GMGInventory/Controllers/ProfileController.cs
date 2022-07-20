@@ -40,7 +40,7 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Update(UserInformationForUpdateVM userInformationVM)
         {
-            if (await userRepository.IsUserExistAsync(userInformationVM.Id) == false)
+            if (await userRepository.IsUserIdExistAsync(userInformationVM.UserId) == false)
             {
                 return NotFound();
             }
