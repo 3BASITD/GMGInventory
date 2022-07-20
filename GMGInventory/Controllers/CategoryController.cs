@@ -95,9 +95,9 @@ namespace GMGInventory.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Category successfully updated";
                 return RedirectToAction(nameof(Index));
             }
-            TempData["SuccessMessage"] = "Category successfully updated";
             return View(categoryVM);
         }
 
