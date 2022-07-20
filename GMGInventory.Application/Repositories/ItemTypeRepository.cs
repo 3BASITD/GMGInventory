@@ -40,7 +40,10 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ItemTypeViewVM?> GetItemTypeViewVMAsync(int? id)
         {
-            var itemType = await context.ItemTypes.Include(s => s.Category).Where(s => s.Id == id).FirstOrDefaultAsync();
+            var itemType = await context.ItemTypes
+                .Where(s => s.Id == id)
+                .Include(s => s.Category)
+                .FirstOrDefaultAsync();
             if (itemType == null)
             {
                 return null;

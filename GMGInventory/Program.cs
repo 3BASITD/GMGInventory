@@ -23,6 +23,7 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
 builder.Services.AddScoped(typeof(IItemTypeRepository), typeof(ItemTypeRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

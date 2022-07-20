@@ -45,7 +45,7 @@ namespace GMGInventory.Common.Models
         public string ConfirmPassword { get; set; }
 
         [Required]
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
         [Display(Name = "User Created")]

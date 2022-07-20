@@ -1,0 +1,260 @@
+﻿@model ItemInformationVM
+
+@{
+    ViewData["Title"] = "Item Details";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Item" asp-action="Index">Items</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                @if (Model?.IsActive == true)
+            {
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> Edit Item
+                </a>
+            }
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Code)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Code
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Name
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.PartNumber)
+                    </span>
+                    <b class="d-block">
+                        @Model?.PartNumber
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.InterchangeNumber)
+                    </span>
+                    <b class="d-block">
+                        @Model?.InterchangeNumber
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.UnitCode)
+                    </span>
+                    <b class="d-block">
+                        @Model?.UnitCode
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Size)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Size
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ModelNumber)
+                    </span>
+                    <b class="d-block">
+                        @Model?.ModelNumber
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Category)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Category.Name
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ItemType)
+                    </span>
+                    <b class="d-block">
+                        @Model?.ItemType.Name
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Brand.Name
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.IsNonInventory)
+                    </span>
+                    <b class="d-block">
+                        @Model?.IsNonInventory
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Gross Price
+                    </span>
+                    <b class="d-block">
+                        0.00
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Net-B Price
+                    </span>
+                    <b class="d-block">
+                        0.00
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Net-A Price
+                    </span>
+                    <b class="d-block">
+                        0.00
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Special Price
+                    </span>
+                    <b class="d-block">
+                        0.00
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+            <div class="card card-danger card-tabs">
+                <div class="card-header p-0 pt-1 pl-2">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="nav-warehouse-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-warehouse"
+                               aria-controls="nav-warehouse" aria-selected="true">
+                                Warehouse Details
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-cost-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-cost"
+                               aria-controls="nav-cost" aria-selected="true">
+                                Cost History
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-order-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-order"
+                               aria-controls="nav-order" aria-selected="true">
+                                Sales Order Details
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-count-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-count"
+                               aria-controls="nav-count" aria-selected="true">
+                                Physical Count Adjustment
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-price-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-price"
+                               aria-controls="nav-price" aria-selected="true">
+                                Price History
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-transfer-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-transfer"
+                               aria-controls="nav-transfer" aria-selected="true">
+                                Transfer History
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-return-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-return"
+                               aria-controls="nav-return" aria-selected="true">
+                                Return History
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="nav-warehouse" role="tabpanel"
+                             aria-labelledby="nav-warehouse-tab">
+                            <table class="table table-head-fixed">
+                                <thead>
+                                    <tr>
+                                        <th>Warehouse Code</th>
+                                        <th>Warehouse Name</th>
+                                        <th>Warehouse</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>W1</td>
+                                        <td>Warehouse#1</td>
+                                        <td>10</td>
+                                        <td>
+                                            <a class="btn btn-warning btn-xs" href="#" data-bs-toggle="tooltip" title="Adjust Quantity">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>W2</td>
+                                        <td>Warehouse#2</td>
+                                        <td>15</td>
+                                        <td>
+                                            <a class="btn btn-warning btn-xs" href="#" data-bs-toggle="tooltip" title="Adjust Quantity">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="nav-cost" role="tabpanel" aria-labelledby="nav-cost-tab">...</div>
+                        <div class="tab-pane fade" id="nav-order" role="tabpanel" aria-labelledby="nav-order-tab">...</div>
+                        <div class="tab-pane fade" id="nav-count" role="tabpanel" aria-labelledby="nav-count-tab">...</div>
+                        <div class="tab-pane fade" id="nav-price" role="tabpanel" aria-labelledby="nav-price-tab">...</div>
+                        <div class="tab-pane fade" id="nav-transfer" role="tabpanel" aria-labelledby="nav-transfer-tab">...</div>
+                        <div class="tab-pane fade" id="nav-return" role="tabpanel" aria-labelledby="nav-return-tab">...</div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

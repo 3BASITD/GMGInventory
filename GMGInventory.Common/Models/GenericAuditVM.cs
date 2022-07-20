@@ -12,7 +12,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Name")]
         public string Name { get; set; }
 
-        [Display(Name = "Is Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
         [Display(Name = "User Created")]

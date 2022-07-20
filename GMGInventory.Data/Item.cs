@@ -22,7 +22,7 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(50)")]
         public string Size { get; set; }
-
+         
         [Column(TypeName = "nvarchar(50)")]
         public string ModelNumber { get; set; }
 
@@ -33,10 +33,14 @@ namespace GMGInventory.Data
         public int? ItemTypeId { get; set; }
         public ItemType ItemType { get; set; }
 
-        public int? MinimumQuantity { get; set; }
-        public int? MaximumQuantity { get; set; }
+        [ForeignKey("CategoryId")]
+        public int? CategoryId { get; set; }
+        public Category Category { get; set; }
+
+        //public int? MinimumQuantity { get; set; }
+        //public int? MaximumQuantity { get; set; }
         public bool IsNonInventory { get; set; }
         public bool IsActive { get; set; }
-        public bool IsDeleted { get; set; }
+        //public bool IsDeleted { get; set; }
     }
 }
