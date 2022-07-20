@@ -2,7 +2,6 @@ using GMGInventory.Application.Configurations;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

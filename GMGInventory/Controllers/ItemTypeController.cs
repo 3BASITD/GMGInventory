@@ -14,12 +14,14 @@ namespace GMGInventory.Controllers
     {
         private readonly IItemTypeRepository itemTypeRepository;
         private readonly ICategoryRepository categoryRepository;
+        private readonly IMapper mapper;
 
         public ItemTypeController(IItemTypeRepository itemTypeRepository
             , ICategoryRepository categoryRepository)
         {
             this.itemTypeRepository = itemTypeRepository;
             this.categoryRepository = categoryRepository;
+            this.mapper = mapper;
         }
 
         public async Task<IActionResult> Index()

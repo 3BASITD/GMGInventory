@@ -9,6 +9,7 @@
     var activeUser = userManager.FindByNameAsync(User.Identity?.Name).Result;
 }
 
+
 @section Breadcrumb {
     <li class="breadcrumb-item"><a asp-controller="Profile" asp-action="Index">Profile</a></li>
 }

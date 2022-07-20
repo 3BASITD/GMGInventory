@@ -93,6 +93,7 @@ namespace GMGInventory.Common.Models
 
     public class UserPasswordVM
     {
+        [Required]
         public string Id { get; set; }
 
         [Required]

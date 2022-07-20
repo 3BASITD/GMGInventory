@@ -41,6 +41,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<UserInformationVM> GetUserInformationVMAsync(string name)
         {
+            //var user = await context.Users.FindAsync(id);
             var user = await userManager.FindByNameAsync(name);
             return mapper.Map<UserInformationVM>(user);
         }
