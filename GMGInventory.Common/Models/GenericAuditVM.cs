@@ -26,5 +26,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Date Modifed")]
         public string DateModified { get; set; }
+
+
     }
 }

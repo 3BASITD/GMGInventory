@@ -13,6 +13,15 @@ namespace GMGInventory.Application.Configurations
             CreateMap<Category, CategoryVM>().ReverseMap();
             CreateMap<ItemType, ItemTypeVM>().ReverseMap();
             CreateMap<ItemType, ItemTypeViewVM>().ReverseMap();
+            CreateMap<Agent, AgentVM>().ReverseMap();
+            CreateMap<Agent, GenericAuditVM>().ReverseMap();
+            CreateMap<Brand, BrandVM>().ReverseMap();
+            CreateMap<Brand, GenericAuditVM>().ReverseMap();
+            CreateMap<Brand, BrandViewVM>().ReverseMap();
+            CreateMap<Area, AreaVM>().ReverseMap();
+            CreateMap<Area, GenericAuditVM>().ReverseMap();
+            CreateMap<Supplier, SupplierVM>().ReverseMap();
+            CreateMap<Supplier, GenericAuditVM>().ReverseMap();
             CreateMap<User, UserInformationVM>().ReverseMap();
 
         }

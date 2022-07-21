@@ -21,6 +21,12 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
 builder.Services.AddScoped(typeof(IItemTypeRepository), typeof(ItemTypeRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped(typeof(IBrandRepository), typeof(BrandRepository));
+builder.Services.AddScoped(typeof(IAgentRepository), typeof(AgentRepository));
+builder.Services.AddScoped(typeof(IAreaRepository), typeof(AreaRepository));
+builder.Services.AddScoped(typeof(IRegionRepository), typeof(RegionRepository));
+builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
+
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

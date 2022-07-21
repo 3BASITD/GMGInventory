@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<GenericAuditVM>
 
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = "Category";
 }
 
 <div class="card card-default">
@@ -78,6 +78,14 @@
         </table>
     </div>
 </div>
+
+<form id="deleteCategoryForm" asp-action="Delete">
+    <input type="hidden" id="deleteCategoryId" name="Id" />
+</form>
+
+<form id="reactivateCategoryForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateCategoryId" name="Id" />
+</form>
 
 <form id="deleteCategoryForm" asp-action="Delete">
     <input type="hidden" id="deleteCategoryId" name="Id" />
