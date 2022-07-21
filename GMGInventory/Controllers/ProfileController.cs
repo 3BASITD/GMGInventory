@@ -33,14 +33,14 @@ namespace GMGInventory.Controllers
         public async Task<ActionResult> Update()
         {
             var currentUserName = User?.Identity?.Name;
-            return View(await userRepository.GetUserInformationVMAsync(currentUserName));
+            return View(await userRepository.GetUserInformationVMToEditAsync(currentUserName));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Update(UserInformationVM userInformationVM)
+        public async Task<ActionResult> Update(UserInformationForUpdateVM userInformationVM)
         {
-            if (await userRepository.IsUserExistAsync(userInformationVM.Id) == false)
+            if (await userRepository.IsUserIdExistAsync(userInformationVM.UserId) == false)
             {
                 return NotFound();
             }
@@ -48,7 +48,7 @@ namespace GMGInventory.Controllers
             if (ModelState.IsValid)
             {
                 await userRepository.UpdateUserAsync(userInformationVM);
-                TempData["message"] = "Account successfully updated";
+                TempData["SuccessMessage"] = "Account successfully updated";
                 return RedirectToAction(nameof(Index));
             }
             return View(userInformationVM);
@@ -67,12 +67,13 @@ namespace GMGInventory.Controllers
             {
                 if (await userRepository.IsPasswordMatchAsync(userPasswordVM) == false)
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid current password.");
+                    //ModelState.AddModelError(string.Empty, "Invalid current password.");
+                    TempData["ErrorMessage"] = "Invalid current password";
                 }
                 else
                 {
                     await userRepository.UpdatePassword(userPasswordVM);
-                    TempData["message"] = "Password successfully updated";
+                    TempData["SuccessMessage"] = "Password successfully updated";
                     return RedirectToAction(nameof(Index));
                 }
             }

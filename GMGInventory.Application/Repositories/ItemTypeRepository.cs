@@ -38,16 +38,30 @@ namespace GMGInventory.Application.Repositories
             return itemTypesViewVM;
         }
 
-        public async Task<ItemTypeViewVM?> GetItemTypeVMAsync(int? id)
+        public async Task<ItemTypeViewVM?> GetItemTypeViewVMAsync(int? id)
         {
-            var itemType = await context.ItemTypes.Include(s => s.Category).Where(s=>s.Id == id).FirstOrDefaultAsync();
-            if(itemType == null)
+            var itemType = await context.ItemTypes
+                .Where(s => s.Id == id)
+                .Include(s => s.Category)
+                .FirstOrDefaultAsync();
+            if (itemType == null)
             {
                 return null;
             }
             var itemTypeViewVM = mapper.Map<ItemTypeViewVM>(itemType);
             itemTypeViewVM.UserCreated = await GetUserName(itemTypeViewVM.UserCreated);
             itemTypeViewVM.UserModified = await GetUserName(itemTypeViewVM.UserModified);
+            return itemTypeViewVM;
+        }
+
+        public async Task<ItemTypeVM?> GetItemTypeVMAsync(int? id)
+        {
+            var itemType = await context.ItemTypes.Include(s => s.Category).Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (itemType == null)
+            {
+                return null;
+            }
+            var itemTypeViewVM = mapper.Map<ItemTypeVM>(itemType);
             return itemTypeViewVM;
         }
 
@@ -65,6 +79,49 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.Brands.AnyAsync(s => s.ItemTypeId == id) 
                 || await context.Items.AnyAsync(s => s.ItemTypeId == id);
+        }
+
+        public async Task<bool> IsItemTypeIdExistAsync(int id)
+        {
+            return await context.ItemTypes.AnyAsync(s=>s.Id == id);
+        }
+
+        public async Task DeactivateItemTypeAsync(int id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var itemType = await context.ItemTypes.FirstAsync(s => s.Id == id);
+            itemType.IsActive = false;
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task ReactivateItemTypeAsync(int id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var itemType = await context.ItemTypes.FirstAsync(s => s.Id == id);
+            itemType.IsActive = true;
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task AddAsync(ItemTypeVM itemTypeVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var itemType = mapper.Map<ItemType>(itemTypeVM);
+            itemType.IsActive = true;
+            await context.ItemTypes.AddAsync(itemType);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task UpdateAsync(int id, ItemTypeVM itemTypeVM)
+        {
+            var itemType = context.ItemTypes.Where(s => s.Id == id).FirstOrDefault();
+            if (itemType == null)
+            {
+                throw new DbUpdateConcurrencyException();
+            }
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            mapper.Map(itemTypeVM, itemType);
+            context.ItemTypes.Update(itemType);
+            await context.SaveChangesAsync(currentUserId);
         }
     }
 }

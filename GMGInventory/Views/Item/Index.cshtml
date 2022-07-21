@@ -1,0 +1,138 @@
+﻿@model IEnumerable<ItemInformationVM>
+
+@{
+    ViewData["Title"] = "Items";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                <span class="fas fa-plus"></span> New Item
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Code)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PartNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.InterchangeNumber)
+                    </th>
+                    <th>
+                        Warehouse 1-1?
+                    </th>
+                    <th>
+                        SRP
+                    </th>
+                    <th>
+                        Net-B Price
+                    </th>
+                    <th>
+                        Net-A Price
+                    </th>
+                    <th>
+                        Special Price
+                    </th>
+                    <th>
+                        Quantity on Hand
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Code</td>
+                        <td>@item.Name</td>
+                        <td>@item.PartNumber</td>
+                        <td>@item.InterchangeNumber</td>
+                        <td>Warehouse / Warehouses?</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>0</td>
+                        <td>
+                            <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="View Details">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                            @if (item.IsActive)
+                            {
+                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="Edit Details">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form id="deleteItemForm" asp-action="Delete">
+    <input type="hidden" id="deleteItemId" name="Id" />
+</form>
+
+<form id="reactivateItemForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateItemId" name="Id" />
+</form>
+
+@section Scripts {
+    <script>
+        $('.deleteBtn').click(function(e) {
+            swal({
+                title: "Delete / Deactivate Item",
+                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((confirm) => {
+                if (confirm) {
+                    var btn = $(this);
+                    var id = btn.data("id");
+                    $('#deleteItemId').val(id);
+                    $('#deleteItemForm').submit();
+                }
+            });
+        });
+
+        $('.reactivateBtn').click(function(e) {
+            swal({
+                title: "Reactivate Item",
+                text: "Are you sure you want to reactivate this record?",
+                icon: "info",
+                buttons: true,
+                infoMode: true
+            }).then((confirm) => {
+                if (confirm) {
+                    var btn = $(this);
+                    var id = btn.data("id");
+                    $('#reactivateItemId').val(id);
+                    $('#reactivateItemForm').submit();
+                }
+            });
+        });
+    </script>
+}

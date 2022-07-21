@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<GenericAuditVM>> GetAllCategoryVMAsync()
+        public async Task<List<GenericAuditVM>> GetAllGenericVMAsync()
         {
             var categories = await context.Categories.ToListAsync();
             var categoriesVM = mapper.Map<List<GenericAuditVM>>(categories);
@@ -38,7 +38,7 @@ namespace GMGInventory.Application.Repositories
             return categoriesVM;
         }
 
-        public async Task<GenericAuditVM?> GetCategoryVMAsync(int? id)
+        public async Task<GenericAuditVM?> GetGenericVMAsync(int? id)
         {
             var category = await context.Categories.Where(s => s.Id == id).FirstOrDefaultAsync();
             if (category == null)
@@ -48,6 +48,17 @@ namespace GMGInventory.Application.Repositories
             var categoryVM = mapper.Map<GenericAuditVM>(category);
             categoryVM.UserCreated = await GetUserName(categoryVM.UserCreated);
             categoryVM.UserModified = await GetUserName(categoryVM.UserModified);
+            return categoryVM;
+        }
+
+        public async Task<CategoryVM?> GetCategoryVMAsync(int? id)
+        {
+            var category = await context.Categories.Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (category == null)
+            {
+                return null;
+            }
+            var categoryVM = mapper.Map<CategoryVM>(category);
             return categoryVM;
         }
 
@@ -64,6 +75,28 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> IsCategoryInUse(int id)
         {
             return await context.ItemTypes.AnyAsync(s => s.CategoryId == id);
+        }
+
+        public async Task AddAsync(CategoryVM categoryVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var category = mapper.Map<Category>(categoryVM);
+            category.IsActive = true;
+            await context.Categories.AddAsync(category);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task UpdateAsync(int id, CategoryVM categoryVM)
+        {
+            var category = context.Categories.Where(s => s.Id == id).FirstOrDefault();
+            if(category == null)
+            {
+                throw new DbUpdateConcurrencyException();
+            }
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            mapper.Map(categoryVM, category);
+            context.Categories.Update(category);
+            await context.SaveChangesAsync(currentUserId);
         }
     }
 }

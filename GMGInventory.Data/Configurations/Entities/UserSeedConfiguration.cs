@@ -20,8 +20,10 @@ namespace GMGInventory.Data.Configurations.Entities
                     LastName = "Administrator",
                     Nickname = "MISNet",
                     IsDarkMode = false,
-                    DateCreated = DateTime.Now,
-                    PasswordHash = hasher.HashPassword(null, "Misnet@2022")
+                    PasswordHash = hasher.HashPassword(null, "Misnet@2022"),
+                    IsActive = true,
+                    UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
+                    DateCreated = DateTime.Now
                 },
                 new User
                 {
@@ -32,8 +34,10 @@ namespace GMGInventory.Data.Configurations.Entities
                     LastName = "Administrator",
                     Nickname = "GMG",
                     IsDarkMode = false,
-                    DateCreated = DateTime.Now,
                     PasswordHash = hasher.HashPassword(null, "Gmg@2022"),
+                    IsActive = true,
+                    UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
+                    DateCreated = DateTime.Now
                 }
             );
         }

@@ -22,6 +22,8 @@
         <div class="card card-default">
             <div class="card-header">
                 <span class="card-title">@ViewData["Title"]</span>
+                @if (activeUser.IsActive)
+                {
                 <div class="card-tools">
                     <a class="btn btn-secondary btn-sm float-right" asp-action="Password">
                         <span class="fas fa-edit"></span> Change Password
@@ -30,6 +32,7 @@
                         <span class="fas fa-edit"></span> Update Information
                     </a>
                 </div>
+                }
             </div>
             <div class="card-body">
                 <dl class="row">
@@ -62,6 +65,8 @@
         </div>
     </div>
     <div class="col-6">
+        @if (activeUser.IsActive)
+        {
         <div class="card card-default">
             <div class="card-header">
                 <span class="card-title">Theme</span>
@@ -77,6 +82,7 @@
                 </form>
             </div>
         </div>
+        }
     </div>
 </div>
 
@@ -87,12 +93,12 @@
                 <span class="card-title">Audit Logs</span>
             </div>
             <div class="card-body">
-                <table class="table table-head-fixed table-striped">
+                <table class="table table-head-fixed">
                     <thead>
                         <tr>
+                            <th>Date Time</th>
                             <th>Action Type</th>
                             <th>Table Name</th>
-                            <th>Date Time</th>
                             <th>Affected Columns</th>
                             <th>Old Values</th>
                             <th>New Values</th>
@@ -102,12 +108,16 @@
                         @foreach (var item in Model)
                         {
                             <tr>
+                                <td>@item.DateTime.ToString("yyyy/MM/dd hh:mm:ss tt")</td>
                                 <td>@item.Type</td>
                                 <td>@item.TableName</td>
-                                <td>@item.DateTime</td>
-                                <td><div class="json">@item.AffectedColumns</div></td>
-                                <td><div class="json">@item.OldValues</div></td>
-                                <td><div class="json">@item.NewValues</div></td>
+                                <td><pre>@item.AffectedColumns</pre></td>
+                                <td>
+                                    <pre>@item.OldValues.Replace("{", "").Replace("}", "").Replace(",\"",",\n\"")</pre>
+                                </td>
+                                <td>
+                                    <pre>@item.NewValues.Replace("{", "").Replace("}", "").Replace(",\"",",\n\"")</pre>
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -118,6 +128,10 @@
 </div>
 @section Scripts {
     <script>
+        $('.table').DataTable({
+            order: [[0, "desc"]]
+        });
+
         $("#themeCheckbox").on("change", function(e) {
             $("#themeForm").submit();
         });

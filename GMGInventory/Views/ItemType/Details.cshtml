@@ -14,11 +14,11 @@
             <div class="card-tools">
                 @if (Model?.IsActive == true)
             {
-                <a class="btn btn-primary btn-sm float-right" asp-action="Edit" asp-route-id="@Model?.Id">
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
                     <span class="fas fa-edit"></span> Edit Item Type
                 </a>
             }
-            <a class="btn btn-light btn-sm float-right mr-2" asp-action="Index">
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
         </div>

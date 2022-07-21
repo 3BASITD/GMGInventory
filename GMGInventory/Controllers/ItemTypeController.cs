@@ -17,8 +17,7 @@ namespace GMGInventory.Controllers
         private readonly IMapper mapper;
 
         public ItemTypeController(IItemTypeRepository itemTypeRepository
-            , ICategoryRepository categoryRepository
-            , IMapper mapper)
+            , ICategoryRepository categoryRepository)
         {
             this.itemTypeRepository = itemTypeRepository;
             this.categoryRepository = categoryRepository;
@@ -58,12 +57,12 @@ namespace GMGInventory.Controllers
                 if (await itemTypeRepository.IsItemTypeCodeExist(itemTypeVM.Code))
                 {
                     ModelState.AddModelError(string.Empty, "Item type code already in use.");
+                    TempData["ErrorMessage"] = "Item type code already in use";
                 }
                 else
                 {
-                    var itemType = mapper.Map<ItemType>(itemTypeVM);
-                    itemType.IsActive = true;
-                    await itemTypeRepository.AddAsync(itemType);
+                    await itemTypeRepository.AddAsync(itemTypeVM);
+                    TempData["SuccessMessage"] = "Item type successfully added";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -73,12 +72,11 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            var itemType = await itemTypeRepository.GetAsync(id);
-            if (itemType == null)
+            var itemTypeVM = await itemTypeRepository.GetItemTypeVMAsync(id);
+            if (itemTypeVM == null)
             {
                 return NotFound();
             }
-            var itemTypeVM = mapper.Map<ItemTypeVM>(itemType);
             itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
             return View(itemTypeVM);
         }
@@ -96,9 +94,7 @@ namespace GMGInventory.Controllers
             {
                 try
                 {
-                    var itemType = await itemTypeRepository.GetAsync(id);
-                    mapper.Map(itemTypeVM, itemType);
-                    await itemTypeRepository.UpdateAsync(itemType);
+                    await itemTypeRepository.UpdateAsync(id, itemTypeVM);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -111,6 +107,7 @@ namespace GMGInventory.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Item type successfully updated";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -122,19 +119,19 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var itemType = await itemTypeRepository.GetAsync(id);
-            if (itemType == null)
+            if (await itemTypeRepository.IsItemTypeIdExistAsync(id) == false)
             {
                 return NotFound();
             }
             if (await itemTypeRepository.IsItemTypeInUse(id))
             {
-                itemType.IsActive = false;
-                await itemTypeRepository.UpdateAsync(itemType);
+                await itemTypeRepository.DeactivateItemTypeAsync(id);
+                TempData["WarningMessage"] = "Item type has been deactivated";
             }
             else
             {
                 await itemTypeRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Item type successfully deleted";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -143,13 +140,12 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
-            var itemType = await itemTypeRepository.GetAsync(id);
-            if (itemType == null)
+            if (await itemTypeRepository.IsItemTypeIdExistAsync(id) == false)
             {
                 return NotFound();
             }
-            itemType.IsActive = true;
-            await itemTypeRepository.UpdateAsync(itemType);
+            await itemTypeRepository.ReactivateItemTypeAsync(id);
+            TempData["SuccessMessage"] = "Item type reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
     }

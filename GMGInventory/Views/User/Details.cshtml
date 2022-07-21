@@ -1,0 +1,91 @@
+﻿@model UserInformationVM
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="User" asp-action="Index">Users</a></li>
+}
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                @if (Model?.IsActive == true)
+            {
+                <a class="btn btn-warning btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.UserId">
+                    <span class="fas fa-edit"></span> Edit Details
+                </a>
+                <a class="btn btn-secondary btn-sm float-right ml-2" asp-action="Password" asp-route-id="@Model?.UserId">
+                    <span class="fas fa-key"></span> Change Password
+                </a>
+            }
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Username)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Model?.Username
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.FirstName)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Model?.FirstName
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.LastName)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Model?.LastName
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Nickname)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Model?.Nickname
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.IsActive)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @if (Model?.IsActive == true)
+                        {
+                            <span class="fas fa-check text-success"></span>
+                        }
+                        else
+                        {
+                            <span class="fas fa-times text-danger mr-2"></span>
+                            <span class="fas fa-question-circle text-primary" data-bs-toggle="tooltip" title="This was deleted but instead marked as Inactive because it was used in other records."></span>
+                        }
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Model?.DateCreated
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <strong class="mb-1">Role(s)</strong>
+                <ul class="list-group">
+                    @foreach (var role in @Model?.Role)
+                    {
+                        <li class="list-group-item">
+                            @role
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

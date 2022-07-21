@@ -12,23 +12,20 @@ namespace GMGInventory.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository categoryRepository;
-        private readonly IMapper mapper;
 
-        public CategoryController(ICategoryRepository categoryRepository
-            , IMapper mapper)
+        public CategoryController(ICategoryRepository categoryRepository)
         {
             this.categoryRepository = categoryRepository;
-            this.mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
         {
-            return View(await categoryRepository.GetAllCategoryVMAsync());
+            return View(await categoryRepository.GetAllGenericVMAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
         {
-            var categoryVM = await categoryRepository.GetCategoryVMAsync(id);
+            var categoryVM = await categoryRepository.GetGenericVMAsync(id);
             if (categoryVM == null)
             {
                 return NotFound();
@@ -49,13 +46,13 @@ namespace GMGInventory.Controllers
             {
                 if (await categoryRepository.IsCategoryCodeExist(categoryVM.Code))
                 {
-                    ModelState.AddModelError(string.Empty, "Category code already in use.");
+                    //ModelState.AddModelError(string.Empty, "Category code already in use.");
+                    TempData["ErrorMessage"] = "Category code already in use";
                 }
                 else
                 {
-                    var category = mapper.Map<Category>(categoryVM);
-                    category.IsActive = true;
-                    await categoryRepository.AddAsync(category);
+                    await categoryRepository.AddAsync(categoryVM);
+                    TempData["SuccessMessage"] = "Category successfully added";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -64,12 +61,11 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            var category = await categoryRepository.GetAsync(id);
-            if (category == null)
+            var categoryVM = await categoryRepository.GetCategoryVMAsync(id);
+            if (categoryVM == null)
             {
                 return NotFound();
             }
-            var categoryVM = mapper.Map<CategoryVM>(category);
             return View(categoryVM);
         }
 
@@ -86,9 +82,7 @@ namespace GMGInventory.Controllers
             {
                 try
                 {
-                    var category = await categoryRepository.GetAsync(id);
-                    mapper.Map(categoryVM, category);
-                    await categoryRepository.UpdateAsync(category);
+                    await categoryRepository.UpdateAsync(id, categoryVM);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -101,6 +95,7 @@ namespace GMGInventory.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Category successfully updated";
                 return RedirectToAction(nameof(Index));
             }
             return View(categoryVM);
@@ -119,10 +114,12 @@ namespace GMGInventory.Controllers
             {
                 category.IsActive = false;
                 await categoryRepository.UpdateAsync(category);
+                TempData["WarningMessage"] = "Category has been deactivated";
             }
             else
             {
                 await categoryRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Category successfully deleted";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -138,6 +135,7 @@ namespace GMGInventory.Controllers
             }
             category.IsActive = true;
             await categoryRepository.UpdateAsync(category);
+            TempData["SuccessMessage"] = "Category successfully reactivated";
             return RedirectToAction(nameof(Index));
         }
     }

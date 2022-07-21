@@ -35,21 +35,44 @@ namespace GMGInventory.Data
         public virtual Task<int> SaveChangesAsync(string user)
         {
             OnBeforeSaveChanges(user);
+            //foreach (var entry in base.ChangeTracker
+            //            .Entries<BaseEntity>()
+            //            .Where(s =>
+            //                s.State == EntityState.Added ||
+            //                s.State == EntityState.Modified))
+            //{
+            //    if (entry.State == EntityState.Added)
+            //    {
+            //        entry.Entity.UserCreated = user;
+            //        entry.Entity.DateCreated = DateTime.Now;
+            //    }
+            //    if (entry.State == EntityState.Modified)
+            //    {
+            //        entry.Entity.UserModified = user;
+            //        entry.Entity.DateModified = DateTime.Now;
+            //    }
+            //}
             foreach (var entry in base.ChangeTracker
-                        .Entries<BaseEntity>()
+                        .Entries()
                         .Where(s =>
                             s.State == EntityState.Added ||
                             s.State == EntityState.Modified))
             {
-                if (entry.State == EntityState.Added)
+                foreach (var property in entry.Properties
+                    .Where(s => s.Metadata.Name == "UserCreated" || s.Metadata.Name == "DateCreated"
+                    || s.Metadata.Name == "UserModified" || s.Metadata.Name == "DateModified"))
                 {
-                    entry.Entity.UserCreated = user;
-                    entry.Entity.DateCreated = DateTime.Now;
-                }
-                if (entry.State == EntityState.Modified)
-                {
-                    entry.Entity.UserModified = user;
-                    entry.Entity.DateModified = DateTime.Now;
+                    var propertyName = property.Metadata.Name;
+                    if (entry.State == EntityState.Added)
+                    {
+                        if (propertyName == "UserCreated") { property.CurrentValue = user; }
+                        if (propertyName == "DateCreated") { property.CurrentValue = DateTime.Now; }
+                    }
+                    if (entry.State == EntityState.Modified)
+                    {
+                        if (propertyName == "UserModified") { property.CurrentValue = user; }
+                        if (propertyName == "DateModified") { property.CurrentValue = DateTime.Now; }
+                    }
                 }
             }
             return base.SaveChangesAsync();
@@ -70,31 +93,37 @@ namespace GMGInventory.Data
                 foreach (var property in entry.Properties)
                 {
                     string propertyName = property.Metadata.Name;
-                    if (propertyName != "UserCreated" && propertyName != "UserModified"
+                    if ((auditEntry.TableName != "User" 
+                        && propertyName != "UserCreated" && propertyName != "UserModified"
                         && propertyName != "DateCreated" && propertyName != "DateModified")
+                      ||(auditEntry.TableName == "User"
+                        && (propertyName == "Id" || propertyName == "UserName" || propertyName == "FirstName" || propertyName == "IsActive" || propertyName == "IsDarkMode" || propertyName == "LastName" || propertyName == "Nickname" || propertyName == "PasswordHash")))
                     {
+                        var currentValue = propertyName == "PasswordHash" ? "*****" : property.CurrentValue;
+                        var originalValue = propertyName == "PasswordHash" ? "*****" : property.OriginalValue;
                         if (property.Metadata.IsPrimaryKey())
                         {
-                            auditEntry.KeyValues[propertyName] = property.CurrentValue;
+                            auditEntry.KeyValues[propertyName] = currentValue;
                             continue;
                         }
                         switch (entry.State)
                         {
                             case EntityState.Added:
                                 auditEntry.AuditType = Common.Constants.AuditType.Create;
-                                auditEntry.NewValues[propertyName] = property.CurrentValue;
+                                auditEntry.NewValues[propertyName] = currentValue;
                                 break;
                             case EntityState.Deleted:
                                 auditEntry.AuditType = Common.Constants.AuditType.Delete;
-                                auditEntry.OldValues[propertyName] = property.OriginalValue;
+                                auditEntry.OldValues[propertyName] = originalValue;
                                 break;
                             case EntityState.Modified:
-                                if (property.IsModified)
+                                if (property.IsModified && (originalValue.Equals(currentValue) == false 
+                                    || property.CurrentValue.Equals(property.OriginalValue) == false))
                                 {
                                     auditEntry.ChangedColumns.Add(propertyName);
                                     auditEntry.AuditType = Common.Constants.AuditType.Update;
-                                    auditEntry.OldValues[propertyName] = property.OriginalValue;
-                                    auditEntry.NewValues[propertyName] = property.CurrentValue;
+                                    auditEntry.OldValues[propertyName] = originalValue;
+                                    auditEntry.NewValues[propertyName] = currentValue;
                                 }
                                 break;
                         }
@@ -129,7 +158,7 @@ namespace GMGInventory.Data
         public DbSet<InvoiceType> InvoiceTypes { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemInventory> ItemInventories { get; set; }
-        public DbSet<ItemPrice> itemPrices { get; set; }
+        public DbSet<ItemPrice> ItemPrices { get; set; }
         public DbSet<ItemType> ItemTypes { get; set; }
         public DbSet<Pack> Packs { get; set; }
         public DbSet<PackLineItem> PackLineItems { get; set; }

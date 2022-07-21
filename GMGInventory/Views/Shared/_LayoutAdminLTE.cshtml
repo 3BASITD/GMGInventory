@@ -62,11 +62,24 @@
                     </div>
                     <div class="info">
                         <a asp-controller="Profile" asp-action="Index" class="d-block">
-                            @(activeUser.FirstName + " " + activeUser.LastName)
+                            @(activeUser.FirstName != null || activeUser.LastName != null
+                            ? activeUser.FirstName + " " + activeUser.LastName
+                            : activeUser.Nickname)
                         </a>
                     </div>
                 </div>
-                <partial name="_Navigation" />
+                @if (activeUser.IsActive == false)
+                {
+                    <nav class="mt-2">
+                        <ul class="nav nav-pills nav-sidebar flex-column nav-flat" data-widget="treeview" role="menu" data-accordion="false">
+                            <li class="nav-header">YOUR ACCOUNT IS DEACTIVATED</li>
+                        </ul>
+                    </nav>
+                }
+                else
+                {
+                    <partial name="_Navigation" />
+                }
             </div>
         </aside>
 
@@ -98,6 +111,15 @@
 
             <section class="content">
                 <div class="container-fluid">
+                    @if (TempData["SuccessMessage"] != null || TempData["WarningMessage"] != null || TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @(TempData["SuccessMessage"] ?? TempData["WarningMessage"] ?? TempData["ErrorMessage"])
+                            <button type="button" class="close" aria-label="Close" data-bs-dismiss="alert">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    }
                     @RenderBody()
                 </div>
             </section>
@@ -129,11 +151,15 @@
 
     <script>
         $(document).ready(function() {
-            $('.table').DataTable({
-                columnDefs: [
-                    { orderable: false, targets: -1 }
-                ]
-            });
+            //var datatableOrder = "asc";
+            //if ($('.table th.defaultSort').hasClass("asc")) { datatableOrder = "asc"; }
+            //if ($('.table th.defaultSort').hasClass("desc")) { datatableOrder = "desc"; }
+            //$('.table').DataTable({
+            //    columnDefs: [
+            //        { orderable: false, targets: -1 }
+            //    ],
+            //    order: [[$('th.defaultSort').index(), datatableOrder]]
+            //});
 
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
@@ -143,24 +169,26 @@
             $("form").attr("autocomplete", "off");
 
             $('#logout-link').click(function(e) {
-                swal({
-                    title: "Logging out",
-                    text: "You are about to log out, are you sure you want to continue?",
-                    icon: "info",
-                    buttons: ["Cancel", "Yes"],
-                }).then((confirm) => {
-                    if (confirm) {
-                        $('#logoutForm').submit();
-                    }
-                });
+                //swal({
+                //    title: "Logging out",
+                //    text: "You are about to log out, are you sure you want to continue?",
+                //    icon: "info",
+                //    buttons: ["Cancel", "Yes"],
+                //}).then((confirm) => {
+                //    if (confirm) {
+                $('#logoutForm').submit();
+                //    }
+                //});
             });
 
-            $(".json").each(function() {
-                var jsonViewer = new JSONViewer();
-                var jsontext = $(this).html();
-                $(this).append(jsonViewer.getContainer());
-                jsonViewer.showJSON(jsontext, null, 1);
-            });
+            //$("pre").each(function() {
+            //    //var jsonViewer = new JSONViewer();
+            //    var jsontext = $(this).html();
+            //    //$(this).append(jsonViewer.getContainer());
+            //    //jsonViewer.showJSON(jsontext, null, 1);
+            //    var json = JSON.stringify(jsontext);
+            //    $(this).html();
+            //});
         });
     </script>
 

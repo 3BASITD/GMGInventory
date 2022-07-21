@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<User> userManager
 
-@model UserInformationVM
+@model UserInformationForUpdateVM
 
 @{
     ViewData["Title"] = "Update Profile";
@@ -43,7 +43,7 @@
                             <input asp-for="Nickname" class="form-control form-control-sm" />
                             <span asp-validation-for="Nickname" class="text-danger"></span>
                         </div>
-                        <input type="hidden" asp-for="Id" value="@activeUser.Id"/>
+                        <input type="hidden" asp-for="UserId" value="@activeUser.Id"/>
                     </div>
                 </div>
             </div>

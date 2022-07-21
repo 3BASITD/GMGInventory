@@ -4,3 +4,15 @@
 .select2-container--default .select2-selection--single {
     padding: 0.46875rem 0rem;
 }
+
+.form-check-input {
+    position: static !important;
+    margin-left: 0 !important;
+    margin-top: 0.25em !important;
+}
+
+pre {
+    white-space: pre-wrap;
+    color: unset;
+    padding: 0;
+}
