@@ -3,7 +3,26 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
-    public class ItemVM 
+    public class ItemFilterVM
+    {
+        [Display(Name = "Category")]
+        public int? CategoryId { get; set; }
+        public SelectList? Categories { get; set; }
+
+        [Display(Name = "Item Type")]
+        public int? ItemTypeId { get; set; }
+        public SelectList? ItemTypes { get; set; }
+
+        [Display(Name = "Brand")]
+        public int? BrandId { get; set; }
+        public SelectList? Brands { get; set; }
+
+        [Display(Name = "Warehouse")]
+        public int? WarehouseId { get; set; }
+        public SelectList? Warehouses { get; set; }
+    }
+
+    public class ItemVM
     {
         public int Id { get; set; }
 
@@ -78,10 +97,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Category")]
         public int CategoryId { get; set; }
         public SelectList? Categories { get; set; }
-
     }
 
-    public class ItemInformationVM : ItemVM
+    public class ItemViewVM : ItemVM
     {
         [Display(Name = "Brand")]
         public BrandVM Brand { get; set; }
@@ -91,5 +109,11 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Category")]
         public CategoryVM Category { get; set; }
+
+        [Display(Name = "Retail Price")]
+        public decimal RetailPrice { get; set; }
+
+        [Display(Name = "Net Price")]
+        public decimal NetPrice { get; set; }
     }
 }

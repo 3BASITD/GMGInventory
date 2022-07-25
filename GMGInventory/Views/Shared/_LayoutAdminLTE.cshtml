@@ -151,17 +151,25 @@
 
     <script>
         $(document).ready(function() {
-            //var datatableOrder = "asc";
-            //if ($('.table th.defaultSort').hasClass("asc")) { datatableOrder = "asc"; }
-            //if ($('.table th.defaultSort').hasClass("desc")) { datatableOrder = "desc"; }
-            //$('.table').DataTable({
-            //    columnDefs: [
-            //        { orderable: false, targets: -1 }
-            //    ],
-            //    order: [[$('th.defaultSort').index(), datatableOrder]]
-            //});
+        @if (activeUser.IsDarkMode)
+        {
+            <text>
+                $(".table").each(function() {
+                    $(this).addClass("table-dark");
+                });
+            </text>
+        }
+                            //var datatableOrder = "asc";
+                            //if ($('.table th.defaultSort').hasClass("asc")) { datatableOrder = "asc"; }
+                            //if ($('.table th.defaultSort').hasClass("desc")) { datatableOrder = "desc"; }
+                            //$('.table').DataTable({
+                            //    columnDefs: [
+                            //        { orderable: false, targets: -1 }
+                            //    ],
+                            //    order: [[$('th.defaultSort').index(), datatableOrder]]
+                            //});
 
-            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
             $('.select2').select2();

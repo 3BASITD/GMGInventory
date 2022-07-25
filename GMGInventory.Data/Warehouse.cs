@@ -14,7 +14,7 @@ namespace GMGInventory.Data
         public string AddressLine1 { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
-        public string AddressLine2 { get; set; }
+        public string? AddressLine2 { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string ContactPerson { get; set; }
