@@ -28,6 +28,10 @@ builder.Services.AddScoped(typeof(IAgentRepository), typeof(AgentRepository));
 builder.Services.AddScoped(typeof(IAreaRepository), typeof(AreaRepository));
 builder.Services.AddScoped(typeof(IRegionRepository), typeof(RegionRepository));
 builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
+builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
+builder.Services.AddScoped(typeof(ICurrencyRepository), typeof(CurrencyRepository));
+
+
 
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));

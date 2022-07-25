@@ -1,4 +1,4 @@
-﻿@model AreaVM
+﻿@model AreaViewVM
 
 @{
     ViewData["Title"] = "Area Details";
@@ -36,6 +36,12 @@
             </dt>
             <dd class="col-sm-10">
                 @Model?.Name
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Region)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.Region.Name
             </dd>
             <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.IsActive)

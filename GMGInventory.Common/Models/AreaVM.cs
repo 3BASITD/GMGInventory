@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
-    public class AreaVM : GenericAuditVM
+    public class AreaVM 
     {
         public int Id { get; set; }
 
@@ -24,9 +24,9 @@ namespace GMGInventory.Common.Models
         public SelectList? Regions { get; set; }
     }
 
-    //public class AreaViewVM : GenericAuditVM
-    //{
-    //    [Display(Name = "Region")]
-    //    public RegionVM Region { get; set; }
-    //}
+    public class AreaViewVM : GenericAuditVM
+    {
+        [Display(Name = "Region")]
+        public RegionVM Region { get; set; }
+    }
 }

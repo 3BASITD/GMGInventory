@@ -25,6 +25,7 @@ namespace GMGInventory.Controllers
             this.mapper = mapper;
         }
 
+
         public async Task<IActionResult> Index()
         {
             return View(await areaRepository.GetAllAreaVMAsync());
@@ -32,7 +33,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            var areaVM = await areaRepository.GetAreaVMAsync(id);
+            var areaVM = await areaRepository.GetAreaViewVMAsync(id);
             if (areaVM == null)
             {
                 return NotFound();
@@ -58,12 +59,12 @@ namespace GMGInventory.Controllers
                 if (await areaRepository.IsAreaCodeExist(areaVM.Code))
                 {
                     ModelState.AddModelError(string.Empty, "Area code already in use.");
+                    TempData["ErrorMessage"] = "Area code already in use";
                 }
                 else
                 {
-                    var area = mapper.Map<Area>(areaVM);
-                    area.IsActive = true;
-                    await areaRepository.AddAsync(area);
+                    await areaRepository.AddAsync(areaVM);
+                    TempData["SuccessMessage"] = "Area successfully added";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -73,12 +74,11 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            var area = await areaRepository.GetAsync(id);
-            if (area == null)
+            var areaVM = await areaRepository.GetAreaVMAsync(id);
+            if (areaVM == null)
             {
                 return NotFound();
             }
-            var areaVM = mapper.Map<AreaVM>(area);
             areaVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
             return View(areaVM);
         }
@@ -96,9 +96,7 @@ namespace GMGInventory.Controllers
             {
                 try
                 {
-                    var area = await areaRepository.GetAsync(id);
-                    mapper.Map(areaVM, area);
-                    await areaRepository.UpdateAsync(area);
+                    await areaRepository.UpdateAsync(id, areaVM);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -111,6 +109,7 @@ namespace GMGInventory.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Area successfully updated";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -122,19 +121,19 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var area = await areaRepository.GetAsync(id);
-            if (area == null)
+            if (await areaRepository.IsAreaIdExistAsync(id) == false)
             {
                 return NotFound();
             }
             if (await areaRepository.IsAreaInUse(id))
             {
-                area.IsActive = false;
-                await areaRepository.UpdateAsync(area);
+                await areaRepository.DeactivateAreaAsync(id);
+                TempData["WarningMessage"] = "Area has been deactivated";
             }
             else
             {
                 await areaRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Area successfully deleted";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -143,14 +142,15 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
-            var area = await areaRepository.GetAsync(id);
-            if (area == null)
+            if (await areaRepository.IsAreaIdExistAsync(id) == false)
             {
                 return NotFound();
             }
-            area.IsActive = true;
-            await areaRepository.UpdateAsync(area);
+            await areaRepository.ReactivateAreaAsync(id);
+            TempData["SuccessMessage"] = "Area reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
+
+
     }
 }

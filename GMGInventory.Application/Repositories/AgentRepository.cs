@@ -26,29 +26,43 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<AgentVM>> GetAllAgentVMAsync()
+        public async Task<List<AgentViewVM>> GetAllAgentVMAsync()
         {
-            var agents = await context.Agents.ToListAsync();
-            var agentsVM = mapper.Map<List<AgentVM>>(agents);
-            foreach (AgentVM avm in agentsVM)
+            var agents = await context.Agents.Include(s => s.Area).ToListAsync();
+            var agentsViewVM = mapper.Map<List<AgentViewVM>>(agents);
+            foreach (AgentViewVM ivm in agentsViewVM)
             {
-                avm.UserCreated = await GetUserName(avm.UserCreated);
-                avm.UserModified = await GetUserName(avm.UserModified);
+                ivm.UserCreated = await GetUserName(ivm.UserCreated);
+                ivm.UserModified = await GetUserName(ivm.UserModified);
             }
-            return agentsVM;
+            return agentsViewVM;
         }
 
-        public async Task<AgentVM?> GetAgentVMAsync(int? id)
+        public async Task<AgentViewVM?> GetAgentViewVMAsync(int? id)
         {
-            var agents = await context.Agents.Where(s => s.Id == id).FirstOrDefaultAsync();
+            var agents = await context.Agents
+                .Where(s => s.Id == id)
+                .Include(s => s.Area)
+                .FirstOrDefaultAsync();
             if (agents == null)
             {
                 return null;
             }
-            var agentsVM = mapper.Map<AgentVM>(agents);
-            agentsVM.UserCreated = await GetUserName(agentsVM.UserCreated);
-            agentsVM.UserModified = await GetUserName(agentsVM.UserModified);
-            return agentsVM;
+            var agentsViewVM = mapper.Map<AgentViewVM>(agents);
+            agentsViewVM.UserCreated = await GetUserName(agentsViewVM.UserCreated);
+            agentsViewVM.UserModified = await GetUserName(agentsViewVM.UserModified);
+            return agentsViewVM;
+        }
+
+        public async Task<AgentVM?> GetAgentVMAsync(int? id)
+        {
+            var agents = await context.Agents.Include(s => s.Area).Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (agents == null)
+            {
+                return null;
+            }
+            var agentViewVM = mapper.Map<AgentVM>(agents);
+            return agentViewVM;
         }
 
         public async Task<List<Agent>> GetAllActiveAgentAsync(int includeId)
@@ -63,7 +77,50 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsAgentInUse(int id)
         {
+            return await context.Areas.AnyAsync(s => s.Id == id);
+        }
+
+        public async Task<bool> IsAgentIdExistAsync(int id)
+        {
             return await context.Agents.AnyAsync(s => s.Id == id);
+        }
+
+        public async Task DeactivateAgentAsync(int id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var agents = await context.Agents.FirstAsync(s => s.Id == id);
+            agents.IsActive = false;
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task ReactivateAgentAsync(int id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var agents = await context.Agents.FirstAsync(s => s.Id == id);
+            agents.IsActive = true;
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task AddAsync(AgentVM agentVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var agents = mapper.Map<Agent>(agentVM);
+            agents.IsActive = true;
+            await context.Agents.AddAsync(agents);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task UpdateAsync(int id, AgentVM agentVM)
+        {
+            var agents = context.Agents.Where(s => s.Id == id).FirstOrDefault();
+            if (agents == null)
+            {
+                throw new DbUpdateConcurrencyException();
+            }
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            mapper.Map(agentVM, agents);
+            context.Agents.Update(agents);
+            await context.SaveChangesAsync(currentUserId);
         }
     }
 }

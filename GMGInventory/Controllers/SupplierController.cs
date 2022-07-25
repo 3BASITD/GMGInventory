@@ -5,6 +5,7 @@ using GMGInventory.Common.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
@@ -12,12 +13,20 @@ namespace GMGInventory.Controllers
     public class SupplierController : Controller
     {
         private readonly ISupplierRepository supplierRepository;
+        private readonly IAreaRepository areaRepository;
+        private readonly ICurrencyRepository currencyRepository;
+        private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
 
         public SupplierController(ISupplierRepository supplierRepository
-            , IMapper mapper)
+            , IAreaRepository areaRepository
+            , ICurrencyRepository currencyRepository
+            , IRegionRepository regionRepository)
         {
             this.supplierRepository = supplierRepository;
+            this.areaRepository = areaRepository;
+            this.currencyRepository = currencyRepository;
+            this.regionRepository = regionRepository;
             this.mapper = mapper;
         }
 
@@ -28,7 +37,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            var supplierVM = await supplierRepository.GetSupplierVMAsync(id);
+            var supplierVM = await supplierRepository.GetSupplierViewVMAsync(id);
             if (supplierVM == null)
             {
                 return NotFound();
@@ -36,9 +45,15 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var supplierVM = new SupplierVM
+            {
+                Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name"),
+                Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(-1), "Id", "Name"),
+                Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name")
+            };
+            return View(supplierVM);
         }
 
         [HttpPost]
@@ -50,26 +65,33 @@ namespace GMGInventory.Controllers
                 if (await supplierRepository.IsSupplierCodeExist(supplierVM.Code))
                 {
                     ModelState.AddModelError(string.Empty, "Supplier code already in use.");
+                    TempData["ErrorMessage"] = "Supplier code already in use";
                 }
                 else
                 {
-                    var supplier = mapper.Map<Supplier>(supplierVM);
-                    supplier.IsActive = true;
-                    await supplierRepository.AddAsync(supplier);
+                    await supplierRepository.AddAsync(supplierVM);
+                    TempData["SuccessMessage"] = "Supplier successfully added";
                     return RedirectToAction(nameof(Index));
                 }
             }
+            supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(supplierVM.AreaId), "Id", "Name", supplierVM.AreaId);
+            supplierVM.Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(supplierVM.CurrencyId), "Id", "Name", supplierVM.CurrencyId);
+            supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(supplierVM.RegionId), "Id", "Name", supplierVM.RegionId);
             return View(supplierVM);
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
-            var supplier = await supplierRepository.GetAsync(id);
-            if (supplier == null)
+            var supplierVM = await supplierRepository.GetSupplierVMAsync(id);
+            if (supplierVM == null)
             {
                 return NotFound();
             }
-            var supplierVM = mapper.Map<SupplierVM>(supplier);
+            supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
+           
+            supplierVM.Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(-1), "Id", "Name");
+            supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
+
             return View(supplierVM);
         }
 
@@ -86,9 +108,7 @@ namespace GMGInventory.Controllers
             {
                 try
                 {
-                    var supplier = await supplierRepository.GetAsync(id);
-                    mapper.Map(supplierVM, supplier);
-                    await supplierRepository.UpdateAsync(supplier);
+                    await supplierRepository.UpdateAsync(id, supplierVM);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -101,8 +121,13 @@ namespace GMGInventory.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Supplier successfully updated";
                 return RedirectToAction(nameof(Index));
             }
+
+            supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
+            supplierVM.Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(-1), "Id", "Name");
+            supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
             return View(supplierVM);
         }
 
@@ -110,19 +135,19 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var supplier = await supplierRepository.GetAsync(id);
-            if (supplier == null)
+            if (await supplierRepository.IsSupplierIdExistAsync(id) == false)
             {
                 return NotFound();
             }
             if (await supplierRepository.IsSupplierInUse(id))
             {
-                supplier.IsActive = false;
-                await supplierRepository.UpdateAsync(supplier);
+                await supplierRepository.DeactivateSupplierAsync(id);
+                TempData["WarningMessage"] = "Supplier has been deactivated";
             }
             else
             {
                 await supplierRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Supplier successfully deleted";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -131,13 +156,12 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
-            var supplier = await supplierRepository.GetAsync(id);
-            if (supplier == null)
+            if (await supplierRepository.IsSupplierIdExistAsync(id) == false)
             {
                 return NotFound();
             }
-            supplier.IsActive = true;
-            await supplierRepository.UpdateAsync(supplier);
+            await supplierRepository.ReactivateSupplierAsync(id);
+            TempData["SuccessMessage"] = "Supplier reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
     }

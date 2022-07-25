@@ -26,34 +26,47 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+
         public async Task<List<BrandViewVM>> GetAllBrandVMAsync()
         {
-            var brands = await context.Brands.Include(s => s.ItemType).ToListAsync();
-            var brandsViewVM = mapper.Map<List<BrandViewVM>>(brands);
-            foreach (BrandViewVM bvm in brandsViewVM)
+            var brand = await context.Brands.Include(s => s.ItemType).ToListAsync();
+            var brandViewVM = mapper.Map<List<BrandViewVM>>(brand);
+            foreach (BrandViewVM ivm in brandViewVM)
             {
-                bvm.UserCreated = await GetUserName(bvm.UserCreated);
-                bvm.UserModified = await GetUserName(bvm.UserModified);
+                ivm.UserCreated = await GetUserName(ivm.UserCreated);
+                ivm.UserModified = await GetUserName(ivm.UserModified);
             }
-            return brandsViewVM;
+            return brandViewVM;
         }
 
-        public async Task<BrandViewVM?> GetBrandVMAsync(int? id)
+        public async Task<BrandViewVM?> GetBrandViewVMAsync(int? id)
         {
-            var brands = await context.Brands.Include(s => s.ItemType).Where(s => s.Id == id).FirstOrDefaultAsync();
-            if (brands == null)
+            var brand = await context.Brands.Include(s => s.ItemType).Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (brand == null)
             {
                 return null;
             }
-            var brandViewVM = mapper.Map<BrandViewVM>(brands);
+            var brandViewVM = mapper.Map<BrandViewVM>(brand);
             brandViewVM.UserCreated = await GetUserName(brandViewVM.UserCreated);
             brandViewVM.UserModified = await GetUserName(brandViewVM.UserModified);
+            return brandViewVM;
+        }
+
+        public async Task<BrandVM?> GetBrandVMAsync(int? id)
+        {
+            var brand = await context.Brands.Include(s => s.ItemType).Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (brand == null)
+            {
+                return null;
+            }
+            var brandViewVM = mapper.Map<BrandVM>(brand);
             return brandViewVM;
         }
 
         public async Task<List<Brand>> GetAllActiveBrandAsync(int includeId)
         {
             return await context.Brands.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
+            //return await context.Areas.ToListAsync();
         }
 
         public async Task<bool> IsBrandCodeExist(string code)
@@ -63,8 +76,50 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsBrandInUse(int id)
         {
-            return await context.Brands.AnyAsync(s => s.ItemTypeId == id)
-                || await context.Items.AnyAsync(s => s.ItemTypeId == id);
+            return await context.Brands.AnyAsync(s => s.Id == id);
+        }
+
+        public async Task<bool> IsBrandIdExistAsync(int id)
+        {
+            return await context.Brands.AnyAsync(s => s.Id == id);
+        }
+
+        public async Task DeactivateBrandAsync(int id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var brand = await context.Brands.FirstAsync(s => s.Id == id);
+            brand.IsActive = false;
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task ReactivateBrandAsync(int id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var brand = await context.Brands.FirstAsync(s => s.Id == id);
+            brand.IsActive = true;
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task AddAsync(BrandVM brandVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var brand = mapper.Map<Brand>(brandVM);
+            brand.IsActive = true;
+            await context.Brands.AddAsync(brand);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task UpdateAsync(int id, BrandVM brandVM)
+        {
+            var brand = context.Brands.Where(s => s.Id == id).FirstOrDefault();
+            if (brand == null)
+            {
+                throw new DbUpdateConcurrencyException();
+            }
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            mapper.Map(brandVM, brand);
+            context.Brands.Update(brand);
+            await context.SaveChangesAsync(currentUserId);
         }
     }
 }
