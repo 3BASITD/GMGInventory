@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -13,15 +14,21 @@ namespace GMGInventory.Controllers
             this.itemRepository = itemRepository;
         }
 
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(ItemFilterVM itemFilterVM)
         {
-            var items = await itemRepository.GetAllInformationAsync();
+            var items = await itemRepository.GetAllAsync(itemFilterVM);
             return View(items);
+        }
+
+        public async Task<PartialViewResult> PartialItems(ItemFilterVM itemFilterVM)
+        {
+            var items = await itemRepository.GetAllAsync(itemFilterVM);
+            return PartialView(items);
         }
 
         public async Task<ActionResult> Details(int id)
         {
-            var item = await itemRepository.GetInformationAsync(id);
+            var item = await itemRepository.GetAsync(id);
             if (item == null)
             {
                 return NotFound();

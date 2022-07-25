@@ -1,0 +1,204 @@
+﻿@model WarehouseViewVM
+
+@{
+    ViewData["Title"] = "Warehouse Details";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Warehouse" asp-action="Index">Warehouses</a></li>
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (Model?.IsActive == true)
+            {
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> Edit Warehouse
+                </a>
+            }
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Code)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Code
+                    </b>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Name
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.AddressLine1)
+                    </span>
+                    <b class="d-block">
+                        @Model?.AddressLine1
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.AddressLine2)
+                    </span>
+                    <b class="d-block">
+                        @(Model?.AddressLine2 ?? "-")
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ContactPerson)
+                    </span>
+                    <b class="d-block">
+                        @Model?.ContactPerson
+                    </b>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ContactNumber)
+                    </span>
+                    <b class="d-block">
+                        @Model?.ContactNumber
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.UserCreated)
+                    </span>
+                    <b class="d-block">
+                        @Model?.UserCreated
+                    </b>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </span>
+                    <b class="d-block">
+                        @Model?.DateCreated
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.UserModified)
+                    </span>
+                    <b class="d-block">
+                        @(Model?.UserModified ?? "-")
+                    </b>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateModified)
+                    </span>
+                    <b class="d-block">
+                        @(Model?.DateModified ?? "-")
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+            <div class="card card-danger card-tabs">
+                <div class="card-header p-0 pt-1 pl-2">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="nav-items-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-items"
+                               aria-controls="nav-items" aria-selected="true">
+                                Item Details
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="nav-transfer-tab" data-toggle="pill" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#nav-transfer"
+                               aria-controls="nav-transfer" aria-selected="true">
+                                Item Transfer History
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="nav-items" role="tabpanel"
+                             aria-labelledby="nav-items-tab">
+                            <table class="table table-head-fixed table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Warehouse Code</th>
+                                        <th>Warehouse Name</th>
+                                        <th>Warehouse</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>W1</td>
+                                        <td>Warehouse#1</td>
+                                        <td>10</td>
+                                        <td>
+                                            <a class="btn btn-warning btn-xs" href="#" data-bs-toggle="tooltip" title="Adjust Quantity">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>W2</td>
+                                        <td>Warehouse#2</td>
+                                        <td>15</td>
+                                        <td>
+                                            <a class="btn btn-warning btn-xs" href="#" data-bs-toggle="tooltip" title="Adjust Quantity">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="nav-transfer" role="tabpanel" aria-labelledby="nav-transfer-tab">...</div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

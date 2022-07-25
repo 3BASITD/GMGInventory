@@ -4,6 +4,7 @@ using GMGInventory.Application.Repositories;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,11 +29,27 @@ builder.Services.AddScoped(typeof(IAgentRepository), typeof(AgentRepository));
 builder.Services.AddScoped(typeof(IAreaRepository), typeof(AreaRepository));
 builder.Services.AddScoped(typeof(IRegionRepository), typeof(RegionRepository));
 builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
+builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
+builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseRepository));
+
 
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 
 builder.Services.AddControllersWithViews();
+
+//builder.Services.AddHsts(options =>
+//{
+//    options.Preload = true;
+//    options.IncludeSubDomains = true;
+//    options.MaxAge = TimeSpan.FromDays(360);
+//});
+
+//builder.Services.AddHttpsRedirection(options =>
+//{
+//    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
+//    options.HttpsPort = 5001;
+//});
 
 var app = builder.Build();
 

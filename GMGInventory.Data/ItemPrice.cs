@@ -14,11 +14,11 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal RetailSellingPrice { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal WholesaleSellingPrice { get; set; }
+        //[Column(TypeName = "decimal(18, 2)")]
+        //public decimal WholesaleSellingPrice { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal SpecialPrice { get; set; }
+        //[Column(TypeName = "decimal(18, 2)")]
+        //public decimal SpecialPrice { get; set; }
 
         public DateTime EffectiveDate { get; set; }
     }

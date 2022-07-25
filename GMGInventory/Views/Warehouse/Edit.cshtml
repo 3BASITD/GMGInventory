@@ -1,0 +1,90 @@
+﻿@model WarehouseFormVM
+
+@{
+    ViewData["Title"] = "Edit Warehouse";
+}
+
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Warehouse" asp-action="Index">Warehouses</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <a class="btn btn-light btn-sm float-right mr-2" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="Code" class="control-label mb-0"></label>
+                            <input asp-for="Code" class="form-control form-control-sm" readonly />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label mb-0"></label>
+                            <input asp-for="Name" class="form-control form-control-sm" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label asp-for="AddressLine1" class="control-label mb-0"></label>
+                            <input asp-for="AddressLine1" class="form-control form-control-sm" readonly />
+                            <span asp-validation-for="AddressLine1" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label asp-for="AddressLine2" class="control-label mb-0"></label>
+                            <input asp-for="AddressLine2" class="form-control form-control-sm" readonly />
+                            <span asp-validation-for="AddressLine2" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="ContactPerson" class="control-label mb-0"></label>
+                            <input asp-for="ContactPerson" class="form-control form-control-sm" readonly />
+                            <span asp-validation-for="ContactPerson" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="ContactNumber" class="control-label mb-0"></label>
+                            <input asp-for="ContactNumber" class="form-control form-control-sm" />
+                            <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" asp-for="Id" />
+            </div>
+            <div class="card-footer">
+                <div class="card-tools">
+                    <button type="submit" class="btn btn-primary btn-sm float-right">
+                        <span class="fas fa-save"></span> Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

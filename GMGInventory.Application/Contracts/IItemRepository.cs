@@ -4,8 +4,8 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IItemRepository
     {
-        Task<ItemInformationVM?> GetInformationAsync(int? id);
-        Task<List<ItemInformationVM>> GetAllInformationAsync();
+        Task<ItemViewVM?> GetAsync(int? id);
+        Task<List<ItemViewVM>> GetAllAsync(ItemFilterVM itemFilterVM);
         Task<ItemVM> AddAsync(ItemVM itemVM);
         Task<bool> Exists(int id);
         Task DeleteAsync(int id);
