@@ -15,7 +15,7 @@
                 @if (Model?.IsActive == true)
             {
                 <a class="btn btn-primary btn-sm float-right" asp-action="Edit" asp-route-id="@Model?.Id">
-                    <span class="fas fa-edit"></span> Edit Area
+                    <span class="fas fa-edit"></span> Edit Supplier
                 </a>
             }
             <a class="btn btn-light btn-sm float-right mr-2" asp-action="Index">
@@ -99,7 +99,7 @@
                 @Html.DisplayNameFor(model => model.Region)
             </dt>
             <dd class="col-sm-10">
-                @Model?.Region.Name
+                @Model?.Region
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Area)
@@ -117,7 +117,7 @@
                 @Html.DisplayNameFor(model => model.Currency)
             </dt>
             <dd class="col-sm-10">
-                @Model?.Currency
+                @Model?.Currency.Name
             </dd>
              <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.IsForeign)

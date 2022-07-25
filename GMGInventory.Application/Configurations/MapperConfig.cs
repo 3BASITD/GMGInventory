@@ -12,10 +12,12 @@ namespace GMGInventory.Application.Configurations
             // Agent
             CreateMap<Agent, AgentVM>().ReverseMap();
             CreateMap<Agent, GenericAuditVM>().ReverseMap();
+            CreateMap<Agent, AgentViewVM>().ReverseMap();
 
             // Area
             CreateMap<Area, AreaVM>().ReverseMap();
             CreateMap<Area, GenericAuditVM>().ReverseMap();
+            CreateMap<Area, AreaViewVM>().ReverseMap();
 
             // Brand
             CreateMap<Brand, BrandVM>().ReverseMap();
@@ -39,6 +41,7 @@ namespace GMGInventory.Application.Configurations
 
             // Supplier
             CreateMap<Supplier, SupplierVM>().ReverseMap();
+            CreateMap<Supplier, SupplierViewVM>().ReverseMap();
             CreateMap<Supplier, GenericAuditVM>().ReverseMap();
 
             // User
@@ -51,6 +54,16 @@ namespace GMGInventory.Application.Configurations
                 .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
                 .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
                 .ReverseMap();
+
+            // Currency
+            CreateMap<Currency, CurrencyVM>().ReverseMap();
+            CreateMap<Currency, GenericAuditVM>().ReverseMap();
+
+            // Region
+            CreateMap<Region, RegionVM>().ReverseMap();
+            CreateMap<Region, GenericAuditVM>().ReverseMap();
+
+
 
         }
     }
