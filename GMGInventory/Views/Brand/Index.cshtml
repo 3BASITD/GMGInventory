@@ -51,7 +51,16 @@
                         <td>@item.Code</td>
                         <td>@item.Name</td>
                         <td>@item.ItemType.Name</td>
-                        <td>@item.IsActive</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="fas fa-check text-success"></span>
+                            }
+                            else
+                            {
+                                <span class="fas fa-times text-danger"></span>
+                            }
+                        </td>
                         <td>@item.UserCreated</td>
                         <td>@item.DateCreated</td>
                         <td>@item.UserModified</td>
@@ -83,20 +92,29 @@
     </div>
 </div>
 
-<form id="deleteItemTypeForm" asp-action="Delete">
-    <input type="hidden" id="deleteItemTypeId" name="Id" />
+<form id="deleteBrandForm" asp-action="Delete">
+    <input type="hidden" id="deleteBrandId" name="Id" />
 </form>
 
-<form id="reactivateItemTypeForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateItemTypeId" name="Id" />
+<form id="reactivateBrandForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateBrandId" name="Id" />
 </form>
+
+<form id="deleteBrandForm" asp-action="Delete">
+    <input type="hidden" id="deleteBrandId" name="Id" />
+</form>
+
+<form id="reactivateBrandForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateBrandId" name="Id" />
+</form>
+
 
 @section Scripts {
     <script>
         $('.deleteBtn').click(function(e) {
             swal({
-                title: "Delete Item Type",
-                text: "Are you sure you want to delete this record?",
+                title: "Delete / Deactivate Brand",
+                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true
@@ -104,15 +122,15 @@
                 if (confirm) {
                     var btn = $(this);
                     var id = btn.data("id");
-                    $('#deleteItemTypeId').val(id);
-                    $('#deleteItemTypeForm').submit();
+                    $('#deleteBrandId').val(id);
+                    $('#deleteBrandForm').submit();
                 }
             });
         });
 
         $('.reactivateBtn').click(function(e) {
             swal({
-                title: "Reactivate Item Type",
+                title: "Reactivate Brand",
                 text: "Are you sure you want to reactivate this record?",
                 icon: "info",
                 buttons: true,
@@ -121,8 +139,8 @@
                 if (confirm) {
                     var btn = $(this);
                     var id = btn.data("id");
-                    $('#reactivateItemTypeId').val(id);
-                    $('#reactivateItemTypeForm').submit();
+                    $('#reactivateBrandId').val(id);
+                    $('#reactivateBrandForm').submit();
                 }
             });
         });

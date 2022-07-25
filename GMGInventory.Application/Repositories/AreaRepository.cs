@@ -26,11 +26,11 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<AreaVM>> GetAllAreaVMAsync()
+        public async Task<List<AreaViewVM>> GetAllAreaVMAsync()
         {
             var areas = await context.Areas.Include(s => s.Region).ToListAsync();
-            var areasViewVM = mapper.Map<List<AreaVM>>(areas);
-            foreach (AreaVM ivm in areasViewVM)
+            var areasViewVM = mapper.Map<List<AreaViewVM>>(areas);
+            foreach (AreaViewVM ivm in areasViewVM)
             {
                 ivm.UserCreated = await GetUserName(ivm.UserCreated);
                 ivm.UserModified = await GetUserName(ivm.UserModified);
@@ -38,22 +38,35 @@ namespace GMGInventory.Application.Repositories
             return areasViewVM;
         }
 
-        public async Task<AreaVM?> GetAreaVMAsync(int? id)
+        public async Task<AreaViewVM?> GetAreaViewVMAsync(int? id)
         {
             var areas = await context.Areas.Include(s => s.Region).Where(s => s.Id == id).FirstOrDefaultAsync();
             if (areas == null)
             {
                 return null;
             }
-            var areasViewVM = mapper.Map<AreaVM>(areas);
+            var areasViewVM = mapper.Map<AreaViewVM>(areas);
             areasViewVM.UserCreated = await GetUserName(areasViewVM.UserCreated);
             areasViewVM.UserModified = await GetUserName(areasViewVM.UserModified);
             return areasViewVM;
         }
 
+        public async Task<AreaVM?> GetAreaVMAsync(int? id)
+        {
+            var area = await context.Areas.Include(s => s.Region).Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (area == null)
+            {
+                return null;
+            }
+            var areaViewVM = mapper.Map<AreaVM>(area);
+            return areaViewVM;
+        }
+
         public async Task<List<Area>> GetAllActiveAreaAsync(int includeId)
         {
             return await context.Areas.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
+            //var areas = await context.Areas.ToListAsync();
+            //return areas;
         }
 
         public async Task<bool> IsAreaCodeExist(string code)
@@ -64,6 +77,49 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> IsAreaInUse(int id)
         {
             return await context.Regions.AnyAsync(s => s.Id == id);
+        }
+
+        public async Task<bool> IsAreaIdExistAsync(int id)
+        {
+            return await context.Areas.AnyAsync(s => s.Id == id);
+        }
+
+        public async Task DeactivateAreaAsync(int id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var area = await context.Areas.FirstAsync(s => s.Id == id);
+            area.IsActive = false;
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task ReactivateAreaAsync(int id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var area = await context.Areas.FirstAsync(s => s.Id == id);
+            area.IsActive = true;
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task AddAsync(AreaVM areaVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var area = mapper.Map<Area>(areaVM);
+            area.IsActive = true;
+            await context.Areas.AddAsync(area);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task UpdateAsync(int id, AreaVM areaVM)
+        {
+            var area = context.Areas.Where(s => s.Id == id).FirstOrDefault();
+            if (area == null)
+            {
+                throw new DbUpdateConcurrencyException();
+            }
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            mapper.Map(areaVM, area);
+            context.Areas.Update(area);
+            await context.SaveChangesAsync(currentUserId);
         }
     }
 }

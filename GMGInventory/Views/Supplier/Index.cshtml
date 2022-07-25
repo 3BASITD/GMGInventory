@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SupplierVM>
+﻿@model IEnumerable<SupplierViewVM>
 
 @{
     ViewData["Title"] = "Supplier";
@@ -20,17 +20,18 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Code)
                     </th>
+                   
                     <th>
                         @Html.DisplayNameFor(model => model.Name)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.CreditLimit)
                     </th>
+   
                     <th>
                         @Html.DisplayNameFor(model => model.IsActive)
                     </th>
-
-                    <th>
+                      <th>
                         @Html.DisplayNameFor(model => model.UserCreated)
                     </th>
                     <th>
@@ -41,7 +42,8 @@
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.DateModified)
-                    </th>
+                    </th> 
+                   
                     <th></th>
                 </tr>
             </thead>
@@ -52,7 +54,16 @@
                         <td>@item.Code</td>
                         <td>@item.Name</td>
                         <td>@item.CreditLimit</td>
-                        <td>@item.IsActive</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="fas fa-check text-success"></span>
+                            }
+                            else
+                            {
+                                <span class="fas fa-times text-danger"></span>
+                            }
+                        </td>
                         <td>@item.UserCreated</td>
                         <td>@item.DateCreated</td>
                         <td>@item.UserModified</td>
@@ -71,12 +82,12 @@
                                 </button>
                             }
                             else
-                            {
+                            { 
                                 <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button">
                                     <i class="fas fa-check"></i>
                                 </button>
                             }
-                        </td>
+                        </td> 
                     </tr>
                 }
             </tbody>
@@ -84,28 +95,29 @@
     </div>
 </div>
 
-<form id="deleteCategoryForm" asp-action="Delete">
-    <input type="hidden" id="deleteCategoryId" name="Id" />
+<form id="deleteSupplierForm" asp-action="Delete">
+    <input type="hidden" id="deleteSupplierId" name="Id" />
 </form>
 
-<form id="reactivateCategoryForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateCategoryId" name="Id" />
+<form id="reactivateSupplierForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateSupplierId" name="Id" />
 </form>
 
-<form id="deleteCategoryForm" asp-action="Delete">
-    <input type="hidden" id="deleteCategoryId" name="Id" />
+<form id="deleteSupplierForm" asp-action="Delete">
+    <input type="hidden" id="deleteSupplierId" name="Id" />
 </form>
 
-<form id="reactivateCategoryForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateCategoryId" name="Id" />
+<form id="reactivateSupplierForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateSupplierId" name="Id" />
 </form>
+
 
 @section Scripts {
     <script>
         $('.deleteBtn').click(function(e) {
             swal({
-                title: "Delete Supplier",
-                text: "Are you sure you want to delete this record?",
+                title: "Delete / Deactivate Supplier",
+                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true
@@ -113,15 +125,15 @@
                 if (confirm) {
                     var btn = $(this);
                     var id = btn.data("id");
-                    $('#deleteCategoryId').val(id);
-                    $('#deleteCategoryForm').submit();
+                    $('#deleteSupplierId').val(id);
+                    $('#deleteSupplierForm').submit();
                 }
             });
         });
 
         $('.reactivateBtn').click(function(e) {
             swal({
-                title: "Reactivate Category",
+                title: "Reactivate Supplier",
                 text: "Are you sure you want to reactivate this record?",
                 icon: "info",
                 buttons: true,
@@ -130,8 +142,8 @@
                 if (confirm) {
                     var btn = $(this);
                     var id = btn.data("id");
-                    $('#reactivateCategoryId').val(id);
-                    $('#reactivateCategoryForm').submit();
+                    $('#reactivateSupplierId').val(id);
+                    $('#reactivateSupplierForm').submit();
                 }
             });
         });

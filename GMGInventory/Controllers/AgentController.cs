@@ -5,19 +5,22 @@ using GMGInventory.Common.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
     [Authorize]
-    public class AgentController : Controller 
+    public class AgentController : Controller
     {
         private readonly IAgentRepository agentRepository;
+        private readonly IAreaRepository areaRepository;
         private readonly IMapper mapper;
 
         public AgentController(IAgentRepository agentRepository
-            , IMapper mapper)
+            , IAreaRepository areaRepository)
         {
             this.agentRepository = agentRepository;
+            this.areaRepository = areaRepository;
             this.mapper = mapper;
         }
 
@@ -28,7 +31,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            var agentVM = await agentRepository.GetAgentVMAsync(id);
+            var agentVM = await agentRepository.GetAgentViewVMAsync(id);
             if (agentVM == null)
             {
                 return NotFound();
@@ -36,9 +39,13 @@ namespace GMGInventory.Controllers
             return View(agentVM);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var agentVM = new AgentVM
+            {
+                Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name")
+            };
+            return View(agentVM);
         }
 
         [HttpPost]
@@ -50,26 +57,27 @@ namespace GMGInventory.Controllers
                 if (await agentRepository.IsAgentCodeExist(agentVM.Code))
                 {
                     ModelState.AddModelError(string.Empty, "Agent code already in use.");
+                    TempData["ErrorMessage"] = "Agent code already in use";
                 }
                 else
                 {
-                    var agent = mapper.Map<Agent>(agentVM);
-                    agent.IsActive = true;
-                    await agentRepository.AddAsync(agent);
+                    await agentRepository.AddAsync(agentVM);
+                    TempData["SuccessMessage"] = "Agent successfully added";
                     return RedirectToAction(nameof(Index));
                 }
             }
+            agentVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(agentVM.AreaId), "Id", "Name", agentVM.AreaId);
             return View(agentVM);
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
-            var agent = await agentRepository.GetAsync(id);
-            if (agent == null)
+            var agentVM = await agentRepository.GetAgentVMAsync(id);
+            if (agentVM == null)
             {
                 return NotFound();
             }
-            var agentVM = mapper.Map<AgentVM>(agent);
+            agentVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
             return View(agentVM);
         }
 
@@ -86,9 +94,7 @@ namespace GMGInventory.Controllers
             {
                 try
                 {
-                    var agent = await agentRepository.GetAsync(id);
-                    mapper.Map(agentVM, agent);
-                    await agentRepository.UpdateAsync(agent);
+                    await agentRepository.UpdateAsync(id, agentVM);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -101,8 +107,11 @@ namespace GMGInventory.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Agent successfully updated";
                 return RedirectToAction(nameof(Index));
             }
+
+            agentVM.Areas= new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
             return View(agentVM);
         }
 
@@ -110,19 +119,19 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var agent = await agentRepository.GetAsync(id);
-            if (agent == null)
+            if (await agentRepository.IsAgentIdExistAsync(id) == false)
             {
                 return NotFound();
             }
             if (await agentRepository.IsAgentInUse(id))
             {
-                agent.IsActive = false;
-                await agentRepository.UpdateAsync(agent);
+                await agentRepository.DeactivateAgentAsync(id);
+                TempData["WarningMessage"] = "Agent has been deactivated";
             }
             else
             {
                 await agentRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Agent successfully deleted";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -131,13 +140,12 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
-            var agent= await agentRepository.GetAsync(id);
-            if (agent == null)
+            if (await agentRepository.IsAgentIdExistAsync(id) == false)
             {
                 return NotFound();
             }
-            agent.IsActive = true;
-            await agentRepository.UpdateAsync(agent);
+            await agentRepository.ReactivateAgentAsync(id);
+            TempData["SuccessMessage"] = "Agent reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
     }

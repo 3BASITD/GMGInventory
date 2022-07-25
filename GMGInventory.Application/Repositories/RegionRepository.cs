@@ -54,7 +54,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<List<Region>> GetAllActiveRegionAsync(int includeId)
         {
             //return await context.Regions.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
-            return await context.Regions.Where(s => s.Id == includeId).ToListAsync();
+            var region =await context.Regions.ToListAsync();
+            return region;
         }
 
         public async Task<bool> IsRegionCodeExist(string code)

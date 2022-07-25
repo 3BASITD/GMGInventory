@@ -1,4 +1,4 @@
-﻿@model AgentVM
+﻿@model AgentViewVM
 
 @{
     ViewData["Title"] = "Agent Details";
@@ -48,6 +48,12 @@
             </dt>
             <dd class="col-sm-10">
                 @Model?.LastName
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Area)
+            </dt>
+            <dd class="col-sm-10">
+                @Model?.Area.Name
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.IsActive)

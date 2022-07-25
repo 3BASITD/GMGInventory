@@ -32,7 +32,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            var brandVM = await brandRepository.GetBrandVMAsync(id);
+            var brandVM = await brandRepository.GetBrandViewVMAsync(id);
             if (brandVM == null)
             {
                 return NotFound();
@@ -58,28 +58,27 @@ namespace GMGInventory.Controllers
                 if (await brandRepository.IsBrandCodeExist(brandVM.Code))
                 {
                     ModelState.AddModelError(string.Empty, "Brand code already in use.");
+                    TempData["ErrorMessage"] = "Brand code already in use";
                 }
                 else
                 {
-                    var brand = mapper.Map<Brand>(brandVM);
-                    brand.IsActive = true;
-                    await brandRepository.AddAsync(brand);
+                    await brandRepository.AddAsync(brandVM);
+                    TempData["SuccessMessage"] = "Brand successfully added";
                     return RedirectToAction(nameof(Index));
                 }
             }
-            brandVM.ItemTypes = new SelectList(await itemTypeRepository.GetAllActiveItemTypeAsync(brandVM.ItemTypeId), "Id", "Name", brandVM.ItemTypeId);
+            brandVM.ItemTypes = new SelectList(await brandRepository.GetAllActiveBrandAsync(brandVM.ItemTypeId), "Id", "Name", brandVM.ItemTypeId);
             return View(brandVM);
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
-            var brand = await brandRepository.GetAsync(id);
-            if (brand == null)
+            var brandVM = await brandRepository.GetBrandVMAsync(id);
+            if (brandVM == null)
             {
                 return NotFound();
             }
-            var brandVM = mapper.Map<BrandVM>(brand);
-            brandVM.ItemTypes = new SelectList(await itemTypeRepository.GetAllActiveItemTypeAsync(-1), "Id", "Name");
+            brandVM.ItemTypes = new SelectList(await brandRepository.GetAllActiveBrandAsync(-1), "Id", "Name");
             return View(brandVM);
         }
 
@@ -96,9 +95,7 @@ namespace GMGInventory.Controllers
             {
                 try
                 {
-                    var brand = await brandRepository.GetAsync(id);
-                    mapper.Map(brandVM, brand);
-                    await brandRepository.UpdateAsync(brand);
+                    await brandRepository.UpdateAsync(id, brandVM);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -111,6 +108,7 @@ namespace GMGInventory.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Brand successfully updated";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -122,19 +120,19 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var brand = await brandRepository.GetAsync(id);
-            if (brand== null)
+            if (await brandRepository.IsBrandIdExistAsync(id) == false)
             {
                 return NotFound();
             }
             if (await brandRepository.IsBrandInUse(id))
             {
-                brand.IsActive = false;
-                await brandRepository.UpdateAsync(brand);
+                await brandRepository.DeactivateBrandAsync(id);
+                TempData["WarningMessage"] = "Brand has been deactivated";
             }
             else
             {
                 await brandRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Brand successfully deleted";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -143,13 +141,12 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
-            var brand = await brandRepository.GetAsync(id);
-            if (brand == null)
+            if (await brandRepository.IsBrandIdExistAsync(id) == false)
             {
                 return NotFound();
             }
-            brand.IsActive = true;
-            await brandRepository.UpdateAsync(brand);
+            await brandRepository.ReactivateBrandAsync(id);
+            TempData["SuccessMessage"] = "Brand reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
     }
