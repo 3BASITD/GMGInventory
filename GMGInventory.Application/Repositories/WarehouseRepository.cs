@@ -41,6 +41,19 @@ namespace GMGInventory.Application.Repositories
             return warehouseVM;
         }
 
+        public async Task<WarehouseFormVM?> GetToEditAsync(int? id)
+        {
+            var warehouse = await context.Warehouses
+                .Where(s => s.Id == id)
+                .FirstOrDefaultAsync();
+            if (warehouse == null)
+            {
+                return null;
+            }
+            var warehouseVM = mapper.Map<WarehouseFormVM>(warehouse);
+            return warehouseVM;
+        }
+
         public async Task<List<WarehouseViewVM>> GetAllAsync()
         {
             var warehouses = await context.Warehouses.ToListAsync();

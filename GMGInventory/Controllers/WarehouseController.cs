@@ -55,29 +55,29 @@ namespace GMGInventory.Controllers
             return View(warehouseVM);
         }
 
-        //public async Task<ActionResult> Edit(string id)
-        //{
-        //    var user = await userRepository.GetUserInformationVMToEditAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
+        public async Task<ActionResult> Edit(int id)
+        {
+            var warehouse = await warehouseRepository.GetToEditAsync(id);
+            if (warehouse == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(user);
-        //}
+            return View(warehouse);
+        }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> Edit(UserInformationForUpdateVM userInformationVM)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        await userRepository.UpdateUserAsync(userInformationVM);
-        //        TempData["SuccessMessage"] = "User details of " +userInformationVM.Username + " was successfully updated";
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(userInformationVM);
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(WarehouseFormVM warehouseVM)
+        {
+            if (ModelState.IsValid)
+            {
+                await warehouseRepository.UpdateAsync(warehouseVM);
+                TempData["SuccessMessage"] = "Warehouse successfully updated";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(warehouseVM);
+        }
 
         //public async Task<ActionResult> Password(string id)
         //{
