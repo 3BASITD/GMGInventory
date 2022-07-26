@@ -10,10 +10,10 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                Retail Price
+                @Html.DisplayNameFor(model=>model.RetailPrice)
             </th>
             <th>
-                Net Price
+                @Html.DisplayNameFor(model=>model.NetPrice)
             </th>
         </tr>
     </thead>
@@ -29,8 +29,8 @@
                 <tr>
                     <td>@item.Code</td>
                     <td>@item.Name</td>
-                    <td>0.00</td>
-                    <td>0.00</td>
+                    <td>@item.RetailPrice</td>
+                    <td>@item.NetPrice</td>
                 </tr>
             }
         }

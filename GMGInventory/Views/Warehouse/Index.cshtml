@@ -33,34 +33,41 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var warehouse in Model)
+                @if (Model == null)
                 {
-                    <tr>
-                        <td>@warehouse.Code</td>
-                        <td>@warehouse.Name</td>
-                        <td>@warehouse.ContactPerson</td>
-                        <td>@warehouse.ContactNumber</td>
-                        <td>
-                            <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@warehouse.Id" data-bs-toggle="tooltip" title="View Details">
-                                <i class="fas fa-info-circle"></i>
-                            </a>
-                            @if (warehouse.IsActive)
-                            {
-                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@warehouse.Id" data-bs-toggle="tooltip" title="Edit Details">
-                                    <i class="fas fa-pencil-alt"></i>
+                    <tr><td colspan="5"><p class="text-center m-0">This record is empty</p></td></tr>
+                }
+                else
+                {
+                    @foreach (var warehouse in Model)
+                    {
+                        <tr>
+                            <td>@warehouse.Code</td>
+                            <td>@warehouse.Name</td>
+                            <td>@warehouse.ContactPerson</td>
+                            <td>@warehouse.ContactNumber</td>
+                            <td>
+                                <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@warehouse.Id" data-bs-toggle="tooltip" title="View Details">
+                                    <i class="fas fa-info-circle"></i>
                                 </a>
-                                <button data-id="@warehouse.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item">
-                                    <i class="far fa-trash-alt"></i>
-                                </button>
-                            }
-                            else
-                            {
-                                <button data-id="@warehouse.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            }
-                        </td>
-                    </tr>
+                                @if (warehouse.IsActive)
+                                {
+                                    <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@warehouse.Id" data-bs-toggle="tooltip" title="Edit Details">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <button data-id="@warehouse.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item">
+                                        <i class="far fa-trash-alt"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button data-id="@warehouse.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
