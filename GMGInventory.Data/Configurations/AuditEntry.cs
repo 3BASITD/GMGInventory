@@ -20,15 +20,17 @@ namespace GMGInventory.Data
         public List<string> ChangedColumns { get; } = new List<string>();
         public AuditLog ToAudit()
         {
-            var audit = new AuditLog();
-            audit.UserId = UserId;
-            audit.Type = AuditType.ToString();
-            audit.TableName = TableName;
-            audit.DateTime = DateTime.Now;
-            audit.PrimaryKey = JsonConvert.SerializeObject(KeyValues);
-            audit.OldValues = OldValues.Count == 0 ? "-" : JsonConvert.SerializeObject(OldValues);
-            audit.NewValues = NewValues.Count == 0 ? "-" : JsonConvert.SerializeObject(NewValues);
-            audit.AffectedColumns = ChangedColumns.Count == 0 ? "-" : JsonConvert.SerializeObject(ChangedColumns);
+            var audit = new AuditLog
+            {
+                UserId = UserId,
+                Type = AuditType.ToString(),
+                TableName = TableName,
+                DateTime = DateTime.Now,
+                PrimaryKey = JsonConvert.SerializeObject(KeyValues),
+                OldValues = OldValues.Count == 0 ? "-" : JsonConvert.SerializeObject(OldValues),
+                NewValues = NewValues.Count == 0 ? "-" : JsonConvert.SerializeObject(NewValues),
+                AffectedColumns = ChangedColumns.Count == 0 ? "-" : JsonConvert.SerializeObject(ChangedColumns)
+            };
             return audit;
         }
     }

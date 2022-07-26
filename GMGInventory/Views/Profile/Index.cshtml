@@ -99,7 +99,7 @@
                             <th>Date Time</th>
                             <th>Action Type</th>
                             <th>Table Name</th>
-                            <th>Affected Columns</th>
+                            @*<th>Affected Columns</th>*@
                             <th>Old Values</th>
                             <th>New Values</th>
                         </tr>
@@ -111,7 +111,7 @@
                                 <td>@item.DateTime.ToString("yyyy/MM/dd hh:mm:ss tt")</td>
                                 <td>@item.Type</td>
                                 <td>@item.TableName</td>
-                                <td><pre>@item.AffectedColumns</pre></td>
+                                @*<td><pre>@item.AffectedColumns</pre></td>*@
                                 <td>
                                     <pre>@item.OldValues.Replace("{", "").Replace("}", "").Replace(",\"",",\n\"")</pre>
                                 </td>

@@ -8,10 +8,13 @@ namespace GMGInventory.Controllers
     public class WarehouseController : Controller
     {
         public IWarehouseRepository warehouseRepository;
+        private readonly IItemRepository itemRepository;
 
-        public WarehouseController(IWarehouseRepository warehouseRepository)
+        public WarehouseController(IWarehouseRepository warehouseRepository,
+            IItemRepository itemRepository)
         {
             this.warehouseRepository = warehouseRepository;
+            this.itemRepository = itemRepository;
         }
 
         public async Task<ActionResult> Index()
@@ -22,12 +25,21 @@ namespace GMGInventory.Controllers
 
         public async Task<ActionResult> Details(int id)
         {
-            var item = await warehouseRepository.GetAsync(id);
-            if (item == null)
+            var warehouse = await warehouseRepository.GetAsync(id);
+            if (warehouse == null)
             {
                 return NotFound();
             }
-            return View(item);
+            var itemFilter = new ItemFilterVM() { WarehouseId = warehouse.Id };
+            warehouse.Items = await itemRepository.GetAllAsync(itemFilter);
+            warehouse.Items.Add(new ItemViewVM
+            {
+                Code = "test",
+                Id = 0,
+                IsActive = true,
+                Name = "test"
+            });
+            return View(warehouse);
         }
 
         public async Task<ActionResult> Create()
@@ -79,66 +91,38 @@ namespace GMGInventory.Controllers
             return View(warehouseVM);
         }
 
-        //public async Task<ActionResult> Password(string id)
-        //{
-        //    var user = await userRepository.GetUserInformationVMToEditAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var userPasswordVM = new UserResetPasswordVM()
-        //    {
-        //        Id = id,
-        //        Username = user.Username
-        //    };
-        //    return View(userPasswordVM);
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (await warehouseRepository.IsIdExists(id) != true)
+            {
+                return NotFound();
+            }
+            if (await warehouseRepository.IsInUse(id))
+            {
+                await warehouseRepository.DeactivateAsync(id);
+                TempData["WarningMessage"] = "Warehouse has been deactivated";
+            }
+            else
+            {
+                await warehouseRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Warehouse successfully deleted";
+            }
+            return RedirectToAction(nameof(Index));
+        }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Password(UserResetPasswordVM userPasswordVM)
-        //{
-        //    if(ModelState.IsValid)
-        //    {
-        //        await userRepository.ResetPassword(userPasswordVM);
-        //        TempData["SuccessMessage"] = "Password successfully reset";
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(userPasswordVM);
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Delete(string id)
-        //{
-        //    if (await userRepository.IsUserIdExistAsync(id) != true)
-        //    {
-        //        return NotFound();
-        //    }
-        //    if (await userRepository.IsUserInUseAsync(id))
-        //    {
-        //        await userRepository.DeactivateUserAsync(id);
-        //        TempData["WarningMessage"] = "User has been deactivated";
-        //    }
-        //    else
-        //    {
-        //        await userRepository.DeleteAsync(id);
-        //        TempData["SuccessMessage"] = "User successfully deleted";
-        //    }
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Reactivate(string id)
-        //{
-        //    if (await userRepository.IsUserIdExistAsync(id) != true)
-        //    {
-        //        return NotFound();
-        //    }
-        //    await userRepository.ReactivateUserAsync(id);
-        //    TempData["SuccessMessage"] = "User successfully reactivated";
-        //    return RedirectToAction(nameof(Index));
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reactivate(int id)
+        {
+            if (await warehouseRepository.IsIdExists(id) != true)
+            {
+                return NotFound();
+            }
+            await warehouseRepository.ReactivateAsync(id);
+            TempData["SuccessMessage"] = "Warehouse successfully reactivated";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

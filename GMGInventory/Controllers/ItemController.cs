@@ -20,12 +20,6 @@ namespace GMGInventory.Controllers
             return View(items);
         }
 
-        public async Task<PartialViewResult> PartialItems(ItemFilterVM itemFilterVM)
-        {
-            var items = await itemRepository.GetAllAsync(itemFilterVM);
-            return PartialView(items);
-        }
-
         public async Task<ActionResult> Details(int id)
         {
             var item = await itemRepository.GetAsync(id);

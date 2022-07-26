@@ -99,8 +99,8 @@ namespace GMGInventory.Data
                       ||(auditEntry.TableName == "User"
                         && (propertyName == "Id" || propertyName == "UserName" || propertyName == "FirstName" || propertyName == "IsActive" || propertyName == "IsDarkMode" || propertyName == "LastName" || propertyName == "Nickname" || propertyName == "PasswordHash")))
                     {
-                        var currentValue = propertyName == "PasswordHash" ? "*****" : property.CurrentValue;
-                        var originalValue = propertyName == "PasswordHash" ? "*****" : property.OriginalValue;
+                        var currentValue = propertyName == "PasswordHash" ? "*****" : property.CurrentValue ?? string.Empty;
+                        var originalValue = propertyName == "PasswordHash" ? "*****" : property.OriginalValue ?? string.Empty;
                         if (property.Metadata.IsPrimaryKey())
                         {
                             auditEntry.KeyValues[propertyName] = currentValue;
@@ -118,7 +118,7 @@ namespace GMGInventory.Data
                                 break;
                             case EntityState.Modified:
                                 if (property.IsModified && (originalValue.Equals(currentValue) == false 
-                                    || property.CurrentValue.Equals(property.OriginalValue) == false))
+                                    || (propertyName == "PasswordHash" && property.CurrentValue.Equals(property.OriginalValue) == false)))
                                 {
                                     auditEntry.ChangedColumns.Add(propertyName);
                                     auditEntry.AuditType = Common.Constants.AuditType.Update;

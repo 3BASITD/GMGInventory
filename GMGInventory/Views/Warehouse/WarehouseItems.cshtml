@@ -1,0 +1,38 @@
+﻿@model IEnumerable<ItemViewVM>
+
+<table class="table table-head-fixed table-striped table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                Retail Price
+            </th>
+            <th>
+                Net Price
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model == null)
+        {
+            <tr><td colspan="4"><p class="text-center m-0">This record is empty</p></td></tr>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Code</td>
+                    <td>@item.Name</td>
+                    <td>0.00</td>
+                    <td>0.00</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

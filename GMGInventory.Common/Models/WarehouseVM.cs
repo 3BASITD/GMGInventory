@@ -56,5 +56,6 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Date Modified")]
         public string DateModified { get; set; }
+        public List<ItemViewVM> Items { get; set; }
     }
 }

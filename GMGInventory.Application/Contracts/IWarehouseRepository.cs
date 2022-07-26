@@ -12,5 +12,8 @@ namespace GMGInventory.Application.Contracts
         Task<bool> IsCodeExists(string code);
         Task DeleteAsync(int id);
         Task UpdateAsync(WarehouseFormVM itemVM);
+        Task ReactivateAsync(int id);
+        Task DeactivateAsync(int id);
+        Task<bool> IsInUse(int id);
     }
 }

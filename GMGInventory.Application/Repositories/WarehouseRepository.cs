@@ -14,6 +14,7 @@ namespace GMGInventory.Application.Repositories
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
         private readonly IMapper mapper;
+        private readonly string currentUser;
 
         public WarehouseRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
@@ -24,6 +25,7 @@ namespace GMGInventory.Application.Repositories
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
             this.mapper = mapper;
+            this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
         public async Task<WarehouseViewVM?> GetAsync(int? id)
@@ -63,11 +65,10 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<WarehouseFormVM> AddAsync(WarehouseFormVM warehouseVM)
         {
-            string userId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var warehouse = mapper.Map<Warehouse>(warehouseVM);
             warehouse.IsActive = true;
             await context.Warehouses.AddAsync(warehouse);
-            await context.SaveChangesAsync(userId);
+            await context.SaveChangesAsync(currentUser);
             return mapper.Map<WarehouseFormVM>(warehouse);
         }
 
@@ -84,17 +85,41 @@ namespace GMGInventory.Application.Repositories
         public async Task DeleteAsync(int id)
         {
             var warehouse = context.Warehouses.Where(s => s.Id == id).First();
-            context.Warehouses.Remove(warehouse);
-            await context.SaveChangesAsync();
+                context.Warehouses.Remove(warehouse);
+            await context.SaveChangesAsync(currentUser);
         }
 
         public async Task UpdateAsync(WarehouseFormVM warehouseVM)
         {
-            string userId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var warehouse = await context.Warehouses.Where(s => s.Id == warehouseVM.Id).FirstAsync();
             mapper.Map(warehouseVM, warehouse);
             context.Warehouses.Update(warehouse);
-            await context.SaveChangesAsync(userId);
+            await context.SaveChangesAsync(currentUser);
+        }
+
+        public async Task<bool> IsInUse(int id)
+        {
+            return await context.ItemInventories.AnyAsync(s => s.WarehouseId == id)
+                || await context.PhysicalCountHistories.AnyAsync(s => s.WarehouseId == id)
+                || await context.PurchaseOrders.AnyAsync(s => s.ToWarehouseId == id)
+                || await context.TransferItems.AnyAsync(s => s.ToWarehouseId == id)
+                || await context.TransferItems.AnyAsync(s => s.FromWarehouseId == id);
+        }
+
+        public async Task ReactivateAsync(int id)
+        {
+            var warehouse = await context.Warehouses.Where(s => s.Id == id).FirstAsync();
+            warehouse.IsActive = true;
+            context.Warehouses.Update(warehouse);
+            await context.SaveChangesAsync(currentUser);
+        }
+
+        public async Task DeactivateAsync(int id)
+        {
+            var warehouse = await context.Warehouses.Where(s => s.Id == id).FirstAsync();
+            warehouse.IsActive = false;
+            context.Warehouses.Update(warehouse);
+            await context.SaveChangesAsync(currentUser);
         }
 
         private async Task<string> GetUserName(string? userId)
