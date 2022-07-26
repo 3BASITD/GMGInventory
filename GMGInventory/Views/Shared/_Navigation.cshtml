@@ -92,7 +92,7 @@
         || User.IsInRole(Roles.SalesManager) || User.IsInRole(Roles.SystemAdmin)
         || User.IsInRole(Roles.Telemarketer))
         {
-            var navInventoryActive = (new List<string> { "Forwarder", "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "Replenish", "Warehouse", "Transfer", "Unserved" }).Contains(currentController ?? "");
+            var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "Replenish", "Warehouse", "Transfer", "Unserved" }).Contains(currentController ?? "");
 
             <li class="nav-item @(navInventoryActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navInventoryActive ? "active" : "")">
@@ -103,16 +103,6 @@
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
-                    @if (User.IsInRole(Roles.SystemAdmin))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "Forwarder" ? "active" : "")"
-                       asp-area="" asp-controller="Forwarder" asp-action="Index">
-                                <i class="nav-icon fas fa-shipping-fast"></i>
-                                <p>Forwarder</p>
-                            </a>
-                        </li>
-                    }
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Item" ? "active" : "")"
                        asp-area="" asp-controller="Item" asp-action="Index">
@@ -204,7 +194,7 @@
         @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager)
         || User.IsInRole(Roles.SalesManager) || User.IsInRole(Roles.SystemAdmin))
         {
-            var navCreditsCollectionActive = (new List<string> { "Customer", "Payment", "Soacr" }).Contains(currentController ?? "");
+            var navCreditsCollectionActive = (new List<string> { "Customer", "Forwarder", "Payment", "Soacr" }).Contains(currentController ?? "");
 
             <li class="nav-item @(navCreditsCollectionActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navCreditsCollectionActive ? "active" : "")">
@@ -220,6 +210,13 @@
                        asp-area="" asp-controller="Customer" asp-action="Index">
                             <i class="nav-icon fas fa-shapes"></i>
                             <p>Customer</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Forwarder" ? "active" : "")"
+                       asp-area="" asp-controller="Forwarder" asp-action="Index">
+                            <i class="nav-icon fas fa-shipping-fast"></i>
+                            <p>Forwarder</p>
                         </a>
                     </li>
                     <li class="nav-item">
