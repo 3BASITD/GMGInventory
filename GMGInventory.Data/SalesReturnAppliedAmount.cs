@@ -4,9 +4,9 @@ namespace GMGInventory.Data
 {
     public class SalesReturnAppliedAmount : BaseEntity
     {
-        [ForeignKey("TotalReturnId")]
-        public int TotalReturnId { get; set; }
-        public SalesReturnTotalReturnAmount TotalReturn { get; set; }
+        [ForeignKey("SalesReturnTotalReturnAmountId")]
+        public int SalesReturnTotalReturnAmountId { get; set; }
+        public SalesReturnTotalReturnAmount SalesReturnTotalReturnAmount { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string AppliedTo { get; set; }

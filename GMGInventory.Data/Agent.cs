@@ -4,6 +4,12 @@ namespace GMGInventory.Data
 {
     public class Agent : BaseEntity
     {
+        public Agent()
+        {
+            this.Customers = new HashSet<Customer>();
+            this.SalesOrders = new HashSet<SalesOrder>();
+        }
+
         [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
 
@@ -27,5 +33,8 @@ namespace GMGInventory.Data
 
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
+
+        public ICollection<Customer> Customers { get; set; }
+        public ICollection<SalesOrder> SalesOrders { get; set; }
     }
 }

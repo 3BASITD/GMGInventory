@@ -4,6 +4,12 @@ namespace GMGInventory.Data
 {
     public class SOACR : BaseEntity
     {
+        public SOACR()
+        {
+            this.CustomerPayments = new HashSet<CustomerPayment>();
+            this.SOACRLineItems = new HashSet<SOACRLineItem>();
+        }
+
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
@@ -38,5 +44,8 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal OverPayment { get; set; }
+
+        public ICollection<CustomerPayment> CustomerPayments { get; set; }
+        public ICollection<SOACRLineItem> SOACRLineItems { get; set; }
     }
 }

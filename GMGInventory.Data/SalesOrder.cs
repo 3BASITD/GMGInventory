@@ -4,6 +4,14 @@ namespace GMGInventory.Data
 {
     public class SalesOrder : BaseEntity
     {
+        public SalesOrder()
+        {
+            this.Invoices = new HashSet<Invoice>();
+            this.Packs = new HashSet<Pack>();
+            this.SalesOrderDeliveryMonitorings = new HashSet<SalesOrderDeliveryMonitoring>();
+            this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
+        }
+
         [ForeignKey("AgentId")]
         public int AgentId { get; set; }
         public Agent Agent { get; set; }
@@ -46,5 +54,10 @@ namespace GMGInventory.Data
         public int? QuantityPacked { get; set; }
         public int? QuantityInvoiced { get; set; }
         public int? QuantityOrdered { get; set; }
+
+        public ICollection<Invoice> Invoices { get; set; }
+        public ICollection<Pack> Packs { get; set; }
+        public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
+        public ICollection<SalesOrderLineItem> SalesOrderLineItems { get; set; }
     }
 }

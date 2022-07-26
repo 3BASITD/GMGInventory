@@ -4,6 +4,11 @@ namespace GMGInventory.Data
 {
     public class Supplier : BaseEntity
     {
+        public Supplier()
+        {
+            this.PurchaseOrder = new HashSet<PurchaseOrder>();
+        }
+
         [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
 
@@ -48,5 +53,7 @@ namespace GMGInventory.Data
         public bool IsActive { get; set; }
         public bool IsForeign { get; set; }
         public bool IsDeleted { get; set; }
+
+        public ICollection<PurchaseOrder> PurchaseOrder { get; set; }
     }
 }

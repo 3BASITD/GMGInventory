@@ -4,8 +4,9 @@ namespace GMGInventory.Data
 {
     public class StockCard : BaseEntity
     {
-        [Column(TypeName = "nvarchar(50)")]
-        public string ItemCode { get; set; }
+        [ForeignKey("ItemId")]
+        public int ItemId { get; set; }
+        public Item Item { get; set; }
 
         public int? In { get; set; }
         public int? Out { get; set; }

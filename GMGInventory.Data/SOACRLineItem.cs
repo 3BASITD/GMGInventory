@@ -4,9 +4,9 @@ namespace GMGInventory.Data
 {
     public class SOACRLineItem : BaseEntity
     {
-        [ForeignKey("SOAId")]
-        public int SOAId { get; set; }
-        public SOACR SOA { get; set; }
+        [ForeignKey("SOACRId")]
+        public int SOACRId { get; set; }
+        public SOACR SOACR { get; set; }
 
         [ForeignKey("InvoiceId")]
         public int InvoiceId { get; set; }

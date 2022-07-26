@@ -516,7 +516,7 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int>("SOAId")
+                    b.Property<int>("SOACRId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TKTSolicitation")
@@ -543,7 +543,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("SOAId");
+                    b.HasIndex("SOACRId");
 
                     b.ToTable("CustomerPayments");
                 });
@@ -978,9 +978,8 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("UnitCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -996,6 +995,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ItemTypeId");
+
+                    b.HasIndex("UnitId");
 
                     b.ToTable("Items");
                 });
@@ -1335,7 +1336,7 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.PaymentDetails", b =>
+            modelBuilder.Entity("GMGInventory.Data.PaymentDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1811,9 +1812,8 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Forwarder")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("ForwarderId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SalesOrderId")
                         .HasColumnType("int");
@@ -1830,6 +1830,8 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ForwarderId");
 
                     b.HasIndex("SalesOrderId");
 
@@ -1953,7 +1955,10 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TotalReturnId")
+                    b.Property<int?>("SalesOrderDeliveryMonitoringId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SalesReturnTotalReturnAmountId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserCreated")
@@ -1965,7 +1970,9 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TotalReturnId");
+                    b.HasIndex("SalesOrderDeliveryMonitoringId");
+
+                    b.HasIndex("SalesReturnTotalReturnAmountId");
 
                     b.ToTable("SalesReturnAppliedAmounts");
                 });
@@ -2268,7 +2275,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<decimal>("PaidAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("SOAId")
+                    b.Property<int>("SOACRId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TBRAmount")
@@ -2285,7 +2292,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("InvoiceId");
 
-                    b.HasIndex("SOAId");
+                    b.HasIndex("SOACRId");
 
                     b.ToTable("SOACRLineItems");
                 });
@@ -2491,9 +2498,8 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("InOutDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ItemCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("Out")
                         .HasColumnType("int");
@@ -2509,6 +2515,8 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
 
                     b.ToTable("StockCards");
                 });
@@ -2622,9 +2630,6 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int>("ToWarehouseId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserCreated")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
@@ -2635,8 +2640,6 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FromWarehouseId");
-
-                    b.HasIndex("ToWarehouseId");
 
                     b.ToTable("TransferItems");
                 });
@@ -2661,6 +2664,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<int>("ToWarehouseId")
+                        .HasColumnType("int");
+
                     b.Property<int>("TransferItemId")
                         .HasColumnType("int");
 
@@ -2674,6 +2680,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ItemId");
+
+                    b.HasIndex("ToWarehouseId");
 
                     b.HasIndex("TransferItemId");
 
@@ -2869,42 +2877,42 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            ConcurrencyStamp = "8c703056-9f7d-4d07-b230-b2876dc0ed69",
+                            ConcurrencyStamp = "ac33e2bf-86e3-41fd-b3a6-38e97ab98546",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            ConcurrencyStamp = "8e29409b-f4eb-449d-a9b9-81f56e744eb1",
+                            ConcurrencyStamp = "b00d7f57-2e4e-4df8-b18d-a2ea8a45e6c1",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            ConcurrencyStamp = "53f3cb45-ef4e-4fd3-a7c9-1b940e696232",
+                            ConcurrencyStamp = "baed9032-8843-4285-a8d0-ac901c694d36",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            ConcurrencyStamp = "e42b2333-1ba2-42f6-b104-53267f63b3c4",
+                            ConcurrencyStamp = "3d51fee5-8f28-4f69-9524-2483bc23feba",
                             Name = "Sales Manager",
                             NormalizedName = "SALES MANAGER"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            ConcurrencyStamp = "5d695153-4a28-4893-9043-949ba2de20cc",
+                            ConcurrencyStamp = "3f0d8597-62b7-4650-b9a0-8fbfe27d25c5",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            ConcurrencyStamp = "55f71592-2b44-4b18-a87c-1bf74f1f3423",
+                            ConcurrencyStamp = "171f13c6-8aba-482e-ad27-aec78d4c9238",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER"
                         });
@@ -3143,16 +3151,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "994272f9-24c0-40ab-9c91-5db2f62445bf",
+                            ConcurrencyStamp = "6b17d4a4-c1c4-4135-a040-2811c0c62a54",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAEAACcQAAAAEJctmZQ3cDiA9jwlo+4VwvXfrhUkiNRuzv3LkGENjJ8+k3jNV/CsVghGEDbZSM2+Hg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEKR6GuwBYnkFqgPXjuHQzok+m0MCRMPoctVoc3zvxcPic0x4wkOk7g2IWcbiqSqIEg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7bedf75d-017f-40a0-a9c4-f9c84845dd89",
+                            SecurityStamp = "ff88f98d-5190-4313-903b-2a89dcca914d",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2022, 7, 25, 4, 59, 38, 113, DateTimeKind.Local).AddTicks(7086),
+                            DateCreated = new DateTime(2022, 7, 26, 22, 13, 12, 838, DateTimeKind.Local).AddTicks(2320),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3164,16 +3172,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "274033fb-6b4b-4060-be84-80022ab854c8",
+                            ConcurrencyStamp = "75a22d95-7339-45a3-a99f-0c95fe8db61a",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAEAACcQAAAAEO6LhLl/TIcePi82h9b+0RJuRmb5uryQw2RHhLX9fNHp55SK2hdMBgAJ2UOvIjEjNQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEED7RzsYQVLeSA1l4GcomLWfPCL+32O132hcZ045SWlHlnXJYnxFVBOlshG/Or27jA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "84c21440-e491-402a-89e0-12e78aa006e8",
+                            SecurityStamp = "ce760775-1d09-42d3-b908-0dbbe716b551",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2022, 7, 25, 4, 59, 38, 121, DateTimeKind.Local).AddTicks(488),
+                            DateCreated = new DateTime(2022, 7, 26, 22, 13, 12, 845, DateTimeKind.Local).AddTicks(8507),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3186,7 +3194,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Agent", b =>
                 {
                     b.HasOne("GMGInventory.Data.Area", "Area")
-                        .WithMany()
+                        .WithMany("Agents")
                         .HasForeignKey("AreaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3197,7 +3205,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Area", b =>
                 {
                     b.HasOne("GMGInventory.Data.Region", "Region")
-                        .WithMany()
+                        .WithMany("Areas")
                         .HasForeignKey("RegionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3208,7 +3216,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
                 {
                     b.HasOne("GMGInventory.Data.ItemType", "ItemType")
-                        .WithMany()
+                        .WithMany("Brands")
                         .HasForeignKey("ItemTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3219,7 +3227,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
                 {
                     b.HasOne("GMGInventory.Data.CreditDebitMemoType", "CreditDebitMemoType")
-                        .WithMany()
+                        .WithMany("CreditDebitMemos")
                         .HasForeignKey("CreditDebitMemoTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3230,19 +3238,19 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Customer", b =>
                 {
                     b.HasOne("GMGInventory.Data.Agent", "Agent")
-                        .WithMany()
+                        .WithMany("Customers")
                         .HasForeignKey("AgentId");
 
                     b.HasOne("GMGInventory.Data.Area", "Area")
-                        .WithMany()
+                        .WithMany("Customers")
                         .HasForeignKey("AreaId");
 
                     b.HasOne("GMGInventory.Data.CreditTerm", "CreditTerm")
-                        .WithMany()
+                        .WithMany("Customers")
                         .HasForeignKey("CreditTermId");
 
                     b.HasOne("GMGInventory.Data.CustomerType", "CustomerType")
-                        .WithMany()
+                        .WithMany("Customers")
                         .HasForeignKey("CustomerTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3259,32 +3267,32 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
                 {
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("CustomerPayments")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.SOACR", "SOA")
-                        .WithMany()
-                        .HasForeignKey("SOAId")
+                    b.HasOne("GMGInventory.Data.SOACR", "SOACR")
+                        .WithMany("CustomerPayments")
+                        .HasForeignKey("SOACRId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
 
-                    b.Navigation("SOA");
+                    b.Navigation("SOACR");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPaymentDetail", b =>
                 {
                     b.HasOne("GMGInventory.Data.Invoice", "Invoice")
-                        .WithMany()
+                        .WithMany("CustomerPaymentDetails")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Payment", "Payment")
-                        .WithMany()
+                        .WithMany("CustomerPaymentDetails")
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3297,7 +3305,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Forwarder", b =>
                 {
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Forwarders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3308,23 +3316,23 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
                 {
                     b.HasOne("GMGInventory.Data.InvoiceType", "InvoiceType")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("InvoiceTypeId");
 
                     b.HasOne("GMGInventory.Data.Pack", "Pack")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("PackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("SalesOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Status", "Status")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3341,13 +3349,13 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.InvoiceLineItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.Invoice", "Invoice")
-                        .WithMany()
+                        .WithMany("InvoiceLineItems")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("InvoiceLineItems")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3360,7 +3368,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.InvoicePayment", b =>
                 {
                     b.HasOne("GMGInventory.Data.Invoice", "Invoice")
-                        .WithMany()
+                        .WithMany("InvoicePayments")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3371,36 +3379,44 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Item", b =>
                 {
                     b.HasOne("GMGInventory.Data.Brand", "Brand")
-                        .WithMany()
+                        .WithMany("Items")
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Category", "Category")
-                        .WithMany()
+                        .WithMany("Items")
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("GMGInventory.Data.ItemType", "ItemType")
-                        .WithMany()
+                        .WithMany("Items")
                         .HasForeignKey("ItemTypeId");
+
+                    b.HasOne("GMGInventory.Data.Unit", "Unit")
+                        .WithMany("Items")
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
 
                     b.Navigation("ItemType");
+
+                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemInventory", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("ItemInventories")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Warehouse", "Warehouse")
-                        .WithMany()
+                        .WithMany("ItemInventories")
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3413,7 +3429,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.ItemPrice", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("ItemPrices")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3424,7 +3440,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.ItemType", b =>
                 {
                     b.HasOne("GMGInventory.Data.Category", "Category")
-                        .WithMany()
+                        .WithMany("ItemTypes")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3435,13 +3451,13 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Pack", b =>
                 {
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
-                        .WithMany()
+                        .WithMany("Packs")
                         .HasForeignKey("SalesOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Status", "Status")
-                        .WithMany()
+                        .WithMany("Packs")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3454,19 +3470,19 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PackLineItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("PackLineItems")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Pack", "Pack")
-                        .WithMany()
+                        .WithMany("PackLineItems")
                         .HasForeignKey("PackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.PackReturn", "PackReturn")
-                        .WithMany()
+                        .WithMany("PackLineItems")
                         .HasForeignKey("PackReturnId");
 
                     b.Navigation("Item");
@@ -3479,7 +3495,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PackReturn", b =>
                 {
                     b.HasOne("GMGInventory.Data.Pack", "Pack")
-                        .WithMany()
+                        .WithMany("PackReturns")
                         .HasForeignKey("PackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3490,13 +3506,13 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PackReturnLineItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("PackReturnLineItems")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.PackReturn", "PackReturn")
-                        .WithMany()
+                        .WithMany("PackReturnLineItems")
                         .HasForeignKey("PackReturnId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3509,7 +3525,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Payment", b =>
                 {
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Payments")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3517,16 +3533,16 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.PaymentDetails", b =>
+            modelBuilder.Entity("GMGInventory.Data.PaymentDetail", b =>
                 {
                     b.HasOne("GMGInventory.Data.Invoice", "Invoice")
-                        .WithMany()
+                        .WithMany("PaymentDetails")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Payment", "Payment")
-                        .WithMany()
+                        .WithMany("PaymentDetails")
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3539,13 +3555,13 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PhysicalCountHistory", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("PhysicalCountHistories")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Warehouse", "Warehouse")
-                        .WithMany()
+                        .WithMany("PhysicalCountHistories")
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3558,23 +3574,23 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrder", b =>
                 {
                     b.HasOne("GMGInventory.Data.Currency", "Currency")
-                        .WithMany()
+                        .WithMany("PurchaseOrders")
                         .HasForeignKey("CurrencyId");
 
                     b.HasOne("GMGInventory.Data.Status", "Status")
-                        .WithMany()
+                        .WithMany("PurchaseOrders")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Supplier", "Supplier")
-                        .WithMany()
+                        .WithMany("PurchaseOrder")
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Warehouse", "ToWarehouse")
-                        .WithMany()
+                        .WithMany("PurchaseOrders")
                         .HasForeignKey("ToWarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3591,13 +3607,13 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderLineItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("PurchaseOrderLineItems")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.PurchaseOrder", "PurchaseOrder")
-                        .WithMany()
+                        .WithMany("PurchaseOrderLineItems")
                         .HasForeignKey("PurchaseOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3610,7 +3626,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturn", b =>
                 {
                     b.HasOne("GMGInventory.Data.PurchaseOrder", "PurchaseOrder")
-                        .WithMany()
+                        .WithMany("PurchaseReturns")
                         .HasForeignKey("PurchaseOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3621,13 +3637,13 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturnLineItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.PurchaseOrderLineItem", "PurchaseOrderLineItem")
-                        .WithMany()
+                        .WithMany("PurchaseReturnLineItems")
                         .HasForeignKey("PurchaseOrderLineItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.PurchaseReturn", "PurchaseReturn")
-                        .WithMany()
+                        .WithMany("PurchaseReturnLineItems")
                         .HasForeignKey("PurchaseReturnId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3640,31 +3656,31 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.SalesOrder", b =>
                 {
                     b.HasOne("GMGInventory.Data.Agent", "Agent")
-                        .WithMany()
+                        .WithMany("SalesOrders")
                         .HasForeignKey("AgentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("SalesOrders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.DeliveryType", "DeliveryType")
-                        .WithMany()
+                        .WithMany("SalesOrders")
                         .HasForeignKey("DeliveryTypeId");
 
                     b.HasOne("GMGInventory.Data.PriceType", "PriceType")
-                        .WithMany()
+                        .WithMany("SalesOrders")
                         .HasForeignKey("PriceTypeId");
 
                     b.HasOne("GMGInventory.Data.PurchaseOrder", "PurchaseOrder")
-                        .WithMany()
+                        .WithMany("SalesOrders")
                         .HasForeignKey("PurchaseOrderId");
 
                     b.HasOne("GMGInventory.Data.Status", "Status")
-                        .WithMany()
+                        .WithMany("SalesOrders")
                         .HasForeignKey("StatusId");
 
                     b.Navigation("Agent");
@@ -3682,11 +3698,19 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderDeliveryMonitoring", b =>
                 {
+                    b.HasOne("GMGInventory.Data.Forwarder", "Forwarder")
+                        .WithMany("SalesOrderDeliveryMonitorings")
+                        .HasForeignKey("ForwarderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
-                        .WithMany()
+                        .WithMany("SalesOrderDeliveryMonitorings")
                         .HasForeignKey("SalesOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Forwarder");
 
                     b.Navigation("SalesOrder");
                 });
@@ -3694,13 +3718,13 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.SalesOrderLineItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("SalesOrderLineItems")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
-                        .WithMany()
+                        .WithMany("SalesOrderLineItems")
                         .HasForeignKey("SalesOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3713,7 +3737,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
                 {
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("SalesReturns")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3723,25 +3747,29 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnAppliedAmount", b =>
                 {
-                    b.HasOne("GMGInventory.Data.SalesReturnTotalReturnAmount", "TotalReturn")
+                    b.HasOne("GMGInventory.Data.SalesOrderDeliveryMonitoring", null)
+                        .WithMany("SalesReturnAppliedAmounts")
+                        .HasForeignKey("SalesOrderDeliveryMonitoringId");
+
+                    b.HasOne("GMGInventory.Data.SalesReturnTotalReturnAmount", "SalesReturnTotalReturnAmount")
                         .WithMany()
-                        .HasForeignKey("TotalReturnId")
+                        .HasForeignKey("SalesReturnTotalReturnAmountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("TotalReturn");
+                    b.Navigation("SalesReturnTotalReturnAmount");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnLineItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("SalesReturnLineItems")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.SalesReturn", "SalesReturn")
-                        .WithMany()
+                        .WithMany("SalesReturnLineItems")
                         .HasForeignKey("SalesReturnId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3754,7 +3782,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.SalesReturnTotalReturnAmount", b =>
                 {
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("SalesReturnTotalReturnAmounts")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3765,7 +3793,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.ShippingAddress", b =>
                 {
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("ShippingAddresses")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3776,13 +3804,13 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.SOACR", b =>
                 {
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("SOACRs")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.SOACRType", "SOACRType")
-                        .WithMany()
+                        .WithMany("SOACRs")
                         .HasForeignKey("SOACRTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3795,7 +3823,7 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.SOACRCheck", b =>
                 {
                     b.HasOne("GMGInventory.Data.Payment", "Payment")
-                        .WithMany()
+                        .WithMany("SOACRChecks")
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3806,32 +3834,43 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.SOACRLineItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.Invoice", "Invoice")
-                        .WithMany()
+                        .WithMany("SOACRLineItems")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.SOACR", "SOA")
-                        .WithMany()
-                        .HasForeignKey("SOAId")
+                    b.HasOne("GMGInventory.Data.SOACR", "SOACR")
+                        .WithMany("SOACRLineItems")
+                        .HasForeignKey("SOACRId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Invoice");
 
-                    b.Navigation("SOA");
+                    b.Navigation("SOACR");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.StockCard", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Item", "Item")
+                        .WithMany("StockCards")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Supplier", b =>
                 {
                     b.HasOne("GMGInventory.Data.Area", "Area")
-                        .WithMany()
+                        .WithMany("Suppliers")
                         .HasForeignKey("AreaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Currency", "Currency")
-                        .WithMany()
+                        .WithMany("Suppliers")
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3844,37 +3883,37 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.TransferItem", b =>
                 {
                     b.HasOne("GMGInventory.Data.Warehouse", "FromWarehouse")
-                        .WithMany()
+                        .WithMany("TransferItems")
                         .HasForeignKey("FromWarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.Warehouse", "ToWarehouse")
-                        .WithMany()
-                        .HasForeignKey("ToWarehouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("FromWarehouse");
-
-                    b.Navigation("ToWarehouse");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItemDetail", b =>
                 {
                     b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany()
+                        .WithMany("TransferItemDetails")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.Warehouse", "ToWarehouse")
+                        .WithMany("TransferItemDetails")
+                        .HasForeignKey("ToWarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.TransferItem", "TransferItem")
-                        .WithMany()
+                        .WithMany("TransferItemDetails")
                         .HasForeignKey("TransferItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Item");
+
+                    b.Navigation("ToWarehouse");
 
                     b.Navigation("TransferItem");
                 });
@@ -3928,6 +3967,261 @@ namespace GMGInventory.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Agent", b =>
+                {
+                    b.Navigation("Customers");
+
+                    b.Navigation("SalesOrders");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Area", b =>
+                {
+                    b.Navigation("Agents");
+
+                    b.Navigation("Customers");
+
+                    b.Navigation("Suppliers");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Brand", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Category", b =>
+                {
+                    b.Navigation("ItemTypes");
+
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CreditDebitMemoType", b =>
+                {
+                    b.Navigation("CreditDebitMemos");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CreditTerm", b =>
+                {
+                    b.Navigation("Customers");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Currency", b =>
+                {
+                    b.Navigation("PurchaseOrders");
+
+                    b.Navigation("Suppliers");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Customer", b =>
+                {
+                    b.Navigation("CustomerPayments");
+
+                    b.Navigation("Forwarders");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("SOACRs");
+
+                    b.Navigation("SalesOrders");
+
+                    b.Navigation("SalesReturnTotalReturnAmounts");
+
+                    b.Navigation("SalesReturns");
+
+                    b.Navigation("ShippingAddresses");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CustomerType", b =>
+                {
+                    b.Navigation("Customers");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.DeliveryType", b =>
+                {
+                    b.Navigation("SalesOrders");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Forwarder", b =>
+                {
+                    b.Navigation("SalesOrderDeliveryMonitorings");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
+                {
+                    b.Navigation("CustomerPaymentDetails");
+
+                    b.Navigation("InvoiceLineItems");
+
+                    b.Navigation("InvoicePayments");
+
+                    b.Navigation("PaymentDetails");
+
+                    b.Navigation("SOACRLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.InvoiceType", b =>
+                {
+                    b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Item", b =>
+                {
+                    b.Navigation("InvoiceLineItems");
+
+                    b.Navigation("ItemInventories");
+
+                    b.Navigation("ItemPrices");
+
+                    b.Navigation("PackLineItems");
+
+                    b.Navigation("PackReturnLineItems");
+
+                    b.Navigation("PhysicalCountHistories");
+
+                    b.Navigation("PurchaseOrderLineItems");
+
+                    b.Navigation("SalesOrderLineItems");
+
+                    b.Navigation("SalesReturnLineItems");
+
+                    b.Navigation("StockCards");
+
+                    b.Navigation("TransferItemDetails");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ItemType", b =>
+                {
+                    b.Navigation("Brands");
+
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Pack", b =>
+                {
+                    b.Navigation("Invoices");
+
+                    b.Navigation("PackLineItems");
+
+                    b.Navigation("PackReturns");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PackReturn", b =>
+                {
+                    b.Navigation("PackLineItems");
+
+                    b.Navigation("PackReturnLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Payment", b =>
+                {
+                    b.Navigation("CustomerPaymentDetails");
+
+                    b.Navigation("PaymentDetails");
+
+                    b.Navigation("SOACRChecks");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PriceType", b =>
+                {
+                    b.Navigation("SalesOrders");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrder", b =>
+                {
+                    b.Navigation("PurchaseOrderLineItems");
+
+                    b.Navigation("PurchaseReturns");
+
+                    b.Navigation("SalesOrders");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderLineItem", b =>
+                {
+                    b.Navigation("PurchaseReturnLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReturn", b =>
+                {
+                    b.Navigation("PurchaseReturnLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Region", b =>
+                {
+                    b.Navigation("Areas");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.SalesOrder", b =>
+                {
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Packs");
+
+                    b.Navigation("SalesOrderDeliveryMonitorings");
+
+                    b.Navigation("SalesOrderLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.SalesOrderDeliveryMonitoring", b =>
+                {
+                    b.Navigation("SalesReturnAppliedAmounts");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
+                {
+                    b.Navigation("SalesReturnLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.SOACR", b =>
+                {
+                    b.Navigation("CustomerPayments");
+
+                    b.Navigation("SOACRLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.SOACRType", b =>
+                {
+                    b.Navigation("SOACRs");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Status", b =>
+                {
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Packs");
+
+                    b.Navigation("PurchaseOrders");
+
+                    b.Navigation("SalesOrders");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Supplier", b =>
+                {
+                    b.Navigation("PurchaseOrder");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.TransferItem", b =>
+                {
+                    b.Navigation("TransferItemDetails");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Unit", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Warehouse", b =>
+                {
+                    b.Navigation("ItemInventories");
+
+                    b.Navigation("PhysicalCountHistories");
+
+                    b.Navigation("PurchaseOrders");
+
+                    b.Navigation("TransferItemDetails");
+
+                    b.Navigation("TransferItems");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,6 +4,14 @@ namespace GMGInventory.Data
 {
     public class Invoice : BaseEntity
     {
+        public Invoice()
+        {
+            this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
+            this.InvoiceLineItems = new HashSet<InvoiceLineItem>();
+            this.InvoicePayments = new HashSet<InvoicePayment>();
+            this.SOACRLineItems = new HashSet<SOACRLineItem>();
+        }
+
         [ForeignKey("SalesOrderId")]
         public int SalesOrderId { get; set; }
         public SalesOrder SalesOrder { get; set; }
@@ -37,6 +45,12 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
+
+        public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
+        public ICollection<InvoiceLineItem> InvoiceLineItems { get; set; }
+        public ICollection<InvoicePayment> InvoicePayments { get; set; }
+        public ICollection<PaymentDetail> PaymentDetails { get; set; }
+        public ICollection<SOACRLineItem> SOACRLineItems { get; set; }
 
     }
 }

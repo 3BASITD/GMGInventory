@@ -4,6 +4,11 @@ namespace GMGInventory.Data
 {
     public class SalesReturn : BaseEntity
     {
+        public SalesReturn()
+        {
+            this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
+        }
+
         [Column(TypeName = "nvarchar(50)")]
         public string Number { get; set; }
 
@@ -13,5 +18,7 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
+
+        public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
     }
 }

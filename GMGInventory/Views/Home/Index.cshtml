@@ -1,95 +1,271 @@
-﻿@{
+﻿@using GMGInventory.Controllers
+@{
     ViewData["Title"] = "Home Page";
+
+    var TaskProgress = new List<HomeTaskRow>(){
+    new HomeTaskRow { MD = "SYSTEM > Login", ST = "Done" },
+    new HomeTaskRow { MD = "SYSTEM > Logout", ST = "Done" },
+    new HomeTaskRow { MD = "SYSTEM > System Template", ST = "Done (May change on later works)" },
+    new HomeTaskRow { MD = "SYSTEM > Database", ST = "Done (May change on later works)" },
+    new HomeTaskRow { MD = "SYSTEM > Profile", ST = "Done" },
+    new HomeTaskRow { MD = "SYSTEM > Navigation with Account Access binding", ST = "Done" },
+    new HomeTaskRow { MD = "SYSTEM > Data transfer from Old System (since 2019)", ST = "Not Started" },
+
+    new HomeTaskRow { MD = "SALES > Customer Purchase History", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES > Pack Listing", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES > Sales Invoice", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES > Sales Order", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES > Sales Order Delivery", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES > Sales Return", ST = "Not Started" },
+
+    new HomeTaskRow { MD = "INVENTORY > Item", ST = "On-going" },
+    new HomeTaskRow { MD = "INVENTORY > Price List", ST = "Pending" },
+    new HomeTaskRow { MD = "INVENTORY > Price Update", ST = "Pending" },
+    new HomeTaskRow { MD = "INVENTORY > Purchase Return", ST = "Pending" },
+    new HomeTaskRow { MD = "INVENTORY > Replenish", ST = "Pending" },
+    new HomeTaskRow { MD = "INVENTORY > Warehouse", ST = "On-going" },
+    new HomeTaskRow { MD = "INVENTORY > Warehouse Transfer", ST = "Pending" },
+    new HomeTaskRow { MD = "INVENTORY > Unserved Item", ST = "Pending" },
+
+    new HomeTaskRow { MD = "CREDITS & COLLECTION > Customer", ST = "Pending" },
+    new HomeTaskRow { MD = "CREDITS & COLLECTION > Forwarder", ST = "Pending" },
+    new HomeTaskRow { MD = "CREDITS & COLLECTION > Payment", ST = "Pending" },
+    new HomeTaskRow { MD = "CREDITS & COLLECTION > SOA / Counter Receipt", ST = "Pending" },
+
+    new HomeTaskRow { MD = "ADMINISTRATION > Agents", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Areas", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Brands", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Categories", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Item Types", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Users", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Suppliers", ST = "Done" },
+
+    new HomeTaskRow { MD = "SALES REPORTS > Agent Sales per Items", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Brand Sales Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Best Selling Item", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Best Selling Item (Invoice)", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Commission Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales Analytis Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Daily Sales Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Daily Sales Margin Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales Invoice Listing Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales by Agent / Area", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales Margin Item", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales Report Basis", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales Return Listing Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Unserved Item", ST = "Not Started" },
+
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Below Maintaining Item", ST = "Not Started" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Listing", ST = "Not Started" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Listing Supplier", ST = "Not Started" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Summary", ST = "Not Started" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Stock Card", ST = "Not Started" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Stock Status Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Supplier Purchase History", ST = "Not Started" },
+
+    new HomeTaskRow { MD = "ACCOUNTING REPORTS > Credit Memo Listing Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "ACCOUNTING REPORTS > Debit Memo Listing Report", ST = "Not Started" },
+
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register by Date", ST = "Not Started" },
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register by Customer", ST = "Not Started" },
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register Summary", ST = "Not Started" }
+    };
+
+    var TaskDone = TaskProgress.Count(s => s.ST == "Done");
+    var TaskDoneMayChange = TaskProgress.Count(s => s.ST == "Done (May change on later works)");
+    var TaskPending = TaskProgress.Count(s => s.ST == "Pending");
+    var TaskOngoing = TaskProgress.Count(s => s.ST == "On-going");
+    var TaskNotStarted = TaskProgress.Count(s => s.ST == "Not Started");
+    var TaskTotal = TaskProgress.Count();
 }
 
-<div class="card">
-    <div class="card-header">
-        List of Progress
+<div class="row">
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-box bg-success">
+                    <span class="info-box-icon"><i class="fas fa-battery-full"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Done</span>
+                        <span class="info-box-number">@(TaskDone + TaskDoneMayChange)</span>
+                        @{
+                            var DonePercentage = string.Format("{0:0.00}", ((((decimal)TaskDone + (decimal)TaskDoneMayChange) / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @DonePercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @DonePercentage% Progress
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-box bg-info">
+                    <span class="info-box-icon"><i class="fas fa-battery-quarter"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Pending</span>
+                        <span class="info-box-number">@TaskPending</span>
+                        @{
+                            var PendingPercentage = string.Format("{0:0.00}", (((decimal)TaskPending / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @PendingPercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @PendingPercentage% Progress
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-box bg-danger">
+                    <span class="info-box-icon"><i class="fas fa-battery-three-quarters"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">On-going</span>
+                        <span class="info-box-number">@TaskOngoing</span>
+                        @{
+                            var OngoingPercentage = string.Format("{0:0.00}", (((decimal)TaskOngoing / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @OngoingPercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @OngoingPercentage% Progress
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-box bg-secondary">
+                    <span class="info-box-icon"><i class="fas fa-battery-empty"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Not Started</span>
+                        <span class="info-box-number">@TaskNotStarted</span>
+                        @{
+                            var NotStartedPercentage = string.Format("{0:0.00}", (((decimal)TaskNotStarted / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @NotStartedPercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @NotStartedPercentage% Progress
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-label md-0">Select chart type</label>
+                    <select class="form-control" id="chartType" onchange="updateChartType()">
+                        <option value="line">Line</option>
+                        <option value="bar">Bar</option>
+                        <option value="radar">Radar</option>
+                        <option value="pie">Pie</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <table class="table table-bordered table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>####</th>
-                    <th>Module</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>0001</td><td>SYSTEM > Login</td><td class="text-success">Done</td></tr>
-                <tr><td>0002</td><td>SYSTEM > Logout</td><td class="text-success">Done</td></tr>
-                <tr><td>0003</td><td>SYSTEM > System Template</td><td class="text-warning">Done (May change on later works)</td></tr>
-                <tr><td>0004</td><td>SYSTEM > Database</td><td class="text-warning">Done (May change on later works)</td></tr>
-                <tr><td>0005</td><td>SYSTEM > Profile</td><td class="text-success">Done</td></tr>
-                <tr><td>0006</td><td>SYSTEM > Navigation with Account Access binding</td><td class="text-success">Done</td></tr>
-                <tr><td>0007</td><td>SYSTEM > Data transfer from Old System (since 2019)</td><td>Not Started</td></tr>
-
-                <tr><td>0008</td><td>SALES > Customer Purchase History</td><td>Not Started</td></tr>
-                <tr><td>0009</td><td>SALES > Pack Listing</td><td>Not Started</td></tr>
-                <tr><td>0010</td><td>SALES > Sales Invoice</td><td>Not Started</td></tr>
-                <tr><td>0011</td><td>SALES > Sales Order</td><td>Not Started</td></tr>
-                <tr><td>0012</td><td>SALES > Sales Order Delivery</td><td>Not Started</td></tr>
-                <tr><td>0013</td><td>SALES > Sales Return</td><td>Not Started</td></tr>
-
-                <tr><td>0014</td><td>INVENTORY > Forwarder</td><td class="text-muted">On-going</td></tr>
-                <tr><td>0015</td><td>INVENTORY > Item</td><td class="text-muted">On-going</td></tr>
-                <tr><td>0016</td><td>INVENTORY > Price List</td><td>Pending</td></tr>
-                <tr><td>0017</td><td>INVENTORY > Price Update</td><td>Pending</td></tr>
-                <tr><td>0018</td><td>INVENTORY > Purchase Return</td><td>Pending</td></tr>
-                <tr><td>0019</td><td>INVENTORY > Replenish</td><td>Pending</td></tr>
-                <tr><td>0020</td><td>INVENTORY > Warehouse</td><td>Pending</td></tr>
-                <tr><td>0021</td><td>INVENTORY > Warehouse Transfer</td><td>Pending</td></tr>
-                <tr><td>0022</td><td>INVENTORY > Unserved Item</td><td>Pending</td></tr>
-
-                <tr><td>0023</td><td>CREDITS & COLLECTION > Customer</td><td>Not Started</td></tr>
-                <tr><td>0024</td><td>CREDITS & COLLECTION > Payment</td><td>Not Started</td></tr>
-                <tr><td>0025</td><td>CREDITS & COLLECTION > SOA / Counter Receipt</td><td>Not Started</td></tr>
-
-                <tr><td>0026</td><td>ADMINISTRATION > Agents</td><td class="text-muted">On-going</td></tr>
-                <tr><td>0027</td><td>ADMINISTRATION > Areas</td><td class="text-muted">On-going</td></tr>
-                <tr><td>0028</td><td>ADMINISTRATION > Brands</td><td class="text-muted">On-going</td></tr>
-                <tr><td>0029</td><td>ADMINISTRATION > Categories</td><td class="text-success">Done</td></tr>
-                <tr><td>0030</td><td>ADMINISTRATION > Item Types</td><td class="text-success">Done</td></tr>
-                <tr><td>0031</td><td>ADMINISTRATION > Users</td><td class="text-success">Done</td></tr>
-                <tr><td>0032</td><td>ADMINISTRATION > Suppliers</td><td class="text-muted">On-going</td></tr>
-
-                <tr><td>0033</td><td>SALES REPORTS > Agent Sales per Items</td><td>Not Started</td></tr>
-                <tr><td>0034</td><td>SALES REPORTS > Brand Sales Report</td><td>Not Started</td></tr>
-                <tr><td>0035</td><td>SALES REPORTS > Best Selling Item</td><td>Not Started</td></tr>
-                <tr><td>0036</td><td>SALES REPORTS > Best Selling Item (Invoice)</td><td>Not Started</td></tr>
-                <tr><td>0037</td><td>SALES REPORTS > Commission Report</td><td>Not Started</td></tr>
-                <tr><td>0038</td><td>SALES REPORTS > Customer Sales Analytis Report</td><td>Not Started</td></tr>
-                <tr><td>0039</td><td>SALES REPORTS > Customer Sales Report</td><td>Not Started</td></tr>
-                <tr><td>0040</td><td>SALES REPORTS > Daily Sales Report</td><td>Not Started</td></tr>
-                <tr><td>0041</td><td>SALES REPORTS > Daily Sales Margin Report</td><td>Not Started</td></tr>
-                <tr><td>0042</td><td>SALES REPORTS > Sales Invoice Listing Report</td><td>Not Started</td></tr>
-                <tr><td>0043</td><td>SALES REPORTS > Sales by Agent / Area</td><td>Not Started</td></tr>
-                <tr><td>0044</td><td>SALES REPORTS > Sales Margin Item</td><td>Not Started</td></tr>
-                <tr><td>0045</td><td>SALES REPORTS > Sales Report Basis</td><td>Not Started</td></tr>
-                <tr><td>0046</td><td>SALES REPORTS > Sales Return Listing Report</td><td>Not Started</td></tr>
-                <tr><td>0047</td><td>SALES REPORTS > Unserved Item</td><td>Not Started</td></tr>
-
-                <tr><td>0048</td><td>INVENTORY REPORTS > Below Maintaining Item</td><td>Not Started</td></tr>
-                <tr><td>0049</td><td>INVENTORY REPORTS > Receiving Listing</td><td>Not Started</td></tr>
-                <tr><td>0050</td><td>INVENTORY REPORTS > Receiving Listing Supplier</td><td>Not Started</td></tr>
-                <tr><td>0051</td><td>INVENTORY REPORTS > Receiving Summary</td><td>Not Started</td></tr>
-                <tr><td>0052</td><td>INVENTORY REPORTS > Stock Card</td><td>Not Started</td></tr>
-                <tr><td>0053</td><td>INVENTORY REPORTS > Stock Status Report</td><td>Not Started</td></tr>
-                <tr><td>0054</td><td>INVENTORY REPORTS > Supplier Purchase History</td><td>Not Started</td></tr>
-
-                <tr><td>0055</td><td>ACCOUNTING REPORTS > Credit Memo Listing Report</td><td>Not Started</td></tr>
-                <tr><td>0056</td><td>ACCOUNTING REPORTS > Debit Memo Listing Report</td><td>Not Started</td></tr>
-
-                <tr><td>0057</td><td>MANAGEMENT REPORTS > Check Register by Date</td><td>Not Started</td></tr>
-                <tr><td>0058</td><td>MANAGEMENT REPORTS > Check Register by Customer</td><td>Not Started</td></tr>
-                <tr><td>0059</td><td>MANAGEMENT REPORTS > Check Register Summary</td><td>Not Started</td></tr>
-            </tbody>
-        </table>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Chart
+            </div>
+            <div class="card-body">
+                <canvas id="progressChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                List of Progress
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>####</th>
+                            <th>Module</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in TaskProgress)
+                        {
+                            <tr class="@(a.ST == "Done" ? "table-success"
+                               : a.ST == "Done (May change on later works)" ? "table-warning"
+                               : a.ST == "Pending" ? "table-info"
+                               : a.ST == "On-going" ? "table-danger"
+                               : "")">
+                                <td>@string.Format("{0:000}", TaskProgress.IndexOf(a) + 1)</td>
+                                <td>@a.MD</td>
+                                <td class="@(a.ST == "Done" ? "text-success"
+                                   : a.ST == "Done (May change on later works)" ? "text-warning"
+                                   : a.ST == "Pending" ? "text-info"
+                                   : a.ST == "On-going" ? "text-danger"
+                                   : "")">
+                                    @a.ST
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
         $('.table').DataTable();
+        var data = [@TaskDone, @TaskDoneMayChange, @TaskPending, @TaskOngoing, @TaskNotStarted];
+        var myData = {
+            labels: ['Done', 'Done (May change on later works)', 'Pending', 'On-going', 'Not Started'],
+            datasets: [{
+                label: 'Status',
+                data: data,
+                backgroundColor: [
+                    'rgba(0, 255, 0, 0.5)',
+                    'rgba(255, 255, 0, 0.5)',
+                    'rgba(0, 0, 255, 0.5)',
+                    'rgba(255, 0, 0, 0.5)',
+                    'rgba(0, 0, 0, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(0, 255, 0, 1)',
+                    'rgba(255, 255, 0, 1)',
+                    'rgba(0, 0, 255, 1)',
+                    'rgba(255, 0, 0, 1)',
+                    'rgba(0, 0, 0, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        var ctx = document.getElementById('progressChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: myData
+        });
+
+        function updateChartType() {
+            myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: document.getElementById("chartType").value,
+                data: myData,
+            });
+        };
     </script>
 }

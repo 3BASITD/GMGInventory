@@ -31,4 +31,10 @@ namespace GMGInventory.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
+
+    public class HomeTaskRow
+    {
+        public string MD { get; set; }
+        public string ST { get; set; }
+    }
 }

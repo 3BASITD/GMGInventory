@@ -4,11 +4,18 @@ namespace GMGInventory.Data
 {
     public class PurchaseReturn : BaseEntity
     {
+        public PurchaseReturn()
+        {
+            this.PurchaseReturnLineItems = new HashSet<PurchaseReturnLineItem>();
+        }
+
         [ForeignKey("PurchaseOrder")]
         public int PurchaseOrderId { get; set; }
         public PurchaseOrder PurchaseOrder { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
         public string? Remarks { get; set; }
+
+        public ICollection<PurchaseReturnLineItem> PurchaseReturnLineItems { get; set; }
     }
 }

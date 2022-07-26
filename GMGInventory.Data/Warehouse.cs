@@ -4,6 +4,15 @@ namespace GMGInventory.Data
 {
     public class Warehouse : BaseEntity
     {
+        public Warehouse()
+        {
+            this.ItemInventories = new HashSet<ItemInventory>();
+            this.PhysicalCountHistories = new HashSet<PhysicalCountHistory>();
+            this.PurchaseOrders = new HashSet<PurchaseOrder>();
+            this.TransferItems = new HashSet<TransferItem>();
+            this.TransferItemDetails = new HashSet<TransferItemDetail>();
+        }
+
         [Column(TypeName = "nvarchar(10)")]
         public string Code { get; set; }
 
@@ -23,5 +32,11 @@ namespace GMGInventory.Data
         public string ContactNumber { get; set; }
 
         public bool IsActive { get; set; }
+
+        public ICollection<ItemInventory> ItemInventories { get; set; }
+        public ICollection<PhysicalCountHistory> PhysicalCountHistories { get; set; }
+        public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
+        public ICollection<TransferItem> TransferItems { get; set; }
+        public ICollection<TransferItemDetail> TransferItemDetails { get; set; }
     }
 }

@@ -4,6 +4,11 @@ namespace GMGInventory.Data
 {
     public class Forwarder : BaseEntity
     {
+        public Forwarder()
+        {
+            this.SalesOrderDeliveryMonitorings = new List<SalesOrderDeliveryMonitoring>();
+        }
+
         [Column(TypeName = "nvarchar(50)")]
         public string Name { get; set; }
 
@@ -19,5 +24,7 @@ namespace GMGInventory.Data
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
+
+        public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
     }
 }

@@ -4,6 +4,13 @@ namespace GMGInventory.Data
 {
     public class Area : BaseEntity
     {
+        public Area()
+        {
+            this.Agents = new HashSet<Agent>();
+            this.Customers = new HashSet<Customer>();
+            this.Suppliers = new HashSet<Supplier>();
+        }
+
         [ForeignKey("RegionId")]
         public int RegionId { get; set; }
         public Region Region { get; set; }
@@ -18,5 +25,9 @@ namespace GMGInventory.Data
         public decimal CommissionRate { get; set; }
 
         public bool IsActive { get; set; }
+
+        public ICollection<Agent> Agents { get; set; }
+        public ICollection<Customer> Customers { get; set; }
+        public ICollection<Supplier> Suppliers { get; set; }
     }
 }

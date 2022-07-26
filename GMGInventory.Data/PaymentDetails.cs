@@ -2,7 +2,7 @@
 
 namespace GMGInventory.Data
 {
-    public class PaymentDetails : BaseEntity
+    public class PaymentDetail : BaseEntity
     {
         [ForeignKey("PaymentId")]
         public int PaymentId { get; set; }

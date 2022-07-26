@@ -4,6 +4,12 @@ namespace GMGInventory.Data
 {
     public class Payment : BaseEntity
     {
+        public Payment()
+        {
+            this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
+            this.SOACRChecks = new HashSet<SOACRCheck>();
+        }
+
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
@@ -24,5 +30,9 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(250)")]
         public string? Remarks { get; set; }
+
+        public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
+        public ICollection<PaymentDetail> PaymentDetails { get; set; }
+        public ICollection<SOACRCheck> SOACRChecks { get; set; }
     }
 }

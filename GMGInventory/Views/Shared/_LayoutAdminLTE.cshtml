@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="~/lib/jquery-ui/jquery-ui.min.css" />
     <link rel="stylesheet" href="~/lib/select2/css/select2.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-toggle/css/bootstrap2-toggle.min.css" />
-    <link rel="stylesheet" href="~/lib/json-viewer/src/json-viewer.css" />
+    <link rel="stylesheet" href="~/lib/chart.js/Chart.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="layout-fixed sidebar-mini @(activeUser.IsDarkMode ? "dark-mode" : "")" style="height: auto;">
@@ -147,10 +147,10 @@
     <script src="~/lib/popper.js/umd/popper.min.js"></script>
     <script src="~/lib/select2/js/select2.js"></script>
     <script src="~/lib/bootstrap-toggle/js/bootstrap2-toggle.min.js"></script>
-    <script src="~/lib/json-viewer/src/json-viewer.js"></script>
+    <script src="~/lib/chart.js/Chart.min.js"></script>
 
     <script>
-        $(document).ready(function() {
+    $(document).ready(function() {
         @if (activeUser.IsDarkMode)
         {
             <text>
@@ -159,45 +159,36 @@
                 });
             </text>
         }
-                            //var datatableOrder = "asc";
-                            //if ($('.table th.defaultSort').hasClass("asc")) { datatableOrder = "asc"; }
-                            //if ($('.table th.defaultSort').hasClass("desc")) { datatableOrder = "desc"; }
-                            //$('.table').DataTable({
-                            //    columnDefs: [
-                            //        { orderable: false, targets: -1 }
-                            //    ],
-                            //    order: [[$('th.defaultSort').index(), datatableOrder]]
-                            //});
+        //var datatableOrder = "asc";
+        //if ($('.table th.defaultSort').hasClass("asc")) { datatableOrder = "asc"; }
+        //if ($('.table th.defaultSort').hasClass("desc")) { datatableOrder = "desc"; }
+        //$('.table').DataTable({
+        //    columnDefs: [
+        //        { orderable: false, targets: -1 }
+        //    ],
+        //    order: [[$('th.defaultSort').index(), datatableOrder]]
+        //});
 
-                            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-            $('.select2').select2();
+        $('.select2').select2();
 
-            $("form").attr("autocomplete", "off");
+        $("form").attr("autocomplete", "off");
 
-            $('#logout-link').click(function(e) {
-                //swal({
-                //    title: "Logging out",
-                //    text: "You are about to log out, are you sure you want to continue?",
-                //    icon: "info",
-                //    buttons: ["Cancel", "Yes"],
-                //}).then((confirm) => {
-                //    if (confirm) {
-                $('#logoutForm').submit();
-                //    }
-                //});
-            });
-
-            //$("pre").each(function() {
-            //    //var jsonViewer = new JSONViewer();
-            //    var jsontext = $(this).html();
-            //    //$(this).append(jsonViewer.getContainer());
-            //    //jsonViewer.showJSON(jsontext, null, 1);
-            //    var json = JSON.stringify(jsontext);
-            //    $(this).html();
+        $('#logout-link').click(function(e) {
+            //swal({
+            //    title: "Logging out",
+            //    text: "You are about to log out, are you sure you want to continue?",
+            //    icon: "info",
+            //    buttons: ["Cancel", "Yes"],
+            //}).then((confirm) => {
+            //    if (confirm) {
+            $('#logoutForm').submit();
+            //    }
             //});
         });
+    });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

@@ -19,8 +19,8 @@ namespace GMGInventory.Controllers
 
         public async Task<ActionResult> Index()
         {
-            var items = await warehouseRepository.GetAllAsync();
-            return View(items);
+            var warehouses = await warehouseRepository.GetAllAsync();
+            return View(warehouses);
         }
 
         public async Task<ActionResult> Details(int id)

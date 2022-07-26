@@ -4,6 +4,18 @@ namespace GMGInventory.Data
 {
     public class Customer : BaseEntity
     {
+        public Customer()
+        {
+            this.CustomerPayments = new HashSet<CustomerPayment>();
+            this.Forwarders = new HashSet<Forwarder>();
+            this.Payments = new HashSet<Payment>();
+            this.SalesOrders = new HashSet<SalesOrder>();
+            this.SalesReturns = new HashSet<SalesReturn>();
+            this.SalesReturnTotalReturnAmounts = new HashSet<SalesReturnTotalReturnAmount>();
+            this.ShippingAddresses = new HashSet<ShippingAddress>();
+            this.SOACRs = new HashSet<SOACR>();
+        }
+
         [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
 
@@ -53,5 +65,14 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal OutstandingBalance { get; set; }
+
+        public ICollection<CustomerPayment> CustomerPayments { get; set; }
+        public ICollection<Forwarder> Forwarders { get; set; }
+        public ICollection<Payment> Payments { get; set; }
+        public ICollection<SalesOrder> SalesOrders { get; set; }
+        public ICollection<SalesReturn> SalesReturns { get; set; }
+        public ICollection<SalesReturnTotalReturnAmount> SalesReturnTotalReturnAmounts { get; set; }
+        public ICollection<ShippingAddress> ShippingAddresses { get; set; }
+        public ICollection<SOACR> SOACRs { get; set; }
     }
 }

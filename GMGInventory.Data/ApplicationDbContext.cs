@@ -165,7 +165,7 @@ namespace GMGInventory.Data
         public DbSet<PackReturn> PackReturns { get; set; }
         public DbSet<PackReturnLineItem> PackReturnLineItems { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<PaymentDetails> PaymentDetails { get; set; }
+        public DbSet<PaymentDetail> PaymentDetails { get; set; }
         public DbSet<PhysicalCountHistory> PhysicalCountHistories { get; set; }
         public DbSet<PriceType> PriceTypes { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }

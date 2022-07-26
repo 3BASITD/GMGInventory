@@ -38,9 +38,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
 
-        [ForeignKey("SOAId")]
-        public int SOAId { get; set; }
-        public SOACR SOA { get; set; }
+        [ForeignKey("SOACRId")]
+        public int SOACRId { get; set; }
+        public SOACR SOACR { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalAmountPaid { get; set; }
