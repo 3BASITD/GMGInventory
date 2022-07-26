@@ -5,7 +5,7 @@
 }
 
 @section Breadcrumb {
-    <li class="breadcrumb-item"><a asp-controller="Supplier" asp-action="Index">Supplier</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Supplier" asp-action="Index">Suppliers</a></li>
 }
 
     <div class="card card-default">
@@ -19,9 +19,10 @@
         </div>
         <form asp-action="Create">
             <div class="card-body">
-                <div class="row">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                 <div class="row">
                     <div class="col-md-4">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <div class="form-group">
                             <label asp-for="Code" class="control-label mb-0"></label>
                             <input asp-for="Code" class="form-control form-control-sm" />
@@ -33,34 +34,25 @@
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="EmailAddress" class="control-label mb-0"></label>
-                            <input asp-for="EmailAddress" class="form-control form-control-sm" />
-                        @*    <span asp-validation-for="EmailAddress" class="text-danger"></span>*@
-                        </div>
-                        <div class="form-group">
                             <label asp-for="ContactPerson" class="control-label mb-0"></label>
                             <input asp-for="ContactPerson" class="form-control form-control-sm" />
-                        @*    <span asp-validation-for="ContactPerson" class="text-danger"></span>*@
+                            <span asp-validation-for="ContactNumber" class="text-danger"></span>
                         </div>
 
                           <div class="form-group">
                             <label asp-for="ContactNumber" class="control-label mb-0"></label>
                             <input asp-for="ContactNumber" class="form-control form-control-sm" />
-                         @*   <span asp-validation-for="ContactNumber" class="text-danger"></span>*@
+                            <span asp-validation-for="ContactNumber" class="text-danger"></span>
                         </div>
-                       
-                      @*  <div class="form-group">
-                            <label asp-for="CurrencyId" class="control-label mb-0"></label>
-                            <select asp-for="CurrencyId"  class="checkbox">
-                            </select>
-                        </div>*@
-
-
-
+                        <div class="form-group">
+                            <label asp-for="EmailAddress" class="control-label mb-0"></label>
+                            <input asp-for="EmailAddress" class="form-control form-control-sm" />
+                            <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                        </div>
                  
                     </div>
 
-                     <div class="col-md-4">
+                    <div class="col-md-4">
                        <div class="form-group">
                             <label asp-for="AddressLine1" class="control-label mb-0"></label>
                             <input asp-for="AddressLine1" class="form-control form-control-sm" />
@@ -74,7 +66,7 @@
                         <div class="form-group">
                             <label asp-for="Barangay" class="control-label mb-0"></label>
                             <input asp-for="Barangay" class="form-control form-control-sm" />
-                           @* <span asp-validation-for="Barangay" class="text-danger"></span>*@
+                            <span asp-validation-for="Barangay" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="City" class="control-label mb-0"></label>
@@ -98,39 +90,32 @@
                         <div class="form-group">
                             <label asp-for="ZipCode" class="control-label mb-0"></label>
                             <input asp-for="ZipCode" class="form-control form-control-sm" />
-                          @*  <span asp-validation-for="ZipCode" class="text-danger"></span>*@
+                            <span asp-validation-for="ZipCode" class="text-danger"></span>
                         </div>
-
-                     
                  
                     </div>
 
                      <div class="col-md-4">
-
                         <div class="form-group">
                             <label asp-for="CreditLimit" class="control-label mb-0"></label>
                             <input asp-for="CreditLimit" class="form-control form-control-sm" />
                             <span asp-validation-for="CreditLimit" class="text-danger"></span>
                         </div>
-
-                       
-                     
                         <div class="form-group">
                             <label asp-for="CurrencyId" class="control-label mb-0"></label>
                             <select asp-for="CurrencyId" asp-items="Model?.Currencies" class="form-control select2">
                             </select>
                             <span asp-validation-for="CurrencyId" class="text-danger"></span>
                         </div>
-
                          <div class="form-group">
                             <label asp-for="IsForeign" class="control-label mb-0"></label>
                             <input asp-for="IsForeign" class="checkbox" />
+                            <span asp-validation-for="IsForeign" class="text-danger"></span>
                         </div>
-
-                     
-                 
                     </div>
+                   
                 </div>
+            
             </div>
             <div class="card-footer">
                 <div class="card-tools">

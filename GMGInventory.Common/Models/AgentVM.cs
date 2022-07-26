@@ -16,19 +16,16 @@ namespace GMGInventory.Common.Models
 
         [Required]
         [StringLength(50)]
-        [MinLength(5)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
         [Required]
         [StringLength(50)]
-        [MinLength(5)]
         [Display(Name = "Middle Name")]
         public string MiddleName { get; set; }
 
         [Required]
         [StringLength(50)]
-        [MinLength(5)]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
@@ -43,21 +40,12 @@ namespace GMGInventory.Common.Models
         [Display(Name="Area")]
         public AreaVM Area { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        [MinLength(5)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        [MinLength(5)]
         [Display(Name = "Middle Name")]
         public string MiddleName { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        [MinLength(5)]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 

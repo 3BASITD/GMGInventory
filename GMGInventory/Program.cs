@@ -32,6 +32,7 @@ builder.Services.AddScoped(typeof(IRegionRepository), typeof(RegionRepository));
 builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
 builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseRepository));
+builder.Services.AddScoped(typeof(ICurrencyRepository), typeof(CurrencyRepository));
 
 
 
