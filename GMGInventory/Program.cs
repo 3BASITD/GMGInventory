@@ -24,6 +24,7 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
 builder.Services.AddScoped(typeof(ICurrencyRepository), typeof(CurrencyRepository));
 builder.Services.AddScoped(typeof(IItemTypeRepository), typeof(ItemTypeRepository));
+builder.Services.AddScoped(typeof(IItemPriceRepository), typeof(ItemPriceRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IBrandRepository), typeof(BrandRepository));
 builder.Services.AddScoped(typeof(IAgentRepository), typeof(AgentRepository));

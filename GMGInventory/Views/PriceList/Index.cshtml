@@ -1,0 +1,79 @@
+﻿@model IEnumerable<ItemPriceVM>
+
+@{
+    ViewData["Title"] = "Price List";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"])
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ModelNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Size)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Code)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Unit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RetailPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.NetPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null)
+                {
+                    <tr><td colspan="9"><p class="text-center m-0">This record is empty</p></td></tr>
+                }
+                else
+                {
+                    @foreach (var warehouse in Model)
+                    {
+                        <tr>
+                            <td>@warehouse.Brand</td>
+                            <td>@warehouse.ModelNumber</td>
+                            <td>@warehouse.Size</td>
+                            <td>@warehouse.Code</td>
+                            <td>@warehouse.Name</td>
+                            <td>@warehouse.PartNumber</td>
+                            <td>@warehouse.Unit</td>
+                            <td>@warehouse.RetailPrice</td>
+                            <td>@warehouse.NetPrice</td>
+                            <td>@warehouse.Quantity</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('.table').DataTable();
+    </script>
+}

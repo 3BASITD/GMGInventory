@@ -31,8 +31,8 @@ namespace GMGInventory.Data.Configurations.Entities
                 new IdentityRole
                 {
                     Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                    Name = Roles.SalesManager,
-                    NormalizedName = Roles.SalesManager.ToUpper()
+                    Name = Roles.SalesDirector,
+                    NormalizedName = Roles.SalesDirector.ToUpper()
                 },
                 new IdentityRole
                 {

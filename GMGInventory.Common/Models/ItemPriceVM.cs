@@ -2,7 +2,7 @@
 
 namespace GMGInventory.Common.Models
 {
-    public class PriceVM
+    public class ItemPriceVM
     {
         public int Id { get; set; }
 
@@ -21,17 +21,17 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Model Number")]
         public string ModelNumber { get; set; }
 
-        [Display(Name = "Unit Code")]
-        public string UnitCode { get; set; }
+        [Display(Name = "Unit")]
+        public string Unit { get; set; }
 
         [Display(Name = "Retail Price")]
-        public string RetailPrice { get; set; }
+        public decimal RetailPrice { get; set; }
 
         [Display(Name = "Net Price")]
-        public string NetPrice { get; set; }
+        public decimal NetPrice { get; set; }
 
         [Display(Name = "Quantity on Hand")]
-        public string Quantity { get; set; }
+        public int Quantity { get; set; }
 
         [Display(Name = "Category")]
         public string Category { get; set; }

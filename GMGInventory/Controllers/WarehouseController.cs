@@ -7,7 +7,7 @@ namespace GMGInventory.Controllers
 {
     public class WarehouseController : Controller
     {
-        public IWarehouseRepository warehouseRepository;
+        private readonly IWarehouseRepository warehouseRepository;
         private readonly IItemRepository itemRepository;
 
         public WarehouseController(IWarehouseRepository warehouseRepository,
