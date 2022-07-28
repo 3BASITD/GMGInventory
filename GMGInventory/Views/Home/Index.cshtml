@@ -78,10 +78,27 @@
     var TaskOngoing = TaskProgress.Count(s => s.ST == "On-going");
     var TaskNotStarted = TaskProgress.Count(s => s.ST == "Not Started");
     var TaskTotal = TaskProgress.Count();
+
+    DateTime FromDate = new DateTime(2022, 7, 18);
+    DateTime ToDate = DateTime.Now;
+
+    double calcBusinessDays = 1 + ((ToDate - FromDate).TotalDays * 5 - (FromDate.DayOfWeek - ToDate.DayOfWeek) * 2) / 7;
+
+    if (ToDate.DayOfWeek == DayOfWeek.Saturday) calcBusinessDays--;
+    if (FromDate.DayOfWeek == DayOfWeek.Sunday) calcBusinessDays--;
+
+    int totalDays = (int)calcBusinessDays, until = 105;
 }
 
 <div class="row">
     <div class="col-md-6">
+        <div class="alert alert-warning">
+            <h5><i class="icon fas fa-calendar-day"></i> Project Start Date</h5>
+            @FromDate.ToString("MMMM dd, yyyy")
+            <div class="progress progress-xxs">
+                <div class="progress-bar progress-bar-danger progress-bar-striped" style="width: @(((decimal)totalDays/(decimal)105) * (decimal)100)%"></div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <div class="info-box bg-success">

@@ -37,29 +37,41 @@ namespace GMGInventory.Application.Repositories
                     Id = s.Item.Id,
                     Code = s.Item.Code,
                     Name = s.Item.Name,
-                    
+
                 })
                 .FirstOrDefaultAsync();
             return itemVM;
         }
 
-        public async Task<List<ItemViewVM>> GetAllAsync(ItemFilterVM itemFilterVM)
+        public IQueryable<ItemViewVM> GetAll(ItemFilterVM itemFilterVM)
         {
-            var test = await context.Currencies.ToListAsync();
-            var itemsVM = await context.ItemInventories
-                .Include(s => s.Item)
-                .Include(s => s.Warehouse)
-                .Where(s =>
-                (itemFilterVM.CategoryId == null || itemFilterVM.CategoryId == s.Item.CategoryId) &&
-                (itemFilterVM.ItemTypeId == null || itemFilterVM.ItemTypeId == s.Item.ItemTypeId) &&
-                (itemFilterVM.BrandId == null || itemFilterVM.BrandId == s.Item.BrandId) &&
-                (itemFilterVM.WarehouseId == null || itemFilterVM.WarehouseId == s.WarehouseId))
-                .Select(s => new ItemViewVM
-                {
-            Id = s.Id
-                })
-                .ToListAsync();
-            //var itemsVM = mapper.Map<List<ItemViewVM>>(items);
+            var itemsVM = (from item in context.Items
+                           from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.EffectiveDate <= DateTime.Now).OrderByDescending(s => s.EffectiveDate).Take(1).DefaultIfEmpty()
+                           join inventory in context.ItemInventories on item.Id equals inventory.ItemId
+                           where ((itemFilterVM.CategoryId == null || itemFilterVM.CategoryId == item.CategoryId)
+                               && (itemFilterVM.ItemTypeId == null || itemFilterVM.ItemTypeId == item.ItemTypeId)
+                               && (itemFilterVM.BrandId == null || itemFilterVM.BrandId == item.BrandId)
+                               && (itemFilterVM.WarehouseId == null || itemFilterVM.WarehouseId == inventory.WarehouseId))
+                           select new ItemViewVM
+                           {
+                               Brand = item.Brand.Code,
+                               Category = item.Category.Code,
+                               Code = item.Code,
+                               Id = item.Id,
+                               InterchangeNumber = item.InterchangeNumber,
+                               ItemType = item.ItemType.Code,
+                               IsActive = item.IsActive,
+                               ModelNumber = item.ModelNumber,
+                               Name = item.Name,
+                               NetPrice = price == null ? 0 : price.NetSellingPrice,
+                               PartNumber = item.PartNumber,
+                               Quantity = inventory.Quantity,
+                               RetailPrice = price == null ? 0 : price.RetailSellingPrice,
+                               Size = item.Size,
+                               IsNonInventory = item.IsNonInventory,
+                               UnitCode = item.Unit.Code,
+                               Warehouse = inventory.Warehouse.Name
+                           });
             return itemsVM;
         }
 

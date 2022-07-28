@@ -48,54 +48,47 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model == null)
+                @foreach (var item in Model)
                 {
-                    <tr><td colspan="9"><p class="text-center m-0">This record is empty</p></td></tr>
-                }
-                else
-                {
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Code</td>
-                            <td>@item.Name</td>
-                            <td>@item.CreditLimit</td>
-                            <td>
-                                @if (item.IsActive)
-                                {
-                                    <span class="fas fa-check text-success"></span>
-                                }
-                                else
-                                {
-                                    <span class="fas fa-times text-danger"></span>
-                                }
-                            </td>
-                            <td>@item.UserCreated</td>
-                            <td>@item.DateCreated</td>
-                            <td>@item.UserModified</td>
-                            <td>@item.DateModified</td>
-                            <td>
-                                <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id">
-                                    <i class="fas fa-info-circle"></i>
+                    <tr>
+                        <td>@item.Code</td>
+                        <td>@item.Name</td>
+                        <td>@item.CreditLimit</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="fas fa-check text-success"></span>
+                            }
+                            else
+                            {
+                                <span class="fas fa-times text-danger"></span>
+                            }
+                        </td>
+                        <td>@item.UserCreated</td>
+                        <td>@item.DateCreated</td>
+                        <td>@item.UserModified</td>
+                        <td>@item.DateModified</td>
+                        <td>
+                            <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                            @if (item.IsActive)
+                            {
+                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id">
+                                    <i class="fas fa-pencil-alt"></i>
                                 </a>
-                                @if (item.IsActive)
-                                {
-                                    <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button">
-                                        <i class="far fa-trash-alt"></i>
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                }
-                            </td>
-                        </tr>
-                    }
+                                <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            }
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -121,6 +114,12 @@
 
 @section Scripts {
     <script>
+        $('.table').DataTable({
+            columnDefs: [
+                { orderable: false, targets: -1 },
+            ]
+        });
+
         $('.deleteBtn').click(function(e) {
             swal({
                 title: "Delete / Deactivate Supplier",

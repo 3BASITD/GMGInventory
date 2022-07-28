@@ -77,7 +77,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("AreaId");
 
-                    b.ToTable("Agents");
+                    b.ToTable("Agents", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Area", b =>
@@ -122,7 +122,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("Areas");
+                    b.ToTable("Areas", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.AuditLog", b =>
@@ -166,7 +166,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
@@ -208,7 +208,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ItemTypeId");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Category", b =>
@@ -245,7 +245,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
@@ -286,7 +286,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CreditDebitMemoTypeId");
 
-                    b.ToTable("CreditDebitMemos");
+                    b.ToTable("CreditDebitMemos", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemoType", b =>
@@ -307,7 +307,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CreditDebitMemoTypes");
+                    b.ToTable("CreditDebitMemoTypes", (string)null);
 
                     b.HasData(
                         new
@@ -354,7 +354,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CreditTerms");
+                    b.ToTable("CreditTerms", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Currency", b =>
@@ -381,7 +381,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies");
+                    b.ToTable("Currencies", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Customer", b =>
@@ -467,7 +467,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerTypeId");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
@@ -545,7 +545,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SOACRId");
 
-                    b.ToTable("CustomerPayments");
+                    b.ToTable("CustomerPayments", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPaymentDetail", b =>
@@ -584,7 +584,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("CustomerPaymentDetails");
+                    b.ToTable("CustomerPaymentDetails", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerType", b =>
@@ -605,7 +605,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerTypes");
+                    b.ToTable("CustomerTypes", (string)null);
 
                     b.HasData(
                         new
@@ -640,7 +640,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DeliveryTypes");
+                    b.ToTable("DeliveryTypes", (string)null);
 
                     b.HasData(
                         new
@@ -701,7 +701,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Forwarders");
+                    b.ToTable("Forwarders", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
@@ -772,7 +772,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoices", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoiceLineItem", b =>
@@ -814,7 +814,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("InvoiceLineItems");
+                    b.ToTable("InvoiceLineItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoicePayment", b =>
@@ -870,7 +870,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("InvoiceId");
 
-                    b.ToTable("InvoicePayments");
+                    b.ToTable("InvoicePayments", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoiceSequence", b =>
@@ -887,7 +887,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InvoiceSequences");
+                    b.ToTable("InvoiceSequences", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoiceType", b =>
@@ -908,7 +908,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InvoiceTypes");
+                    b.ToTable("InvoiceTypes", (string)null);
 
                     b.HasData(
                         new
@@ -998,7 +998,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("Items");
+                    b.ToTable("Items", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemInventory", b =>
@@ -1037,7 +1037,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("ItemInventories");
+                    b.ToTable("ItemInventories", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemPrice", b =>
@@ -1077,7 +1077,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("ItemPrices");
+                    b.ToTable("ItemPrices", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemType", b =>
@@ -1119,7 +1119,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ItemTypes");
+                    b.ToTable("ItemTypes", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Pack", b =>
@@ -1164,7 +1164,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Packs");
+                    b.ToTable("Packs", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PackLineItem", b =>
@@ -1211,7 +1211,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PackReturnId");
 
-                    b.ToTable("PackLineItems");
+                    b.ToTable("PackLineItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PackReturn", b =>
@@ -1242,7 +1242,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PackId");
 
-                    b.ToTable("PackReturns");
+                    b.ToTable("PackReturns", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PackReturnLineItem", b =>
@@ -1284,7 +1284,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PackReturnId");
 
-                    b.ToTable("PackReturnLineItems");
+                    b.ToTable("PackReturnLineItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Payment", b =>
@@ -1333,7 +1333,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PaymentDetail", b =>
@@ -1393,7 +1393,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("PaymentDetails");
+                    b.ToTable("PaymentDetails", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PhysicalCountHistory", b =>
@@ -1438,7 +1438,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("PhysicalCountHistories");
+                    b.ToTable("PhysicalCountHistories", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PriceType", b =>
@@ -1459,7 +1459,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PriceTypes");
+                    b.ToTable("PriceTypes", (string)null);
 
                     b.HasData(
                         new
@@ -1536,7 +1536,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ToWarehouseId");
 
-                    b.ToTable("PurchaseOrders");
+                    b.ToTable("PurchaseOrders", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderLineItem", b =>
@@ -1590,7 +1590,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PurchaseOrderLineItems");
+                    b.ToTable("PurchaseOrderLineItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturn", b =>
@@ -1624,7 +1624,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PurchaseReturns");
+                    b.ToTable("PurchaseReturns", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturnLineItem", b =>
@@ -1663,7 +1663,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PurchaseReturnId");
 
-                    b.ToTable("PurchaseReturnLineItems");
+                    b.ToTable("PurchaseReturnLineItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Region", b =>
@@ -1684,7 +1684,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions");
+                    b.ToTable("Regions", (string)null);
 
                     b.HasData(
                         new
@@ -1795,7 +1795,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("SalesOrders");
+                    b.ToTable("SalesOrders", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderDeliveryMonitoring", b =>
@@ -1835,7 +1835,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("SalesOrderDeliveryMonitorings");
+                    b.ToTable("SalesOrderDeliveryMonitorings", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderLineItem", b =>
@@ -1892,7 +1892,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("SalesOrderLineItems");
+                    b.ToTable("SalesOrderLineItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
@@ -1931,7 +1931,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("SalesReturns");
+                    b.ToTable("SalesReturns", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnAppliedAmount", b =>
@@ -1974,7 +1974,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SalesReturnTotalReturnAmountId");
 
-                    b.ToTable("SalesReturnAppliedAmounts");
+                    b.ToTable("SalesReturnAppliedAmounts", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnLineItem", b =>
@@ -2029,7 +2029,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SalesReturnId");
 
-                    b.ToTable("SalesReturnLineItems");
+                    b.ToTable("SalesReturnLineItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnTotalReturnAmount", b =>
@@ -2069,7 +2069,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("SalesReturnTotalReturnAmounts");
+                    b.ToTable("SalesReturnTotalReturnAmounts", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ShippingAddress", b =>
@@ -2116,7 +2116,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("ShippingAddresses");
+                    b.ToTable("ShippingAddresses", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACR", b =>
@@ -2182,7 +2182,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SOACRTypeId");
 
-                    b.ToTable("SOACRs");
+                    b.ToTable("SOACRs", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACRCheck", b =>
@@ -2231,7 +2231,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("SOACRChecks");
+                    b.ToTable("SOACRChecks", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACRLineItem", b =>
@@ -2294,7 +2294,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SOACRId");
 
-                    b.ToTable("SOACRLineItems");
+                    b.ToTable("SOACRLineItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACRType", b =>
@@ -2315,7 +2315,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SOACRTypes");
+                    b.ToTable("SOACRTypes", (string)null);
 
                     b.HasData(
                         new
@@ -2350,7 +2350,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Statuses");
+                    b.ToTable("Statuses", (string)null);
 
                     b.HasData(
                         new
@@ -2518,7 +2518,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("StockCards");
+                    b.ToTable("StockCards", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Supplier", b =>
@@ -2606,7 +2606,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CurrencyId");
 
-                    b.ToTable("Suppliers");
+                    b.ToTable("Suppliers", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItem", b =>
@@ -2641,7 +2641,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("FromWarehouseId");
 
-                    b.ToTable("TransferItems");
+                    b.ToTable("TransferItems", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItemDetail", b =>
@@ -2685,7 +2685,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("TransferItemId");
 
-                    b.ToTable("TransferItemDetails");
+                    b.ToTable("TransferItemDetails", (string)null);
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Unit", b =>
@@ -2706,7 +2706,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Units");
+                    b.ToTable("Units", (string)null);
 
                     b.HasData(
                         new
@@ -2844,7 +2844,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Warehouses");
+                    b.ToTable("Warehouses", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -53,7 +53,7 @@
                         @Html.DisplayNameFor(model => model.AddressLine1)
                     </span>
                     <b class="d-block">
-                        @Model?.AddressLine1
+                        @(string.IsNullOrWhiteSpace(Model?.AddressLine1) ? "-" : Model?.AddressLine1)
                     </b>
                 </p>
             </div>
@@ -65,7 +65,7 @@
                         @Html.DisplayNameFor(model => model.AddressLine2)
                     </span>
                     <b class="d-block">
-                        @(Model?.AddressLine2 ?? "-")
+                        @(string.IsNullOrWhiteSpace(Model?.AddressLine2) ? "-" : Model?.AddressLine2)
                     </b>
                 </p>
             </div>
@@ -77,7 +77,7 @@
                         @Html.DisplayNameFor(model => model.ContactPerson)
                     </span>
                     <b class="d-block">
-                        @Model?.ContactPerson
+                        @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
                     </b>
                 </p>
             </div>
@@ -87,7 +87,7 @@
                         @Html.DisplayNameFor(model => model.ContactNumber)
                     </span>
                     <b class="d-block">
-                        @Model?.ContactNumber
+                        @(string.IsNullOrWhiteSpace(Model?.ContactNumber) ? "-" : Model?.ContactNumber)
                     </b>
                 </p>
             </div>
@@ -121,7 +121,7 @@
                         @Html.DisplayNameFor(model => model.UserModified)
                     </span>
                     <b class="d-block">
-                        @(Model?.UserModified ?? "-")
+                        @(string.IsNullOrWhiteSpace(Model?.UserModified) ? "-" : Model?.UserModified)
                     </b>
                 </p>
             </div>
@@ -161,7 +161,16 @@
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="nav-items" role="tabpanel"
                                  aria-labelledby="nav-items-tab">
-                                @await Html.PartialAsync("WarehouseItems", Model?.Items)
+                                <table class="table table-head-fixed table-striped table-hover table-warehouse-items">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>Retail Price</th>
+                                            <th>Net Price</th>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                             <div class="tab-pane fade" id="nav-transfer" role="tabpanel" aria-labelledby="nav-transfer-tab">...</div>
                         </div>
@@ -171,3 +180,45 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        var itemTable = $('.table-warehouse-items').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemListJson")",
+                type: "POST",
+                data: function(data) {
+                    data.WarehouseId = @Model?.Id;
+                },
+            },
+            //processing: true,
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                {
+                    data: function(data, type, dataToSet) { return data.retailPrice.toFixed(2); },
+                    name: "RetailPrice",
+                    className: "text-end"
+                },
+                {
+                    data: function(data, type, dataToSet) { return data.netPrice.toFixed(2); },
+                    name: "NetPrice",
+                    className: "text-end"
+                }
+            ]
+        });
+
+        itemTable.on("draw", function() {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            $.LoadingOverlay("hide");
+        });
+    </script>
+}

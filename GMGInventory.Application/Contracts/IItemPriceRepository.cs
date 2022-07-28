@@ -5,6 +5,6 @@ namespace GMGInventory.Application.Contracts
     public interface IItemPriceRepository
     {
         Task<ItemPriceVM?> GetAsync(int? id);
-        Task<List<ItemPriceVM>> GetAllAsync(ItemFilterVM itemFilterVM);
+        IQueryable<ItemPriceVM> GetAll(ItemFilterVM itemFilterVM);
     }
 }

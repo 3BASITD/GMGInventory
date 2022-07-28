@@ -72,6 +72,11 @@ namespace GMGInventory.Application.Repositories
             return mapper.Map<WarehouseFormVM>(warehouse);
         }
 
+        public async Task<List<Warehouse>> GetAllActiveWarehouseAsync(int includeId)
+        {
+            return await context.Warehouses.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
+        }
+
         public async Task<bool> IsIdExists(int id)
         {
             return await context.Warehouses.AnyAsync(s => s.Id == id);

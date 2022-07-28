@@ -31,6 +31,9 @@
                         @Html.DisplayNameFor(model => model.Name)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.PartNumber)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Unit)
                     </th>
                     <th>
@@ -44,36 +47,63 @@
                     </th>
                 </tr>
             </thead>
-            <tbody>
-                @if (Model == null)
-                {
-                    <tr><td colspan="9"><p class="text-center m-0">This record is empty</p></td></tr>
-                }
-                else
-                {
-                    @foreach (var warehouse in Model)
-                    {
-                        <tr>
-                            <td>@warehouse.Brand</td>
-                            <td>@warehouse.ModelNumber</td>
-                            <td>@warehouse.Size</td>
-                            <td>@warehouse.Code</td>
-                            <td>@warehouse.Name</td>
-                            <td>@warehouse.PartNumber</td>
-                            <td>@warehouse.Unit</td>
-                            <td>@warehouse.RetailPrice</td>
-                            <td>@warehouse.NetPrice</td>
-                            <td>@warehouse.Quantity</td>
-                        </tr>
-                    }
-                }
-            </tbody>
         </table>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        $('.table').DataTable();
+        var dataTable = $('.table').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+                data: function(data) {
+                    var categoryId = $("#CategoryId").val();
+                    var itemTypeId = $("#ItemTypeId").val();
+                    var brandId = $("#BrandId").val();
+
+                    if (categoryId) data.CategoryId = categoryId;
+                    if (itemTypeId) data.ItemTypeId = itemTypeId;
+                    if (brandId) data.BrandId = brandId;
+                },
+            },
+            //processing: true,
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "brand", name: "Brand" },
+                { data: "modelNumber", name: "ModelNumber" },
+                { data: "size", name: "Size" },
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                { data: "partNumber", name: "PartNumber" },
+                { data: "unit", name: "Unit" },
+                {
+                    data: function(data, type, dataToSet) { return data.retailPrice.toFixed(2); },
+                    name: "RetailPrice",
+                    className: "text-end"
+                },
+                {
+                    data: function(data, type, dataToSet) { return data.netPrice.toFixed(2); },
+                    name: "NetPrice",
+                    className: "text-end"
+                },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+            ]
+        });
+
+        dataTable.on("draw", function() {
+            $.LoadingOverlay("hide");
+        });
+
+        function ApplyFilter() {
+            $(".table").DataTable().ajax.reload();
+            $("#filterModal").modal("hide");
+        }
     </script>
 }

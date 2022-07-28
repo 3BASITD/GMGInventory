@@ -148,53 +148,55 @@
     <script src="~/lib/select2/js/select2.js"></script>
     <script src="~/lib/bootstrap-toggle/js/bootstrap2-toggle.min.js"></script>
     <script src="~/lib/chart.js/Chart.min.js"></script>
+    <script src="~/lib/loadingoverlay/loadingoverlay.min.js"></script>
 
     <script>
-    $(document).ready(function() {
-        @if (activeUser.IsDarkMode)
-        {
-            <text>
-                $(".table").each(function() {
-                    $(this).addClass("table-dark");
-                });
-            </text>
-        }
-        //var datatableOrder = "asc";
-        //if ($('.table th.defaultSort').hasClass("asc")) { datatableOrder = "asc"; }
-        //if ($('.table th.defaultSort').hasClass("desc")) { datatableOrder = "desc"; }
-        //$('.table').DataTable({
-        //    columnDefs: [
-        //        { orderable: false, targets: -1 }
-        //    ],
-        //    order: [[$('th.defaultSort').index(), datatableOrder]]
-        //});
-
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
-        $('.select2').select2({
-            allowClear: true,
-            placeholder: {
-                id: "",
-                text: "<empty>"
+        $(document).ready(function() {
+            @if (activeUser.IsDarkMode)
+            {
+                <text>
+                        $(".table").each(function() {
+                            $(this).addClass("table-dark");
+                        });
+                </text>
             }
-        });
 
-        $("form").attr("autocomplete", "off");
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-        $('#logout-link').click(function(e) {
-            //swal({
-            //    title: "Logging out",
-            //    text: "You are about to log out, are you sure you want to continue?",
-            //    icon: "info",
-            //    buttons: ["Cancel", "Yes"],
-            //}).then((confirm) => {
-            //    if (confirm) {
-            $('#logoutForm').submit();
-            //    }
-            //});
+            $('.select2').select2({
+                allowClear: true,
+                placeholder: {
+                    id: "",
+                    text: "<empty>"
+                }
+            });
+
+            $("form").attr("autocomplete", "off");
+
+            $('#logout-link').click(function(e) {
+                //swal({
+                //    title: "Logging out",
+                //    text: "You are about to log out, are you sure you want to continue?",
+                //    icon: "info",
+                //    buttons: ["Cancel", "Yes"],
+                //}).then((confirm) => {
+                //    if (confirm) {
+                $('#logoutForm').submit();
+                //    }
+                //});
+            });
+
+            $(document).ajaxSend(function(event, jqxhr, settings) {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fa fa-bug fa-spin"
+                });
+            });
+            $(document).ajaxComplete(function(event, jqxhr, settings) {
+                $.LoadingOverlay("hide");
+            });
         });
-    });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

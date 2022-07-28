@@ -8,9 +8,10 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+            <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
                 <span class="fas fa-plus"></span> New Item
             </a>
+            @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"])
         </div>
     </div>
     <div class="card-body">
@@ -30,63 +31,20 @@
                         @Html.DisplayNameFor(model => model.InterchangeNumber)
                     </th>
                     <th>
-                        Warehouse 1-1?
+                        @Html.DisplayNameFor(model => model.Warehouse)
                     </th>
                     <th>
-                        SRP
+                        @Html.DisplayNameFor(model => model.RetailPrice)
                     </th>
                     <th>
-                        Net-B Price
+                        @Html.DisplayNameFor(model => model.NetPrice)
                     </th>
                     <th>
-                        Net-A Price
-                    </th>
-                    <th>
-                        Special Price
-                    </th>
-                    <th>
-                        Quantity on Hand
+                        @Html.DisplayNameFor(model => model.Quantity)
                     </th>
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.Code</td>
-                        <td>@item.Name</td>
-                        <td>@item.PartNumber</td>
-                        <td>@item.InterchangeNumber</td>
-                        <td>Warehouse / Warehouses?</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0</td>
-                        <td>
-                            <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="View Details">
-                                <i class="fas fa-info-circle"></i>
-                            </a>
-                            @if (item.IsActive)
-                            {
-                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="Edit Details">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </a>
-                                <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item">
-                                    <i class="far fa-trash-alt"></i>
-                                </button>
-                            }
-                            else
-                            {
-                                <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
         </table>
     </div>
 </div>
@@ -101,6 +59,73 @@
 
 @section Scripts {
     <script>
+        var dataTable = $('.table').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+                data: function(data) {
+                    var categoryId = $("#CategoryId").val();
+                    var itemTypeId = $("#ItemTypeId").val();
+                    var brandId = $("#BrandId").val();
+                    var warehouseId = $("#WarehouseId").val();
+
+                    if (categoryId) data.CategoryId = categoryId;
+                    if (itemTypeId) data.ItemTypeId = itemTypeId;
+                    if (warehouseId) data.WarehouseId = warehouseId;
+                },
+            },
+            //processing: true,
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                { data: "partNumber", name: "PartNumber" },
+                { data: "interchangeNumber", name: "InterchangeNumber" },
+                { data: "warehouse", name: "Warehouse" },
+                {
+                    data: function(data, type, dataToSet) { return data.retailPrice.toFixed(2); },
+                    name: "RetailPrice",
+                    className: "text-end"
+                },
+                {
+                    data: function(data, type, dataToSet) { return data.netPrice.toFixed(2); },
+                    name: "NetPrice",
+                    className: "text-end"
+                },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                {
+                    orderable: false,
+                    data: function(data, type, dataToSet) {
+                        var actions = '<a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        if (data.isActive) {
+                            actions += '<a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="Edit Details"><i class="fas fa-pencil-alt"></i></a>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item"><i class="far fa-trash-alt"></i></button>';
+                        } else {
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item"><i class="fas fa-check"></i></button>';
+                        }
+                        return actions;
+                    }
+                }
+            ]
+        });
+
+        dataTable.on("draw", function() {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            $.LoadingOverlay("hide");
+        });
+
+        function ApplyFilter() {
+            dataTable.ajax.reload();
+            $("#filterModal").modal("hide");
+        }
+
         $('.deleteBtn').click(function(e) {
             swal({
                 title: "Delete / Deactivate Item",

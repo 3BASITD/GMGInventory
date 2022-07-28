@@ -12,6 +12,10 @@
     font-size: 20px;
 }
 
+.dataTables_processing {
+    z-index: 99;
+}
+
 .form-check-input {
     position: static !important;
     margin-left: 0 !important;

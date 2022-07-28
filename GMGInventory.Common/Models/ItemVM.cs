@@ -102,18 +102,24 @@ namespace GMGInventory.Common.Models
     public class ItemViewVM : ItemVM
     {
         [Display(Name = "Brand")]
-        public BrandVM Brand { get; set; }
+        public string Brand { get; set; }
 
         [Display(Name = "Item Type")]
-        public ItemTypeVM ItemType { get; set; }
+        public string ItemType { get; set; }
 
         [Display(Name = "Category")]
-        public CategoryVM Category { get; set; }
+        public string Category { get; set; }
 
         [Display(Name = "Retail Price")]
         public decimal RetailPrice { get; set; }
 
         [Display(Name = "Net Price")]
         public decimal NetPrice { get; set; }
+
+        [Display(Name = "Quantity on Hand")]
+        public int Quantity { get; set; }
+
+        [Display(Name = "Warehouse")]
+        public string Warehouse { get; set; }
     }
 }

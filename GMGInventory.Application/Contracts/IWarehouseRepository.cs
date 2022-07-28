@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Common.Models;
+using GMGInventory.Data;
 
 namespace GMGInventory.Application.Contracts
 {
@@ -8,6 +9,7 @@ namespace GMGInventory.Application.Contracts
         Task<WarehouseFormVM?> GetToEditAsync(int? id);
         Task<List<WarehouseViewVM>> GetAllAsync();
         Task<WarehouseFormVM> AddAsync(WarehouseFormVM itemVM);
+        Task<List<Warehouse>> GetAllActiveWarehouseAsync(int includeId);
         Task<bool> IsIdExists(int id);
         Task<bool> IsCodeExists(string code);
         Task DeleteAsync(int id);
