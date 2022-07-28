@@ -1,0 +1,124 @@
+﻿@model IEnumerable<ForwarderViewVM>
+
+@{
+    ViewData["Title"] = "Forwarder";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                <span class="fas fa-plus"></span> New Forwarder
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover">
+            <thead>
+                <tr>
+
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserCreated)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserModified)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateModified)
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null)
+                {
+                    <tr><td colspan="9"><p class="text-center m-0">This record is empty</p></td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Address</td>
+                            <td>@item.Customer.Name</td>
+                            <td>@item.UserCreated</td>
+                            <td>@item.DateCreated</td>
+                            <td>@item.UserModified</td>
+                            <td>@item.DateModified</td>
+                            <td>
+                                <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
+                                
+                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id">
+                                        <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                    <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button">
+                                        <i class="far fa-trash-alt"></i>
+                                    </button>
+                                
+                           
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form id="deleteForwarderForm" asp-action="Delete">
+    <input type="hidden" id="deleteForwarderId" name="Id" />
+</form>
+
+
+
+<form id="deleteForwarderForm" asp-action="Delete">
+    <input type="hidden" id="deleteForwarderId" name="Id" />
+</form>
+
+
+
+
+@section Scripts {
+    <script>
+
+        $('.table').DataTable({
+            order: [[0, "desc"]]
+        });
+
+        $('.deleteBtn').click(function(e) {
+            swal({
+                title: "Delete Forwarder",
+                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((confirm) => {
+                if (confirm) {
+                    var btn = $(this);
+                    var id = btn.data("id");
+                    $('#deleteForwarderId').val(id);
+                    $('#deleteForwarderForm').submit();
+                }
+            });
+        });
+
+     
+    </script>
+}

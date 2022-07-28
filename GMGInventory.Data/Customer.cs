@@ -53,6 +53,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string? TIN { get; set; }
 
+        [Column(TypeName = "nvarchar(50)")]
+        public string? VAT { get; set; }
+
         [Column(TypeName = "decimal(18, 2)")]
         public decimal CreditLimit { get; set; }
 

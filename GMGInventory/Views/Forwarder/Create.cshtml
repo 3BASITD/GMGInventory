@@ -1,0 +1,73 @@
+﻿@model ForwarderVM
+
+@{
+    ViewData["Title"] = "New Forwarder";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Forwarder" asp-action="Index">Forwarders</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <a class="btn btn-light btn-sm float-right mr-2" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <form asp-action="Create">
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                 <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label mb-0"></label>
+                            <input asp-for="Name" class="form-control form-control-sm" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Address" class="control-label mb-0"></label>
+                            <input asp-for="Address" class="form-control form-control-sm" />
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber" class="control-label mb-0"></label>
+                            <input asp-for="PhoneNumber" class="form-control form-control-sm" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                          <div class="form-group">
+                            <label asp-for="FaxNumber" class="control-label mb-0"></label>
+                            <input asp-for="FaxNumber" class="form-control form-control-sm" />
+                            <span asp-validation-for="FaxNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CustomerId" class="control-label mb-0"></label>
+                            <select asp-for="CustomerId" asp-items="Model?.Customers" class="form-control select2">
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
+                 
+                    </div>
+                   
+                </div>
+            
+            </div>
+            <div class="card-footer">
+                <div class="card-tools">
+                    <button type="submit" class="btn btn-primary btn-sm float-right">
+                        <span class="fas fa-save"></span> Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

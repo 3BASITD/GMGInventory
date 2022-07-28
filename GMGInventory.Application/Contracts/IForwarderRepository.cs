@@ -1,0 +1,20 @@
+﻿using GMGInventory.Common.Models;
+using GMGInventory.Data;
+
+namespace GMGInventory.Application.Contracts
+{
+    public interface IForwarderRepository : IGenericRepository<Forwarder>
+    {
+        Task<List<ForwarderViewVM>> GetAllForwarderVMAsync();
+        Task<ForwarderViewVM?> GetForwarderViewVMAsync(int? id);
+        Task<ForwarderVM?> GetForwarderVMAsync(int? id);
+        Task<List<Forwarder>> GetAllActiveForwarderAsync(int includeId);
+        Task<bool> IsForwarderCodeExist(string code);
+        Task<bool> IsForwarderInUse(int id);
+        Task<bool> IsForwarderIdExistAsync(int id);
+        Task DeactivateForwarderAsync(int id);
+        Task ReactivateForwarderAsync(int id);
+        Task AddAsync(ForwarderVM forwarderVM);
+        Task UpdateAsync(int id, ForwarderVM forwarderVM);
+    }
+}

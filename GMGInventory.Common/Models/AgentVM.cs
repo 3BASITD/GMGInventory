@@ -29,6 +29,15 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
+        [Display(Name  = "Full Name")]
+        public string FullName
+        {
+            get
+            {
+                return FirstName + " " + MiddleName + " "+ LastName;
+            }
+        }
+
         [Display(Name = "Area")]
         public int AreaId { get; set; }
         public SelectList? Areas { get; set; }

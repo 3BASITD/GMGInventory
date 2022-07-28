@@ -65,9 +65,12 @@ namespace GMGInventory.Application.Repositories
             return agentViewVM;
         }
 
-        public async Task<List<Agent>> GetAllActiveAgentAsync(int includeId)
-        {
-            return await context.Agents.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
+        public async Task<List<AgentVM>> GetAllActiveAgentAsync(int includeId)
+
+        { 
+            var agents =  await context.Agents.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
+            var agentViewVM = mapper.Map <List<AgentVM>>(agents);
+            return agentViewVM;
         }
 
         public async Task<bool> IsAgentCodeExist(string code)
