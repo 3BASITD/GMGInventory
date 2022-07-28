@@ -39,9 +39,14 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Create()
         {
+            var cat = await categoryRepository.GetAllActiveCategoryAsync(-1);
             var itemTypeVM = new ItemTypeVM
             {
-                Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name")
+                //Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name")
+                Categories = cat.Select(s => new SelectListItem{ 
+                    Value = s.Id.ToString(), 
+                    Text = s.Code 
+                }).ToList()
             };
             return View(itemTypeVM);
         }
@@ -64,7 +69,15 @@ namespace GMGInventory.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId), "Id", "Name", itemTypeVM.CategoryId);
+            //itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId), "Id", "Name", itemTypeVM.CategoryId);
+
+            var cat = await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId);
+            itemTypeVM.Categories = cat.Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = s.Code,
+                Selected = s.Id == itemTypeVM.CategoryId
+            }).ToList();
             return View(itemTypeVM);
         }
 
@@ -75,7 +88,14 @@ namespace GMGInventory.Controllers
             {
                 return NotFound();
             }
-            itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
+
+            //itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
+            var cat = await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId);
+            itemTypeVM.Categories = cat.Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = s.Code
+            }).ToList();
             return View(itemTypeVM);
         }
 
@@ -109,7 +129,15 @@ namespace GMGInventory.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
+            //itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
+
+            var cat = await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId);
+            itemTypeVM.Categories = cat.Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = s.Code,
+                Selected = s.Id == itemTypeVM.CategoryId
+            }).ToList();
             return View(itemTypeVM);
         }
 
