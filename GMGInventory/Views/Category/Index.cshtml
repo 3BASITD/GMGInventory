@@ -113,6 +113,11 @@
 
 @section Scripts {
     <script>
+
+        $('.table').DataTable({
+            order: [[0, "desc"]]
+        });
+
         $('.deleteBtn').click(function(e) {
             swal({
                 title: "Delete / Deactivate Category",

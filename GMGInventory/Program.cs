@@ -34,6 +34,10 @@ builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepositor
 builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseRepository));
 builder.Services.AddScoped(typeof(ICurrencyRepository), typeof(CurrencyRepository));
+builder.Services.AddScoped(typeof(ICustomerRepository), typeof(CustomerRepository));
+builder.Services.AddScoped(typeof(ICreditTermRepository), typeof(CreditTermRepository));
+builder.Services.AddScoped(typeof(ICustomerTypeRepository), typeof(CustomerTypeRepository));
+builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
 
 
 

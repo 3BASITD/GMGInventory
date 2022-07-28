@@ -11,17 +11,28 @@ namespace GMGInventory.Application.Configurations
             string DateFormat = "yyyy/MM/dd hh:mm:ss tt";
             // Agent
             CreateMap<Agent, AgentVM>().ReverseMap();
-            CreateMap<Agent, GenericAuditVM>().ReverseMap();
             CreateMap<Agent, AgentViewVM>().ReverseMap();
+            CreateMap<Agent, GenericAuditVM>()
+                .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
+                .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
+                .ReverseMap();
+            
 
             // Area
             CreateMap<Area, AreaVM>().ReverseMap();
-            CreateMap<Area, GenericAuditVM>().ReverseMap();
             CreateMap<Area, AreaViewVM>().ReverseMap();
+            CreateMap<Area, GenericAuditVM>()
+                .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
+                .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
+                .ReverseMap();
+
 
             // Brand
             CreateMap<Brand, BrandVM>().ReverseMap();
-            CreateMap<Brand, GenericAuditVM>().ReverseMap();
+            CreateMap<Brand, GenericAuditVM>()
+                .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
+                .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
+                .ReverseMap();
             CreateMap<Brand, BrandViewVM>().ReverseMap();
 
             // Category
@@ -42,7 +53,10 @@ namespace GMGInventory.Application.Configurations
             // Supplier
             CreateMap<Supplier, SupplierVM>().ReverseMap();
             CreateMap<Supplier, SupplierViewVM>().ReverseMap();
-            CreateMap<Supplier, GenericAuditVM>().ReverseMap();
+            CreateMap<Supplier, GenericAuditVM>()
+                .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
+                .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
+                .ReverseMap();
 
             // User
             CreateMap<User, UserInformationVM>().ReverseMap();
@@ -62,6 +76,33 @@ namespace GMGInventory.Application.Configurations
             // Region
             CreateMap<Region, RegionVM>().ReverseMap();
             CreateMap<Region, GenericAuditVM>().ReverseMap();
+
+            // CustomerType
+            CreateMap<CustomerType, CustomerTypeVM>().ReverseMap();
+            CreateMap<CustomerType, GenericAuditVM>().ReverseMap();
+
+            // CreditTerm
+            CreateMap<CreditTerm, CreditTermVM>().ReverseMap();
+            CreateMap<CreditTerm, GenericAuditVM>().ReverseMap();
+
+            // Customer
+            CreateMap<Customer, CustomerVM>().ReverseMap();
+            CreateMap<Customer, CustomerViewVM>().ReverseMap();
+            CreateMap<Customer, GenericAuditVM>()
+                .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
+                .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
+                .ReverseMap();
+
+            // Forwarder
+            CreateMap<Forwarder, ForwarderVM>().ReverseMap();
+            CreateMap<Forwarder, ForwarderViewVM>().ReverseMap();
+            CreateMap<Forwarder, GenericAuditVM>()
+                .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
+                .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
+                .ReverseMap();
+
+
+
 
 
 

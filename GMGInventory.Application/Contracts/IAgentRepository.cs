@@ -8,7 +8,7 @@ namespace GMGInventory.Application.Contracts
         Task<List<AgentViewVM>> GetAllAgentVMAsync();
         Task<AgentViewVM?> GetAgentViewVMAsync(int? id);
         Task<AgentVM?> GetAgentVMAsync(int? id);
-        Task<List<Agent>> GetAllActiveAgentAsync(int includeId);
+        Task<List<AgentVM>> GetAllActiveAgentAsync(int includeId);
         Task<bool> IsAgentCodeExist(string code);
         Task<bool> IsAgentInUse(int id);
         Task<bool> IsAgentIdExistAsync(int id);
