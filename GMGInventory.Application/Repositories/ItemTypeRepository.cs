@@ -26,32 +26,102 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<ItemTypeViewVM>> GetAllItemTypeVMAsync()
+        public IQueryable<ItemTypeViewVM> GetAllItemTypeVM()
         {
-            var itemTypes = await context.ItemTypes.Include(s => s.Category).ToListAsync();
-            var itemTypesViewVM = mapper.Map<List<ItemTypeViewVM>>(itemTypes);
-            foreach (ItemTypeViewVM ivm in itemTypesViewVM)
-            {
-                ivm.UserCreated = await GetUserName(ivm.UserCreated);
-                ivm.UserModified = await GetUserName(ivm.UserModified);
-            }
-            return itemTypesViewVM;
+            var itemTypes = from itemType in context.ItemTypes
+                            select new ItemTypeViewVM
+                            {
+                                Id = itemType.Id,
+                                Category = itemType.Category.Name,
+                                CategoryId = itemType.Category.Id,
+                                Code = itemType.Code,
+                                DateCreated = itemType.DateCreated.ToString("yyyy/dd/MM hh:mm:ss tt"),
+                                DateModified = itemType.DateModified == null ? "-" : itemType.DateModified.Value.ToString("yyyy/dd/MM hh:mm:ss tt"),
+                                IsActive = itemType.IsActive,
+                                Name = itemType.Name,
+                                UserCreated = userManager.FindByIdAsync(itemType.UserCreated).Result.Nickname,
+                                UserModified = itemType.UserModified == null ? "-" : userManager.FindByIdAsync(itemType.UserModified).Result.Nickname
+                            };
+            return itemTypes;
         }
 
-        public async Task<ItemTypeViewVM?> GetItemTypeViewVMAsync(int? id)
+
+        public ForDataTables<ItemTypeViewVM> GetListDataTables(DataTablesRequestForm form)
         {
-            var itemType = await context.ItemTypes
-                .Where(s => s.Id == id)
-                .Include(s => s.Category)
-                .FirstOrDefaultAsync();
-            if (itemType == null)
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = GetAllItemTypeVM().ToList().AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                    || x.Name.ToLower().Contains(form.SearchValue)
+                                    || x.Category.ToLower().Contains(form.SearchValue)
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.DateModified.ToLower().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderBy(s => s.Code); break;
+                        case "Name": data = data.OrderBy(s => s.Name); break;
+                        case "Category": data = data.OrderBy(s => s.Category); break;
+                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateModified); break;
+                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModified); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderByDescending(s => s.Code); break;
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
+                        case "NetPrice": data = data.OrderByDescending(s => s.Category); break;
+                        case "PartNumber": data = data.OrderByDescending(s => s.UserCreated); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.DateCreated); break;
+                        case "RetailPrice": data = data.OrderByDescending(s => s.UserModified); break;
+                        case "Size": data = data.OrderByDescending(s => s.DateModified); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<ItemTypeViewVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+        public ItemTypeViewVM? GetItemTypeViewVM(int? id)
+        {
+            var itemTypeVM = GetAllItemTypeVM().Where(s => s.Id == id).FirstOrDefault();
+            if (itemTypeVM == null)
             {
                 return null;
             }
-            var itemTypeViewVM = mapper.Map<ItemTypeViewVM>(itemType);
-            itemTypeViewVM.UserCreated = await GetUserName(itemTypeViewVM.UserCreated);
-            itemTypeViewVM.UserModified = await GetUserName(itemTypeViewVM.UserModified);
-            return itemTypeViewVM;
+            return itemTypeVM;
+        }
+
+        public async Task<bool> UploadCombinationExistAsync(ItemTypeVM itemTypeVM)
+        {
+            return await GetAllItemTypeVM().AnyAsync(s => s.Code == itemTypeVM.Code && s.Name == itemTypeVM.Name && s.Category == s.Category);
         }
 
         public async Task<ItemTypeVM?> GetItemTypeVMAsync(int? id)
@@ -77,13 +147,13 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsItemTypeInUse(int id)
         {
-            return await context.Brands.AnyAsync(s => s.ItemTypeId == id) 
+            return await context.Brands.AnyAsync(s => s.ItemTypeId == id)
                 || await context.Items.AnyAsync(s => s.ItemTypeId == id);
         }
 
         public async Task<bool> IsItemTypeIdExistAsync(int id)
         {
-            return await context.ItemTypes.AnyAsync(s=>s.Id == id);
+            return await context.ItemTypes.AnyAsync(s => s.Id == id);
         }
 
         public async Task DeactivateItemTypeAsync(int id)
@@ -105,15 +175,21 @@ namespace GMGInventory.Application.Repositories
         public async Task AddAsync(ItemTypeVM itemTypeVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var itemType = mapper.Map<ItemType>(itemTypeVM);
-            itemType.IsActive = true;
+            //var itemType = mapper.Map<ItemType>(itemTypeVM);
+            var itemType = new ItemType
+            {
+                Code = itemTypeVM.Code,
+                Name = itemTypeVM.Name,
+                CategoryId = itemTypeVM.CategoryId,
+                IsActive = true
+            };
             await context.ItemTypes.AddAsync(itemType);
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task UpdateAsync(int id, ItemTypeVM itemTypeVM)
+        public async Task UpdateAsync(ItemTypeVM itemTypeVM)
         {
-            var itemType = context.ItemTypes.Where(s => s.Id == id).FirstOrDefault();
+            var itemType = context.ItemTypes.Where(s => s.Id == itemTypeVM.Id).FirstOrDefault();
             if (itemType == null)
             {
                 throw new DbUpdateConcurrencyException();

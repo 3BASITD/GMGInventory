@@ -21,12 +21,14 @@ namespace GMGInventory.Common.Models
         [Required]
         [Display(Name = "Category")]
         public int CategoryId { get; set; }
+        public string Category { get; set; }
         public List<SelectListItem>? Categories { get; set; }
     }
 
     public class ItemTypeViewVM : GenericAuditVM
     {
         [Display(Name = "Category")]
-        public CategoryVM Category { get; set; }
+        public string Category { get; set; }
+        public int CategoryId { get; set; }
     }
 }

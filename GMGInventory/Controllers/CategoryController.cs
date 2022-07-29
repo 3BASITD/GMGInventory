@@ -5,6 +5,7 @@ using GMGInventory.Common.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
@@ -16,6 +17,11 @@ namespace GMGInventory.Controllers
         public CategoryController(ICategoryRepository categoryRepository)
         {
             this.categoryRepository = categoryRepository;
+        }
+
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await categoryRepository.GetOptions(IncludeId));
         }
 
         public async Task<IActionResult> Index()

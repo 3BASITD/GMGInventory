@@ -68,16 +68,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AreaId");
 
-                    b.ToTable("Agents", (string)null);
+                    b.ToTable("Agents");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Area", b =>
@@ -113,16 +113,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("Areas", (string)null);
+                    b.ToTable("Areas");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.AuditLog", b =>
@@ -162,11 +162,13 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuditLogs", (string)null);
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
@@ -199,16 +201,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ItemTypeId");
 
-                    b.ToTable("Brands", (string)null);
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Category", b =>
@@ -238,14 +240,14 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
@@ -277,16 +279,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreditDebitMemoTypeId");
 
-                    b.ToTable("CreditDebitMemos", (string)null);
+                    b.ToTable("CreditDebitMemos");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemoType", b =>
@@ -307,7 +309,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CreditDebitMemoTypes", (string)null);
+                    b.ToTable("CreditDebitMemoTypes");
 
                     b.HasData(
                         new
@@ -347,14 +349,14 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("CreditTerms", (string)null);
+                    b.ToTable("CreditTerms");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Currency", b =>
@@ -381,7 +383,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies", (string)null);
+                    b.ToTable("Currencies");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Customer", b =>
@@ -452,10 +454,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("VAT")
                         .HasColumnType("nvarchar(50)");
@@ -470,7 +472,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerTypeId");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
@@ -537,10 +539,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -548,7 +550,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SOACRId");
 
-                    b.ToTable("CustomerPayments", (string)null);
+                    b.ToTable("CustomerPayments");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPaymentDetail", b =>
@@ -576,10 +578,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -587,7 +589,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("CustomerPaymentDetails", (string)null);
+                    b.ToTable("CustomerPaymentDetails");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerType", b =>
@@ -608,7 +610,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerTypes", (string)null);
+                    b.ToTable("CustomerTypes");
 
                     b.HasData(
                         new
@@ -643,7 +645,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DeliveryTypes", (string)null);
+                    b.ToTable("DeliveryTypes");
 
                     b.HasData(
                         new
@@ -695,16 +697,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Forwarders", (string)null);
+                    b.ToTable("Forwarders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
@@ -760,10 +762,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -775,7 +777,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Invoices", (string)null);
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoiceLineItem", b =>
@@ -806,10 +808,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -817,7 +819,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("InvoiceLineItems", (string)null);
+                    b.ToTable("InvoiceLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoicePayment", b =>
@@ -864,16 +866,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("InvoiceId");
 
-                    b.ToTable("InvoicePayments", (string)null);
+                    b.ToTable("InvoicePayments");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoiceSequence", b =>
@@ -890,7 +892,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InvoiceSequences", (string)null);
+                    b.ToTable("InvoiceSequences");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoiceType", b =>
@@ -911,7 +913,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InvoiceTypes", (string)null);
+                    b.ToTable("InvoiceTypes");
 
                     b.HasData(
                         new
@@ -986,10 +988,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1001,7 +1003,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("Items", (string)null);
+                    b.ToTable("Items");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemInventory", b =>
@@ -1026,10 +1028,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
@@ -1040,7 +1042,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("ItemInventories", (string)null);
+                    b.ToTable("ItemInventories");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemPrice", b =>
@@ -1071,16 +1073,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("ItemPrices", (string)null);
+                    b.ToTable("ItemPrices");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemType", b =>
@@ -1113,16 +1115,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ItemTypes", (string)null);
+                    b.ToTable("ItemTypes");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Pack", b =>
@@ -1156,10 +1158,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1167,7 +1169,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Packs", (string)null);
+                    b.ToTable("Packs");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PackLineItem", b =>
@@ -1201,10 +1203,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1214,7 +1216,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PackReturnId");
 
-                    b.ToTable("PackLineItems", (string)null);
+                    b.ToTable("PackLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PackReturn", b =>
@@ -1236,16 +1238,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PackId");
 
-                    b.ToTable("PackReturns", (string)null);
+                    b.ToTable("PackReturns");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PackReturnLineItem", b =>
@@ -1276,10 +1278,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1287,7 +1289,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PackReturnId");
 
-                    b.ToTable("PackReturnLineItems", (string)null);
+                    b.ToTable("PackReturnLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Payment", b =>
@@ -1327,16 +1329,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PaymentDetail", b =>
@@ -1385,10 +1387,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1396,7 +1398,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("PaymentDetails", (string)null);
+                    b.ToTable("PaymentDetails");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PhysicalCountHistory", b =>
@@ -1427,10 +1429,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
@@ -1441,7 +1443,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("PhysicalCountHistories", (string)null);
+                    b.ToTable("PhysicalCountHistories");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PriceType", b =>
@@ -1462,7 +1464,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PriceTypes", (string)null);
+                    b.ToTable("PriceTypes");
 
                     b.HasData(
                         new
@@ -1524,10 +1526,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1539,7 +1541,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ToWarehouseId");
 
-                    b.ToTable("PurchaseOrders", (string)null);
+                    b.ToTable("PurchaseOrders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderLineItem", b =>
@@ -1582,10 +1584,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1593,7 +1595,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PurchaseOrderLineItems", (string)null);
+                    b.ToTable("PurchaseOrderLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturn", b =>
@@ -1618,16 +1620,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PurchaseReturns", (string)null);
+                    b.ToTable("PurchaseReturns");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturnLineItem", b =>
@@ -1655,10 +1657,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1666,7 +1668,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PurchaseReturnId");
 
-                    b.ToTable("PurchaseReturnLineItems", (string)null);
+                    b.ToTable("PurchaseReturnLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Region", b =>
@@ -1687,7 +1689,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions", (string)null);
+                    b.ToTable("Regions");
 
                     b.HasData(
                         new
@@ -1779,10 +1781,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1798,7 +1800,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("SalesOrders", (string)null);
+                    b.ToTable("SalesOrders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderDeliveryMonitoring", b =>
@@ -1823,10 +1825,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Waybill")
                         .IsRequired()
@@ -1838,7 +1840,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("SalesOrderDeliveryMonitorings", (string)null);
+                    b.ToTable("SalesOrderDeliveryMonitorings");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderLineItem", b =>
@@ -1884,10 +1886,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1895,7 +1897,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("SalesOrderLineItems", (string)null);
+                    b.ToTable("SalesOrderLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
@@ -1925,16 +1927,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("SalesReturns", (string)null);
+                    b.ToTable("SalesReturns");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnAppliedAmount", b =>
@@ -1966,10 +1968,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1977,7 +1979,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SalesReturnTotalReturnAmountId");
 
-                    b.ToTable("SalesReturnAppliedAmounts", (string)null);
+                    b.ToTable("SalesReturnAppliedAmounts");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnLineItem", b =>
@@ -2021,10 +2023,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2032,7 +2034,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SalesReturnId");
 
-                    b.ToTable("SalesReturnLineItems", (string)null);
+                    b.ToTable("SalesReturnLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnTotalReturnAmount", b =>
@@ -2063,16 +2065,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("SalesReturnTotalReturnAmounts", (string)null);
+                    b.ToTable("SalesReturnTotalReturnAmounts");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ShippingAddress", b =>
@@ -2110,16 +2112,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("ShippingAddresses", (string)null);
+                    b.ToTable("ShippingAddresses");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACR", b =>
@@ -2174,10 +2176,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2185,7 +2187,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SOACRTypeId");
 
-                    b.ToTable("SOACRs", (string)null);
+                    b.ToTable("SOACRs");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACRCheck", b =>
@@ -2225,16 +2227,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("SOACRChecks", (string)null);
+                    b.ToTable("SOACRChecks");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACRLineItem", b =>
@@ -2286,10 +2288,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2297,7 +2299,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("SOACRId");
 
-                    b.ToTable("SOACRLineItems", (string)null);
+                    b.ToTable("SOACRLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACRType", b =>
@@ -2318,7 +2320,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SOACRTypes", (string)null);
+                    b.ToTable("SOACRTypes");
 
                     b.HasData(
                         new
@@ -2353,7 +2355,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Statuses", (string)null);
+                    b.ToTable("Statuses");
 
                     b.HasData(
                         new
@@ -2512,16 +2514,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("StockCards", (string)null);
+                    b.ToTable("StockCards");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Supplier", b =>
@@ -2594,10 +2596,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ZipCode")
                         .IsRequired()
@@ -2609,7 +2611,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CurrencyId");
 
-                    b.ToTable("Suppliers", (string)null);
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItem", b =>
@@ -2635,16 +2637,16 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FromWarehouseId");
 
-                    b.ToTable("TransferItems", (string)null);
+                    b.ToTable("TransferItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItemDetail", b =>
@@ -2675,10 +2677,10 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2688,7 +2690,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("TransferItemId");
 
-                    b.ToTable("TransferItemDetails", (string)null);
+                    b.ToTable("TransferItemDetails");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Unit", b =>
@@ -2709,7 +2711,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Units", (string)null);
+                    b.ToTable("Units");
 
                     b.HasData(
                         new
@@ -2840,14 +2842,14 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Warehouses", (string)null);
+                    b.ToTable("Warehouses");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -2880,42 +2882,42 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            ConcurrencyStamp = "319d1663-3d5a-44eb-999d-5330a8be1b4f",
+                            ConcurrencyStamp = "55f270b4-4118-49cf-a6b5-aca55e6edbe6",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            ConcurrencyStamp = "4e09b1aa-7322-4d7b-b64d-845efc6a3eca",
+                            ConcurrencyStamp = "ad668d30-298e-4f65-b672-28aee2fba64a",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            ConcurrencyStamp = "129fa264-e760-4b85-8aa0-4d15ed30d99f",
+                            ConcurrencyStamp = "27ec3132-7299-46c8-b7f3-8c75fb60d6c7",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            ConcurrencyStamp = "47a59b68-d308-4986-9d4e-d7d055c23563",
+                            ConcurrencyStamp = "022ea87e-d58a-47f6-89bc-054dacfb8074",
                             Name = "Sales Director",
                             NormalizedName = "SALES DIRECTOR"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            ConcurrencyStamp = "bc61ae63-3808-4091-9b6a-a451a59d38e6",
+                            ConcurrencyStamp = "0059da36-42fa-485f-81c8-e2cc7e9456e1",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            ConcurrencyStamp = "f4d43e1b-6590-48c5-9be7-21d8567c6941",
+                            ConcurrencyStamp = "5f2823b4-2c31-41e7-a0d9-43dcac26bde4",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER"
                         });
@@ -3140,12 +3142,12 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("UserCreated")
+                    b.Property<string>("UsrCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<string>("UsrModified")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasDiscriminator().HasValue("User");
 
@@ -3154,43 +3156,43 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "01b6d092-028c-4847-b912-2402804a30ad",
+                            ConcurrencyStamp = "808a0bde-9500-418e-87d1-0c65793fd685",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAEAACcQAAAAEFfvBzrpo8O2QL3T8IeoLZGi9xPQBG9OsfwRPsH/0oLL7cUv2hB4lrQIj/WzGRjcyA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEOlHWZJWiNaxRZfIOFKLeNssRA/lsx1ZOT7w0pAK3oi6MxXUzAprFzPNnv5vlh4dCw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a539be12-d0aa-4881-ba6f-44ef537f8cd7",
+                            SecurityStamp = "3545c44f-59dd-46ff-a9b6-9e8bf4ad476c",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2022, 7, 28, 13, 22, 29, 266, DateTimeKind.Local).AddTicks(3125),
+                            DateCreated = new DateTime(2022, 7, 29, 15, 1, 5, 573, DateTimeKind.Local).AddTicks(8975),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
                             LastName = "Administrator",
                             Nickname = "MISNet",
-                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                            UsrCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ac43d4d2-1886-4fc9-8dce-387fe30803f0",
+                            ConcurrencyStamp = "a68e52f9-0bfd-484e-9eeb-583f06b4e478",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAEAACcQAAAAEJYUTgtTDzplOxpHDBltscatKNut/1ZTg1vsl4UVNTpwhqffU9CJlNuSFpAKva/wlA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEMLGh21uda7ccr5QD78FQ1grCBvqVlgT+YW0wh9Xo3eSINgZZil+IRsS55jHkseojA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3de5635f-d9cf-4709-bc5a-b3860230e640",
+                            SecurityStamp = "b62eb847-2a77-4781-a5c9-ad77f99b4ae5",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2022, 7, 28, 13, 22, 29, 277, DateTimeKind.Local).AddTicks(2870),
+                            DateCreated = new DateTime(2022, 7, 29, 15, 1, 5, 582, DateTimeKind.Local).AddTicks(4877),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,
                             LastName = "Administrator",
                             Nickname = "GMG",
-                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                            UsrCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -3214,6 +3216,17 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Region");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.AuditLog", b =>
+                {
+                    b.HasOne("GMGInventory.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>

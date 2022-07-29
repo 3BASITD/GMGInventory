@@ -5,8 +5,10 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IItemTypeRepository : IGenericRepository<ItemType>
     {
-        Task<List<ItemTypeViewVM>> GetAllItemTypeVMAsync();
-        Task<ItemTypeViewVM?> GetItemTypeViewVMAsync(int? id);
+        IQueryable<ItemTypeViewVM> GetAllItemTypeVM();
+        ForDataTables<ItemTypeViewVM> GetListDataTables(DataTablesRequestForm form);
+        ItemTypeViewVM? GetItemTypeViewVM(int? id);
+        Task<bool> UploadCombinationExistAsync(ItemTypeVM itemTypeVM);
         Task<ItemTypeVM?> GetItemTypeVMAsync(int? id);
         Task<List<ItemType>> GetAllActiveItemTypeAsync(int includeId);
         Task<bool> IsItemTypeCodeExist(string code);
@@ -15,6 +17,6 @@ namespace GMGInventory.Application.Contracts
         Task DeactivateItemTypeAsync(int id);
         Task ReactivateItemTypeAsync(int id);
         Task AddAsync(ItemTypeVM itemTypeVM);
-        Task UpdateAsync(int id, ItemTypeVM itemTypeVM);
+        Task UpdateAsync(ItemTypeVM itemTypeVM);
     }
 }

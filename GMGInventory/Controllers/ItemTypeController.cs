@@ -6,6 +6,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
+using ClosedXML.Excel;
 
 namespace GMGInventory.Controllers
 {
@@ -24,121 +26,118 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await itemTypeRepository.GetAllItemTypeVMAsync());
-        }
-
-        public async Task<IActionResult> Details(int? id)
-        {
-            var itemTypeVM = await itemTypeRepository.GetItemTypeVMAsync(id);
-            if (itemTypeVM == null)
-            {
-                return NotFound();
-            }
-            return View(itemTypeVM);
-        }
-
-        public async Task<IActionResult> Create()
-        {
-            var cat = await categoryRepository.GetAllActiveCategoryAsync(-1);
-            var itemTypeVM = new ItemTypeVM
-            {
-                //Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name")
-                Categories = cat.Select(s => new SelectListItem{ 
-                    Value = s.Id.ToString(), 
-                    Text = s.Code 
-                }).ToList()
-            };
-            return View(itemTypeVM);
+            return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ItemTypeVM itemTypeVM)
+        public JsonResult GetListJson()
         {
-            if (ModelState.IsValid)
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(itemTypeRepository.GetListDataTables(dtForm));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreateJson(ItemTypeVM itemTypeVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await itemTypeRepository.IsItemTypeCodeExist(itemTypeVM.Code))
             {
-                if (await itemTypeRepository.IsItemTypeCodeExist(itemTypeVM.Code))
+                responseModel.Status = "Error";
+                responseModel.Message = "Item type code already in use";
+            }
+            else
+            {
+                await itemTypeRepository.AddAsync(itemTypeVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Item type successfully added";
+            }
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UploadJson(ItemTypeVM itemTypeVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if(await itemTypeRepository.UploadCombinationExistAsync(itemTypeVM))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Already exist";
+            }
+            else if (await itemTypeRepository.IsItemTypeCodeExist(itemTypeVM.Code))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Code already in use";
+            }
+            else
+            {
+                int? CategoryId = await categoryRepository.GetIdAsync(itemTypeVM.Category);
+                if (CategoryId == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Item type code already in use.");
-                    TempData["ErrorMessage"] = "Item type code already in use";
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Category";
                 }
                 else
                 {
+                    itemTypeVM.CategoryId = CategoryId.Value;
                     await itemTypeRepository.AddAsync(itemTypeVM);
-                    TempData["SuccessMessage"] = "Item type successfully added";
-                    return RedirectToAction(nameof(Index));
+                    responseModel.Status = "Success";
+                    responseModel.Message = "Item type successfully added";
                 }
             }
-            //itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId), "Id", "Name", itemTypeVM.CategoryId);
-
-            var cat = await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId);
-            itemTypeVM.Categories = cat.Select(s => new SelectListItem
-            {
-                Value = s.Id.ToString(),
-                Text = s.Code,
-                Selected = s.Id == itemTypeVM.CategoryId
-            }).ToList();
-            return View(itemTypeVM);
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            var itemTypeVM = await itemTypeRepository.GetItemTypeVMAsync(id);
-            if (itemTypeVM == null)
-            {
-                return NotFound();
-            }
-
-            //itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
-            var cat = await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId);
-            itemTypeVM.Categories = cat.Select(s => new SelectListItem
-            {
-                Value = s.Id.ToString(),
-                Text = s.Code
-            }).ToList();
-            return View(itemTypeVM);
+            return Json(responseModel);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ItemTypeVM itemTypeVM)
+        public async Task<JsonResult> EditJson(ItemTypeVM itemTypeVM)
         {
-            if (id != itemTypeVM.Id)
+            ResponseModel responseModel = new ResponseModel();
+            try
             {
-                return NotFound();
+                await itemTypeRepository.UpdateAsync(itemTypeVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Item type successfully updated";
+            }
+            catch (Exception ex)
+            {
+                if (!await itemTypeRepository.Exists(itemTypeVM.Id))
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Item type cannot be found";
+                }
+                else
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = ex.Message;
+                }
+            }
+            return Json(responseModel);
+        }
+
+        public IActionResult DownloadFile()
+        {
+            DataTable dt = new DataTable("Category");
+            dt.Columns.AddRange(new DataColumn[3] {
+                new DataColumn("Code"),
+                new DataColumn("Name"),
+                new DataColumn("Category")
+            });
+            var itemTypes = itemTypeRepository.GetAllItemTypeVM().Where(s => s.IsActive == true).ToList();
+            foreach (var itemType in itemTypes)
+            {
+                dt.Rows.Add(itemType.Code, itemType.Name, itemType.Category);
             }
 
-            if (ModelState.IsValid)
+            using (XLWorkbook wb = new())
             {
-                try
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
                 {
-                    await itemTypeRepository.UpdateAsync(id, itemTypeVM);
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Item Types.xlsx");
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await itemTypeRepository.Exists(itemTypeVM.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                TempData["SuccessMessage"] = "Item type successfully updated";
-                return RedirectToAction(nameof(Index));
             }
-
-            //itemTypeVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
-
-            var cat = await categoryRepository.GetAllActiveCategoryAsync(itemTypeVM.CategoryId);
-            itemTypeVM.Categories = cat.Select(s => new SelectListItem
-            {
-                Value = s.Id.ToString(),
-                Text = s.Code,
-                Selected = s.Id == itemTypeVM.CategoryId
-            }).ToList();
-            return View(itemTypeVM);
         }
 
         [HttpPost]

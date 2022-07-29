@@ -22,7 +22,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     IsDarkMode = false,
                     PasswordHash = hasher.HashPassword(null, "Misnet@2022"),
                     IsActive = true,
-                    UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
+                    UsrCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                     DateCreated = DateTime.Now
                 },
                 new User
@@ -36,7 +36,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     IsDarkMode = false,
                     PasswordHash = hasher.HashPassword(null, "Gmg@2022"),
                     IsActive = true,
-                    UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
+                    UsrCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                     DateCreated = DateTime.Now
                 }
             );

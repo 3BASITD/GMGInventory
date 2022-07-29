@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="~/lib/select2/css/select2.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-toggle/css/bootstrap2-toggle.min.css" />
     <link rel="stylesheet" href="~/lib/chart.js/Chart.min.css" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="layout-fixed sidebar-mini @(activeUser.IsDarkMode ? "dark-mode" : "")" style="height: auto;">
@@ -137,8 +138,13 @@
         <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
     </form>
 
+    <div id="partial-holder" class="text-sm"></div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatables-bs4/js/dataTables.bootstrap4.js"></script>
     <script src="~/lib/adminlte/js/adminlte.min.js"></script>
@@ -149,54 +155,22 @@
     <script src="~/lib/bootstrap-toggle/js/bootstrap2-toggle.min.js"></script>
     <script src="~/lib/chart.js/Chart.min.js"></script>
     <script src="~/lib/loadingoverlay/loadingoverlay.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script src="~/lib/sheetjs/dist/xlsx.core.min.js"></script>
+    <script src="~/lib/filereader/filereader.js"></script>
+    <script src="~/js/site.js"></script>
 
     <script>
         $(document).ready(function() {
-            @if (activeUser.IsDarkMode)
-            {
-                <text>
-                        $(".table").each(function() {
-                            $(this).addClass("table-dark");
-                        });
-                </text>
-            }
-
-            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
-            $('.select2').select2({
-                allowClear: true,
-                placeholder: {
-                    id: "",
-                    text: "<empty>"
-                }
-            });
-
-            $("form").attr("autocomplete", "off");
-
-            $('#logout-link').click(function(e) {
-                //swal({
-                //    title: "Logging out",
-                //    text: "You are about to log out, are you sure you want to continue?",
-                //    icon: "info",
-                //    buttons: ["Cancel", "Yes"],
-                //}).then((confirm) => {
-                //    if (confirm) {
-                $('#logoutForm').submit();
-                //    }
-                //});
-            });
-
-            $(document).ajaxSend(function(event, jqxhr, settings) {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesome: "fa fa-bug fa-spin"
+        @if (activeUser.IsDarkMode)
+        {
+            <text>
+                    $(".table").each(function() {
+                        $(this).addClass("table-dark");
+                    });
+            </text>
+        }
                 });
-            });
-            $(document).ajaxComplete(function(event, jqxhr, settings) {
-                $.LoadingOverlay("hide");
-            });
-        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

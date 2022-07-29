@@ -6,10 +6,10 @@ namespace GMGInventory.Data
     {
         public int Id { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(450)")]
         public string UserCreated { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(450)")]
         public string? UserModified { get; set; }
 
         public DateTime DateCreated { get; set; }

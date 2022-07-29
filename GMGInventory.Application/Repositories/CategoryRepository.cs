@@ -26,6 +26,25 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.Categories
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var category = await context.Categories.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return category?.Id;
+        }
+
         public async Task<List<GenericAuditVM>> GetAllGenericVMAsync()
         {
             var categories = await context.Categories.ToListAsync();
@@ -89,7 +108,7 @@ namespace GMGInventory.Application.Repositories
         public async Task UpdateAsync(int id, CategoryVM categoryVM)
         {
             var category = context.Categories.Where(s => s.Id == id).FirstOrDefault();
-            if(category == null)
+            if (category == null)
             {
                 throw new DbUpdateConcurrencyException();
             }
