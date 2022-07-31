@@ -21,9 +21,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string? ApprovedBy { get; set; }
 
-        [ForeignKey("ToWarehouseId")]
-        public int ToWarehouseId { get; set; }
-        public Warehouse ToWarehouse { get; set; }
+        [ForeignKey("DestinationId")]
+        public int DestinationId { get; set; }
+        public Warehouse Destination { get; set; }
 
         [ForeignKey("CurrencyId")]
         public int? CurrencyId { get; set; }

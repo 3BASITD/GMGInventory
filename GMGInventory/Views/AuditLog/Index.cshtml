@@ -1,0 +1,92 @@
+﻿@model IEnumerable<AuditLogVM>
+
+@{
+    ViewData["Title"] = "Audit Logs";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-logs">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.User)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Type)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TableName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateTime)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PrimaryKey)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OldValues)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.NewValues)
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load List on DataTable
+        var dataTable = $('.table-logs').on('preXhr.dt', function(e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "user", name: "User" },
+                { data: "type", name: "Type" },
+                { data: "tableName", name: "TableName" },
+                { data: "dateTime", name: "DateTime" },
+                {
+                    data: function(data, type, dataToSet) { return formatValues(data.primaryKey); },
+                    name: "PrimaryKey"
+                },
+                {
+                    data: function(data, type, dataToSet) { return formatValues(data.oldValues); },
+                    name: "OldValues"
+                },
+                {
+                    data: function(data, type, dataToSet) { return formatValues(data.newValues); },
+                    name: "NewValues"
+                }
+            ]
+        });
+
+        // Load functions upon DataTable load
+        dataTable.on("draw", function() {
+            $.LoadingOverlay("hide");
+        });
+
+        function formatValues(value) {
+            if (value && value != "-") {
+                var JSONvalue = JSON.parse(value);
+                var returnValue = [];
+                $.each(JSONvalue, function(k, v) {
+                    returnValue.push(k + ": " + v);
+                });
+                return returnValue.join("<br />");
+            } else {
+                return value;
+            }
+        }
+    </script>
+    }

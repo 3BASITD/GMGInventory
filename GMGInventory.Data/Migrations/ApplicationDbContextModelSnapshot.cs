@@ -1504,6 +1504,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DestinationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PONumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
@@ -1516,9 +1519,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToWarehouseId")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPurchaseAmount")
@@ -1535,11 +1535,11 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CurrencyId");
 
+                    b.HasIndex("DestinationId");
+
                     b.HasIndex("StatusId");
 
                     b.HasIndex("SupplierId");
-
-                    b.HasIndex("ToWarehouseId");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -2628,12 +2628,15 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("FromWarehouseId")
+                    b.Property<int>("DestinationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Remarks")
                         .IsRequired()
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("SourceId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -2642,9 +2645,16 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("WarehouseId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FromWarehouseId");
+                    b.HasIndex("DestinationId");
+
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("TransferItems");
                 });
@@ -2669,9 +2679,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("ToWarehouseId")
-                        .HasColumnType("int");
-
                     b.Property<int>("TransferItemId")
                         .HasColumnType("int");
 
@@ -2682,13 +2689,16 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("WarehouseId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ItemId");
 
-                    b.HasIndex("ToWarehouseId");
-
                     b.HasIndex("TransferItemId");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("TransferItemDetails");
                 });
@@ -2882,42 +2892,42 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            ConcurrencyStamp = "55f270b4-4118-49cf-a6b5-aca55e6edbe6",
+                            ConcurrencyStamp = "cff12848-0200-4147-bd80-151ee526d321",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            ConcurrencyStamp = "ad668d30-298e-4f65-b672-28aee2fba64a",
+                            ConcurrencyStamp = "a7ec9c03-4c1f-4f72-953b-dd1e68168e0b",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            ConcurrencyStamp = "27ec3132-7299-46c8-b7f3-8c75fb60d6c7",
+                            ConcurrencyStamp = "204903fb-a41e-4d64-8c5f-e3ff8f5f0605",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            ConcurrencyStamp = "022ea87e-d58a-47f6-89bc-054dacfb8074",
+                            ConcurrencyStamp = "8b3063d5-99a6-4cfd-ae76-dba73d25241b",
                             Name = "Sales Director",
                             NormalizedName = "SALES DIRECTOR"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            ConcurrencyStamp = "0059da36-42fa-485f-81c8-e2cc7e9456e1",
+                            ConcurrencyStamp = "f23c75db-4418-478a-a5cf-ca1b6b1de998",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            ConcurrencyStamp = "5f2823b4-2c31-41e7-a0d9-43dcac26bde4",
+                            ConcurrencyStamp = "a61aed0b-9891-4831-b597-e473047740e0",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER"
                         });
@@ -3156,16 +3166,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "808a0bde-9500-418e-87d1-0c65793fd685",
+                            ConcurrencyStamp = "0b0c8844-066e-419d-aa7a-b722d8327b03",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAEAACcQAAAAEOlHWZJWiNaxRZfIOFKLeNssRA/lsx1ZOT7w0pAK3oi6MxXUzAprFzPNnv5vlh4dCw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEIlS/JEW0EsG8Qfbmt4qRrKEo+C9+FqoF8Rgk9Zplay5AArgFWJO/ZJOTwEG+OKhjg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3545c44f-59dd-46ff-a9b6-9e8bf4ad476c",
+                            SecurityStamp = "5a899ac2-7d94-4c8b-b93e-fbee239674eb",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2022, 7, 29, 15, 1, 5, 573, DateTimeKind.Local).AddTicks(8975),
+                            DateCreated = new DateTime(2022, 7, 31, 16, 7, 43, 894, DateTimeKind.Local).AddTicks(5469),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3177,16 +3187,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a68e52f9-0bfd-484e-9eeb-583f06b4e478",
+                            ConcurrencyStamp = "d6a62cce-a65c-4ecf-8adf-d031f79e320a",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAEAACcQAAAAEMLGh21uda7ccr5QD78FQ1grCBvqVlgT+YW0wh9Xo3eSINgZZil+IRsS55jHkseojA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEDHsbemGjRTW/2gURYY5UwiU3wM9lDqDK/ruDv8VGagTeVgtfGMojBemzapCFZRxow==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b62eb847-2a77-4781-a5c9-ad77f99b4ae5",
+                            SecurityStamp = "6b7c07c5-103c-4647-b877-bc3d8dcbe7ab",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2022, 7, 29, 15, 1, 5, 582, DateTimeKind.Local).AddTicks(4877),
+                            DateCreated = new DateTime(2022, 7, 31, 16, 7, 43, 901, DateTimeKind.Local).AddTicks(7099),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3593,6 +3603,12 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseOrders")
                         .HasForeignKey("CurrencyId");
 
+                    b.HasOne("GMGInventory.Data.Warehouse", "Destination")
+                        .WithMany("PurchaseOrders")
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.Status", "Status")
                         .WithMany("PurchaseOrders")
                         .HasForeignKey("StatusId")
@@ -3605,19 +3621,13 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.Warehouse", "ToWarehouse")
-                        .WithMany("PurchaseOrders")
-                        .HasForeignKey("ToWarehouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Currency");
+
+                    b.Navigation("Destination");
 
                     b.Navigation("Status");
 
                     b.Navigation("Supplier");
-
-                    b.Navigation("ToWarehouse");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderLineItem", b =>
@@ -3898,13 +3908,25 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.TransferItem", b =>
                 {
-                    b.HasOne("GMGInventory.Data.Warehouse", "FromWarehouse")
-                        .WithMany("TransferItems")
-                        .HasForeignKey("FromWarehouseId")
+                    b.HasOne("GMGInventory.Data.Warehouse", "Destination")
+                        .WithMany("DestinationWarehouse")
+                        .HasForeignKey("DestinationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FromWarehouse");
+                    b.HasOne("GMGInventory.Data.Warehouse", "Source")
+                        .WithMany("SourceWarehouse")
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.Warehouse", null)
+                        .WithMany("TransferItems")
+                        .HasForeignKey("WarehouseId");
+
+                    b.Navigation("Destination");
+
+                    b.Navigation("Source");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItemDetail", b =>
@@ -3915,21 +3937,17 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.Warehouse", "ToWarehouse")
-                        .WithMany("TransferItemDetails")
-                        .HasForeignKey("ToWarehouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("GMGInventory.Data.TransferItem", "TransferItem")
                         .WithMany("TransferItemDetails")
                         .HasForeignKey("TransferItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Item");
+                    b.HasOne("GMGInventory.Data.Warehouse", null)
+                        .WithMany("TransferItemDetails")
+                        .HasForeignKey("WarehouseId");
 
-                    b.Navigation("ToWarehouse");
+                    b.Navigation("Item");
 
                     b.Navigation("TransferItem");
                 });
@@ -4229,11 +4247,15 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Warehouse", b =>
                 {
+                    b.Navigation("DestinationWarehouse");
+
                     b.Navigation("ItemInventories");
 
                     b.Navigation("PhysicalCountHistories");
 
                     b.Navigation("PurchaseOrders");
+
+                    b.Navigation("SourceWarehouse");
 
                     b.Navigation("TransferItemDetails");
 

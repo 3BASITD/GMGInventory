@@ -303,6 +303,13 @@
                             <p>Suppliers</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "AuditLog" ? "active" : "")"
+                       asp-area="" asp-controller="AuditLog" asp-action="Index">
+                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <p>Audit Logs</p>
+                        </a>
+                    </li>
                 </ul>
             </li>
         }

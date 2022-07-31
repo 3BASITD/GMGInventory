@@ -12,10 +12,6 @@ namespace GMGInventory.Data
         public int ItemId { get; set; }
         public Item Item { get; set; }
 
-        [ForeignKey("ToWarehouseId")]
-        public int ToWarehouseId { get; set; }
-        public Warehouse ToWarehouse { get; set; }
-
         public int Quantity { get; set; }
     }
 }

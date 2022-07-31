@@ -9,9 +9,13 @@ namespace GMGInventory.Data
             this.TransferItemDetails = new HashSet<TransferItemDetail>();
         }
 
-        [ForeignKey("FromWarehouseId")]
-        public int FromWarehouseId { get; set; }
-        public Warehouse FromWarehouse { get; set; }
+        [ForeignKey(nameof(TransferItem.Source))]
+        public int SourceId { get; set; }
+        public Warehouse Source { get; set; }
+
+        [ForeignKey(nameof(TransferItem.Destination))]
+        public int DestinationId { get; set; }
+        public Warehouse Destination { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }

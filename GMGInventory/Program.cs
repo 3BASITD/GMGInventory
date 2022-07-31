@@ -38,6 +38,7 @@ builder.Services.AddScoped(typeof(ICustomerRepository), typeof(CustomerRepositor
 builder.Services.AddScoped(typeof(ICreditTermRepository), typeof(CreditTermRepository));
 builder.Services.AddScoped(typeof(ICustomerTypeRepository), typeof(CustomerTypeRepository));
 builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
+builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
 
 
 

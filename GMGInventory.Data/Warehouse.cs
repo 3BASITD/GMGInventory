@@ -11,6 +11,8 @@ namespace GMGInventory.Data
             this.PurchaseOrders = new HashSet<PurchaseOrder>();
             this.TransferItems = new HashSet<TransferItem>();
             this.TransferItemDetails = new HashSet<TransferItemDetail>();
+            this.SourceWarehouse = new HashSet<TransferItem>();
+            this.DestinationWarehouse = new HashSet<TransferItem>();
         }
 
         [Column(TypeName = "nvarchar(10)")]
@@ -38,5 +40,11 @@ namespace GMGInventory.Data
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
         public ICollection<TransferItem> TransferItems { get; set; }
         public ICollection<TransferItemDetail> TransferItemDetails { get; set; }
+
+        [InverseProperty(nameof(TransferItem.Source))]
+        public ICollection<TransferItem> SourceWarehouse { get; set; }
+
+        [InverseProperty(nameof(TransferItem.Destination))]
+        public ICollection<TransferItem> DestinationWarehouse { get; set; }
     }
 }
