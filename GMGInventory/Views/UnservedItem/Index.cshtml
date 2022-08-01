@@ -1,0 +1,90 @@
+﻿@model IEnumerable<UnservedItemVM>
+
+@{
+    ViewData["Title"] = "Unserved Item";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-unserved">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Item)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OrderDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesOrderNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UnitPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PackedQuantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UnservedQuantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Discount1)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Discount2)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Agent)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CreatedBy)
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load List on DataTable
+        var dataTable = $('.table-unserved').on('preXhr.dt', function(e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "item", name: "Item" },
+                { data: "orderDate", name: "OrderDate" },
+                { data: "salesOrderNumber", name: "SalesOrderNumber" },
+                { data: "customer", name: "Customer" },
+                { data: "unitPrice", name: "UnitPrice" },
+                { data: "quantity", name: "Quantity" },
+                { data: "packedQuantity", name: "PackedQuantity" },
+                { data: "unservedQuantity", name: "UnservedQuantity" },
+                { data: "discount1", name: "Discount1" },
+                { data: "discount2", name: "Discount2" },
+                { data: "agent", name: "Agent" },
+                { data: "createdBy", name: "CreatedBy" }
+            ]
+        });
+
+        // Load functions upon DataTable load
+        dataTable.on("draw", function() {
+            $.LoadingOverlay("hide");
+        });
+    </script>
+    }

@@ -102,14 +102,15 @@
                 {
                     orderable: false,
                     data: function(data, type, dataToSet) {
-                        var actions = '<a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
                         if (data.isActive) {
                             actions += '<a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="Edit Details"><i class="fas fa-pencil-alt"></i></a>';
                             actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item"><i class="far fa-trash-alt"></i></button>';
                         } else {
                             actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item"><i class="fas fa-check"></i></button>';
                         }
-                        return actions;
+                        return actions + "</div>";
                     }
                 }
             ]

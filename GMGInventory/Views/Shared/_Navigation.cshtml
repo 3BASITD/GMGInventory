@@ -92,7 +92,7 @@
         || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin)
         || User.IsInRole(Roles.Telemarketer))
         {
-            var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "Replenish", "Warehouse", "Transfer", "Unserved" }).Contains(currentController ?? "");
+            var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "Replenish", "Warehouse", "Transfer", "UnservedItem" }).Contains(currentController ?? "");
 
             <li class="nav-item @(navInventoryActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navInventoryActive ? "active" : "")">
@@ -180,8 +180,8 @@
                    || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
                     {
                         <li class="nav-item">
-                            <a class="nav-link @(currentController == "Unserved" ? "active" : "")"
-                       asp-area="" asp-controller="Unserved" asp-action="Index">
+                            <a class="nav-link @(currentController == "UnservedItem" ? "active" : "")"
+                       asp-area="" asp-controller="UnservedItem" asp-action="Index">
                                 <i class="nav-icon fas fa-shapes"></i>
                                 <p>Unserved Item</p>
                             </a>
