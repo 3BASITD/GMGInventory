@@ -25,6 +25,11 @@ namespace GMGInventory.Controllers
             this.mapper = mapper;
         }
 
+        public async Task<IActionResult> GetOptions(int ItemTypeId, int? IncludeId)
+        {
+            return Json(await brandRepository.GetOptions(ItemTypeId, IncludeId));
+        }
+
         public async Task<IActionResult> Index()
         {
             return View(await brandRepository.GetAllBrandVMAsync());

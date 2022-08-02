@@ -40,6 +40,7 @@ builder.Services.AddScoped(typeof(ICustomerTypeRepository), typeof(CustomerTypeR
 builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
 builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
 builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
+builder.Services.AddScoped(typeof(IReportSalesRepository), typeof(ReportSalesRepository));
 
 
 

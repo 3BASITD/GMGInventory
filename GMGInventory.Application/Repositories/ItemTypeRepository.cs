@@ -26,6 +26,19 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<List<JsonOptionsModel>> GetOptions(int CategoryId, int? IncludeId)
+        {
+            return await context.ItemTypes
+                .Where(s => (s.CategoryId == CategoryId && s.IsActive) || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
         public IQueryable<ItemTypeViewVM> GetAllItemTypeVM()
         {
             var itemTypes = from itemType in context.ItemTypes

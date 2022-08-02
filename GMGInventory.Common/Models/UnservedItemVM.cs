@@ -59,4 +59,13 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
     }
+
+    public class UnservedItemFilter
+    {
+        public DateTime StartDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Now;
+        public int? CategoryId { get; set; }
+        public int? ItemTypeId { get; set; }
+        public int? BrandId { get; set; }
+    }
 }

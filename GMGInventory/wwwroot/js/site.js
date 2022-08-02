@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     reloadToolTip();
 
-    $('.select2').select2({
+    $('.select2option').select2({
         allowClear: true,
         placeholder: {
             id: "",
