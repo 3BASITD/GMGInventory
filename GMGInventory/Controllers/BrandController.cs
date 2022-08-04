@@ -12,8 +12,8 @@ using GMGInventory.Common.Constants;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
-    //[Authorize]
+    //[Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
+    [Authorize]
     public class BrandController : Controller
     {
         private readonly IItemTypeRepository itemTypeRepository;

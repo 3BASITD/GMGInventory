@@ -25,7 +25,19 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
             this.mapper = mapper;
         }
-        
+
+        public async Task<List<JsonOptionsModel>> GetOptions(int ItemTypeId, int? IncludeId)
+        {
+            return await context.Brands
+                .Where(s => (s.ItemTypeId == ItemTypeId && s.IsActive) || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
         public IQueryable<BrandViewVM> GetAllBrandVM()
         {
             var brands = from brand in context.Brands

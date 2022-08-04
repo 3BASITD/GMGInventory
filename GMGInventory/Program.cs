@@ -41,7 +41,7 @@ builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderReposit
 builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
 builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
 builder.Services.AddScoped(typeof(IReportSalesRepository), typeof(ReportSalesRepository));
-
+builder.Services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
 
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
