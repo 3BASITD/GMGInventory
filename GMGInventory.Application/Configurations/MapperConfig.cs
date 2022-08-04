@@ -101,6 +101,13 @@ namespace GMGInventory.Application.Configurations
                 .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
                 .ReverseMap();
 
+            // Payment
+            CreateMap<Payment, PaymentVM>().ReverseMap();
+            CreateMap<Payment, PaymentFormVM>().ReverseMap();
+            CreateMap<Payment, PaymentViewVM>()
+                .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
+                .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
+                .ReverseMap();
 
 
 

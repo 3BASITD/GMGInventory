@@ -24,6 +24,16 @@ namespace GMGInventory.Controllers
             this.categoryRepository = categoryRepository;
         }
 
+        public async Task<IActionResult> GetOptionsCreate(int? IncludeId)
+        {
+            return Json(await itemTypeRepository.GetOptionsCreate(IncludeId));
+        }
+
+        public async Task<IActionResult> GetOptionsEdit(int? IncludeId)
+        {
+            return Json(await itemTypeRepository.GetOptionsEdit(IncludeId));
+        }
+
         public async Task<IActionResult> Index()
         {
             return View();

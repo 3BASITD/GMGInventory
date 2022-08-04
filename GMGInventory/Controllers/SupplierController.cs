@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using GMGInventory.Data;
 using GMGInventory.Common.Models;
+using GMGInventory.Common.Constants;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
     public class SupplierController : Controller
     {
         private readonly ISupplierRepository supplierRepository;

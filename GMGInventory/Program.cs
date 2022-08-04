@@ -39,7 +39,7 @@ builder.Services.AddScoped(typeof(ICreditTermRepository), typeof(CreditTermRepos
 builder.Services.AddScoped(typeof(ICustomerTypeRepository), typeof(CustomerTypeRepository));
 builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
 builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
-
+builder.Services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
 
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));

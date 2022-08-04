@@ -27,7 +27,7 @@ namespace GMGInventory.Data
         public string Address { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [ForeignKey("CustomerTypeId")]
         public int CustomerTypeId { get; set; }

@@ -199,5 +199,38 @@ namespace GMGInventory.Application.Repositories
             context.ItemTypes.Update(itemType);
             await context.SaveChangesAsync(currentUserId);
         }
+
+        public async Task<List<JsonOptionsModel>> GetOptionsCreate(int? IncludeId)
+        {
+            return await context.ItemTypes
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<JsonOptionsModel>> GetOptionsEdit(int? IncludeId)
+        {
+            return await context.ItemTypes
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var itemType = await context.ItemTypes.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return itemType?.Id;
+        }
+
     }
 }
