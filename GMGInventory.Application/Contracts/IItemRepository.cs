@@ -4,8 +4,9 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IItemRepository
     {
-        Task<ItemViewVM?> GetAsync(int? id);
-        IQueryable<ItemViewVM> GetAll(ItemFilterVM itemFilterVM);
+        Task<List<JsonOptionsModel>> GetOptions(ItemFilterVM filter, int? IncludeId);
+        IQueryable<ItemViewVM> GetAllItemVM(ItemFilterVM filter);
+        ItemViewVM? GetItemViewVM(int? id);
         Task<ItemVM> AddAsync(ItemVM itemVM);
         Task<bool> Exists(int id);
         Task DeleteAsync(int id);

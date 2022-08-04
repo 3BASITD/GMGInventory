@@ -1,0 +1,270 @@
+﻿@model IEnumerable<UnservedItemVM>
+
+@{
+    ViewData["Title"] = "Unserved Item";
+}
+
+<form id="filter-form" class="mb-3" autocomplete="off">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label for="filter-start-date" class="control-label mb-0">Start Date</label>
+                <input type="date" id="filter-start-date" name="StartDate"
+                       class="form-control form-control-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                <span data-valmsg-for="filter-start-date" data-valmsg-replace="true" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label for="filter-end-date" class="control-label mb-0">End Date</label>
+                <input type="date" id="filter-end-date" name="EndDate"
+                       class="form-control form-control-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                <span data-valmsg-for="filter-end-date" data-valmsg-replace="true" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label for="filter-category" class="control-label mb-0">Category</label>
+                <select id="filter-category" name="CategoryId" style="width:100%">
+                    <option></option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label for="filter-item-type" class="control-label mb-0">Item Type</label>
+                <select id="filter-item-type" name="ItemTypeId" style="width:100%">
+                    <option></option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label for="filter-brand" class="control-label mb-0">Brand</label>
+                <select id="filter-brand" name="BrandId" style="width:100%">
+                    <option></option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary float-right btn-sm">
+                <span class="fas fa-filter"></span> Apply Filter
+            </button>
+        </div>
+    </div>
+</form>
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn" disabled>
+                <span class="fas fa-download"></span> Download
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-unserved">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Item)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OrderDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesOrderNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UnitPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PackedQuantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UnservedQuantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Discount1)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Discount2)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Agent)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CreatedBy)
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load Select2 Category on Filter
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Category")",
+            success: function(data, status, xhr) {
+                $("#filter-category").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    }
+                }).on("select2:select", loadFilterItemType);
+            },
+            complete: function(xhr, status) {
+                loadFilterItemType();
+                $(".downloadBtn").attr("disabled", true);
+            }
+        });
+
+        // Load Select2 Item Type on Filter
+        function loadFilterItemType() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "ItemType")",
+                data: {
+                    CategoryId: $("#filter-category").val()
+                },
+                success: function(data, status, xhr) {
+                    if ($("#filter-item-type").data("select2")) {
+                        $("#filter-item-type").select2("destroy");
+                    }
+                    $("#filter-item-type option").remove();
+                    $("#filter-item-type").append("<option />");
+                    $("#filter-item-type").select2({
+                        data: data,
+                        allowClear: true,
+                        placeholder: {
+                            id: "",
+                            text: "All"
+                        }
+                    }).on("select2:select", loadFilterBrand);
+                },
+                complete: function(xhr, status) {
+                    loadFilterBrand();
+                    $(".downloadBtn").attr("disabled", true);
+                }
+            });
+        }
+
+        // Load Select2 Brand on Filter
+        function loadFilterBrand() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Brand")",
+                data: {
+                    ItemTypeId: $("#filter-item-type").val()
+                },
+                success: function(data, status, xhr) {
+                    if ($("#filter-brand").data("select2")) {
+                        $("#filter-brand").select2("destroy");
+                    }
+                    $("#filter-brand option").remove();
+                    $("#filter-brand").append("<option />");
+                    $("#filter-brand").select2({
+                        data: data,
+                        allowClear: true,
+                        placeholder: {
+                            id: "",
+                            text: "All"
+                        }
+                    });
+                },
+                complete: function(xhr, status) {
+                    $(".downloadBtn").attr("disabled", true);
+                }
+            });
+        }
+
+        $("#filter-start-date, #filter-end-date").on("change", function() {
+            $(".downloadBtn").attr("disabled", true);
+        });
+
+        // Validation for Create Modal
+        var formFilter = $("#filter-form").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                StartDate: { required: true },
+                EndDate: { required: true }
+            },
+            messages: {
+                StartDate: { required: "Please enter Start Date." },
+                EndDate: { required: "Please enter End Date." }
+            },
+            submitHandler: function(form) {
+                dataTable.ajax.reload();
+                return false;
+            }
+        });
+
+        // Load List on DataTable
+        var dataTable = $('.table-unserved').on('preXhr.dt', function(e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetUnservedItemDT")",
+                type: "POST",
+                data: function(data) {
+                    var categoryId = $("#filter-category").val();
+                    var itemTypeId = $("#filter-item-type").val();
+                    var brandId = $("#filter-brand").val();
+
+                    data.StartDate = $("#filter-start-date").val();
+                    data.EndDate = $("#filter-end-date").val();
+                    if (categoryId) data.CategoryId = categoryId;
+                    if (itemTypeId) data.ItemTypeId = itemTypeId;
+                    if (brandId) data.BrandId = brandId;
+                }
+            },
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "item", name: "Item" },
+                { data: "orderDate", name: "OrderDate" },
+                { data: "salesOrderNumber", name: "SalesOrderNumber" },
+                { data: "customer", name: "Customer" },
+                { data: "unitPrice", name: "UnitPrice" },
+                { data: "quantity", name: "Quantity" },
+                { data: "packedQuantity", name: "PackedQuantity" },
+                { data: "unservedQuantity", name: "UnservedQuantity" },
+                { data: "discount1", name: "Discount1" },
+                { data: "discount2", name: "Discount2" },
+                { data: "agent", name: "Agent" },
+                { data: "createdBy", name: "CreatedBy" }
+            ]
+        });
+
+        // Load functions upon DataTable load
+        dataTable.on("draw", function() {
+            $.LoadingOverlay("hide");
+            $(".downloadBtn").attr("disabled", false);
+        });
+
+        $(".downloadBtn").click(function(e) {
+            var urlQuery = [];
+            urlQuery.push("StartDate=" + $("#filter-start-date").val());
+            urlQuery.push("EndDate=" + $("#filter-end-date").val());
+            if ($("#filter-category").val()) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
+            if ($("#filter-item-type").val()) { urlQuery.push("ItemTypeId=" + $("#filter-item-type").val()); }
+            if ($("#filter-brand").val()) { urlQuery.push("BrandId=" + $("#filter-brand").val()); }
+            window.location = "@Url.Action("DownloadUnservedItem")?" + urlQuery.join("&");
+        });
+    </script>
+    }

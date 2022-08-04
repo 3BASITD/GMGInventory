@@ -4,6 +4,7 @@
 
 .select2-container--default .select2-selection--single {
     padding: 0.46875rem 0rem;
+    border: 1px solid #ced4da;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__clear {

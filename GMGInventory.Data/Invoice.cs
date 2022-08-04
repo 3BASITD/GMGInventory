@@ -9,6 +9,7 @@ namespace GMGInventory.Data
             this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
             this.InvoiceLineItems = new HashSet<InvoiceLineItem>();
             this.InvoicePayments = new HashSet<InvoicePayment>();
+            this.PaymentDetails = new HashSet<PaymentDetail>();
             this.SOACRLineItems = new HashSet<SOACRLineItem>();
         }
 

@@ -26,6 +26,11 @@ namespace GMGInventory.Controllers
             this.brandRepository = brandRepository;
         }
 
+        public async Task<IActionResult> GetOptions(int ItemTypeId, int? IncludeId)
+        {
+            return Json(await brandRepository.GetOptions(ItemTypeId, IncludeId));
+        }
+
         public async Task<IActionResult> Index()
         {
             return View();

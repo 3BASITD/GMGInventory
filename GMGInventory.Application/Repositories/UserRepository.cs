@@ -91,7 +91,7 @@ namespace GMGInventory.Application.Repositories
                 || await context.InvoicePayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.Invoices.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.ItemInventories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.ItemPrices.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
+                || await context.ItemPrices.AnyAsync(s => s.UserCreated == id)
                 || await context.Items.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.ItemTypes.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.PackLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)

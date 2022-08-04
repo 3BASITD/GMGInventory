@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using GMGInventory.Application.Configurations;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +28,19 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<List<JsonOptionsModel>> GetOptions(int CategoryId, int? IncludeId)
+        {
+            return await context.ItemTypes
+                .Where(s => (s.CategoryId == CategoryId && s.IsActive) || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
         public IQueryable<ItemTypeViewVM> GetAllItemTypeVM()
         {
             var itemTypes = from itemType in context.ItemTypes
@@ -35,8 +50,10 @@ namespace GMGInventory.Application.Repositories
                                 Category = itemType.Category.Name,
                                 CategoryId = itemType.Category.Id,
                                 Code = itemType.Code,
-                                DateCreated = itemType.DateCreated.ToString("yyyy/dd/MM hh:mm:ss tt"),
-                                DateModified = itemType.DateModified == null ? "-" : itemType.DateModified.Value.ToString("yyyy/dd/MM hh:mm:ss tt"),
+                                DateCreated = itemType.DateCreated.ToString(SystemFormat.StringDateTime),
+                                DateCreatedD = itemType.DateCreated,
+                                DateModified = itemType.DateModified == null ? "-" : itemType.DateModified.Value.ToString(SystemFormat.StringDateTime),
+                                DateModifiedD = itemType.DateModified == null ? null : itemType.DateModified.Value,
                                 IsActive = itemType.IsActive,
                                 Name = itemType.Name,
                                 UserCreated = userManager.FindByIdAsync(itemType.UserCreated).Result.Nickname,
@@ -44,7 +61,6 @@ namespace GMGInventory.Application.Repositories
                             };
             return itemTypes;
         }
-
 
         public ForDataTables<ItemTypeViewVM> GetListDataTables(DataTablesRequestForm form)
         {
@@ -77,9 +93,9 @@ namespace GMGInventory.Application.Repositories
                         case "Name": data = data.OrderBy(s => s.Name); break;
                         case "Category": data = data.OrderBy(s => s.Category); break;
                         case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderBy(s => s.DateModified); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
                         case "UserModified": data = data.OrderBy(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderBy(s => s.DateModified); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
                         default: break;
                     }
                 }
@@ -91,9 +107,9 @@ namespace GMGInventory.Application.Repositories
                         case "Name": data = data.OrderByDescending(s => s.Name); break;
                         case "NetPrice": data = data.OrderByDescending(s => s.Category); break;
                         case "PartNumber": data = data.OrderByDescending(s => s.UserCreated); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.DateCreated); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.DateCreatedD); break;
                         case "RetailPrice": data = data.OrderByDescending(s => s.UserModified); break;
-                        case "Size": data = data.OrderByDescending(s => s.DateModified); break;
+                        case "Size": data = data.OrderByDescending(s => s.DateModifiedD); break;
                         default: break;
                     }
                 }

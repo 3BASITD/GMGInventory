@@ -41,5 +41,12 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Brand")]
         public string Brand { get; set; }
+
+        [Display(Name = "Updated By")]
+        public string UserCreated { get; set; }
+
+        [Display(Name = "Updated Date")]
+        public string DateCreated { get; set; }
+        public DateTime DateCreatedD { get; set; }
     }
 }

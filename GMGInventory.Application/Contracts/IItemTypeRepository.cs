@@ -5,6 +5,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IItemTypeRepository : IGenericRepository<ItemType>
     {
+        Task<List<JsonOptionsModel>> GetOptions(int CategoryId, int? IncludeId);
         IQueryable<ItemTypeViewVM> GetAllItemTypeVM();
         ForDataTables<ItemTypeViewVM> GetListDataTables(DataTablesRequestForm form);
         ItemTypeViewVM? GetItemTypeViewVM(int? id);

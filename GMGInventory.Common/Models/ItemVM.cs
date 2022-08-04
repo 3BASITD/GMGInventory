@@ -20,6 +20,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Warehouse")]
         public int? WarehouseId { get; set; }
         public SelectList? Warehouses { get; set; }
+
+        public bool ActiveOnly { get; set; } = false;
     }
 
     public class ItemVM
@@ -111,10 +113,10 @@ namespace GMGInventory.Common.Models
         public string Category { get; set; }
 
         [Display(Name = "Retail Price")]
-        public decimal RetailPrice { get; set; }
+        public string RetailPrice { get; set; }
 
         [Display(Name = "Net Price")]
-        public decimal NetPrice { get; set; }
+        public string NetPrice { get; set; }
 
         [Display(Name = "Quantity on Hand")]
         public int Quantity { get; set; }
