@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -12,18 +13,21 @@ namespace GMGInventory.Application.Repositories
     {
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly UserManager<User> userManager;
 
         public ItemPriceRepository(ApplicationDbContext context
-            , IHttpContextAccessor httpContextAccessor)
+            , IHttpContextAccessor httpContextAccessor
+            , UserManager<User> userManager)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
+            this.userManager = userManager;
         }
 
         public async Task<ItemPriceVM?> GetAsync(int? id)
         {
             var priceVM = (from item in context.Items
-                           from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.EffectiveDate >= DateTime.Now).Take(1).DefaultIfEmpty()
+                           from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated >= DateTime.Now).OrderByDescending(s=>s.DateCreated).Take(1).DefaultIfEmpty()
                            join inventory in context.ItemInventories on item.Id equals inventory.Id
                            group inventory by new { item, price } into i
                            where i.Key.item.Id == id
@@ -51,14 +55,16 @@ namespace GMGInventory.Application.Repositories
             return priceVM;
         }
 
-        public IQueryable<ItemPriceVM> GetAll(ItemFilterVM itemFilterVM)
+        public IQueryable<ItemPriceVM> GetAllItemPrice(ItemFilterVM filter)
         {
             var pricesVM = (from item in context.Items
-                            from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.EffectiveDate <= DateTime.Now).OrderByDescending(s => s.EffectiveDate).Take(1).DefaultIfEmpty()
+                            from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated <= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
                             let quantity = (from inventory in context.ItemInventories where inventory.ItemId == item.Id select inventory.Quantity).ToList()
-                            where ((itemFilterVM.CategoryId == null || itemFilterVM.CategoryId == item.CategoryId)
-                                && (itemFilterVM.ItemTypeId == null || itemFilterVM.ItemTypeId == item.ItemTypeId)
-                                && (itemFilterVM.BrandId == null || itemFilterVM.BrandId == item.BrandId))
+                            join user in userManager.Users on price.UserCreated equals user.Id
+                            where ((!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+                                && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
+                                && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
+                                && (filter.BrandId == null || filter.BrandId == item.BrandId))
                             select new ItemPriceVM
                             {
                                 Brand = item.Brand.Code,
@@ -73,9 +79,30 @@ namespace GMGInventory.Application.Repositories
                                 Quantity = quantity.Count() == 0 ? 0 : quantity.Sum(s => s),
                                 RetailPrice = price == null ? 0 : price.RetailSellingPrice,
                                 Size = item.Size,
-                                Unit = item.Unit.Code
+                                Unit = item.Unit.Code,
+                                UserCreated = user.Nickname,
+                                DateCreated = price.DateCreated.ToString(SystemFormat.StringDateTime),
+                                DateCreatedD = price.DateCreated
                             });
             return pricesVM;
+        }
+
+        public async Task<bool?> UpdateAsync(int? id, decimal retailPrice, decimal netPrice)
+        {
+            if (!context.Items.Any(s => s.Id == id))
+            {
+                return null;
+            }
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var itemPrice = new ItemPrice
+            {
+                ItemId = id.Value,
+                RetailSellingPrice = retailPrice,
+                NetSellingPrice = netPrice
+            };
+            context.ItemPrices.Add(itemPrice);
+            await context.SaveChangesAsync(currentUserId);
+            return true;
         }
     }
 }

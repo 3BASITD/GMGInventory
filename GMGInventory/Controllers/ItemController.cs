@@ -26,6 +26,11 @@ namespace GMGInventory.Controllers
             this.warehouseRepository = warehouseRepository;
         }
 
+        public async Task<IActionResult> GetOptions(ItemFilterVM filter, int? IncludeId)
+        {
+            return Json(await itemRepository.GetOptions(filter, IncludeId));
+        }
+
         public async Task<ActionResult> Index()
         {
             ItemFilterVM itemFilterVM = new ItemFilterVM();
@@ -38,83 +43,89 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetListJson(ItemFilterVM itemFilterVM)
+        public JsonResult GetListJson(ItemFilterVM filter)
         {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             int totalRecord = 0;
             int filterRecord = 0;
-            var draw = Request.Form["draw"].FirstOrDefault();
-            var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
-            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-            var searchValue = Request.Form["search[value]"].FirstOrDefault();
-            int pageSize = Convert.ToInt32(Request.Form["length"].FirstOrDefault() ?? "0");
-            int skip = Convert.ToInt32(Request.Form["start"].FirstOrDefault() ?? "0");
-            var data = itemRepository.GetAll(itemFilterVM);
+            var data = itemRepository.GetAllItemVM(filter);
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrEmpty(searchValue))
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(searchValue.ToLower())
-                                || x.InterchangeNumber.ToLower().Contains(searchValue.ToLower())
-                                || x.Name.ToLower().Contains(searchValue.ToLower())
-                                || x.NetPrice.ToString().ToLower().Contains(searchValue.ToLower())
-                                || x.PartNumber.ToLower().Contains(searchValue.ToLower())
-                                || x.Quantity.ToString().ToLower().Contains(searchValue.ToLower())
-                                || x.RetailPrice.ToString().ToLower().Contains(searchValue.ToLower())
-                                || x.Warehouse.ToLower().Contains(searchValue.ToLower()));
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                    || x.Name.ToLower().Contains(form.SearchValue)
+                                    || x.Category.ToLower().Contains(form.SearchValue)
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.DateModified.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
-            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                //data = data.OrderBy(sortColumn + " " + sortColumnDirection);
-                if (sortColumnDirection == "asc")
+                if (form.SortColumnDirection == "asc")
                 {
-                    switch (sortColumn)
+                    switch (form.SortColumn)
                     {
+                        case "Brand": data = data.OrderBy(s => s.Brand); break;
+                        case "Category": data = data.OrderBy(s => s.Category); break;
                         case "Code": data = data.OrderBy(s => s.Code); break;
                         case "InterchangeNumber": data = data.OrderBy(s => s.InterchangeNumber); break;
+                        case "ItemType": data = data.OrderBy(s => s.ItemType); break;
+                        case "IsActive": data = data.OrderBy(s => s.IsActive); break;
+                        case "ModelNumber": data = data.OrderBy(s => s.ModelNumber); break;
                         case "Name": data = data.OrderBy(s => s.Name); break;
                         case "NetPrice": data = data.OrderBy(s => s.NetPrice); break;
                         case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
                         case "Quantity": data = data.OrderBy(s => s.Quantity); break;
                         case "RetailPrice": data = data.OrderBy(s => s.RetailPrice); break;
+                        case "Size": data = data.OrderBy(s => s.Size); break;
+                        case "UnitCode": data = data.OrderBy(s => s.UnitCode); break;
                         case "Warehouse": data = data.OrderBy(s => s.Warehouse); break;
                         default: break;
                     }
                 }
-                else if (sortColumnDirection == "desc")
+                else if (form.SortColumnDirection == "desc")
                 {
-                    switch (sortColumn)
+                    switch (form.SortColumn)
                     {
+                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
+                        case "Category": data = data.OrderByDescending(s => s.Category); break;
                         case "Code": data = data.OrderByDescending(s => s.Code); break;
                         case "InterchangeNumber": data = data.OrderByDescending(s => s.InterchangeNumber); break;
+                        case "ItemType": data = data.OrderByDescending(s => s.ItemType); break;
+                        case "IsActive": data = data.OrderByDescending(s => s.IsActive); break;
+                        case "ModelNumber": data = data.OrderByDescending(s => s.ModelNumber); break;
                         case "Name": data = data.OrderByDescending(s => s.Name); break;
                         case "NetPrice": data = data.OrderByDescending(s => s.NetPrice); break;
                         case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
                         case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
                         case "RetailPrice": data = data.OrderByDescending(s => s.RetailPrice); break;
+                        case "Size": data = data.OrderByDescending(s => s.Size); break;
+                        case "UnitCode": data = data.OrderByDescending(s => s.UnitCode); break;
                         case "Warehouse": data = data.OrderByDescending(s => s.Warehouse); break;
                         default: break;
                     }
                 }
             }
             //pagination
-            var empList = data.Skip(skip).Take(pageSize).ToList();
-            var returnObj = new
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return Json(new
             {
-                draw = draw,
-                recordsTotal = totalRecord,
-                recordsFiltered = filterRecord,
-                data = empList
-            };
-            return Json(returnObj);
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            });
         }
 
-        public async Task<ActionResult> Details(int id)
+        public ActionResult Details(int id)
         {
-            var item = await itemRepository.GetAsync(id);
+            var item = itemRepository.GetItemViewVM(id);
             if (item == null)
             {
                 return NotFound();

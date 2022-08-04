@@ -35,8 +35,8 @@ namespace GMGInventory.Application.Repositories
                        Agent = s.Agent.Code,
                        CreatedBy = u.Nickname,
                        Customer = s.Customer.Name,
-                       Discount1 = l.Discount1.GetValueOrDefault(0).ToString("N", new CultureInfo("en-US")),
-                       Discount2 = l.Discount2.GetValueOrDefault(0).ToString("N", new CultureInfo("en-US")),
+                       Discount1 = l.Discount1.GetValueOrDefault(0).ToString($"{0:#,##0.00}"),
+                       Discount2 = l.Discount2.GetValueOrDefault(0).ToString($"{0:#,##0.00}"),
                        Id = s.Id,
                        Item = l.Item.Code,
                        OrderDate = s.DateCreated.ToString(SystemFormat.StringDateTime),
@@ -44,7 +44,7 @@ namespace GMGInventory.Application.Repositories
                        PackedQuantity = l.PackedQuantity.ToString(),
                        Quantity = l.Quantity.ToString(),
                        SalesOrderNumber = s.SalesOrderNumber,
-                       UnitPrice = l.UnitPrice.ToString("N", new CultureInfo("en-US")),
+                       UnitPrice = l.UnitPrice.ToString($"{0:#,##0.00}"),
                        UnservedQuantity = (l.Quantity - l.PackedQuantity).ToString()
                    };
         }

@@ -58,24 +58,8 @@
                         @Model?.InterchangeNumber
                     </b>
                 </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.UnitCode)
-                    </span>
-                    <b class="d-block">
-                        @Model?.UnitCode
-                    </b>
-                </p>
             </div>
             <div class="col-4">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Size)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Size
-                    </b>
-                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.ModelNumber)
@@ -112,42 +96,34 @@
             <div class="col-4">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.IsNonInventory)
+                        @Html.DisplayNameFor(model => model.UnitCode)
                     </span>
                     <b class="d-block">
-                        @Model?.IsNonInventory
+                        @Model?.UnitCode
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        Gross Price
+                        @Html.DisplayNameFor(model => model.Size)
                     </span>
                     <b class="d-block">
-                        0.00
+                        @Model?.Size
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        Net-B Price
+                        @Html.DisplayNameFor(model => model.RetailPrice)
                     </span>
                     <b class="d-block">
-                        0.00
+                        @Model?.RetailPrice
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        Net-A Price
+                        @Html.DisplayNameFor(model => model.NetPrice)
                     </span>
                     <b class="d-block">
-                        0.00
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        Special Price
-                    </span>
-                    <b class="d-block">
-                        0.00
+                        @Model?.NetPrice
                     </b>
                 </p>
             </div>

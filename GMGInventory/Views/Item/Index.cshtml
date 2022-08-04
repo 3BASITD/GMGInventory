@@ -76,6 +76,7 @@
 
                     if (categoryId) data.CategoryId = categoryId;
                     if (itemTypeId) data.ItemTypeId = itemTypeId;
+                    if (brandId) data.BrandId = brandId;
                     if (warehouseId) data.WarehouseId = warehouseId;
                 }
             },
@@ -88,22 +89,14 @@
                 { data: "partNumber", name: "PartNumber" },
                 { data: "interchangeNumber", name: "InterchangeNumber" },
                 { data: "warehouse", name: "Warehouse" },
-                {
-                    data: function(data, type, dataToSet) { return data.retailPrice.toFixed(2); },
-                    name: "RetailPrice",
-                    className: "text-end"
-                },
-                {
-                    data: function(data, type, dataToSet) { return data.netPrice.toFixed(2); },
-                    name: "NetPrice",
-                    className: "text-end"
-                },
+                {data: "retailPrice", name: "RetailPrice", className: "text-end" },
+                { data:"netPrice", name: "NetPrice", className: "text-end" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 {
                     orderable: false,
                     data: function(data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
                         if (data.isActive) {
                             actions += '<a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="Edit Details"><i class="fas fa-pencil-alt"></i></a>';
                             actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item"><i class="far fa-trash-alt"></i></button>';

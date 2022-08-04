@@ -20,12 +20,14 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Date Created")]
         public string DateCreated { get; set; }
+        public DateTime DateCreatedD { get; set; }
 
         [Display(Name = "User Modified")]
         public string UserModified { get; set; }
 
         [Display(Name = "Date Modifed")]
         public string DateModified { get; set; }
+        public DateTime? DateModifiedD { get; set; }
 
 
     }

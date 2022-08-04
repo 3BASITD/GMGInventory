@@ -261,10 +261,10 @@
             var urlQuery = [];
             urlQuery.push("StartDate=" + $("#filter-start-date").val());
             urlQuery.push("EndDate=" + $("#filter-end-date").val());
-            if ($("#filter-category")) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
-            if ($("#filter-item-type")) { urlQuery.push("ItemTypeId=" + $("#filter-item-type").val()); }
-            if ($("#filter-brand")) { urlQuery.push("BrandId=" + $("#filter-brand").val()); }
-            window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+            if ($("#filter-category").val()) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
+            if ($("#filter-item-type").val()) { urlQuery.push("ItemTypeId=" + $("#filter-item-type").val()); }
+            if ($("#filter-brand").val()) { urlQuery.push("BrandId=" + $("#filter-brand").val()); }
+            window.location = "@Url.Action("DownloadUnservedItem")?" + urlQuery.join("&");
         });
     </script>
     }

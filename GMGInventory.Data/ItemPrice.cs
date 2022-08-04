@@ -2,8 +2,10 @@
 
 namespace GMGInventory.Data
 {
-    public class ItemPrice : BaseEntity
+    public class ItemPrice
     {
+        public int Id { get; set; }
+
         [ForeignKey("ItemId")]
         public int ItemId { get; set; }
         public Item Item { get; set; }
@@ -14,12 +16,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal RetailSellingPrice { get; set; }
 
-        //[Column(TypeName = "decimal(18, 2)")]
-        //public decimal WholesaleSellingPrice { get; set; }
+        [Column(TypeName = "nvarchar(450)")]
+        public string UserCreated { get; set; }
 
-        //[Column(TypeName = "decimal(18, 2)")]
-        //public decimal SpecialPrice { get; set; }
-
-        public DateTime EffectiveDate { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

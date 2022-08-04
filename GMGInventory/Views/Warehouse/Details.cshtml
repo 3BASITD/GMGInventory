@@ -34,8 +34,6 @@
                         @Model?.Code
                     </b>
                 </p>
-            </div>
-            <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Name)
@@ -45,9 +43,7 @@
                     </b>
                 </p>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.AddressLine1)
@@ -56,10 +52,6 @@
                         @(string.IsNullOrWhiteSpace(Model?.AddressLine1) ? "-" : Model?.AddressLine1)
                     </b>
                 </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.AddressLine2)
@@ -68,10 +60,6 @@
                         @(string.IsNullOrWhiteSpace(Model?.AddressLine2) ? "-" : Model?.AddressLine2)
                     </b>
                 </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.ContactPerson)
@@ -80,8 +68,6 @@
                         @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
                     </b>
                 </p>
-            </div>
-            <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.ContactNumber)
@@ -91,8 +77,6 @@
                     </b>
                 </p>
             </div>
-        </div>
-        <div class="row">
             <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -102,8 +86,6 @@
                         @Model?.UserCreated
                     </b>
                 </p>
-            </div>
-            <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.DateCreated)
@@ -112,10 +94,6 @@
                         @Model?.DateCreated
                     </b>
                 </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.UserModified)
@@ -124,8 +102,6 @@
                         @(string.IsNullOrWhiteSpace(Model?.UserModified) ? "-" : Model?.UserModified)
                     </b>
                 </p>
-            </div>
-            <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.DateModified)
@@ -190,34 +166,23 @@
             });
         }).DataTable({
             ajax: {
-                url: "@Url.Action("GetItemListJson")",
+                url: "@Url.Action("GetListJson", "Item")",
                 type: "POST",
                 data: function(data) {
                     data.WarehouseId = @Model?.Id;
                 },
             },
-            //processing: true,
             serverSide: true,
             filter: true,
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
-                {
-                    data: function(data, type, dataToSet) { return data.retailPrice.toFixed(2); },
-                    name: "RetailPrice",
-                    className: "text-end"
-                },
-                {
-                    data: function(data, type, dataToSet) { return data.netPrice.toFixed(2); },
-                    name: "NetPrice",
-                    className: "text-end"
-                }
+                { data: "retailPrice", name: "RetailPrice", className: "text-end" },
+                { data: "netPrice", name: "NetPrice", className: "text-end" }
             ]
         });
 
         itemTable.on("draw", function() {
-            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             $.LoadingOverlay("hide");
         });
     </script>
