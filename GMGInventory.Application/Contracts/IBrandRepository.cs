@@ -8,6 +8,11 @@ namespace GMGInventory.Application.Contracts
         Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
         Task<List<BrandViewVM>> GetAllBrandVMAsync();
         Task<BrandViewVM?> GetBrandViewVMAsync(int? id);
+        IQueryable<BrandViewVM> GetAllBrandVM();
+        Task<List<JsonOptionsModel>> GetOptions(int ItemTypeId, int? IncludeId);
+        ForDataTables<BrandViewVM> GetListDataTables(DataTablesRequestForm form);
+        BrandViewVM? GetBrandViewVM(int? id);
+        Task<bool> UploadCombinationExistAsync(BrandVM brandVM);
         Task<BrandVM?> GetBrandVMAsync(int? id);
         Task<List<Brand>> GetAllActiveBrandAsync(int includeId);
         Task<bool> IsBrandCodeExist(string code);
@@ -16,6 +21,6 @@ namespace GMGInventory.Application.Contracts
         Task DeactivateBrandAsync(int id);
         Task ReactivateBrandAsync(int id);
         Task AddAsync(BrandVM brandVM);
-        Task UpdateAsync(int id, BrandVM brandVM);
+        Task UpdateAsync(BrandVM brandVM);
     }
 }

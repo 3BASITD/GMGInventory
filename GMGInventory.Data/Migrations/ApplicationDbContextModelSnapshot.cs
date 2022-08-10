@@ -430,7 +430,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("FaxNumber")
@@ -1050,6 +1049,12 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
@@ -1061,6 +1066,9 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");

@@ -19,14 +19,16 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
 
         [Required]
-        [Display(Name = "Item Type")]
+        [Display(Name = "Item Types")]
         public int ItemTypeId { get; set; }
-        public SelectList? ItemTypes { get; set; }
+        public string ItemType { get; set; }
+        public List<SelectListItem>? ItemTypes { get; set; }
     }
 
     public class BrandViewVM : GenericAuditVM
     {
         [Display(Name = "Item Type")]
-        public ItemTypeVM ItemType { get; set; }
+        public string ItemType { get; set; }
+        public int ItemTypeId { get; set; }
     }
 }

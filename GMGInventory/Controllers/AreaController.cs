@@ -6,10 +6,11 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using GMGInventory.Common.Constants;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
     public class AreaController : Controller
     {
         private readonly IAreaRepository areaRepository;

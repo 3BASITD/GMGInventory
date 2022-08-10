@@ -1,0 +1,142 @@
+﻿@model IEnumerable<PaymentViewVM>
+
+@{
+    ViewData["Title"] = "Payments";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+         @*   <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
+                <span class="fas fa-plus"></span> New Item
+            </a>
+            @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"]) *@
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover">
+            <thead>
+                <tr>
+                   <th>
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReceivedDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReturnedAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AdjustedAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CRNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PaymentMode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<form id="deleteItemForm" asp-action="Delete">
+    <input type="hidden" id="deleteItemId" name="Id" />
+</form>
+
+<form id="reactivateItemForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateItemId" name="Id" />
+</form>
+
+@section Scripts {
+    <script>
+        var dataTable = $('.table').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+               
+            },
+            //processing: true,
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "customer", name: "Customer" },
+                { data: "receivedDate", name: "ReceivedDate" },
+                { data: "returnedAmount", name: "ReturnedAmount" },
+                { data: "adjustedAmount", name: "AdjustedAmount" },
+                { data: "crNumber", name: "CRNumber" },
+                { data: "paymentMode", name: "PaymentMode" },
+                { data: "remarks", name: "Remarks" },
+                {
+                    orderable: false,
+                    data: function(data, type, dataToSet) {
+                        var actions = '<a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        //if (data.isActive) {
+                        //    actions += '<a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="' + data.id + '" data-bs-toggle="tooltip" title="Edit Details"><i class="fas fa-pencil-alt"></i></a>';
+                        //    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item"><i class="far fa-trash-alt"></i></button>';
+                        //} else {
+                        //    actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item"><i class="fas fa-check"></i></button>';
+                        //}
+                        return actions;
+                    }
+                }
+            ]
+        });
+
+        dataTable.on("draw", function() {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            $.LoadingOverlay("hide");
+        });
+
+        function ApplyFilter() {
+            dataTable.ajax.reload();
+            $("#filterModal").modal("hide");
+        }
+
+        $('.deleteBtn').click(function(e) {
+            swal({
+                title: "Delete / Deactivate Payment",
+                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((confirm) => {
+                if (confirm) {
+                    var btn = $(this);
+                    var id = btn.data("id");
+                    $('#deletePaymentId').val(id);
+                    $('#deletePaymentForm').submit();
+                }
+            });
+        });
+
+        $('.reactivateBtn').click(function(e) {
+            swal({
+                title: "Reactivate Payment",
+                text: "Are you sure you want to reactivate this record?",
+                icon: "info",
+                buttons: true,
+                infoMode: true
+            }).then((confirm) => {
+                if (confirm) {
+                    var btn = $(this);
+                    var id = btn.data("id");
+                    $('#reactivatePaymentId').val(id);
+                    $('#reactivatePaymentForm').submit();
+                }
+            });
+        });
+    </script>
+}
