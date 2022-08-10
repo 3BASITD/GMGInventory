@@ -25,6 +25,9 @@
         //});
     });
 
+    $(document).ajaxStart(function (event, jqxhr, settings) {
+    });
+
     $(document).ajaxSend(function (event, jqxhr, settings) {
         $.LoadingOverlay("show", {
             image: "",
@@ -32,15 +35,33 @@
         });
     });
 
+    $(document).ajaxSuccess(function (event, jqxhr, settings) {
+    });
+
     $(document).ajaxComplete(function (event, jqxhr, settings) {
         $.LoadingOverlay("hide");
         reloadToolTip();
     });
+
+    $(document).ajaxStop(function (event, jqxhr, settings) {
+        $.LoadingOverlay("hide");
+        reloadToolTip();
+    });
+
+    $.validator.addMethod('lessThan', function (value, element, param) {
+        return this.optional(element) || parseInt(value) < parseInt($(param).val());
+    }, 'Should not be greater than');
+
+    $.validator.addMethod('notEqualTo', function (value, element, param) {
+        return this.optional(element) || parseInt(value) !== parseInt($(param).val());
+    }, 'Should not be equal');
 });
 
 function reloadToolTip() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, {
+        trigger: "hover"
+    }));
 }
 
 function showLoader() {

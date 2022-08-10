@@ -9,8 +9,6 @@ namespace GMGInventory.Data
             this.ItemInventories = new HashSet<ItemInventory>();
             this.PhysicalCountHistories = new HashSet<PhysicalCountHistory>();
             this.PurchaseOrders = new HashSet<PurchaseOrder>();
-            this.TransferItems = new HashSet<TransferItem>();
-            this.TransferItemDetails = new HashSet<TransferItemDetail>();
             this.SourceWarehouse = new HashSet<TransferItem>();
             this.DestinationWarehouse = new HashSet<TransferItem>();
         }
@@ -38,8 +36,6 @@ namespace GMGInventory.Data
         public ICollection<ItemInventory> ItemInventories { get; set; }
         public ICollection<PhysicalCountHistory> PhysicalCountHistories { get; set; }
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
-        public ICollection<TransferItem> TransferItems { get; set; }
-        public ICollection<TransferItemDetail> TransferItemDetails { get; set; }
 
         [InverseProperty(nameof(TransferItem.Source))]
         public ICollection<TransferItem> SourceWarehouse { get; set; }

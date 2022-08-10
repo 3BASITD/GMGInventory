@@ -1,0 +1,130 @@
+﻿@model TransferVM
+
+@{
+    ViewData["Title"] = "Transfer Details";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Transfer" asp-action="Index">Warehouse Transfer</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Id)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Id
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Source)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Source
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Destination)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Destination
+                        </b>
+                    </p>
+                </div>
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.TransferBy)
+                        </span>
+                        <b class="d-block">
+                            @Model?.TransferBy
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.TransferDate)
+                        </span>
+                        <b class="d-block">
+                            @Model?.TransferDate
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Remarks)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Remarks
+                        </b>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <table class="table table-head-fixed table-striped table-hover table-item">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+@section Scripts {
+    <script>
+        var dataTable = $('.table-item').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemTransferJson")",
+                data: { transferId: @Model?.Id },
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "unit", name: "Unit" },
+            ],
+            order: [[0, "asc"]]
+        });
+
+        dataTable.on("draw", function() {
+            reloadToolTip();
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    dataTable.search($(this).val()).draw();
+                }
+            });
+
+            $.LoadingOverlay("hide");
+        });
+    </script>
+}

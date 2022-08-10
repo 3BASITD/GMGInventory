@@ -174,16 +174,26 @@
             },
             serverSide: true,
             filter: true,
+            responsive: true,
+            autoWidth: false,
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
                 { data: "retailPrice", name: "RetailPrice", className: "text-end" },
                 { data: "netPrice", name: "NetPrice", className: "text-end" }
-            ]
+            ],
+            order: [[0, "asc"]]
         });
 
         itemTable.on("draw", function() {
             $.LoadingOverlay("hide");
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    dataTable.search($(this).val()).draw();
+                }
+            });
         });
     </script>
 }

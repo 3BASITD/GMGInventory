@@ -240,6 +240,8 @@
             },
             serverSide: true,
             filter: true,
+            responsive: true,
+            autoWidth: false,
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
@@ -273,12 +275,20 @@
                         return actions;
                     }
                 }
-            ]
+            ],
+            order: [[4, "desc"]]
         });
 
         // Load functions upon DataTable load
         dataTable.on("draw", function() {
             reloadToolTip();
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    dataTable.search($(this).val()).draw();
+                }
+            });
 
             $.LoadingOverlay("hide");
 
@@ -401,8 +411,6 @@
                             $("#editModal").modal("hide");
                             dataTable.ajax.reload();
                         }
-                    },
-                    complete: function(xhr, status) {
                     }
                 });
             }

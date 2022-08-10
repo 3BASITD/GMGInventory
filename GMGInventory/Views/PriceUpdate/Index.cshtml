@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ItemPriceVM>
+﻿@model IEnumerable<ItemPriceUpdateVM>
 
 @{
     ViewData["Title"] = "Price Update";
@@ -8,7 +8,9 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"])
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+    <span class="fas fa-filter"></span> Filter
+</button>
         </div>
     </div>
     <div class="card-body">
@@ -60,7 +62,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="update-name" class="control-label mb-0 d-block">Name</label>
-                                <input name="name" id="update-name" class="form-control form-control-sm" />
+                                <input name="name" id="update-name" class="form-control form-control-sm" readonly="readonly" />
                             </div>
                             <div class="form-group">
                                 <label for="update-retail" class="control-label mb-0 d-block">Retail Price</label>
@@ -89,6 +91,47 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-category" class="control-label mb-0">Category</label>
+                            <select id="filter-category" name="CategoryId" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-item-type" class="control-label mb-0">Item Type</label>
+                            <select id="filter-item-type" name="ItemTypeId" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-brand" class="control-label mb-0">Brand</label>
+                            <select id="filter-brand" name="BrandId" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         var dataTable = $('.table-update').on('preXhr.dt', function(e, settings, data) {
@@ -113,6 +156,8 @@
             //processing: true,
             serverSide: true,
             filter: true,
+            responsive: true,
+            autoWidth: false,
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
@@ -136,11 +181,19 @@
                         return actions;
                     }
                 }
-            ]
+            ],
+            order: [[5, "desc"]]
         });
 
         dataTable.on("draw", function() {
             reloadToolTip();
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    dataTable.search($(this).val()).draw();
+                }
+            });
 
             $.LoadingOverlay("hide");
 

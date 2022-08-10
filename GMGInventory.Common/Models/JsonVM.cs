@@ -12,7 +12,7 @@ namespace GMGInventory.Common.Models
         public string? Draw { get; set; }
         public int RecordsTotal { get; set; }
         public int RecordsFiltered { get; set; }
-        public List<T> Data { get; set; }
+        public IList<T> Data { get; set; }
     }
 
     public class DataTablesRequestForm

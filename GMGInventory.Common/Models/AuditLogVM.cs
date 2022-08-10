@@ -1,20 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GMGInventory.Common.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
     public class AuditLogVM
     {
-        public AuditLogVM()
-        {
-            User = string.Empty;
-            Type = string.Empty;
-            TableName = string.Empty;
-            DateTime = string.Empty;
-            PrimaryKey = string.Empty;
-            OldValues = string.Empty;
-            NewValues = string.Empty;
-        }
-
         public int Id { get; set; }
 
         [Display(Name = "User Nickname")]
@@ -27,7 +17,8 @@ namespace GMGInventory.Common.Models
         public string TableName { get; set; }
 
         [Display(Name = "Date & Time")]
-        public string DateTime { get; set; }
+        public string DateTime => DateTimeD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateTimeD { get; set; }
 
         [Display(Name = "Primary Key")]
         public string PrimaryKey { get; set; }

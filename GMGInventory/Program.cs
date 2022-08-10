@@ -41,6 +41,7 @@ builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderReposit
 builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
 builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
 builder.Services.AddScoped(typeof(IReportSalesRepository), typeof(ReportSalesRepository));
+builder.Services.AddScoped(typeof(IItemTransferRepository), typeof(ItemTransferRepository));
 
 
 
@@ -66,7 +67,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+    //app.UseExceptionHandler("/Home/Error");
+   app.UseMigrationsEndPoint();
 }
 else
 {

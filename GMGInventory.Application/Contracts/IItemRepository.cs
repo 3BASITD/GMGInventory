@@ -5,11 +5,25 @@ namespace GMGInventory.Application.Contracts
     public interface IItemRepository
     {
         Task<List<JsonOptionsModel>> GetOptions(ItemFilterVM filter, int? IncludeId);
-        IQueryable<ItemViewVM> GetAllItemVM(ItemFilterVM filter);
+        Task<List<JsonOptionsModel>> GetUnitOptions(int? IncludeId);
+        Task<IList<ItemListVM>> GetAllAsync(ItemFilterVM filter);
+        Task<ForDataTables<ItemListVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, ItemFilterVM filter);
         ItemViewVM? GetItemViewVM(int? id);
-        Task<ItemVM> AddAsync(ItemVM itemVM);
-        Task<bool> Exists(int id);
+        Task<bool> IsCodeExistAsync(string code);
+        Task<bool> IsInUseAsync(int id);
+        Task<bool> IsIdExistAsync(int id);
+        Task DeactivateAsync(int id);
+        Task ReactivateAsync(int id);
+        Task AddAsync(ItemCommonVM itemVM);
+        Task UpdateAsync(ItemCommonVM itemVM);
         Task DeleteAsync(int id);
-        Task UpdateAsync(ItemVM itemVM);
+        Task UpdateQuantityAsync(int id, int quantity, string remarks);
+        Task<ForDataTables<ItemDetailWarehouseVM>> GetItemWarehouseDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<ItemDetailPurchaseVM>> GetItemPurchaseDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<ItemDetailSalesVM>> GetItemSalesDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<ItemDetailCountVM>> GetItemCountDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<ItemDetailPriceVM>> GetItemPriceDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<ItemDetailTransferVM>> GetItemTransferDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<ItemDetailReturnVM>> GetItemReturnDTAsync(DataTablesRequestForm form, int id);
     }
 }

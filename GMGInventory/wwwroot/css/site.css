@@ -1,13 +1,33 @@
-.text-sm .select2-container--default .select2-selection--single .select2-selection__arrow, select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow {
+.text-sm .select2-container--default .select2-selection--single .select2-selection__arrow, 
+select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow, 
+.text-sm .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow, 
+select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow 
+{
     top: 0.12rem;
+}
+
+.select2-container--default .select2-selection--single, 
+.select2-container--bootstrap-5 .select2-selection--single {
+    border: 1px solid #ced4da;
 }
 
 .select2-container--default .select2-selection--single {
     padding: 0.46875rem 0rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    padding: 0.18rem 0rem;
+    border-radius: 0.2rem;
     border: 1px solid #ced4da;
 }
 
-.select2-container--default .select2-selection--single .select2-selection__clear {
+.dark-mode .select2-container--default .select2-selection--single, 
+.dark-mode .select2-container--bootstrap-5 .select2-selection--single {
+    border: 1px solid #6c757d;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__clear,
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear {
     margin-top: -9px;
     color: red;
     font-size: 20px;

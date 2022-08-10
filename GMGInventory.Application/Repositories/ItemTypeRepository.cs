@@ -28,14 +28,15 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int CategoryId, int? IncludeId)
+        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.ItemTypes
-                .Where(s => (s.CategoryId == CategoryId && s.IsActive) || s.Id == IncludeId)
+                //.Where(s => (s.CategoryId == CategoryId && s.IsActive) || s.Id == IncludeId)
+                .Where(s => s.IsActive || s.Id == IncludeId)
                 .Select(s => new JsonOptionsModel
                 {
                     Id = s.Id.ToString(),
-                    Text = s.Name,
+                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
                 .ToListAsync();
@@ -156,7 +157,7 @@ namespace GMGInventory.Application.Repositories
             return await context.ItemTypes.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
         }
 
-        public async Task<bool> IsItemTypeCodeExist(string code)
+        public async Task<bool> IsCodeExist(string code)
         {
             return await context.ItemTypes.AnyAsync(c => c.Code == code);
         }

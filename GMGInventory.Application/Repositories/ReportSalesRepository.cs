@@ -112,17 +112,15 @@ namespace GMGInventory.Application.Repositories
                         Agent = rdr["Agent"].ToString() ?? string.Empty,
                         CreatedBy = rdr["CreatedBy"].ToString() ?? string.Empty,
                         Customer = rdr["Customer"].ToString() ?? string.Empty,
-                        Discount1 = Convert.ToDecimal(rdr["Discount1"]).ToString("N", new CultureInfo("en-US")),
-                        Discount2 = Convert.ToDecimal(rdr["Discount2"]).ToString("N", new CultureInfo("en-US")),
+                        Discount1D = Convert.ToDecimal(rdr["Discount1"]),
+                        Discount2D = Convert.ToDecimal(rdr["Discount2"]),
                         Id = Convert.ToInt32(rdr["Id"]),
                         Item = rdr["Item"].ToString() ?? string.Empty,
-                        OrderDate = Convert.ToDateTime(rdr["OrderDate"]).ToString(SystemFormat.StringDateTime),
-                        OrderDateDT = Convert.ToDateTime(rdr["OrderDate"]),
-                        PackedQuantity = rdr["PackedQuantity"].ToString() ?? string.Empty,
-                        Quantity = rdr["Quantity"].ToString() ?? string.Empty,
+                        OrderDateD = Convert.ToDateTime(rdr["OrderDate"]),
+                        PackedQuantity = Convert.ToInt32(rdr["PackedQuantity"]),
+                        Quantity = Convert.ToInt32(rdr["Quantity"]),
                         SalesOrderNumber = rdr["SalesOrderNumber"].ToString() ?? string.Empty,
-                        UnitPrice = Convert.ToDecimal(rdr["UnitPrice"]).ToString("N", new CultureInfo("en-US")),
-                        UnservedQuantity = rdr["UnservedQuantity"].ToString() ?? string.Empty
+                        UnitPriceD = Convert.ToDecimal(rdr["UnitPrice"])
                     };
 
                     unservedItemVMs.Add(unservedItemVM);
@@ -150,11 +148,11 @@ namespace GMGInventory.Application.Repositories
                                     || x.Discount2.ToLower().Contains(form.SearchValue)
                                     || x.Item.ToLower().Contains(form.SearchValue)
                                     || x.OrderDate.ToLower().Contains(form.SearchValue)
-                                    || x.PackedQuantity.ToLower().Contains(form.SearchValue)
-                                    || x.Quantity.ToLower().Contains(form.SearchValue)
+                                    || x.PackedQuantity.ToString().Contains(form.SearchValue)
+                                    || x.Quantity.ToString().Contains(form.SearchValue)
                                     || x.SalesOrderNumber.ToLower().Contains(form.SearchValue)
                                     || x.UnitPrice.ToLower().Contains(form.SearchValue)
-                                    || x.UnservedQuantity.ToLower().Contains(form.SearchValue));
+                                    || x.UnservedQuantity.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -168,14 +166,14 @@ namespace GMGInventory.Application.Repositories
                         case "Agent": data = data.OrderBy(s => s.Agent); break;
                         case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "Discount1": data = data.OrderBy(s => s.Discount1); break;
-                        case "Discount2": data = data.OrderBy(s => s.Discount2); break;
+                        case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
+                        case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
                         case "Item": data = data.OrderBy(s => s.Item); break;
-                        case "OrderDate": data = data.OrderBy(s => s.OrderDateDT); break;
+                        case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
                         case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantity); break;
                         case "Quantity": data = data.OrderBy(s => s.Quantity); break;
                         case "SalesOrderNumber": data = data.OrderBy(s => s.SalesOrderNumber); break;
-                        case "UnitPrice": data = data.OrderBy(s => s.UnitPrice); break;
+                        case "UnitPrice": data = data.OrderBy(s => s.UnitPriceD); break;
                         case "UnservedQuantity": data = data.OrderBy(s => s.UnservedQuantity); break;
                         default: break;
                     }
@@ -187,14 +185,14 @@ namespace GMGInventory.Application.Repositories
                         case "Agent": data = data.OrderByDescending(s => s.Agent); break;
                         case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
                         case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "Discount1": data = data.OrderByDescending(s => s.Discount1); break;
-                        case "Discount2": data = data.OrderByDescending(s => s.Discount2); break;
+                        case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
+                        case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
                         case "Item": data = data.OrderByDescending(s => s.Item); break;
-                        case "OrderDate": data = data.OrderByDescending(s => s.OrderDateDT); break;
+                        case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
                         case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantity); break;
                         case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
                         case "SalesOrderNumber": data = data.OrderByDescending(s => s.SalesOrderNumber); break;
-                        case "UnitPrice": data = data.OrderByDescending(s => s.UnitPrice); break;
+                        case "UnitPrice": data = data.OrderByDescending(s => s.UnitPriceD); break;
                         case "UnservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantity); break;
                         default: break;
                     }

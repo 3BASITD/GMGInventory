@@ -5,6 +5,6 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IAuditLogRepository
     {
-        ForDataTables<AuditLogVM> GetListDataTables(DataTablesRequestForm form);
+        Task<ForDataTables<AuditLogVM>> GetListDataTablesAsync(DataTablesRequestForm form);
     }
 }

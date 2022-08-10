@@ -20,10 +20,10 @@ namespace GMGInventory.Data
         public decimal UnitPrice { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal? Discount1 { get; set; }
+        public decimal Discount1 { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal? Discount2 { get; set; }
+        public decimal Discount2 { get; set; }
 
         public bool IsServed { get; set; }
     }
