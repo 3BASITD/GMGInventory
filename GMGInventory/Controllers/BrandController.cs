@@ -26,11 +26,6 @@ namespace GMGInventory.Controllers
             this.brandRepository = brandRepository;
         }
 
-        public async Task<IActionResult> GetOptions(int? IncludeId)
-        {
-            return Json(await brandRepository.GetOptions(IncludeId));
-        }
-
         public async Task<IActionResult> Index()
         {
             return View();
@@ -120,7 +115,7 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        public async Task<IActionResult> DownloadFile()
+        public IActionResult DownloadFile()
         {
             DataTable dt = new DataTable("ItemType");
             dt.Columns.AddRange(new DataColumn[3] {
@@ -128,7 +123,7 @@ namespace GMGInventory.Controllers
                 new DataColumn("Name"),
                 new DataColumn("ItemType")
             });
-            var brands = (await brandRepository.GetAllBrandVMAsync()).Where(s => s.IsActive == true).ToList();
+            var brands = brandRepository.GetAllBrandVM().Where(s => s.IsActive == true).ToList();
             foreach (var brand in brands)
             {
                 dt.Rows.Add(brand.Code, brand.Name, brand.ItemType);
