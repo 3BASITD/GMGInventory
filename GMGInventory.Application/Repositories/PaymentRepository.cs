@@ -96,8 +96,9 @@ namespace GMGInventory.Application.Repositories
            return from c in context.Customers
             join cp in context.CustomerPayments
                              on c.Id equals cp.CustomerId
+          //  into CustAndCustPaymentGroup 
+
             join p in context.Payments
-                                .Include(s => s.Customer)
                              on c.Id equals p.CustomerId
             join pd in context.PaymentDetails
                              on p.Id equals pd.PaymentId
@@ -302,7 +303,7 @@ namespace GMGInventory.Application.Repositories
                        TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString($"{0:#,##0.00}"),
                        AmountPaid = cp.TotalAmountPaid.ToString($"{0:#,##0.00}"),
                        OverPayment = cp.OverPayment.ToString($"{0:#,##0.00}"),
-                       TransactionDate = cp.DateCreated.ToString(SystemFormat.StringDateTime),
+                       TransactionDate = cp.DateCreated.ToString("yyyy/dd/MM"),
                        CreatedBy = u.Nickname,
                        Remarks = cp.Remarks
 

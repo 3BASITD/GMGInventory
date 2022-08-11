@@ -54,16 +54,12 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> Create()
 
         {
-            
-
-
             var customerVM = new CustomerVM
             {
                 Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name"),
                 Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name"),
                 CreditTerms = new SelectList(await credittermRepository.GetAllActiveCreditTermAsync(-1), "Id", "Name"),
                 CustomerTypes = new SelectList(await customertypeRepository.GetAllActiveCustomerTypeAsync(-1), "Id", "Name"),
-             
                 Agents = new SelectList(await agentRepository.GetAllActiveAgentAsync(-1), "Id", "FullName")
 
 

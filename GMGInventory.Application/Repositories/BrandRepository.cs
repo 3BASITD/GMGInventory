@@ -26,45 +26,31 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
-        {
-            return await context.Brands
-                //.Where(s => (s.ItemTypeId == ItemTypeId && s.IsActive) || s.Id == IncludeId)
-                .Where(s => s.IsActive || s.Id == IncludeId)
-                .Select(s => new JsonOptionsModel
-                {
-                    Id = s.Id.ToString(),
-                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
-                    Selected = IncludeId != null && IncludeId == s.Id
-                })
-                .ToListAsync();
-        }
-
-        public async Task<IList<BrandViewVM>> GetAllBrandVMAsync()
+        public IQueryable<BrandViewVM> GetAllBrandVM()
         {
             var brands = from brand in context.Brands
-                            select new BrandViewVM
-                            {
-                                Id = brand.Id,
-                                ItemType = brand.ItemType.Name,
-                                ItemTypeId = brand.ItemType.Id,
-                                Code = brand.Code,
-                                DateCreated = brand.DateCreated.ToString("yyyy/dd/MM hh:mm:ss tt"),
-                                DateModified = brand.DateModified == null ? "-" : brand.DateModified.Value.ToString("yyyy/dd/MM hh:mm:ss tt"),
-                                IsActive = brand.IsActive,
-                                Name = brand.Name,
-                                UserCreated = userManager.FindByIdAsync(brand.UserCreated).Result.Nickname,
-                                UserModified = brand.UserModified == null ? "-" : userManager.FindByIdAsync(brand.UserModified).Result.Nickname
-                            };
-            return await brands.ToListAsync();
+                         select new BrandViewVM
+                         {
+                             Id = brand.Id,
+                             ItemType = brand.ItemType.Name,
+                             ItemTypeId = brand.ItemType.Id,
+                             Code = brand.Code,
+                             DateCreated = brand.DateCreated.ToString("yyyy/dd/MM hh:mm:ss tt"),
+                             DateModified = brand.DateModified == null ? "-" : brand.DateModified.Value.ToString("yyyy/dd/MM hh:mm:ss tt"),
+                             IsActive = brand.IsActive,
+                             Name = brand.Name,
+                             UserCreated = userManager.FindByIdAsync(brand.UserCreated).Result.Nickname,
+                             UserModified = brand.UserModified == null ? "-" : userManager.FindByIdAsync(brand.UserModified).Result.Nickname
+                         };
+            return brands;
         }
 
 
-        public async Task<ForDataTables<BrandViewVM>> GetListDataTables(DataTablesRequestForm form)
+        public ForDataTables<BrandViewVM> GetListDataTables(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetAllBrandVMAsync()).AsQueryable();
+            var data = GetAllBrandVM().ToList().AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -123,9 +109,9 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<BrandViewVM?> GetBrandViewVMAsync(int? id)
+        public BrandViewVM? GetBrandViewVM(int? id)
         {
-            var brandVM = (await GetAllBrandVMAsync()).Where(s => s.Id == id).FirstOrDefault();
+            var brandVM = GetAllBrandVM().Where(s => s.Id == id).FirstOrDefault();
             if (brandVM == null)
             {
                 return null;
@@ -135,7 +121,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(BrandVM brandVM)
         {
-            return (await GetAllBrandVMAsync()).Any(s => s.Code == brandVM.Code && s.Name == brandVM.Name && s.ItemType == s.ItemType);
+            return await GetAllBrandVM().AnyAsync(s => s.Code == brandVM.Code && s.Name == brandVM.Name && s.ItemType == s.ItemType);
         }
 
         public async Task<BrandVM?> GetBrandVMAsync(int? id)
@@ -164,7 +150,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsBrandInUse(int id)
         {
-            return  await context.ItemTypes.AnyAsync(s => s.Id == id);
+            return await context.ItemTypes.AnyAsync(s => s.Id == id);
         }
 
         public async Task<bool> IsBrandIdExistAsync(int id)
