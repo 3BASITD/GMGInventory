@@ -41,6 +41,24 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Brand")]
         public string Brand { get; set; }
+    }
+
+    public class ItemPriceUpdateVM
+    {
+
+        public int Id { get; set; }
+
+        [Display(Name = "Code")]
+        public string Code { get; set; }
+
+        [Display(Name = "Name")]
+        public string Name { get; set; }
+
+        [Display(Name = "Retail Price")]
+        public decimal RetailPrice { get; set; }
+
+        [Display(Name = "Net Price")]
+        public decimal NetPrice { get; set; }
 
         [Display(Name = "Updated By")]
         public string UserCreated { get; set; }

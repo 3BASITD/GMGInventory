@@ -26,27 +26,27 @@ namespace GMGInventory.Data
         public string Name { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
-        public string PartNumber { get; set; }
+        public string? PartNumber { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
-        public string InterchangeNumber { get; set; }
+        public string? InterchangeNumber { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? ModelNumber { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string Size { get; set; }
-         
-        [Column(TypeName = "nvarchar(50)")]
-        public string ModelNumber { get; set; }
 
         [ForeignKey("UnitId")]
         public int UnitId { get; set; }
         public Unit Unit { get; set; }
 
         [ForeignKey("CategoryId")]
-        public int? CategoryId { get; set; }
+        public int CategoryId { get; set; }
         public Category Category { get; set; }
 
         [ForeignKey("ItemTypeId")]
-        public int? ItemTypeId { get; set; }
+        public int ItemTypeId { get; set; }
         public ItemType ItemType { get; set; }
 
         [ForeignKey("BrandId")]

@@ -33,7 +33,7 @@ namespace GMGInventory.Application.Repositories
                 .Select(s => new JsonOptionsModel
                 {
                     Id = s.Id.ToString(),
-                    Text = s.Name,
+                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
                 .ToListAsync();

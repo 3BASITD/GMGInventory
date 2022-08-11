@@ -24,6 +24,12 @@ namespace GMGInventory.Controllers
             this.categoryRepository = categoryRepository;
         }
 
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+
+            return Json(await itemTypeRepository.GetOptions(IncludeId));
+        }
+
         public async Task<IActionResult> GetOptionsCreate(int? IncludeId)
         {
             return Json(await itemTypeRepository.GetOptionsCreate(IncludeId));
@@ -50,7 +56,7 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> CreateJson(ItemTypeVM itemTypeVM)
         {
             ResponseModel responseModel = new ResponseModel();
-            if (await itemTypeRepository.IsItemTypeCodeExist(itemTypeVM.Code))
+            if (await itemTypeRepository.IsCodeExist(itemTypeVM.Code))
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Item type code already in use";
@@ -73,7 +79,7 @@ namespace GMGInventory.Controllers
                 responseModel.Status = "Error";
                 responseModel.Message = "Already exist";
             }
-            else if (await itemTypeRepository.IsItemTypeCodeExist(itemTypeVM.Code))
+            else if (await itemTypeRepository.IsCodeExist(itemTypeVM.Code))
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Code already in use";

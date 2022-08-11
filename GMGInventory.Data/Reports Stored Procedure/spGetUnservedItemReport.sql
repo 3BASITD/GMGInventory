@@ -40,7 +40,6 @@ BEGIN
 		 , sol.UnitPrice 'UnitPrice'
 		 , sol.Quantity 'Quantity'
 		 , sol.PackedQuantity 'PackedQuantity'
-		 , sol.Quantity - sol.PackedQuantity 'UnservedQuantity'
 		 , sol.Discount1 'Discount1'
 		 , sol.Discount2 'Discount2'
 		 , a.Code 'Agent'

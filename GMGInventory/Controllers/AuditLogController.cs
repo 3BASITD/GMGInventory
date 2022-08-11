@@ -23,10 +23,10 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetListJson()
+        public async Task<JsonResult> GetListJson()
         {
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
-            return Json(auditLogRepository.GetListDataTables(dtForm));
+            return Json(await auditLogRepository.GetListDataTablesAsync(dtForm));
         }
     }
 }

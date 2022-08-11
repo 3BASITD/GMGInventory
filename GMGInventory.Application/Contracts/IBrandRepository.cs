@@ -5,6 +5,9 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IBrandRepository : IGenericRepository<Brand>
     {
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<List<BrandViewVM>> GetAllBrandVMAsync();
+        Task<BrandViewVM?> GetBrandViewVMAsync(int? id);
         IQueryable<BrandViewVM> GetAllBrandVM();
         Task<List<JsonOptionsModel>> GetOptions(int ItemTypeId, int? IncludeId);
         ForDataTables<BrandViewVM> GetListDataTables(DataTablesRequestForm form);

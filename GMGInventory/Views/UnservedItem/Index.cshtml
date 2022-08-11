@@ -66,25 +66,47 @@
             },
             serverSide: true,
             filter: true,
+            responsive: true,
+            autoWidth: false,
             columns: [
                 { data: "item", name: "Item" },
                 { data: "orderDate", name: "OrderDate" },
                 { data: "salesOrderNumber", name: "SalesOrderNumber" },
                 { data: "customer", name: "Customer" },
-                { data: "unitPrice", name: "UnitPrice" },
-                { data: "quantity", name: "Quantity" },
-                { data: "packedQuantity", name: "PackedQuantity" },
-                { data: "unservedQuantity", name: "UnservedQuantity" },
-                { data: "discount1", name: "Discount1" },
-                { data: "discount2", name: "Discount2" },
+                {
+                    data: "unitPrice",// function(data, type, dataToSet) { return data.unitPrice.toFixed(2); },
+                    name: "UnitPrice",
+                    className: "text-end"
+                },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "packedQuantity", name: "PackedQuantity", className: "text-end" },
+                { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end" },
+                {
+                    data: "discount1",//function(data, type, dataToSet) { return data.discount1.toFixed(2); },
+                    name: "Discount1",
+                    className: "text-end"
+                },
+                {
+                    data: "discount2",//function(data, type, dataToSet) { return data.discount2.toFixed(2); },
+                    name: "Discount2",
+                    className: "text-end"
+                },
                 { data: "agent", name: "Agent" },
                 { data: "createdBy", name: "CreatedBy" }
-            ]
+            ],
+            order: [[1, "desc"]]
         });
 
         // Load functions upon DataTable load
         dataTable.on("draw", function() {
             $.LoadingOverlay("hide");
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    dataTable.search($(this).val()).draw();
+                }
+            });
         });
     </script>
     }

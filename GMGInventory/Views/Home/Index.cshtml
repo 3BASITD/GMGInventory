@@ -18,13 +18,13 @@
     new HomeTaskRow { MD = "SALES > Sales Order Delivery", ST = "Not Started" },
     new HomeTaskRow { MD = "SALES > Sales Return", ST = "Not Started" },
 
-    new HomeTaskRow { MD = "INVENTORY > Item", ST = "On-going" },
+    new HomeTaskRow { MD = "INVENTORY > Item", ST = "Done" },
     new HomeTaskRow { MD = "INVENTORY > Price List", ST = "Done" },
     new HomeTaskRow { MD = "INVENTORY > Price Update", ST = "Done" },
     new HomeTaskRow { MD = "INVENTORY > Purchase Return", ST = "Pending" },
     new HomeTaskRow { MD = "INVENTORY > Replenish", ST = "Pending" },
     new HomeTaskRow { MD = "INVENTORY > Warehouse", ST = "On-going" },
-    new HomeTaskRow { MD = "INVENTORY > Warehouse Transfer", ST = "Pending" },
+    new HomeTaskRow { MD = "INVENTORY > Warehouse Transfer", ST = "On-going" },
     new HomeTaskRow { MD = "INVENTORY > Unserved Item", ST = "Done" },
 
     new HomeTaskRow { MD = "CREDITS & COLLECTION > Customer", ST = "Done" },
@@ -206,10 +206,10 @@
                 <div class="form-group">
                     <label class="form-label mb-0">Select Chart Type:</label>
                     <select class="form-control form-control-sm" id="chartType" onchange="updateChartType()">
-                        <option value="line">Line</option>
-                        <option value="bar">Bar</option>
-                        <option value="radar">Radar</option>
                         <option value="pie">Pie</option>
+                        <option value="radar">Radar</option>
+                        <option value="bar">Bar</option>
+                        <option value="line">Line</option>
                     </select>
                 </div>
             </div>
@@ -297,7 +297,7 @@
         };
         var ctx = document.getElementById('progressChart').getContext('2d');
         var myChart = new Chart(ctx, {
-            type: 'line',
+            type: 'pie',
             data: myData
         });
 

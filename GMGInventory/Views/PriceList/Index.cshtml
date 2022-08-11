@@ -75,6 +75,8 @@
             //processing: true,
             serverSide: true,
             filter: true,
+            responsive: true,
+            autoWidth: false,
             columns: [
                 { data: "brand", name: "Brand" },
                 { data: "modelNumber", name: "ModelNumber" },
@@ -94,11 +96,19 @@
                     className: "text-end"
                 },
                 { data: "quantity", name: "Quantity", className: "text-end" },
-            ]
+            ],
+            order: [[3, "asc"]]
         });
 
         dataTable.on("draw", function() {
             $.LoadingOverlay("hide");
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    dataTable.search($(this).val()).draw();
+                }
+            });
         });
 
         function ApplyFilter() {

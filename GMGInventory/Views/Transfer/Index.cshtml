@@ -1,0 +1,204 @@
+﻿@model IEnumerable<WarehouseTransferVM>
+
+@{
+    ViewData["Title"] = "Warehouse Transfer";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-transfer">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Source)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Destination)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemCount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TransferBy)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TransferDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- Update Price Modal -->
+@*<div class="modal fade" id="updateModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Price</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="form-update">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="update-code" class="control-label mb-0 d-block">Code</label>
+                                <input name="code" id="update-code" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                            <div class="form-group">
+                                <label for="update-name" class="control-label mb-0 d-block">Name</label>
+                                <input name="name" id="update-name" class="form-control form-control-sm" />
+                            </div>
+                            <div class="form-group">
+                                <label for="update-retail" class="control-label mb-0 d-block">Retail Price</label>
+                                <input type="number" step="0.01" min="0" max="1999999.99" name="RetailPrice" id="update-retail" class="form-control form-control-sm" />
+                                <span data-valmsg-for="update-retail" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="update-net" class="control-label mb-0 d-block">Net Price</label>
+                                <input type="number" step="0.01" min="0" max="1999999.99" name="NetPrice" id="update-net" class="form-control form-control-sm" />
+                                <span data-valmsg-for="update-net" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <input type="hidden" id="update-id" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-edit"></span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>*@
+
+@section Scripts {
+    <script>
+        var dataTable = $('.table-transfer').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetWarehouseTransferJson")",
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "id", name: "Id" },
+                { data: "source", name: "Source" },
+                { data: "destination", name: "Destination" },
+                { data: "itemCount", name: "ItemCount", className: "text-end" },
+                { data: "transferBy", name: "TransferBy" },
+                { data: "transferDate", name: "TransferDate" },
+                { data: "remarks", name: "Remarks" },
+                {
+                    orderable: false,
+                    data: function(data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        return actions;
+                    }
+                }
+            ],
+            order: [[5, "desc"]]
+        });
+
+        dataTable.on("draw", function() {
+            reloadToolTip();
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    dataTable.search($(this).val()).draw();
+                }
+            });
+
+            $.LoadingOverlay("hide");
+
+            // Actions upon Display Update Modal
+            $('.btn-update').click(function(e) {
+                var data = dataTable.row($(this).parents('tr')).data();
+                $("#update-code").val(data.code);
+                $("#update-name").val(data.name);
+                $("#update-retail").val(data.retailPrice);
+                $("#update-net").val(data.netPrice);
+                $("#update-id").val(data.id);
+            });
+
+            // Validation for Update Modal
+            var validateUpdate = $("#form-update").validate({
+                errorClass: 'text-danger text-xs',
+                rules: {
+                    retailPrice: { required: true, range: [0, 1999999.99] },
+                    netPrice: { required: true, range: [0, 1999999.99] }
+                },
+                messages: {
+                    retailPrice: {
+                        required: "Please enter new Retail Price.",
+                        range: "Price must be between 0-1999999.99."
+                    },
+                    netPrice: {
+                        required: "Please enter new Net Price.",
+                        range: "Price must be between 0-1999999.99."
+                    }
+                },
+                submitHandler: function(form) {
+                    DoUpdate();
+                    return false;
+                }
+            });
+
+            // Send Update to Controller
+            function DoUpdate() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateJson")",
+                    data: {
+                        Id: $("#update-id").val(),
+                        RetailPrice: $("#update-retail").val(),
+                        NetPrice: $("#update-net").val()
+                    },
+                    error: jQueryCommonError,
+                    success: function(data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#updateModal").modal("hide");
+                            dataTable.ajax.reload();
+                        }
+                    },
+                    complete: function(xhr, status) {
+                    }
+                });
+            }
+        });
+
+        function ApplyFilter() {
+            $(".table").DataTable().ajax.reload();
+            $("#filterModal").modal("hide");
+        }
+    </script>
+}

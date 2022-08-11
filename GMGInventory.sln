@@ -5,11 +5,11 @@ VisualStudioVersion = 17.2.32505.173
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMGInventory", "GMGInventory\GMGInventory.csproj", "{81AA743E-CDAE-469B-A5EA-DB300D0F3ABD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMGInventory.Data", "GMGInventory.Data\GMGInventory.Data.csproj", "{5D11E979-2E09-49FA-ACD9-BB2C4FA261CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMGInventory.Data", "GMGInventory.Data\GMGInventory.Data.csproj", "{5D11E979-2E09-49FA-ACD9-BB2C4FA261CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMGInventory.Common", "GMGInventory.Common\GMGInventory.Common.csproj", "{80A9E44E-662E-4617-B47C-ACCFF5B50F3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMGInventory.Common", "GMGInventory.Common\GMGInventory.Common.csproj", "{80A9E44E-662E-4617-B47C-ACCFF5B50F3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMGInventory.Application", "GMGInventory.Application\GMGInventory.Application.csproj", "{A44B0F95-F305-45A5-A6E8-BF204834536F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMGInventory.Application", "GMGInventory.Application\GMGInventory.Application.csproj", "{A44B0F95-F305-45A5-A6E8-BF204834536F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

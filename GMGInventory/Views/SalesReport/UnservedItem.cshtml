@@ -235,6 +235,8 @@
             },
             serverSide: true,
             filter: true,
+            responsive: true,
+            autoWidth: false,
             columns: [
                 { data: "item", name: "Item" },
                 { data: "orderDate", name: "OrderDate" },
@@ -248,12 +250,21 @@
                 { data: "discount2", name: "Discount2" },
                 { data: "agent", name: "Agent" },
                 { data: "createdBy", name: "CreatedBy" }
-            ]
+            ],
+            order: [[1, "desc"]]
         });
 
         // Load functions upon DataTable load
         dataTable.on("draw", function() {
             $.LoadingOverlay("hide");
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    dataTable.search($(this).val()).draw();
+                }
+            });
+
             $(".downloadBtn").attr("disabled", false);
         });
 
