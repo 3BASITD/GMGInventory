@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -13,68 +15,176 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
         private readonly string currentUser;
 
         public PaymentRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager
-            , IMapper mapper)
+            , UserManager<User> userManager)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
-            this.mapper = mapper;
             this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
-        public IQueryable<PaymentViewVM> GetAll()
+
+        public PaymentVM? GetPaymentVM(int? id)
         {
-            var paymentVM = (from payment in context.Payments
-                             //from paymentDetails in context.PaymentDetails.Where(s => s.PaymentId == payment.Id)
-                             //from invoices in context.Invoices.Where(s => s.Id == paymentDetails.InvoiceId)
-                             //join invoicePayment in context.InvoicePayments on paymentDetails.InvoiceId equals invoicePayment.InvoiceId
-                             //where ((paymentFilterVM.CustomerId == null || paymentFilterVM.CustomerId == payment.CustomerId)
+            var paymentVM = (from c in context.Customers
+                                 join cp in context.CustomerPayments
+                                                  on c.Id equals cp.CustomerId
+                                 join p in context.Payments
+                                                   .Include(s => s.Customer)
+                                                  on c.Id equals p.CustomerId
+                                 join pd in context.PaymentDetails
+                                                  on p.Id equals pd.PaymentId
+                                 join i in context.Invoices
+                                                  on pd.InvoiceId equals i.Id
+                                 join ip in context.InvoicePayments
+                                                  on i.Id equals ip.InvoiceId
+                                 join it in context.InvoiceTypes
+                                                 on i.InvoiceTypeId equals it.Id
 
-                             //    && (paymentFilterVM.PaymentId == null || paymentFilterVM.PaymentId == paymentDetails.PaymentId))
-                             select new PaymentViewVM
-                             {
-                                 Customer = payment.Customer.Name,
-                                 ReceivedDate = payment.ReceivedDate,
-                                 ReturnedAmount = payment.ReturnedAmount,
-                                 AdjustedAmount = payment.AdjustedAmount,
-                                 CRNumber = payment.CRNumber,
-                                 PaymentMode = payment.PaymentMode,
-                                 Remarks = payment.Remarks,
-                                 DateCreated = payment.DateCreated.ToString("yyyy/dd/MM hh:mm:ss tt"),
-                                 DateModified = payment.DateModified == null ? "-" : payment.DateModified.Value.ToString("yyyy/dd/MM hh:mm:ss tt"),
-                                 UserCreated = userManager.FindByIdAsync(payment.UserCreated).Result.Nickname,
-                                 UserModified = payment.UserModified == null ? "-" : userManager.FindByIdAsync(payment.UserModified).Result.Nickname
-                             });
+                                 join u in userManager.Users on c.UserCreated equals u.Id
+                                 where cp.Id == id
+                                 select new PaymentVM
+                                 {
+                                     Id = cp.Id,
+                                     CRNumber = cp.CRNumber,
+                                     SOANo = cp.SOACRId.ToString(),
+                                     CustomerName = c.Name,
+                                     TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString($"{0:#,##0.00}"),
+                                     AmountPaid = cp.TotalAmountPaid.ToString($"{0:#,##0.00}"),
+                                     OverPayment = cp.OverPayment.ToString($"{0:#,##0.00}"),
+                                     TransactionDate = cp.DateCreated.ToString(SystemFormat.StringDateTime),
+                                     CreatedBy = u.Nickname,
+                                     Remarks = cp.Remarks,
+                                     SalesOrderNo = i.SalesOrderId.ToString(),
+                                     CheckNo = ip.CheckNumber,
+                                     Tax = cp.Tax.ToString(),
+                                     Discount = cp.Discount.ToString($"{0:#,##0.00}"),
+                                     CashAmount = cp.Cash.ToString($"{0:#,##0.00}"),
+                                     TKT = cp.TKTSolicitation.ToString(),
+                                     CashAdvanced = cp.CashAdvance.ToString($"{0:#,##0.00}"),
+                                     Offset = cp.OffSet.ToString(),
+                                     BackLoad = cp.BackLoad.ToString(),
+                                     BankName = ip.BankName,
+                                     BankBranch = ip.BankBranch,
+                                     CheckAmount = ip.CheckAmount.ToString($"{0:#,##0.00}"),
+                                     CheckDate = ip.CheckDate.ToString(SystemFormat.StringDateTime),
+                                     InvoiceDate = i.DateCreated.ToString(SystemFormat.StringDateTime),
+                                     InvoiceNumber = i.InvoiceNumber,
+                                     InvoiceType = i.InvoiceTypeId.ToString(),
+                                     InvoiceAmount = i.Amount.ToString($"{0:#,##0.00}"),
+                                     BalanceAmount = i.PaidAmount.ToString($"{0:#,##0.00}"),
+                                     PackNo = i.PackId.ToString()
 
+
+                                 }).FirstOrDefault();
             return paymentVM;
         }
-        public ForDataTables<PaymentViewVM> GetListDT(DataTablesRequestForm form)
+
+        private async Task<string> GetUserName(string? userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            return user != null ? user.Nickname : "-";
+        }
+
+        private IQueryable<PaymentVM> GetListDetails()
+        {
+
+           return from c in context.Customers
+            join cp in context.CustomerPayments
+                             on c.Id equals cp.CustomerId
+            join p in context.Payments
+                                .Include(s => s.Customer)
+                             on c.Id equals p.CustomerId
+            join pd in context.PaymentDetails
+                             on p.Id equals pd.PaymentId
+            join i in context.Invoices
+                             on pd.InvoiceId equals i.Id
+            join ip in context.InvoicePayments
+                             on i.Id equals ip.InvoiceId
+            join it in context.InvoiceTypes
+                             on i.InvoiceTypeId equals it.Id
+
+            join u in userManager.Users on c.UserCreated equals u.Id
+            select new PaymentVM
+            {
+                Id = cp.Id,
+                CRNumber = cp.CRNumber,
+                SOANo = cp.SOACRId.ToString(),
+                CustomerName = c.Name,
+                TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString($"{0:#,##0.00}"),
+                AmountPaid = cp.TotalAmountPaid.ToString($"{0:#,##0.00}"),
+                OverPayment = cp.OverPayment.ToString($"{0:#,##0.00}"),
+                TransactionDate = cp.DateCreated.ToString(SystemFormat.StringDateTime),
+                CreatedBy = u.Nickname,
+                Remarks = cp.Remarks,
+                SalesOrderNo = i.SalesOrderId.ToString(),
+                CheckNo = ip.CheckNumber,
+                Tax = cp.Tax.ToString(),
+                Discount = cp.Discount.ToString($"{0:#,##0.00}"),
+                CashAmount = cp.Cash.ToString($"{0:#,##0.00}"),
+                TKT = cp.TKTSolicitation.ToString(),
+                CashAdvanced = cp.CashAdvance.ToString($"{0:#,##0.00}"),
+                Offset = cp.OffSet.ToString(),
+                BackLoad = cp.BackLoad.ToString(),
+                BankName = ip.BankName,
+                BankBranch = ip.BankBranch,
+                CheckAmount = ip.CheckAmount.ToString($"{0:#,##0.00}"),
+                CheckDate = ip.CheckDate.ToString(SystemFormat.StringDateTime),
+                InvoiceDate = i.DateCreated.ToString(SystemFormat.StringDateTime),
+                InvoiceNumber = i.InvoiceNumber,
+                InvoiceType = i.InvoiceTypeId.ToString(),
+                InvoiceAmount = i.Amount.ToString($"{0:#,##0.00}"),
+                BalanceAmount = i.PaidAmount.ToString($"{0:#,##0.00}"),
+                PackNo = i.PackId.ToString()
+
+
+            };
+        }
+
+        public ForDataTables<PaymentVM> GetListDataTablesDetails(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = GetAll().ToList().AsQueryable();
+            //var data = context.AuditLogs.Include(s=>s.User).AsQueryable();
+            var data = GetListDetails();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue)
-                                     || x.ReceivedDate.ToString().ToLower().Contains(form.SearchValue)
-                                     || x.ReturnedAmount.ToString().ToLower().Contains(form.SearchValue)
-                                     || x.AdjustedAmount.ToString().ToLower().Contains(form.SearchValue)
-                                     || x.CRNumber.ToString().ToLower().Contains(form.SearchValue)
-                                     || x.PaymentMode.ToString().ToLower().Contains(form.SearchValue)
-                                     || x.Remarks.ToString().ToLower().Contains(form.SearchValue)
-                                     || x.UserModified.ToString().ToLower().Contains(form.SearchValue)
-                                     || x.DateModified.ToLower().Contains(form.SearchValue)
-                                     || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
-                                     || x.UserCreated.ToLower().Contains(form.SearchValue));
+             
+                data = data.Where(x => x.CRNumber.ToLower().Contains(form.SearchValue)
+                                    || x.SOANo.ToLower().Contains(form.SearchValue)
+                                    || x.CustomerName.ToLower().Contains(form.SearchValue)
+                                    || x.TotalInvoiceAmount.ToLower().Contains(form.SearchValue)
+                                    || x.AmountPaid.ToLower().Contains(form.SearchValue)
+                                    || x.OverPayment.ToLower().Contains(form.SearchValue)
+                                    || x.TransactionDate.ToLower().Contains(form.SearchValue)
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
+                                    || x.Remarks.ToLower().Contains(form.SearchValue)
+                                    || x.SalesOrderNo.ToLower().Contains(form.SearchValue)
+                                    || x.CheckNo.ToLower().Contains(form.SearchValue)
+                                    || x.Tax.ToLower().Contains(form.SearchValue)
+                                    || x.Discount.ToLower().Contains(form.SearchValue)
+                                    || x.CashAmount.ToLower().Contains(form.SearchValue)
+                                    || x.TKT.ToLower().Contains(form.SearchValue)
+                                    || x.CashAdvanced.ToLower().Contains(form.SearchValue)
+                                    || x.Offset.ToLower().Contains(form.SearchValue)
+                                    || x.BackLoad.ToLower().Contains(form.SearchValue)
+                                    || x.BankName.ToLower().Contains(form.SearchValue)
+                                    || x.BankBranch.ToLower().Contains(form.SearchValue)
+                                    || x.CheckAmount.ToLower().Contains(form.SearchValue)
+                                    || x.CheckDate.ToLower().Contains(form.SearchValue)
+                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue)
+                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue)
+                                    || x.InvoiceType.ToLower().Contains(form.SearchValue)
+                                    || x.InvoiceAmount.ToLower().Contains(form.SearchValue)
+                                    || x.BalanceAmount.ToLower().Contains(form.SearchValue)
+                                    || x.PackNo.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -85,17 +195,36 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "ReceivedDate": data = data.OrderBy(s => s.ReceivedDate); break;
-                        case "ReturnedAmount": data = data.OrderBy(s => s.ReturnedAmount); break;
-                        case "AdjustedAmount": data = data.OrderBy(s => s.AdjustedAmount); break;
                         case "CRNumber": data = data.OrderBy(s => s.CRNumber); break;
-                        case "PaymentMode": data = data.OrderBy(s => s.PaymentMode); break;
+                        case "SOANo": data = data.OrderBy(s => s.SOANo); break;
+                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
+                        case "TotalInvoiceAmount": data = data.OrderBy(s => s.TotalInvoiceAmount); break;
+                        case "AmountPaid": data = data.OrderBy(s => s.AmountPaid); break;
+                        case "OverPayment": data = data.OrderBy(s => s.OverPayment); break;
+                        case "TransactionDate": data = data.OrderBy(s => s.TransactionDate); break;
+                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderBy(s => s.Remarks); break;
-                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderBy(s => s.DateModified); break;
-                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderBy(s => s.DateModified); break;
+                        case "SalesOrderNo": data = data.OrderBy(s => s.SalesOrderNo); break;
+                        case "CheckNo": data = data.OrderBy(s => s.CheckNo); break;
+                        case "Tax": data = data.OrderBy(s => s.Tax); break;
+                        case "Discount": data = data.OrderBy(s => s.Discount); break;
+                        case "CashAmount": data = data.OrderBy(s => s.CashAmount); break;
+                        case "TKT": data = data.OrderBy(s => s.TKT); break;
+                        case "CashAdvanced": data = data.OrderBy(s => s.CashAdvanced); break;
+                        case "Offset": data = data.OrderBy(s => s.Offset); break;
+                        case "BackLoad": data = data.OrderBy(s => s.BackLoad); break;
+                        case "BankName": data = data.OrderBy(s => s.BankName); break;
+                        case "BankBranch": data = data.OrderBy(s => s.BankBranch); break;
+                        case "CheckAmount": data = data.OrderBy(s => s.CheckAmount); break;
+                        case "CheckDate": data = data.OrderBy(s => s.CheckDate); break;
+                        case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDate); break;
+                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
+                        case "InvoiceType": data = data.OrderBy(s => s.InvoiceType); break;
+                        case "InvoiceAmount": data = data.OrderBy(s => s.InvoiceAmount); break;
+                        case "BalanceAmount": data = data.OrderBy(s => s.BalanceAmount); break;
+                        case "PackNo": data = data.OrderBy(s => s.PackNo); break;
+
+
                         default: break;
                     }
                 }
@@ -103,133 +232,155 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "ReceivedDate": data = data.OrderByDescending(s => s.ReceivedDate); break;
-                        case "ReturnedAmount": data = data.OrderByDescending(s => s.ReturnedAmount); break;
-                        case "AdjustedAmount": data = data.OrderByDescending(s => s.AdjustedAmount); break;
                         case "CRNumber": data = data.OrderByDescending(s => s.CRNumber); break;
-                        case "PaymentMode": data = data.OrderByDescending(s => s.PaymentMode); break;
+                        case "SOANo": data = data.OrderByDescending(s => s.SOANo); break;
+                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
+                        case "TotalInvoiceAmount": data = data.OrderByDescending(s => s.TotalInvoiceAmount); break;
+                        case "AmountPaid": data = data.OrderByDescending(s => s.AmountPaid); break;
+                        case "OverPayment": data = data.OrderByDescending(s => s.OverPayment); break;
+                        case "TransactionDate": data = data.OrderByDescending(s => s.TransactionDate); break;
+                        case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
-                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderByDescending(s => s.DateModified); break;
-                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderByDescending(s => s.DateModified); break;
+                        case "SalesOrderNo": data = data.OrderByDescending(s => s.SalesOrderNo); break;
+                        case "CheckNo": data = data.OrderByDescending(s => s.CheckNo); break;
+                        case "Tax": data = data.OrderByDescending(s => s.Tax); break;
+                        case "Discount": data = data.OrderByDescending(s => s.Discount); break;
+                        case "CashAmount": data = data.OrderByDescending(s => s.CashAmount); break;
+                        case "TKT": data = data.OrderByDescending(s => s.TKT); break;
+                        case "CashAdvanced": data = data.OrderByDescending(s => s.CashAdvanced); break;
+                        case "Offset": data = data.OrderByDescending(s => s.Offset); break;
+                        case "BackLoad": data = data.OrderByDescending(s => s.BackLoad); break;
+                        case "BankName": data = data.OrderByDescending(s => s.BankName); break;
+                        case "BankBranch": data = data.OrderByDescending(s => s.BankBranch); break;
+                        case "CheckAmount": data = data.OrderByDescending(s => s.CheckAmount); break;
+                        case "CheckDate": data = data.OrderByDescending(s => s.CheckDate); break;
+                        case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDate); break;
+                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
+                        case "InvoiceType": data = data.OrderByDescending(s => s.InvoiceType); break;
+                        case "InvoiceAmount": data = data.OrderByDescending(s => s.InvoiceAmount); break;
+                        case "BalanceAmount": data = data.OrderByDescending(s => s.BalanceAmount); break;
+                        case "PackNo": data = data.OrderByDescending(s => s.PackNo); break;
                         default: break;
                     }
                 }
             }
             //pagination
-            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
-            return new ForDataTables<PaymentViewVM>
+            var pageList = data.Skip(form.Skip).Take(form.PageSize);
+            var dataList = pageList.ToList();
+            return new ForDataTables<PaymentVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
-                Data = pageList
+                Data = dataList
             };
         }
 
-        public async Task<PaymentViewVM?> GetAsync(int? id)
+        private IQueryable<PaymentVM> GetList()
         {
-            var payment = await context.Payments
-                .Where(s => s.Id == id)
-                .FirstOrDefaultAsync();
-            if (payment == null)
+            
+            return from c in context.Customers
+                   join cp in context.CustomerPayments
+                                 //   .Include(s => s.SOACR)
+                                    on c.Id equals cp.CustomerId
+                   //join p in context.Payments
+                   //                 on c.Id equals p.CustomerId
+                   //join pd in context.PaymentDetails
+                   //                 on p.Id equals pd.PaymentId
+                   //join i in context.Invoices
+                   //                 on pd.InvoiceId equals i.Id
+                   //join ip in context.InvoicePayments
+                   //                 on i.Id equals ip.InvoiceId
+                   
+                   join u in userManager.Users on c.UserCreated equals u.Id
+                   select new PaymentVM
+                   {
+                       Id = cp.Id,
+                       CRNumber = cp.CRNumber,
+                       SOANo = cp.SOACRId.ToString(),
+                       CustomerName = c.Name,
+                       TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString($"{0:#,##0.00}"),
+                       AmountPaid = cp.TotalAmountPaid.ToString($"{0:#,##0.00}"),
+                       OverPayment = cp.OverPayment.ToString($"{0:#,##0.00}"),
+                       TransactionDate = cp.DateCreated.ToString(SystemFormat.StringDateTime),
+                       CreatedBy = u.Nickname,
+                       Remarks = cp.Remarks
+
+
+                   };
+
+        }
+
+        public ForDataTables<PaymentVM> GetListDataTables(DataTablesRequestForm form)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            //var data = context.AuditLogs.Include(s=>s.User).AsQueryable();
+            var data = GetList();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                return null;
+                data = data.Where(x => x.CRNumber.ToLower().Contains(form.SearchValue)
+                                    || x.SOANo.ToLower().Contains(form.SearchValue)
+                                    || x.CustomerName.ToLower().Contains(form.SearchValue)
+                                    || x.TotalInvoiceAmount.ToLower().Contains(form.SearchValue)
+                                    || x.AmountPaid.ToLower().Contains(form.SearchValue)
+                                    || x.OverPayment.ToLower().Contains(form.SearchValue)
+                                    || x.TransactionDate.ToLower().Contains(form.SearchValue)
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
+                                    || x.Remarks.ToLower().Contains(form.SearchValue));
             }
-            var paymentVM = mapper.Map<PaymentViewVM>(payment);
-            paymentVM.UserCreated = await GetUserName(paymentVM.UserCreated);
-            paymentVM.UserModified = await GetUserName(paymentVM.UserModified);
-            return paymentVM;
-        }
-
-        public async Task<PaymentFormVM?> GetToEditAsync(int? id)
-        {
-            var payment = await context.Payments
-                .Where(s => s.Id == id)
-                .FirstOrDefaultAsync();
-            if (payment == null)
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                return null;
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "CRNumber": data = data.OrderBy(s => s.CRNumber); break;
+                        case "SOANo": data = data.OrderBy(s => s.SOANo); break;
+                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
+                        case "TotalInvoiceAmount": data = data.OrderBy(s => s.TotalInvoiceAmount); break;
+                        case "AmountPaid": data = data.OrderBy(s => s.AmountPaid); break;
+                        case "OverPayment": data = data.OrderBy(s => s.OverPayment); break;
+                        case "TransactionDate": data = data.OrderBy(s => s.TransactionDate); break;
+                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
+                        case "Remarks": data = data.OrderBy(s => s.Remarks); break;
+
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "CRNumber": data = data.OrderByDescending(s => s.CRNumber); break;
+                        case "SOANo": data = data.OrderByDescending(s => s.SOANo); break;
+                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
+                        case "TotalInvoiceAmount": data = data.OrderByDescending(s => s.TotalInvoiceAmount); break;
+                        case "AmountPaid": data = data.OrderByDescending(s => s.AmountPaid); break;
+                        case "OverPayment": data = data.OrderByDescending(s => s.OverPayment); break;
+                        case "TransactionDate": data = data.OrderByDescending(s => s.TransactionDate); break;
+                        case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
+                        case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
+                        default: break;
+                    }
+                }
             }
-            var paymentVM = mapper.Map<PaymentFormVM>(payment);
-            return paymentVM;
-        }
-
-        public async Task<List<PaymentViewVM>> GetAllAsync()
-        {
-            var payments = await context.Payments.ToListAsync();
-            var paymentsVM = mapper.Map<List<PaymentViewVM>>(payments);
-            return paymentsVM;
-        }
-
-        public async Task<PaymentFormVM> AddAsync(PaymentFormVM paymentVM)
-        {
-            var payment = mapper.Map<Payment>(paymentVM);
-          //  payment.IsActive = true;
-            await context.Payments.AddAsync(payment);
-            await context.SaveChangesAsync(currentUser);
-            return mapper.Map<PaymentFormVM>(payment);
-        }
-
-        public async Task<List<Payment>> GetAllActivePaymentAsync(int includeId)
-        {
-          //  return await context.Payments.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
-            return await context.Payments.Where(s => s.Id == includeId).ToListAsync();
-        }
-
-        public async Task<bool> IsIdExists(int id)
-        {
-            return await context.Payments.AnyAsync(s => s.Id == id);
-        }
-
-        public async Task<bool> IsCodeExists(string code)
-        {
-            return await context.Payments.AnyAsync(s => s.CRNumber == code);
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var payment = context.Payments.Where(s => s.Id == id).First();
-            context.Payments.Remove(payment);
-            await context.SaveChangesAsync(currentUser);
-        }
-
-        public async Task UpdateAsync(PaymentFormVM paymentVM)
-        {
-            var payment = await context.Payments.Where(s => s.Id == paymentVM.Id).FirstAsync();
-            mapper.Map(paymentVM, payment);
-            context.Payments.Update(payment);
-            await context.SaveChangesAsync(currentUser);
-        }
-
-        public async Task<bool> IsInUse(int id)
-        {
-            return await context.CustomerPaymentDetails.AnyAsync(s => s.PaymentId == id)
-                || await context.SOACRChecks.AnyAsync(s => s.PaymentId == id);
-        }
-
-        public async Task ReactivateAsync(int id)
-        {
-            var payment = await context.Payments.Where(s => s.Id == id).FirstAsync();
-           // payment.IsActive = true;
-            context.Payments.Update(payment);
-            await context.SaveChangesAsync(currentUser);
-        }
-
-        public async Task DeactivateAsync(int id)
-        {
-            var payment = await context.Payments.Where(s => s.Id == id).FirstAsync();
-           // payment.IsActive = false;
-            context.Payments.Update(payment);
-            await context.SaveChangesAsync(currentUser);
-        }
-
-        private async Task<string> GetUserName(string? userId)
-        {
-            var user = await userManager.FindByIdAsync(userId);
-            return user != null ? user.Nickname : "-";
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize);
+            var dataList = pageList.ToList();
+            return new ForDataTables<PaymentVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = dataList
+            };
         }
     }
 }

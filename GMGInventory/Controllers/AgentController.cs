@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
-    //[Authorize]
+    //[Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
+    [Authorize]
     public class AgentController : Controller
     {
         private readonly IAgentRepository agentRepository;

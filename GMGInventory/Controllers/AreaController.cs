@@ -10,7 +10,8 @@ using GMGInventory.Common.Constants;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
+    //[Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
+    [Authorize]
     public class AreaController : Controller
     {
         private readonly IAreaRepository areaRepository;

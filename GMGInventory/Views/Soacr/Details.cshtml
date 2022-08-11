@@ -1,0 +1,139 @@
+﻿@model SoacrVM
+
+@{
+    ViewData["Title"] = "SOACr Details";
+}
+
+<div class="card card-default">
+   <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools"> 
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+          
+             <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> Print
+             </a>
+             <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> +Freight Charge
+             </a>
+            
+             <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> Add Invoice
+             </a>
+             
+             <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> +Credit/Debit Memo
+             </a>
+            
+             <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> +TBR
+             </a>
+             
+             <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> Remove Invoice
+             </a>
+             <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                    <span class="fas fa-edit"></span> Add New Payment
+             </a>
+            </div>
+    </div>
+     <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Id)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Id
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CustomerName)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CustomerName
+                    </b>
+                </p>
+                
+              </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-soa">
+            <thead>
+                <tr>
+                  
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TBR)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Credit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Debit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PaidAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.FreightCharge)
+                    </th>
+                     <th>
+                        @Html.DisplayNameFor(model => model.Balance)
+                    </th>
+                    
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        var itemTable = $('.table-soa').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson", "Soacr")",
+                type: "POST",
+                data: function(data) {
+                    data.SoacrId = @Model?.Id;
+                },
+            },
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "invoiceAmount", name: "InvoiceAmount" },
+                { data: "tbr", name: "TBR" },
+                { data: "credit", name: "Credit" },
+                { data: "debit", name: "Debit" },
+                { data: "paidAmount", name: "PaidAmount" },
+                { data: "freightCharge", name: "FreightCharge" },
+                { data: "balance", name: "Balance" }
+               
+            ]
+        });
+
+        itemTable.on("draw", function() {
+            $.LoadingOverlay("hide");
+        });
+
+    </script>
+    }
+
