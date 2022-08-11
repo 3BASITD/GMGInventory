@@ -1,0 +1,110 @@
+﻿@model IEnumerable<SoacrVM>
+
+@{
+    ViewData["Title"] = "SOACr";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-soa">
+            <thead>
+                <tr>
+                  
+                    <th>
+                        @Html.DisplayNameFor(model => model.CRNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CustomerName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Type)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SOAFrom)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SOATo)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TotalAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TBR)
+                    </th>
+                     <th>
+                        @Html.DisplayNameFor(model => model.Credit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Debit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PaidAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.FreightCharge)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Balance)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OverPayment)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        // Load List on DataTable
+        var dataTable = $('.table-soa').on('preXhr.dt', function(e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson", "Soacr")",
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "id", name: "Id" },
+                { data: "customerName", name: "CustomerName" },
+                { data: "type", name: "Type" },
+                { data: "soaFrom", name: "SOAFrom" },
+                { data: "soaTo", name: "SOATo" },
+                { data: "totalAmount", name: "TotalAmount" },
+                { data: "tbr", name: "TBR" },
+                { data: "credit", name: "Credit" },
+                { data: "debit", name: "Debit" },
+                { data: "paidAmount", name: "PaidAmount" },
+                { data: "freightCharge", name: "FreightCharge" },
+                { data: "balance", name: "Balance" },
+                { data: "overPayment", name: "OverPayment" },
+                {
+                    orderable: false,
+                    data: function(data, type, dataToSet) {
+                      var actions = '<div class="btn-group" role="group">';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        return actions;
+                    }
+                }
+                
+            ]
+        });
+
+        // load functions upon datatable load
+        datatable.on("draw", function() {
+            $.loadingoverlay("hide");
+        });
+
+      
+
+    </script>
+    }
