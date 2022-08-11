@@ -1,0 +1,176 @@
+﻿@{
+    ViewData["Title"] = "New Warehouse Transfer";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Transfer" asp-action="Index">Warehouse Transfer</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="transfer-source" class="form-label mb-0">Source Warehouse</label>
+                        <select id="transfer-source" name="Source" class="form-control select2"></select>
+                        <span data-valmsg-for="transfer-source" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="transfer-destination" class="form-label mb-0">Destination Warehouse</label>
+                        <select id="transfer-destination" name="Destination" class="form-control select2"></select>
+                        <span data-valmsg-for="transfer-destination" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="transfer-date" class="form-label mb-0">Transfer Date</label>
+                        <input type="date" id="transfer-date" name="TransferDate" class="form-control form-control-sm" />
+                        <span data-valmsg-for="transfer-date" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="transfer-remarks" class="form-label mb-0">Remarks</label>
+                        <input type="text" id="transfer-remarks" name="Remarks" class="form-control form-control-sm" />
+                        <span data-valmsg-for="transfer-remarks" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h6>Source Warehouse Item(s)</h6>
+                    <table class="table table-head-fixed table-striped table-hover table-item-source">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div class="col-12">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h6>To Transfer Item(s)</h6>
+                    <table class="table table-head-fixed table-striped table-hover table-item-destination">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div class="col-12">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+    <script>
+        // Load warehouse data for select2
+        var warehouseOption;
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Warehouse")",
+            success: function(data, status, xhr) {
+                warehouseOption = data;
+                // Load Select2 Source
+                $("#transfer-source").select2({
+                    data: warehouseOption
+                });
+
+                // Load Select2 Destination
+                $("#transfer-destination").select2({
+                    data: warehouseOption.filter(s => s.id !== $("#transfer-source").val())
+                });
+                sourceDT.ajax.reload();
+
+                $("#transfer-source").on("select2:select", function() {
+                    if ($("#transfer-destination").attr("data-select2-id")) {
+                        $("#transfer-destination").select2("destroy");
+                        $("#transfer-destination").empty();
+                    }
+                    $("#transfer-destination").select2({
+                        data: warehouseOption.filter(s => s.id !== $("#transfer-source").val())
+                    });
+                    sourceDT.ajax.reload();
+                });
+            }
+        });
+
+        var sourceDT = $('.table-item-source').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetSourceItemTransferJson")",
+                type: "POST",
+                data: function(data) {
+                    data.WarehouseId = $("#transfer-source").val();
+                },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                }
+            },
+            //processing: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                { data: "quantity", name: "Quantity" },
+                { data: "unit", name: "Unit" },
+                {
+                    orderable: false,
+                    data: function(data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<div data-bs-toggle="tooltip" title="Transfer Item"><button class="btn btn-warning btn-xs sourceBtn"><i class="fas fa-share"></i></button></div>';
+                        return actions + "";
+                    }
+                }
+            ]
+        });
+
+        sourceDT.on("draw", function() {
+            reloadToolTip();
+
+            $('.table-item-source .dataTables_filter input').unbind();
+            $('.table-item-destination .dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    sourceDT.search($(this).val()).draw();
+                }
+            });
+
+            $.LoadingOverlay("hide");
+
+            // Actions upon Display Edit Modal
+            $(".sourceBtn").click(function(e) {
+                var data = sourceDT.row($(this).parents('tr')).data();
+                destinationDT.row.add([data.code, data.name, data.quantity, data.unit]).draw();
+            });
+        });
+
+        var destinationDT = $('.table-item-destination').DataTable({
+            data: [],
+            filter: true,
+            responsive: true,
+            autoWidth: false
+        });
+    </script>
+        }
