@@ -47,17 +47,17 @@ namespace GMGInventory.Common.Models
 
         [Required]
         [Display(Name = "Credit Term")]
-        public int CreditTermId { get; set; }
+        public int? CreditTermId { get; set; }
         public SelectList? CreditTerms { get; set; }
 
         [Required]
         [Display(Name = "Agent")]
-        public int AgentId { get; set; }
+        public int? AgentId { get; set; }
         public SelectList? Agents { get; set; }
 
         [Required]
         [Display(Name = "Area")]
-        public int AreaId { get; set; }
+        public int? AreaId { get; set; }
         public SelectList? Areas { get; set; }
 
         [MaxLength(50)]

@@ -25,8 +25,6 @@
                 <span class="fas fa-plus"></span> Edit Customer 
                 </button>
 
-
-          
         </div>
     </div>
     <div class="card-body">
@@ -278,6 +276,7 @@
 
 
 
+
 <!-- Edit Modal -->
 <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog" style="max-width: 70%;" role="document">
@@ -291,8 +290,7 @@
             <form autocomplete="off" id="editForm">
                 <div class="modal-body">
                     <div class="row">
-                       <div class="row">
-                        <div class="col-md-4">
+                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-code" class="control-label mb-0 d-block">Customer Code</label>
                                 <input type="text" name="Code" id="edit-code" class="form-control form-control-sm" />
@@ -306,13 +304,7 @@
                                 <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                         @*<div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-is-active" class="control-label mb-0 d-block">Is Active?</label>
-                                <input type="checkbox" name="IsActive" id="create-is-active" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-is-active" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>*@
+                     
                     </div>
                     <div class="row">
                         <div class="col-md-4">
@@ -329,15 +321,16 @@
                                 </select>
                                 <span data-valmsg-for="edit-area" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
-                          <div class="col-md-4">
+                         <div class="col-md-4">
                             <label for="edit-customer-type" class="control-label mb-0 d-block">Customer Type</label>
                                 <select name="CustomerType" id="edit-customer-type" class="form-control" style="width: 100%">
                                 </select>
                                 <span data-valmsg-for="edit-customer-type" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
+                       
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-contact-person" class="control-label mb-0 d-block">Contact Person</label>
                                 <input type="text" name="ContactPerson" id="edit-contact-person" class="form-control form-control-sm" />
@@ -358,9 +351,10 @@
                                 <span data-valmsg-for="edit-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
+                       
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                         <div class="col-md-4">
                             <div class="form-group">
                                <label for="edit-email" class="control-label mb-0 d-block">Email Address</label>
                                 <input type="text" name="Email" id="edit-email" class="form-control form-control-sm" />
@@ -382,9 +376,10 @@
                                 <span data-valmsg-for="edit-fax-number" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
+                       
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-tin" class="control-label mb-0 d-block">TIN</label>
                                 <input type="text" name="TIN" id="edit-tin" class="form-control form-control-sm" />
@@ -408,7 +403,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-credit-limit" class="control-label mb-0 d-block">Credit Limit</label>
                                 <input type="number" name="CreditLimit" id="edit-credit-limit" class="form-control form-control-sm" />
@@ -422,8 +417,10 @@
                                 <span data-valmsg-for="edit-remarks" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
+                      
                     </div>
                     <input type="hidden" id="edit-id" />
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
@@ -437,38 +434,36 @@
         </div>
     </div>
 </div>
-
 
 
 
 
 
 <!-- Shipping Modal -->
-<div class="modal fade" id="shippingModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+<div class="modal fade" id="shippingModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static" >
     <div class="modal-dialog" style="max-width: 70%;" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Shipping</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title">Add Shipping Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form autocomplete="off" id="editForm">
-                <div class="modal-body">
+            <form autocomplete="off" id="createForm">
+                <div class="modal-body" >
                     <div class="row">
-                       <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-code" class="control-label mb-0 d-block">Customer Code</label>
-                                <input type="text" name="Code" id="edit-code" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-code" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-code" class="control-label mb-0 d-block">Customer Code</label>
+                                <input type="text" name="Code" id="create-code" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-name" class="control-label mb-0 d-block">Customer Name</label>
-                                <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-name" class="control-label mb-0 d-block">Customer Name</label>
+                                <input type="text" name="Name" id="create-name" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                          @*<div class="col-md-4">
@@ -482,117 +477,116 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-region" class="control-label mb-0 d-block">Region</label>
-                                <select name="Region" id="edit-region" class="form-control" style="width: 100%">
+                                <label for="create-region" class="control-label mb-0 d-block">Region</label>
+                                <select name="Region" id="create-region" class="form-control" style="width: 100%">
                                 </select>
-                                <span data-valmsg-for="edit-region" data-valmsg-replace="true" class="text-danger"></span>
+                                <span data-valmsg-for="create-region" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
-                              <label for="edit-area" class="control-label mb-0 d-block">Area</label>
-                                <select name="Area" id="edit-area" class="form-control" style="width: 100%">
+                              <label for="create-area" class="control-label mb-0 d-block">Area</label>
+                                <select name="Area" id="create-area" class="form-control" style="width: 100%">
                                 </select>
-                                <span data-valmsg-for="edit-area" data-valmsg-replace="true" class="text-danger"></span>
+                                <span data-valmsg-for="create-area" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                           <div class="col-md-4">
-                            <label for="edit-customer-type" class="control-label mb-0 d-block">Customer Type</label>
-                                <select name="CustomerType" id="edit-customer-type" class="form-control" style="width: 100%">
+                            <label for="create-customer-type" class="control-label mb-0 d-block">Customer Type</label>
+                                <select name="CustomerType" id="create-customer-type" class="form-control" style="width: 100%">
                                 </select>
-                                <span data-valmsg-for="edit-customer-type" data-valmsg-replace="true" class="text-danger"></span>
+                                <span data-valmsg-for="create-customer-type" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-contact-person" class="control-label mb-0 d-block">Contact Person</label>
-                                <input type="text" name="ContactPerson" id="edit-contact-person" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-contact-person" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-contact-person" class="control-label mb-0 d-block">Contact Person</label>
+                                <input type="text" name="ContactPerson" id="create-contact-person" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-contact-person" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-contact-number" class="control-label mb-0 d-block">Contact Number</label>
-                                <input type="text" name="ContactNumber" id="edit-contact-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-contact-number" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-contact-number" class="control-label mb-0 d-block">Contact Number</label>
+                                <input type="text" name="ContactNumber" id="create-contact-number" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-contact-number" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                           <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-address" class="control-label mb-0 d-block">Address</label>
-                                <input type="text" name="Address" id="edit-address" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-address" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-address" class="control-label mb-0 d-block">Address</label>
+                                <input type="text" name="Address" id="create-address" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                               <label for="edit-email" class="control-label mb-0 d-block">Email Address</label>
-                                <input type="text" name="Email" id="edit-email" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-email" data-valmsg-replace="true" class="text-danger"></span>
+                               <label for="create-email" class="control-label mb-0 d-block">Email</label>
+                                <input type="text" name="Email" id="create-email" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-email" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-agent" class="control-label mb-0 d-block">Agent Name</label>
-                                <select name="Agent" id="edit-agent" class="form-control" style="width: 100%">
+                                <label for="create-agent" class="control-label mb-0 d-block">Agent Name</label>
+                                <select name="Agent" id="create-agent" class="form-control" style="width: 100%">
                                 </select>
-                                <span data-valmsg-for="edit-agent" data-valmsg-replace="true" class="text-danger"></span>
+                                <span data-valmsg-for="create-agent" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-fax-number" class="control-label mb-0 d-block">Fax Number</label>
-                                <input type="text" name="FaxNumber" id="edit-fax-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-fax-number" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-fax-number" class="control-label mb-0 d-block">Fax Number</label>
+                                <input type="text" name="FaxNumber" id="create-fax-number" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-fax-number" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-tin" class="control-label mb-0 d-block">TIN</label>
-                                <input type="text" name="TIN" id="edit-tin" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-tin" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-tin" class="control-label mb-0 d-block">TIN</label>
+                                <input type="text" name="TIN" id="create-tin" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-tin" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                               <label for="edit-vat" class="control-label mb-0 d-block">VAT</label>
-                                <input type="text" name="VAT" id="edit-vat" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-vat" data-valmsg-replace="true" class="text-danger"></span>
+                               <label for="create-vat" class="control-label mb-0 d-block">VAT</label>
+                                <input type="text" name="VAT" id="create-vat" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-vat" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                          <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-credit-term" class="control-label mb-0 d-block">Credit Term</label>
-                                <select name="CreditTerm" id="edit-credit-term" class="form-control" style="width: 100%">
+                                <label for="create-credit-term" class="control-label mb-0 d-block">Credit Term</label>
+                                <select name="CreditTerm" id="create-credit-term" class="form-control" style="width: 100%">
                                 </select>
-                                <span data-valmsg-for="edit-credit-term" data-valmsg-replace="true" class="text-danger"></span>
+                                <span data-valmsg-for="create-credit-term" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-credit-limit" class="control-label mb-0 d-block">Credit Limit</label>
-                                <input type="number" name="CreditLimit" id="edit-credit-limit" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-credit-limit" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-credit-limit" class="control-label mb-0 d-block">Credit Limit</label>
+                                <input type="number" name="CreditLimit" id="create-credit-limit" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-credit-limit" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-8">
                             <div class="form-group">
-                                <label for="edit-remarks" class="control-label mb-0 d-block">Remarks</label>
-                                <input name="Remarks" id="edit-remarks" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-remarks" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
+                                <input name="Remarks" id="create-remarks" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-remarks" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" id="edit-id" />
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-edit"></span> Update
+                        <span class="fas fa-plus"></span> Add
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <span class="fas fa-times"></span> Cancel
@@ -602,7 +596,6 @@
         </div>
     </div>
 </div>
-
 
 
 @section Scripts {
@@ -719,7 +712,7 @@
             }
         });
 
-           
+
 
         //Shipping Details
         var shippingDT = $('.table-shipping').on('preXhr.dt', function(e, settings, data) {
@@ -878,28 +871,38 @@
 
         });
 
-        
-         // Actions upon Display Edit Modal
+
+            
+   
         $(".editBtn").click(function(e) {
-             var data = dataTable.row($(this).parents('tr')).data();
-                $("#edit-code").val("");
-                $("#edit-area").val("");
-                $("#edit-customer-type").val("");
-                $("#edit-contact-person").val("");
-                $("#edit-contact-number").val("");
-                $("#edit-address").val("");
-                $("#edit-agent").val(data.agentId).trigger("change");
-                $("#edit-region").val(data.regionId).trigger("change");
-                $("#edit-credit-term").val(data.creditTermId).trigger("change");
-                $("#edit-area").val(data.areaId).trigger("change");
-                $("#edit-customer-type").val(data.customerTypeId).trigger("change");
-                $("#edit-email").val("");
-                $("#edit-fax-number").val("");
-                $("#edit-tin").val("");
-                $("#edit-vat").val("");
-                $("#edit-credit-limit").val("");
-                $("#edit-remarks").val("");
+            var data = dataTable.row($(this).parents('tr')).data();
+               $.ajax({
+                      type: "POST",
+                      url: "@Url.Action("GetCustomerJson")",
+                      data: { Id: data.id },
+                      success: function(data, status, xhr) {
+                                $("#edit-code").val(data.code);
+                                $("#edit-area").val(data.areaId);
+                                $("#edit-customer-type").val(data.customerTypeId);
+                                $("#edit-contact-person").val(data.contactPerson);
+                                $("#edit-contact-number").val(data.contactNumber);
+                                $("#edit-address").val(data.address);
+                                $("#edit-agent").val(data.agentId).trigger("change");
+                                $("#edit-region").val(data.regionId).trigger("change");
+                                $("#edit-credit-term").val(data.creditTermId).trigger("change");
+                                $("#edit-area").val(data.areaId).trigger("change");
+                                $("#edit-customer-type").val(data.customerTypeId).trigger("change");
+                                $("#edit-email").val(data.email);
+                                $("#edit-fax-number").val(data.faxNumber);
+                                $("#edit-tin").val(data.tin);
+                                $("#edit-vat").val(data.vat);
+                                $("#edit-credit-limit").val(data.creditLimit);
+                                $("#edit-remarks").val(data.remarks);
+                      }
+               });
+              
         });
+
 
         // Validation for Edit Modal
         var validateEdit = $("#editForm").validate({
@@ -929,40 +932,43 @@
             }
         });
 
-        // Send Create to Controller
-        function DoEdit() {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("EditJson")",
-                data: {
-                    Code: $("#edit-code").val(),
-                    Name: $("#edit-name").val(),
-                    AreaId: $("#edit-area").val(),
-                    CustomerTypeId: $("#edit-customer-type").val(),
-                    ContactPerson: $("#edit-contact-person").val(),
-                    ContactNumber: $("#edit-contact-number").val(),
-                    Address: $("#edit-address").val(),
-                    Email: $("#edit-email").val(),
-                    AgentId: $("#edit-agent").val(),
-                    FaxNumber: $("#edit-fax-number").val(),
-                    TIN: $("#edit-tin").val(),
-                    VAT: $("#edit-vat").val(),
-                    CreditTermId: $("#edit-credit-term").val(),
-                    CreditLimit: $("#edit-credit-limit").val(),
-                    Remarks: $("#edit-remarks").val()
-                },
-                error: jQueryCommonError,
-                success: function(data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
-                    } else {
-                        toastr.success(data.message, "Success");
-                        $("#editModal").modal("hide");
-                        dataTable.ajax.reload();
-                    }
-                }
-            });
-        }
+
+        // // Send Edit to Controller
+        //function DoEdit() {
+        //    $.ajax({
+        //        type: "POST",
+        //        url: "@Url.Action("EditJson")",
+        //        data: {
+        //            Code: $("#edit-code").(data.code),
+        //            Name: $("#edit-name").val(),
+        //            AreaId: $("#edit-area").val(),
+        //            CustomerTypeId: $("#edit-customer-type").val(),
+        //            ContactPerson: $("#edit-contact-person").val(),
+        //            ContactNumber: $("#edit-contact-number").val(),
+        //            Address: $("#edit-address").val(),
+        //            Email: $("#edit-email").val(),
+        //            AgentId: $("#edit-agent").val(),
+        //            FaxNumber: $("#edit-fax-number").val(),
+        //            TIN: $("#edit-tin").val(),
+        //            VAT: $("#edit-vat").val(),
+        //            CreditTermId: $("#edit-credit-term").val(),
+        //            CreditLimit: $("#edit-credit-limit").val(),
+        //            Remarks: $("#edit-remarks").val()
+        //        },
+        //        error: jQueryCommonError,
+        //        success: function(data, status, xhr) {
+        //            if (data.status == "Error") {
+        //                toastr.error(data.message, "Error");
+        //            } else {
+        //                toastr.success(data.message, "Success");
+        //                $("#editModal").modal("hide");
+        //                dataTable.ajax.reload();
+        //            }
+        //        }
+        //    });
+        //}
+
+      
 
          
          // Actions upon Display Shipping Modal
@@ -974,10 +980,10 @@
         
    
 
-        // load functions upon datatable load
-        datatable.on("draw", function() {
-            $.loadingoverlay("hide");
-        });
+        //// load functions upon datatable load
+        //datatable.on("draw", function() {
+        //    $.loadingoverlay("hide");
+        //});
         
 
         

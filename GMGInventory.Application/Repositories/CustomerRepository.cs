@@ -185,31 +185,33 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
+   
+
         public async Task UpdateAsync(CustomerVM custVM)
         {
-            var cust = context.Customers.Where(s => s.Id == custVM.Id).FirstOrDefault();
+            var cust = context.Customers.Where(s => s.Code == custVM.Code).FirstOrDefault();
             if (cust == null)
             {
                 throw new DbUpdateConcurrencyException();
             }
 
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                cust.Code = custVM.Code;
-                cust.Name = custVM.Name;
-                cust.AreaId = custVM.AreaId;
-                cust.CustomerTypeId = custVM.CustomerTypeId;
-                cust.ContactPerson = custVM.ContactPerson;
-                cust.ContactNumber = custVM.ContactNumber;
-                cust.Address = custVM.Address;
-                cust.Email = custVM.Email;
-                cust.AgentId = custVM.AgentId;
-                cust.FaxNumber = custVM.FaxNumber;
-                cust.TIN = custVM.TIN;
-                cust.VAT = custVM.VAT;
-                cust.CreditTermId = custVM.CreditTermId;
-                cust.CreditLimit = custVM.CreditLimit;
-                cust.Remarks = custVM.Remarks;
-                cust.IsActive = true;
+            cust.Code = custVM.Code;
+            cust.Name = custVM.Name;
+            cust.AreaId = custVM.AreaId;
+            cust.CustomerTypeId = custVM.CustomerTypeId;
+            cust.ContactPerson = custVM.ContactPerson;
+            cust.ContactNumber = custVM.ContactNumber;
+            cust.Address = custVM.Address;
+            cust.Email = custVM.Email;
+            cust.AgentId = custVM.AgentId;
+            cust.FaxNumber = custVM.FaxNumber;
+            cust.TIN = custVM.TIN;
+            cust.VAT = custVM.VAT;
+            cust.CreditTermId = custVM.CreditTermId;
+            cust.CreditLimit = custVM.CreditLimit;
+            cust.Remarks = custVM.Remarks;
+            cust.IsActive = true;
             context.Customers.Update(cust);
             await context.SaveChangesAsync(currentUserId);
         }
@@ -241,6 +243,92 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
 
       
+        }
+
+        private async Task<IList<CustomerVM>> GetCustomerDetailsAsync(int id)
+        {
+            var customerVM = from cust in context.Customers
+                                    .Include(s => s.Area)
+                                    .Include(s => s.CustomerType)
+                                    .Include(s => s.Agent)
+                                    .Include(s => s.CreditTerm)
+                             select new CustomerVM
+                             {
+                                 Code = cust.Code,
+                                 Name = cust.Name,
+                                 AreaId = cust.AreaId,
+                                 CustomerTypeId = cust.CustomerTypeId,
+                                 ContactPerson = cust.ContactPerson,
+                                 ContactNumber = cust.ContactNumber,
+                                 Address = cust.Address,
+                                 Email = cust.Email,
+                                 AgentId = cust.AgentId,
+                                 FaxNumber = cust.FaxNumber,
+                                 TIN = cust.TIN,
+                                 VAT = cust.VAT,
+                                 CreditTermId = cust.CreditTermId,
+                                 CreditLimit = cust.CreditLimit,
+                                 Remarks = cust.Remarks,
+                                 IsActive = true
+        };
+            return await customerVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<CustomerVM>> GetCustomerDetailsDTAsync(DataTablesRequestForm form, int id)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetCustomerDetailsAsync(id)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                   || x.Name.ToLower().Contains(form.SearchValue)
+                                   || x.AgentName.ToLower().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderBy(s => s.Code); break;
+                        case "Name": data = data.OrderBy(s => s.Name); break;
+                        case "AgentName": data = data.OrderBy(s => s.AgentName); break;
+                        case "CreditLimit": data = data.OrderBy(s => s.CreditLimit); break;
+                        case "OutstandingBalance": data = data.OrderBy(s => s.OutstandingBalance); break;
+                        default: break;
+
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderByDescending(s => s.Code); break;
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
+                        case "AgentName": data = data.OrderByDescending(s => s.AgentName); break;
+                        case "CreditLimit": data = data.OrderByDescending(s => s.CreditLimit); break;
+                        case "OutstandingBalance": data = data.OrderByDescending(s => s.OutstandingBalance); break;
+                        default: break;
+
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<CustomerVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
         }
 
         private async Task<IList<CustomerVM>> GetCustomerShippingAsync(int id)

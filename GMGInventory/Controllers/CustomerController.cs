@@ -77,7 +77,7 @@ namespace GMGInventory.Controllers
             }
             catch (Exception ex)
             {
-                if (!await customerRepository.IsCustomerIdExistAsync(custVM.Id))
+                if (!await customerRepository.IsCodeExistAsync(custVM.Code))
                 {
                     responseModel.Status = "Error";
                     responseModel.Message = "Customer cannot be found";
@@ -98,6 +98,13 @@ namespace GMGInventory.Controllers
                 return NotFound();
             }
             return View(cust);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetCustomerJson(int id)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await customerRepository.GetCustomerDetailsDTAsync(form, id));
         }
 
         [HttpPost]
