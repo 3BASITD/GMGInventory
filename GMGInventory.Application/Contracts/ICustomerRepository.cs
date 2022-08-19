@@ -16,11 +16,14 @@ namespace GMGInventory.Application.Contracts
         Task DeactivateCustomerAsync(int id);
         Task ReactivateCustomerAsync(int id);
         Task AddAsync(CustomerVM custVM);
+
+        Task AddShippingAsync(CustomerVM shippingVM);
+        Task AddForwarderAsync(CustomerVM forwarderVM);
         Task UpdateAsync(CustomerVM custVM);
 
         //Task UpdateAsync(int id, CustomerVM customerVM);
         ForDataTables<CustomerVM> GetListDataTables(DataTablesRequestForm form);
-        CustomerVM? GetCustomerVM(int? id);
+        CustomerVM? GetCustomerDtlVM(int? id);
         Task<ForDataTables<CustomerVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerPaymentDTAsync(DataTablesRequestForm form, int id);

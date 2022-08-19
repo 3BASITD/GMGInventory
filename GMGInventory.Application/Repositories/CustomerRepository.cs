@@ -23,7 +23,8 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public CustomerVM? GetCustomerVM(int? id)
+       
+        public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers
                                     .Include(s => s.Area)
@@ -31,34 +32,35 @@ namespace GMGInventory.Application.Repositories
                                     .Include(s => s.Agent)
                                     .Include(s => s.CreditTerm)
 
-                             //join sd in context.ShippingAddresses
-                             //         on cust.Id equals sd.CustomerId into cs
-                             //from css in cs.DefaultIfEmpty()
-                             //join fd in context.Forwarders
-                             //         on cust.Id equals fd.CustomerId into fds
-                             //from fdsd in fds.DefaultIfEmpty()
-                             //join pay in context.Payments
-                             //         on cust.Id equals pay.CustomerId into cp
-                             //from cps in cp.DefaultIfEmpty()
-                             //join payd in context.PaymentDetails
-                             //         on cps.Id equals payd.PaymentId into pdsp
-                             //from pdsps in pdsp.DefaultIfEmpty()
-                             //join inv in context.Invoices
-                             //         on pdsps.InvoiceId equals inv.Id into invs
-                             //from invsv in invs.DefaultIfEmpty()
-                             where cust.Id == id
-                             select new CustomerVM
-                             {
-                                 Id = cust.Id,
-                                 Code = cust.Code,
-                                 Name = cust.Name,
-                                 AgentName = cust.Agent.FullName,
-                                 CreditLimit = cust.CreditLimit,
-                                 OutstandingBalance = cust.OutstandingBalance,
-                                 IsActive = cust.IsActive
+                                 
+                              where cust.Id == id
+                              select new CustomerVM
+                              {
+                                  Id = cust.Id,
+                                  Code = cust.Code,
+                                  Name = cust.Name,
+                                  AreaId = cust.Area.Id,
+                                  CustomerTypeId = cust.CustomerType.Id,
+                                  ContactPerson = cust.ContactPerson,
+                                  ContactNumber = cust.ContactNumber,
+                                  Address = cust.Address,
+                                  Email = cust.Email,
+                                  AgentId = cust.Agent.Id,
+                                  AgentName = cust.Agent.FullName,
+                                  AreaName = cust.Area.Name,
+                                  CreditTermName = cust.CreditTerm.Name,
+                                  RegionName = cust.Area.Region.Name,
+                                  CustomerTypeName = cust.CustomerType.Name,
+                                  FaxNumber = cust.FaxNumber,
+                                  TIN = cust.TIN,
+                                  VAT = cust.VAT,
+                                  RegionId = cust.Area.RegionId,
+                                  CreditTermId = cust.CreditTerm.Id,
+                                  CreditLimit = cust.CreditLimit,
+                                  Remarks = cust.Remarks,
+                                  IsActive = cust.IsActive
 
-
-                             }).FirstOrDefault();
+                              }).FirstOrDefault();
             return customerVM;
         }
         private IQueryable<CustomerVM> GetList()
@@ -243,6 +245,47 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
 
       
+        }
+
+        public async Task AddShippingAsync(CustomerVM shippingVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var shipping = new ShippingAddress
+            {
+                CustomerId = shippingVM.Id,
+                Address = shippingVM.ShippingAddress,
+                PhoneNumber = shippingVM.ShippingPhoneNo,
+                FaxNumber = shippingVM.ShippingFaxNo,
+                ContactPerson = shippingVM.ShippingContactPerson
+
+
+                
+            };
+            await context.ShippingAddresses.AddAsync(shipping);
+            await context.SaveChangesAsync(currentUserId);
+
+
+        }
+
+        public async Task AddForwarderAsync(CustomerVM forwarderVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var forwarders = new Forwarder
+            {
+                CustomerId = forwarderVM.Id,
+                Name = forwarderVM.ForwarderName,
+                Address = forwarderVM.ForwarderAddress,
+                PhoneNumber = forwarderVM.ForwarderPhoneNo,
+                FaxNumber = forwarderVM.ForwarderFaxNo
+               
+
+
+
+            };
+            await context.Forwarders.AddAsync(forwarders);
+            await context.SaveChangesAsync(currentUserId);
+
+
         }
 
         private async Task<IList<CustomerVM>> GetCustomerDetailsAsync(int id)
