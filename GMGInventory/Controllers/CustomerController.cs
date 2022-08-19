@@ -18,7 +18,6 @@ namespace GMGInventory.Controllers
         private readonly ICreditTermRepository credittermRepository;
         private readonly ICustomerTypeRepository customertypeRepository;
         private readonly IAgentRepository agentRepository;
-        private readonly IMapper mapper;
 
         public CustomerController(ICustomerRepository customerRepository
             , IAreaRepository areaRepository
@@ -33,152 +32,125 @@ namespace GMGInventory.Controllers
             this.credittermRepository = credittermRepository;
             this.customertypeRepository = customertypeRepository;
             this.agentRepository = agentRepository;
-            this.mapper = mapper;
         }
-
-        public async Task<IActionResult> Index()
+        public ActionResult Index()
         {
-            return View(await customerRepository.GetAllCustomerVMAsync());
-        }
-
-        public async Task<IActionResult> Details(int? id)
-        {
-            var customerVM = await customerRepository.GetCustomerViewVMAsync(id);
-            if (customerVM == null)
-            {
-                return NotFound();
-            }
-            return View(customerVM);
-        }
-
-        public async Task<IActionResult> Create()
-
-        {
-            var customerVM = new CustomerVM
-            {
-                Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name"),
-                Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name"),
-                CreditTerms = new SelectList(await credittermRepository.GetAllActiveCreditTermAsync(-1), "Id", "Name"),
-                CustomerTypes = new SelectList(await customertypeRepository.GetAllActiveCustomerTypeAsync(-1), "Id", "Name"),
-                Agents = new SelectList(await agentRepository.GetAllActiveAgentAsync(-1), "Id", "FullName")
-
-
-            };
-            return View(customerVM);
+            return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CustomerVM customerVM)
+        public JsonResult GetListJson()
         {
-            if (ModelState.IsValid)
-            {
-                if (await customerRepository.IsCustomerCodeExist(customerVM.Code))
-                {
-                    ModelState.AddModelError(string.Empty, "Customer code already in use.");
-                    TempData["ErrorMessage"] = "Customer code already in use";
-                }
-                else
-                {
-                    await customerRepository.AddAsync(customerVM);
-                    TempData["SuccessMessage"] = "Customer successfully added";
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            customerVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(customerVM.AreaId), "Id", "Name", customerVM.AreaId);
-            customerVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(customerVM.RegionId), "Id", "Name", customerVM.RegionId);
-            customerVM.CustomerTypes = new SelectList(await customertypeRepository.GetAllActiveCustomerTypeAsync(customerVM.CustomerTypeId), "Id", "Name", customerVM.CustomerTypeId);
-            customerVM.CreditTerms = new SelectList(await credittermRepository.GetAllActiveCreditTermAsync(customerVM.CreditTermId), "Id", "Name", customerVM.CreditTermId);
-            customerVM.Agents = new SelectList(await agentRepository.GetAllActiveAgentAsync(customerVM.AgentId), "Id", "FullName", customerVM.AgentId);
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(customerRepository.GetListDataTables(dtForm));
 
-            return View(customerVM);
-        }
 
-        public async Task<IActionResult> Edit(int? id)
-        {
-            var customerVM = await customerRepository.GetCustomerVMAsync(id);
-            if (customerVM == null)
-            {
-                return NotFound();
-            }
-            customerVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(customerVM.AreaId), "Id", "Name", customerVM.AreaId);
-            customerVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(customerVM.RegionId), "Id", "Name", customerVM.RegionId);
-            customerVM.CustomerTypes = new SelectList(await customertypeRepository.GetAllActiveCustomerTypeAsync(customerVM.CustomerTypeId), "Id", "Name", customerVM.CustomerTypeId);
-            customerVM.CreditTerms = new SelectList(await credittermRepository.GetAllActiveCreditTermAsync(customerVM.CreditTermId), "Id", "Name", customerVM.CreditTermId);
-            customerVM.Agents = new SelectList(await agentRepository.GetAllActiveAgentAsync(customerVM.AgentId), "Id", "FullName", customerVM.AgentId);
-            return View(customerVM);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CustomerVM customerVM)
+        public async Task<JsonResult> CreateJson(CustomerVM custVM)
         {
-            if (id != customerVM.Id)
+            ResponseModel responseModel = new ResponseModel();
+            if (await customerRepository.IsCodeExistAsync(custVM.Code))
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await customerRepository.UpdateAsync(id, customerVM);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await customerRepository.Exists(customerVM.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                TempData["SuccessMessage"] = "Customer successfully updated";
-                return RedirectToAction(nameof(Index));
-            }
-
-            customerVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(customerVM.AreaId), "Id", "Name", customerVM.AreaId);
-            customerVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(customerVM.RegionId), "Id", "Name", customerVM.RegionId);
-            customerVM.CustomerTypes = new SelectList(await customertypeRepository.GetAllActiveCustomerTypeAsync(customerVM.CustomerTypeId), "Id", "Name", customerVM.CustomerTypeId);
-            customerVM.CreditTerms = new SelectList(await credittermRepository.GetAllActiveCreditTermAsync(customerVM.CreditTermId), "Id", "Name", customerVM.CreditTermId);
-            customerVM.Agents = new SelectList(await agentRepository.GetAllActiveAgentAsync(customerVM.AgentId), "Id", "FullName", customerVM.AgentId);
-            return View(customerVM);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (await customerRepository.IsCustomerIdExistAsync(id) == false)
-            {
-                return NotFound();
-            }
-            if (await customerRepository.IsCustomerInUse(id))
-            {
-                await customerRepository.DeactivateCustomerAsync(id);
-                TempData["WarningMessage"] = "Customer has been deactivated";
+                responseModel.Status = "Error";
+                responseModel.Message = "Customer code already in use";
             }
             else
             {
-                await customerRepository.DeleteAsync(id);
-                TempData["SuccessMessage"] = "Customer successfully deleted";
+                await customerRepository.AddAsync(custVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Customer successfully added";
             }
-            return RedirectToAction(nameof(Index));
+            return Json(responseModel);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reactivate(int id)
+        public async Task<JsonResult> EditJson(CustomerVM custVM)
         {
-            if (await customerRepository.IsCustomerIdExistAsync(id) == false)
+            ResponseModel responseModel = new ResponseModel();
+            try
+            {
+                await customerRepository.UpdateAsync(custVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Customer successfully updated";
+            }
+            catch (Exception ex)
+            {
+                if (!await customerRepository.IsCustomerIdExistAsync(custVM.Id))
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Customer cannot be found";
+                }
+                else
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = ex.Message;
+                }
+            }
+            return Json(responseModel);
+        }
+        public ActionResult Details(int id)
+        {
+            var cust = customerRepository.GetCustomerVM(id);
+            if (cust == null)
             {
                 return NotFound();
             }
-            await customerRepository.ReactivateCustomerAsync(id);
-            TempData["SuccessMessage"] = "Customer reactivated successfully";
-            return RedirectToAction(nameof(Index));
+            return View(cust);
         }
+
+        [HttpPost]
+        public async Task<JsonResult> GetShippingJson(int id)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await customerRepository.GetCustomerShippingDTAsync(form, id));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetForwarderJson(int id)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await customerRepository.GetCustomerForwarderDTAsync(form, id));
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> GetPaymentJson(int id)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await customerRepository.GetCustomerPaymentDTAsync(form, id));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetReceivableJson(int id)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await customerRepository.GetCustomerReceivableDTAsync(form, id));
+        }
+
+
+
+
+
+        //[HttpPost]
+        //public JsonResult GetListJsonDetails()
+        //{
+        //    DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+        //    return Json(soaRepository.GetListDataTablesDetails(dtForm));
+        //}
+
+
+        //public ActionResult Details(int id)
+        //{
+        //    var payment = soaRepository.GetSoacrVM(id);
+        //    if (payment == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(payment);
+        //}
+
+
     }
 }

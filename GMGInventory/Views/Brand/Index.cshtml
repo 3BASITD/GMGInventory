@@ -348,7 +348,7 @@
                 }
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("GetOptionsEdit", "ItemType")",
+                    url: "@Url.Action("GetOptions", "ItemType")",
                     data: { includeId: data.ItemTypeId },
                     success: function(data, status, xhr) {
                         $("#edit-itemType").select2({
@@ -411,7 +411,7 @@
         // Load Select2 Category on Add
         $.ajax({
             type: "POST",
-            url: "@Url.Action("GetOptionsCreate", "ItemType")",
+            url: "@Url.Action("GetOptions", "ItemType")",
             success: function(data, status, xhr) {
                 $("#create-itemType").select2({
                     data: data,

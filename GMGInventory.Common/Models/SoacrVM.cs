@@ -46,7 +46,7 @@ namespace GMGInventory.Common.Models
         public string FreightCharge { get; set; }
 
         [Display(Name = "Balance")]
-        public string? Balance { get; set; }
+        public decimal? Balance { get; set; }
 
         [Display(Name = "Over Payment")]
         public string? OverPayment { get; set; }

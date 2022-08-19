@@ -201,5 +201,19 @@ namespace GMGInventory.Application.Repositories
             context.Brands.Update(brand);
             await context.SaveChangesAsync(currentUserId);
         }
+
+        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.Brands
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
     }
 }

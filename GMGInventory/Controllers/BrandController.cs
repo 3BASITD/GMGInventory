@@ -31,6 +31,12 @@ namespace GMGInventory.Controllers
             return View();
         }
 
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+
+            return Json(await brandRepository.GetOptions(IncludeId));
+        }
+
         [HttpPost]
         public JsonResult GetListJson()
         {

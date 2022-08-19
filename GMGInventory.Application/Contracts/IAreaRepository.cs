@@ -17,5 +17,6 @@ namespace GMGInventory.Application.Contracts
         Task ReactivateAreaAsync(int id);
         Task AddAsync(AreaVM areaVM);
         Task UpdateAsync(int id, AreaVM areaVM);
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }

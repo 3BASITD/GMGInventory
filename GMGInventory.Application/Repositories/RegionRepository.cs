@@ -68,6 +68,18 @@ namespace GMGInventory.Application.Repositories
             return await context.Areas.AnyAsync(s => s.RegionId == id);
         }
 
+        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.Regions
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
 
     }
 

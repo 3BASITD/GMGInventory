@@ -153,6 +153,13 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+
+            return Json(await areaRepository.GetOptions(IncludeId));
+        }
+
+
 
     }
 }

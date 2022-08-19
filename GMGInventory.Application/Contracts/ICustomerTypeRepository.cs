@@ -10,5 +10,6 @@ namespace GMGInventory.Application.Contracts
         Task<List<CustomerType>> GetAllActiveCustomerTypeAsync(int includeId);
         Task<bool> IsCustomerTypeCodeExist(string code);
         Task<bool> IsCustomerTypeInUse(int id);
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }

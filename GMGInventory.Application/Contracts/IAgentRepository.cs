@@ -16,5 +16,7 @@ namespace GMGInventory.Application.Contracts
         Task ReactivateAgentAsync(int id);
         Task AddAsync(AgentVM agentVM);
         Task UpdateAsync(int id, AgentVM agentVM);
+
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace GMGInventory.Common.Models
 {
-    public class PaymentVM 
+    public class PaymentVM
     {
 
         public int Id { get; set; }

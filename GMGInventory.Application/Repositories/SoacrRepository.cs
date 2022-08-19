@@ -32,31 +32,33 @@ namespace GMGInventory.Application.Repositories
         {
             var soaVM = (from c in context.Customers
                          join soa in context.SOACRs
-                                          on c.Id equals soa.CustomerId
+                                          on c.Id equals soa.CustomerId into custSoa
+                         from custSoaGrouping in custSoa.DefaultIfEmpty()
                          join st in context.SOACRTypes
-                                          on soa.SOACRTypeId equals st.Id
+                                          on custSoaGrouping.SOACRTypeId equals st.Id
                          join sl in context.SOACRLineItems
-                                          on soa.Id equals sl.SOACRId
+                                     on custSoaGrouping.Id equals sl.SOACRId into custSoaSL
+                         from custSoaGroupingSL in custSoaSL.DefaultIfEmpty()
                          join i in context.Invoices
-                                          on sl.InvoiceId equals i.Id
-                         where soa.Id == id
+                                          on custSoaGroupingSL.InvoiceId equals i.Id
+                         where custSoaGrouping.Id == id
                          select new SoacrVM
                          {
 
-                             Id = soa.Id,
-                             CRNumber = soa.Id.ToString(),
-                             CustomerName = c.Name,
+                             Id = custSoaGrouping.Id,
+                             CRNumber = custSoaGrouping.Id.ToString(),
+                             CustomerName = custSoaGrouping.Customer.Name,
                              Type = st.Code,
-                             SOAFrom = soa.SOAFrom.ToString(),
-                             SOATo = soa.SOATo.ToString(),
-                             TotalAmount = soa.TotalAmount.ToString(),
-                             TBR = sl.TBRAmount.ToString(),
-                             Credit = sl.CreditAmount.ToString(),
-                             Debit = sl.DebitAmount.ToString(),
-                             PaidAmount = sl.PaidAmount.ToString(),
-                             FreightCharge = sl.FreightCost.ToString(),
-                             Balance = sl.Balance.ToString(),
-                             OverPayment = soa.OverPayment.ToString(),
+                             SOAFrom = custSoaGrouping.SOAFrom.ToString(),
+                             SOATo = custSoaGrouping.SOATo.ToString(),
+                             TotalAmount = custSoaGrouping.TotalAmount.ToString(),
+                             TBR = custSoaGroupingSL.TBRAmount.ToString(),
+                             Credit = custSoaGroupingSL.CreditAmount.ToString(),
+                             Debit = custSoaGroupingSL.DebitAmount.ToString(),
+                             PaidAmount = custSoaGroupingSL.PaidAmount.ToString(),
+                             FreightCharge = custSoaGroupingSL.FreightCost.ToString(),
+                             Balance = custSoaGroupingSL.Balance,
+                             OverPayment = custSoaGrouping.OverPayment.ToString(),
                              InvoiceNumber = i.InvoiceNumber.ToString(),
                              InvoiceAmount = i.Amount.ToString()
 
@@ -233,30 +235,36 @@ namespace GMGInventory.Application.Repositories
 
             return from c in context.Customers
                    join soa in context.SOACRs
-                                    on c.Id equals soa.CustomerId
+                                    on c.Id equals soa.CustomerId into custSoa
+                   from custSoaGrouping in custSoa.DefaultIfEmpty()
+               
                    join st in context.SOACRTypes
-                                    on soa.SOACRTypeId equals st.Id
+                                    on custSoaGrouping.SOACRTypeId equals st.Id
                    join sl in context.SOACRLineItems
-                                    on soa.Id equals sl.SOACRId
+                                    on custSoaGrouping.Id equals sl.SOACRId into custSoaSL
+                   from custSoaGroupingSL in custSoaSL.DefaultIfEmpty()
                    join i in context.Invoices
-                                    on sl.InvoiceId equals i.Id
+                                    on custSoaGroupingSL.InvoiceId equals i.Id
+                   
+                   
+
                    select new SoacrVM
                    {
 
-                       Id = soa.Id,
-                       CRNumber = soa.Id.ToString(),
-                       CustomerName = c.Name,
+                       Id = custSoaGrouping.Id,
+                       CRNumber = custSoaGrouping.Id.ToString(),
+                       CustomerName = custSoaGrouping.Customer.Name,
                        Type = st.Code,
-                       SOAFrom = soa.SOAFrom.ToString(),
-                       SOATo = soa.SOATo.ToString(),
-                       TotalAmount = soa.TotalAmount.ToString(),
-                       TBR = sl.TBRAmount.ToString(),
-                       Credit = sl.CreditAmount.ToString(),
-                       Debit = sl.DebitAmount.ToString(),
-                       PaidAmount = sl.PaidAmount.ToString(),
-                       FreightCharge = sl.FreightCost.ToString(),
-                       Balance = sl.Balance.ToString(),
-                       OverPayment = soa.OverPayment.ToString(),
+                       SOAFrom = custSoaGrouping.SOAFrom.ToString(),
+                       SOATo = custSoaGrouping.SOATo.ToString(),
+                       TotalAmount = custSoaGrouping.TotalAmount.ToString(),
+                       TBR = custSoaGroupingSL.TBRAmount.ToString(),
+                       Credit = custSoaGroupingSL.CreditAmount.ToString(),
+                       Debit = custSoaGroupingSL.DebitAmount.ToString(),
+                       PaidAmount = custSoaGroupingSL.PaidAmount.ToString(),
+                       FreightCharge = custSoaGroupingSL.FreightCost.ToString(),
+                       Balance = custSoaGroupingSL.Balance,
+                       OverPayment = custSoaGrouping.OverPayment.ToString(),
                        InvoiceNumber = i.InvoiceNumber.ToString(),
                        InvoiceAmount = i.Amount.ToString()
 
@@ -286,7 +294,6 @@ namespace GMGInventory.Application.Repositories
                                     || x.Debit.ToLower().Contains(form.SearchValue)
                                     || x.PaidAmount.ToLower().Contains(form.SearchValue)
                                     || x.FreightCharge.ToLower().Contains(form.SearchValue)
-                                    || x.Balance.ToLower().Contains(form.SearchValue)
                                     || x.OverPayment.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search

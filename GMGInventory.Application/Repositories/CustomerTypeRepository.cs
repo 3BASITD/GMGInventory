@@ -68,6 +68,18 @@ namespace GMGInventory.Application.Repositories
             return await context.Customers.AnyAsync(s => s.CustomerTypeId == id);
         }
 
+        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.CustomerTypes
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
 
     }
 

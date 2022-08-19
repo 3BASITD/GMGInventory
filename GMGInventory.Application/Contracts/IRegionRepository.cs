@@ -10,5 +10,6 @@ namespace GMGInventory.Application.Contracts
         Task<List<Region>> GetAllActiveRegionAsync(int includeId);
         Task<bool> IsRegionCodeExist(string code);
         Task<bool> IsRegionInUse(int id);
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }

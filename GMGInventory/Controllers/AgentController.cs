@@ -150,5 +150,11 @@ namespace GMGInventory.Controllers
             TempData["SuccessMessage"] = "Agent reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
+
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+
+            return Json(await agentRepository.GetOptions(IncludeId));
+        }
     }
 }

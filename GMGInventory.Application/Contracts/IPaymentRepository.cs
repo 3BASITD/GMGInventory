@@ -6,8 +6,8 @@ namespace GMGInventory.Application.Contracts
     {
         ForDataTables<PaymentVM> GetListDataTables(DataTablesRequestForm form);
 
-        ForDataTables<PaymentVM> GetListDataTablesDetails (DataTablesRequestForm form);
-
         PaymentVM? GetPaymentVM(int? id);
+
+        Task<ForDataTables<PaymentVM>> GetPaymentChecksDTAsync(DataTablesRequestForm form, int id);
     }
 }

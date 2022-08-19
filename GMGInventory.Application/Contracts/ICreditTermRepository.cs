@@ -10,5 +10,7 @@ namespace GMGInventory.Application.Contracts
         Task<List<CreditTerm>> GetAllActiveCreditTermAsync(int includeId);
         Task<bool> IsCreditTermCodeExist(int code);
         Task<bool> IsCreditTermInUse(int id);
+
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }
