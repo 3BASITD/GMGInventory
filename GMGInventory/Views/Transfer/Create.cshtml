@@ -43,35 +43,59 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-6">
-                    <h6>Source Warehouse Item(s)</h6>
-                    <table class="table table-head-fixed table-striped table-hover table-item-source">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Name</th>
-                                <th>Quantity</th>
-                                <th>Unit</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                    </table>
-                    <div class="col-12">
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-header bg-light source-name"></div>
+                        <div class="card-body p-3">
+                            <div class="form-group">
+                                <label for="source-code" class="form-label mb-0">Code</label>
+                                <select id="source-code" name="Code" class="form-control select2"></select>
+                                <span data-valmsg-for="source-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="source-name" class="form-label mb-0">Name</label>
+                                <input type="text" id="source-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="source-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="source-current-quantity" class="form-label mb-0">Current Quantity</label>
+                                <input type="number" min="0" max="1999999" id="source-current-quantity" name="CurrentQuantity" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="source-current-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="source-transfer-quantity" class="form-label mb-0">Transfer Quantity</label>
+                                <input type="number" min="0" max="1999999" id="source-transfer-quantity" name="TransferQuantity" class="form-control form-control-sm" />
+                                <span data-valmsg-for="source-transfer-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="source-unit" class="form-label mb-0">Unit</label>
+                                <input type="text" id="source-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-outline-warning">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-6">
-                    <h6>To Transfer Item(s)</h6>
-                    <table class="table table-head-fixed table-striped table-hover table-item-destination">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Name</th>
-                                <th>Quantity</th>
-                                <th>Unit</th>
-                            </tr>
-                        </thead>
-                    </table>
-                    <div class="col-12">
+                <div class="col-9">
+                    <div class="card">
+                        <div class="card-header bg-light destination-name"></div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item-destination">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Source Quantity</th>
+                                        <th>Transfer Quantity</th>
+                                        <th>Unit</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -85,7 +109,7 @@
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "Warehouse")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 warehouseOption = data;
                 // Load Select2 Source
                 $("#transfer-source").select2({
@@ -96,9 +120,9 @@
                 $("#transfer-destination").select2({
                     data: warehouseOption.filter(s => s.id !== $("#transfer-source").val())
                 });
-                sourceDT.ajax.reload();
+                ReloadTransferItemHeader();
 
-                $("#transfer-source").on("select2:select", function() {
+                $("#transfer-source").on("select2:select", function () {
                     if ($("#transfer-destination").attr("data-select2-id")) {
                         $("#transfer-destination").select2("destroy");
                         $("#transfer-destination").empty();
@@ -106,12 +130,69 @@
                     $("#transfer-destination").select2({
                         data: warehouseOption.filter(s => s.id !== $("#transfer-source").val())
                     });
-                    sourceDT.ajax.reload();
+                    ReloadTransferItemHeader();
+                });
+
+                $("#transfer-destination").on("select2:select", function () {
+                    ReloadTransferItemHeader();
                 });
             }
         });
 
-        var sourceDT = $('.table-item-source').on('preXhr.dt', function(e, settings, data) {
+        function ReloadTransferItemHeader() {
+            //sourceDT.ajax.reload();
+            LoadSourceItems();
+            $(".source-name").html($("#transfer-source option:selected").text() + "'s Available Item(s)");
+            $(".destination-name").html("Transfer Item(s) to " + $("#transfer-destination option:selected").text());
+        }
+
+        function LoadSourceItems() {
+            if ($("#source-code").attr("data-select2-id")) {
+                $("#source-code").select2("destroy");
+                $("#source-code").empty();
+            }
+            $("#source-code").select2({
+                minimumInputLength: 1,
+                placeholder: '<empty>',
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return (repo.text !== repo.name ? "(" + repo.text + ") " : "") + repo.name;
+                },
+                ajax: {
+                    url: "@Url.Action("GetInWarehouseOptions", "Item")",
+                    dataType: 'json',
+                    type: "POST",
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1,
+                            warehouse: $("#transfer-source").val()
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $("#source-code").on("select2:select", function () {
+                $("#source-name").val($("#source-code").select2("data")[0].name);
+                $("#source-current-quantity").val($("#source-code").select2("data")[0].quantity);
+                $("#source-transfer-quantity").val($("#source-code").select2("data")[0].quantity);
+                $("#source-unit").val($("#source-code").select2("data")[0].unit);
+            });
+        }
+
+        /*var sourceDT = $('.table-item-source').on('preXhr.dt', function(e, settings, data) {
             $.LoadingOverlay("show", {
                 image: "",
                 fontawesome: "fa fa-cog fa-spin"
@@ -123,7 +204,7 @@
                 data: function(data) {
                     data.WarehouseId = $("#transfer-source").val();
                 },
-                dataSrc: function (json) {
+                dataSrc: function(json) {
                     return JSON.parse(JSON.stringify(json));
                 }
             },
@@ -171,6 +252,6 @@
             filter: true,
             responsive: true,
             autoWidth: false
-        });
+        });*/
     </script>
         }

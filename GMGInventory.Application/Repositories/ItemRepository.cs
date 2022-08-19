@@ -22,20 +22,52 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(ItemFilterVM filter, int? IncludeId)
+        public async Task<ItemSelect2Model> GetOptions(string search, int page)
         {
-            return await context.Items
-                                .Where(s => (!filter.ActiveOnly || (filter.ActiveOnly && s.IsActive))
-                                    & (filter.CategoryId == null || s.CategoryId == filter.CategoryId)
-                                    & (filter.ItemTypeId == null || s.ItemTypeId == filter.ItemTypeId)
-                                    & (filter.BrandId == null || s.BrandId == filter.BrandId))
-                                .Select(s => new JsonOptionsModel
+            var items = await context.Items.Include(s=>s.Unit)
+                                .Where(s => string.IsNullOrWhiteSpace(search)
+                                         || (s.Code.ToLower().Contains(search.ToLower())))
+                                .Select(s => new JsonItemOptionsModel
                                 {
                                     Id = s.Id.ToString(),
-                                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
-                                    Selected = IncludeId != null && IncludeId == s.Id
+                                    Text = s.Code,
+                                    Name = s.Name,
+                                    Quantity = 0,
+                                    Unit = s.Unit.Code
                                 })
                                 .ToListAsync();
+            var itemsFiltered = items.Skip((page - 1) * 50).Take(50).ToList();
+            return new ItemSelect2Model
+            {
+                //incomplete_results = false,
+                items = itemsFiltered,
+                total_count = items.Count()
+            };
+        }
+
+        public async Task<ItemSelect2Model> GetInWarehouseOptions(string search, int warehouse, int page)
+        {
+            var items = await context.ItemInventories.Include(s => s.Item).ThenInclude(s=>s.Unit)
+                                .Where(s => s.WarehouseId == warehouse
+                                         && (string.IsNullOrWhiteSpace(search)
+                                         || (s.Item.Code.ToLower().Contains(search.ToLower()))
+                                         || (s.Item.Name.ToLower().Contains(search.ToLower()))))
+                                .Select(s => new JsonItemOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Item.Code,
+                                    Name = s.Item.Name,
+                                    Quantity = s.Quantity,
+                                    Unit = s.Item.Unit.Code
+                                })
+                                .ToListAsync();
+            var itemsFiltered = items.Skip((page - 1) * 50).Take(50).ToList();
+            return new ItemSelect2Model
+            {
+                //incomplete_results = false,
+                items = itemsFiltered,
+                total_count = items.Count()
+            };
         }
 
         public async Task<List<JsonOptionsModel>> GetUnitOptions(int? IncludeId)

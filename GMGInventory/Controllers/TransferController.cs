@@ -52,13 +52,6 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetSourceItemTransferJson(int warehouseId)
-        {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form); 
-            return Json(await itemTransferRepository.GetWarehouseItemsAsync(warehouseId));
-        }
-
-        [HttpPost]
         public async Task<JsonResult> CreateJson(TransferFormVM formVM)
         {
             ResponseModel responseModel = new ResponseModel();

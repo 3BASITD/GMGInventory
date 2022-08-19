@@ -46,10 +46,27 @@ namespace GMGInventory.Common.Models
         public string Message { get; set; }
         public T NewRow { get; set; }
     }
+
     public class JsonOptionsModel
     {
         public string Id { get; set; }
         public string Text { get; set; }
-        public bool Selected { get; set; }
+        public bool Selected { get; set; } = false;
+    }
+
+    public class JsonItemOptionsModel
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+        public string Name { get; set; }
+        public int Quantity { get; set; }
+        public string Unit { get; set; }
+    }
+
+    public class ItemSelect2Model
+    {
+        //public bool incomplete_results { get; set; }
+        public List<JsonItemOptionsModel> items { get; set; }
+        public int total_count { get; set; }
     }
 }

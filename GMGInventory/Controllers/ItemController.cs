@@ -26,9 +26,14 @@ namespace GMGInventory.Controllers
             this.warehouseRepository = warehouseRepository;
         }
 
-        public async Task<IActionResult> GetOptions(ItemFilterVM filter, int? IncludeId)
+        public async Task<IActionResult> GetOptions(string search, int page)
         {
-            return Json(await itemRepository.GetOptions(filter, IncludeId));
+            return Json(await itemRepository.GetOptions(search, page));
+        }
+
+        public async Task<IActionResult> GetInWarehouseOptions(string search, int warehouse, int page)
+        {
+            return Json(await itemRepository.GetInWarehouseOptions(search, warehouse, page));
         }
 
         public async Task<IActionResult> GetUnitOptions(int? IncludeId)

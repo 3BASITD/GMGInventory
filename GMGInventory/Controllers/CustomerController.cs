@@ -100,6 +100,16 @@ namespace GMGInventory.Controllers
             return View(cust);
         }
 
+        public ActionResult MoreDetails(int id)
+        {
+            var cust = customerRepository.GetCustomerVM(id); // gawa ka panibagong GetCustomerVM(id) na andun mga kailangan mo sa modal
+            if (cust == null)
+            {
+                return NotFound();
+            }
+            return Json(cust);
+        }
+
         [HttpPost]
         public async Task<JsonResult> GetCustomerJson(int id)
         {

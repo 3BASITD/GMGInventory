@@ -12,46 +12,46 @@
         <div class="card-header">
             <span class="card-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                <span class="fas fa-arrow-left"></span> Back to List
-                 </a>
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
                 <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
-                <span class="fas fa-plus"></span> Add Shipping Details 
+                    <span class="fas fa-plus"></span> Add Shipping Details
                 </button>
                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                <span class="fas fa-plus"></span> Add Forwarder Details
+                    <span class="fas fa-plus"></span> Add Forwarder Details
                 </button>
                 <button type="button" class="btn btn-primary btn-sm float-right editBtn ml-2" data-bs-toggle="modal" data-bs-target="#editModal">
-                <span class="fas fa-plus"></span> Edit Customer 
+                    <span class="fas fa-plus"></span> Edit Customer
                 </button>
 
+            </div>
         </div>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-4">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Code)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Code
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Regions)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Regions
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ContactPerson)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Code)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Code
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Regions)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Regions
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ContactPerson)
+                        </span>
+                        <b class="d-block">
+                            @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
                     </b>
                 </p>
                 <p class="text-sm">
@@ -67,7 +67,7 @@
                         @Html.DisplayNameFor(model => model.TIN)
                     </span>
                     <b class="d-block">
-                         @(string.IsNullOrWhiteSpace(Model?.TIN) ? "-" : Model?.TIN)
+                        @(string.IsNullOrWhiteSpace(Model?.TIN) ? "-" : Model?.TIN)
                     </b>
                 </p>
                 <p class="text-sm">
@@ -146,7 +146,7 @@
                         @Model?.CustomerTypes
                     </b>
                 </p>
-               <p class="text-sm">
+                <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Address)
                     </span>
@@ -154,7 +154,7 @@
                         @(string.IsNullOrWhiteSpace(Model?.Address) ? "-" : Model?.Address)
                     </b>
                 </p>
-               <p class="text-sm">
+                <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.FaxNumber)
                     </span>
@@ -167,7 +167,7 @@
                         @Html.DisplayNameFor(model => model.CreditTerms)
                     </span>
                     <b class="d-block">
-                       @Model?.CreditTerms
+                        @Model?.CreditTerms
                     </b>
                 </p>
             </div>
@@ -181,7 +181,7 @@
                                 <a class="nav-link active" id="nav-shipping-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-shipping"
                                    aria-controls="nav-shipping" aria-selected="true">
-                                   Shipping Details
+                                    Shipping Details
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -191,7 +191,7 @@
                                     Forwarder Details
                                 </a>
                             </li>
-                              <li class="nav-item">
+                            <li class="nav-item">
                                 <a class="nav-link" id="nav-receivables-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-receivables"
                                    aria-controls="nav-receivables" aria-selected="true">
@@ -205,7 +205,7 @@
                                     Payments
                                 </a>
                             </li>
-                           
+
                         </ul>
                     </div>
                     <div class="card-body">
@@ -231,12 +231,12 @@
                                             <th>Address</th>
                                             <th>Fax Number</th>
                                             <th>Phone Number</th>
-                                            
+
                                         </tr>
                                     </thead>
                                 </table>
                             </div>
-                             <div class="tab-pane fade" id="nav-receivables" role="tabpanel" aria-labelledby="nav-receivables-tab">
+                            <div class="tab-pane fade" id="nav-receivables" role="tabpanel" aria-labelledby="nav-receivables-tab">
                                 <table class="table table-head-fixed table-striped table-hover table-receivables">
                                     <thead>
                                         <tr>
@@ -266,7 +266,7 @@
 
 
                         </div>
-                
+
                     </div>
                 </div>
             </div>
@@ -290,7 +290,7 @@
             <form autocomplete="off" id="editForm">
                 <div class="modal-body">
                     <div class="row">
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-code" class="control-label mb-0 d-block">Customer Code</label>
                                 <input type="text" name="Code" id="edit-code" class="form-control form-control-sm" />
@@ -304,7 +304,7 @@
                                 <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                     
+
                     </div>
                     <div class="row">
                         <div class="col-md-4">
@@ -316,21 +316,21 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                              <label for="edit-area" class="control-label mb-0 d-block">Area</label>
-                                <select name="Area" id="edit-area" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-area" data-valmsg-replace="true" class="text-danger"></span>
+                            <label for="edit-area" class="control-label mb-0 d-block">Area</label>
+                            <select name="Area" id="edit-area" class="form-control" style="width: 100%">
+                            </select>
+                            <span data-valmsg-for="edit-area" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <label for="edit-customer-type" class="control-label mb-0 d-block">Customer Type</label>
-                                <select name="CustomerType" id="edit-customer-type" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-customer-type" data-valmsg-replace="true" class="text-danger"></span>
+                            <select name="CustomerType" id="edit-customer-type" class="form-control" style="width: 100%">
+                            </select>
+                            <span data-valmsg-for="edit-customer-type" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
-                       
+
                     </div>
                     <div class="row">
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-contact-person" class="control-label mb-0 d-block">Contact Person</label>
                                 <input type="text" name="ContactPerson" id="edit-contact-person" class="form-control form-control-sm" />
@@ -344,19 +344,19 @@
                                 <span data-valmsg-for="edit-contact-number" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                          <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-address" class="control-label mb-0 d-block">Address</label>
                                 <input type="text" name="Address" id="edit-address" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                       
+
                     </div>
                     <div class="row">
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
-                               <label for="edit-email" class="control-label mb-0 d-block">Email Address</label>
+                                <label for="edit-email" class="control-label mb-0 d-block">Email Address</label>
                                 <input type="text" name="Email" id="edit-email" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-email" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -376,10 +376,10 @@
                                 <span data-valmsg-for="edit-fax-number" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                       
+
                     </div>
                     <div class="row">
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-tin" class="control-label mb-0 d-block">TIN</label>
                                 <input type="text" name="TIN" id="edit-tin" class="form-control form-control-sm" />
@@ -388,12 +388,12 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                               <label for="edit-vat" class="control-label mb-0 d-block">VAT</label>
+                                <label for="edit-vat" class="control-label mb-0 d-block">VAT</label>
                                 <input type="text" name="VAT" id="edit-vat" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-vat" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-credit-term" class="control-label mb-0 d-block">Credit Term</label>
                                 <select name="CreditTerm" id="edit-credit-term" class="form-control" style="width: 100%">
@@ -403,7 +403,7 @@
                         </div>
                     </div>
                     <div class="row">
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="edit-credit-limit" class="control-label mb-0 d-block">Credit Limit</label>
                                 <input type="number" name="CreditLimit" id="edit-credit-limit" class="form-control form-control-sm" />
@@ -417,10 +417,10 @@
                                 <span data-valmsg-for="edit-remarks" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                      
+
                     </div>
                     <input type="hidden" id="edit-id" />
-                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
@@ -440,7 +440,7 @@
 
 
 <!-- Shipping Modal -->
-<div class="modal fade" id="shippingModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static" >
+<div class="modal fade" id="shippingModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog" style="max-width: 70%;" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -450,7 +450,7 @@
                 </button>
             </div>
             <form autocomplete="off" id="createForm">
-                <div class="modal-body" >
+                <div class="modal-body">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
@@ -466,12 +466,12 @@
                                 <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                         @*<div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-is-active" class="control-label mb-0 d-block">Is Active?</label>
-                                <input type="checkbox" name="IsActive" id="create-is-active" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-is-active" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
+                        @*<div class="col-md-4">
+                        <div class="form-group">
+                        <label for="create-is-active" class="control-label mb-0 d-block">Is Active?</label>
+                        <input type="checkbox" name="IsActive" id="create-is-active" class="form-control form-control-sm" />
+                        <span data-valmsg-for="create-is-active" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
                         </div>*@
                     </div>
                     <div class="row">
@@ -484,16 +484,16 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                              <label for="create-area" class="control-label mb-0 d-block">Area</label>
-                                <select name="Area" id="create-area" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-area" data-valmsg-replace="true" class="text-danger"></span>
+                            <label for="create-area" class="control-label mb-0 d-block">Area</label>
+                            <select name="Area" id="create-area" class="form-control" style="width: 100%">
+                            </select>
+                            <span data-valmsg-for="create-area" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
-                          <div class="col-md-4">
+                        <div class="col-md-4">
                             <label for="create-customer-type" class="control-label mb-0 d-block">Customer Type</label>
-                                <select name="CustomerType" id="create-customer-type" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-customer-type" data-valmsg-replace="true" class="text-danger"></span>
+                            <select name="CustomerType" id="create-customer-type" class="form-control" style="width: 100%">
+                            </select>
+                            <span data-valmsg-for="create-customer-type" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="row">
@@ -511,7 +511,7 @@
                                 <span data-valmsg-for="create-contact-number" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                          <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="create-address" class="control-label mb-0 d-block">Address</label>
                                 <input type="text" name="Address" id="create-address" class="form-control form-control-sm" />
@@ -522,7 +522,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                               <label for="create-email" class="control-label mb-0 d-block">Email</label>
+                                <label for="create-email" class="control-label mb-0 d-block">Email</label>
                                 <input type="text" name="Email" id="create-email" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-email" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -553,12 +553,12 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                               <label for="create-vat" class="control-label mb-0 d-block">VAT</label>
+                                <label for="create-vat" class="control-label mb-0 d-block">VAT</label>
                                 <input type="text" name="VAT" id="create-vat" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-vat" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="create-credit-term" class="control-label mb-0 d-block">Credit Term</label>
                                 <select name="CreditTerm" id="create-credit-term" class="form-control" style="width: 100%">
@@ -600,9 +600,9 @@
 
 @section Scripts {
     <script>
-     
 
-        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             var selectedTab = e.currentTarget.dataset.bsTarget;
             if (selectedTab == "#nav-shipping") shippingDT.ajax.reload();
             if (selectedTab == "#nav-forwarder") forwarderDT.ajax.reload();
@@ -629,11 +629,11 @@
             }
         }
 
-                // Load Select2 Region
+        // Load Select2 Region
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "Region")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 $("#create-region").select2({
                     data: data,
                     dropdownParent: $("#createModal")
@@ -649,7 +649,7 @@
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "Area")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 $("#create-area").select2({
                     data: data,
                     dropdownParent: $("#createModal")
@@ -665,7 +665,7 @@
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "CustomerType")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 $("#create-customer-type").select2({
                     data: data,
                     //theme: "bootstrap-5",
@@ -683,7 +683,7 @@
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "Agent")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 $("#create-agent").select2({
                     data: data,
                     dropdownParent: $("#createModal")
@@ -695,12 +695,12 @@
             }
         });
 
-        
+
         // Load Select2 Credit Term
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "CreditTerm")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 $("#create-credit-term").select2({
                     data: data,
                     dropdownParent: $("#createModal")
@@ -715,13 +715,13 @@
 
 
         //Shipping Details
-        var shippingDT = $('.table-shipping').on('preXhr.dt', function(e, settings, data) {
+        var shippingDT = $('.table-shipping').on('preXhr.dt', function (e, settings, data) {
             ShowLoader("shipping");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetShippingJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -733,16 +733,16 @@
             columns: [
                 { data: "shippingAddress", name: "ShippingAddress" },
                 { data: "shippingContactPerson", name: "ShippingContactPerson" },
-                { data: "shippingFaxNo", name: "ShippingFaxNo"},
-                { data: "shippingPhoneNo", name: "ShippingPhoneNo"},
-           
+                { data: "shippingFaxNo", name: "ShippingFaxNo" },
+                { data: "shippingPhoneNo", name: "ShippingPhoneNo" },
+
             ],
             order: [[0, "asc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             reloadToolTip();
 
             $('.table-shipping .dataTables_filter input').unbind();
-            $('.table-shipping .dataTables_filter input').keyup(function(e) {
+            $('.table-shipping .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
                     shippingDT.search($(this).val()).draw();
                 }
@@ -752,15 +752,15 @@
 
         });
 
-        
+
         // Forwarder Details
-        var forwarderDT = $('.table-forwarder').on('preXhr.dt', function(e, settings, data) {
+        var forwarderDT = $('.table-forwarder').on('preXhr.dt', function (e, settings, data) {
             ShowLoader("forwarder");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetForwarderJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -772,16 +772,16 @@
             columns: [
                 { data: "forwarderName", name: "ForwarderName" },
                 { data: "forwarderAddress", name: "ForwarderAddress" },
-                { data: "forwarderFaxNo", name: "ForwarderFaxNo"},
-                { data: "forwarderPhoneNo", name: "ForwarderPhoneNo"},
-           
+                { data: "forwarderFaxNo", name: "ForwarderFaxNo" },
+                { data: "forwarderPhoneNo", name: "ForwarderPhoneNo" },
+
             ],
             order: [[0, "asc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             reloadToolTip();
 
             $('.table-forwarder .dataTables_filter input').unbind();
-            $('.table-forwarder .dataTables_filter input').keyup(function(e) {
+            $('.table-forwarder .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
                     forwarderDT.search($(this).val()).draw();
                 }
@@ -792,13 +792,13 @@
         });
 
         // Payment Details
-        var paymentsDT = $('.table-payments').on('preXhr.dt', function(e, settings, data) {
+        var paymentsDT = $('.table-payments').on('preXhr.dt', function (e, settings, data) {
             ShowLoader("payments");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPaymentJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -810,20 +810,20 @@
             columns: [
                 { data: "crNo", name: "CRNo" },
                 { data: "soaNo", name: "SOANo" },
-                { data: "totalInvoiceAmount", name: "TotalInvoiceAmount"},
-                { data: "amountPaid", name: "AmountPaid"},
+                { data: "totalInvoiceAmount", name: "TotalInvoiceAmount" },
+                { data: "amountPaid", name: "AmountPaid" },
                 { data: "overPayment", name: "OverPayment" },
-                { data: "transactionDate", name: "TransactionDate"},
-                { data: "createdBy", name: "CreatedBy"},
-                { data: "remarks", name: "Remarks"},
-           
+                { data: "transactionDate", name: "TransactionDate" },
+                { data: "createdBy", name: "CreatedBy" },
+                { data: "remarks", name: "Remarks" },
+
             ],
             order: [[0, "asc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             reloadToolTip();
 
             $('.table-payments .dataTables_filter input').unbind();
-            $('.table-payments .dataTables_filter input').keyup(function(e) {
+            $('.table-payments .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
                     paymentsDT.search($(this).val()).draw();
                 }
@@ -835,13 +835,13 @@
 
 
         //  Receivable Details
-        var receivablesDT = $('.table-receivables').on('preXhr.dt', function(e, settings, data) {
+        var receivablesDT = $('.table-receivables').on('preXhr.dt', function (e, settings, data) {
             ShowLoader("receivables");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetReceivableJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -853,15 +853,15 @@
             columns: [
                 { data: "invoiceNo", name: "InvoiceNo" },
                 { data: "invoicedDate", name: "InvoicedDate" },
-                { data: "invoicedAmount", name: "InvoicedAmount"}
-           
+                { data: "invoicedAmount", name: "InvoicedAmount" }
+
             ],
             order: [[0, "asc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             reloadToolTip();
 
             $('.table-receivables .dataTables_filter input').unbind();
-            $('.table-receivables .dataTables_filter input').keyup(function(e) {
+            $('.table-receivables .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
                     receivablesDT.search($(this).val()).draw();
                 }
@@ -872,35 +872,36 @@
         });
 
 
-            
-   
-        $(".editBtn").click(function(e) {
-            var data = dataTable.row($(this).parents('tr')).data();
-               $.ajax({
-                      type: "POST",
-                      url: "@Url.Action("GetCustomerJson")",
-                      data: { Id: data.id },
-                      success: function(data, status, xhr) {
-                                $("#edit-code").val(data.code);
-                                $("#edit-area").val(data.areaId);
-                                $("#edit-customer-type").val(data.customerTypeId);
-                                $("#edit-contact-person").val(data.contactPerson);
-                                $("#edit-contact-number").val(data.contactNumber);
-                                $("#edit-address").val(data.address);
-                                $("#edit-agent").val(data.agentId).trigger("change");
-                                $("#edit-region").val(data.regionId).trigger("change");
-                                $("#edit-credit-term").val(data.creditTermId).trigger("change");
-                                $("#edit-area").val(data.areaId).trigger("change");
-                                $("#edit-customer-type").val(data.customerTypeId).trigger("change");
-                                $("#edit-email").val(data.email);
-                                $("#edit-fax-number").val(data.faxNumber);
-                                $("#edit-tin").val(data.tin);
-                                $("#edit-vat").val(data.vat);
-                                $("#edit-credit-limit").val(data.creditLimit);
-                                $("#edit-remarks").val(data.remarks);
-                      }
-               });
-              
+
+
+        $(".editBtn").click(function (e) {
+            //var data = dataTable.row($(this).parents('tr')).data();
+            $.ajax({
+                type: "POST",
+                //url: "@Url.Action("GetCustomerJson")",
+                url: "@Url.Action("MoreDetails")",
+                data: { Id: @Model?.Id },
+                success: function (data, status, xhr) {
+                    $("#edit-code").val(data.code);
+                    $("#edit-area").val(data.areaId);
+                    $("#edit-customer-type").val(data.customerTypeId);
+                    $("#edit-contact-person").val(data.contactPerson);
+                    $("#edit-contact-number").val(data.contactNumber);
+                    $("#edit-address").val(data.address);
+                    $("#edit-agent").val(data.agentId).trigger("change");
+                    $("#edit-region").val(data.regionId).trigger("change");
+                    $("#edit-credit-term").val(data.creditTermId).trigger("change");
+                    $("#edit-area").val(data.areaId).trigger("change");
+                    $("#edit-customer-type").val(data.customerTypeId).trigger("change");
+                    $("#edit-email").val(data.email);
+                    $("#edit-fax-number").val(data.faxNumber);
+                    $("#edit-tin").val(data.tin);
+                    $("#edit-vat").val(data.vat);
+                    $("#edit-credit-limit").val(data.creditLimit);
+                    $("#edit-remarks").val(data.remarks);
+                }
+            });
+
         });
 
 
@@ -924,9 +925,9 @@
                 Email: { maxlength: "Email number must not exceed 50 characters." },
                 Address: { required: "Please enter address.", maxlength: "Address must not exceed 50 characters." },
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
-                
+
             },
-            submitHandler: function(form) {
+            submitHandler: function (form) {
                 DoEdit();
                 return false;
             }
@@ -968,24 +969,24 @@
         //    });
         //}
 
-      
 
-         
-         // Actions upon Display Shipping Modal
-        $(".shippingBtn").click(function(e) {
-             var data = dataTable.row($(this).parents('tr')).data();
-                $("#shipping-code").val("");
+
+
+        // Actions upon Display Shipping Modal
+        $(".shippingBtn").click(function (e) {
+            var data = shippingDT.row($(this).parents('tr')).data();
+            $("#shipping-code").val("");
         });
 
-        
-   
 
-        //// load functions upon datatable load
-        //datatable.on("draw", function() {
-        //    $.loadingoverlay("hide");
-        //});
-        
 
-        
+
+                //// load functions upon datatable load
+                //datatable.on("draw", function() {
+                //    $.loadingoverlay("hide");
+                //});
+
+
+
     </script>
 }
