@@ -23,27 +23,6 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<IList<WarehouseTransferVM>> GetWarehouseTransfersAsync()
-        {
-            var transferVM = (from transfer in context.TransferItems
-                                                      .Include(s => s.TransferItemDetails)
-                                                      .Include(s => s.Source)
-                                                      .Include(s => s.Destination)
-                              join user in userManager.Users on transfer.UserCreated equals user.Id
-                              select new WarehouseTransferVM
-                              {
-                                  Destination = transfer.Destination.Name,
-                                  Id = transfer.Id,
-                                  ItemCount = transfer.TransferItemDetails.Count,
-                                  Remarks = transfer.Remarks,
-                                  Source = transfer.Source.Name,
-                                  TransferBy = user.Nickname,
-                                  TransferDate = transfer.DateCreated.ToString(SystemFormat.StringDateTime),
-                                  TransferDateD = transfer.DateCreated
-                              });
-            return await transferVM.ToListAsync();
-        }
-
         public async Task<TransferVM?> GetTransferVMAsync(int? Id)
         {
             var transferVM = (from transfer in context.TransferItems
@@ -58,17 +37,36 @@ namespace GMGInventory.Application.Repositories
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
                                   TransferBy = user.Nickname,
-                                  TransferDate = transfer.DateCreated.ToString(SystemFormat.StringDateTime),
                                   TransferDateD = transfer.DateCreated
                               });
             return await transferVM.FirstOrDefaultAsync();
         }
 
-        public async Task<ForDataTables<WarehouseTransferVM>> GetWarehouseTransfersDataTablesAsync(DataTablesRequestForm form)
+        private async Task<IList<WarehouseTransferVM>> GetWarehouseTransfersAsync()
+        {
+            var transferVM = (from transfer in context.TransferItems
+                                                      .Include(s => s.TransferItemDetails)
+                                                      .Include(s => s.Source)
+                                                      .Include(s => s.Destination)
+                              join user in userManager.Users on transfer.UserCreated equals user.Id
+                              select new WarehouseTransferVM
+                              {
+                                  Destination = transfer.Destination.Name,
+                                  Id = transfer.Id,
+                                  ItemCount = transfer.TransferItemDetails.Count,
+                                  Remarks = transfer.Remarks,
+                                  Source = transfer.Source.Name,
+                                  TransferBy = user.Nickname,
+                                  TransferDateD = transfer.DateCreated
+                              });
+            return await transferVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<WarehouseTransferVM>> GetWarehouseTransfersDTAsync(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data =(await  GetWarehouseTransfersAsync()).AsQueryable();
+            var data = (await GetWarehouseTransfersAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -127,7 +125,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<ItemTransferVM>> GetItemTransfersAsync()
+        private async Task<IList<ItemTransferVM>> GetItemTransfersAsync()
         {
             var transferVM = (from transfer in context.TransferItemDetails
                                                       .Include(s => s.TransferItem).ThenInclude(s => s.Source)
@@ -144,14 +142,13 @@ namespace GMGInventory.Application.Repositories
                                   Remarks = transfer.TransferItem.Remarks,
                                   Source = transfer.TransferItem.Source.Code,
                                   TransferBy = user.Nickname,
-                                  TransferDate = transfer.DateCreated.ToString(SystemFormat.StringDateTime),
                                   TransferDateD = transfer.DateCreated,
                                   Unit = transfer.Item.Unit.Code
                               });
             return await transferVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<ItemTransferVM>> GetItemTransfersDataTablesAsync(DataTablesRequestForm form, int? TransferId)
+        public async Task<ForDataTables<ItemTransferVM>> GetItemTransfersDTAsync(DataTablesRequestForm form, int? TransferId)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -215,6 +212,98 @@ namespace GMGInventory.Application.Repositories
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
             return new ForDataTables<ItemTransferVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+        public async Task AddAsync(TransferFormVM formVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var transferVM = new TransferItem
+            {
+                DestinationId = formVM.Destination,
+                Remarks = formVM.Remarks,
+                SourceId = formVM.Source
+            };
+            await context.TransferItems.AddAsync(transferVM);
+            await context.SaveChangesAsync(currentUserId);
+            var itemsVM = formVM.Items.Select(s => new TransferItemDetail
+            {
+                ItemId = s.Id,
+                Quantity = s.Quantity,
+                TransferItemId = transferVM.Id
+            });
+            await context.AddRangeAsync(itemsVM);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task<IList<NewTransferSourceVM>> GetWarehouseItemsAsync(int warehouseId)
+        {
+            var itemsVM = context.ItemInventories
+                                 .Include(s => s.Item).ThenInclude(s => s.Unit)
+                                 .Include(s => s.Warehouse)
+                                 .Where(s=>s.WarehouseId == warehouseId)
+                                 .Select(s => new NewTransferSourceVM
+                                 {
+                                     Code = s.Item.Code,
+                                     Id = s.Item.Id,
+                                     Name = s.Item.Name,
+                                     Quantity = s.Quantity,
+                                     Unit = s.Item.Unit.Code
+                                 });
+            return await itemsVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<NewTransferSourceVM>> GetWarehouseItemsDTAsync(DataTablesRequestForm form, int warehouseId)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetWarehouseItemsAsync(warehouseId)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                    || x.Name.ToLower().Contains(form.SearchValue)
+                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.Unit.ToLower().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderBy(s => s.Code); break;
+                        case "Name": data = data.OrderBy(s => s.Name); break;
+                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "Unit": data = data.OrderBy(s => s.Unit); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderByDescending(s => s.Code); break;
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<NewTransferSourceVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,

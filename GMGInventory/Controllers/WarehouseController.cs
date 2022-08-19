@@ -18,6 +18,11 @@ namespace GMGInventory.Controllers
             this.itemRepository = itemRepository;
         }
 
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await warehouseRepository.GetOptions(IncludeId));
+        }
+
         public async Task<ActionResult> Index()
         {
             var warehouses = await warehouseRepository.GetAllAsync();

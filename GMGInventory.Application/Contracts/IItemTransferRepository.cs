@@ -4,10 +4,11 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IItemTransferRepository
     {
-        Task<IList<WarehouseTransferVM>> GetWarehouseTransfersAsync();
         Task<TransferVM?> GetTransferVMAsync(int? Id);
-        Task<ForDataTables<WarehouseTransferVM>> GetWarehouseTransfersDataTablesAsync(DataTablesRequestForm form);
-        Task<IList<ItemTransferVM>> GetItemTransfersAsync();
-        Task<ForDataTables<ItemTransferVM>> GetItemTransfersDataTablesAsync(DataTablesRequestForm form, int? TransferId);
+        Task<ForDataTables<WarehouseTransferVM>> GetWarehouseTransfersDTAsync(DataTablesRequestForm form);
+        Task<ForDataTables<ItemTransferVM>> GetItemTransfersDTAsync(DataTablesRequestForm form, int? TransferId);
+        Task AddAsync(TransferFormVM formVM);
+        Task<IList<NewTransferSourceVM>> GetWarehouseItemsAsync(int warehouseId);
+        Task<ForDataTables<NewTransferSourceVM>> GetWarehouseItemsDTAsync(DataTablesRequestForm form, int warehouseId);
     }
 }

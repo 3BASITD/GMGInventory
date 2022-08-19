@@ -5,6 +5,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IWarehouseRepository
     {
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
         Task<WarehouseViewVM?> GetAsync(int? id);
         Task<WarehouseFormVM?> GetToEditAsync(int? id);
         Task<List<WarehouseViewVM>> GetAllAsync();

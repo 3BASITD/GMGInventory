@@ -415,7 +415,7 @@
             ]
         });
 
-        dataTable.on("xhr.dt", function() {
+        dataTable.on("init.dt", function() {
             reloadToolTip();
 
             $('.dataTables_filter input').unbind();
@@ -460,7 +460,7 @@
                     }
                 });
             });
-
+            
             // Actions upon Display Edit Modal
             $(".editBtn").click(function(e) {
                 var data = dataTable.row($(this).parents('tr')).data();

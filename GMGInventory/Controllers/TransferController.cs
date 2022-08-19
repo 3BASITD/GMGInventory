@@ -26,7 +26,7 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> GetWarehouseTransferJson()
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await itemTransferRepository.GetWarehouseTransfersDataTablesAsync(form));
+            return Json(await itemTransferRepository.GetWarehouseTransfersDTAsync(form));
         }
 
         public async Task<ActionResult> Details(int? Id)
@@ -43,25 +43,29 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> GetItemTransferJson(int? TransferId)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await itemTransferRepository.GetItemTransfersDataTablesAsync(form, TransferId));
+            return Json(await itemTransferRepository.GetItemTransfersDTAsync(form, TransferId));
         }
 
-        //[HttpPost]
-        //public async Task<JsonResult> UpdateJson(int? Id, decimal RetailPrice, decimal NetPrice)
-        //{
-        //    ResponseModel responseModel = new ResponseModel();
-        //    var update = await itemPriceRepository.UpdateAsync(Id, RetailPrice, NetPrice);
-        //    if (update == null)
-        //    {
-        //        responseModel.Status = "Error";
-        //        responseModel.Message = "Item cannot be found";
-        //    }
-        //    else
-        //    {
-        //        responseModel.Status = "Success";
-        //        responseModel.Message = "Item Price successfully updated";
-        //    }
-        //    return Json(responseModel);
-        //}
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetSourceItemTransferJson(int warehouseId)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form); 
+            return Json(await itemTransferRepository.GetWarehouseItemsAsync(warehouseId));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreateJson(TransferFormVM formVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            await itemTransferRepository.AddAsync(formVM);
+            responseModel.Status = "Success";
+            responseModel.Message = "Transfer successfully added";
+            return Json(responseModel);
+        }
     }
 }
