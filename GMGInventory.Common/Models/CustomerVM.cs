@@ -157,6 +157,24 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Remarks")]
         public string PaymentRemarks { get; set; }
 
+        [Required]
+        [Display(Name = "Area")]
+        public string AreaName { get; set; }
+
+        [Required]
+        [Display(Name = "Credit Term")]
+        public string CreditTermName { get; set; }
+
+        [Required]
+        [Display(Name = "Customer Type")]
+        public string CustomerTypeName { get; set; }
+
+        [Required]
+        [Display(Name = "Region")]
+        public string RegionName { get; set; }
+
+
+
 
 
     }

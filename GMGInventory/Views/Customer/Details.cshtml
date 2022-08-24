@@ -5,7 +5,7 @@
 }
 
 @section Breadcrumb {
-    <li class="breadcrumb-item"><a asp-controller="Customer" asp-action="Index">Items</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Customer" asp-action="Index">Customers</a></li>
 }
 
     <div class="card card-default">
@@ -18,11 +18,11 @@
                 <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
                     <span class="fas fa-plus"></span> Add Shipping Details
                 </button>
-                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                <button type="button" class="btn btn-primary btn-sm float-right forwarderBtn ml-2" data-bs-toggle="modal" data-bs-target="#forwarderModal">
                     <span class="fas fa-plus"></span> Add Forwarder Details
                 </button>
                 <button type="button" class="btn btn-primary btn-sm float-right editBtn ml-2" data-bs-toggle="modal" data-bs-target="#editModal">
-                    <span class="fas fa-plus"></span> Edit Customer
+                    <span class="fas fa-edit"></span> Edit Customer
                 </button>
 
             </div>
@@ -40,10 +40,10 @@
                     </p>
                     <p class="text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Regions)
+                            @Html.DisplayNameFor(model => model.RegionName)
                         </span>
                         <b class="d-block">
-                            @Model?.Regions
+                            @Model?.RegionName
                         </b>
                     </p>
                     <p class="text-sm">
@@ -90,10 +90,10 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Areas)
+                        @Html.DisplayNameFor(model => model.AreaName)
                     </span>
                     <b class="d-block">
-                        @Model?.Areas
+                        @Model?.AreaName
                     </b>
                 </p>
                 <p class="text-sm">
@@ -135,15 +135,24 @@
                         @Html.DisplayNameFor(model => model.IsActive)
                     </span>
                     <b class="d-block">
-                        @Model?.IsActive
+                         
+                    @if (Model?.IsActive == true)
+           
+                            {
+                                <span class="fas fa-check text-success"></span>
+                            }
+                            else
+                            {
+                                <span class="fas fa-times text-danger"></span>
+                            }
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CustomerTypes)
+                        @Html.DisplayNameFor(model => model.CustomerTypeName)
                     </span>
                     <b class="d-block">
-                        @Model?.CustomerTypes
+                        @Model?.CustomerTypeName
                     </b>
                 </p>
                 <p class="text-sm">
@@ -164,10 +173,10 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CreditTerms)
+                        @Html.DisplayNameFor(model => model.CreditTermName)
                     </span>
                     <b class="d-block">
-                        @Model?.CreditTerms
+                        @Model?.CreditTermName
                     </b>
                 </p>
             </div>
@@ -440,8 +449,8 @@
 
 
 <!-- Shipping Modal -->
-<div class="modal fade" id="shippingModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" style="max-width: 70%;" role="document">
+<div class="modal fade" id="shippingModal" role="dialog" aria-labelledby="createshippingModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Shipping Details</h5>
@@ -449,140 +458,121 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form autocomplete="off" id="createForm">
+            <form autocomplete="off" id="shippingForm">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-code" class="control-label mb-0 d-block">Customer Code</label>
-                                <input type="text" name="Code" id="create-code" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-shipping-address" class="control-label mb-0 d-block">Address</label>
+                                <input type="text" name="ShippingAddress" id="create-shipping-address" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-shipping-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-name" class="control-label mb-0 d-block">Customer Name</label>
-                                <input type="text" name="Name" id="create-name" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        @*<div class="col-md-4">
-                        <div class="form-group">
-                        <label for="create-is-active" class="control-label mb-0 d-block">Is Active?</label>
-                        <input type="checkbox" name="IsActive" id="create-is-active" class="form-control form-control-sm" />
-                        <span data-valmsg-for="create-is-active" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        </div>*@
+                     
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-region" class="control-label mb-0 d-block">Region</label>
-                                <select name="Region" id="create-region" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-region" data-valmsg-replace="true" class="text-danger"></span>
+                             <label for="create-shipping-cperson" class="control-label mb-0 d-block">Contact Person</label>
+                                <input type="text" name="ShippingContactPerson" id="create-shipping-cperson" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-shipping-cperson" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label for="create-area" class="control-label mb-0 d-block">Area</label>
-                            <select name="Area" id="create-area" class="form-control" style="width: 100%">
-                            </select>
-                            <span data-valmsg-for="create-area" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="create-customer-type" class="control-label mb-0 d-block">Customer Type</label>
-                            <select name="CustomerType" id="create-customer-type" class="form-control" style="width: 100%">
-                            </select>
-                            <span data-valmsg-for="create-customer-type" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
+                       
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-contact-person" class="control-label mb-0 d-block">Contact Person</label>
-                                <input type="text" name="ContactPerson" id="create-contact-person" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-contact-person" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-shipping-cnumber" class="control-label mb-0 d-block">Phone Number</label>
+                                <input type="text" name="ShippingPhoneNo" id="create-shipping-cnumber" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-shipping-cnumber" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-contact-number" class="control-label mb-0 d-block">Contact Number</label>
-                                <input type="text" name="ContactNumber" id="create-contact-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-contact-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-address" class="control-label mb-0 d-block">Address</label>
-                                <input type="text" name="Address" id="create-address" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-address" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
+                        
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-email" class="control-label mb-0 d-block">Email</label>
-                                <input type="text" name="Email" id="create-email" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-email" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-shipping-fnumber" class="control-label mb-0 d-block">Fax Number</label>
+                                <input type="text" name="ShippingFaxNo" id="create-shipping-fnumber" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-shipping-fnumber" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        
+                    </div>
+                   
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Forwarder Modal -->
+<div class="modal fade" id="forwarderModal" role="dialog" aria-labelledby="createforwarderModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Forwarder Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="forwarderForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-agent" class="control-label mb-0 d-block">Agent Name</label>
-                                <select name="Agent" id="create-agent" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-agent" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-forwarder-name" class="control-label mb-0 d-block">Name</label>
+                                <input type="text" name="ForwarderName" id="create-forwarder-name" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-forwarder-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-fax-number" class="control-label mb-0 d-block">Fax Number</label>
-                                <input type="text" name="FaxNumber" id="create-fax-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-fax-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
+                     
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-tin" class="control-label mb-0 d-block">TIN</label>
-                                <input type="text" name="TIN" id="create-tin" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-tin" data-valmsg-replace="true" class="text-danger"></span>
+                             <label for="create-forwarder-address" class="control-label mb-0 d-block">Address</label>
+                                <input type="text" name="ForwarderAddress" id="create-forwarder-address" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-forwarder-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-vat" class="control-label mb-0 d-block">VAT</label>
-                                <input type="text" name="VAT" id="create-vat" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-vat" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-credit-term" class="control-label mb-0 d-block">Credit Term</label>
-                                <select name="CreditTerm" id="create-credit-term" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-credit-term" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
+                       
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-credit-limit" class="control-label mb-0 d-block">Credit Limit</label>
-                                <input type="number" name="CreditLimit" id="create-credit-limit" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-credit-limit" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-forwarder-cnumber" class="control-label mb-0 d-block">Phone Number</label>
+                                <input type="text" name="ForwarderPhoneNo" id="create-forwarder-cnumber" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-forwarder-cnumber" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
-                                <input name="Remarks" id="create-remarks" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-remarks" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
+                        
                     </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="create-forwarder-fnumber" class="control-label mb-0 d-block">Fax Number</label>
+                                <input type="text" name="ForwarderFaxNo" id="create-forwarder-fnumber" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-forwarder-fnumber" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                   
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
@@ -884,6 +874,7 @@
                 success: function (data, status, xhr) {
                     $("#edit-code").val(data.code);
                     $("#edit-area").val(data.areaId);
+                    $("#edit-name").val(data.name);
                     $("#edit-customer-type").val(data.customerTypeId);
                     $("#edit-contact-person").val(data.contactPerson);
                     $("#edit-contact-number").val(data.contactNumber);
@@ -902,7 +893,7 @@
                 }
             });
 
-        });
+            });
 
 
         // Validation for Edit Modal
@@ -934,51 +925,154 @@
         });
 
 
-        // // Send Edit to Controller
-        //function DoEdit() {
-        //    $.ajax({
-        //        type: "POST",
-        //        url: "@Url.Action("EditJson")",
-        //        data: {
-        //            Code: $("#edit-code").(data.code),
-        //            Name: $("#edit-name").val(),
-        //            AreaId: $("#edit-area").val(),
-        //            CustomerTypeId: $("#edit-customer-type").val(),
-        //            ContactPerson: $("#edit-contact-person").val(),
-        //            ContactNumber: $("#edit-contact-number").val(),
-        //            Address: $("#edit-address").val(),
-        //            Email: $("#edit-email").val(),
-        //            AgentId: $("#edit-agent").val(),
-        //            FaxNumber: $("#edit-fax-number").val(),
-        //            TIN: $("#edit-tin").val(),
-        //            VAT: $("#edit-vat").val(),
-        //            CreditTermId: $("#edit-credit-term").val(),
-        //            CreditLimit: $("#edit-credit-limit").val(),
-        //            Remarks: $("#edit-remarks").val()
-        //        },
-        //        error: jQueryCommonError,
-        //        success: function(data, status, xhr) {
-        //            if (data.status == "Error") {
-        //                toastr.error(data.message, "Error");
-        //            } else {
-        //                toastr.success(data.message, "Success");
-        //                $("#editModal").modal("hide");
-        //                dataTable.ajax.reload();
-        //            }
-        //        }
-        //    });
-        //}
+         // Send Edit to Controller
+        function DoEdit() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("EditJson")",
+                data: {
+                    Code: $("#edit-code").val(),
+                    Name: $("#edit-name").val(),
+                    AreaId: $("#edit-area").val(),
+                    CustomerTypeId: $("#edit-customer-type").val(),
+                    ContactPerson: $("#edit-contact-person").val(),
+                    ContactNumber: $("#edit-contact-number").val(),
+                    Address: $("#edit-address").val(),
+                    Email: $("#edit-email").val(),
+                    AgentId: $("#edit-agent").val(),
+                    FaxNumber: $("#edit-fax-number").val(),
+                    TIN: $("#edit-tin").val(),
+                    VAT: $("#edit-vat").val(),
+                    CreditTermId: $("#edit-credit-term").val(),
+                    CreditLimit: $("#edit-credit-limit").val(),
+                    Remarks: $("#edit-remarks").val()
+                },
+                error: jQueryCommonError,
+                success: function(data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#editModal").modal("hide");
+                        dataTable.ajax.reload();
+                    }
+                }
+            });
+        }
 
 
 
 
-        // Actions upon Display Shipping Modal
-        $(".shippingBtn").click(function (e) {
-            var data = shippingDT.row($(this).parents('tr')).data();
-            $("#shipping-code").val("");
+       // Actions upon Display Shipping Modal
+        $(".shippingBtn").click(function(e) {
+            $("#create-shipping-address").val("");
+            $("#create-shipping-cperson").val("");
+            $("#create-shipping-cnumber").val("");
+            $("#create-shipping-fnumber").val("");
+       
         });
 
+        // Validation for Shipping Modal
+        var validateShipping = $("#shippingForm").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                ShippingAddress: { maxlength: 50 },
+                ShippingPhoneNo: { maxlength: 50 },
+                ShippingContactPerson: { maxlength: 50 },
+                ShippingFaxNo: { maxlength: 50 }
+            },
+            messages: {
+                ShippingAddress: { maxlength: "Address number must not exceed 50 characters." },
+                ShippingContactPerson: { maxlength: "Contact Person number must not exceed 50 characters." },
+                ShippingPhoneNo: { maxlength: "Contact Number number must not exceed 50 characters." },
+                ShippingFaxNo: { maxlength: "Fax Number number must not exceed 50 characters." }
 
+            },
+            submitHandler: function(form) {
+                DoShipping();
+                return false;
+            }
+        });
+
+        // Send Shipping to Controller
+        function DoShipping() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CreateShippingJson")",
+                data: {
+                    ShippingAddress: $("#create-shipping-address").val(),
+                    ShippingPhoneNo: $("#create-shipping-cnumber").val(),
+                    ShippingContactPerson: $("#create-shipping-cperson").val(),
+                    ShippingFaxNo: $("#create-shipping-fnumber").val()
+                },
+                error: jQueryCommonError,
+                success: function(data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#shippingModal").modal("hide");
+                        dataTable.ajax.reload();
+                    }
+                }
+            });
+        }
+
+        
+       // Actions upon Display Forwarder Modal
+        $(".forwarderBtn").click(function(e) {
+            $("#create-forwarder-address").val("");
+            $("#create-forwarder-name").val("");
+            $("#create-forwarder-cnumber").val("");
+            $("#create-forwarder-fnumber").val("");
+       
+        });
+
+        // Validation for Forwarder Modal
+        var validateForwarder = $("#forwarderForm").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                ForwarderAddress: { maxlength: 50 },
+                ForwarderPhoneNo: { maxlength: 50 },
+                ForwarderName: { maxlength: 50 },
+                ForwarderFaxNo: { maxlength: 50 }
+            },
+            messages: {
+                ForwarderAddress: { maxlength: "Address number must not exceed 50 characters." },
+                ForwarderName: { maxlength: "Name number must not exceed 50 characters." },
+                ForwarderPhoneNo: { maxlength: "Contact Number number must not exceed 50 characters." },
+                ForwarderFaxNo: { maxlength: "Fax Number number must not exceed 50 characters." }
+
+            },
+            submitHandler: function(form) {
+                DoForwarder();
+                return false;
+            }
+        });
+
+        // Send Forwarder to Controller
+        function DoForwarder() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CreateForwarderJson")",
+                data: {
+                    ForwarderAddress: $("#create-forwarder-address").val(),
+                    ForwarderPhoneNo: $("#create-forwarder-cnumber").val(),
+                    ForwarderName: $("#create-forwarder-name").val(),
+                    ForwarderFaxNo: $("#create-forwarder-fnumber").val()
+                },
+                error: jQueryCommonError,
+                success: function(data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#forwarderModal").modal("hide");
+                        dataTable.ajax.reload();
+                    }
+                }
+            });
+        }
 
 
                 //// load functions upon datatable load

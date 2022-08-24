@@ -66,6 +66,28 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<JsonResult> CreateShippingJson(CustomerVM shippingVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+                await customerRepository.AddShippingAsync(shippingVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Shipping successfully added";
+            
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreateForwarderJson(CustomerVM forwarderVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            await customerRepository.AddForwarderAsync(forwarderVM);
+            responseModel.Status = "Success";
+            responseModel.Message = "Forwarder successfully added";
+
+            return Json(responseModel);
+        }
+
+        [HttpPost]
         public async Task<JsonResult> EditJson(CustomerVM custVM)
         {
             ResponseModel responseModel = new ResponseModel();
@@ -92,7 +114,7 @@ namespace GMGInventory.Controllers
         }
         public ActionResult Details(int id)
         {
-            var cust = customerRepository.GetCustomerVM(id);
+            var cust = customerRepository.GetCustomerDtlVM(id);
             if (cust == null)
             {
                 return NotFound();
@@ -102,7 +124,7 @@ namespace GMGInventory.Controllers
 
         public ActionResult MoreDetails(int id)
         {
-            var cust = customerRepository.GetCustomerVM(id); // gawa ka panibagong GetCustomerVM(id) na andun mga kailangan mo sa modal
+            var cust = customerRepository.GetCustomerDtlVM(id); // gawa ka panibagong GetCustomerVM(id) na andun mga kailangan mo sa modal
             if (cust == null)
             {
                 return NotFound();
