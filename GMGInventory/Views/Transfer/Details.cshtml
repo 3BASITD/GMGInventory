@@ -90,7 +90,7 @@
 
 @section Scripts {
     <script>
-        var dataTable = $('.table-item').on('preXhr.dt', function(e, settings, data) {
+        var itemDT = $('.table-item').on('preXhr.dt', function(e, settings, data) {
             $.LoadingOverlay("show", {
                 image: "",
                 fontawesome: "fa fa-cog fa-spin"
@@ -114,13 +114,13 @@
             order: [[0, "asc"]]
         });
 
-        dataTable.on("draw", function() {
+        itemDT.on("draw", function() {
             reloadToolTip();
 
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function(e) {
+            $('.table-item .dataTables_filter input').unbind();
+            $('.table-item .dataTables_filter input').keyup(function(e) {
                 if (e.keyCode == 13) {
-                    dataTable.search($(this).val()).draw();
+                    itemDT.search($(this).val()).draw();
                 }
             });
 

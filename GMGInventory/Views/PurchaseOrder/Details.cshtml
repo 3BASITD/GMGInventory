@@ -1,0 +1,173 @@
+﻿@model PurchaseOrderDetailsVM
+
+@{
+    ViewData["Title"] = "Replenishment Details";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Replenish" asp-action="Index">Replenish Orders</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Supplier)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Supplier
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Address1)
+                        </span>
+                        <b class="d-block">
+                        @(string.IsNullOrEmpty(Model?.Address1.Trim()) ? "-" : Model.Address1)
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Address2)
+                        </span>
+                        <b class="d-block">
+                        @(string.IsNullOrEmpty(Model?.Address2.Trim()) ? "-" : Model.Address2)
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Destination)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Destination
+                        </b>
+                    </p>
+                </div>
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.OrderDate)
+                        </span>
+                        <b class="d-block">
+                            @Model?.OrderDate
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Currency)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Currency
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CurrencyRate)
+                        </span>
+                        <b class="d-block">
+                            @Model?.CurrencyRate
+                        </b>
+                    </p>
+                </div>
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.OrderBy)
+                        </span>
+                        <b class="d-block">
+                            @Model?.OrderBy
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.PONumber)
+                        </span>
+                        <b class="d-block">
+                            @Model?.PONumber
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ReferenceNumber)
+                        </span>
+                        <b class="d-block">
+                        @(string.IsNullOrEmpty(Model?.ReferenceNumber.Trim()) ? "-" : Model.ReferenceNumber)
+                        </b>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <table class="table table-head-fixed table-striped table-hover table-item">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Unit Price</th>
+                            <th>Discount 1</th>
+                            <th>Discount 2</th>
+                            <th>Gross Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+@section Scripts {
+    <script>
+        var itemDT = $('.table-item').on('preXhr.dt', function(e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemsDTJson")",
+                data: { purchaseOrderId: @Model?.Id },
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "unit", name: "Unit" },
+                { data: "unitPrice", name: "UnitPrice", className: "text-end" },
+                { data: "discount1", name: "Discount1", className: "text-end" },
+                { data: "discount2", name: "Discount2", className: "text-end" },
+                { data: "grossPrice", name: "GrossPrice", className: "text-end" }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        itemDT.on("draw", function () {
+            reloadToolTip();
+
+            $('.dataTables_filter input').unbind();
+            $('.dataTables_filter input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    itemDT.search($(this).val()).draw();
+                }
+            });
+
+            $.LoadingOverlay("hide");
+        });
+    </script>
+}

@@ -370,28 +370,9 @@
             if (selectedTab == "#nav-return") returnDT.ajax.reload();
         });
 
-        var loaderDisplayed = [];
-
-        function ShowLoader(mod) {
-            if (loaderDisplayed.length === 0) {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            }
-            loaderDisplayed.push(mod);
-        }
-
-        function HideLoader(mod) {
-            loaderDisplayed = loaderDisplayed.filter(s => s !== mod);
-            if (loaderDisplayed.length === 0) {
-                $.LoadingOverlay("hide");
-            }
-        }
-
         // Warehouse Details
         var warehouseDT = $('.table-warehouse').on('preXhr.dt', function(e, settings, data) {
-            ShowLoader("warehouse");
+            ShowTabLoader("warehouse");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehousesJson")",
@@ -429,7 +410,7 @@
                 }
             });
 
-            HideLoader("warehouse");
+            HideTabLoader("warehouse");
 
             // Actions upon Display Edit Quantity Modal
             $(".quantityBtn").click(function(e) {
@@ -489,7 +470,7 @@
 
         // Purchase Order Details
         var purchaseDT = $('.table-purchase').on('preXhr.dt', function(e, settings, data) {
-            ShowLoader("purchase");
+            ShowTabLoader("purchase");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPurchasesJson")",
@@ -519,7 +500,7 @@
             ],
             order: [[9, "desc"]]
         }).on("draw.dt", function() {
-            HideLoader("purchase");
+            HideTabLoader("purchase");
             
             $('.table-purchase .dataTables_filter input').unbind();
             $('.table-purchase .dataTables_filter input').keyup(function(e) {
@@ -532,7 +513,7 @@
 
         // Sales Order Details
         var salesDT = $('.table-sales').on('preXhr.dt', function(e, settings, data) {
-            ShowLoader("sales");
+            ShowTabLoader("sales");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetSalesJson")",
@@ -561,7 +542,7 @@
             ],
             order: [[9, "desc"]]
         }).on("draw.dt", function() {
-            HideLoader("sales");
+            HideTabLoader("sales");
 
             $('.table-sales .dataTables_filter input').unbind();
             $('.table-sales .dataTables_filter input').keyup(function(e) {
@@ -574,7 +555,7 @@
 
         // Physical Count Adjustment
         var countDT = $('.table-count').on('preXhr.dt', function(e, settings, data) {
-            ShowLoader("count");
+            ShowTabLoader("count");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCountsJson")",
@@ -599,7 +580,7 @@
             ],
             order: [[4, "desc"]]
         }).on("draw.dt", function() {
-            HideLoader("count");
+            HideTabLoader("count");
 
             $('.table-count .dataTables_filter input').unbind();
             $('.table-count .dataTables_filter input').keyup(function(e) {
@@ -612,7 +593,7 @@
 
         // Price History
         var priceDT = $('.table-price').on('preXhr.dt', function(e, settings, data) {
-            ShowLoader("price");
+            ShowTabLoader("price");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPricesJson")",
@@ -634,7 +615,7 @@
             ],
             order: [[3, "desc"]]
         }).on("draw.dt", function() {
-            HideLoader("price");
+            HideTabLoader("price");
 
             $('.table-price .dataTables_filter input').unbind();
             $('.table-price .dataTables_filter input').keyup(function(e) {
@@ -647,7 +628,7 @@
 
         // Warehouse Transfer History
         var transferDT = $('.table-transfer').on('preXhr.dt', function(e, settings, data) {
-            ShowLoader("transfer");
+            ShowTabLoader("transfer");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetTransfersJson")",
@@ -672,7 +653,7 @@
             ],
             order: [[4, "desc"]]
         }).on("draw.dt", function() {
-            HideLoader("transfer");
+            HideTabLoader("transfer");
 
             $('.table-transfer .dataTables_filter input').unbind();
             $('.table-transfer .dataTables_filter input').keyup(function(e) {
@@ -685,7 +666,7 @@
 
         // Sales Return Details
         var returnDT = $('.table-return').on('preXhr.dt', function(e, settings, data) {
-            ShowLoader("return");
+            ShowTabLoader("return");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetReturnsJson")",
@@ -710,7 +691,7 @@
             ],
             order: [[5, "desc"]]
         }).on("draw.dt", function() {
-            HideLoader("return");
+            HideTabLoader("return");
 
             $('.table-return .dataTables_filter input').unbind();
             $('.table-return .dataTables_filter input').keyup(function(e) {

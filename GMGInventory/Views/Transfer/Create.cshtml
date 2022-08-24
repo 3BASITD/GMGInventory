@@ -6,101 +6,114 @@
     <li class="breadcrumb-item"><a asp-controller="Transfer" asp-action="Index">Warehouse Transfer</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="transfer-source" class="form-label mb-0">Source Warehouse</label>
-                        <select id="transfer-source" name="Source" class="form-control select2"></select>
-                        <span data-valmsg-for="transfer-source" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="transfer-destination" class="form-label mb-0">Destination Warehouse</label>
-                        <select id="transfer-destination" name="Destination" class="form-control select2"></select>
-                        <span data-valmsg-for="transfer-destination" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="transfer-date" class="form-label mb-0">Transfer Date</label>
-                        <input type="date" id="transfer-date" name="TransferDate" class="form-control form-control-sm" />
-                        <span data-valmsg-for="transfer-date" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="transfer-remarks" class="form-label mb-0">Remarks</label>
-                        <input type="text" id="transfer-remarks" name="Remarks" class="form-control form-control-sm" />
-                        <span data-valmsg-for="transfer-remarks" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
+    <form id="form-transfer">
+        <div class="card card-default">
+            <div class="card-header">
+                <span class="card-title">@ViewData["Title"]</span>
+                <div class="card-tools">
+                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
+                        <span class="fas fa-dolly-flatbed"></span> Transfer Item
+                    </button>
+                    <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                        <span class="fas fa-arrow-left"></span> Back to List
+                    </a>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-3">
-                    <div class="card">
-                        <div class="card-header bg-light source-name"></div>
-                        <div class="card-body p-3">
-                            <div class="form-group">
-                                <label for="source-code" class="form-label mb-0">Code</label>
-                                <select id="source-code" name="Code" class="form-control select2"></select>
-                                <span data-valmsg-for="source-code" data-valmsg-replace="true" class="text-danger"></span>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="transfer-source" class="form-label mb-0">Source Warehouse</label>
+                            <select id="transfer-source" name="Source" style="width: 100%;"></select>
+                            <span data-valmsg-for="transfer-source" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="transfer-destination" class="form-label mb-0">Destination Warehouse</label>
+                            <select id="transfer-destination" name="Destination" style="width: 100%;"></select>
+                            <span data-valmsg-for="transfer-destination" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="transfer-date" class="form-label mb-0">Transfer Date</label>
+                            <input type="date" id="transfer-date" name="TransferDate" class="form-control form-control-sm" />
+                            <span data-valmsg-for="transfer-date" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="transfer-remarks" class="form-label mb-0">Remarks</label>
+                            <input type="text" id="transfer-remarks" name="Remarks" class="form-control form-control-sm" />
+                            <span data-valmsg-for="transfer-remarks" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-3">
+                        <div class="card">
+                            <div class="card-header bg-light source-name"></div>
+                            <div class="card-body p-3">
+                                <div class="form-group">
+                                    <label for="source-code" class="form-label mb-0">Code</label>
+                                    <select id="source-code" style="width: 100%;"></select>
+                                    <span data-valmsg-for="source-code" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="source-name" class="form-label mb-0">Name</label>
+                                    <input type="text" id="source-name" class="form-control form-control-sm" readonly="readonly" />
+                                    <span data-valmsg-for="source-name" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="source-current-quantity" class="form-label mb-0">Current Quantity</label>
+                                    <input type="number" min="0" max="1999999" id="source-current-quantity" class="form-control form-control-sm" readonly="readonly" />
+                                    <span data-valmsg-for="source-current-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="source-transfer-quantity" class="form-label mb-0">Transfer Quantity</label>
+                                    <input type="number" min="0" max="1999999" id="source-transfer-quantity" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="source-transfer-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="source-unit" class="form-label mb-0">Unit</label>
+                                    <input type="text" id="source-unit" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-outline-warning btn-add-item w-100">
+                                        Add Item 
+                                        <i class="fas fa-angle-double-right d-none d-md-inline-block"></i>
+                                        <i class="fas fa-angle-double-down d-inline-block d-md-none"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="source-name" class="form-label mb-0">Name</label>
-                                <input type="text" id="source-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="source-name" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="source-current-quantity" class="form-label mb-0">Current Quantity</label>
-                                <input type="number" min="0" max="1999999" id="source-current-quantity" name="CurrentQuantity" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="source-current-quantity" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="source-transfer-quantity" class="form-label mb-0">Transfer Quantity</label>
-                                <input type="number" min="0" max="1999999" id="source-transfer-quantity" name="TransferQuantity" class="form-control form-control-sm" />
-                                <span data-valmsg-for="source-transfer-quantity" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="source-unit" class="form-label mb-0">Unit</label>
-                                <input type="text" id="source-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                            <div class="form-group">
-                                <button class="btn btn-outline-warning">
-                                    <i class="fas fa-angle-double-right"></i>
-                                </button>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <div class="card">
+                            <div class="card-header bg-light destination-name"></div>
+                            <div class="card-body">
+                                <table class="table table-head-fixed table-striped table-hover table-item-destination">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>Source Quantity</th>
+                                            <th>Transfer Quantity</th>
+                                            <th>Unit</th>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-9">
-                    <div class="card">
-                        <div class="card-header bg-light destination-name"></div>
-                        <div class="card-body">
-                            <table class="table table-head-fixed table-striped table-hover table-item-destination">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Code</th>
-                                        <th>Name</th>
-                                        <th>Source Quantity</th>
-                                        <th>Transfer Quantity</th>
-                                        <th>Unit</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-    </div>
+    </form>
 
     @section Scripts {
     <script>
@@ -142,11 +155,13 @@
         function ReloadTransferItemHeader() {
             //sourceDT.ajax.reload();
             LoadSourceItems();
+            destinationDT.clear().draw();
             $(".source-name").html($("#transfer-source option:selected").text() + "'s Available Item(s)");
             $(".destination-name").html("Transfer Item(s) to " + $("#transfer-destination option:selected").text());
         }
 
         function LoadSourceItems() {
+            AddItemFormReset();
             if ($("#source-code").attr("data-select2-id")) {
                 $("#source-code").select2("destroy");
                 $("#source-code").empty();
@@ -176,7 +191,7 @@
                         return {
                             results: data.items,
                             pagination: {
-                                more: (params.page * 50) < data.total_count
+                                more: (params.page * 10) < data.total_count
                             }
                         };
                     },
@@ -192,66 +207,124 @@
             });
         }
 
-        /*var sourceDT = $('.table-item-source').on('preXhr.dt', function(e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
-        }).DataTable({
-            ajax: {
-                url: "@Url.Action("GetSourceItemTransferJson")",
-                type: "POST",
-                data: function(data) {
-                    data.WarehouseId = $("#transfer-source").val();
-                },
-                dataSrc: function(json) {
-                    return JSON.parse(JSON.stringify(json));
+        function AddItemFormReset() {
+            $("#source-code").val("").trigger("change");
+            $("#source-name").val("");
+            $("#source-current-quantity").val("");
+            $("#source-transfer-quantity").val("");
+            $("#source-unit").val("");
+        }
+
+        $(".btn-add-item").click(function (e) {
+            var rowIndexes = [];
+            destinationDT.rows(function (idx, data, node) {
+                if (data.id === $("#source-code").select2("data")[0].id) {
+                    rowIndexes.push(idx);
                 }
-            },
-            //processing: true,
-            filter: true,
-            responsive: true,
-            autoWidth: false,
-            columns: [
-                { data: "code", name: "Code" },
-                { data: "name", name: "Name" },
-                { data: "quantity", name: "Quantity" },
-                { data: "unit", name: "Unit" },
-                {
-                    orderable: false,
-                    data: function(data, type, dataToSet) {
-                        var actions = '';
-                        actions += '<div data-bs-toggle="tooltip" title="Transfer Item"><button class="btn btn-warning btn-xs sourceBtn"><i class="fas fa-share"></i></button></div>';
-                        return actions + "";
-                    }
-                }
-            ]
-        });
-
-        sourceDT.on("draw", function() {
-            reloadToolTip();
-
-            $('.table-item-source .dataTables_filter input').unbind();
-            $('.table-item-destination .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    sourceDT.search($(this).val()).draw();
-                }
+                return false;
             });
-
-            $.LoadingOverlay("hide");
-
-            // Actions upon Display Edit Modal
-            $(".sourceBtn").click(function(e) {
-                var data = sourceDT.row($(this).parents('tr')).data();
-                destinationDT.row.add([data.code, data.name, data.quantity, data.unit]).draw();
-            });
+            if (rowIndexes.length > 0) {
+                toastr.warning("Can't add duplicate item");
+            } else {
+                destinationDT.row.add({
+                    id: $("#source-code").select2("data")[0].id,
+                    code: $("#source-code").select2("data")[0].text,
+                    name: $("#source-code").select2("data")[0].name,
+                    sourceQuantity: $("#source-code").select2("data")[0].quantity,
+                    transferQuantity: $("#source-transfer-quantity").val() || 0,
+                    unit: $("#source-code").select2("data")[0].unit
+                }).draw();
+                AddItemFormReset();
+            }
         });
 
         var destinationDT = $('.table-item-destination').DataTable({
             data: [],
             filter: true,
             responsive: true,
-            autoWidth: false
-        });*/
+            autoWidth: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-bs-toggle="tooltip" title="Remove Item"><i class="fas fa-minus"></i></button>';
+                        return actions;
+                    }
+                },
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                { data: "sourceQuantity", name: "SourceQuantity" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="number" min="0" max="1999999" value="' + data.transferQuantity + '" />';
+                    },
+                    name: "TransferQuantity"
+                },
+                { data: "unit", name: "Name" }
+            ]
+        });
+
+        destinationDT.on("draw", function () {
+            $(".btn-remove-item").on("click", function () {
+                destinationDT.row($(this).parents('tr')).remove().draw();
+            })
+        });
+
+        function GetItemsToTransfer() {
+            var temp_item = [];
+            destinationDT.rows().every(function () {
+                temp_item.push({
+                    id: this.data().id,
+                    quantity: $(destinationDT.cell(this.index(), 4).node()).find('input').val()
+                });
+            });
+            return temp_item;
+        }
+
+        // Validation for Create Modal
+        var validateCreate = $("#form-transfer").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                TransferDate: { required: true }
+            },
+            messages: {
+                TransferDate: { required: "Please enter date of transfer." }
+            },
+            submitHandler: function (form) {
+                SaveTransfer();
+                return false;
+            }
+        });
+
+        function SaveTransfer() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CreateJson")",
+                data: {
+                    TransferDate: $("#transfer-date").val(),
+                    Source: $("#transfer-source").val(),
+                    Destination: $("#transfer-destination").val(),
+                    Remarks: $("#transfer-remarks"),
+                    Name: $("#create-name").val(),
+                    Items: GetItemsToTransfer()
+                },
+                beforeSend: function (xhr, error) {
+                    $(".save-overlay").showOverlay();
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        window.location = "@Url.Action("Index")"
+                    }
+                },
+                complete: function (xhr, status) {
+                    $(".save-overlay").hideOverlay();
+                }
+            });
+        }
     </script>
         }

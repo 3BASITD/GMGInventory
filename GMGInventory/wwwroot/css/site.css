@@ -52,3 +52,16 @@ pre {
     color: unset;
     padding: 0;
 }
+
+.form-gayahin {
+    padding: 0.31rem 0 !important;
+}
+
+.form-cell {
+    padding: 1rem 0.75rem !important;
+}
+
+#for-print {
+    position: fixed;
+    left: -9999px;   
+}

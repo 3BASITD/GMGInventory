@@ -3,21 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using GMGInventory.Data;
 using GMGInventory.Common.Models;
 using GMGInventory.Common.Constants;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
+    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
     public class SupplierController : Controller
     {
         private readonly ISupplierRepository supplierRepository;
         private readonly IAreaRepository areaRepository;
         private readonly ICurrencyRepository currencyRepository;
         private readonly IRegionRepository regionRepository;
-        private readonly IMapper mapper;
 
         public SupplierController(ISupplierRepository supplierRepository
             , IAreaRepository areaRepository
@@ -28,7 +26,11 @@ namespace GMGInventory.Controllers
             this.areaRepository = areaRepository;
             this.currencyRepository = currencyRepository;
             this.regionRepository = regionRepository;
-            this.mapper = mapper;
+        }
+
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await supplierRepository.GetOptions(IncludeId));
         }
 
         public async Task<IActionResult> Index()

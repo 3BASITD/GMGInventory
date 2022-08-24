@@ -29,6 +29,15 @@ namespace GMGInventory.Common.Models
     {
         [Display(Name = "Item Count")]
         public int ItemCount { get; set; }
+
+        [Display(Name = "Quantity")]
+        public int Quantity { get; set; }
+
+        [Display(Name = "Item Code")]
+        public string ItemCode { get; set; }
+
+        [Display(Name = "Item Name")]
+        public string ItemName { get; set; }
     }
 
     public class ItemTransferVM : TransferVM

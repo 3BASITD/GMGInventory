@@ -148,7 +148,21 @@
                                     </thead>
                                 </table>
                             </div>
-                            <div class="tab-pane fade" id="nav-transfer" role="tabpanel" aria-labelledby="nav-transfer-tab">...</div>
+                            <div class="tab-pane fade" id="nav-transfer" role="tabpanel" aria-labelledby="nav-transfer-tab">
+                                <table class="table table-head-fixed table-striped table-hover table-transfer">
+                                    <thead>
+                                        <tr>
+                                            <th>Source</th>
+                                            <th>Destination</th>
+                                            <th>Item Code</th>
+                                            <th>Item Name</th>
+                                            <th>Quantity</th>
+                                            <th>Transfer By</th>
+                                            <th>Transfer Date</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -159,11 +173,14 @@
 
 @section Scripts {
     <script>
-        var itemTable = $('.table-warehouse-items').on('preXhr.dt', function(e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var selectedTab = e.currentTarget.dataset.bsTarget;
+            if (selectedTab == "#nav-items") itemDT.ajax.reload();
+            if (selectedTab == "#nav-transfer") transferDT.ajax.reload();
+        });
+
+        var itemDT = $('.table-warehouse-items').on('preXhr.dt', function(e, settings, data) {
+            ShowTabLoader("items");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson", "Item")",
@@ -185,15 +202,50 @@
             order: [[0, "asc"]]
         });
 
-        itemTable.on("draw", function() {
-            $.LoadingOverlay("hide");
-
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function(e) {
+        itemDT.on("draw", function() {
+            $('.table-warehouse-items .dataTables_filter input').unbind();
+            $('.table-warehouse-items .dataTables_filter input').keyup(function(e) {
                 if (e.keyCode == 13) {
-                    dataTable.search($(this).val()).draw();
+                    itemDT.search($(this).val()).draw();
                 }
             });
+            HideTabLoader("items");
+        });
+
+        var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
+            ShowTabLoader("transfer");
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetWarehouseTransferJson", "Transfer")",
+                data: function(data) {
+                    data.warehouseId = @Model?.Id
+                },
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "source", name: "Source" },
+                { data: "destination", name: "Destination" },
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "transferBy", name: "TransferBy" },
+                { data: "transferDate", name: "TransferDate" }
+            ],
+            order: [[6, "desc"]]
+        });
+
+        transferDT.on("draw", function () {
+            $('.table-transfer .dataTables_filter input').unbind();
+            $('.table-transfer .dataTables_filter input').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    transferDT.search($(this).val()).draw();
+                }
+            });
+            HideTabLoader("transfer");
         });
     </script>
 }

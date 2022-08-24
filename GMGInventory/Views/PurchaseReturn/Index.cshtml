@@ -1,0 +1,418 @@
+﻿@{
+    ViewData["Title"] = "Purchase Return";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button type="button" class="btn btn-primary btn-sm float-right btn-post ml-2">
+                <span class="fas fa-save"></span> Post Return
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right btn-history" data-bs-toggle="modal" data-bs-target="#historyModal">
+                <span class="fas fa-history"></span> History
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <label for="po-number" class="text-muted fw-normal mb-0">PO Number</label>
+                    <select id="po-number" style="width: 100%;">
+                        <option></option>
+                    </select>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">Supplier</span>
+                    <b class="d-block selected-supplier form-gayahin">-</b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">Order Date</span>
+                    <b class="d-block selected-order-date form-gayahin">-</b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">Order By</span>
+                    <b class="d-block selected-order-by form-gayahin">-</b>
+                </p>
+            </div>
+        </div>
+        <table class="table table-head-fixed table-striped table-hover table-replenish">
+            <thead>
+                <tr>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Gross Price</th>
+                    <th>Quantity to Return</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- Save Return Modal -->
+<div class="modal fade" id="saveModal" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Purchase Return</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        Below are item(s) with quantity to return:
+                        <table class="table table-striped table-hover table-return-items">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity to Return</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="form-group">
+                            <label for="save-remarks" class="control-label mb-0 d-block">Remarks</label>
+                            <input id="save-remarks" class="form-control form-control-sm" autocomplete="off" />
+                        </div>
+                        <input type="hidden" id="update-id" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-save">
+                    <span class="fas fa-edit"></span> Post
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- History Return Modal -->
+<div class="modal fade" id="historyModal" role="dialog" aria-labelledby="historyModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Purchase Return</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped table-hover table-return-history">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Return By</th>
+                                    <th>Return Date</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-history-print">
+                    <span class="fas fa-print"></span> Print
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $("#po-number").select2({
+            minimumInputLength: 3,
+            placeholder: 'Select Purchase Order Number',
+            ajax: {
+                url: "@Url.Action("GetOptions", "PurchaseOrder")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 10) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $("#po-number").on("select2:select", function () {
+            $(".selected-supplier").html(ReplaceEmptyString($(this).select2("data")[0].supplier, "-"));
+            $(".selected-order-date").html(ReplaceEmptyString($(this).select2("data")[0].orderDate, "-"));
+            $(".selected-order-by").html(ReplaceEmptyString($(this).select2("data")[0].orderBy, "-"));
+            itemDT.ajax.reload();
+        });
+
+        var itemDT = $('.table-replenish').on('preXhr.dt', function (e, settings, data) {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-cog fa-spin"
+            });
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemsJson", "PurchaseOrder")",
+                data: function (data) {
+                    data.purchaseOrderId = $("#po-number").val()
+                },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                },
+                type: "POST",
+            },
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "itemCode", name: "ItemCode", className: "form-cell" },
+                { data: "itemName", name: "ItemName", className: "form-cell" },
+                { data: "quantity", name: "Quantity", className: "text-end form-cell" },
+                { data: "unitPrice", name: "UnitPrice", className: "text-end form-cell" },
+                { data: "grossPrice", name: "GrossPrice", className: "text-end form-cell" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<input type="number" value="0" min="0" max="' + data.quantity + '" class="form-control form-control-sm" style="width: 100%;" />';
+                        return actions + "";
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        itemDT.on("draw", function () {
+            reloadToolTip();
+            $(".table-replenish th").removeClass("form-cell");
+            $.LoadingOverlay("hide");
+        });
+
+        var returnDT = $('.table-return-items').DataTable({
+            data: [],
+            filter: false,
+            paging: false,
+            info: false,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-bs-toggle="tooltip" title="Remove Item"><i class="fas fa-minus"></i></button>';
+                        return actions;
+                    }
+                },
+                { data: "code" },
+                { data: "name" },
+                { data: "quantity" }
+            ]
+        });
+
+        returnDT.on("draw", function () {
+            reloadToolTip();
+            $(".table-return-items .btn-remove-item").on("click", function () {
+                returnDT.row($(this).parents('tr')).remove().draw();
+                resetToolTip();
+            })
+        });
+
+        $(".btn-post").on("click", function () {
+            if ($("#po-number").val() == "") {
+                toastr.warning("Please select Purchase Order Number first");
+            } else {
+                var item_to_return = [];
+                itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var row_data = this.data();
+                    var row_input = parseInt($(this.node()).find("input").val());
+                    if (row_input > 0) {
+                        item_to_return.push({
+                            id: row_data.id,
+                            code: row_data.itemCode,
+                            name: row_data.itemName,
+                            quantity: row_input
+                        });
+                    }
+                });
+                if (item_to_return.length) {
+                    returnDT.clear().draw();
+                    $.each(item_to_return, function (i, item) {
+                        returnDT.row.add(item).draw();
+                    });
+                    $("#save-po-number").val($("#po-number").text());
+                    $("#save-remarks").val("");
+                    $("#saveModal").modal("show");
+                } else {
+                    toastr.warning("No change in quantity. Nothing to return");
+                }
+            }
+        });
+
+        $(".btn-save").on("click", function () {
+            if (returnDT.rows().count() > 0) {
+                var item_to_return = [];
+                returnDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var row_data = this.data();
+                    item_to_return.push({
+                        POItemId: row_data.id,
+                        Quantity: row_data.quantity
+                    });
+                });
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveJson", "PurchaseReturn")",
+                    data: {
+                        PurchaseOrderId: $("#po-number").val(),
+                        Remarks: $("#save-remarks").val(),
+                        Items: item_to_return
+                    },
+                    error: jQueryCommonError,
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#saveModal").modal("hide");
+                            itemDT.ajax.reload();
+                        }
+                    }
+                });
+            } else {
+                toastr.warning("Seems like the list of items to return have been cleared out.");
+            }
+        });
+
+        var historyDT;
+        $(".btn-history").on("click", function () {
+            if ($("#po-number").val() == "") {
+                toastr.warning("Please select Purchase Order Number first");
+            } else {
+                if($.fn.DataTable.isDataTable('.table-return-history')) {
+                    historyDT.destroy();
+                    $('.table-return-history tbody').empty();
+                }
+                historyDT = $('.table-return-history').on('preXhr.dt', function (e, settings, data) {
+                    $.LoadingOverlay("show", {
+                        image: "",
+                        fontawesome: "fa fa-cog fa-spin"
+                    });
+                }).DataTable({
+                    ajax: {
+                        url: "@Url.Action("GetListJson", "PurchaseReturn")",
+                        data: function (data) {
+                            data.purchaseOrderId = $("#po-number").val()
+                        },
+                        dataSrc: function (json) {
+                            return JSON.parse(JSON.stringify(json));
+                        },
+                        type: "POST",
+                    },
+                    filter: true,
+                    responsive: true,
+                    autoWidth: false,
+                    columns: [
+                        { data: "itemCode", name: "ItemCode", className: "form-cell" },
+                        { data: "itemName", name: "ItemName", className: "form-cell" },
+                        { data: "quantity", name: "Quantity", className: "text-end form-cell" },
+                        { data: "returnBy", name: "ReturnBy", className: "form-cell" },
+                        { data: "returnDate", name: "ReturnDate", className: "form-cell" },
+                        { data: "remarks", name: "Remarks", className: "form-cell" }
+                    ],
+                    order: [[4, "desc"]]
+                });
+
+                historyDT.on("draw", function () {
+                    reloadToolTip();
+                    $.LoadingOverlay("hide");
+                });
+            }
+        });
+
+        $(".btn-history-print").on("click", function () {
+            var history_html = '<h3>Purchase Return History</h3>';
+            history_html += '<table class="table-header">';
+            history_html += '<tr><th>Purchase Order Number</th><td>' + $("#po-number").select2("data")[0].text + '</td></tr>';
+            history_html += '<tr><th>Supplier</th><td>' + $(".selected-supplier").html() + '</td></tr>';
+            history_html += '<tr><th>Order By</th><td>' + $(".selected-order-by").html() + '</td></tr>';
+            history_html += '<tr><th>Order Date</th><td>' + $(".selected-order-date").html() + '</td></tr>';
+            history_html += '</table>';
+
+            history_html += '<table class="table-items">';
+            history_html += '<tr>';
+            history_html += '<th>Item Code</th>';
+            history_html += '<th>Item Name</th>';
+            history_html += '<th>Quantity</th>';
+            history_html += '<th>Return By</th>';
+            history_html += '<th>Return Date</th>';
+            history_html += '<th>Remarks</th>';
+            history_html += '</th>';
+            historyDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                history_html += '<tr>';
+                history_html += '<td>' + row_data.itemCode + '</td>';
+                history_html += '<td>' + row_data.itemName + '</td>';
+                history_html += '<td>' + row_data.quantity + '</td>';
+                history_html += '<td>' + row_data.returnBy + '</td>';
+                history_html += '<td>' + row_data.returnDate + '</td>';
+                history_html += '<td>' + row_data.remarks + '</td>';
+                history_html += '</tr>';
+            });
+            history_html += '</table>';
+            $("#for-print").html(history_html);
+            $("#for-print").printThis({
+                importCSS: false,
+                loadCSS: "/css/print.css",
+                pageTitle: "GMG Inventory"
+            });
+
+            //printJS({
+            //    printable: item_to_return,
+            //    type: 'json',
+            //    properties: [
+            //        { field: 'ItemCode', displayName: 'Item Code' },
+            //        { field: 'ItemName', displayName: 'Item Name' },
+            //        { field: 'Quantity', displayName: 'Quantity' },
+            //        { field: 'ReturnBy', displayName: 'Return By' },
+            //        { field: 'ReturnDate', displayName: 'Return Date' },
+            //        { field: 'Remarks', displayName: 'Remarks' }
+            //    ],
+            //    header: '<h3>Purchase Return History</hr><p>'
+            //        + 'Purchase Order Number<span>' + $("#po-number").select2("data")[0].text + '</span><br />'
+            //        + 'Supplier<span>' + $(".selected-supplier").html() + '</span><br />'
+            //        + 'Order By<span>' + $(".selected-order-by").html() + '</span><br />'
+            //        + 'Order Date<span>' + $(".selected-order-date").html() + '</span><br />'
+            //        + '</p>',
+            //    style: 'p { font-size: 13px; } span { margin-right: 5rem; font-weight: normal; }'
+            //});
+        });
+    </script>
+}

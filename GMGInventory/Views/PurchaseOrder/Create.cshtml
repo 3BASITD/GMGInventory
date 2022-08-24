@@ -1,0 +1,394 @@
+﻿@{
+    ViewData["Title"] = "New Replenish Order";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="PurchaseOrder" asp-action="Index">Replenish Orders</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-dolly-flatbed"></span> Transfer Item
+                </button>
+                <button type="submit" class="btn btn-secondary btn-sm float-right ml-2">
+                    <span class="fab fa-firstdraft"></span> Draft
+                </button>
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="form-transfer">
+                <div class="row">
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="replenish-supplier" class="form-label mb-0">Supplier</label>
+                            <select id="replenish-supplier" name="Supplier" style="width: 100%"></select>
+                            <span data-valmsg-for="replenish-source" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="replenish-address1" class="form-label mb-0">Address Line 1</label>
+                            <input type="text" id="replenish-address1" name="Address1" class="form-control form-control-sm" />
+                            <span data-valmsg-for="replenish-address1" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="replenish-address2" class="form-label mb-0">Address Line 2</label>
+                            <input type="text" id="replenish-address2" name="Address2" class="form-control form-control-sm" />
+                            <span data-valmsg-for="replenish-address2" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="replenish-destination" class="form-label mb-0">Destination Warehouse</label>
+                            <select id="replenish-destination" name="Destination" style="width: 100%"></select>
+                            <span data-valmsg-for="replenish-destination" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="replenish-date" class="form-label mb-0">Replenish Date</label>
+                            <input type="date" id="transfer-date" name="TransferDate" class="form-control form-control-sm" />
+                            <span data-valmsg-for="transfer-date" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="replenish-currency" class="form-label mb-0">Currency</label>
+                            <select id="replenish-currency" name="Currency" style="width: 100%"></select>
+                            <span data-valmsg-for="replenish-currency" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="replenish-currency-rate" class="form-label mb-0">Currency Rate</label>
+                            <input type="number" id="replenish-currency-rate" name="CurrencyRate" min="0" max="1999999" class="form-control form-control-sm" />
+                            <span data-valmsg-for="replenish-currency-rate" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="replenish-reference-number" class="form-label mb-0">Currency Rate</label>
+                            <input type="text" id="replenish-reference-number" name="ReferenceNumber" class="form-control form-control-sm" />
+                            <span data-valmsg-for="replenish-reference-number" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Replenish Item(s)</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                    <span class="fas fa-plus"></span> Add Replenish Item
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item-destination">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Quantity</th>
+                                        <th>Unit</th>
+                                        <th>Unit Price</th>
+                                        <th>Discount 1</th>
+                                        <th>Discount 2</th>
+                                        <th>Net Price</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Save Return Modal -->
+    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Replenish Item</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        <div class="form-group">
+                            <label for="add-code" class="form-label mb-0">Code</label>
+                            <select id="add-code" name="Code" class="form-control select2"></select>
+                            <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-name" class="form-label mb-0">Name</label>
+                            <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                            <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-quantity" class="form-label mb-0">Quantity</label>
+                            <input type="number" min="0" max="1999999" id="add-quantity" name="CurrentQuantity" class="form-control form-control-sm" readonly="readonly" />
+                            <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-unit" class="form-label mb-0">Unit</label>
+                            <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                        <div class="form-group">
+                            <label for="add-unit-price" class="form-label mb-0">Unit Price</label>
+                            <input type="number" step="0.01" min="0" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
+                            <span data-valmsg-for="add-unit-price" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-discount1" class="form-label mb-0">Discount 1</label>
+                            <input type="number" step="0.01" min="0" max="1999999.99" id="add-discount1" name="Discount1" class="form-control form-control-sm" />
+                            <span data-valmsg-for="add-discount1" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-discount2" class="form-label mb-0">Discount 2</label>
+                            <input type="number" step="0.01" min="0" max="1999999.99" id="add-discount2" name="Discount2" class="form-control form-control-sm" />
+                            <span data-valmsg-for="add-discount2" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-net-price" class="form-label mb-0">Net Price</label>
+                            <input type="number" id="add-net-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
+                            <span data-valmsg-for="add-net-price" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-add">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+    <script>
+        // Load supplier data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Supplier")",
+            success: function (data, status, xhr) {
+                $("#replenish-supplier").select2({
+                    data: data
+                });
+            }
+        });
+
+        // Load destination data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Warehouse")",
+            success: function (data, status, xhr) {
+                $("#replenish-destination").select2({
+                    data: data
+                });
+            }
+        });
+
+        // Load destination data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetCurrencyOptions")",
+            success: function (data, status, xhr) {
+                $("#replenish-currency").select2({
+                    data: data
+                });
+                $("#replenish-currency-rate").val($("#replenish-currency").select2("data")[0].rate);
+                $("#replenish-currency").on("select2:select", function () {
+                    $("#replenish-currency-rate").val($("#replenish-currency").select2("data")[0].rate);
+                });
+            }
+        });
+
+        function ReloadTransferItemHeader() {
+            //sourceDT.ajax.reload();
+            LoadSourceItems();
+            destinationDT.clear().draw();
+            $(".source-name").html($("#transfer-source option:selected").text() + "'s Available Item(s)");
+            $(".destination-name").html("Transfer Item(s) to " + $("#transfer-destination option:selected").text());
+        }
+
+        function LoadSourceItems() {
+            AddItemFormReset();
+            if ($("#source-code").attr("data-select2-id")) {
+                $("#source-code").select2("destroy");
+                $("#source-code").empty();
+            }
+            $("#source-code").select2({
+                minimumInputLength: 1,
+                placeholder: '<empty>',
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return (repo.text !== repo.name ? "(" + repo.text + ") " : "") + repo.name;
+                },
+                ajax: {
+                    url: "@Url.Action("GetInWarehouseOptions", "Item")",
+                    dataType: 'json',
+                    type: "POST",
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1,
+                            warehouse: $("#transfer-source").val()
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $("#source-code").on("select2:select", function () {
+                $("#source-name").val($("#source-code").select2("data")[0].name);
+                $("#source-current-quantity").val($("#source-code").select2("data")[0].quantity);
+                $("#source-transfer-quantity").val($("#source-code").select2("data")[0].quantity);
+                $("#source-unit").val($("#source-code").select2("data")[0].unit);
+            });
+        }
+
+        function AddItemFormReset() {
+            $("#source-code").val("").trigger("change");
+            $("#source-name").val("");
+            $("#source-current-quantity").val("");
+            $("#source-transfer-quantity").val("");
+            $("#source-unit").val("");
+        }
+
+        $(".btn-add-item").click(function (e) {
+            var rowIndexes = [];
+            destinationDT.rows(function (idx, data, node) {
+                if (data.id === $("#source-code").select2("data")[0].id) {
+                    rowIndexes.push(idx);
+                }
+                return false;
+            });
+            if (rowIndexes.length > 0) {
+                toastr.warning("Can't add duplicate item");
+            } else {
+                destinationDT.row.add({
+                    id: $("#source-code").select2("data")[0].id,
+                    code: $("#source-code").select2("data")[0].text,
+                    name: $("#source-code").select2("data")[0].name,
+                    sourceQuantity: $("#source-code").select2("data")[0].quantity,
+                    transferQuantity: $("#source-transfer-quantity").val() || 0,
+                    unit: $("#source-code").select2("data")[0].unit
+                }).draw();
+                AddItemFormReset();
+            }
+        });
+
+        var destinationDT = $('.table-item-destination').DataTable({
+            data: [],
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-bs-toggle="tooltip" title="Remove Item"><i class="fas fa-minus"></i></button>';
+                        return actions;
+                    }
+                },
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                { data: "quantity", name: "Quantity" },
+                { data: "unit", name: "Unit" },
+                { data: "unitCost", name: "UnitCost" },
+                { data: "discount1", name: "Discount1" },
+                { data: "discount2", name: "Discount2" },
+                { data: "netPrice", name: "NetPrice" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '';
+                    },
+                    name: "TransferQuantity"
+                },
+                { data: "unit", name: "Name" }
+            ]
+        });
+
+        destinationDT.on("draw", function () {
+            $(".btn-remove-item").on("click", function () {
+                destinationDT.row($(this).parents('tr')).remove().draw();
+            })
+        });
+
+        function GetItemsToTransfer() {
+            var temp_item = [];
+            destinationDT.rows().every(function () {
+                temp_item.push({
+                    id: this.data().id,
+                    quantity: $(destinationDT.cell(this.index(), 4).node()).find('input').val()
+                });
+            });
+            return temp_item;
+        }
+
+        // Validation for Create Modal
+        var validateCreate = $("#form-transfer").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                TransferDate: { required: true }
+            },
+            messages: {
+                TransferDate: { required: "Please enter date of transfer." }
+            },
+            submitHandler: function (form) {
+                SaveTransfer();
+                return false;
+            }
+        });
+
+        function SaveTransfer() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CreateJson")",
+                data: {
+                    TransferDate: $("#transfer-date").val(),
+                    Source: $("#transfer-source").val(),
+                    Destination: $("#transfer-destination").val(),
+                    Remarks: $("#transfer-remarks"),
+                    Name: $("#create-name").val(),
+                    Items: GetItemsToTransfer()
+                },
+                beforeSend: function (xhr, error) {
+                    $(".save-overlay").showOverlay();
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        window.location = "@Url.Action("Index")"
+                    }
+                },
+                complete: function (xhr, status) {
+                    $(".save-overlay").hideOverlay();
+                }
+            });
+        }
+    </script>
+        }

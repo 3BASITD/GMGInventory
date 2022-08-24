@@ -23,10 +23,13 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetWarehouseTransferJson()
+        public async Task<JsonResult> GetWarehouseTransferJson(int? WarehouseId)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await itemTransferRepository.GetWarehouseTransfersDTAsync(form));
+            if (WarehouseId == null)
+                return Json(await itemTransferRepository.GetWarehouseTransfersDTAsync(form));
+            else
+                return Json(await itemTransferRepository.GetWarehouseTransfersDTAsync(form, WarehouseId.Value));
         }
 
         public async Task<ActionResult> Details(int? Id)

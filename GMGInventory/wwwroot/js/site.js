@@ -64,6 +64,14 @@ function reloadToolTip() {
     }));
 }
 
+function resetToolTip() {
+    let tooltip = document.getElementsByClassName("tooltip");
+    //tooltip[0].parentNode.removeChild(tooltip[0]);
+    $.each(tooltip, function (i, item) {
+        item.parentNode.removeChild(item);
+    });
+}
+
 function showLoader() {
     $.LoadingOverlay("show", {
         image: "",
@@ -73,6 +81,27 @@ function showLoader() {
 
 function hideLoader() {
     $.LoadingOverlay("hide");
+}
+
+
+// Use for tabs with datatables content
+var tabLoaderDisplayed = [];
+
+function ShowTabLoader(mod) {
+    if (tabLoaderDisplayed.length === 0) {
+        $.LoadingOverlay("show", {
+            image: "",
+            fontawesome: "fa fa-cog fa-spin"
+        });
+    }
+    tabLoaderDisplayed.push(mod);
+}
+
+function HideTabLoader(mod) {
+    tabLoaderDisplayed = tabLoaderDisplayed.filter(s => s !== mod);
+    if (tabLoaderDisplayed.length === 0) {
+        $.LoadingOverlay("hide");
+    }
 }
 
 
@@ -110,4 +139,10 @@ function select2_search($el, term) {
 
     // Timer for delayed trigger while waiting ajax to load
     setTimeout(function () { $('.select2-results__option').trigger("mouseup"); }, 500);
+}
+
+function ReplaceEmptyString(str, replacement) {
+    if (str == null || str.trim() == "")
+        return replacement;
+    return str;
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using GMGInventory.Common.Constants;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,10 +64,28 @@ namespace GMGInventory.Common.Models
         public string Unit { get; set; }
     }
 
-    public class ItemSelect2Model
+    public class JsonPurchaseOrderOptionsModel
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+        public string Supplier { get; set; }
+        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
+        public DateTime OrderDateD { get; set; }
+        public string OrderBy { get; set; }
+    }
+
+    public class JsonCurrencyOptionModel
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+        public bool Selected { get; set; }
+        public decimal Rate { get; set; }
+    }
+
+    public class Select2Model<T>
     {
         //public bool incomplete_results { get; set; }
-        public List<JsonItemOptionsModel> items { get; set; }
+        public IList<T> items { get; set; }
         public int total_count { get; set; }
     }
 }

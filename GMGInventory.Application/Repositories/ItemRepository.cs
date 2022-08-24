@@ -22,7 +22,7 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<ItemSelect2Model> GetOptions(string search, int page)
+        public async Task<Select2Model<JsonItemOptionsModel>> GetOptions(string search, int page)
         {
             var items = await context.Items.Include(s=>s.Unit)
                                 .Where(s => string.IsNullOrWhiteSpace(search)
@@ -36,8 +36,8 @@ namespace GMGInventory.Application.Repositories
                                     Unit = s.Unit.Code
                                 })
                                 .ToListAsync();
-            var itemsFiltered = items.Skip((page - 1) * 50).Take(50).ToList();
-            return new ItemSelect2Model
+            var itemsFiltered = items.Skip((page - 1) * 10).Take(10).ToList();
+            return new Select2Model<JsonItemOptionsModel>
             {
                 //incomplete_results = false,
                 items = itemsFiltered,
@@ -45,7 +45,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<ItemSelect2Model> GetInWarehouseOptions(string search, int warehouse, int page)
+        public async Task<Select2Model<JsonItemOptionsModel>> GetInWarehouseOptions(string search, int warehouse, int page)
         {
             var items = await context.ItemInventories.Include(s => s.Item).ThenInclude(s=>s.Unit)
                                 .Where(s => s.WarehouseId == warehouse
@@ -61,8 +61,8 @@ namespace GMGInventory.Application.Repositories
                                     Unit = s.Item.Unit.Code
                                 })
                                 .ToListAsync();
-            var itemsFiltered = items.Skip((page - 1) * 50).Take(50).ToList();
-            return new ItemSelect2Model
+            var itemsFiltered = items.Skip((page - 1) * 10).Take(10).ToList();
+            return new Select2Model<JsonItemOptionsModel>
             {
                 //incomplete_results = false,
                 items = itemsFiltered,
@@ -435,7 +435,7 @@ namespace GMGInventory.Application.Repositories
                                   ReplenishDateD = purchase.DateCreated,
                                   Status = purchase.Status.Code,
                                   Supplier = purchase.Supplier.Code,
-                                  UnitCostD = purchaseItem.UnitCost,
+                                  UnitCostD = 0, // tinanggal na sa db
                                   UnitPriceD = purchaseItem.UnitPrice,
                                   Warehouse = purchase.Destination.Code
                               };

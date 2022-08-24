@@ -92,7 +92,7 @@
         || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin)
         || User.IsInRole(Roles.Telemarketer))
         {
-            var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "Replenish", "Warehouse", "Transfer", "UnservedItem" }).Contains(currentController ?? "");
+            var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "PurchaseOrder", "Warehouse", "Transfer", "UnservedItem" }).Contains(currentController ?? "");
 
             <li class="nav-item @(navInventoryActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navInventoryActive ? "active" : "")">
@@ -147,10 +147,10 @@
                    || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
                     {
                         <li class="nav-item">
-                            <a class="nav-link @(currentController == "Replenish" ? "active" : "")"
-                       asp-area="" asp-controller="Replenish" asp-action="Index">
+                            <a class="nav-link @(currentController == "PurchaseOrder" ? "active" : "")"
+                       asp-area="" asp-controller="PurchaseOrder" asp-action="Index">
                                 <i class="nav-icon fas fa-shapes"></i>
-                                <p>Replenish</p>
+                                <p>Replenish Inventory</p>
                             </a>
                         </li>
                     }
