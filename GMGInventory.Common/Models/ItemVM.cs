@@ -158,6 +158,21 @@ namespace GMGInventory.Common.Models
         public string Warehouse { get; set; }
     }
 
+    public class ItemFileVM
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public string PartNumber { get; set; }
+        public string InterchangeNumber { get; set; }
+        public string ModelNumber { get; set; }
+        public string Category { get; set; }
+        public string ItemType { get; set; }
+        public string Brand { get; set; }
+        public string Size { get; set; }
+        public string Unit { get; set; }
+        public bool IsActive { get; set; }
+    }
+
     public class ItemDetailWarehouseVM
     {
         public int Id { get; set; }

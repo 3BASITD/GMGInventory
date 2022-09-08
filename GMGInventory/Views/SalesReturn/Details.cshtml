@@ -1,0 +1,274 @@
+﻿@model SalesReturnVM
+
+@{
+    ViewData["Title"] = "Sales Return Details";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Sales Return" asp-action="Index">Sales Returns</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title po-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-print">
+                    <span class="fas fa-print"></span> Print
+                </button>
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.SRNumber)
+                        </span>
+                        <b class="d-block">
+                            @Model?.SRNumber
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerCode)
+                        </span>
+                        <b class="d-block">
+                            @Model?.CustomerCode
+                    </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerName)
+                        </span>
+                        <b class="d-block">
+                            @Model?.CustomerName
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ReturnDate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.ReturnDate
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ReturnBy)
+                    </span>
+                    <b class="d-block">
+                        @Model?.ReturnBy
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrEmpty(Model?.Remarks?.Trim()) ? "-" : Model.Remarks)
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Return Item(s)</span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-item">
+                            <thead>
+                                <tr>
+                                    <th>Defective</th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Amount</th>
+                                    <th>Discount 1</th>
+                                    <th>Discount 2</th>
+                                    <th>Net Amount</th>
+                                    <th>Reference Number</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th>Total</th>
+                                    <th class="total-quantity">0</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th class="total-net-price">0.00</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemsJson")",
+                data: { salesReturnId: @Model?.Id },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                },
+                type: "POST",
+            },
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        if(data.isDefective){
+                            actions += '<span class="fas fa-check text-danger"></span>';
+                        } else {
+                            actions += '<span class="fas fa-times text-success"></span>';
+                        }
+                        return actions;
+                    }
+                },
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "unit", name: "Unit" },
+                { data: "amount", name: "Amount", className: "text-end" },
+                { data: "discount1", name: "Discount1", className: "text-end" },
+                { data: "discount2", name: "Discount2", className: "text-end" },
+                { data: "netAmount", name: "NetAmount", className: "text-end" },
+                { data: "referenceNumber", name: "ReferenceNumber" },
+            ],
+            order: [[0, "asc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                var numVal = function (i) {
+                    return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
+                var totalQuantity = api.column(3).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
+                var totalNetPrice = api.column(8).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
+
+                $(api.column(3).footer()).html(FormatStringInteger(totalQuantity));
+                $(api.column(8).footer()).html(FormatStringDecimal(totalNetPrice));
+            }
+        });
+
+        itemDT.on("draw", function () {
+            reloadToolTip();
+
+            $('.table-item .dataTables_filter input').unbind();
+            $('.table-item .dataTables_filter input').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    itemDT.search($(this).val()).draw();
+                }
+            });
+
+            hideLoader();
+
+            $(".table-item thead th").removeClass("text-end");
+        });
+
+        $(".btn-details-print").on("click", function () {
+            var html = '<h3>Sales Return Details</h3>';
+            html += '<table class="table-header w100">';
+            html += '<tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.SRNumber)</th><td>@Model?.SRNumber</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.ReturnDate)</th><td>@Model?.ReturnDate</td>';
+            html += '</tr>';
+            html += '<tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.CustomerCode)</th><td>@Model?.CustomerCode</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.ReturnBy)</th><td>@Model?.ReturnBy</td>';
+            html += '</tr>';
+            html += '<tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.CustomerName)</th><td>@Model?.CustomerName</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.Remarks)</th><td>@(string.IsNullOrEmpty(Model?.Remarks.Trim()) ? "-" : Model.Remarks)</td>';
+            html += '</tr>';
+            html += '</table>';
+
+            html += '<table class="table-items">';
+            html += '<tr>';
+            html += '<thead>';
+            html += '<th>Defective</th>';
+            html += '<th>Item Code</th>';
+            html += '<th>Item Name</th>';
+            html += '<th>Quantity</th>';
+            html += '<th>Unit</th>';
+            html += '<th>Amount</th>';
+            html += '<th>Discount 1</th>';
+            html += '<th>Discount 2</th>';
+            html += '<th>Net Amount</th>';
+            html += '<th>Reference Number</th>';
+            html += '</thead>';
+            html += '</tr>';
+            var totalQuantity = 0, totalNetPrice = 0;
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                html += '<tr>';
+                html += '<td>';
+                if (row_data.isDefective) {
+                    html += '✔';
+                } else {
+                    html += '🞮';
+                }
+                html += '</td>';
+                html += '<td>' + row_data.itemCode + '</td>';
+                html += '<td>' + row_data.itemName + '</td>';
+                html += '<td class="right-text">' + row_data.quantity + '</td>';
+                html += '<td>' + row_data.unit + '</td>';
+                html += '<td class="right-text">' + row_data.amount + '</td>';
+                html += '<td class="right-text">' + row_data.discount1 + '</td>';
+                html += '<td class="right-text">' + row_data.discount2 + '</td>';
+                html += '<td class="right-text">' + row_data.netAmount + '</td>';
+                html += '<td>' + row_data.referenceNumber + '</td>';
+                html += '</tr>';
+
+                totalQuantity += parseInt(row_data.quantity);
+                totalNetPrice += parseFloat(row_data.netPriceD);
+            });
+            html += '<tr>';
+            html += '<tfoot>';
+            html += '<th colspan="3" class="right-text">Total</th>';
+            html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
+            html += '<th colspan="4"></th>';
+            html += '<th class="right-text">' + FormatStringDecimal(totalNetPrice) + '</th>';
+            html += '<th></th>';
+            html += '</tfoot>';
+            html += '</tr>';
+            html += '</table>';
+            $("#for-print").html(html);
+            $("#for-print").printThis({
+                importCSS: false,
+                loadCSS: "/css/print.css",
+                pageTitle: "GMG Inventory",
+                beforePrint: function () {
+                    $.LoadingOverlay("show", {
+                        image: "",
+                        fontawesome: "fas fa-print"
+                    });
+                },
+                afterPrint: function () {
+                    $.LoadingOverlay("hide");
+                }
+            });
+        });
+    </script>
+}

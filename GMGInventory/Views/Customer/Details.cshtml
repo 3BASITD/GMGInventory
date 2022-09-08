@@ -918,9 +918,9 @@
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
 
             },
-            submitHandler: function (form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                 DoEdit();
-                return false;
             }
         });
 
@@ -988,9 +988,9 @@
                 ShippingFaxNo: { maxlength: "Fax Number number must not exceed 50 characters." }
 
             },
-            submitHandler: function(form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                 DoShipping();
-                return false;
             }
         });
 
@@ -1044,9 +1044,9 @@
                 ForwarderFaxNo: { maxlength: "Fax Number number must not exceed 50 characters." }
 
             },
-            submitHandler: function(form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                 DoForwarder();
-                return false;
             }
         });
 

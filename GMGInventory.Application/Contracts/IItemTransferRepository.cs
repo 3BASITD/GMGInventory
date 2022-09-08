@@ -8,6 +8,6 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<WarehouseTransferVM>> GetWarehouseTransfersDTAsync(DataTablesRequestForm form);
         Task<ForDataTables<WarehouseTransferVM>> GetWarehouseTransfersDTAsync(DataTablesRequestForm form, int WarehouseId);
         Task<ForDataTables<ItemTransferVM>> GetItemTransfersDTAsync(DataTablesRequestForm form, int? TransferId);
-        Task AddAsync(TransferFormVM formVM);
+        Task<int> AddAsync(TransferFormVM formVM);
     }
 }

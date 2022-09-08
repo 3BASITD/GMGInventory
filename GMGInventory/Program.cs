@@ -21,31 +21,36 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
-builder.Services.AddScoped(typeof(ICurrencyRepository), typeof(CurrencyRepository));
-builder.Services.AddScoped(typeof(IItemTypeRepository), typeof(ItemTypeRepository));
-builder.Services.AddScoped(typeof(IItemPriceRepository), typeof(ItemPriceRepository));
-builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
-builder.Services.AddScoped(typeof(IBrandRepository), typeof(BrandRepository));
+
 builder.Services.AddScoped(typeof(IAgentRepository), typeof(AgentRepository));
 builder.Services.AddScoped(typeof(IAreaRepository), typeof(AreaRepository));
-builder.Services.AddScoped(typeof(IRegionRepository), typeof(RegionRepository));
-builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
-builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
-builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseRepository));
+builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
+builder.Services.AddScoped(typeof(IBrandRepository), typeof(BrandRepository));
+builder.Services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
+builder.Services.AddScoped(typeof(ICreditTermRepository), typeof(CreditTermRepository));
 builder.Services.AddScoped(typeof(ICurrencyRepository), typeof(CurrencyRepository));
 builder.Services.AddScoped(typeof(ICustomerRepository), typeof(CustomerRepository));
-builder.Services.AddScoped(typeof(ICreditTermRepository), typeof(CreditTermRepository));
+builder.Services.AddScoped(typeof(ICustomerPurchaseRepository), typeof(CustomerPurchaseRepository));
 builder.Services.AddScoped(typeof(ICustomerTypeRepository), typeof(CustomerTypeRepository));
 builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
-builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
-builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
-builder.Services.AddScoped(typeof(IReportSalesRepository), typeof(ReportSalesRepository));
+builder.Services.AddScoped(typeof(IInvoiceRepository), typeof(InvoiceRepository));
+builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
+builder.Services.AddScoped(typeof(IItemPriceRepository), typeof(ItemPriceRepository));
 builder.Services.AddScoped(typeof(IItemTransferRepository), typeof(ItemTransferRepository));
+builder.Services.AddScoped(typeof(IItemTypeRepository), typeof(ItemTypeRepository));
+builder.Services.AddScoped(typeof(IPackRepository), typeof(PackRepository));
+builder.Services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
 builder.Services.AddScoped(typeof(IPurchaseOrderRepository), typeof(PurchaseOrderReporitory));
 builder.Services.AddScoped(typeof(IPurchaseReturnRepository), typeof(PurchaseReturnReporitory));
-builder.Services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
+builder.Services.AddScoped(typeof(IRegionRepository), typeof(RegionRepository));
+builder.Services.AddScoped(typeof(IReportSalesRepository), typeof(ReportSalesRepository));
+builder.Services.AddScoped(typeof(ISalesOrderDeliveryRepository), typeof(SalesOrderDeliveryRepository));
+builder.Services.AddScoped(typeof(ISalesReturnRepository), typeof(SalesReturnRepository));
 builder.Services.AddScoped(typeof(ISoacrRepository), typeof(SoacrRepository));
+builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
+builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
+builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseRepository));
 
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
@@ -71,7 +76,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     //app.UseExceptionHandler("/Home/Error");
-   app.UseMigrationsEndPoint();
+    app.UseMigrationsEndPoint();
 }
 else
 {

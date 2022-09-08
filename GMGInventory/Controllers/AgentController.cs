@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using GMGInventory.Application.Repositories;
 
 namespace GMGInventory.Controllers
 {
@@ -24,6 +25,16 @@ namespace GMGInventory.Controllers
             this.agentRepository = agentRepository;
             this.areaRepository = areaRepository;
             this.mapper = mapper;
+        }
+
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await agentRepository.GetOptions2(search, page));
+        }
+
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await agentRepository.GetOptions(IncludeId));
         }
 
         public async Task<IActionResult> Index()
@@ -149,12 +160,6 @@ namespace GMGInventory.Controllers
             await agentRepository.ReactivateAgentAsync(id);
             TempData["SuccessMessage"] = "Agent reactivated successfully";
             return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> GetOptions(int? IncludeId)
-        {
-
-            return Json(await agentRepository.GetOptions(IncludeId));
         }
     }
 }

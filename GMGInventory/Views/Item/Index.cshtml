@@ -12,6 +12,12 @@
                 <span class="fas fa-plus"></span> New Item
             </button>
             @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"])
+            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <span class="fas fa-upload"></span> Upload
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                <span class="fas fa-download"></span> Download
+            </button>
         </div>
     </div>
     <div class="card-body">
@@ -294,84 +300,122 @@
     </div>
 </div>
 
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Item</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label mb-0" for="upload-file">Excel File</label>
+                    <input type="file" id="upload-file" name="file"
+                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                           class="form-control form-control-sm" />
+                </div>
+                <table class="table table-striped" id="upload-table">
+                    <thead>
+                        <tr><th>Row #</th><th>Code</th><th>Name</th><th>Status</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                    <span class="fas fa-upload"></span> Upload
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        // Load Select2 Unit
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetUnitOptions", "Item")",
-            success: function(data, status, xhr) {
-                $("#create-unit").select2({
-                    data: data,
-                    dropdownParent: $("#createModal")
-                });
-                $("#edit-unit").select2({
-                    data: data,
-                    dropdownParent: $("#editModal")
-                });
-            }
-        });
-
-        // Load Select2 Category
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Category")",
-            success: function(data, status, xhr) {
-                $("#create-category").select2({
-                    data: data,
-                    dropdownParent: $("#createModal")
-                });
-                $("#edit-category").select2({
-                    data: data,
-                    dropdownParent: $("#editModal")
-                });
-            }
-        });
-
-        // Load Select2 Item Type
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "ItemType")",
-            success: function(data, status, xhr) {
-                $("#create-item-type").select2({
-                    data: data,
-                    //theme: "bootstrap-5",
-                    dropdownParent: $("#createModal")
-                });
-                $("#edit-item-type").select2({
-                    data: data,
-                    //theme: "bootstrap-5",
-                    dropdownParent: $("#editModal")
-                });
-            }
-        });
-
-        // Load Select2 Brand
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Brand")",
-            success: function(data, status, xhr) {
-                $("#create-brand").select2({
-                    data: data,
-                    dropdownParent: $("#createModal")
-                });
-                $("#edit-brand").select2({
-                    data: data,
-                    dropdownParent: $("#editModal")
-                });
-            }
-        });
-
-        var dataTable = $('.table-item').on('preXhr.dt', function(e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
+        var loadselect2loaded = false;
+        function LoadSelect2() {
+            if (loadselect2loaded) return;
+            loadselect2loaded = true;
+            // Load Select2 Unit
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetUnitOptions", "Item")",
+                success: function (data, status, xhr) {
+                    $("#create-unit").select2({
+                        data: data,
+                        dropdownParent: $("#createModal")
+                    });
+                    $("#edit-unit").select2({
+                        data: data,
+                        dropdownParent: $("#editModal")
+                    });
+                }
             });
+
+            // Load Select2 Category
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Category")",
+                success: function (data, status, xhr) {
+                    $("#create-category").select2({
+                        data: data,
+                        dropdownParent: $("#createModal")
+                    });
+                    $("#edit-category").select2({
+                        data: data,
+                        dropdownParent: $("#editModal")
+                    });
+                }
+            });
+
+            // Load Select2 Item Type
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "ItemType")",
+                success: function (data, status, xhr) {
+                    $("#create-item-type").select2({
+                        data: data,
+                        //theme: "bootstrap-5",
+                        dropdownParent: $("#createModal")
+                    });
+                    $("#edit-item-type").select2({
+                        data: data,
+                        //theme: "bootstrap-5",
+                        dropdownParent: $("#editModal")
+                    });
+                }
+            });
+
+            // Load Select2 Brand
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Brand")",
+                success: function (data, status, xhr) {
+                    $("#create-brand").select2({
+                        data: data,
+                        dropdownParent: $("#createModal")
+                    });
+                    $("#edit-brand").select2({
+                        data: data,
+                        dropdownParent: $("#editModal")
+                    });
+                }
+            });
+        }
+
+        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     var categoryId = $("#CategoryId").val();
                     var itemTypeId = $("#ItemTypeId").val();
                     var brandId = $("#BrandId").val();
@@ -400,7 +444,7 @@
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 {
                     orderable: false,
-                    data: function(data, type, dataToSet) {
+                    data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
                         if (data.isActive) {
@@ -415,19 +459,21 @@
             ]
         });
 
-        dataTable.on("init.dt", function() {
+        itemDT.on("init.dt", function () {
             reloadToolTip();
 
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function(e) {
+            $('.table-item .dataTables_filter input').unbind();
+            $('.table-item .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
-                    dataTable.search($(this).val()).draw();
+                    itemDT.search($(this).val()).draw();
                 }
             });
 
-            $.LoadingOverlay("hide");
+            hideLoader();
 
-            $('.deleteBtn').click(function(e) {
+            LoadSelect2();
+
+            $('.deleteBtn').click(function (e) {
                 swal({
                     title: "Delete / Deactivate Item",
                     text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
@@ -444,7 +490,7 @@
                 });
             });
 
-            $('.reactivateBtn').click(function(e) {
+            $('.reactivateBtn').click(function (e) {
                 swal({
                     title: "Reactivate Item",
                     text: "Are you sure you want to reactivate this record?",
@@ -460,10 +506,10 @@
                     }
                 });
             });
-            
+
             // Actions upon Display Edit Modal
-            $(".editBtn").click(function(e) {
-                var data = dataTable.row($(this).parents('tr')).data();
+            $(".editBtn").click(function (e) {
+                var data = itemDT.row($(this).parents('tr')).data();
 
                 $("#edit-id").val(data.id);
                 $("#edit-code").val(data.code);
@@ -498,9 +544,9 @@
                 ModelNumber: { maxlength: "Model number must not exceed 50 characters." },
                 Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." }
             },
-            submitHandler: function(form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                 DoEdit();
-                return false;
             }
         });
 
@@ -523,20 +569,20 @@
                     BrandId: $("#edit-brand").val()
                 },
                 error: jQueryCommonError,
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastr.error(data.message, "Error");
                     } else {
                         toastr.success(data.message, "Success");
                         $("#editModal").modal("hide");
-                        dataTable.ajax.reload();
+                        itemDT.ajax.reload();
                     }
                 }
             });
         }
 
         // Actions upon Display Create Modal
-        $(".createBtn").click(function(e) {
+        $(".createBtn").click(function (e) {
             $("#create-code").val("");
             $("#create-name").val("");
             $("#create-part-number").val("");
@@ -574,9 +620,9 @@
                 RetailPrice: { required: "Please enter new Retail Price.", range: "Price must be between 0-1999999.99." },
                 NetPrice: { required: "Please enter new Net Price.", range: "Price must be between 0-1999999.99." }
             },
-            submitHandler: function(form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                 DoCreate();
-                return false;
             }
         });
 
@@ -600,21 +646,154 @@
                     BrandId: $("#create-brand").val()
                 },
                 error: jQueryCommonError,
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastr.error(data.message, "Error");
                     } else {
                         toastr.success(data.message, "Success");
                         $("#createModal").modal("hide");
-                        dataTable.ajax.reload();
+                        itemDT.ajax.reload();
                     }
                 }
             });
         }
 
         function ApplyFilter() {
-            dataTable.ajax.reload();
+            itemDT.ajax.reload();
             $("#filterModal").modal("hide");
         }
+
+        var json_of_excel_headers;
+        var json_of_excel;
+        var colnumber = 10; // number of columns required for upload
+        var done_upload_excel = 0;
+        var duplicate_upload = 0;
+
+        var opts = {
+            readAsDefault: 'ArrayBuffer',
+            dragClass: 'drag',
+            on: {
+                load: function (e, file) {
+                    var result = new Uint8Array(e.target.result);
+
+                    var xlsread = XLSX.read(result, { type: 'array' });
+                    json_of_excel = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                }
+            }
+        };
+        $("#upload-file").fileReaderJS(opts);
+
+        // Actions upon file selection
+        $("#upload-file").on("change", function () {
+            done_upload_excel = 0;
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        // Actions upon Display Upload Modal
+        $(".uploadBtn").click(function (e) {
+            done_upload_excel = 0;
+            $("#upload-file").val("");
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        function DoUpload() {
+            if (!$("#upload-file").val()) {
+                toastr.error("Please select a file first");
+            } if (json_of_excel.length == 0) {
+                toastr.error("The excel file is empty");
+            } else {
+                var columns = Object.keys(json_of_excel[0]);
+                $("#upload-table tbody").html("");
+                $("#upload-table").show();
+                duplicate_upload = 0;
+                for (var i = 0; i < json_of_excel.length; i++) {
+                    var rowNum = json_of_excel[i].__rowNum__;
+                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                        var cellValue = json_of_excel[i][columns[colIndex]];
+                        if (cellValue == null)
+                            cellValue = "";
+                        if (colIndex == 0 || colIndex == 1)
+                            row$.append($('<td/>').html(cellValue));
+                    }
+                    if (columns.includes("Code") == false
+                        || columns.includes("Name") == false
+                        || columns.includes("Part Number") == false
+                        || columns.includes("Interchange Number") == false
+                        || columns.includes("Model Number") == false
+                        || columns.includes("Category") == false
+                        || columns.includes("Item Type") == false
+                        || columns.includes("Brand") == false
+                        || columns.includes("Unit") == false
+                        || columns.includes("Size") == false) {
+                        row$.append($('<td/>').html("Unexpected columns"));
+                        UploadRowDone();
+                    } else {
+                        SaveXLSX(json_of_excel[i]["Code"],
+                            json_of_excel[i]["Name"],
+                            json_of_excel[i]["Part Number"],
+                            json_of_excel[i]["Interchange Number"],
+                            json_of_excel[i]["Model Number"],
+                            json_of_excel[i]["Category"],
+                            json_of_excel[i]["Item Type"],
+                            json_of_excel[i]["Brand"],
+                            json_of_excel[i]["Unit"],
+                            json_of_excel[i]["Size"],
+                            rowNum);
+                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                    }
+                    $("#upload-table").append(row$);
+                }
+            }
+        }
+
+        function SaveXLSX(code, name, part, interchange, model, category, itemtype, brand, unit, size, rownum) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UploadJson")",
+                data: {
+                    Code: code,
+                    Name: name,
+                    PartNumber: part,
+                    InterchangeNumber: interchange,
+                    ModelNumber: model,
+                    Category: category,
+                    ItemType: itemtype,
+                    Brand: brand,
+                    Unit: unit,
+                    Size: size
+                },
+                error: function (xhr, status, error) {
+                    $("#upload-row" + rownum + "td").html("Error: " + status + " " + error);
+                },
+                success: function (data, status, xhr) {
+                    if (data.message == "Already exist") {
+                        $("#upload-row" + rownum + "tr").remove();
+                        duplicate_upload++;
+                    } else {
+                        $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                    }
+                },
+                complete: function (xhr, status) {
+                    UploadRowDone();
+                }
+            });
+        }
+
+        function UploadRowDone() {
+            done_upload_excel++;
+            $.LoadingOverlay("progress", parseInt((done_upload_excel / json_of_excel.length) * 100));
+            if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                $("#upload-file").val("");
+            }
+        }
+
+        $(".downloadBtn").click(function (e) {
+            window.location = "@Url.Action("DownloadFile")";
+        });
     </script>
 }

@@ -36,13 +36,19 @@ namespace GMGInventory.Application.Repositories
                                     Unit = s.Unit.Code
                                 })
                                 .ToListAsync();
-            var itemsFiltered = items.Skip((page - 1) * 10).Take(10).ToList();
+            var itemsFiltered = items.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonItemOptionsModel>
             {
                 //incomplete_results = false,
                 items = itemsFiltered,
                 total_count = items.Count()
             };
+        }
+
+        public async Task<int?> GetIdAsync(string? Code)
+        {
+            var item = await context.Items.Where(s => s.Code == Code).FirstOrDefaultAsync();
+            return item?.Id;
         }
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetInWarehouseOptions(string search, int warehouse, int page)
@@ -54,14 +60,14 @@ namespace GMGInventory.Application.Repositories
                                          || (s.Item.Name.ToLower().Contains(search.ToLower()))))
                                 .Select(s => new JsonItemOptionsModel
                                 {
-                                    Id = s.Id.ToString(),
+                                    Id = s.Item.Id.ToString(),
                                     Text = s.Item.Code,
                                     Name = s.Item.Name,
                                     Quantity = s.Quantity,
                                     Unit = s.Item.Unit.Code
                                 })
                                 .ToListAsync();
-            var itemsFiltered = items.Skip((page - 1) * 10).Take(10).ToList();
+            var itemsFiltered = items.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonItemOptionsModel>
             {
                 //incomplete_results = false,
@@ -80,6 +86,12 @@ namespace GMGInventory.Application.Repositories
                                     Selected = IncludeId != null && IncludeId == s.Id
                                 })
                                 .ToListAsync();
+        }
+
+        public async Task<int?> GetUnitIdAsync(string? Code)
+        {
+            var unit = await context.Units.Where(s => s.Code == Code).FirstOrDefaultAsync();
+            return unit?.Id;
         }
 
         public async Task<IList<ItemListVM>> GetAllAsync(ItemFilterVM filter)
@@ -195,12 +207,12 @@ namespace GMGInventory.Application.Repositories
                           where item.Id == id
                           select new ItemViewVM
                           {
-                              Brand = item.Brand.Code,
-                              Category = item.Category.Code,
+                              Brand = item.Brand.Name,
+                              Category = item.Category.Name,
                               Code = item.Code,
                               Id = item.Id,
                               InterchangeNumber = item.InterchangeNumber + "",
-                              ItemType = item.ItemType.Code,
+                              ItemType = item.ItemType.Name,
                               IsActive = item.IsActive,
                               ModelNumber = item.ModelNumber + "",
                               Name = item.Name,
@@ -209,10 +221,49 @@ namespace GMGInventory.Application.Repositories
                               Quantity = inventory.Quantity,
                               RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                               Size = item.Size,
-                              UnitCode = item.Unit.Code,
+                              UnitCode = item.Unit.Name,
                               Warehouse = inventory.Warehouse.Name
                           }).FirstOrDefault();
             return itemVM;
+        }
+
+        public async Task<IList<ItemFileVM>> GetAllFileAsync()
+        {
+            var itemsVM = context.Items
+                                 .Include(s => s.Category)
+                                 .Include(s => s.ItemType)
+                                 .Include(s => s.Brand)
+                                 .Include(s => s.Unit)
+                                 .Select(s => new ItemFileVM
+                                 {
+                                     Brand = s.Brand.Name,
+                                     Category = s.Category.Name,
+                                     Code = s.Code,
+                                     ItemType = s.ItemType.Name,
+                                     InterchangeNumber = s.InterchangeNumber + "",
+                                     ModelNumber = s.ModelNumber + "",
+                                     Name = s.Name,
+                                     PartNumber = s.PartNumber + "",
+                                     Size = s.Size,
+                                     Unit = s.Unit.Code,
+                                     IsActive = s.IsActive
+                                 });
+            return await itemsVM.ToListAsync();
+        }
+
+        public async Task<bool> UploadCombinationExistAsync(ItemFileVM itemVM)
+        {
+            return (await GetAllFileAsync())//.Where(s=>s.IsActive == true)
+                                            .Any(s => s.Code == itemVM.Code
+                                                   && s.Name == itemVM.Name
+                                                   && s.PartNumber + "" == itemVM.PartNumber + ""
+                                                   && s.InterchangeNumber + "" == itemVM.InterchangeNumber + ""
+                                                   && s.ModelNumber + "" == itemVM.ModelNumber + ""
+                                                   && s.Category == itemVM.Category
+                                                   && s.ItemType == itemVM.ItemType
+                                                   && s.Brand == itemVM.Brand
+                                                   && s.Size + "" == itemVM.Size + ""
+                                                   && s.Unit == itemVM.Unit);
         }
 
         public async Task<bool> IsCodeExistAsync(string code)
@@ -264,14 +315,14 @@ namespace GMGInventory.Application.Repositories
                 BrandId = itemVM.BrandId,
                 CategoryId = itemVM.CategoryId,
                 Code = itemVM.Code,
-                PartNumber = itemVM.PartNumber,
-                InterchangeNumber = itemVM.InterchangeNumber,
-                ModelNumber = itemVM.ModelNumber,
-                UnitId = itemVM.UnitId,
+                InterchangeNumber = itemVM.InterchangeNumber + "",
+                IsActive = true,
                 ItemTypeId = itemVM.ItemTypeId,
-                Size = itemVM.Size,
+                ModelNumber = itemVM.ModelNumber + "",
                 Name = itemVM.Name,
-                IsActive = true
+                PartNumber = itemVM.PartNumber + "",
+                Size = itemVM.Size + "",
+                UnitId = itemVM.UnitId
             };
             await context.Items.AddAsync(item);
             await context.SaveChangesAsync(currentUserId);
@@ -310,13 +361,14 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             item.BrandId = itemVM.BrandId;
             item.CategoryId = itemVM.CategoryId;
-            item.PartNumber = itemVM.PartNumber;
-            item.InterchangeNumber = itemVM.InterchangeNumber;
-            item.ModelNumber = itemVM.ModelNumber;
-            item.UnitId = itemVM.UnitId;
+            item.InterchangeNumber = itemVM.InterchangeNumber + "";
             item.ItemTypeId = itemVM.ItemTypeId;
-            item.Size = itemVM.Size;
+            item.ModelNumber = itemVM.ModelNumber + "";
             item.Name = itemVM.Name;
+            item.PartNumber = itemVM.PartNumber + "";
+            item.Size = itemVM.Size + "";
+            item.UnitId = itemVM.UnitId;
+
             context.Items.Update(item);
             await context.SaveChangesAsync(currentUserId);
         }

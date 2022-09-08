@@ -26,6 +26,40 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
+        {
+            var customers = await context.Agents
+                                         .Where(s => string.IsNullOrWhiteSpace(search)
+                                                 || (s.Code.ToLower().Contains(search.ToLower())))
+                                         .Select(s => new JsonNameOptionsModel
+                                         {
+                                             Id = s.Id.ToString(),
+                                             Text = s.Code,
+                                             Name = s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName,
+                                         })
+                                         .ToListAsync();
+            var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = customersFiltered,
+                total_count = customers.Count
+            };
+        }
+
+        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.Agents
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.FullName,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
         public async Task<List<AgentViewVM>> GetAllAgentVMAsync()
         {
             var agents = await context.Agents.Include(s => s.Area).ToListAsync();
@@ -124,19 +158,6 @@ namespace GMGInventory.Application.Repositories
             mapper.Map(agentVM, agents);
             context.Agents.Update(agents);
             await context.SaveChangesAsync(currentUserId);
-        }
-
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
-        {
-            return await context.Agents
-                .Where(s => s.IsActive || s.Id == IncludeId)
-                .Select(s => new JsonOptionsModel
-                {
-                    Id = s.Id.ToString(),
-                    Text = s.FullName,
-                    Selected = IncludeId != null && IncludeId == s.Id
-                })
-                .ToListAsync();
         }
     }
 }

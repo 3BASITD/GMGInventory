@@ -23,7 +23,27 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-       
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions(string search, int page)
+        {
+            var customers = await context.Customers
+                                         .Where(s => string.IsNullOrWhiteSpace(search)
+                                                 || (s.Code.ToLower().Contains(search.ToLower())))
+                                         .Select(s => new JsonNameOptionsModel
+                                         {
+                                             Id = s.Id.ToString(),
+                                             Text = s.Code,
+                                             Name = s.Name
+                                         })
+                                         .ToListAsync();
+            var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = customersFiltered,
+                total_count = customers.Count
+            };
+        }
+
         public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers
@@ -32,7 +52,7 @@ namespace GMGInventory.Application.Repositories
                                     .Include(s => s.Agent)
                                     .Include(s => s.CreditTerm)
 
-                                 
+
                               where cust.Id == id
                               select new CustomerVM
                               {
@@ -70,7 +90,7 @@ namespace GMGInventory.Application.Repositories
                                     .Include(s => s.CustomerType)
                                     .Include(s => s.Agent)
                                     .Include(s => s.CreditTerm)
-                   
+
                    select new CustomerVM
                    {
                        Id = cust.Id,
@@ -143,7 +163,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        
+
 
         public async Task<List<Customer>> GetAllActiveCustomerAsync(int includeId)
         {
@@ -187,7 +207,7 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-   
+
 
         public async Task UpdateAsync(CustomerVM custVM)
         {
@@ -244,7 +264,7 @@ namespace GMGInventory.Application.Repositories
             await context.Customers.AddAsync(cust);
             await context.SaveChangesAsync(currentUserId);
 
-      
+
         }
 
         public async Task AddShippingAsync(CustomerVM shippingVM)
@@ -259,7 +279,7 @@ namespace GMGInventory.Application.Repositories
                 ContactPerson = shippingVM.ShippingContactPerson
 
 
-                
+
             };
             await context.ShippingAddresses.AddAsync(shipping);
             await context.SaveChangesAsync(currentUserId);
@@ -277,7 +297,7 @@ namespace GMGInventory.Application.Repositories
                 Address = forwarderVM.ForwarderAddress,
                 PhoneNumber = forwarderVM.ForwarderPhoneNo,
                 FaxNumber = forwarderVM.ForwarderFaxNo
-               
+
 
 
 
@@ -313,7 +333,7 @@ namespace GMGInventory.Application.Repositories
                                  CreditLimit = cust.CreditLimit,
                                  Remarks = cust.Remarks,
                                  IsActive = true
-        };
+                             };
             return await customerVM.ToListAsync();
         }
 
@@ -377,16 +397,16 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<CustomerVM>> GetCustomerShippingAsync(int id)
         {
             var customerVM = from customer in context.Customers
-                               join shipping in context.ShippingAddresses
-                                              on customer.Id equals shipping.CustomerId
-                               where shipping.CustomerId == id
-                               select new CustomerVM
-                               {
+                             join shipping in context.ShippingAddresses
+                                            on customer.Id equals shipping.CustomerId
+                             where shipping.CustomerId == id
+                             select new CustomerVM
+                             {
                                  ShippingAddress = shipping.Address,
                                  ShippingContactPerson = shipping.ContactPerson,
                                  ShippingFaxNo = shipping.FaxNumber,
                                  ShippingPhoneNo = shipping.PhoneNumber
-                               };
+                             };
             return await customerVM.ToListAsync();
         }
 
@@ -452,10 +472,10 @@ namespace GMGInventory.Application.Repositories
                              where frwdr.CustomerId == id
                              select new CustomerVM
                              {
-                                ForwarderName = frwdr.Name,
-                                ForwarderAddress = frwdr.Address,
-                                ForwarderFaxNo = frwdr.FaxNumber,
-                                ForwarderPhoneNo = frwdr.PhoneNumber
+                                 ForwarderName = frwdr.Name,
+                                 ForwarderAddress = frwdr.Address,
+                                 ForwarderFaxNo = frwdr.FaxNumber,
+                                 ForwarderPhoneNo = frwdr.PhoneNumber
                              };
             return await customerVM.ToListAsync();
         }
@@ -612,7 +632,7 @@ namespace GMGInventory.Application.Repositories
                                       on p.Id equals pd.PaymentId
                              join i in context.Invoices
                                       on pd.InvoiceId equals i.Id
-                             
+
                              where p.CustomerId == id
                              select new CustomerVM
                              {

@@ -5,6 +5,8 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IAgentRepository : IGenericRepository<Agent>
     {
+        Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page);
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
         Task<List<AgentViewVM>> GetAllAgentVMAsync();
         Task<AgentViewVM?> GetAgentViewVMAsync(int? id);
         Task<AgentVM?> GetAgentVMAsync(int? id);
@@ -17,6 +19,5 @@ namespace GMGInventory.Application.Contracts
         Task AddAsync(AgentVM agentVM);
         Task UpdateAsync(int id, AgentVM agentVM);
 
-        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }

@@ -6,6 +6,7 @@ namespace GMGInventory.Application.Contracts
     public interface IItemTypeRepository : IGenericRepository<ItemType>
     {
         Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<int?> GetIdAsync(string? Name);
         IQueryable<ItemTypeViewVM> GetAllItemTypeVM();
         ForDataTables<ItemTypeViewVM> GetListDataTables(DataTablesRequestForm form);
         ItemTypeViewVM? GetItemTypeViewVM(int? id);
@@ -19,7 +20,6 @@ namespace GMGInventory.Application.Contracts
         Task ReactivateItemTypeAsync(int id);
         Task AddAsync(ItemTypeVM itemTypeVM);
         Task UpdateAsync(ItemTypeVM itemTypeVM);
-        Task<int?> GetIdAsync(string? Name);
 
     }
 }

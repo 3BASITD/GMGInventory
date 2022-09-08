@@ -21,6 +21,19 @@ select.form-control-sm ~ .select2-container--default .select2-selection--single 
     border: 1px solid #ced4da;
 }
 
+.s2ph-bold ~ .select2 .select2-selection__placeholder,
+.s2-bold ~ .select2 .select2-selection__rendered {
+    font-weight: bold;
+}
+
+.s2ph-dark ~ .select2 .select2-selection__placeholder {
+    color: #212529;
+}
+
+.dark-mode .s2ph-dark ~ .select2 .select2-selection__placeholder {
+    color: white;
+}
+
 .dark-mode .select2-container--default .select2-selection--single, 
 .dark-mode .select2-container--bootstrap-5 .select2-selection--single {
     border: 1px solid #6c757d;

@@ -42,6 +42,12 @@ namespace GMGInventory.Application.Repositories
                 .ToListAsync();
         }
 
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var itemType = await context.ItemTypes.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return itemType?.Id;
+        }
+
         public IQueryable<ItemTypeViewVM> GetAllItemTypeVM()
         {
             var itemTypes = from itemType in context.ItemTypes
@@ -215,12 +221,6 @@ namespace GMGInventory.Application.Repositories
             mapper.Map(itemTypeVM, itemType);
             context.ItemTypes.Update(itemType);
             await context.SaveChangesAsync(currentUserId);
-        }
-
-        public async Task<int?> GetIdAsync(string? Name)
-        {
-            var itemType = await context.ItemTypes.Where(s => s.Name == Name).FirstOrDefaultAsync();
-            return itemType?.Id;
         }
 
     }

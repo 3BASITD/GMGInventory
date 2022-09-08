@@ -24,6 +24,7 @@ namespace GMGInventory.Application.Repositories
         {
             var auditVM = from audit in context.AuditLogs
                                                .Include(s => s.User)
+                          where audit.Type != "None"
                           select new AuditLogVM
                           {
                               Id = audit.Id,

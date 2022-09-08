@@ -27,18 +27,20 @@ namespace GMGInventory.Application.Repositories
         {
             var orders = from order in context.PurchaseOrders
                                               .Include(s => s.Supplier)
+                                              .Include(s => s.Status)
                          join user in userManager.Users on order.UserCreated equals user.Id
                          where string.IsNullOrWhiteSpace(search)
+                         && order.Status.Code != "Draft"
                             || (order.PONumber.ToLower().Contains(search.ToLower()))
                          select new JsonPurchaseOrderOptionsModel
                          {
                              Id = order.Id.ToString(),
                              OrderBy = string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.FirstName) ? user.Nickname : (user.FirstName + " " + user.LastName),
-                             OrderDateD = order.DateCreated,
+                             OrderDateD = order.ReplenishDate,
                              Supplier = order.Supplier.Name,
                              Text = order.PONumber
                          };
-            var ordersFiltered = await orders.Skip((page - 1) * 10).Take(10).ToListAsync();
+            var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonPurchaseOrderOptionsModel>
             {
                 //incomplete_results = false,
@@ -75,14 +77,16 @@ namespace GMGInventory.Application.Repositories
                                Address2 = order.Supplier.AddressLine2,
                                Currency = order.Currency.Code,
                                CurrencyRateD = order.CurrencyRate,
-                               Destination = order.Destination.Code,
+                               DateCreatedD = order.DateCreated,
+                               DateModifiedD = order.DateModified,
+                               Destination = order.Destination.Name,
                                Id = order.Id,
                                OrderBy = user.Nickname,
-                               OrderDateD = order.DateCreated,
+                               OrderDateD = order.ReplenishDate,
                                PONumber = order.PONumber,
-                               ReferenceNumber = order.ReferenceNumber,
+                               ReferenceNumber = order.ReferenceNumber + "",
                                Status = order.Status.Code,
-                               Supplier = order.Supplier.Code,
+                               Supplier = order.Supplier.Name,
                                TotalAmountD = order.TotalPurchaseAmount == null ? 0 : order.TotalPurchaseAmount.Value
                            });
             return await orderVM.FirstOrDefaultAsync();
@@ -100,7 +104,7 @@ namespace GMGInventory.Application.Repositories
                                Destination = order.Destination.Code,
                                Id = order.Id,
                                OrderBy = user.Nickname,
-                               OrderDateD = order.DateCreated,
+                               OrderDateD = order.ReplenishDate,
                                PONumber = order.PONumber,
                                Status = order.Status.Code,
                                Supplier = order.Supplier.Code,
@@ -175,13 +179,15 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PurchaseOrderItemVM>> GetItemsAsync(int purchaseOrderId)
         {
             var itemVM = from order in context.PurchaseOrderLineItems
-                         //join rturn in context.PurchaseReturnLineItems on order.Id equals rturn.PurchaseOrderLineItemId into ritem
+                                              .Include(s => s.Item)
+                                                .ThenInclude(s => s.Unit)
+                             //join rturn in context.PurchaseReturnLineItems on order.Id equals rturn.PurchaseOrderLineItemId into ritem
                          where order.PurchaseOrderId == purchaseOrderId
                          select new PurchaseOrderItemVM
                          {
                              Discount1D = order.Discount1,
                              Discount2D = order.Discount2,
-                             Id = order.Id,
+                             Id = order.ItemId,
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
                              Quantity = order.Quantity - ((int?)context.PurchaseReturnLineItems.Where(s => s.PurchaseOrderLineItemId == order.Id).Sum(s => s.Quantity) ?? 0),
@@ -208,7 +214,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.Quantity.ToString().Contains(form.SearchValue)
                                     || x.Unit.ToLower().Contains(form.SearchValue)
                                     || x.UnitPrice.ToLower().Contains(form.SearchValue)
-                                    || x.GrossPrice.ToLower().Contains(form.SearchValue));
+                                    || x.NetPrice.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -219,14 +225,14 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Discount1": data = data.OrderBy(s => s.Discount1); break;
-                        case "Discount2": data = data.OrderBy(s => s.Discount2); break;
+                        case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
+                        case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
                         case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderBy(s => s.ItemName); break;
                         case "Quantity": data = data.OrderBy(s => s.Quantity); break;
                         case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        case "UnitPrice": data = data.OrderBy(s => s.UnitPrice); break;
-                        case "GrossPrice": data = data.OrderBy(s => s.GrossPrice); break;
+                        case "UnitPrice": data = data.OrderBy(s => s.UnitPriceD); break;
+                        case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
                         default: break;
                     }
                 }
@@ -234,14 +240,14 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Discount1": data = data.OrderByDescending(s => s.Discount1); break;
-                        case "Discount2": data = data.OrderByDescending(s => s.Discount2); break;
+                        case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
+                        case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
                         case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
                         case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
                         case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        case "UnitPrice": data = data.OrderByDescending(s => s.UnitPrice); break;
-                        case "GrossPrice": data = data.OrderByDescending(s => s.GrossPrice); break;
+                        case "UnitPrice": data = data.OrderByDescending(s => s.UnitPriceD); break;
+                        case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
                         default: break;
                     }
                 }
@@ -257,25 +263,125 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        //public async Task AddAsync(TransferFormVM formVM)
-        //{
-        //    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-        //    var transferVM = new TransferItem
-        //    {
-        //        DestinationId = formVM.Destination,
-        //        Remarks = formVM.Remarks,
-        //        SourceId = formVM.Source
-        //    };
-        //    await context.TransferItems.AddAsync(transferVM);
-        //    await context.SaveChangesAsync(currentUserId);
-        //    var itemsVM = formVM.Items.Select(s => new TransferItemDetail
-        //    {
-        //        ItemId = s.Id,
-        //        Quantity = s.Quantity,
-        //        TransferItemId = transferVM.Id
-        //    });
-        //    await context.AddRangeAsync(itemsVM);
-        //    await context.SaveChangesAsync(currentUserId);
-        //}
+        private async Task<int> SaveOrderAsync(PurchaseOrderFormVM form, int statusId)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var orderVM = await context.PurchaseOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+            var previousOrders = context.PurchaseOrders.Count();
+            string poNumber = string.Format("{0:PO00000000}", previousOrders);
+            while (context.PurchaseOrders.Any(s => s.PONumber == poNumber))
+            {
+                previousOrders++;
+                poNumber = string.Format("{0:PO00000000}", previousOrders);
+            }
+
+            decimal totalPurchaseAmount = form.Items.Sum(s => (decimal)s.Quantity * ((s.UnitPrice * (100 - s.Discount1 - s.Discount2)) / 100m));
+            if (orderVM == null)
+            {
+                orderVM = new PurchaseOrder
+                {
+                    CurrencyId = form.Currency,
+                    CurrencyRate = form.CurrencyRate,
+                    DestinationId = form.Destination,
+                    PONumber = poNumber,
+                    ReferenceNumber = form.ReferenceNumber,
+                    ReplenishDate = form.ReplenishDate,
+                    StatusId = statusId,
+                    SupplierId = form.Supplier,
+                    TotalPurchaseAmount = totalPurchaseAmount
+                };
+                await context.PurchaseOrders.AddAsync(orderVM);
+            }
+            else
+            {
+                orderVM.StatusId = statusId;
+                orderVM.TotalPurchaseAmount = totalPurchaseAmount;
+                context.PurchaseOrders.Update(orderVM);
+            }
+            await context.SaveChangesAsync(currentUserId);
+
+            await SaveReplenishItemsAsync(form.Items, orderVM.Id);
+
+            return orderVM.Id;
+        }
+
+        public async Task<int> SaveDraftAsync(PurchaseOrderFormVM form)
+        {
+            int draftStatusId = await context.Statuses.Where(s => s.Name == "Purchase Order Draft").Select(s => s.Id).FirstAsync();
+            return await SaveOrderAsync(form, draftStatusId);
+        }
+
+        public async Task<int> SaveReplenishAsync(PurchaseOrderFormVM form)
+        {
+            int draftPostedId = await context.Statuses.Where(s => s.Name == "Purchase Order Posted").Select(s => s.Id).FirstAsync();
+            return await SaveOrderAsync(form, draftPostedId);
+        }
+
+        public async Task SaveReplenishItemsAsync(IList<PurchaseOrderFormItemVM> Items, int PurchaseOrderId)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var citemsVM = context.PurchaseOrderLineItems.Where(s => s.PurchaseOrderId == PurchaseOrderId);
+
+            // add item
+            // check items not in db
+            var items = citemsVM.Select(s => s.ItemId);
+            // add excluding items already available
+            var itemsVM = Items.Where(s => items.Contains(s.Item) == false)
+                               .Select(s => new PurchaseOrderLineItem
+                               {
+                                   Discount1 = s.Discount1,
+                                   Discount2 = s.Discount2,
+                                   ItemId = s.Item,
+                                   PurchaseOrderId = PurchaseOrderId,
+                                   Quantity = s.Quantity,
+                                   UnitPrice = s.UnitPrice
+                               });
+            context.PurchaseOrderLineItems.AddRange(itemsVM);
+
+            // update item
+            // get items available in db
+            var ditems = Items.Where(s => items.Contains(s.Item));
+            foreach (var di in ditems)
+            {
+                // update all available in db
+                var dbitem = await citemsVM.Where(s => s.ItemId == di.Item).FirstAsync();
+                dbitem.Discount1 = di.Discount1;
+                dbitem.Discount2 = di.Discount2;
+                dbitem.Quantity = di.Quantity;
+                dbitem.UnitPrice = di.UnitPrice;
+
+                context.PurchaseOrderLineItems.Update(dbitem);
+            }
+
+            // delete item
+            // get items not in form
+            var fitems = Items.Select(s => s.Item);
+            var ritems = citemsVM.Where(s => fitems.Contains(s.ItemId) == false);
+            // remove unavailable items
+            context.PurchaseOrderLineItems.RemoveRange(ritems);
+
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task<bool> DeleteDraftAsync(int purchaseOrderId)
+        {
+            var orderVM = context.PurchaseOrders.Where(s => s.Id == purchaseOrderId).FirstOrDefault();
+            if (orderVM == null)
+            {
+                return false;
+            }
+            else
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                var orderItemsVM = context.PurchaseOrderLineItems.Where(s => s.PurchaseOrderId == orderVM.Id);
+                context.PurchaseOrderLineItems.RemoveRange(orderItemsVM);
+
+                context.PurchaseOrders.Remove(orderVM);
+                await context.SaveChangesAsync(currentUserId);
+
+                return true;
+            }
+        }
     }
 }

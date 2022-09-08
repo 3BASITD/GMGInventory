@@ -142,7 +142,7 @@
     <script>
         $("#po-number").select2({
             minimumInputLength: 3,
-            placeholder: 'Select Purchase Order Number',
+            placeholder: 'Select PO Number',
             ajax: {
                 url: "@Url.Action("GetOptions", "PurchaseOrder")",
                 dataType: 'json',
@@ -154,11 +154,11 @@
                     };
                 },
                 processResults: function (data, params) {
-                    params.page = params.page;
+                    params.page = params.page || 1;
                     return {
                         results: data.items,
                         pagination: {
-                            more: (params.page * 10) < data.total_count
+                            more: (params.page * 50) < data.total_count
                         }
                     };
                 },
@@ -197,7 +197,7 @@
                 { data: "itemName", name: "ItemName", className: "form-cell" },
                 { data: "quantity", name: "Quantity", className: "text-end form-cell" },
                 { data: "unitPrice", name: "UnitPrice", className: "text-end form-cell" },
-                { data: "grossPrice", name: "GrossPrice", className: "text-end form-cell" },
+                { data: "netPrice", name: "NetPrice", className: "text-end form-cell" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -248,7 +248,7 @@
 
         $(".btn-post").on("click", function () {
             if ($("#po-number").val() == "") {
-                toastr.warning("Please select Purchase Order Number first");
+                toastr.warning("Please select PO Number first");
             } else {
                 var item_to_return = [];
                 itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -314,7 +314,7 @@
         var historyDT;
         $(".btn-history").on("click", function () {
             if ($("#po-number").val() == "") {
-                toastr.warning("Please select Purchase Order Number first");
+                toastr.warning("Please select PO Number first");
             } else {
                 if($.fn.DataTable.isDataTable('.table-return-history')) {
                     historyDT.destroy();
@@ -360,7 +360,7 @@
         $(".btn-history-print").on("click", function () {
             var history_html = '<h3>Purchase Return History</h3>';
             history_html += '<table class="table-header">';
-            history_html += '<tr><th>Purchase Order Number</th><td>' + $("#po-number").select2("data")[0].text + '</td></tr>';
+            history_html += '<tr><th>PO Number</th><td>' + $("#po-number").select2("data")[0].text + '</td></tr>';
             history_html += '<tr><th>Supplier</th><td>' + $(".selected-supplier").html() + '</td></tr>';
             history_html += '<tr><th>Order By</th><td>' + $(".selected-order-by").html() + '</td></tr>';
             history_html += '<tr><th>Order Date</th><td>' + $(".selected-order-date").html() + '</td></tr>';
@@ -393,26 +393,6 @@
                 loadCSS: "/css/print.css",
                 pageTitle: "GMG Inventory"
             });
-
-            //printJS({
-            //    printable: item_to_return,
-            //    type: 'json',
-            //    properties: [
-            //        { field: 'ItemCode', displayName: 'Item Code' },
-            //        { field: 'ItemName', displayName: 'Item Name' },
-            //        { field: 'Quantity', displayName: 'Quantity' },
-            //        { field: 'ReturnBy', displayName: 'Return By' },
-            //        { field: 'ReturnDate', displayName: 'Return Date' },
-            //        { field: 'Remarks', displayName: 'Remarks' }
-            //    ],
-            //    header: '<h3>Purchase Return History</hr><p>'
-            //        + 'Purchase Order Number<span>' + $("#po-number").select2("data")[0].text + '</span><br />'
-            //        + 'Supplier<span>' + $(".selected-supplier").html() + '</span><br />'
-            //        + 'Order By<span>' + $(".selected-order-by").html() + '</span><br />'
-            //        + 'Order Date<span>' + $(".selected-order-date").html() + '</span><br />'
-            //        + '</p>',
-            //    style: 'p { font-size: 13px; } span { margin-right: 5rem; font-weight: normal; }'
-            //});
         });
     </script>
 }

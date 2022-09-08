@@ -8,9 +8,9 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary btn-sm float-right ml-2">
+            <a asp-action="Create" class="btn btn-primary btn-sm float-right">
                 <span class="fas fa-plus"></span> New Warehouse Transfer
-            </button>
+            </a>
         </div>
     </div>
     <div class="card-body">
@@ -96,7 +96,7 @@
 
 @section Scripts {
     <script>
-        var dataTable = $('.table-transfer').on('preXhr.dt', function(e, settings, data) {
+        var dataTable = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
             $.LoadingOverlay("show", {
                 image: "",
                 fontawesome: "fa fa-cog fa-spin"
@@ -120,7 +120,7 @@
                 { data: "remarks", name: "Remarks" },
                 {
                     orderable: false,
-                    data: function(data, type, dataToSet) {
+                    data: function (data, type, dataToSet) {
                         var actions = '';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
                         return actions;
@@ -130,11 +130,11 @@
             order: [[5, "desc"]]
         });
 
-        dataTable.on("draw", function() {
+        dataTable.on("draw", function () {
             reloadToolTip();
 
             $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function(e) {
+            $('.dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
                     dataTable.search($(this).val()).draw();
                 }
@@ -143,7 +143,7 @@
             $.LoadingOverlay("hide");
 
             // Actions upon Display Update Modal
-            $('.btn-update').click(function(e) {
+            $('.btn-update').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
                 $("#update-code").val(data.code);
                 $("#update-name").val(data.name);
@@ -169,9 +169,9 @@
                         range: "Price must be between 0-1999999.99."
                     }
                 },
-                submitHandler: function(form) {
+                submitHandler: function (form, event) {
+                    event.preventDefault();
                     DoUpdate();
-                    return false;
                 }
             });
 
@@ -186,7 +186,7 @@
                         NetPrice: $("#update-net").val()
                     },
                     error: jQueryCommonError,
-                    success: function(data, status, xhr) {
+                    success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
@@ -195,7 +195,7 @@
                             dataTable.ajax.reload();
                         }
                     },
-                    complete: function(xhr, status) {
+                    complete: function (xhr, status) {
                     }
                 });
             }

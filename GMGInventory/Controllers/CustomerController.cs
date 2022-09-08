@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using GMGInventory.Application.Repositories;
 
 namespace GMGInventory.Controllers
 {
@@ -33,6 +34,12 @@ namespace GMGInventory.Controllers
             this.customertypeRepository = customertypeRepository;
             this.agentRepository = agentRepository;
         }
+
+        public async Task<IActionResult> GetOptions(string search, int page)
+        {
+            return Json(await customerRepository.GetOptions(search, page));
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -43,8 +50,6 @@ namespace GMGInventory.Controllers
         {
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(customerRepository.GetListDataTables(dtForm));
-
-
         }
 
         [HttpPost]

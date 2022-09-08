@@ -130,7 +130,8 @@ namespace GMGInventory.Data
                     }
                 }
             }
-            foreach (var auditEntry in auditEntries)
+            //foreach (var auditEntry in auditEntries)
+            foreach (var auditEntry in auditEntries.Where(s => s.AuditType != Common.Constants.AuditType.None))
             {
                 AuditLogs.Add(auditEntry.ToAudit());
             }

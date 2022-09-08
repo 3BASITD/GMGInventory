@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GMGInventory.Common.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
@@ -55,16 +56,20 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
 
         [Display(Name = "Retail Price")]
-        public decimal RetailPrice { get; set; }
+        public string RetailPrice => string.Format("{0:#,##0.00}", RetailPriceD);
+        public decimal RetailPriceD { get; set; }
 
         [Display(Name = "Net Price")]
-        public decimal NetPrice { get; set; }
+        public string NetPrice => string.Format("{0:#,##0.00}", NetPriceD);
+        public decimal NetPriceD { get; set; }
 
         [Display(Name = "Updated By")]
         public string UserCreated { get; set; }
 
         [Display(Name = "Updated Date")]
-        public string DateCreated { get; set; }
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
         public DateTime DateCreatedD { get; set; }
+        public bool IsLatest { get; set; }
+        public int Temp { get; set; }
     }
 }

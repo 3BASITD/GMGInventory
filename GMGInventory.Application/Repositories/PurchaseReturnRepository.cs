@@ -54,9 +54,13 @@ namespace GMGInventory.Application.Repositories
             };
             await context.PurchaseReturns.AddAsync(rturn);
             await context.SaveChangesAsync(currentUserId);
+
             var itemsVM = formVM.Items.Select(s => new PurchaseReturnLineItem
             {
-                PurchaseOrderLineItemId = s.POItemId,
+                PurchaseOrderLineItemId = context.PurchaseOrderLineItems
+                                                 .Where(a => a.PurchaseOrderId == formVM.PurchaseOrderId && a.ItemId == s.POItemId)
+                                                 .Select(a => a.Id)
+                                                 .First(),
                 PurchaseReturnId = rturn.Id,
                 Quantity = s.Quantity
             });

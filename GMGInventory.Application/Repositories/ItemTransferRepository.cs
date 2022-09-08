@@ -36,8 +36,8 @@ namespace GMGInventory.Application.Repositories
                                   Id = transfer.Id,
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
-                                  TransferBy = user.Nickname,
-                                  TransferDateD = transfer.DateCreated
+                                  TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                                  TransferDateD = transfer.TransferDate
                               });
             return await transferVM.FirstOrDefaultAsync();
         }
@@ -144,7 +144,7 @@ namespace GMGInventory.Application.Repositories
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
                                   TransferBy = user.Nickname,
-                                  TransferDateD = transfer.DateCreated
+                                  TransferDateD = transfer.TransferDate
                               });
             return await transferVM.ToListAsync();
         }
@@ -308,17 +308,19 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task AddAsync(TransferFormVM formVM)
+        public async Task<int> AddAsync(TransferFormVM formVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var transferVM = new TransferItem
             {
                 DestinationId = formVM.Destination,
-                Remarks = formVM.Remarks,
-                SourceId = formVM.Source
+                Remarks = formVM.Remarks + "",
+                SourceId = formVM.Source,
+                TransferDate = formVM.TransferDate
             };
             await context.TransferItems.AddAsync(transferVM);
             await context.SaveChangesAsync(currentUserId);
+
             var itemsVM = formVM.Items.Select(s => new TransferItemDetail
             {
                 ItemId = s.Id,
@@ -327,6 +329,37 @@ namespace GMGInventory.Application.Repositories
             });
             await context.AddRangeAsync(itemsVM);
             await context.SaveChangesAsync(currentUserId);
+
+            foreach (var item in formVM.Items)
+            {
+                var sourceItem = await context.ItemInventories
+                                              .Where(s => s.WarehouseId == formVM.Source && s.ItemId == item.Id)
+                                              .FirstAsync();
+                sourceItem.Quantity -= item.Quantity;
+                context.ItemInventories.Update(sourceItem);
+                await context.SaveChangesAsync(currentUserId);
+
+                var destinationItem = await context.ItemInventories
+                                                   .Where(s => s.WarehouseId == formVM.Destination && s.ItemId == item.Id)
+                                                   .FirstOrDefaultAsync();
+                if (destinationItem != null)
+                {
+                    destinationItem.Quantity += item.Quantity;
+                    context.ItemInventories.Update(destinationItem);
+                } else
+                {
+                    destinationItem = new ItemInventory
+                    {
+                        ItemId = item.Id,
+                        Quantity = item.Quantity,
+                        WarehouseId = formVM.Destination
+                    };
+                    await context.ItemInventories.AddAsync(destinationItem);
+                }
+                await context.SaveChangesAsync(currentUserId);
+            }
+
+            return transferVM.Id;
         }
     }
 }

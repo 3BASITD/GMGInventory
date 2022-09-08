@@ -215,5 +215,11 @@ namespace GMGInventory.Application.Repositories
                 .ToListAsync();
         }
 
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var brand = await context.Brands.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return brand?.Id;
+        }
+
     }
 }

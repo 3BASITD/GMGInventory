@@ -55,6 +55,12 @@ namespace GMGInventory.Common.Models
         public bool Selected { get; set; } = false;
     }
 
+    public class JsonSupplierOptionsModel : JsonOptionsModel
+    {
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+    }
+
     public class JsonItemOptionsModel
     {
         public string Id { get; set; }
@@ -62,6 +68,13 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
         public int Quantity { get; set; }
         public string Unit { get; set; }
+    }
+
+    public class JsonNameOptionsModel
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+        public string Name { get; set; }
     }
 
     public class JsonPurchaseOrderOptionsModel

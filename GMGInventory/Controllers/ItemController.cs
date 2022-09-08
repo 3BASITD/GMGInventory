@@ -1,7 +1,10 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -155,6 +158,140 @@ namespace GMGInventory.Controllers
             await itemRepository.ReactivateAsync(id);
             TempData["SuccessMessage"] = "Item reactivated successfully";
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UploadJson(ItemFileVM itemVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await itemRepository.UploadCombinationExistAsync(itemVM))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Already exist";
+            }
+            else
+            {
+                int? CategoryId = await categoryRepository.GetIdAsync(itemVM.Category);
+                if (CategoryId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Category";
+                }
+                else
+                {
+                    int? ItemTypeId = await itemTypeRepository.GetIdAsync(itemVM.ItemType);
+                    if (ItemTypeId == null)
+                    {
+                        responseModel.Status = "Error";
+                        responseModel.Message = "Unknown Item Type";
+                    }
+                    else
+                    {
+                        int? BrandId = await brandRepository.GetIdAsync(itemVM.Brand);
+                        if (BrandId == null)
+                        {
+                            responseModel.Status = "Error";
+                            responseModel.Message = "Unknown Brand";
+                        }
+                        else
+                        {
+                            int? UnitId = await itemRepository.GetUnitIdAsync(itemVM.Unit);
+                            if (UnitId == null)
+                            {
+                                responseModel.Status = "Error";
+                                responseModel.Message = "Unknown Unit";
+                            }
+                            else
+                            {
+                                if (await itemRepository.IsCodeExistAsync(itemVM.Code))
+                                {
+                                    int itemId = (int)await itemRepository.GetIdAsync(itemVM.Code);
+
+                                    await itemRepository.UpdateAsync(new ItemCommonVM
+                                    {
+                                        BrandId = BrandId.Value,
+                                        CategoryId = CategoryId.Value,
+                                        Id = itemId,
+                                        InterchangeNumber = itemVM.InterchangeNumber,
+                                        ItemTypeId = ItemTypeId.Value,
+                                        ModelNumber = itemVM.ModelNumber,
+                                        Name = itemVM.Name,
+                                        PartNumber = itemVM.PartNumber,
+                                        Size = itemVM.Size,
+                                        UnitId = UnitId.Value
+                                    });
+                                    responseModel.Status = "Success";
+                                    responseModel.Message = "Item updated";
+                                }
+                                else
+                                {
+                                    await itemRepository.AddAsync(new ItemCommonVM
+                                    {
+                                        BrandId = BrandId.Value,
+                                        CategoryId = CategoryId.Value,
+                                        Code = itemVM.Code,
+                                        InterchangeNumber = itemVM.InterchangeNumber,
+                                        ItemTypeId = ItemTypeId.Value,
+                                        ModelNumber = itemVM.ModelNumber,
+                                        Name = itemVM.Name,
+                                        NetPriceD = 0,
+                                        PartNumber = itemVM.PartNumber,
+                                        RetailPriceD = 0,
+                                        Size = itemVM.Size,
+                                        UnitId = UnitId.Value
+                                    });
+                                    responseModel.Status = "Success";
+                                    responseModel.Message = "Item added";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return Json(responseModel);
+        }
+
+        public async Task<IActionResult> DownloadFile()
+        {
+            DataTable dt = new DataTable("Items");
+            dt.Columns.AddRange(new DataColumn[10] {
+                new DataColumn("Code"),
+                new DataColumn("Name"),
+                new DataColumn("Part Number"),
+                new DataColumn("Interchange Number"),
+                new DataColumn("Model Number"),
+                new DataColumn("Category"),
+                new DataColumn("Item Type"),
+                new DataColumn("Brand"),
+                new DataColumn("Size"),
+                new DataColumn("Unit")
+            });
+            var items = await itemRepository.GetAllFileAsync();
+            foreach (var item in items)
+            {
+                dt.Rows.Add(item.Code, 
+                            item.Name,
+                            item.PartNumber,
+                            item.InterchangeNumber,
+                            item.ModelNumber,
+                            item.Category,
+                            item.ItemType,
+                            item.Brand,
+                            item.Size,
+                            item.Unit);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Items.xlsx");
+                }
+            }
         }
 
         [HttpPost]

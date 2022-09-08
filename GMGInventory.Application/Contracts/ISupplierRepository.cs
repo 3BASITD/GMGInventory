@@ -5,7 +5,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface ISupplierRepository : IGenericRepository<Supplier>
     {
-        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<List<JsonSupplierOptionsModel>> GetOptions(int? IncludeId);
         Task<List<SupplierViewVM>> GetAllSupplierVMAsync();
         Task<SupplierViewVM?> GetSupplierViewVMAsync(int? id);
         Task<SupplierVM?> GetSupplierVMAsync(int? id);

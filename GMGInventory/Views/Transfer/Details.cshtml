@@ -67,7 +67,7 @@
                             @Html.DisplayNameFor(model => model.Remarks)
                         </span>
                         <b class="d-block">
-                            @Model?.Remarks
+                            @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model?.Remarks)
                         </b>
                     </p>
                 </div>

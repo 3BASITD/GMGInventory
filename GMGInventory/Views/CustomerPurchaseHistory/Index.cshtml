@@ -1,0 +1,379 @@
+﻿@model IEnumerable<CustomerPurchaseVM>
+
+@{
+    ViewData["Title"] = "Customer Purchase History";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-history">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SONumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ControlNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PartNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Unit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SellingPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Discount1)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Discount2)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ExtendedPrice)
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-customer" class="form-label mb-0">Customer Code</label>
+                            <select id="filter-customer" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-customer-name" class="form-label mb-0">Customer Name</label>
+                            <input type="text" id="filter-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item" class="form-label mb-0">Item Code</label>
+                            <select id="filter-item" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item-name" class="form-label mb-0">Item Name</label>
+                            <input type="text" id="filter-item-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-category" class="form-label mb-0">Category</label>
+                            <select id="filter-category" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item-type" class="form-label mb-0">Item Type</label>
+                            <select id="filter-item-type" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Invoice Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Invoice Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        SetDateFilter();
+        function SetDateFilter() {
+            if ($("#filter-to").val() == "") {
+                if ($("#filter-from").val() == "") {
+                    $("#filter-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter-from").val());
+                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    $("#filter-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter-from").val() == "") {
+                var dt_to = new Date($("#filter-to").val());
+                dt_to.setFullYear(dt_to.getFullYear() - 1);
+                $("#filter-from").val(DateForInput(dt_to));
+            }
+        }
+
+        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+
+        var loadfilterloaded = false;
+        function LoadFilterSelect2() {
+            if(loadfilterloaded) return;
+            loadfilterloaded = true;
+            // Load Select2 for Customer
+            $("#filter-customer").select2({
+                minimumInputLength: 1,
+                allowClear: true,
+                placeholder: '<empty>',
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions", "Customer")",
+                    dataType: 'json',
+                    type: "POST",
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                dropdownParent: $("#filterModal")
+            });
+
+            $("#filter-customer").on("select2:select", function () {
+                $("#filter-customer-name").val($(this).select2("data")[0].name);
+            });
+
+            $("#filter-customer").on("select2:unselecting", function (e) {
+                $("#filter-customer-name").val("");
+            });
+
+            // Load Select2 for Item
+            $("#filter-item").select2({
+                minimumInputLength: 1,
+                allowClear: true,
+                placeholder: '<empty>',
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions", "Item")",
+                    dataType: 'json',
+                    type: "POST",
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                dropdownParent: $("#filterModal")
+            });
+
+            $("#filter-item").on("select2:select", function () {
+                $("#filter-item-name").val($(this).select2("data")[0].name);
+            });
+
+            $("#filter-item").on("select2:unselecting", function (e) {
+                $("#filter-item-name").val("");
+            });
+
+            // Load Select2 for Category
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Category")",
+                success: function (data, status, xhr) {
+                    $("#filter-category").select2({
+                        data: data,
+                        allowClear: true,
+                        placeholder: '<empty>',
+                        dropdownParent: $("#filterModal")
+                    });
+                }
+            });
+
+            // Load Select2 for Item Type
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "ItemType")",
+                success: function (data, status, xhr) {
+                    $("#filter-item-type").select2({
+                        data: data,
+                        allowClear: true,
+                        placeholder: '<empty>',
+                        dropdownParent: $("#filterModal")
+                    });
+                }
+            });
+
+            // Load Select2 for Brand
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Brand")",
+                success: function (data, status, xhr) {
+                    $("#filter-brand").select2({
+                        data: data,
+                        allowClear: true,
+                        placeholder: '<empty>',
+                        dropdownParent: $("#filterModal")
+                    });
+                }
+            });
+        }
+
+        $(".btnFilter").on("click", function () {
+            historyDT.ajax.reload();
+            $("#filterModal").modal("hide");
+        });
+
+        // Load List on DataTable
+        var historyDT = $('.table-history').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                data: function (data) {
+                    var customerId = $("#filter-customer").val();
+                    var itemId = $("#filter-item").val();
+                    var categoryId = $("#filter-category").val();
+                    var itemTypeId = $("#filter-item-type").val();
+                    var brandId = $("#filter-brand").val();
+
+                    if (customerId) data.CustomerId = customerId;
+                    if (itemId) data.ItemId = itemId;
+                    if (categoryId) data.CategoryId = categoryId;
+                    if (itemTypeId) data.ItemTypeId = itemTypeId;
+                    if (brandId) data.BrandId = brandId;
+
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+                },
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "invoiceDate", name: "InvoiceDate" },
+                { data: "soNumber", name: "SONumber" },
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "controlNumber", name: "ControlNumber" },
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "partNumber", name: "PartNumber" },
+                { data: "unit", name: "Unit" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "sellingPrice", name: "SellingPrice", className: "text-end" },
+                { data: "discount1", name: "Discount1", className: "text-end" },
+                { data: "discount2", name: "Discount2", className: "text-end" },
+                { data: "extendedPrice", name: "ExtendedPrice", className: "text-end" }
+            ],
+            order: [[0, "desc"]]
+        });
+
+        // Load functions upon DataTable load
+        historyDT.on("draw", function () {
+            hideLoader();
+
+            $('.table-history .dataTables_filter input').unbind();
+            $('.table-history .dataTables_filter input').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    historyDT.search($(this).val()).draw();
+                }
+            });
+
+            LoadFilterSelect2();
+        });
+    </script>
+    }

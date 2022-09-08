@@ -37,10 +37,12 @@ namespace GMGInventory.Data
         public decimal? TotalPurchaseAmount { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
-        public string ReferenceNumber { get; set; }
+        public string? ReferenceNumber { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal CurrencyRate { get; set; }
+
+        public DateTime ReplenishDate { get; set; }
 
         public ICollection<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
         public ICollection<PurchaseReturn> PurchaseReturns { get; set; }

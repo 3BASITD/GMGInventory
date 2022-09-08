@@ -20,6 +20,8 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
 
+        public DateTime TransferDate { get; set; }
+
         public ICollection<TransferItemDetail> TransferItemDetails { get; set; }
     }
 }

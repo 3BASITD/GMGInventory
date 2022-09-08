@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -68,11 +69,48 @@ namespace GMGInventory.Controllers
             return View();
         }
 
+        [HttpPost]
+        public async Task<JsonResult> SaveJson(PurchaseOrderFormVM form, string type)
+        {
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            if (type == "Draft")
+            {
+                var draft = await purchaseOrderRepository.SaveDraftAsync(form);
+                responseModel.Status = "Success";
+                responseModel.Message = "Draft successfully saved";
+                responseModel.NewRow = draft;
+            }
+            else
+            {
+                var replenish = await purchaseOrderRepository.SaveReplenishAsync(form);
+                responseModel.Status = "Success";
+                responseModel.Message = "Replenish successfully saved";
+                responseModel.NewRow = replenish;
+            }
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> DeleteDraftJson(int Id)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if(await purchaseOrderRepository.DeleteDraftAsync(Id))
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "Draft successfully removed";
+            } else
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Cannot remove draft. Please try again later";
+            }
+            return Json(responseModel);
+        }
+
         //[HttpPost]
-        //public async Task<JsonResult> CreateJson(TransferFormVM formVM)
+        //public async Task<JsonResult> CreateJson(PurchaseOrderFormVM formVM)
         //{
         //    ResponseModel responseModel = new ResponseModel();
-        //    await itemTransferRepository.AddAsync(formVM);
+        //    await purchaseOrderRepository.AddAsync(formVM);
         //    responseModel.Status = "Success";
         //    responseModel.Message = "Transfer successfully added";
         //    return Json(responseModel);

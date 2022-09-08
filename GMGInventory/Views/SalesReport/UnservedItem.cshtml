@@ -118,7 +118,7 @@
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "Category")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 $("#filter-category").select2({
                     data: data,
                     allowClear: true,
@@ -128,7 +128,7 @@
                     }
                 }).on("select2:select", loadFilterItemType);
             },
-            complete: function(xhr, status) {
+            complete: function (xhr, status) {
                 loadFilterItemType();
                 $(".downloadBtn").attr("disabled", true);
             }
@@ -142,7 +142,7 @@
                 data: {
                     CategoryId: $("#filter-category").val()
                 },
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if ($("#filter-item-type").data("select2")) {
                         $("#filter-item-type").select2("destroy");
                     }
@@ -157,7 +157,7 @@
                         }
                     }).on("select2:select", loadFilterBrand);
                 },
-                complete: function(xhr, status) {
+                complete: function (xhr, status) {
                     loadFilterBrand();
                     $(".downloadBtn").attr("disabled", true);
                 }
@@ -172,7 +172,7 @@
                 data: {
                     ItemTypeId: $("#filter-item-type").val()
                 },
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if ($("#filter-brand").data("select2")) {
                         $("#filter-brand").select2("destroy");
                     }
@@ -187,13 +187,13 @@
                         }
                     });
                 },
-                complete: function(xhr, status) {
+                complete: function (xhr, status) {
                     $(".downloadBtn").attr("disabled", true);
                 }
             });
         }
 
-        $("#filter-start-date, #filter-end-date").on("change", function() {
+        $("#filter-start-date, #filter-end-date").on("change", function () {
             $(".downloadBtn").attr("disabled", true);
         });
 
@@ -208,20 +208,20 @@
                 StartDate: { required: "Please enter Start Date." },
                 EndDate: { required: "Please enter End Date." }
             },
-            submitHandler: function(form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                 dataTable.ajax.reload();
-                return false;
             }
         });
 
         // Load List on DataTable
-        var dataTable = $('.table-unserved').on('preXhr.dt', function(e, settings, data) {
+        var dataTable = $('.table-unserved').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetUnservedItemDT")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     var categoryId = $("#filter-category").val();
                     var itemTypeId = $("#filter-item-type").val();
                     var brandId = $("#filter-brand").val();
@@ -255,11 +255,11 @@
         });
 
         // Load functions upon DataTable load
-        dataTable.on("draw", function() {
+        dataTable.on("draw", function () {
             $.LoadingOverlay("hide");
 
             $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function(e) {
+            $('.dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
                     dataTable.search($(this).val()).draw();
                 }
@@ -268,7 +268,7 @@
             $(".downloadBtn").attr("disabled", false);
         });
 
-        $(".downloadBtn").click(function(e) {
+        $(".downloadBtn").click(function (e) {
             var urlQuery = [];
             urlQuery.push("StartDate=" + $("#filter-start-date").val());
             urlQuery.push("EndDate=" + $("#filter-end-date").val());

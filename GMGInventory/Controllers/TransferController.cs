@@ -57,10 +57,11 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<JsonResult> CreateJson(TransferFormVM formVM)
         {
-            ResponseModel responseModel = new ResponseModel();
-            await itemTransferRepository.AddAsync(formVM);
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            int transferId = await itemTransferRepository.AddAsync(formVM);
             responseModel.Status = "Success";
             responseModel.Message = "Transfer successfully added";
+            responseModel.NewRow = transferId;
             return Json(responseModel);
         }
     }

@@ -27,18 +27,23 @@
         <div class="row">
             <div class="col-4">
                 <p class="text-sm">
-                    <span class="text-muted">
+                    <label for="item-code" class="text-muted fw-normal mb-0">
+                        @Html.DisplayNameFor(model => model.Code)
+                    </label>
+                        <select id="item-code" class="s2-bold s2ph-bold s2ph-dark" style="width: 100%;">
+                    </select>
+                    @*<span class="text-muted">
                         @Html.DisplayNameFor(model => model.Code)
                     </span>
                     <b class="d-block">
                         @Model?.Code
-                    </b>
+                    </b>*@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Name)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.Name
                     </b>
                 </p>
@@ -46,16 +51,16 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.PartNumber)
                     </span>
-                    <b class="d-block">
-                        @Model?.PartNumber
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrWhiteSpace(Model?.PartNumber) ? "-" : Model.PartNumber)
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.InterchangeNumber)
                     </span>
-                    <b class="d-block">
-                        @Model?.InterchangeNumber
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrWhiteSpace(Model?.InterchangeNumber) ? "-" : Model.InterchangeNumber)
                     </b>
                 </p>
             </div>
@@ -64,15 +69,15 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.ModelNumber)
                     </span>
-                    <b class="d-block">
-                        @Model?.ModelNumber
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrWhiteSpace(Model?.ModelNumber) ? "-" : Model.ModelNumber)
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Category)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.Category
                     </b>
                 </p>
@@ -80,7 +85,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.ItemType)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.ItemType
                     </b>
                 </p>
@@ -88,7 +93,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Brand)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.Brand
                     </b>
                 </p>
@@ -98,7 +103,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.UnitCode)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.UnitCode
                     </b>
                 </p>
@@ -106,7 +111,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Size)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.Size
                     </b>
                 </p>
@@ -114,7 +119,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.RetailPrice)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.RetailPrice
                     </b>
                 </p>
@@ -122,7 +127,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.NetPrice)
                     </span>
-                    <b class="d-block">
+                        <b class="d-block form-gayahin">
                         @Model?.NetPrice
                     </b>
                 </p>
@@ -359,6 +364,42 @@
 
 @section Scripts {
     <script>
+        $("#item-code").select2({
+            minimumInputLength: 1,
+            placeholder: '@Model?.Code',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Item")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $("#item-code").on("select2:select", function () {
+            window.location = window.location.href.replace("@Model?.Id",$("#item-code").val());
+        });
+
         $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
             var selectedTab = e.currentTarget.dataset.bsTarget;
             if (selectedTab == "#nav-warehouse") warehouseDT.ajax.reload();

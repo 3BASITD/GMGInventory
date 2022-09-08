@@ -262,8 +262,8 @@
                 { data: "dateModified", name: "DateModified" },
                 {
                     orderable: false,
-                    data: function(data, type, dataToSet) {
-                        var actions = '';
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
                         actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
                             actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-toggle="tooltip" title="Edit Details"><i class="fas fa-pencil-alt"></i></button>';
@@ -272,7 +272,7 @@
                             actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-bs-toggle="tooltip" title="Reactivate Item"><i class="fas fa-check"></i></button>';
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
-                        return actions;
+                        return actions + "</div>";
                     }
                 }
             ],
@@ -290,7 +290,7 @@
                 }
             });
 
-            $.LoadingOverlay("hide");
+            hideLoader();
 
             $('.deleteBtn').click(function(e) {
                 swal({
@@ -385,9 +385,9 @@
                     code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
                     name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." }
                 },
-                submitHandler: function(form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                     DoEdit();
-                    return false;
                 }
             });
 
@@ -450,9 +450,9 @@
                 code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
                 name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." }
             },
-            submitHandler: function(form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                 DoCreate();
-                return false;
             }
         });
 
@@ -497,7 +497,7 @@
                 load: function(e, file) {
                     var result = new Uint8Array(e.target.result);
                     var xlsread = XLSX.read(result, { type: 'array' });
-                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]]);
+                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
                     json_of_excel = xlsjson;
                 }
             }
@@ -582,7 +582,7 @@
         function UploadRowDone() {
             done_upload_excel++;
             if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
-                $("#upload-table").append('<tr><td colspan="5">Excluded because it already exist: ' + duplicate_upload + ' row(s)</tr>');
+                $("#upload-table").append('<tr><td>*</td><td colspan="3">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
                 $("#upload-file").val("");
             }
         }

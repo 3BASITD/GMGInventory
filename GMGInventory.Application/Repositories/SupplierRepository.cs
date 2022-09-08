@@ -26,15 +26,17 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<List<JsonSupplierOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Suppliers
                                 .Where(s => s.IsActive || s.Id == IncludeId)
-                                .Select(s => new JsonOptionsModel
+                                .Select(s => new JsonSupplierOptionsModel
                                 {
                                     Id = s.Id.ToString(),
                                     Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
-                                    Selected = IncludeId != null && IncludeId == s.Id
+                                    Selected = IncludeId != null && IncludeId == s.Id,
+                                    Address1 = s.AddressLine1,
+                                    Address2 = s.AddressLine2
                                 })
                                 .ToListAsync();
         }

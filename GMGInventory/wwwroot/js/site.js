@@ -31,7 +31,8 @@
     $(document).ajaxSend(function (event, jqxhr, settings) {
         $.LoadingOverlay("show", {
             image: "",
-            fontawesome: "fa fa-compact-disc fa-spin"
+            fontawesome: "fa fa-compact-disc fa-spin",
+            progress: true
         });
     });
 
@@ -55,6 +56,19 @@
     $.validator.addMethod('notEqualTo', function (value, element, param) {
         return this.optional(element) || parseInt(value) !== parseInt($(param).val());
     }, 'Should not be equal');
+
+    $.validator.addMethod('isNotZero', function (value, element, param) {
+        return this.optional(element) || parseInt(value) !== 0;
+    }, 'Should not be 0');
+
+    $("input[step='0.01']").on("focusout", function () {
+        $(this).val(Round2Decimal($(this).val()));
+    });
+
+    $("input[type='number']").on("focusout", function () {
+        if ($(this).val() == "")
+            $(this).val("0");
+    });
 });
 
 function reloadToolTip() {
@@ -104,14 +118,16 @@ function HideTabLoader(mod) {
     }
 }
 
-
+var temp_xhr;
 function jQueryCommonError(xhr, status, error) {
     if (xhr.status == 503) {
         toastr.warning("Looks like you got signed out! Please reload the page", xhr.statusText);
     } else if (xhr.status == 403) {
         toastr.warning("You are not allowed to do this action.", xhr.statusText);
+    } else if (error.trim() != "") {
+        toastr.error(error, "Error");
     } else {
-        toastr.error(error);
+        toastr.warning(xhr.status, xhr.statusText);
     }
 }
 
@@ -145,4 +161,28 @@ function ReplaceEmptyString(str, replacement) {
     if (str == null || str.trim() == "")
         return replacement;
     return str;
+}
+
+function Round2Decimal(num) {
+    return parseFloat(Math.round(parseFloat(num) * 100) / 100, 2).toFixed(2);
+}
+
+function FormatStringDecimal(num) {
+        return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add comma every 3 digits
+}
+
+function FormatStringInteger(num) {
+        return parseInt(num).toFixed(0).replace(/\B(?=(\d{3}))/g, ","); // add comma every 3 digits
+}
+
+function DateForInput(date) {
+    var d = new Date(Date.parse(date));
+    var day = d.getDate();
+    var month = d.getMonth() + 1;
+    var year = d.getFullYear();
+
+    if (month < 10) month = "0" + month;
+    if (day < 10) day = "0" + day;
+
+    return year + "-" + month + "-" + day;
 }

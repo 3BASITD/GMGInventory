@@ -1,0 +1,91 @@
+﻿@model IEnumerable<SalesReturnVM>
+
+@{
+    ViewData["Title"] = "Sales Returns";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                <span class="fas fa-plus"></span> New Sales Return
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-return">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SRNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CustomerCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CustomerName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReturnDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReturnBy)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        // Load List on DataTable
+        var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "srNumber", name: "SRNumber" },
+                { data: "customerCode", name: "CustomerCode" },
+                { data: "customerName", name: "CustomerName" },
+                { data: "returnDate", name: "ReturnDate" },
+                { data: "returnBy", name: "ReturnBy" },
+                { data: "remarks", name: "Remarks" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[0, "desc"]]
+        });
+
+        // Load functions upon DataTable load
+        returnDT.on("draw", function () {
+            hideLoader();
+
+            $('.table-return .dataTables_filter input').unbind();
+            $('.table-return .dataTables_filter input').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    returnDT.search($(this).val()).draw();
+                }
+            });
+        });
+    </script>
+    }

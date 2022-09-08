@@ -1,0 +1,97 @@
+﻿@model IEnumerable<InvoiceVM>
+
+@{
+    ViewData["Title"] = "Sales Invoice";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-invoice">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceType)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PackNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SONumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TotalAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        // Load List on DataTable
+        var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "invoiceDate", name: "InvoiceDate" },
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "invoiceType", name: "InvoiceType" },
+                { data: "packNumber", name: "PackNumber" },
+                { data: "customer", name: "Customer" },
+                { data: "soNumber", name: "SONumber" },
+                { data: "totalAmount", name: "TotalAmount" },
+                { data: "status", name: "Status" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        if (data.status == "Draft" && data.packedBy == $("#current-user-nickname").val()) {
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete Draft"><i class="far fa-trash-alt"></i></button>';
+                        }
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[0, "desc"]]
+        });
+
+        // Load functions upon DataTable load
+        invoiceDT.on("draw", function () {
+            hideLoader();
+
+            $('.table-invoice .dataTables_filter input').unbind();
+            $('.table-invoice .dataTables_filter input').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    invoiceDT.search($(this).val()).draw();
+                }
+            });
+        });
+    </script>
+    }

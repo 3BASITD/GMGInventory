@@ -7,11 +7,11 @@
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
-        <div class="card-tools">
+        @*<div class="card-tools">
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
-    <span class="fas fa-filter"></span> Filter
-</button>
-        </div>
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>*@
     </div>
     <div class="card-body">
         <table class="table table-head-fixed table-striped table-hover table-update">
@@ -91,7 +91,7 @@
     </div>
 </div>
 
-<!-- Filter Modal -->
+@*<!-- Filter Modal -->
 <div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
@@ -130,20 +130,17 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
 
 @section Scripts {
     <script>
-        var dataTable = $('.table-update').on('preXhr.dt', function(e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+        var dataTable = $('.table-update').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     var categoryId = $("#CategoryId").val();
                     var itemTypeId = $("#ItemTypeId").val();
                     var brandId = $("#BrandId").val();
@@ -161,23 +158,17 @@
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
-                {
-                    data: function(data, type, dataToSet) { return data.retailPrice.toFixed(2); },
-                    name: "RetailPrice",
-                    className: "text-end"
-                },
-                {
-                    data: function(data, type, dataToSet) { return data.netPrice.toFixed(2); },
-                    name: "NetPrice",
-                    className: "text-end"
-                },
+                { data: "retailPrice",  name: "RetailPrice",  className: "text-end" },
+                { data: "netPrice", name: "NetPrice", className: "text-end" },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
                 {
                     orderable: false,
-                    data: function(data, type, dataToSet) {
+                    data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button class="btn btn-warning btn-xs btn-update" data-bs-toggle="modal" data-bs-target="#updateModal" data-bs-toggle="tooltip" title="Update Price"><i class="fas fa-pencil-alt"></i></button>';
+                        if (data.isLatest) {
+                            actions += '<button class="btn btn-warning btn-xs btn-update" data-bs-toggle="modal" data-bs-target="#updateModal" data-bs-toggle="tooltip" title="Update Price"><i class="fas fa-pencil-alt"></i></button>';
+                        }
                         return actions;
                     }
                 }
@@ -185,20 +176,21 @@
             order: [[5, "desc"]]
         });
 
-        dataTable.on("draw", function() {
+        dataTable.on("draw", function () {
             reloadToolTip();
 
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function(e) {
+            $('.table-update .dataTables_filter input').unbind();
+            $('.table-update .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
                     dataTable.search($(this).val()).draw();
                 }
             });
+            $(".table-update thead th").removeClass("text-end");
 
-            $.LoadingOverlay("hide");
+            hideLoader();
 
             // Actions upon Display Update Modal
-            $('.btn-update').click(function(e) {
+            $('.btn-update').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
                 $("#update-code").val(data.code);
                 $("#update-name").val(data.name);
@@ -224,9 +216,9 @@
                         range: "Price must be between 0-1999999.99."
                     }
                 },
-                submitHandler: function(form) {
+                submitHandler: function (form, event) {
+                    event.preventDefault();
                     DoUpdate();
-                    return false;
                 }
             });
 
@@ -241,7 +233,7 @@
                         NetPrice: $("#update-net").val()
                     },
                     error: jQueryCommonError,
-                    success: function(data, status, xhr) {
+                    success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
@@ -250,7 +242,7 @@
                             dataTable.ajax.reload();
                         }
                     },
-                    complete: function(xhr, status) {
+                    complete: function (xhr, status) {
                     }
                 });
             }

@@ -6,6 +6,7 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -72,7 +73,7 @@ namespace GMGInventory.Application.Repositories
                                 Code = item.Code,
                                 Id = item.Id,
                                 ItemType = item.ItemType.Code,
-                                ModelNumber = string.IsNullOrWhiteSpace(item.ModelNumber) ? "-" :item.ModelNumber,
+                                ModelNumber = string.IsNullOrWhiteSpace(item.ModelNumber) ? "-" : item.ModelNumber,
                                 Name = item.Name,
                                 NetPrice = price == null ? 0 : price.NetSellingPrice,
                                 PartNumber = string.IsNullOrWhiteSpace(item.PartNumber) ? "-" : item.PartNumber,
@@ -164,25 +165,40 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ItemPriceUpdateVM>> GetAllItemPriceUpdateAsync(ItemFilterVM filter)
         {
-            var pricesVM = (from item in context.Items
-                            join price in context.ItemPrices on item.Id equals price.ItemId
-                            join user in userManager.Users on price.UserCreated equals user.Id
-                            where ((!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
-                                && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
-                                && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
-                                && (filter.BrandId == null || filter.BrandId == item.BrandId))
-                            select new ItemPriceUpdateVM
-                            {
-                                Code = item.Code,
-                                Id = item.Id,
-                                Name = item.Name,
-                                NetPrice = price == null ? 0 : price.NetSellingPrice,
-                                RetailPrice = price == null ? 0 : price.RetailSellingPrice,
-                                UserCreated = user.Nickname,
-                                DateCreated = price.DateCreated.ToString(SystemFormat.StringDateTime),
-                                DateCreatedD = price.DateCreated
-                            });
-            return await pricesVM.ToListAsync();
+            var pricesVM = await (from item in context.Items
+                                  join price in context.ItemPrices on item.Id equals price.ItemId
+                                  join user in userManager.Users on price.UserCreated equals user.Id
+                                  where ((!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+                                      && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
+                                      && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
+                                      && (filter.BrandId == null || filter.BrandId == item.BrandId))
+                                  select new ItemPriceUpdateVM
+                                  {
+                                      Code = item.Code,
+                                      Id = item.Id,
+                                      Name = item.Name,
+                                      NetPriceD = price == null ? 0m : price.NetSellingPrice,
+                                      RetailPriceD = price == null ? 0m : price.RetailSellingPrice,
+                                      UserCreated = user.Nickname,
+                                      DateCreatedD = price.DateCreated,
+                                      IsLatest = false
+                                  }).ToListAsync();
+            var pricesVM2 = pricesVM.OrderBy(s => s.Code)
+                                    .ThenByDescending(s => s.DateCreatedD)
+                                    .GroupBy(s => s.Code)
+                                    .SelectMany(s => s.Select((j, i) => new ItemPriceUpdateVM
+                                    {
+                                        Code = j.Code,
+                                        Id = j.Id,
+                                        Name = j.Name,
+                                        NetPriceD = j.NetPriceD,
+                                        RetailPriceD = j.RetailPriceD,
+                                        UserCreated = j.UserCreated,
+                                        DateCreatedD = j.DateCreatedD,
+                                        IsLatest = i == 0,
+                                        Temp = i
+                                    })).ToList();
+            return pricesVM2;
         }
 
         public async Task<ForDataTables<ItemPriceUpdateVM>> GetAllItemPriceUpdateDataTablesAsync(DataTablesRequestForm form, ItemFilterVM filter)
@@ -197,8 +213,8 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
                                     || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.NetPrice.ToString().ToLower().Contains(form.SearchValue)
-                                    || x.RetailPrice.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.NetPrice.ToLower().Contains(form.SearchValue)
+                                    || x.RetailPrice.ToLower().Contains(form.SearchValue)
                                     || x.UserCreated.ToLower().Contains(form.SearchValue)
                                     || x.DateCreated.ToLower().Contains(form.SearchValue));
             }
@@ -213,8 +229,8 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Code": data = data.OrderBy(s => s.Code); break;
                         case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "NetPrice": data = data.OrderBy(s => s.NetPrice); break;
-                        case "RetailPrice": data = data.OrderBy(s => s.RetailPrice); break;
+                        case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
+                        case "RetailPrice": data = data.OrderBy(s => s.RetailPriceD); break;
                         case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
                         default: break;
@@ -226,8 +242,8 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Code": data = data.OrderByDescending(s => s.Code); break;
                         case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "NetPrice": data = data.OrderByDescending(s => s.NetPrice); break;
-                        case "RetailPrice": data = data.OrderByDescending(s => s.RetailPrice); break;
+                        case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
+                        case "RetailPrice": data = data.OrderByDescending(s => s.RetailPriceD); break;
                         case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
                         default: break;

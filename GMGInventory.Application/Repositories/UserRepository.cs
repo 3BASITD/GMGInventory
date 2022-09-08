@@ -238,7 +238,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<List<AuditLog>> GetAuditLogAsync(string Id)
         {
             return await context.AuditLogs
-                .Where(s => s.UserId == Id)
+                .Where(s => s.UserId == Id && s.Type != "None")
                 .OrderByDescending(s=>s.DateTime)
                 .Take(100)
                 .ToListAsync();

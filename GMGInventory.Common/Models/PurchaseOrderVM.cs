@@ -11,11 +11,11 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
 
-        [Display(Name = "Purchase Order Number")]
+        [Display(Name = "PO Number")]
         public string PONumber { get; set; }
 
         [Display(Name = "Purchase Date")]
-        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
+        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
         public DateTime OrderDateD { get; set; }
 
         [Display(Name = "Purchase By")]
@@ -30,6 +30,10 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Status")]
         public string Status { get; set; }
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+        public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
     }
 
     public class PurchaseOrderDetailsVM : PurchaseOrderVM
@@ -80,8 +84,28 @@ namespace GMGInventory.Common.Models
         public decimal Discount2D { get; set; }
 
         [Display(Name = "Gross Price")]
-        public string GrossPrice => string.Format("{0:#,##0.00}", GrossPriceD);
-        //public decimal GrossPriceD => UnitPriceD - (Discount1D == 0 ? 0 : ((Discount1D / 100) * UnitPriceD)) - (Discount2D == 0 ? 0 : ((Discount2D / 100) * UnitPriceD));
-        public decimal GrossPriceD => UnitPriceD - ((Discount1D / 100) * UnitPriceD) - ((Discount2D / 100) * UnitPriceD);
+        public string NetPrice => string.Format("{0:#,##0.00}", NetPriceD);
+        public decimal NetPriceD => Quantity * (((100m - Discount1D - Discount2D) * UnitPriceD) / 100m);
+    }
+
+    public class PurchaseOrderFormVM
+    {
+        public int? Id { get; set; }
+        public int Supplier { get; set; }
+        public int Destination { get; set; }
+        public DateTime ReplenishDate { get; set; }
+        public int Currency { get; set; }
+        public decimal CurrencyRate { get; set; }
+        public string ReferenceNumber { get; set; }
+        public IList<PurchaseOrderFormItemVM> Items { get; set; }
+    }
+
+    public class PurchaseOrderFormItemVM
+    {
+        public int Item { get; set; }
+        public int Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal Discount1 { get; set; }
+        public decimal Discount2 { get; set; }
     }
 }

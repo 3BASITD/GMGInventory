@@ -231,7 +231,7 @@
 @section Scripts {
     <script>
         // Load List on DataTable
-        var dataTable = $('.table-brands').on('preXhr.dt', function(e, settings, data) {
+        var dataTable = $('.table-brands').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
@@ -245,7 +245,7 @@
                 { data: "name", name: "Name" },
                 { data: "itemType", name: "ItemType" },
                 {
-                    data: function(data, type, dataToSet) {
+                    data: function (data, type, dataToSet) {
                         if (data.isActive) {
                             return '<span class="fas fa-check text-success"></span>';
                         } else {
@@ -260,7 +260,7 @@
                 { data: "dateModified", name: "DateModified" },
                 {
                     orderable: false,
-                    data: function(data, type, dataToSet) {
+                    data: function (data, type, dataToSet) {
                         var actions = '';
                         actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
@@ -277,12 +277,12 @@
         });
 
         // Load functions upon DataTable load
-        dataTable.on("draw", function() {
+        dataTable.on("draw", function () {
             reloadToolTip();
 
             $.LoadingOverlay("hide");
 
-            $('.deleteBtn').click(function(e) {
+            $('.deleteBtn').click(function (e) {
                 swal({
                     title: "Delete / Deactivate Brand",
                     text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
@@ -299,7 +299,7 @@
                 });
             });
 
-            $('.reactivateBtn').click(function(e) {
+            $('.reactivateBtn').click(function (e) {
                 swal({
                     title: "Reactivate Brand",
                     text: "Are you sure you want to reactivate this record?",
@@ -316,7 +316,7 @@
                 });
             });
 
-            $('.detailsBtn').click(function(e) {
+            $('.detailsBtn').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
                 $(".modal-detail-code").html(data.code);
                 $(".modal-detail-name").html(data.name);
@@ -332,7 +332,7 @@
             });
 
             // Actions upon Display Edit Modal
-            $(".editBtn").click(function(e) {
+            $(".editBtn").click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
 
                 $("#edit-id").val(data.id);
@@ -350,7 +350,7 @@
                     type: "POST",
                     url: "@Url.Action("GetOptions", "ItemType")",
                     data: { includeId: data.ItemTypeId },
-                    success: function(data, status, xhr) {
+                    success: function (data, status, xhr) {
                         $("#edit-itemType").select2({
                             data: data,
                             allowClear: true,
@@ -375,9 +375,9 @@
                     code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
                     name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." }
                 },
-                submitHandler: function(form) {
+                submitHandler: function (form, event) {
+                    event.preventDefault();
                     DoEdit();
-                    return false;
                 }
             });
 
@@ -393,7 +393,7 @@
                         ItemTypeId: $("#edit-itemType").val()
                     },
                     error: jQueryCommonError,
-                    success: function(data, status, xhr) {
+                    success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
@@ -402,7 +402,7 @@
                             dataTable.ajax.reload();
                         }
                     },
-                    complete: function(xhr, status) {
+                    complete: function (xhr, status) {
                     }
                 });
             }
@@ -412,7 +412,7 @@
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "ItemType")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 $("#create-itemType").select2({
                     data: data,
                     allowClear: true,
@@ -426,7 +426,7 @@
         });
 
         // Actions upon Display Create Modal
-        $(".createBtn").click(function(e) {
+        $(".createBtn").click(function (e) {
             $("#create-code").val("");
             $("#create-name").val("");
         });
@@ -442,9 +442,9 @@
                 code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
                 name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." }
             },
-            submitHandler: function(form) {
+            submitHandler: function (form, event) {
+                event.preventDefault();
                 DoCreate();
-                return false;
             }
         });
 
@@ -462,7 +462,7 @@
                 //    $(".save-overlay").showOverlay();
                 //},
                 error: jQueryCommonError,
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastr.error(data.message, "Error");
                     } else {
@@ -471,7 +471,7 @@
                         dataTable.ajax.reload();
                     }
                 },
-                complete: function(xhr, status) {
+                complete: function (xhr, status) {
                     //$(".save-overlay").hideOverlay();
                 }
             });
@@ -486,10 +486,10 @@
             readAsDefault: 'ArrayBuffer',
             dragClass: 'drag',
             on: {
-                load: function(e, file) {
+                load: function (e, file) {
                     var result = new Uint8Array(e.target.result);
                     var xlsread = XLSX.read(result, { type: 'array' });
-                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]]);
+                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
                     json_of_excel = xlsjson;
                 }
             }
@@ -497,14 +497,14 @@
         $("#upload-file").fileReaderJS(opts);
 
         // Actions upon file selection
-        $("#upload-file").on("change", function() {
+        $("#upload-file").on("change", function () {
             done_upload_excel = 0;
             $("#upload-table tbody").html("");
             $("#upload-table").hide();
         });
 
         // Actions upon Display Upload Modal
-        $(".uploadBtn").click(function(e) {
+        $(".uploadBtn").click(function (e) {
             done_upload_excel = 0;
             $("#upload-file").val("");
             $("#upload-table tbody").html("");
@@ -554,10 +554,10 @@
                     Name: name,
                     ItemType: itemType
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     $("#upload-row" + rownum).html(error);
                 },
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.message == "Already exist") {
                         $("#upload-row" + rownum + "tr").remove();
                         duplicate_upload++;
@@ -565,7 +565,7 @@
                         $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
                     }
                 },
-                complete: function(xhr, status) {
+                complete: function (xhr, status) {
                     UploadRowDone();
                 }
             });
@@ -579,10 +579,9 @@
             }
         }
 
-        $(".downloadBtn").click(function(e) {
+        $(".downloadBtn").click(function (e) {
             window.location = "@Url.Action("DownloadFile")";
         });
     </script>
     }
-	
-	
+

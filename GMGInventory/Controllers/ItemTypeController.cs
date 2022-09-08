@@ -88,7 +88,7 @@ namespace GMGInventory.Controllers
                     itemTypeVM.CategoryId = CategoryId.Value;
                     await itemTypeRepository.AddAsync(itemTypeVM);
                     responseModel.Status = "Success";
-                    responseModel.Message = "Item type successfully added";
+                    responseModel.Message = "Item type added";
                 }
             }
             return Json(responseModel);
@@ -122,7 +122,7 @@ namespace GMGInventory.Controllers
 
         public IActionResult DownloadFile()
         {
-            DataTable dt = new DataTable("Category");
+            DataTable dt = new DataTable("Item Types");
             dt.Columns.AddRange(new DataColumn[3] {
                 new DataColumn("Code"),
                 new DataColumn("Name"),

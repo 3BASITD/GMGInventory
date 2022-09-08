@@ -90,7 +90,7 @@
     <div class="col-12">
         <div class="card card-default">
             <div class="card-header">
-                <span class="card-title">Audit Logs</span>
+                <span class="card-title">Audit Logs (Latest 100)</span>
             </div>
             <div class="card-body">
                 <table class="table table-head-fixed table-striped table-hover">
@@ -99,7 +99,7 @@
                             <th>Date Time</th>
                             <th>Action Type</th>
                             <th>Table Name</th>
-                            @*<th>Affected Columns</th>*@
+                            <th>Primary Key</th>
                             <th>Old Values</th>
                             <th>New Values</th>
                         </tr>
@@ -117,7 +117,7 @@
                                     <td>@item.DateTime.ToString("yyyy/MM/dd hh:mm:ss tt")</td>
                                     <td>@item.Type</td>
                                     <td>@item.TableName</td>
-                                    @*<td><pre>@item.AffectedColumns</pre></td>*@
+                                    <td><pre>@item.PrimaryKey</pre></td>
                                     <td>
                                         <pre>@item.OldValues.Replace("{", "").Replace("}", "").Replace(",\"",",\n\"")</pre>
                                     </td>

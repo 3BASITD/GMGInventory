@@ -15,7 +15,7 @@ namespace GMGInventory.Common.Models
         public string Destination { get; set; }
 
         [Display(Name = "Transfer Date")]
-        public string TransferDate => TransferDateD.ToString(SystemFormat.StringDateTime);
+        public string TransferDate => TransferDateD.ToString(SystemFormat.StringDate);
         public DateTime TransferDateD { get; set; }
 
         [Display(Name = "Transfer By")]
