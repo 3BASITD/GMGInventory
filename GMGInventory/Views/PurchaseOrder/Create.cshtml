@@ -385,7 +385,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-bs-toggle="tooltip" title="Remove Item"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -421,7 +421,6 @@
         });
 
         itemDT.on("draw", function () {
-            reloadToolTip();
             $(".btn-remove-item").on("click", function () {
                 itemDT.row($(this).parents('tr')).remove().draw();
             });

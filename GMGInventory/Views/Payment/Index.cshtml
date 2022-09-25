@@ -75,7 +75,7 @@
                     orderable: false,
                     data: function(data, type, dataToSet) {
                       var actions = '';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         return actions;
                     }
                 }
@@ -84,8 +84,10 @@
         });
 
         // load functions upon datatable load
-        datatable.on("draw", function() {
-            $.loadingoverlay("hide");
+        datatable.on("draw", function () {
+            hideLoader();
+
+            DatatablesSearchOnEnter('.table-payment', dataTable);
         });
 
        

@@ -18,15 +18,17 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        private async Task<IList<InvoiceVM>> GetListAsync(int? statusId)
+        private async Task<IList<InvoiceVM>> GetListAsync(ListFilterCommonModel filter)
         {
             var invoices = from inv in context.Invoices
                                            .Include(s => s.InvoiceType)
                                            .Include(s => s.Status)
                                            .Include(s => s.SalesOrder)
                                                .ThenInclude(s => s.Customer)
-                                           .Where(s => statusId == null || s.StatusId == statusId)
-                        join usr in userManager.Users on inv.UserCreated equals usr.Id
+                                           .Where(s => (filter.StatusId == null || s.StatusId == filter.StatusId)
+                                                     && filter.DateFrom <= s.DateCreated
+                                                     && s.DateCreated <= filter.DateTo)
+                           join usr in userManager.Users on inv.UserCreated equals usr.Id
                         select new InvoiceVM
                         {
                             Customer = inv.SalesOrder.Customer.Code,
@@ -43,11 +45,11 @@ namespace GMGInventory.Application.Repositories
             return await invoices.ToListAsync();
         }
 
-        public async Task<ForDataTables<InvoiceVM>> GetListDataTablesAsync(DataTablesRequestForm form, int? statusId)
+        public async Task<ForDataTables<InvoiceVM>> GetListDataTablesAsync(DataTablesRequestForm form, ListFilterCommonModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync(statusId)).AsQueryable();
+            var data = (await GetListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found

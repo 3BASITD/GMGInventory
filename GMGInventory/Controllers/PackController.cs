@@ -9,11 +9,11 @@ namespace GMGInventory.Controllers
     [Authorize(Roles = Roles.InvoicingClerk + ","
                      + Roles.SystemAdmin + "," 
                      + Roles.Telemarketer)]
-    public class PackListingController : Controller
+    public class PackController : Controller
     {
         private readonly IPackRepository packRepository;
 
-        public PackListingController(IPackRepository packRepository)
+        public PackController(IPackRepository packRepository)
         {
             this.packRepository = packRepository;
         }
@@ -24,10 +24,10 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson(int? Id)
+        public async Task<JsonResult> GetListJson(ListFilterCommonModel filter)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await packRepository.GetListDataTablesAsync(form, Id));
+            return Json(await packRepository.GetListDataTablesAsync(form, filter));
         }
     }
 }

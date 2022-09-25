@@ -62,21 +62,21 @@
                         <td>@item.UserModified</td>
                         <td>@item.DateModified</td>
                         <td>
-                            <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="View Details">
+                            <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id" data-microtip-title="View Details" data-microtip-position="left" role="tooltip" data-bs-toggle="tooltip" title="">
                                 <i class="fas fa-info-circle"></i>
                             </a>
                             @if (item.IsActive)
                             {
-                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="Edit Details">
+                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
-                                <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Category">
+                                <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Category" data-microtip-position="left" role="tooltip">
                                     <i class="far fa-trash-alt"></i>
                                 </button>
                             }
                             else
                             {
-                                <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Category">
+                                <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Category" data-microtip-position="left" role="tooltip">
                                     <i class="fas fa-check"></i>
                                 </button>
                             }

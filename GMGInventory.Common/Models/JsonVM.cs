@@ -68,6 +68,11 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
         public int Quantity { get; set; }
         public string Unit { get; set; }
+        public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
+        public decimal NetPriceD { get; set; }
+        public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
+        public decimal RetailPriceD { get; set; }
+        public int InventoryCount { get; set; }
     }
 
     public class JsonNameOptionsModel
@@ -75,6 +80,15 @@ namespace GMGInventory.Common.Models
         public string Id { get; set; }
         public string Text { get; set; }
         public string Name { get; set; }
+    }
+
+    public class JsonAddressOptionsModel
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+        public string Name { get; set; }
+        public string Address { get; set; }
+        public string CreditTerm { get; set; }
     }
 
     public class JsonPurchaseOrderOptionsModel
@@ -100,5 +114,48 @@ namespace GMGInventory.Common.Models
         //public bool incomplete_results { get; set; }
         public IList<T> items { get; set; }
         public int total_count { get; set; }
+    }
+
+    public class ListFilterCommonModel
+    {
+        DateTime? _DateFrom = null, _DateTo = null;
+        public int? StatusId { get; set; }
+        public DateTime? DateFrom {
+            get
+            {
+                SetDates();
+                return _DateFrom;
+            } 
+            set
+            {
+                _DateFrom = value;
+            }
+        }
+        public DateTime? DateTo
+        {
+            get
+            {
+                SetDates();
+                return _DateTo;
+            }
+            set
+            {
+                _DateTo = value;
+            }
+        }
+
+        private void SetDates()
+        {
+
+            if (_DateTo == null)
+            {
+                if (_DateFrom == null) { _DateTo = DateTime.Now; }
+                else { _DateTo = _DateFrom.Value.AddMonths(1); }
+            }
+            if (_DateFrom == null)
+            {
+                _DateFrom = _DateTo.Value.AddMonths(-1);
+            }
+        }
     }
 }

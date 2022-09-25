@@ -56,11 +56,11 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
 
         [Display(Name = "Retail Price")]
-        public string RetailPrice => string.Format("{0:#,##0.00}", RetailPriceD);
+        public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
 
         [Display(Name = "Net Price")]
-        public string NetPrice => string.Format("{0:#,##0.00}", NetPriceD);
+        public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
         public decimal NetPriceD { get; set; }
 
         [Display(Name = "Updated By")]

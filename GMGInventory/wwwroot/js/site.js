@@ -1,6 +1,4 @@
 ﻿$(document).ready(function () {
-    reloadToolTip();
-
     $('.select2option').select2({
         allowClear: true,
         placeholder: {
@@ -8,6 +6,10 @@
             text: "<empty>"
         },
         width: 'resolve'
+    });
+
+    $("select").on("select2:close", function (e) {
+        $(this).valid();
     });
 
     $("form").attr("autocomplete", "off");
@@ -41,12 +43,12 @@
 
     $(document).ajaxComplete(function (event, jqxhr, settings) {
         $.LoadingOverlay("hide");
-        reloadToolTip();
+        reloadInputNumberRule();
     });
 
     $(document).ajaxStop(function (event, jqxhr, settings) {
         $.LoadingOverlay("hide");
-        reloadToolTip();
+        reloadInputNumberRule();
     });
 
     $.validator.addMethod('lessThan', function (value, element, param) {
@@ -61,6 +63,18 @@
         return this.optional(element) || parseInt(value) !== 0;
     }, 'Should not be 0');
 
+});
+
+function userIsInRole(role) {
+    var isInRole = false;
+    $(".current-user-role").each(function () {
+        if ($(this).val() === role)
+            isInRole = true;
+    });
+    return isInRole;
+}
+
+function reloadInputNumberRule() {
     $("input[step='0.01']").on("focusout", function () {
         $(this).val(Round2Decimal($(this).val()));
     });
@@ -69,20 +83,10 @@
         if ($(this).val() == "")
             $(this).val("0");
     });
-});
 
-function reloadToolTip() {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, {
-        trigger: "hover"
-    }));
-}
-
-function resetToolTip() {
-    let tooltip = document.getElementsByClassName("tooltip");
-    //tooltip[0].parentNode.removeChild(tooltip[0]);
-    $.each(tooltip, function (i, item) {
-        item.parentNode.removeChild(item);
+    $("input[type='number']").on("keyup", function () {
+        if (parseFloat($(this).val()) > parseFloat($(this).attr("max")))
+            $(this).val($(this).attr("max"));
     });
 }
 
@@ -97,6 +101,14 @@ function hideLoader() {
     $.LoadingOverlay("hide");
 }
 
+function DatatablesSearchOnEnter(table, table_elem) {
+    $(table + ' .dataTables_filter input').unbind();
+    $(table + ' .dataTables_filter input').keyup(function (e) {
+        if (e.keyCode == 13) {
+            table_elem.search($(this).val()).draw();
+        }
+    });
+}
 
 // Use for tabs with datatables content
 var tabLoaderDisplayed = [];

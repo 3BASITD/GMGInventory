@@ -97,10 +97,7 @@
 @section Scripts {
     <script>
         var dataTable = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehouseTransferJson")",
@@ -122,7 +119,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         return actions;
                     }
                 }
@@ -131,16 +128,9 @@
         });
 
         dataTable.on("draw", function () {
-            reloadToolTip();
+            hideLoader();
 
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    dataTable.search($(this).val()).draw();
-                }
-            });
-
-            $.LoadingOverlay("hide");
+            DatatablesSearchOnEnter('.table-transfer', dataTable);
 
             // Actions upon Display Update Modal
             $('.btn-update').click(function (e) {

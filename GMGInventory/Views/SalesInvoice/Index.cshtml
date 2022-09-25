@@ -7,6 +7,11 @@
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
     </div>
     <div class="card-body">
         <table class="table table-head-fixed table-striped table-hover table-invoice">
@@ -43,8 +48,68 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Invoice Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Invoice Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        SetDateFilter();
+        function SetDateFilter() {
+            if ($("#filter-to").val() == "") {
+                if ($("#filter-from").val() == "") {
+                    $("#filter-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter-from").val());
+                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    $("#filter-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter-from").val() == "") {
+                var dt_to = new Date($("#filter-to").val());
+                dt_to.setFullYear(dt_to.getFullYear() - 1);
+                $("#filter-from").val(DateForInput(dt_to));
+            }
+        }
+
+        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+
+        $(".btnFilter").on("click", function () {
+            invoiceDT.ajax.reload();
+            $("#filterModal").modal("hide");
+        });
 
         // Load List on DataTable
         var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
@@ -71,9 +136,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.status == "Draft" && data.packedBy == $("#current-user-nickname").val()) {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete Draft"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }
                         return actions + "</div>";
                     }
@@ -86,12 +151,7 @@
         invoiceDT.on("draw", function () {
             hideLoader();
 
-            $('.table-invoice .dataTables_filter input').unbind();
-            $('.table-invoice .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    invoiceDT.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-invoice', invoiceDT);
         });
     </script>
     }

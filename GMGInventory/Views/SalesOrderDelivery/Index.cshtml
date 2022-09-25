@@ -264,8 +264,8 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
-                        actions += '<div data-bs-toggle="tooltip" title="Edit Details"><button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                         return actions + "</div>";
                     }
                 }
@@ -277,12 +277,7 @@
         deliveryDT.on("draw", function () {
             hideLoader();
 
-            $('.table-delivery .dataTables_filter input').unbind();
-            $('.table-delivery .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    deliveryDT.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-delivery', deliveryDT);
 
             LoadFilterSelect2();
         });

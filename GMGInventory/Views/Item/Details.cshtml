@@ -142,49 +142,49 @@
                                 <a class="nav-link active" id="nav-warehouse-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-warehouse"
                                    aria-controls="nav-warehouse" aria-selected="true">
-                                    <br />Warehouse Details
+                                    @*<br />*@Warehouse Details
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-purchase-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-purchase"
                                    aria-controls="nav-purchase" aria-selected="true">
-                                    Purchase Order<br />Details
+                                    Purchase Order@*<br />*@ Details
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-sales-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-sales"
                                    aria-controls="nav-sales" aria-selected="true">
-                                    Sales Order<br />Details
+                                    Sales Order@*<br />*@ Details
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-count-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-count"
                                    aria-controls="nav-count" aria-selected="true">
-                                    Physical Count<br />Adjustment
+                                    Physical Count@*<br />*@ Adjustment
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-price-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-price"
                                    aria-controls="nav-price" aria-selected="true">
-                                    <br />Price History
+                                    @*<br />*@Price History
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-transfer-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-transfer"
                                    aria-controls="nav-transfer" aria-selected="true">
-                                    Warehouse Transfer<br />History
+                                    Warehouse Transfer@*<br />*@ History
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-return-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-return"
                                    aria-controls="nav-return" aria-selected="true">
-                                    Sales Return<br />Details
+                                    Sales Return@*<br />*@ Details
                                 </a>
                             </li>
                         </ul>
@@ -435,23 +435,17 @@
                     orderable: false,
                     data: function(data, type, dataToSet) {
                         var actions = '';
-                        actions += '<div data-bs-toggle="tooltip" title="Adjust Quantity" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                        actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
                         return actions;
                     }
                 }
             ],
             order: [[0, "asc"]]
-        }).on("draw.dt", function() {
-            reloadToolTip();
-
-            $('.table-warehouse .dataTables_filter input').unbind();
-            $('.table-warehouse .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    warehouseDT.search($(this).val()).draw();
-                }
-            });
+        }).on("draw.dt", function () {
 
             HideTabLoader("warehouse");
+
+            DatatablesSearchOnEnter('.table-warehouse', warehouseDT);
 
             // Actions upon Display Edit Quantity Modal
             $(".quantityBtn").click(function(e) {
@@ -543,12 +537,7 @@
         }).on("draw.dt", function() {
             HideTabLoader("purchase");
             
-            $('.table-purchase .dataTables_filter input').unbind();
-            $('.table-purchase .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    purchaseDT.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-purchase', purchaseDT);
         });
 
 
@@ -585,12 +574,7 @@
         }).on("draw.dt", function() {
             HideTabLoader("sales");
 
-            $('.table-sales .dataTables_filter input').unbind();
-            $('.table-sales .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    salesDT.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-sales', salesDT);
         });
 
 
@@ -623,12 +607,7 @@
         }).on("draw.dt", function() {
             HideTabLoader("count");
 
-            $('.table-count .dataTables_filter input').unbind();
-            $('.table-count .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    countDT.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-count', countDT);
         });
 
 
@@ -658,12 +637,7 @@
         }).on("draw.dt", function() {
             HideTabLoader("price");
 
-            $('.table-price .dataTables_filter input').unbind();
-            $('.table-price .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    priceDT.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-price', priceDT);
         });
 
 
@@ -696,12 +670,7 @@
         }).on("draw.dt", function() {
             HideTabLoader("transfer");
 
-            $('.table-transfer .dataTables_filter input').unbind();
-            $('.table-transfer .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    transferDT.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-transfer', transferDT);
         });
 
 
@@ -734,12 +703,7 @@
         }).on("draw.dt", function() {
             HideTabLoader("return");
 
-            $('.table-return .dataTables_filter input').unbind();
-            $('.table-return .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    returnDT.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-return', returnDT);
         });
     </script>
 }

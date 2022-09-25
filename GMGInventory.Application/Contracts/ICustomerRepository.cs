@@ -5,7 +5,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface ICustomerRepository : IGenericRepository<Customer>
     {
-        Task<Select2Model<JsonNameOptionsModel>> GetOptions(string search, int page);
+        Task<Select2Model<JsonAddressOptionsModel>> GetOptions(string search, int page);
 
         //Task<List<CustomerViewVM>> GetAllCustomerVMAsync();
         //Task<CustomerViewVM?> GetCustomerViewVMAsync(int? id);

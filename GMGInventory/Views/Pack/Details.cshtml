@@ -1,0 +1,752 @@
+﻿@model SalesOrderDetailsVM
+
+@{
+    ViewData["Title"] = "Package Details";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Pack" asp-action="Index">Pack Lising</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title po-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                    <span class="fas fa-print"></span> Print
+                </button>
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.SONumber)
+                        </span>
+                        <b class="d-block">
+                            @Model?.SONumber
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerCode)
+                        </span>
+                        <b class="d-block">
+                            @Model?.CustomerCode
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerName)
+                        </span>
+                        <b class="d-block">
+                            @Model?.CustomerName
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerAddress)
+                        </span>
+                        <b class="d-block">
+                            @(string.IsNullOrEmpty(Model?.CustomerAddress.Trim()) ? "-" : Model.CustomerAddress)
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.AgentCode)
+                        </span>
+                        <b class="d-block">
+                            @Model?.AgentCode
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.AgentName)
+                        </span>
+                        <b class="d-block">
+                            @Model?.AgentName
+                        </b>
+                    </p>
+                </div>
+                <div class="col-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.GrossNetPrice)
+                        </span>
+                        <b class="d-block">
+                            @Model?.GrossNetPrice
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CreditTerms)
+                        </span>
+                        <b class="d-block">
+                            @Model?.CreditTerms
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DeclaredValue)
+                        </span>
+                        <b class="d-block">
+                        @Model?.DeclaredValue
+                        </b>
+                    </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.PONumber)
+                    </span>
+                    <b class="d-block">
+                            @(string.IsNullOrEmpty(Model?.PONumber?.Trim()) ? "-" : Model.PONumber)
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DeliveryType)
+                    </span>
+                    <b class="d-block">
+                        @Model?.DeliveryType
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.SalesOrderBy)
+                    </span>
+                    <b class="d-block">
+                        @Model?.SalesOrderBy
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.OrderDate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.OrderDate
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.RequiredDate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.RequiredDate
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DeliveryDate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.DeliveryDate
+                    </b>
+                </p>
+                @if (Model?.Status == "Approved")
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ApprovedBy)
+                        </span>
+                        <b class="d-block">
+                            @(string.IsNullOrEmpty(Model?.ApprovedBy?.Trim()) ? "-" : Model.ApprovedBy)
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ApprovedDate)
+                        </span>
+                        <b class="d-block">
+                            @Model?.ApprovedDate
+                        </b>
+                    </p>
+                }
+                @if (Model?.Status == "Disapproved")
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DisapprovedBy)
+                        </span>
+                        <b class="d-block">
+                            @(string.IsNullOrEmpty(Model?.DisapprovedBy?.Trim()) ? "-" : Model.DisapprovedBy)
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DisapprovedDate)
+                        </span>
+                        <b class="d-block">
+                            @Model?.DisapprovedDate
+                        </b>
+                    </p>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Sales Order Item(s)</span>
+                        @if(Model.Status == "Submitted") {
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                    <span class="fas fa-plus"></span> Add Item
+                                </button>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-item">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Inventory Count</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Net Price</th>
+                                    <th>Retail Price</th>
+                                    <th>Selling Price</th>
+                                    <th>Discount 1</th>
+                                    <th>Discount 2</th>
+                                    <th>Gross Price</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3"></th>
+                                    <th>Total</th>
+                                    <th class="total-quantity">0</th>
+                                    <th colspan="3"></th>
+                                    <th class="total-selling-price">0.00</th>
+                                    <th colspan="2"></th>
+                                    <th class="total-net-price">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="po-status" value="@Model?.Status" />
+
+<!-- Save Order Item Modal -->
+<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Sales Order Item</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form-item">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-code" class="form-label mb-0">Code</label>
+                                <div>
+                                    <select id="add-code" name="Code" style="width: 100%;">
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-name" class="form-label mb-0">Name</label>
+                                <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-quantity" class="form-label mb-0">Quantity</label>
+                                <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-unit" class="form-label mb-0">Unit</label>
+                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-unit-price" class="form-label mb-0">Unit Price</label>
+                                <input type="number" step="0.01" min="0" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
+                                <span data-valmsg-for="add-unit-price" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-discount1" class="form-label mb-0">Discount 1</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="add-discount1" name="Discount1" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="add-discount1" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-discount2" class="form-label mb-0">Discount 2</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="add-discount2" name="Discount2" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="add-discount2" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-net-price" class="form-label mb-0">Net Price</label>
+                                <input type="number" id="add-net-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="add-net-price" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-add">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load item for select2
+        $("#add-code").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: "<empty>",
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Item")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#addModal")
+        });
+
+        $("#add-code").on("select2:select", function () {
+            $("#add-name").val($("#add-code").select2("data")[0].name);
+            $("#add-unit").val($("#add-code").select2("data")[0].unit);
+            $("#add-code-error").html("");
+        });
+
+        $("#add-code").on("select2:unselecting", function (e) {
+            $("#add-name").val("");
+            $("#add-unit").val("");
+        });
+
+        $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2").on("input", function () {
+            var quantity = parseFloat($("#add-quantity").val());
+            var unit_price = parseFloat($("#add-unit-price").val());
+            var discount1 = parseFloat($("#add-discount1").val());
+            var discount2 = parseFloat($("#add-discount2").val());
+
+            $("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+        });
+
+        function clearItemForm() {
+            $("#add-code").val("").trigger("change");
+            $("#add-name").val("");
+            $("#add-quantity").val("0");
+            $("#add-unit").val("");
+            $("#add-unit-price").val("0");
+            $("#add-discount1").val("0");
+            $("#add-discount2").val("0");
+            $("#add-net-price").val("0");
+        }
+
+        $(".createBtn").on("click", clearItemForm);
+
+        // Validation for Add Item Modal
+        var validateAdd = $("#form-item").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                Code: { required: true },
+                Quantity: { required: true, isNotZero: true },
+                UnitPrice: { required: true }
+            },
+            messages: {
+                Code: { required: "Please select item to replenish." },
+                Quantity: { required: "Please enter a quantity", isNotZero: "Can not replenish an item with 0 quantity" },
+                UnitPrice: { required: "Please enter the unit cost" }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                AddItem();
+            }
+        });
+
+        function AddItem() {
+            var rowIndexes = [];
+            itemDT.rows(function (idx, data, node) {
+                if (data.id === $("#add-code").select2("data")[0].id) {
+                    rowIndexes.push(idx);
+                }
+                return false;
+            });
+            if (rowIndexes.length > 0) {
+                toastr.warning("Can't add duplicate item");
+            } else {
+                itemDT.row.add({
+                    id: $("#add-code").select2("data")[0].id,
+                    itemCode: $("#add-code").select2("data")[0].text,
+                    itemName: $("#add-code").select2("data")[0].name,
+                    quantity: $("#add-quantity").val() || 0,
+                    unit: $("#add-code").select2("data")[0].unit,
+                    unitPrice: Round2Decimal($("#add-unit-price").val() || 0),
+                    unitPriceD: $("#add-unit-price").val() || 0,
+                    discount1: Round2Decimal($("#add-discount1").val() || 0),
+                    discount1D: $("#add-discount1").val() || 0,
+                    discount2: Round2Decimal($("#add-discount2").val() || 0),
+                    discount2D: $("#add-discount2").val() || 0,
+                    netPrice: Round2Decimal($("#add-net-price").val() || 0),
+                    netPriceD: $("#add-net-price").val() || 0
+                }).draw();
+                clearItemForm();
+            }
+        }
+
+        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemsJson")",
+                data: { salesOrderId: @Model?.Id },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                },
+                type: "POST",
+            },
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-bs-toggle="tooltip" title="Remove Item"><i class="fas fa-minus"></i></button>';
+                        return actions;
+                    }, 
+                    className: "form-cell"
+                },
+                { data: "itemCode", name: "ItemCode", className: "form-cell" },
+                { data: "itemName", name: "ItemName", className: "form-cell" },
+                { data: "inventoryCount", name: "InventoryCount", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if ($("#po-status").val() == "Submitted") {
+                            return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        } else {
+                            return data.quantity
+                        }
+                    },
+                    name: "Quantity",
+                    className: "form-cell text-end"
+                },
+                { data: "unit", name: "Unit", className: "form-cell" },
+                { data: "netPrice", name: "NetPrice", className: "form-cell text-end" },
+                { data: "retailPrice", name: "RetailPrice", className: "form-cell text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if ($("#po-status").val() == "Submitted") {
+                            return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm sellingprice" style="width: 100%;" />';
+                        } else {
+                            return data.sellingPrice
+                        }
+                    },
+                    name: "SellingPrice",
+                    className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if ($("#po-status").val() == "Submitted") {
+                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
+                        } else {
+                            return data.discount1
+                        }
+                    },
+                    name: "Discount1",
+                    className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if ($("#po-status").val() == "Submitted") {
+                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
+                        } else {
+                            return data.discount2
+                        }
+                    },
+                    name: "Discount2",
+                    className: "form-cell text-end"
+                },
+                { data: "grossPrice", name: "GrossPrice", className: "form-cell text-end grossprice" }
+            ],
+            order: [[0, "asc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                var numVal = function (i) {
+                    switch (typeof i) {
+                        case 'string': return elemVal(i);
+                        case 'number': return i;
+                        default: return 0;
+                    }
+                };
+                var elemVal = function (i) {
+                    if(i.includes("input"))
+                        return $(i).val() * 1;
+                    else
+                        return i.replace(/[\$,]/g, '') * 1;
+                }
+                var totalQuantity = api.column(4).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
+                var totalSellPrice = api.column(8).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
+                var totalGrossPrice = api.column(11).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
+
+                $(api.column(4).footer()).html(FormatStringInteger(totalQuantity));
+                $(api.column(8).footer()).html(FormatStringDecimal(totalSellPrice));
+                $(api.column(11).footer()).html(FormatStringDecimal(totalGrossPrice));
+            }
+        });
+
+        itemDT.on("draw", function () {
+            if ($("#po-status").val() == "Submitted") {
+                itemDT.column(0).visible(true);
+            } else {
+                itemDT.column(0).visible(false);
+            }
+            //itemDT.ajax.reload();
+
+            reloadToolTip();
+
+            $('.table-item .dataTables_filter input').unbind();
+            $('.table-item .dataTables_filter input').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    itemDT.search($(this).val()).draw();
+                }
+            });
+            hideLoader();
+
+            $(".btn-remove-item").on("click", function () {
+                itemDT.row($(this).parents('tr')).remove().draw();
+            });
+            $(".table-item thead th").removeClass("form-cell");
+            $(".table-item thead th").removeClass("text-end");
+            $(".table-item thead th").removeClass("grossprice");
+            
+            ComputeTotalQuantity();
+            ComputeTotalSellingPrice();
+            ComputeTotalGrossPrice();
+            $(".quantity, .sellingprice, .discount1, .discount2").on("input", function () {
+                var quantity = parseInt($(this).parents("tr").find(".quantity").val());
+                var selling_price = parseFloat($(this).parents("tr").find(".sellingprice").val());
+                var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
+                var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
+
+                var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * selling_price) / 100)));
+                $(this).parents("tr").find(".grossprice").html(gross_price);
+                ComputeTotalQuantity();
+                ComputeTotalSellingPrice();
+                ComputeTotalGrossPrice();
+            });
+        });
+
+        function ComputeTotalQuantity() {
+            total_quantity = 0;
+            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                total_quantity += parseInt($(this.node()).find(".quantity").val());
+            } );
+            $(".total-quantity").html(FormatStringInteger(total_quantity));
+        }
+
+        function ComputeTotalSellingPrice() {
+            total_selling_price = 0;
+            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                total_selling_price += parseFloat($(this.node()).find(".sellingprice").val());
+            } );
+            $(".total-selling-price").html(FormatStringDecimal(total_selling_price));
+        }
+
+        function ComputeTotalGrossPrice() {
+            total_gross_price = 0;
+            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",",""));
+            } );
+            $(".total-gross-price").html(FormatStringDecimal(total_gross_price));
+        }
+
+        function GetItemsToReplenish() {
+            var item_to_replenish = [];
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                var row_quantity = parseInt($(this.node()).find(".quantity").val());
+                var row_sellprice = parseFloat($(this.node()).find(".sellingprice").val());
+                var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
+                var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
+                item_to_replenish.push({
+                    item: row_data.id,
+                    quantity: row_quantity,
+                    unitPrice: row_sellprice,
+                    discount1: row_discount1,
+                    discount2: row_discount2
+                });
+            });
+            return item_to_replenish;
+        }
+
+        $(".btn-details-submit").on("click", function () {
+            var itemsToReplenish = GetItemsToReplenish();
+            if (itemsToReplenish.length == 0) {
+                toastr.warning("No item to replenish. Add an item to the list to continue");
+            } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveJson")",
+                    data: {
+                        Id: @Model?.Id,
+                        Items: itemsToReplenish
+                    },
+                    error: jQueryCommonError,
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                        }
+                    }
+                });
+            }
+        });
+
+        $(".btn-details-print").on("click", function () {
+            var html = '<h3>Replenishment Details</h3>';
+            html += '<table class="table-header w100">';
+            html += '<tr>';
+            @*
+            html += '<th>@Html.DisplayNameFor(model => model.Supplier)</th><td>@Model?.Supplier</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.OrderDate)</th><td>@Model?.OrderDate</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.OrderBy)</th><td>@Model?.OrderBy</td>';
+            html += '</tr>';
+            html += '<tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.Address1)</th><td>@(string.IsNullOrEmpty(Model?.Address1.Trim()) ? "-" : Model.Address1)</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.Currency)</th><td>@Model?.Currency</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.PONumber)</th><td>@Model?.PONumber</td>';
+            html += '</tr>';
+            html += '<tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.Address2)</th><td>@(string.IsNullOrEmpty(Model?.Address2.Trim()) ? "-" : Model.Address2)</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.CurrencyRate)</th><td>@Model?.CurrencyRate</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.ReferenceNumber)</th><td>@Model?.ReferenceNumber</td>';
+            html += '</tr>';
+            html += '<tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.Destination)</th><td>@Model?.Destination</td > ';*@
+            html += '</tr>';
+            html += '</table>';
+
+            html += '<table class="table-items">';
+            html += '<tr>';
+            html += '<thead>';
+            html += '<th>Item Code</th>';
+            html += '<th>Item Name</th>';
+            html += '<th>Quantity</th>';
+            html += '<th>Unit</th>';
+            html += '<th>Unit Price</th>';
+            html += '<th>Discount 1</th>';
+            html += '<th>Discount 2</th>';
+            html += '<th>Net Price</th>';
+            html += '</thead>';
+            html += '</tr>';
+            var totalQuantity = 0, totalNetPrice = 0;
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                html += '<tr>';
+                html += '<td>' + row_data.itemCode + '</td>';
+                html += '<td>' + row_data.itemName + '</td>';
+                html += '<td class="right-text">' + row_data.quantity + '</td>';
+                html += '<td>' + row_data.unit + '</td>';
+                html += '<td class="right-text">' + row_data.unitPrice + '</td>';
+                html += '<td class="right-text">' + row_data.discount1 + '</td>';
+                html += '<td class="right-text">' + row_data.discount2 + '</td>';
+                html += '<td class="right-text">' + row_data.netPrice + '</td>';
+                html += '</tr>';
+
+                totalQuantity += parseInt(row_data.quantity);
+                totalNetPrice += parseFloat(row_data.netPriceD);
+            });
+            html += '<tr>';
+            html += '<tfoot>';
+            html += '<th colspan="2" class="right-text">Total</th>';
+            html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
+            html += '<th colspan="4"></th>';
+            html += '<th class="right-text">' + FormatStringDecimal(totalNetPrice) + '</th>';
+            html += '</tfoot>';
+            html += '</tr>';
+            html += '</table>';
+            $("#for-print").html(html);
+            $("#for-print").printThis({
+                importCSS: false,
+                loadCSS: "/css/print.css",
+                pageTitle: "GMG Inventory",
+                beforePrint: function () {
+                    $.LoadingOverlay("show", {
+                        image: "",
+                        fontawesome: "fas fa-print"
+                    });
+                },
+                afterPrint: function () {
+                    $.LoadingOverlay("hide");
+                }
+            });
+        });
+    </script>
+}

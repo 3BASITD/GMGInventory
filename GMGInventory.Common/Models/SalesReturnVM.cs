@@ -47,19 +47,19 @@ namespace GMGInventory.Common.Models
         public string Unit { get; set; }
 
         [Display(Name = "Amount")]
-        public string Amount => string.Format("{0:#,##0.00}", AmountD);
+        public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
         public decimal AmountD { get; set; }
 
         [Display(Name = "Discount 1")]
-        public string Discount1 => string.Format("{0:#,##0.00}", Discount1D);
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
         public decimal Discount1D { get; set; }
 
         [Display(Name = "Discount 2")]
-        public string Discount2 => string.Format("{0:#,##0.00}", Discount2D);
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
         [Display(Name = "Net Amount")]
-        public string NetAmount => string.Format("{0:#,##0.00}", NetAmountD);
+        public string NetAmount => string.Format(SystemFormat.StringDecimalComma, NetAmountD);
         public decimal NetAmountD => Quantity * (((100m - Discount1D - Discount2D) * AmountD) / 100m);
 
         [Display(Name = "Reference Number")]

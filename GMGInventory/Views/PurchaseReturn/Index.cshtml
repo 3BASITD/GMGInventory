@@ -174,10 +174,7 @@
         });
 
         var itemDT = $('.table-replenish').on('preXhr.dt', function (e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+                showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson", "PurchaseOrder")",
@@ -211,9 +208,8 @@
         });
 
         itemDT.on("draw", function () {
-            reloadToolTip();
             $(".table-replenish th").removeClass("form-cell");
-            $.LoadingOverlay("hide");
+            hideLoader();
         });
 
         var returnDT = $('.table-return-items').DataTable({
@@ -228,7 +224,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-bs-toggle="tooltip" title="Remove Item"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -239,10 +235,8 @@
         });
 
         returnDT.on("draw", function () {
-            reloadToolTip();
             $(".table-return-items .btn-remove-item").on("click", function () {
                 returnDT.row($(this).parents('tr')).remove().draw();
-                resetToolTip();
             })
         });
 
@@ -321,10 +315,7 @@
                     $('.table-return-history tbody').empty();
                 }
                 historyDT = $('.table-return-history').on('preXhr.dt', function (e, settings, data) {
-                    $.LoadingOverlay("show", {
-                        image: "",
-                        fontawesome: "fa fa-cog fa-spin"
-                    });
+                    showLoader();
                 }).DataTable({
                     ajax: {
                         url: "@Url.Action("GetListJson", "PurchaseReturn")",
@@ -351,8 +342,7 @@
                 });
 
                 historyDT.on("draw", function () {
-                    reloadToolTip();
-                    $.LoadingOverlay("hide");
+                    hideLoader();
                 });
             }
         });

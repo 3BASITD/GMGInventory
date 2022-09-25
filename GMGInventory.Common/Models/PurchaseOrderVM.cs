@@ -25,7 +25,7 @@ namespace GMGInventory.Common.Models
         public string Destination { get; set; }
 
         [Display(Name = "Total Purchase Amount")]
-        public string TotalAmount => string.Format("{0:#,##0.00}", TotalAmountD);
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
         public decimal TotalAmountD { get; set; }
 
         [Display(Name = "Status")]
@@ -48,7 +48,7 @@ namespace GMGInventory.Common.Models
         public string Currency { get; set; }
 
         [Display(Name = "Currency Rate")]
-        public string CurrencyRate => string.Format("{0:#,##0.00}", CurrencyRateD);
+        public string CurrencyRate => string.Format(SystemFormat.StringDecimalComma, CurrencyRateD);
         public decimal CurrencyRateD { get; set; }
 
         [Display(Name = "Reference Number")]
@@ -72,19 +72,19 @@ namespace GMGInventory.Common.Models
         public string Unit { get; set; }
 
         [Display(Name = "Unit Cost")]
-        public string UnitPrice => string.Format("{0:#,##0.00}", UnitPriceD);
+        public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
         public decimal UnitPriceD { get; set; }
 
         [Display(Name = "Discount 1")]
-        public string Discount1 => string.Format("{0:#,##0.00}", Discount1D);
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
         public decimal Discount1D { get; set; }
 
         [Display(Name = "Discount 2")]
-        public string Discount2 => string.Format("{0:#,##0.00}", Discount2D);
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
         [Display(Name = "Gross Price")]
-        public string NetPrice => string.Format("{0:#,##0.00}", NetPriceD);
+        public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
         public decimal NetPriceD => Quantity * (((100m - Discount1D - Discount2D) * UnitPriceD) / 100m);
     }
 

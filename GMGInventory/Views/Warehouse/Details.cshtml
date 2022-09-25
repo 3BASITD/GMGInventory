@@ -203,13 +203,9 @@
         });
 
         itemDT.on("draw", function() {
-            $('.table-warehouse-items .dataTables_filter input').unbind();
-            $('.table-warehouse-items .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    itemDT.search($(this).val()).draw();
-                }
-            });
             HideTabLoader("items");
+
+            DatatablesSearchOnEnter('.table-warehouse-items', itemDT);
         });
 
         var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
@@ -239,13 +235,9 @@
         });
 
         transferDT.on("draw", function () {
-            $('.table-transfer .dataTables_filter input').unbind();
-            $('.table-transfer .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    transferDT.search($(this).val()).draw();
-                }
-            });
             HideTabLoader("transfer");
+
+            DatatablesSearchOnEnter('.table-transfer', transferDT);
         });
     </script>
 }

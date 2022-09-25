@@ -256,14 +256,9 @@
 
         // Load functions upon DataTable load
         dataTable.on("draw", function () {
-            $.LoadingOverlay("hide");
+            hideLoader();
 
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    dataTable.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table-unserved', dataTable);
 
             $(".downloadBtn").attr("disabled", false);
         });

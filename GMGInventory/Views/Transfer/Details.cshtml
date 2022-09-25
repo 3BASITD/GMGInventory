@@ -90,11 +90,8 @@
 
 @section Scripts {
     <script>
-        var itemDT = $('.table-item').on('preXhr.dt', function(e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemTransferJson")",
@@ -115,16 +112,9 @@
         });
 
         itemDT.on("draw", function() {
-            reloadToolTip();
+            hideLoader();
 
-            $('.table-item .dataTables_filter input').unbind();
-            $('.table-item .dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    itemDT.search($(this).val()).draw();
-                }
-            });
-
-            $.LoadingOverlay("hide");
+            DatatablesSearchOnEnter('.table-item', itemDT);
         });
     </script>
 }

@@ -62,7 +62,7 @@
                 @Model?.IsActive
                 @if (Model?.IsActive == false)
                 {
-                    <span class="fas fa-question-circle text-primary" data-bs-toggle="tooltip" title="This was deleted but instead marked as Inactive because it was used in other records."></span>
+                    <span class="fas fa-question-circle text-primary" data-microtip-title="This was deleted but instead marked as Inactive because it was used in other records." data-microtip-position="left" role="tooltip"></span>
                 }
             </dd>
             <dt class="col-sm-2">

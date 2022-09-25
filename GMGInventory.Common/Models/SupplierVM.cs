@@ -120,7 +120,6 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Email Address")]
         public string EmailAddress { get; set; }
 
-        public bool IsActive { get; set; }
         public bool IsForeign { get; set; }
     }
 

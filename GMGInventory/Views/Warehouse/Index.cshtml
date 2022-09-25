@@ -48,21 +48,21 @@
                             <td>@warehouse.ContactNumber</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@warehouse.Id" data-bs-toggle="tooltip" title="View Details">
+                                    <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@warehouse.Id" data-microtip-title="View Details" data-microtip-position="left" role="tooltip">
                                         <i class="fas fa-info-circle"></i>
                                     </a>
                                     @if (warehouse.IsActive)
                                     {
-                                        <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@warehouse.Id" data-bs-toggle="tooltip" title="Edit Details">
+                                        <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@warehouse.Id" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip">
                                             <i class="fas fa-pencil-alt"></i>
                                         </a>
-                                        <button data-id="@warehouse.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item">
+                                        <button data-id="@warehouse.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="left" role="tooltip">
                                             <i class="far fa-trash-alt"></i>
                                         </button>
                                     }
                                     else
                                     {
-                                        <button data-id="@warehouse.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item">
+                                        <button data-id="@warehouse.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="left" role="tooltip">
                                             <i class="fas fa-check"></i>
                                         </button>
                                     }

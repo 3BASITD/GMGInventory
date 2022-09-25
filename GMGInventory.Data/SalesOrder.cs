@@ -23,9 +23,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string SalesOrderNumber { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
-        public string ApprovedBy { get; set; }
-
         [ForeignKey("DeliveryTypeId")]
         public int? DeliveryTypeId { get; set; }
         public DeliveryType DeliveryType { get; set; }
@@ -34,8 +31,8 @@ namespace GMGInventory.Data
         public int? StatusId { get; set; }
         public Status Status { get; set; }
 
-        public DateTime? RequiredDate { get; set; }
-        public DateTime? DeliveryDate { get; set; }
+        public DateTime RequiredDate { get; set; }
+        public DateTime DeliveryDate { get; set; }
 
         [ForeignKey("PurchaseOrderId")]
         public int? PurchaseOrderId { get; set; }
@@ -51,9 +48,17 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalAmount { get; set; }
 
-        public int? QuantityPacked { get; set; }
-        public int? QuantityInvoiced { get; set; }
-        public int? QuantityOrdered { get; set; }
+        public int QuantityPacked { get; set; }
+        public int QuantityInvoiced { get; set; }
+        public int QuantityOrdered { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? ApprovedBy { get; set; }
+        public DateTime? ApprovedDate { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? DisapprovedBy { get; set; }
+        public DateTime? DisapprovedDate { get; set; }
 
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<Pack> Packs { get; set; }

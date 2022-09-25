@@ -21,7 +21,7 @@ namespace GMGInventory.Common.Models
         public string Customer { get; set; }
 
         [Display(Name = "Unit Price")]
-        public string UnitPrice => string.Format("{0:#,##0.00}", UnitPriceD);
+        public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
         public decimal UnitPriceD { get; set; }
 
         [Display(Name = "Quantity")]
@@ -34,11 +34,11 @@ namespace GMGInventory.Common.Models
         public int UnservedQuantity => Quantity - PackedQuantity;
 
         [Display(Name = "Discount 1")]
-        public string Discount1 => string.Format("{0:#,##0.00}", Discount1D);
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
         public decimal Discount1D { get; set; }
 
         [Display(Name = "Discount 2")]
-        public string Discount2 => string.Format("{0:#,##0.00}", Discount2D);
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
         [Display(Name = "Agent")]

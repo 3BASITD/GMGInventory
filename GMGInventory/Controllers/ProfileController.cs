@@ -18,7 +18,7 @@ namespace GMGInventory.Controllers
 
         public async Task<ActionResult> Index()
         {
-            var userId = await userRepository.GetUserIdByNameAsync(User?.Identity?.Name);
+            var userId = await userRepository.GetUserIdByNameAsync(User?.Identity?.Name ?? "");
             return View(await userRepository.GetAuditLogAsync(userId));
         }
 
@@ -32,7 +32,7 @@ namespace GMGInventory.Controllers
 
         public async Task<ActionResult> Update()
         {
-            var currentUserName = User?.Identity?.Name;
+            var currentUserName = User?.Identity?.Name ?? "";
             return View(await userRepository.GetUserInformationVMToEditAsync(currentUserName));
         }
 
@@ -54,7 +54,7 @@ namespace GMGInventory.Controllers
             return View(userInformationVM);
         }
 
-        public async Task<ActionResult> Password()
+        public ActionResult Password()
         {
             return View();
         }

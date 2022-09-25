@@ -17,7 +17,7 @@ namespace GMGInventory.Data
         public int InvoicedQuantity { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal UnitPrice { get; set; }
+        public decimal SellingPrice { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount1 { get; set; }

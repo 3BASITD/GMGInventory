@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
 using GMGInventory.Common.Models;
-using GMGInventory.Common.Constants;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using GMGInventory.Application.Repositories;
 
 namespace GMGInventory.Controllers
 {
@@ -17,14 +13,12 @@ namespace GMGInventory.Controllers
     {
         private readonly IAgentRepository agentRepository;
         private readonly IAreaRepository areaRepository;
-        private readonly IMapper mapper;
 
         public AgentController(IAgentRepository agentRepository
             , IAreaRepository areaRepository)
         {
             this.agentRepository = agentRepository;
             this.areaRepository = areaRepository;
-            this.mapper = mapper;
         }
 
         public async Task<IActionResult> GetOptions2(string search, int page)

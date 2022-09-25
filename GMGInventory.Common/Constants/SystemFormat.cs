@@ -2,7 +2,7 @@
 {
     public static class SystemFormat
     {
-        public const string StringDateTime = "yyyy/MM/dd hh:mm:ss tt";
+        public const string StringDateTime = "MMM dd, yyyy hh:mm:ss tt";
         public const string StringDate = "MMMM dd, yyyy";
         public const string StringDecimalComma = "{0:#,##0.00}";
         //public const string SqlConnectionString = "Server=.;Database=GMGInventory;Trusted_Connection=True;MultipleActiveResultSets=true;";

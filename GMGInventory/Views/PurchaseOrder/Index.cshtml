@@ -48,10 +48,7 @@
 @section Scripts {
     <script>
         var replenishDT = $('.table-replenish').on('preXhr.dt', function (e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
@@ -73,9 +70,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.status == "Draft" && data.orderBy == $("#current-user-nickname").val()) {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete Draft"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }
                         return actions + "</div>";
                     }
@@ -85,16 +82,9 @@
         });
 
         replenishDT.on("draw", function () {
-            reloadToolTip();
+            hideLoader();
 
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    replenishDT.search($(this).val()).draw();
-                }
-            });
-
-            $.LoadingOverlay("hide");
+            DatatablesSearchOnEnter('.table-replenish', replenishDT);
 
             $('.deleteBtn').click(function (e) {
                 swal({

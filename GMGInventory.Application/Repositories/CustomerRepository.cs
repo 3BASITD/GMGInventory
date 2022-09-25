@@ -23,20 +23,23 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions(string search, int page)
+        public async Task<Select2Model<JsonAddressOptionsModel>> GetOptions(string search, int page)
         {
             var customers = await context.Customers
+                                         .Include(s => s.CreditTerm)
                                          .Where(s => string.IsNullOrWhiteSpace(search)
                                                  || (s.Code.ToLower().Contains(search.ToLower())))
-                                         .Select(s => new JsonNameOptionsModel
+                                         .Select(s => new JsonAddressOptionsModel
                                          {
                                              Id = s.Id.ToString(),
                                              Text = s.Code,
-                                             Name = s.Name
+                                             Name = s.Name,
+                                             Address = s.Address,
+                                             CreditTerm = s.CreditTerm.Name
                                          })
                                          .ToListAsync();
             var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
-            return new Select2Model<JsonNameOptionsModel>
+            return new Select2Model<JsonAddressOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,

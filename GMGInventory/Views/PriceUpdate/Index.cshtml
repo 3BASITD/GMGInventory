@@ -167,7 +167,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (data.isLatest) {
-                            actions += '<button class="btn btn-warning btn-xs btn-update" data-bs-toggle="modal" data-bs-target="#updateModal" data-bs-toggle="tooltip" title="Update Price"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs btn-update" data-bs-toggle="modal" data-bs-target="#updateModal" data-microtip-title="Update Price" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                         }
                         return actions;
                     }
@@ -177,17 +177,11 @@
         });
 
         dataTable.on("draw", function () {
-            reloadToolTip();
-
-            $('.table-update .dataTables_filter input').unbind();
-            $('.table-update .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    dataTable.search($(this).val()).draw();
-                }
-            });
-            $(".table-update thead th").removeClass("text-end");
-
             hideLoader();
+
+            DatatablesSearchOnEnter('.table-update', dataTable);
+
+            $(".table-update thead th").removeClass("text-end");
 
             // Actions upon Display Update Modal
             $('.btn-update').click(function (e) {

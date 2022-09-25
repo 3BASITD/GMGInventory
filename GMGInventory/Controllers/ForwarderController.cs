@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
 using GMGInventory.Common.Models;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,14 +12,12 @@ namespace GMGInventory.Controllers
     {
         private readonly IForwarderRepository forwarderRepository;
         private readonly ICustomerRepository customerRepository;
-        private readonly IMapper mapper;
 
         public ForwarderController(IForwarderRepository forwarderRepository
             , ICustomerRepository customerRepository)
         {
             this.forwarderRepository = forwarderRepository;
             this.customerRepository = customerRepository;
-            this.mapper = mapper;
         }
 
         public async Task<IActionResult> Index()

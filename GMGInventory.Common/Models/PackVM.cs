@@ -26,4 +26,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Status")]
         public string Status { get; set; }
     }
+
+    public class PackDetailsVM
+    {
+
+    }
 }

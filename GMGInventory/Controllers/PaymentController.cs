@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
 using GMGInventory.Common.Models;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
@@ -13,11 +9,6 @@ namespace GMGInventory.Controllers
     public class PaymentController : Controller
     {
         private readonly IPaymentRepository customerpaymentRepository;
-        private readonly IAreaRepository areaRepository;
-        private readonly IRegionRepository regionRepository;
-        private readonly ICreditTermRepository credittermRepository;
-        private readonly ICustomerTypeRepository customertypeRepository;
-        private readonly IAgentRepository agentRepository;
 
         public PaymentController(IPaymentRepository customerpaymentRepository)
         {

@@ -32,11 +32,9 @@ namespace GMGInventory.Common.Models
         public string WaybillNumber { get; set; }
     }
 
-    public class SalesOrderDeliveryFilterVM
+    public class SalesOrderDeliveryFilterVM : ListFilterCommonModel
     {
         public int? AgentId { get; set; }
         public int? CustomerId { get; set; }
-        public DateTime? DateFrom { get; set; }
-        public DateTime? DateTo { get; set; }
     }
 }

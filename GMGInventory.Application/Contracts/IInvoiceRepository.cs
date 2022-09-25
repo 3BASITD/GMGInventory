@@ -4,6 +4,6 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IInvoiceRepository
     {
-        Task<ForDataTables<InvoiceVM>> GetListDataTablesAsync(DataTablesRequestForm form, int? statusId);
+        Task<ForDataTables<InvoiceVM>> GetListDataTablesAsync(DataTablesRequestForm form, ListFilterCommonModel filter);
     }
 }

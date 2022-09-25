@@ -382,10 +382,7 @@
         }
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+                showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
@@ -403,7 +400,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-bs-toggle="tooltip" title="Remove Item"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -496,16 +493,9 @@
         }
 
         itemDT.on("draw", function () {
-            reloadToolTip();
+            hideLoader();
 
-            $('.table-item .dataTables_filter input').unbind();
-            $('.table-item .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    itemDT.search($(this).val()).draw();
-                }
-            });
-
-            $.LoadingOverlay("hide");
+            DatatablesSearchOnEnter('.table-item', itemDT);
 
             $(".btn-remove-item").on("click", function () {
                 itemDT.row($(this).parents('tr')).remove().draw();
@@ -677,7 +667,7 @@
                     });
                 },
                 afterPrint: function () {
-                    $.LoadingOverlay("hide");
+                    hideLoader();
                 }
             });
         });

@@ -604,10 +604,7 @@
 
         function ShowLoader(mod) {
             if (loaderDisplayed.length === 0) {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
+                showLoader();
             }
             loaderDisplayed.push(mod);
         }
@@ -615,7 +612,7 @@
         function HideLoader(mod) {
             loaderDisplayed = loaderDisplayed.filter(s => s !== mod);
             if (loaderDisplayed.length === 0) {
-                $.LoadingOverlay("hide");
+                hideLoader();
             }
         }
 
@@ -729,8 +726,6 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            reloadToolTip();
-
             $('.table-shipping .dataTables_filter input').unbind();
             $('.table-shipping .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
@@ -768,8 +763,6 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            reloadToolTip();
-
             $('.table-forwarder .dataTables_filter input').unbind();
             $('.table-forwarder .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
@@ -810,8 +803,6 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            reloadToolTip();
-
             $('.table-payments .dataTables_filter input').unbind();
             $('.table-payments .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
@@ -848,8 +839,6 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            reloadToolTip();
-
             $('.table-receivables .dataTables_filter input').unbind();
             $('.table-receivables .dataTables_filter input').keyup(function (e) {
                 if (e.keyCode == 13) {
@@ -1077,7 +1066,7 @@
 
                 //// load functions upon datatable load
                 //datatable.on("draw", function() {
-                //    $.loadingoverlay("hide");
+                //    hideLoader();
                 //});
 
 

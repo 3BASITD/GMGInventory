@@ -27,7 +27,7 @@ namespace GMGInventory.Common.Models
         public string SONumber { get; set; }
 
         [Display(Name = "Total Amount")]
-        public string TotalAmount => string.Format("{0:#,##0.00}", TotalAmountD);
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
         public decimal TotalAmountD { get; set; }
 
         [Display(Name = "Status")]

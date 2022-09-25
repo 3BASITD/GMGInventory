@@ -1,3 +1,17 @@
+/*html { -moz-transform: scale(1.0, 1.0); zoom: 1.0; zoom: 100%; }*/
+    html { -moz-transform: scale(0.9, 0.9); zoom: 0.9; zoom: 90%; }
+@media only screen and (min-width: 992px) {
+    html { -moz-transform: scale(0.9, 0.9); zoom: 0.9; zoom: 90%; }
+    .main-sidebar { height: 111vh; }
+    .layout-fixed .wrapper .sidebar { height: calc(111vh - (3.5rem + 1px)); }
+    .text-sm, .input-group-sm>.btn, .input-group-sm>.form-control, .input-group-sm>.form-select, .input-group-sm>.input-group-text { font-size: .86rem !important; }
+}
+
+.modal-backdrop {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .text-sm .select2-container--default .select2-selection--single .select2-selection__arrow, 
 select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow, 
 .text-sm .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow, 
@@ -19,6 +33,15 @@ select.form-control-sm ~ .select2-container--default .select2-selection--single 
     padding: 0.18rem 0rem;
     border-radius: 0.2rem;
     border: 1px solid #ced4da;
+}
+
+.dark-mode .select2-selection--single {
+    background-color: #343a40 !important;
+    border-color: #6c757d !important;
+}
+
+.dark-mode .select2-selection--single .select2-selection__rendered {
+    color: #fff !important;
 }
 
 .s2ph-bold ~ .select2 .select2-selection__placeholder,
@@ -46,8 +69,40 @@ select.form-control-sm ~ .select2-container--default .select2-selection--single 
     font-size: 20px;
 }
 
+select.form-control-sm~.select2-container--default {
+    font-size: 100%;
+}
+
+.text-sm .select2-container--default .select2-selection--single .select2-selection__rendered,
+select.form-control-sm~.select2-container--default .select2-selection--single .select2-selection__rendered {
+    margin-top: -0.5rem;
+}
+
+input:not(:focus)::-webkit-outer-spin-button,
+input:not(:focus)::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number]:not(:focus) {
+  -moz-appearance: textfield;
+}
+
+input[readonly=readonly] {
+    cursor: default;
+}
+
+input[type="date"] {
+    cursor: text;
+}
+
 .dataTables_processing {
     z-index: 99;
+}
+
+table tr td > .input-group,
+table tr td > input {
+    min-width: 100px;
 }
 
 .form-check-input {
@@ -70,8 +125,8 @@ pre {
     padding: 0.31rem 0 !important;
 }
 
-.form-cell {
-    padding: 1rem 0.75rem !important;
+.form-cell:not(:has(input)) {
+    padding: 1.09rem 0.75rem !important;
 }
 
 #for-print {

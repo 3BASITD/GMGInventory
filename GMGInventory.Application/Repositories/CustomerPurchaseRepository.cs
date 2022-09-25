@@ -16,16 +16,6 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<CustomerPurchaseVM>> GetListAsync(CustomerPurchaseFilterVM filter)
         {
-            if (filter.DateTo == null)
-            {
-                if (filter.DateFrom == null) { filter.DateTo = DateTime.Now; }
-                else { filter.DateTo = filter.DateFrom.Value.AddYears(1); }
-            }
-            if (filter.DateFrom == null)
-            {
-                filter.DateFrom = filter.DateTo.Value.AddYears(-1);
-            }
-
             var salesOrder = from so in context.SalesOrders
                              join sl in context.SalesOrderLineItems
                                                .Include(s => s.Item)
@@ -52,7 +42,7 @@ namespace GMGInventory.Application.Repositories
                                  ItemName = sl.Item.Name,
                                  PartNumber = sl.Item.PartNumber + "",
                                  Quantity = sl.Quantity,
-                                 SellingPriceD = sl.UnitPrice,
+                                 SellingPriceD = sl.SellingPrice,
                                  SONumber = so.SalesOrderNumber,
                                  Unit = sl.Item.Unit.Code
                              };

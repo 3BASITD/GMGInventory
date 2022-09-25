@@ -43,7 +43,7 @@ namespace GMGInventory.Application.Repositories
                        PackedQuantity = l.PackedQuantity,
                        Quantity = l.Quantity,
                        SalesOrderNumber = s.SalesOrderNumber,
-                       UnitPriceD = l.UnitPrice
+                       UnitPriceD = l.SellingPrice
                    };
             return await salesOrder.ToListAsync();
         }

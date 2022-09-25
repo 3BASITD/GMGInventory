@@ -264,12 +264,12 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-toggle="tooltip" title="Edit Details"><i class="fas fa-pencil-alt"></i></button>';
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-bs-toggle="tooltip" title="Delete / Deactivate Item"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Item" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         } else {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-bs-toggle="tooltip" title="Reactivate Item"><i class="fas fa-check"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Item" data-microtip-position="left" role="tooltip"><i class="fas fa-check"></i></button>';
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
@@ -281,16 +281,9 @@
 
         // Load functions upon DataTable load
         dataTable.on("draw", function() {
-            reloadToolTip();
-
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    dataTable.search($(this).val()).draw();
-                }
-            });
-
             hideLoader();
+
+            DatatablesSearchOnEnter('.table-itemtype', dataTable);
 
             $('.deleteBtn').click(function(e) {
                 swal({
@@ -331,10 +324,7 @@
                 $(".modal-detail-code").html(data.code);
                 $(".modal-detail-name").html(data.name);
                 $(".modal-detail-category").html(data.category);
-                $(".modal-detail-isactive").html(data.isActive + (data.isActive ? '' : ' <span class="fas fa-question-circle text-primary" data-bs-toggle="tooltip" title="This was deleted but instead marked as Inactive because it was used in other records."></span>'));
-                if (data.isActive == false) {
-                    reloadToolTip();
-                }
+                $(".modal-detail-isactive").html(data.isActive + (data.isActive ? '' : ' <span class="fas fa-question-circle text-primary" data-microtip-title="This was deleted but instead marked as Inactive because it was used in other records." data-microtip-position="left" role="tooltip"></span>'));
                 $(".modal-detail-usercreated").html(data.userCreated);
                 $(".modal-detail-datecreated").html(data.dateCreated);
                 $(".modal-detail-usermodified").html(data.userModified);

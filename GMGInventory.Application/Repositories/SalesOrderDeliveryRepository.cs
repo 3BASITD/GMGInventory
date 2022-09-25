@@ -17,16 +17,6 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<SalesOrderDeliveryVM>> GetListAsync(SalesOrderDeliveryFilterVM filter)
         {
-            if (filter.DateTo == null)
-            {
-                if (filter.DateFrom == null) { filter.DateTo = DateTime.Now; }
-                else { filter.DateTo = filter.DateFrom.Value.AddYears(1); }
-            }
-            if (filter.DateFrom == null)
-            {
-                filter.DateFrom = filter.DateTo.Value.AddYears(-1);
-            }
-
             var salesOrder = from so in context.SalesOrders
                                                .Include(s => s.Customer)
                              join sdm in context.SalesOrderDeliveryMonitorings

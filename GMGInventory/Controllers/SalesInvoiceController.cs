@@ -25,10 +25,10 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson(int? Id)
+        public async Task<JsonResult> GetListJson(ListFilterCommonModel filter)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await invoiceRepository.GetListDataTablesAsync(form, Id));
+            return Json(await invoiceRepository.GetListDataTablesAsync(form, filter));
         }
     }
 }

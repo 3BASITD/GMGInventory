@@ -102,11 +102,8 @@
 
 @section Scripts {
     <script>
-        var itemTable = $('.table-soa').on('preXhr.dt', function(e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+        var itemTable = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson", "Soacr")",
@@ -130,8 +127,10 @@
             ]
         });
 
-        itemTable.on("draw", function() {
-            $.LoadingOverlay("hide");
+        itemTable.on("draw", function () {
+            hideLoader();
+
+            DatatablesSearchOnEnter('.table-soa', itemTable);
         });
 
     </script>

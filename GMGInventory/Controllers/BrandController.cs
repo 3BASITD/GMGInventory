@@ -26,7 +26,7 @@ namespace GMGInventory.Controllers
             this.brandRepository = brandRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View();
         }

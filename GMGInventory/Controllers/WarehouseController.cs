@@ -40,7 +40,7 @@ namespace GMGInventory.Controllers
             return View(warehouse);
         }
 
-        public async Task<ActionResult> Create()
+        public ActionResult Create()
         {
             return View();
         }

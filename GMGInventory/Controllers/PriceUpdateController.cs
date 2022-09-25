@@ -17,7 +17,7 @@ namespace GMGInventory.Controllers
             this.itemPriceRepository = itemPriceRepository;
         }
 
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             return View();
         }

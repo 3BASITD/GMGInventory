@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap-toggle/css/bootstrap2-toggle.min.css" />
     <link rel="stylesheet" href="~/lib/chart.js/Chart.min.css" />
     <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <link rel="stylesheet" href="~/lib/microtip/microtip.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="layout-fixed sidebar-mini @(activeUser.IsDarkMode ? "dark-mode" : "")" style="height: auto;">
@@ -141,6 +142,11 @@
     <div id="partial-holder" class="text-sm"></div>
     <div id="for-print"></div>
     <input type="hidden" id="current-user-nickname" value="@activeUser.Nickname" />
+    <input type="hidden" class="current-user-role" value="temp" />
+    @foreach(var role in @UserManager.GetRolesAsync(activeUser).Result.ToList())
+    {
+        <input type="hidden" class="current-user-role" value="@role"  />
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -168,12 +174,12 @@
         @if (activeUser.IsDarkMode)
         {
             <text>
-                    $(".table").each(function() {
-                        $(this).addClass("table-dark");
-                    });
+            $(".table").each(function() {
+                $(this).addClass("table-dark");
+            });
             </text>
         }
-                });
+        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

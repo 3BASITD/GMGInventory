@@ -446,12 +446,12 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-bs-toggle="tooltip" title="View Details"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.isActive) {
-                            actions += '<div data-bs-toggle="tooltip" title="Edit Details"><button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fas fa-pencil-alt"></i></button></div>';
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-bs-toggle="tooltip" title="Delete / Deactivate Item"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         } else {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-bs-toggle="tooltip" title="Reactivate Item"><i class="fas fa-check"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="left" role="tooltip"><i class="fas fa-check"></i></button>';
                         }
                         return actions + "</div>";
                     }
@@ -460,16 +460,9 @@
         });
 
         itemDT.on("init.dt", function () {
-            reloadToolTip();
-
-            $('.table-item .dataTables_filter input').unbind();
-            $('.table-item .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    itemDT.search($(this).val()).draw();
-                }
-            });
-
             hideLoader();
+
+            DatatablesSearchOnEnter('.table-item', itemDT);
 
             LoadSelect2();
 

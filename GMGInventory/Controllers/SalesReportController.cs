@@ -24,7 +24,7 @@ namespace GMGInventory.Controllers
             chelper = new();
         }
 
-        public async Task<IActionResult> UnservedItem()
+        public IActionResult UnservedItem()
         {
             return View();
         }

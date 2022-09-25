@@ -36,33 +36,31 @@ namespace GMGInventory.Common.Models
         public int Quantity { get; set; }
 
         [Display(Name = "Selling Price")]
-        public string SellingPrice => string.Format("{0:#,##0.00}", SellingPriceD);
+        public string SellingPrice => string.Format(SystemFormat.StringDecimalComma, SellingPriceD);
         public decimal SellingPriceD { get; set; }
 
         [Display(Name = "Discount 1")]
-        public string Discount1 => string.Format("{0:##0.00}", Discount1D);
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
         public decimal Discount1D { get; set; }
 
         [Display(Name = "Discount 2")]
-        public string Discount2 => string.Format("{0:##0.00}", Discount2D);
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
         [Display(Name = "Extended Price")]
-        public string ExtendedPrice => string.Format("{0:##0.00}", ExtendedPriceD);
+        public string ExtendedPrice => string.Format(SystemFormat.StringDecimalComma, ExtendedPriceD);
         public decimal ExtendedPriceD => Math.Round((SellingPriceD * Quantity * (100m - Discount1D - Discount2D)) / 100m, 2);
 
 
 
     }
 
-    public class CustomerPurchaseFilterVM
+    public class CustomerPurchaseFilterVM : ListFilterCommonModel
     {
         public int? CustomerId { get; set; }
         public int? ItemId { get; set; }
         public int? CategoryId { get; set; }
         public int? ItemTypeId { get; set; }
         public int? BrandId { get; set; }
-        public DateTime? DateFrom { get; set; }
-        public DateTime? DateTo { get; set; }
     }
 }

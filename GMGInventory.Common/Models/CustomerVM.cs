@@ -172,16 +172,10 @@ namespace GMGInventory.Common.Models
         [Required]
         [Display(Name = "Region")]
         public string RegionName { get; set; }
-
-
-
-
-
     }
 
     public class CustomerViewVM : GenericAuditVM
     {
-
         [Display(Name = "Region")]
         public RegionVM Region { get; set; }
 
@@ -192,10 +186,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Credit Term")]
         public CreditTermVM CreditTerm { get; set; }
 
-
         [Display(Name = "Agent")]
         public AgentVM Agent { get; set; }
-
 
         [Display(Name = "Area")]
         public AreaVM Area { get; set; }
@@ -206,33 +198,23 @@ namespace GMGInventory.Common.Models
         [Display(Name = "VAT")]
         public string? VAT { get; set; }
 
-
         [Display(Name = "Credit Limit")]
         public decimal CreditLimit { get; set; }
-
-        [Display(Name = "Status")]
-        public bool IsActive { get; set; }
-
 
         [Display(Name = "Address")]
         public string Address { get; set; }
 
-
         [Display(Name = "Email")]
         public string? Email { get; set; }
-
 
         [Display(Name = "Contact Person")]
         public string ContactPerson { get; set; }
 
-
         [Display(Name = "Contact Number")]
         public string ContactNumber { get; set; }
 
-
         [Display(Name = "Fax Number")]
         public string FaxNumber { get; set; }
-
 
         [Display(Name = "TIN #")]
         public string TIN { get; set; }
@@ -267,10 +249,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Invoiced Date")]
         public string InvoicedDate { get; set; }
 
-
         [Display(Name = "Invoice No")]
         public string InvoiceNo { get; set; }
-
 
         [Display(Name = "Amount")]
         public string InvoicedAmount { get; set; }
@@ -278,10 +258,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Collector Receipt #")]
         public string CRNo { get; set; }
 
-
         [Display(Name = "SOA No")]
         public string SOANo { get; set; }
-
 
         [Display(Name = "Total Invoice Amount")]
         public string TotalInvoiceAmount { get; set; }

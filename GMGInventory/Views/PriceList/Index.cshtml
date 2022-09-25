@@ -53,11 +53,8 @@
 
 @section Scripts {
     <script>
-        var dataTable = $('.table').on('preXhr.dt', function(e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+        var dataTable = $('.table').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -100,15 +97,10 @@
             order: [[3, "asc"]]
         });
 
-        dataTable.on("draw", function() {
-            $.LoadingOverlay("hide");
+        dataTable.on("draw", function () {
+            hideLoader();
 
-            $('.dataTables_filter input').unbind();
-            $('.dataTables_filter input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    dataTable.search($(this).val()).draw();
-                }
-            });
+            DatatablesSearchOnEnter('.table', dataTable);
         });
 
         function ApplyFilter() {

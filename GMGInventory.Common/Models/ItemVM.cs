@@ -61,10 +61,10 @@ namespace GMGInventory.Common.Models
         public string Warehouse { get; set; }
 
         [Display(Name = "Retail Price")]
-        public string RetailPrice => string.Format("{0:#,##0.00}", RetailPriceD);
+        public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
 
         [Display(Name = "Net Price")]
-        public string NetPrice => string.Format("{0:#,##0.00}", NetPriceD);
+        public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
 
         [Display(Name = "Quantity on Hand")]
         public int Quantity { get; set; }
@@ -144,11 +144,11 @@ namespace GMGInventory.Common.Models
         public string Category { get; set; }
 
         [Display(Name = "Retail Price")]
-        public string RetailPrice => string.Format("{0:#,##0.00}", RetailPriceD);
+        public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
 
         [Display(Name = "Net Price")]
-        public string NetPrice => string.Format("{0:#,##0.00}", NetPriceD);
+        public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
         public decimal NetPriceD { get; set; }
 
         [Display(Name = "Quantity on Hand")]
@@ -187,14 +187,14 @@ namespace GMGInventory.Common.Models
         public string Warehouse { get; set; }
         public string Supplier { get; set; }
         public int Quantity { get; set; }
-        public string UnitCost => string.Format("{0:#,##0.00}", UnitCostD);
+        public string UnitCost => string.Format(SystemFormat.StringDecimalComma, UnitCostD);
         public decimal UnitCostD { get; set; }
-        public string UnitPrice => string.Format("{0:#,##0.00}", UnitPriceD);
+        public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
         public decimal UnitPriceD { get; set; }
         public string Currency { get; set; }
-        public string ConversionFactor => string.Format("{0:##0.000}", ConversionFactorD);
+        public string ConversionFactor => string.Format(SystemFormat.StringDecimalComma, ConversionFactorD);
         public decimal ConversionFactorD { get; set; }
-        public string ConvertedUnitPrice => string.Format("{0:##0.00}", ConvertedUnitPriceD);
+        public string ConvertedUnitPrice => string.Format(SystemFormat.StringDecimalComma, ConvertedUnitPriceD);
         public decimal ConvertedUnitPriceD => Math.Round(UnitPriceD * ConversionFactorD, 2);
         public string ReplenishDate => ReplenishDateD.ToString(SystemFormat.StringDateTime);
         public DateTime ReplenishDateD { get; set; }

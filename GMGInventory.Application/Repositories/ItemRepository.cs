@@ -24,19 +24,41 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetOptions(string search, int page)
         {
-            var items = await context.Items.Include(s=>s.Unit)
-                                .Where(s => string.IsNullOrWhiteSpace(search)
-                                         || (s.Code.ToLower().Contains(search.ToLower())))
-                                .Select(s => new JsonItemOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.Code,
-                                    Name = s.Name,
-                                    Quantity = 0,
-                                    Unit = s.Unit.Code
-                                })
-                                .ToListAsync();
-            var itemsFiltered = items.Skip((page - 1) * 50).Take(50).ToList();
+            //var items = await context.Items.Include(s => s.Unit)
+            //                    .Where(s => string.IsNullOrWhiteSpace(search)
+            //                             || (s.Code.ToLower().Contains(search.ToLower())))
+            //                    .Select(s => new JsonItemOptionsModel
+            //                    {
+            //                        Id = s.Id.ToString(),
+            //                        Text = s.Code,
+            //                        Name = s.Name,
+            //                        Quantity = 0,
+            //                        Unit = s.Unit.Code
+            //                    })
+            //                    .ToListAsync();
+            var items = from item in context.Items
+                        from price in context.ItemPrices
+                                             .Where(s => s.ItemId == item.Id
+                                                      && s.DateCreated <= DateTime.Now)
+                                             .OrderByDescending(s => s.DateCreated)
+                                             .Take(1)
+                                             .DefaultIfEmpty()
+                        let inventory = context.ItemInventories.Where(s => s.ItemId == item.Id).Sum(s => s.Quantity)
+                        where item.IsActive == true
+                           && (string.IsNullOrWhiteSpace(search)
+                           || item.Code.ToLower().Contains(search.ToLower()))
+                        select new JsonItemOptionsModel
+                        {
+                            Id = item.Id.ToString(),
+                            InventoryCount = inventory,
+                            Text = item.Code,
+                            Name = item.Name,
+                            NetPriceD = price.NetSellingPrice,
+                            Quantity = 0,
+                            RetailPriceD = price.RetailSellingPrice,
+                            Unit = item.Unit.Code
+                        };
+            var itemsFiltered = await items.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonItemOptionsModel>
             {
                 //incomplete_results = false,
@@ -53,7 +75,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetInWarehouseOptions(string search, int warehouse, int page)
         {
-            var items = await context.ItemInventories.Include(s => s.Item).ThenInclude(s=>s.Unit)
+            var items = await context.ItemInventories.Include(s => s.Item).ThenInclude(s => s.Unit)
                                 .Where(s => s.WarehouseId == warehouse
                                          && (string.IsNullOrWhiteSpace(search)
                                          || (s.Item.Code.ToLower().Contains(search.ToLower()))
@@ -592,7 +614,7 @@ namespace GMGInventory.Application.Repositories
                               PackedQuantity = salesItem.PackedQuantity,
                               Quantity = salesItem.Quantity,
                               SalesNumber = sales.SalesOrderNumber,
-                              UnitPriceD = salesItem.UnitPrice
+                              UnitPriceD = salesItem.SellingPrice
                           };
             return await salesVM.ToListAsync();
         }

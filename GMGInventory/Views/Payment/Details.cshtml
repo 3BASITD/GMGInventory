@@ -190,11 +190,8 @@
 
 @section Scripts {
     <script>
-        var itemTableChecks = $('.table-payment-checks').on('preXhr.dt', function(e, settings, data) {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fa fa-cog fa-spin"
-            });
+        var itemTableChecks = $('.table-payment-checks').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPaymentChecksJson", "Payment")",
@@ -218,15 +215,14 @@
         });
 
         itemTableChecks.on("draw", function() {
-            $.LoadingOverlay("hide");
+            hideLoader();
+
+            DatatablesSearchOnEnter('.table-payment-checks', itemTableChecks);
         });
 
 
         //var itemTableInvoice = $('.table-payment-invoice').on('preXhr.dt', function(e, settings, data) {
-        //    $.LoadingOverlay("show", {
-        //        image: "",
-        //        fontawesome: "fa fa-cog fa-spin"
-        //    });
+        //    showLoader();
         //}).DataTable({
         //    ajax: {
         //        url: "@Url.Action("GetListJsonDetails", "Payment")",
@@ -251,7 +247,7 @@
         //});
 
         //itemTableInvoice.on("draw", function() {
-        //    $.LoadingOverlay("hide");
+        // hideLoader();
         //});
 
 

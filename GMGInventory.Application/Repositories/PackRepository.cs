@@ -18,13 +18,15 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        private async Task<IList<PackVM>> GetListAsync(int? statusId)
+        private async Task<IList<PackVM>> GetListAsync(ListFilterCommonModel filter)
         {
             var packs = from pck in context.Packs
                                            .Include(s => s.Status)
                                            .Include(s => s.SalesOrder)
                                                .ThenInclude(s => s.Customer)
-                                           .Where(s => statusId == null || s.StatusId == statusId)
+                                           .Where(s => (filter.StatusId == null || s.StatusId == filter.StatusId)
+                                                     && filter.DateFrom <= s.DateCreated
+                                                     && s.DateCreated <= filter.DateTo)
                         join usr in userManager.Users on pck.UserCreated equals usr.Id
                         select new PackVM
                         {
@@ -40,11 +42,11 @@ namespace GMGInventory.Application.Repositories
             return await packs.ToListAsync();
         }
 
-        public async Task<ForDataTables<PackVM>> GetListDataTablesAsync(DataTablesRequestForm form, int? statusId)
+        public async Task<ForDataTables<PackVM>> GetListDataTablesAsync(DataTablesRequestForm form, ListFilterCommonModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync(statusId)).AsQueryable();
+            var data = (await GetListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
