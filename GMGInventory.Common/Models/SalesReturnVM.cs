@@ -40,15 +40,15 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Defective")]
         public bool IsDefective { get; set; }
 
-        [Display(Name = "Quantity")]
+        [Display(Name = "Quantity to Return")]
         public int Quantity { get; set; }
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }
 
-        [Display(Name = "Amount")]
-        public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
-        public decimal AmountD { get; set; }
+        [Display(Name = "Selling Price")]
+        public string SellingPrice => string.Format(SystemFormat.StringDecimalComma, SellingPriceD);
+        public decimal SellingPriceD { get; set; }
 
         [Display(Name = "Discount 1")]
         public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
@@ -58,9 +58,9 @@ namespace GMGInventory.Common.Models
         public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
-        [Display(Name = "Net Amount")]
-        public string NetAmount => string.Format(SystemFormat.StringDecimalComma, NetAmountD);
-        public decimal NetAmountD => Quantity * (((100m - Discount1D - Discount2D) * AmountD) / 100m);
+        [Display(Name = "Gross Price")]
+        public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
+        public decimal GrossPriceD => Quantity * (((100m - Discount1D - Discount2D) * SellingPriceD) / 100m);
 
         [Display(Name = "Reference Number")]
         public string ReferenceNumber { get; set; }

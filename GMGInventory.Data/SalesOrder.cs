@@ -25,25 +25,25 @@ namespace GMGInventory.Data
 
         [ForeignKey("DeliveryTypeId")]
         public int? DeliveryTypeId { get; set; }
-        public DeliveryType DeliveryType { get; set; }
+        public DeliveryType? DeliveryType { get; set; }
 
         [ForeignKey("StatusId")]
         public int? StatusId { get; set; }
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
 
         public DateTime RequiredDate { get; set; }
         public DateTime DeliveryDate { get; set; }
 
         [ForeignKey("PurchaseOrderId")]
         public int? PurchaseOrderId { get; set; }
-        public PurchaseOrder PurchaseOrder { get; set; }
+        public PurchaseOrder? PurchaseOrder { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? DeclaredValue { get; set; }
 
         [ForeignKey("PriceTypeId")]
         public int? PriceTypeId { get; set; }
-        public PriceType PriceType { get; set; }
+        public PriceType? PriceType { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalAmount { get; set; }

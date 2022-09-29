@@ -3,6 +3,7 @@ using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -18,34 +19,62 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
+        public async Task<InvoiceDetailsVM?> GetDetailsAsync(int? Id)
+        {
+            var invoiceVM = (from invoice in context.Invoices
+                                                    .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
+                                                    .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
+                                                    .Include(s => s.SalesOrder).ThenInclude(s => s.PurchaseOrder)
+                             join user in userManager.Users on invoice.UserCreated equals user.Id
+                             where invoice.Id == Id
+                             select new InvoiceDetailsVM
+                             {
+                                 Agent = invoice.SalesOrder.Agent.FullName,
+                                 ControlNumber = invoice.ControlNumber,
+                                 CustomerAddress = invoice.SalesOrder.Customer.Address,
+                                 CustomerCode = invoice.SalesOrder.Customer.Code,
+                                 CustomerName = invoice.SalesOrder.Customer.Name,
+                                 Id = invoice.Id,
+                                 InvoiceBy = user.Nickname,
+                                 InvoiceDateD = invoice.DateCreated,
+                                 InvoiceNumber = invoice.InvoiceNumber,
+                                 PackNumber = invoice.PackId,
+                                 PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? "-" : invoice.SalesOrder.Customer.CreditTerm.Name,
+                                 PONumber = invoice.SalesOrder.PurchaseOrder == null ? "-" : invoice.SalesOrder.PurchaseOrder.PONumber,
+                                 Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
+                                 SONumber = invoice.SalesOrder.SalesOrderNumber,
+                                 Status = invoice.Status.Code
+                             });
+            return await invoiceVM.FirstOrDefaultAsync();
+        }
+
         private async Task<IList<InvoiceVM>> GetListAsync(ListFilterCommonModel filter)
         {
             var invoices = from inv in context.Invoices
-                                           .Include(s => s.InvoiceType)
-                                           .Include(s => s.Status)
-                                           .Include(s => s.SalesOrder)
-                                               .ThenInclude(s => s.Customer)
-                                           .Where(s => (filter.StatusId == null || s.StatusId == filter.StatusId)
-                                                     && filter.DateFrom <= s.DateCreated
-                                                     && s.DateCreated <= filter.DateTo)
-                           join usr in userManager.Users on inv.UserCreated equals usr.Id
-                        select new InvoiceVM
-                        {
-                            Customer = inv.SalesOrder.Customer.Code,
-                            Id = inv.Id,
-                            InvoiceDateD = inv.DateCreated,
-                            InvoiceNumber = inv.InvoiceNumber,
-                            InvoiceType = inv.InvoiceType.Code,
-                            PackNumber = inv.PackId + "",
-                            SONumber = inv.SalesOrder.SalesOrderNumber,
-                            Status = inv.Status.Code,
-                            TotalAmountD = inv.Amount
-                        };
+                                              .Include(s => s.InvoiceType)
+                                              .Include(s => s.Status)
+                                              .Include(s => s.SalesOrder)
+                                                  .ThenInclude(s => s.Customer)
+                           where (filter.StatusId == null || inv.StatusId == filter.StatusId)
+                           && filter.DateFrom <= inv.DateCreated
+                           && inv.DateCreated <= filter.DateTo
+                           select new InvoiceVM
+                           {
+                               Customer = inv.SalesOrder.Customer.Code,
+                               Id = inv.Id,
+                               InvoiceDateD = inv.DateCreated,
+                               InvoiceNumber = inv.InvoiceNumber,
+                               InvoiceType = inv.InvoiceType.Code,
+                               PackNumber = inv.PackId,
+                               SONumber = inv.SalesOrder.SalesOrderNumber,
+                               Status = inv.Status.Code,
+                               TotalAmountD = inv.Amount
+                           };
 
             return await invoices.ToListAsync();
         }
 
-        public async Task<ForDataTables<InvoiceVM>> GetListDataTablesAsync(DataTablesRequestForm form, ListFilterCommonModel filter)
+        public async Task<ForDataTables<InvoiceVM>> GetListDTAsync(DataTablesRequestForm form, ListFilterCommonModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -60,7 +89,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.InvoiceDate.ToLower().Contains(form.SearchValue)
                                     || x.InvoiceNumber.ToLower().Contains(form.SearchValue)
                                     || x.InvoiceType.ToLower().Contains(form.SearchValue)
-                                    || x.PackNumber.ToLower().Contains(form.SearchValue)
+                                    || x.PackNumber.ToString().Contains(form.SearchValue)
                                     || x.SONumber.ToLower().Contains(form.SearchValue)
                                     || x.Status.ToLower().Contains(form.SearchValue)
                                     || x.TotalAmountD.ToString().Contains(form.SearchValue));
@@ -112,6 +141,90 @@ namespace GMGInventory.Application.Repositories
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
                 Data = dataList
+            };
+        }
+
+        public async Task<IList<InvoiceItemVM>> GetItemsAsync(int invoiceId)
+        {
+            var itemVM = from invoicel in context.InvoiceLineItems
+                         join item in context.Items on invoicel.ItemId equals item.Id
+                         join invoice in context.Invoices on invoicel.InvoiceId equals invoice.Id
+                         join order in context.SalesOrders on invoice.SalesOrderId equals order.Id
+                         join orderl in context.SalesOrderLineItems on order.Id equals orderl.SalesOrderId
+                         where invoicel.InvoiceId == invoiceId
+                         && orderl.ItemId == invoicel.ItemId
+                         select new InvoiceItemVM
+                         {
+                             Discount1D = orderl.Discount1,
+                             Discount2D = orderl.Discount2,
+                             Id = invoicel.Id,
+                             ItemCode = item.Code,
+                             ItemName = item.Name,
+                             NetPriceD = invoicel.UnitPrice,
+                             Quantity = invoicel.Quantity
+                         };
+            return await itemVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<InvoiceItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int invoiceId)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetItemsAsync(invoiceId)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.Discount1D.ToString().Contains(form.SearchValue)
+                                    || x.Discount2D.ToString().Contains(form.SearchValue)
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
+                                    || x.ItemName.ToLower().Contains(form.SearchValue)
+                                    || x.NetPriceD.ToString().Contains(form.SearchValue)
+                                    || x.Quantity.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
+                        case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
+                        case "GrossPrice": data = data.OrderBy(s => s.GrossPriceD); break;
+                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
+                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
+                        case "NetPrice": data = data.OrderBy(s => s.NetPrice); break;
+                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
+                        case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
+                        case "GrossPrice": data = data.OrderByDescending(s => s.GrossPriceD); break;
+                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
+                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
+                        case "NetPrice": data = data.OrderByDescending(s => s.NetPrice); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<InvoiceItemVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
             };
         }
     }

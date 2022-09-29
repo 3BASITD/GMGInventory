@@ -27,14 +27,27 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Forwarder")]
         public string Forwarder { get; set; }
+        public int ForwarderId { get; set; }
 
         [Display(Name = "Waybill Number")]
         public string WaybillNumber { get; set; }
+
+        [Display(Name = "Remarks")]
+        public string Remarks { get; set; }
     }
 
     public class SalesOrderDeliveryFilterVM : ListFilterCommonModel
     {
         public int? AgentId { get; set; }
         public int? CustomerId { get; set; }
+    }
+
+    public class SalesOrderDeliveryFormVM
+    {
+        public int SalesOrderId { get; set; }
+        public DateTime DeliveryDate { get; set; }
+        public int Forwarder { get; set; }
+        public string Waybill { get; set; }
+        public string Remarks { get; set; }
     }
 }

@@ -23,7 +23,7 @@
         || User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SalesDirector)
         || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
         {
-            var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "PackListing", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice" }).Contains(currentController ?? "");
+            var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice" }).Contains(currentController ?? "");
 
             <li class="nav-item @(navSalesActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navSalesActive ? "active" : "")">
@@ -45,8 +45,8 @@
                    || User.IsInRole(Roles.Telemarketer))
                     {
                         <li class="nav-item">
-                            <a class="nav-link @(currentController == "PackListing" ? "active" : "")"
-                       asp-area="" asp-controller="PackListing" asp-action="Index">
+                            <a class="nav-link @(currentController == "Pack" ? "active" : "")"
+                       asp-area="" asp-controller="Pack" asp-action="Index">
                                 <i class="nav-icon fas fa-cubes"></i>
                                 <p>Pack Listing</p>
                             </a>

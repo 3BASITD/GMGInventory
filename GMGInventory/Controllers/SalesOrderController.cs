@@ -91,6 +91,23 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<JsonResult> SaveItemsJson(SalesOrderFormVM form)
+        {
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            if (form.Id != null)
+            {
+                await salesOrderRepository.SaveItemsAsync(form.Items, (int)form.Id);
+                responseModel.Status = "Success";
+                responseModel.Message = "Order item(s) successfully saved";
+            } else
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Invalid Sales Order";
+            }
+            return Json(responseModel);
+        }
+
+        [HttpPost]
         public async Task<JsonResult> ApproveJson(int Id)
         {
             ResponseModel responseModel = new ResponseModel();
@@ -108,6 +125,24 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Approve(int Id)
+        {
+            if (ModelState.IsValid)
+            {
+                if (await salesOrderRepository.ApproveAsync(Id))
+                {
+                    TempData["SuccessMessage"] = "Sales order approved successfully";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Approving sales order failed";
+                }
+            }
+            return RedirectToAction(nameof(Details), new { id = Id });
+        }
+
+        [HttpPost]
         public async Task<JsonResult> DisapproveJson(int Id)
         {
             ResponseModel responseModel = new ResponseModel();
@@ -122,6 +157,24 @@ namespace GMGInventory.Controllers
                 responseModel.Message = "Cannot disapprove order. Please try again later";
             }
             return Json(responseModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Disapprove(int Id)
+        {
+            if (ModelState.IsValid)
+            {
+                if (await salesOrderRepository.DisapproveAsync(Id))
+                {
+                    TempData["SuccessMessage"] = "Sales order disapproved successfully";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Disapproving sales order failed";
+                }
+            }
+            return RedirectToAction(nameof(Details), new { id = Id });
         }
     }
 }

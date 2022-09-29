@@ -4,6 +4,7 @@ using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using GMGInventory.Application.Repositories;
 
 namespace GMGInventory.Controllers
 {
@@ -18,6 +19,11 @@ namespace GMGInventory.Controllers
         {
             this.forwarderRepository = forwarderRepository;
             this.customerRepository = customerRepository;
+        }
+
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await forwarderRepository.GetOptions(IncludeId));
         }
 
         public async Task<IActionResult> Index()

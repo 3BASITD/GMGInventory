@@ -20,6 +20,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string Waybill { get; set; }
 
+        [Column(TypeName = "nvarchar(250)")]
+        public string Remarks { get; set; }
+
         public ICollection<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
     }
 }

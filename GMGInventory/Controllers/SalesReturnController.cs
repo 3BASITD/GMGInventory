@@ -31,7 +31,7 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> GetListJson()
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await salesReturnRepository.GetListDataTablesAsync(form));
+            return Json(await salesReturnRepository.GetListDTAsync(form));
         }
 
         public async Task<ActionResult> Details(int? Id)
@@ -48,6 +48,11 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> GetItemsJson(int salesReturnId)
         {
             return Json(await salesReturnRepository.GetItemsAsync(salesReturnId));
+        }
+
+        public ActionResult Create()
+        {
+            return View();
         }
     }
 }

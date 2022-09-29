@@ -35,11 +35,11 @@ namespace GMGInventory.Data
 
         [ForeignKey("CreditTermId")]
         public int? CreditTermId { get; set; }
-        public CreditTerm CreditTerm { get; set; }
+        public CreditTerm? CreditTerm { get; set; }
 
         [ForeignKey("AgentId")]
         public int? AgentId { get; set; }
-        public Agent Agent { get; set; }
+        public Agent? Agent { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? ContactPerson { get; set; }
@@ -61,7 +61,7 @@ namespace GMGInventory.Data
 
         [ForeignKey("AreaId")]
         public int? AreaId { get; set; }
-        public Area Area { get; set; }
+        public Area? Area { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
         public string? Remarks { get; set; }

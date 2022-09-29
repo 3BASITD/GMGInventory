@@ -4,6 +4,10 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IPackRepository
     {
-        Task<ForDataTables<PackVM>> GetListDataTablesAsync(DataTablesRequestForm form, ListFilterCommonModel filter);
+        Task<PackDetailsVM?> GetDetailsAsync(int? Id);
+        Task<ForDataTables<PackVM>> GetListDTAsync(DataTablesRequestForm form, ListFilterCommonModel filter);
+        Task<IList<PackItemVM>> GetItemsAsync(int packId);
+        Task<ForDataTables<PackItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int packId);
+
     }
 }

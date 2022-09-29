@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +32,24 @@ namespace GMGInventory.Controllers
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await salesOrderDeliveryRepository.GetListDataTablesAsync(form, filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> EditJson(SalesOrderDeliveryFormVM form)
+        {
+            ResponseModel responseModel = new ResponseModel();
+                var msg = await salesOrderDeliveryRepository.EditAsync(form);
+            if (msg == "Invalid")
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Invalid sales order";
+            }
+            else
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = msg;
+            }
+            return Json(responseModel);
         }
     }
 }
