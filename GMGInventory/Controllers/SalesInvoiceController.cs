@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,30 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> GetListJson(ListFilterCommonModel filter)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await invoiceRepository.GetListDataTablesAsync(form, filter));
+            return Json(await invoiceRepository.GetListDTAsync(form, filter));
+        }
+
+        public async Task<ActionResult> Details(int? Id)
+        {
+            var order = await invoiceRepository.GetDetailsAsync(Id);
+            if (order == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            return View(order);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetItemsJson(int invoiceId)
+        {
+            return Json(await invoiceRepository.GetItemsAsync(invoiceId));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetItemsDTJson(int invoiceId)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await invoiceRepository.GetItemsDTAsync(form, invoiceId));
         }
     }
 }

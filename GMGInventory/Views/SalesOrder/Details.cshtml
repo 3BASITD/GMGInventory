@@ -13,116 +13,121 @@
         <div class="card-header">
             <span class="card-title po-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                @if(Model.Status == "Submitted") {
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-                        <span class="fas fa-save"></span> Save
+            @if (Model.Status == "Submitted")
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
+                    <span class="fas fa-save"></span> Save
+                </button>
+                @if (User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                {
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
+                        <span class="fas fa-check"></span> Approve
                     </button>
-                    @if(User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin)) {
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
-                            <span class="fas fa-check"></span> Approve
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                            <span class="fas fa-times"></span> Disapprove
-                        </button>
-                    }
-                } else {
-                    if(Model.Status == "Approved" && (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin))) {
-                        <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-disapprove">
-                            <span class="fas fa-box-open"></span> Start Packing
-                        </button>
-                    }
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
+                        <span class="fas fa-times"></span> Disapprove
+                    </button>
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null && (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin)))
+                {
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
+                        <span class="fas fa-box-open"></span> Start Packing
+                    </button>
                     <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                         <span class="fas fa-print"></span> Print
                     </button>
                 }
-                <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
-            </div>
+            }
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-4">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.SONumber)
-                        </span>
-                        <b class="d-block">
-                            @Model?.SONumber
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.CustomerCode)
-                        </span>
-                        <b class="d-block">
-                            @Model?.CustomerCode
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.CustomerName)
-                        </span>
-                        <b class="d-block">
-                            @Model?.CustomerName
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.CustomerAddress)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrEmpty(Model?.CustomerAddress.Trim()) ? "-" : Model.CustomerAddress)
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.AgentCode)
-                        </span>
-                        <b class="d-block">
-                            @Model?.AgentCode
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.AgentName)
-                        </span>
-                        <b class="d-block">
-                            @Model?.AgentName
-                        </b>
-                    </p>
-                </div>
-                <div class="col-4">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.GrossNetPrice)
-                        </span>
-                        <b class="d-block">
-                            @Model?.GrossNetPrice
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.CreditTerms)
-                        </span>
-                        <b class="d-block">
-                            @Model?.CreditTerms
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.DeclaredValue)
-                        </span>
-                        <b class="d-block">
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.SONumber)
+                    </span>
+                    <b class="d-block">
+                        @Model?.SONumber
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CustomerCode)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CustomerCode
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CustomerName)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CustomerName
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CustomerAddress)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrEmpty(Model?.CustomerAddress.Trim()) ? "-" : Model.CustomerAddress)
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.AgentCode)
+                    </span>
+                    <b class="d-block">
+                        @Model?.AgentCode
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.AgentName)
+                    </span>
+                    <b class="d-block">
+                        @Model?.AgentName
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.GrossNetPrice)
+                    </span>
+                    <b class="d-block">
+                        @Model?.GrossNetPrice
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CreditTerms)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CreditTerms
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DeclaredValue)
+                    </span>
+                    <b class="d-block">
                         @Model?.DeclaredValue
-                        </b>
-                    </p>
+                    </b>
+                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.PONumber)
                     </span>
                     <b class="d-block">
-                            @(string.IsNullOrEmpty(Model?.PONumber?.Trim()) ? "-" : Model.PONumber)
+                        @(string.IsNullOrEmpty(Model?.PONumber?.Trim()) ? "-" : Model.PONumber)
                     </b>
                 </p>
                 <p class="text-sm">
@@ -167,14 +172,14 @@
                         @Model?.DeliveryDate
                     </b>
                 </p>
-                @if (Model?.Status == "Approved")
+                @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
                 {
                     <p class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.ApprovedBy)
                         </span>
                         <b class="d-block">
-                            @(string.IsNullOrEmpty(Model?.ApprovedBy?.Trim()) ? "-" : Model.ApprovedBy)
+                            @(string.IsNullOrWhiteSpace(Model?.ApprovedBy) ? "-" : Model.ApprovedBy)
                         </b>
                     </p>
                     <p class="text-sm">
@@ -186,14 +191,14 @@
                         </b>
                     </p>
                 }
-                @if (Model?.Status == "Disapproved")
+                @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
                 {
                     <p class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.DisapprovedBy)
                         </span>
                         <b class="d-block">
-                            @(string.IsNullOrEmpty(Model?.DisapprovedBy?.Trim()) ? "-" : Model.DisapprovedBy)
+                            @(string.IsNullOrWhiteSpace(Model?.DisapprovedBy?.Trim()) ? "-" : Model.DisapprovedBy)
                         </b>
                     </p>
                     <p class="text-sm">
@@ -212,7 +217,8 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Sales Order Item(s)</span>
-                        @if(Model.Status == "Submitted") {
+                        @if (Model.Status == "Submitted")
+                        {
                             <div class="card-tools">
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
                                     <span class="fas fa-plus"></span> Add Item
@@ -243,9 +249,7 @@
                                     <th colspan="3"></th>
                                     <th>Total</th>
                                     <th class="total-quantity">0</th>
-                                    <th colspan="3"></th>
-                                    <th class="total-selling-price">0.00</th>
-                                    <th colspan="2"></th>
+                                    <th colspan="6"></th>
                                     <th class="total-net-price">0.00</th>
                                 </tr>
                             </tfoot>
@@ -356,6 +360,14 @@
         </div>
     </div>
 </div>
+
+<form id="approve-form" asp-action="Approve">
+    <input type="hidden" id="approve-id" name="Id" value="@Model.Id" />
+</form>
+
+<form id="disapprove-form" asp-action="Disapprove">
+    <input type="hidden" id="disapprove-id" name="Id" value="@Model.Id" />
+</form>
 
 @section Scripts {
     <script>
@@ -497,7 +509,7 @@
                         var actions = '';
                         actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
-                    }, 
+                    },
                     className: "form-cell"
                 },
                 { data: "itemCode", name: "ItemCode", className: "form-cell" },
@@ -555,26 +567,9 @@
             order: [[0, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
-                var numVal = function (i) {
-                    switch (typeof i) {
-                        case 'string': return elemVal(i);
-                        case 'number': return i;
-                        default: return 0;
-                    }
-                };
-                var elemVal = function (i) {
-                    if(i.includes("input"))
-                        return $(i).val() * 1;
-                    else
-                        return i.replace(/[\$,]/g, '') * 1;
-                }
-                var totalQuantity = api.column(4).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
-                var totalSellPrice = api.column(8).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
-                var totalGrossPrice = api.column(11).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
 
-                $(api.column(4).footer()).html(FormatStringInteger(totalQuantity));
-                $(api.column(8).footer()).html(FormatStringDecimal(totalSellPrice));
-                $(api.column(11).footer()).html(FormatStringDecimal(totalGrossPrice));
+                columnDTTotalInteger(api, 4);
+                columnDTTotalDecimal(api, 11);
             }
         });
 
@@ -594,10 +589,9 @@
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
             $(".table-item thead th").removeClass("grossprice");
-            
-            ComputeTotalQuantity();
-            ComputeTotalSellingPrice();
-            ComputeTotalGrossPrice();
+
+            //ComputeTotalQuantity();
+            //ComputeTotalGrossPrice();
             $(".quantity, .sellingprice, .discount1, .discount2").on("input", function () {
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
                 var selling_price = parseFloat($(this).parents("tr").find(".sellingprice").val());
@@ -607,36 +601,28 @@
                 var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * selling_price) / 100)));
                 $(this).parents("tr").find(".grossprice").html(gross_price);
                 ComputeTotalQuantity();
-                ComputeTotalSellingPrice();
                 ComputeTotalGrossPrice();
             });
         });
 
         function ComputeTotalQuantity() {
             total_quantity = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 total_quantity += parseInt($(this.node()).find(".quantity").val());
-            } );
+                console.log($(this.node()).find(".quantity"));
+            });
             $(".total-quantity").html(FormatStringInteger(total_quantity));
-        }
-
-        function ComputeTotalSellingPrice() {
-            total_selling_price = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                total_selling_price += parseFloat($(this.node()).find(".sellingprice").val());
-            } );
-            $(".total-selling-price").html(FormatStringDecimal(total_selling_price));
         }
 
         function ComputeTotalGrossPrice() {
             total_gross_price = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",",""));
-            } );
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",", ""));
+            });
             $(".total-gross-price").html(FormatStringDecimal(total_gross_price));
         }
 
-        function GetItemsToReplenish() {
+        function GetItemsToOrder() {
             var item_to_replenish = [];
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
@@ -647,7 +633,7 @@
                 item_to_replenish.push({
                     item: row_data.id,
                     quantity: row_quantity,
-                    unitPrice: row_sellprice,
+                    sellingPrice: row_sellprice,
                     discount1: row_discount1,
                     discount2: row_discount2
                 });
@@ -656,7 +642,7 @@
         }
 
         $(".btn-details-submit").on("click", function () {
-            var itemsToReplenish = GetItemsToReplenish();
+            var itemsToReplenish = GetItemsToOrder();
             if (itemsToReplenish.length == 0) {
                 toastr.warning("No item to replenish. Add an item to the list to continue");
             } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
@@ -664,7 +650,7 @@
             } else {
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("SaveJson")",
+                    url: "@Url.Action("SaveItemsJson")",
                     data: {
                         Id: @Model?.Id,
                         Items: itemsToReplenish
@@ -680,29 +666,90 @@
                 });
             }
         });
+            
+            $('.btn-details-approve').click(function (e) {
+                swal({
+                    title: "Approve Sales Order",
+                    text: "Continue to approve this sales order?",
+                    icon: "success",
+                    buttons: true,
+                    successMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $('#approve-form').submit();
+                    }
+                });
+            });
+            
+            $('.btn-details-disapprove').click(function (e) {
+                swal({
+                    title: "Disapprove Sales Order",
+                    text: "Continue to disapprove this sales order?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $('#disapprove-form').submit();
+                    }
+                });
+            });
 
         $(".btn-details-print").on("click", function () {
-            var html = '<h3>Replenishment Details</h3>';
+            var html = '<h3>Sales Order Details</h3>';
             html += '<table class="table-header w100">';
             html += '<tr>';
-            @*
-            html += '<th>@Html.DisplayNameFor(model => model.Supplier)</th><td>@Model?.Supplier</td>';
+            html += '<th>SO Number</th><td>@Model?.SONumber</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.GrossNetPrice)</th><td>@Model?.GrossNetPrice</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.SalesOrderBy)</th><td>@Model?.SalesOrderBy</td>';
+            html += '</tr>';
+            html += '<tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.CustomerCode)</th><td>@Model?.CustomerCode</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.CreditTerms)</th><td>@Model?.CreditTerms</td>';
             html += '<th>@Html.DisplayNameFor(model => model.OrderDate)</th><td>@Model?.OrderDate</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.OrderBy)</th><td>@Model?.OrderBy</td>';
             html += '</tr>';
             html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.Address1)</th><td>@(string.IsNullOrEmpty(Model?.Address1.Trim()) ? "-" : Model.Address1)</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.Currency)</th><td>@Model?.Currency</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.PONumber)</th><td>@Model?.PONumber</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.CustomerName)</th><td>@Model?.CustomerName</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.DeclaredValue)</th><td>@Model?.DeclaredValue</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.RequiredDate)</th><td>@Model?.RequiredDate</td>';
             html += '</tr>';
             html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.Address2)</th><td>@(string.IsNullOrEmpty(Model?.Address2.Trim()) ? "-" : Model.Address2)</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.CurrencyRate)</th><td>@Model?.CurrencyRate</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.ReferenceNumber)</th><td>@Model?.ReferenceNumber</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.CustomerAddress)</th><td>@(string.IsNullOrWhiteSpace(Model?.CustomerAddress) ? "-" : Model.CustomerAddress)</td>';
+            html += '<th>PO Number</th><td>@(string.IsNullOrWhiteSpace(Model?.PONumber) ? "-" : Model.PONumber)</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.DeliveryDate)</th><td>@Model?.DeliveryDate</td > ';
             html += '</tr>';
             html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.Destination)</th><td>@Model?.Destination</td > ';*@
-            html += '</tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.AgentCode)</th><td>@Model?.AgentCode</td>';
+            html += '<th>@Html.DisplayNameFor(model => model.DeliveryType)</th><td>@Model?.DeliveryType</td>';
+        @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
+        {
+            <text>html += '<th>@Html.DisplayNameFor(model => model.ApprovedBy)</th><td>@Model?.ApprovedBy</td>'; </text>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
+        {
+            <text>html += '<th>@Html.DisplayNameFor(model => model.DisapprovedBy)</th><td>@Model?.DisapprovedBy</td>'; </text>
+        }
+        else
+        {
+            <text>html += '<th></th><td></td>'; </text>
+        }
+                html += '</tr>';
+            html += '<tr>';
+            html += '<th>@Html.DisplayNameFor(model => model.AgentName)</th><td>@Model?.AgentName</td>';
+            html += '<th></th><td></td>';
+        @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
+        {
+            <text>html += '<th>@Html.DisplayNameFor(model => model.ApprovedDate)</th><td>@Model?.ApprovedDate</td>'; </text>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
+        {
+            <text>html += '<th>@Html.DisplayNameFor(model => model.DisapprovedDate)</th><td>@Model?.DisapprovedDate</td>'; </text>
+        }
+        else
+        {
+            <text>html += '<th></th><td></td>'; </text>
+        }
+                html += '</tr>';
             html += '</table>';
 
             html += '<table class="table-items">';
@@ -726,7 +773,7 @@
                 html += '<td>' + row_data.itemName + '</td>';
                 html += '<td class="right-text">' + row_data.quantity + '</td>';
                 html += '<td>' + row_data.unit + '</td>';
-                html += '<td class="right-text">' + row_data.unitPrice + '</td>';
+                html += '<td class="right-text">' + row_data.sellingPrice + '</td>';
                 html += '<td class="right-text">' + row_data.discount1 + '</td>';
                 html += '<td class="right-text">' + row_data.discount2 + '</td>';
                 html += '<td class="right-text">' + row_data.netPrice + '</td>';

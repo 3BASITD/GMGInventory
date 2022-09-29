@@ -14,9 +14,5 @@ namespace GMGInventory.Data
 
         public int Quantity { get; set; }
         public int BoxNumber { get; set; }
-
-        [ForeignKey("PackReturnId")]
-        public int? PackReturnId { get; set; }
-        public PackReturn PackReturn { get; set; }
     }
 }

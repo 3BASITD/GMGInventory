@@ -56,9 +56,9 @@
 }
 
 [data-microtip-title][role~="tooltip"]:hover::before,
-[data-microtip-title][role~="tooltip"]:hover::after,
-[data-microtip-title][role~="tooltip"]:focus::before,
-[data-microtip-title][role~="tooltip"]:focus::after {
+[data-microtip-title][role~="tooltip"]:hover::after/*,
+[data-microtip-title][role~="tooltip"]:focus::before*//*,
+[data-microtip-title][role~="tooltip"]:focus::after*/ {
   opacity: 0.99;
   pointer-events: auto;
 }
@@ -212,7 +212,7 @@
 }
 
 [role~="tooltip"][data-microtip-position="left"]::after {
-  margin-right: 11px;
+  margin-right: 10px;
 }
 
 [role~="tooltip"][data-microtip-position="left"]:hover::before,
@@ -241,7 +241,7 @@
 }
 
 [role~="tooltip"][data-microtip-position="right"]::after {
-  margin-left: 11px;
+  margin-left: 10px;
 }
 
 [role~="tooltip"][data-microtip-position="right"]:hover::before,

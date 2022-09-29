@@ -26,6 +26,18 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.Forwarders
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Name,
+                                    Selected = IncludeId != null && IncludeId == s.Id
+                                })
+                                .ToListAsync();
+        }
+
         public async Task<List<ForwarderViewVM>> GetAllForwarderVMAsync()
         {
             var forwarders = await context.Forwarders
@@ -94,7 +106,7 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var forwarders = await context.Forwarders.FirstAsync(s => s.Id == id);
-           // forwarders.IsActive = false;
+            // forwarders.IsActive = false;
             await context.SaveChangesAsync(currentUserId);
         }
 
@@ -102,7 +114,7 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var forwarders = await context.Forwarders.FirstAsync(s => s.Id == id);
-           // forwarders.IsActive = true;
+            // forwarders.IsActive = true;
             await context.SaveChangesAsync(currentUserId);
         }
 
@@ -110,7 +122,7 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var forwarders = mapper.Map<Forwarder>(forwarderVM);
-           // forwarders.IsActive = true;
+            // forwarders.IsActive = true;
             await context.Forwarders.AddAsync(forwarders);
             await context.SaveChangesAsync(currentUserId);
         }

@@ -56,7 +56,7 @@ namespace GMGInventory.Application.Repositories
             return await returns.ToListAsync();
         }
 
-        public async Task<ForDataTables<SalesReturnVM>> GetListDataTablesAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<SalesReturnVM>> GetListDTAsync(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -126,7 +126,7 @@ namespace GMGInventory.Application.Repositories
                          where rturn.SalesReturnId == salesReturnId
                          select new SalesReturnItemVM
                          {
-                             AmountD = rturn.Amount,
+                             SellingPriceD = rturn.Amount,
                              Discount1D = rturn.Discount1,
                              Discount2D = rturn.Discount2,
                              Id = rturn.Id,

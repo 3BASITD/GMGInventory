@@ -216,10 +216,12 @@ namespace GMGInventory.Application.Repositories
                              Discount2D = order.Discount2,
                              Id = order.ItemId,
                              InventoryCount = inventory,
+                             InvoicedQuantity = order.InvoicedQuantity,
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
                              NetPriceD = price.NetSellingPrice,
                              Quantity = order.Quantity,
+                             PackedQuantity = order.PackedQuantity,
                              RetailPriceD = price.RetailSellingPrice,
                              SellingPriceD = order.SellingPrice,
                              Unit = order.Item.Unit.Code,
@@ -240,9 +242,11 @@ namespace GMGInventory.Application.Repositories
                 data = data.Where(x => x.Discount1.ToLower().Contains(form.SearchValue)
                                     || x.Discount2.ToLower().Contains(form.SearchValue)
                                     || x.InventoryCount.ToString().Contains(form.SearchValue)
+                                    || x.InvoicedQuantity.ToString().Contains(form.SearchValue)
                                     || x.ItemCode.ToLower().Contains(form.SearchValue)
                                     || x.ItemName.ToLower().Contains(form.SearchValue)
                                     || x.NetPriceD.ToString().Contains(form.SearchValue)
+                                    || x.PackedQuantity.ToString().Contains(form.SearchValue)
                                     || x.Quantity.ToString().Contains(form.SearchValue)
                                     || x.RetailPriceD.ToString().Contains(form.SearchValue)
                                     || x.SellingPriceD.ToString().Contains(form.SearchValue)
@@ -261,10 +265,12 @@ namespace GMGInventory.Application.Repositories
                         case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
                         case "InventoryCount": data = data.OrderBy(s => s.InventoryCount); break;
+                        case "InvoicedQuantity": data = data.OrderBy(s => s.InvoicedQuantity); break;
                         case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderBy(s => s.ItemName); break;
                         case "Quantity": data = data.OrderBy(s => s.Quantity); break;
                         case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
+                        case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantity); break;
                         case "SellingPrice": data = data.OrderBy(s => s.SellingPriceD); break;
                         case "RetailPrice": data = data.OrderBy(s => s.RetailPriceD); break;
                         case "Unit": data = data.OrderBy(s => s.Unit); break;
@@ -279,10 +285,12 @@ namespace GMGInventory.Application.Repositories
                         case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
                         case "InventoryCount": data = data.OrderByDescending(s => s.InventoryCount); break;
+                        case "InvoicedQuantity": data = data.OrderByDescending(s => s.InvoicedQuantity); break;
                         case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
                         case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
                         case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
+                        case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantity); break;
                         case "SellingPrice": data = data.OrderByDescending(s => s.SellingPriceD); break;
                         case "RetailPrice": data = data.OrderByDescending(s => s.RetailPriceD); break;
                         case "Unit": data = data.OrderByDescending(s => s.Unit); break;
@@ -432,7 +440,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.Statuses.Where(s => s.Name == "Sales Order Approved").Select(s => s.Id).First();
+                int statusId = context.Statuses.Where(s => s.Name == "Sales Order Disapproved").Select(s => s.Id).First();
                 orderVM.ApprovedBy = null;
                 orderVM.ApprovedDate = null;
                 orderVM.DisapprovedBy = currentUserId;

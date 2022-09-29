@@ -563,26 +563,9 @@
             ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
-                var numVal = function (i) {
-                    switch (typeof i) {
-                        case 'string': return elemVal(i);
-                        case 'number': return i;
-                        default: return 0;
-                    }
-                };
-                var elemVal = function (i) {
-                    if(i.includes("input"))
-                        return $(i).val() * 1;
-                    else
-                        return i.replace(/[\$,]/g, '') * 1;
-                }
-                var totalQuantity = api.column(4).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
-                var totalSellPrice = api.column(8).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
-                var totalGrossPrice = api.column(11).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
 
-                $(api.column(4).footer()).html(FormatStringInteger(totalQuantity));
-                $(api.column(8).footer()).html(FormatStringDecimal(totalSellPrice));
-                $(api.column(11).footer()).html(FormatStringDecimal(totalGrossPrice));
+                columnDTTotalInteger(api, 4);
+                columnDTTotalDecimal(api, 11);
             }
         });
 

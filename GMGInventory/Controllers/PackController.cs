@@ -27,7 +27,30 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> GetListJson(ListFilterCommonModel filter)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await packRepository.GetListDataTablesAsync(form, filter));
+            return Json(await packRepository.GetListDTAsync(form, filter));
+        }
+
+        public async Task<ActionResult> Details(int? Id)
+        {
+            var order = await packRepository.GetDetailsAsync(Id);
+            if (order == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            return View(order);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetItemsJson(int packId)
+        {
+            return Json(await packRepository.GetItemsAsync(packId));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetItemsDTJson(int packId)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await packRepository.GetItemsDTAsync(form, packId));
         }
     }
 }

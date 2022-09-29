@@ -123,6 +123,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Quantity")]
         public int Quantity { get; set; }
 
+        [Display(Name = "Packed Quantity")]
+        public int PackedQuantity { get; set; }
+
+        [Display(Name = "Invoiced Quantity")]
+        public int InvoicedQuantity { get; set; }
+
         [Display(Name = "Unit")]
         public string Unit { get; set; }
 

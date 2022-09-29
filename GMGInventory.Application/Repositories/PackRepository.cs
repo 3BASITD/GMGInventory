@@ -18,6 +18,27 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
+        public async Task<PackDetailsVM?> GetDetailsAsync(int? Id)
+        {
+            var orderVM = (from order in context.Packs
+                                                .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
+                                                .Include(s=>s.SalesOrder).ThenInclude(s=>s.DeliveryType)
+                           join user in userManager.Users on order.UserCreated equals user.Id
+                           where order.Id == Id
+                           select new PackDetailsVM
+                           {
+                               CustomerCode = order.SalesOrder.Customer.Code,
+                               CustomerName = order.SalesOrder.Customer.Name,
+                               DeliveryType = order.SalesOrder.DeliveryType.Name,
+                               Id = order.Id,
+                               PackBy = user.Nickname,
+                               PackDateD = order.DateCreated,
+                               SalesOrderDateD = order.SalesOrder.DateCreated,
+                               SONumber = order.SalesOrder.SalesOrderNumber
+                           });
+            return await orderVM.FirstOrDefaultAsync();
+        }
+
         private async Task<IList<PackVM>> GetListAsync(ListFilterCommonModel filter)
         {
             var packs = from pck in context.Packs
@@ -42,7 +63,7 @@ namespace GMGInventory.Application.Repositories
             return await packs.ToListAsync();
         }
 
-        public async Task<ForDataTables<PackVM>> GetListDataTablesAsync(DataTablesRequestForm form, ListFilterCommonModel filter)
+        public async Task<ForDataTables<PackVM>> GetListDTAsync(DataTablesRequestForm form, ListFilterCommonModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -103,6 +124,76 @@ namespace GMGInventory.Application.Repositories
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
                 Data = dataList
+            };
+        }
+
+        public async Task<IList<PackItemVM>> GetItemsAsync(int packId)
+        {
+            var itemVM = from order in context.PackLineItems
+                                              .Include(s => s.Item)
+                         where order.PackId == packId
+                         select new PackItemVM
+                         {
+                             BoxNumber = order.BoxNumber,
+                             Id = order.Id,
+                             ItemCode = order.Item.Code,
+                             ItemName = order.Item.Name,
+                             Quantity = order.Quantity
+                         };
+            return await itemVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<PackItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int packId)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetItemsAsync(packId)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.BoxNumber.ToString().Contains(form.SearchValue)
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
+                                    || x.ItemName.ToLower().Contains(form.SearchValue)
+                                    || x.Quantity.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "BoxNumber": data = data.OrderBy(s => s.BoxNumber); break;
+                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
+                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
+                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "BoxNumber": data = data.OrderByDescending(s => s.BoxNumber); break;
+                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
+                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<PackItemVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
             };
         }
     }

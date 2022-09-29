@@ -6,7 +6,6 @@ namespace GMGInventory.Data
     {
         public PackReturn()
         {
-            this.PackLineItems = new HashSet<PackLineItem>();
             this.PackReturnLineItems = new HashSet<PackReturnLineItem>();
         }
 
@@ -14,7 +13,6 @@ namespace GMGInventory.Data
         public int PackId { get; set; }
         public Pack Pack { get; set; }
 
-        public ICollection<PackLineItem> PackLineItems { get; set; }
         public ICollection<PackReturnLineItem> PackReturnLineItems { get; set; }
     }
 }

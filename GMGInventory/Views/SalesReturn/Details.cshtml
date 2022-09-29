@@ -90,10 +90,10 @@
                                     <th>Item Name</th>
                                     <th>Quantity</th>
                                     <th>Unit</th>
-                                    <th>Amount</th>
+                                    <th>Selling Price</th>
                                     <th>Discount 1</th>
                                     <th>Discount 2</th>
-                                    <th>Net Amount</th>
+                                    <th>Gross Price</th>
                                     <th>Reference Number</th>
                                 </tr>
                             </thead>
@@ -107,7 +107,7 @@
                                     <th></th>
                                     <th></th>
                                     <th></th>
-                                    <th class="total-net-price">0.00</th>
+                                    <th class="total-gross-price">0.00</th>
                                     <th></th>
                                 </tr>
                             </tfoot>
@@ -152,23 +152,18 @@
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "unit", name: "Unit" },
-                { data: "amount", name: "Amount", className: "text-end" },
+                { data: "sellingPrice", name: "SellingPrice", className: "text-end" },
                 { data: "discount1", name: "Discount1", className: "text-end" },
                 { data: "discount2", name: "Discount2", className: "text-end" },
-                { data: "netAmount", name: "NetAmount", className: "text-end" },
+                { data: "grossPrice", name: "GrossPrice", className: "text-end" },
                 { data: "referenceNumber", name: "ReferenceNumber" },
             ],
             order: [[0, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
-                var numVal = function (i) {
-                    return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
-                };
-                var totalQuantity = api.column(3).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
-                var totalNetPrice = api.column(8).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
 
-                $(api.column(3).footer()).html(FormatStringInteger(totalQuantity));
-                $(api.column(8).footer()).html(FormatStringDecimal(totalNetPrice));
+                columnDTTotalInteger(api, 3);
+                columnDTTotalDecimal(api, 8);
             }
         });
 
@@ -203,10 +198,10 @@
             html += '<th>Item Name</th>';
             html += '<th>Quantity</th>';
             html += '<th>Unit</th>';
-            html += '<th>Amount</th>';
+            html += '<th>Selling Price</th>';
             html += '<th>Discount 1</th>';
             html += '<th>Discount 2</th>';
-            html += '<th>Net Amount</th>';
+            html += '<th>Gross Price</th>';
             html += '<th>Reference Number</th>';
             html += '</thead>';
             html += '</tr>';
@@ -225,15 +220,15 @@
                 html += '<td>' + row_data.itemName + '</td>';
                 html += '<td class="right-text">' + row_data.quantity + '</td>';
                 html += '<td>' + row_data.unit + '</td>';
-                html += '<td class="right-text">' + row_data.amount + '</td>';
+                html += '<td class="right-text">' + row_data.sellingPrice + '</td>';
                 html += '<td class="right-text">' + row_data.discount1 + '</td>';
                 html += '<td class="right-text">' + row_data.discount2 + '</td>';
-                html += '<td class="right-text">' + row_data.netAmount + '</td>';
+                html += '<td class="right-text">' + row_data.grossPrice + '</td>';
                 html += '<td>' + row_data.referenceNumber + '</td>';
                 html += '</tr>';
 
                 totalQuantity += parseInt(row_data.quantity);
-                totalNetPrice += parseFloat(row_data.netPriceD);
+                totalNetPrice += parseFloat(row_data.netAmountD);
             });
             html += '<tr>';
             html += '<tfoot>';

@@ -24,11 +24,11 @@ namespace GMGInventory.Data
         public string InvoiceNumber { get; set; }
 
         [ForeignKey("InvoiceTypeId")]
-        public int? InvoiceTypeId { get; set; }
+        public int InvoiceTypeId { get; set; }
         public InvoiceType InvoiceType { get; set; }
 
         [ForeignKey("Status")]
-        public int? StatusId { get; set; }
+        public int StatusId { get; set; }
         public Status Status { get; set; }
 
         [ForeignKey("PackId")]

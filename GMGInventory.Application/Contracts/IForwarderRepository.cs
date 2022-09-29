@@ -5,6 +5,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IForwarderRepository : IGenericRepository<Forwarder>
     {
+        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
         Task<List<ForwarderViewVM>> GetAllForwarderVMAsync();
         Task<ForwarderViewVM?> GetForwarderViewVMAsync(int? id);
         Task<ForwarderVM?> GetForwarderVMAsync(int? id);

@@ -9,7 +9,8 @@
     });
 
     $("select").on("select2:close", function (e) {
-        $(this).valid();
+        if ($(this).closest("form").length)
+            $(this).valid();
     });
 
     $("form").attr("autocomplete", "off");
@@ -180,11 +181,11 @@ function Round2Decimal(num) {
 }
 
 function FormatStringDecimal(num) {
-        return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add comma every 3 digits
+    return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add comma every 3 digits
 }
 
 function FormatStringInteger(num) {
-        return parseInt(num).toFixed(0).replace(/\B(?=(\d{3}))/g, ","); // add comma every 3 digits
+    return parseInt(num).toFixed(0).replace(/\B(?=(\d{3}))/g, ","); // add comma every 3 digits
 }
 
 function DateForInput(date) {
@@ -197,4 +198,33 @@ function DateForInput(date) {
     if (day < 10) day = "0" + day;
 
     return year + "-" + month + "-" + day;
+}
+
+function cellDTNumberValue(i) {
+    if (typeof i == 'string') {
+        if (i.includes("input"))
+            return $(i).val() * 1;
+        else
+            return i.replace(/[\$,]/g, '') * 1;
+    } else if (typeof i == 'number') {
+        return i;
+    } else {
+        return 0;
+    }
+}
+
+function columnDTTotalInteger(api, column) {
+    var total = api.column(column).data().reduce(function (a, b) {
+        return cellDTNumberValue(a) + cellDTNumberValue(b);
+    }, 0);
+
+    $(api.column(column).footer()).html(FormatStringInteger(total));
+}
+
+function columnDTTotalDecimal(api, column) {
+    var total = api.column(column).data().reduce(function (a, b) {
+        return cellDTNumberValue(a) + cellDTNumberValue(b);
+    }, 0);
+
+    $(api.column(column).footer()).html(FormatStringDecimal(total));
 }
