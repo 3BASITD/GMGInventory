@@ -989,6 +989,7 @@
                 type: "POST",
                 url: "@Url.Action("CreateShippingJson")",
                 data: {
+                    Id: @Model.Id,
                     ShippingAddress: $("#create-shipping-address").val(),
                     ShippingPhoneNo: $("#create-shipping-cnumber").val(),
                     ShippingContactPerson: $("#create-shipping-cperson").val(),
@@ -1001,7 +1002,9 @@
                     } else {
                         toastr.success(data.message, "Success");
                         $("#shippingModal").modal("hide");
-                        dataTable.ajax.reload();
+                        shippingDT.ajax.reload();
+                        
+                        hideLoader()
                     }
                 }
             });
@@ -1045,6 +1048,7 @@
                 type: "POST",
                 url: "@Url.Action("CreateForwarderJson")",
                 data: {
+                    Id: @Model.Id,
                     ForwarderAddress: $("#create-forwarder-address").val(),
                     ForwarderPhoneNo: $("#create-forwarder-cnumber").val(),
                     ForwarderName: $("#create-forwarder-name").val(),
@@ -1057,17 +1061,13 @@
                     } else {
                         toastr.success(data.message, "Success");
                         $("#forwarderModal").modal("hide");
-                        dataTable.ajax.reload();
+                        forwarderDT.ajax.reload();
+                        
+                        hideLoader()
                     }
                 }
             });
         }
-
-
-                //// load functions upon datatable load
-                //datatable.on("draw", function() {
-                //    hideLoader();
-                //});
 
 
 

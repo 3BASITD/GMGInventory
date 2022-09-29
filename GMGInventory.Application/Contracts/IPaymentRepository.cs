@@ -9,5 +9,7 @@ namespace GMGInventory.Application.Contracts
         PaymentVM? GetPaymentVM(int? id);
 
         Task<ForDataTables<PaymentVM>> GetPaymentChecksDTAsync(DataTablesRequestForm form, int id);
+
+        Task<ForDataTables<PaymentVM>> GetPaymentInvoicesDTAsync(DataTablesRequestForm form, int id);
     }
 }

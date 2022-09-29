@@ -40,10 +40,10 @@ namespace GMGInventory.Application.Repositories
                                  CRNumber = cp.CRNumber,
                                  SOANo = cp.SOACRId.ToString(),
                                  CustomerName = cp.Customer.Name,
-                                 TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString(SystemFormat.StringDecimalComma),
-                                 AmountPaid = cp.TotalAmountPaid.ToString(SystemFormat.StringDecimalComma),
-                                 OverPayment = cp.OverPayment.ToString(SystemFormat.StringDecimalComma),
-                                 TransactionDate = cp.DateCreated.ToString(SystemFormat.StringDateTime),
+                                 TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString(),
+                                 AmountPaid = cp.TotalAmountPaid.ToString(),
+                                 OverPayment = cp.OverPayment.ToString(),
+                                 TransactionDate = cp.DateCreated.ToString(),
                                  CreatedBy = cp.UserCreated,
                                  Remarks = cp.Remarks
 
@@ -64,10 +64,10 @@ namespace GMGInventory.Application.Repositories
                        CRNumber = cp.CRNumber,
                        SOANo = cp.SOACRId.ToString(),
                        CustomerName = cp.Customer.Name,
-                       TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString(SystemFormat.StringDecimalComma),
-                       AmountPaid = cp.TotalAmountPaid.ToString(SystemFormat.StringDecimalComma),
-                       OverPayment = cp.OverPayment.ToString(SystemFormat.StringDecimalComma),
-                       TransactionDate = cp.DateCreated.ToString(SystemFormat.StringDateTime),
+                       TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString(),
+                       AmountPaid = cp.TotalAmountPaid.ToString(),
+                       OverPayment = cp.OverPayment.ToString(),
+                       TransactionDate = cp.DateCreated.ToString(),
                        CreatedBy = cp.UserCreated,
                        Remarks = cp.Remarks
 
@@ -150,13 +150,12 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<PaymentVM>> GetPaymentChecksAsync(int id)
         {
-            var customerVM = from cp in context.CustomerPayments
-                                               .Include(s => s.Customer)
+            var customerVM = from cpd in context.CustomerPaymentDetails
                              join p in context.Payments
-                                              on cp.Customer.Id equals p.CustomerId
+                                              on cpd.PaymentId equals p.Id
                              join pd in context.PaymentDetails
                                               on p.Id equals pd.PaymentId
-                             where cp.Id == id
+                             where cpd.Id == id
                              select new PaymentVM
                              {
                                  CheckNo = pd.CheckNumber.ToString(),
@@ -228,20 +227,21 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<PaymentVM>> GetPaymentInvoicesAsync(int id)
         {
-            var customerVM = from cp in context.CustomerPayments
-                                               .Include(s => s.Customer)
-                             join p in context.Payments
-                                              on cp.Customer.Id equals p.CustomerId
-                             join pd in context.PaymentDetails
-                                              on p.Id equals pd.PaymentId
-                             where cp.Id == id
+            var customerVM = from cpd in context.CustomerPaymentDetails
+                             join p in context.Invoices
+                                              on cpd.InvoiceId equals p.Id
+                             where cpd.Id == id
                              select new PaymentVM
                              {
-                                 CheckNo = pd.CheckNumber.ToString(),
-                                 CheckAmount = pd.CheckAmount.ToString(),
-                                 CheckDate = pd.CheckDate.ToString(),
-                                 BankName = pd.BankName.ToString(),
-                                 BankBranch = pd.BankBranch.ToString()
+                                 InvoiceNumber = p.InvoiceNumber,
+                                 InvoiceDate = p.DateCreated.ToString(),
+                                 InvoiceType = p.InvoiceType.ToString(),
+                                 InvoiceAmount = p.Amount.ToString(),
+                                 BalanceAmount = p.PaidAmount.ToString(),
+                                 PackNo = p.PackId.ToString(),
+                                 SalesOrderNo = p.SalesOrderId.ToString()
+
+                   
 
                              };
             return await customerVM.ToListAsync();

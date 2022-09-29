@@ -188,6 +188,8 @@
     </div>
 </div>
 
+
+
 @section Scripts {
     <script>
         var itemTableChecks = $('.table-payment-checks').on('preXhr.dt', function (e, settings, data) {
@@ -197,7 +199,7 @@
                 url: "@Url.Action("GetPaymentChecksJson", "Payment")",
                 type: "POST",
                 data: function(data) {
-                    data.CustomerPaymentId = @Model?.Id;
+                    data.Id = @Model?.Id;
                 },
             },
             responsive: true,
@@ -221,34 +223,34 @@
         });
 
 
-        //var itemTableInvoice = $('.table-payment-invoice').on('preXhr.dt', function(e, settings, data) {
-        //    showLoader();
-        //}).DataTable({
-        //    ajax: {
-        //        url: "@Url.Action("GetListJsonDetails", "Payment")",
-        //        type: "POST",
-        //        data: function(data) {
-        //            data.CustomerPaymentId = @Model?.Id;
-        //        },
-        //    },
-        //    responsive: true,
-        //    autoWidth: false,
-        //    serverSide: true,
-        //    filter: true,
-        //    columns: [
-        //        { data: "invoiceNumber", name: "InvoiceNumber" },
-        //        { data: "invoiceDate", name: "InvoiceDate" },
-        //        { data: "invoiceType", name: "InvoiceType" },
-        //        { data: "invoiceAmount", name: "InvoiceAmount" },
-        //        { data: "balanceAmount", name: "BalanceAmount" },
-        //        { data: "packNo", name: "PackNo" },
-        //        { data: "salesOrderNo", name: "SalesOrderNo" }
-        //    ]
-        //});
+        var itemTableInvoice = $('.table-payment-invoice').on('preXhr.dt', function(e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetPaymentInvoicesJson", "Payment")",
+                type: "POST",
+                data: function(data) {
+                    data.Id = @Model?.Id;
+                },
+            },
+            responsive: true,
+            autoWidth: false,
+            serverSide: true,
+            filter: true,
+            columns: [
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "invoiceDate", name: "InvoiceDate" },
+                { data: "invoiceType", name: "InvoiceType" },
+                { data: "invoiceAmount", name: "InvoiceAmount" },
+                { data: "balanceAmount", name: "BalanceAmount" },
+                { data: "packNo", name: "PackNo" },
+                { data: "salesOrderNo", name: "SalesOrderNo" }
+            ]
+        });
 
-        //itemTableInvoice.on("draw", function() {
-        // hideLoader();
-        //});
+        itemTableInvoice.on("draw", function() {
+         hideLoader();
+        });
 
 
 
