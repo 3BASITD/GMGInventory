@@ -56,7 +56,7 @@
             showLoader();
         }).DataTable({
             ajax: {
-                url: "@Url.Action("GetListJson")",
+                url: "@Url.Action("GetListJson", "Payment")",
                 type: "POST",
             },
             serverSide: true,
@@ -84,7 +84,7 @@
         });
 
         // load functions upon datatable load
-        datatable.on("draw", function () {
+        dataTable.on("draw", function () {
             hideLoader();
 
             DatatablesSearchOnEnter('.table-payment', dataTable);

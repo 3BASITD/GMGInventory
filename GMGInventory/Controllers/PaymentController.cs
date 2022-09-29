@@ -49,6 +49,16 @@ namespace GMGInventory.Controllers
 
 
 
+        [HttpPost]
+        public async Task<JsonResult> GetPaymentInvoicesJson(int id)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await customerpaymentRepository.GetPaymentInvoicesDTAsync(form, id));
+        }
+
+
+
+
 
 
     }
