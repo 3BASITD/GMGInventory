@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<AreaViewVM>> GetAllAreaVMAsync()
+        public async Task<IList<AreaViewVM>> GetAllAreaVMAsync()
         {
             var areas = await context.Areas.Include(s => s.Region).ToListAsync();
             var areasViewVM = mapper.Map<List<AreaViewVM>>(areas);
@@ -62,7 +62,7 @@ namespace GMGInventory.Application.Repositories
             return areaViewVM;
         }
 
-        public async Task<List<Area>> GetAllActiveAreaAsync(int includeId)
+        public async Task<IList<Area>> GetAllActiveAreaAsync(int includeId)
         {
             return await context.Areas.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
             //var areas = await context.Areas.ToListAsync();
@@ -123,7 +123,7 @@ namespace GMGInventory.Application.Repositories
         }
 
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Areas
                 .Where(s => s.IsActive || s.Id == IncludeId)

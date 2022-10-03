@@ -168,7 +168,7 @@ namespace GMGInventory.Application.Repositories
 
 
 
-        public async Task<List<Customer>> GetAllActiveCustomerAsync(int includeId)
+        public async Task<IList<Customer>> GetAllActiveCustomerAsync(int includeId)
         {
             return await context.Customers.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
             //var areas = await context.Areas.ToListAsync();

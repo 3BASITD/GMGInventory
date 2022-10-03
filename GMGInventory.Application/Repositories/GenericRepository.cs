@@ -49,7 +49,7 @@ namespace GMGInventory.Application.Repositories
             return entity != null;
         }
 
-        public async Task<List<T>> GetAllAsync()
+        public async Task<IList<T>> GetAllAsync()
         {
             return await context.Set<T>().ToListAsync();
         }

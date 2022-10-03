@@ -28,7 +28,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.ItemTypes
                 //.Where(s => (s.CategoryId == CategoryId && s.IsActive) || s.Id == IncludeId)
@@ -48,7 +48,7 @@ namespace GMGInventory.Application.Repositories
             return itemType?.Id;
         }
 
-        public IQueryable<ItemTypeViewVM> GetAllItemTypeVM()
+        public async Task<IList<ItemTypeViewVM>> GetListAsync()
         {
             var itemTypes = from itemType in context.ItemTypes
                             select new ItemTypeViewVM
@@ -66,14 +66,14 @@ namespace GMGInventory.Application.Repositories
                                 UserCreated = userManager.FindByIdAsync(itemType.UserCreated).Result.Nickname,
                                 UserModified = itemType.UserModified == null ? "-" : userManager.FindByIdAsync(itemType.UserModified).Result.Nickname
                             };
-            return itemTypes;
+            return await itemTypes.ToListAsync();
         }
 
-        public ForDataTables<ItemTypeViewVM> GetListDataTables(DataTablesRequestForm form)
+        public async Task<ForDataTables<ItemTypeViewVM>> GetListDTAsync(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = GetAllItemTypeVM().ToList().AsQueryable();
+            var data = (await GetListAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -132,9 +132,9 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public ItemTypeViewVM? GetItemTypeViewVM(int? id)
+        public async Task<ItemTypeViewVM?> GetItemTypeViewVM(int? id)
         {
-            var itemTypeVM = GetAllItemTypeVM().Where(s => s.Id == id).FirstOrDefault();
+            var itemTypeVM = (await GetListAsync()).Where(s => s.Id == id).FirstOrDefault();
             if (itemTypeVM == null)
             {
                 return null;
@@ -144,7 +144,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(ItemTypeVM itemTypeVM)
         {
-            return await GetAllItemTypeVM().AnyAsync(s => s.Code == itemTypeVM.Code && s.Name == itemTypeVM.Name && s.Category == s.Category);
+            return (await GetListAsync()).Any(s => s.Code == itemTypeVM.Code && s.Name == itemTypeVM.Name && s.Category == s.Category);
         }
 
         public async Task<ItemTypeVM?> GetItemTypeVMAsync(int? id)
@@ -158,7 +158,7 @@ namespace GMGInventory.Application.Repositories
             return itemTypeViewVM;
         }
 
-        public async Task<List<ItemType>> GetAllActiveItemTypeAsync(int includeId)
+        public async Task<IList<ItemType>> GetAllActiveItemTypeAsync(int includeId)
         {
             return await context.ItemTypes.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
         }

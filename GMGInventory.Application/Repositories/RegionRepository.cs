@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<RegionVM>> GetAllRegionVMAsync()
+        public async Task<IList<RegionVM>> GetAllRegionVMAsync()
         {
             var regions = await context.Regions.ToListAsync();
             var regionsVM = mapper.Map<List<RegionVM>>(regions);
@@ -51,7 +51,7 @@ namespace GMGInventory.Application.Repositories
             return regionsVM;
         }
         
-        public async Task<List<Region>> GetAllActiveRegionAsync(int includeId)
+        public async Task<IList<Region>> GetAllActiveRegionAsync(int includeId)
         {
             //return await context.Regions.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
             var region =await context.Regions.ToListAsync();
@@ -68,7 +68,7 @@ namespace GMGInventory.Application.Repositories
             return await context.Areas.AnyAsync(s => s.RegionId == id);
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Regions
                 .Select(s => new JsonOptionsModel

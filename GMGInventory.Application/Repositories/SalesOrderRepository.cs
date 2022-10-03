@@ -49,7 +49,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<List<JsonOptionsModel>> GetPriceTypeOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetPriceTypeOptions(int? IncludeId)
         {
             return await context.PriceTypes
                                 .Select(s => new JsonOptionsModel
@@ -61,7 +61,7 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<List<JsonOptionsModel>> GetDeliveryTypeOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetDeliveryTypeOptions(int? IncludeId)
         {
             return await context.DeliveryTypes
                                 .Select(s => new JsonOptionsModel

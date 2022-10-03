@@ -7,10 +7,10 @@ namespace GMGInventory.Application.Contracts
     {
         Task<Select2Model<JsonAddressOptionsModel>> GetOptions(string search, int page);
 
-        //Task<List<CustomerViewVM>> GetAllCustomerVMAsync();
+        //Task<IList<CustomerViewVM>> GetAllCustomerVMAsync();
         //Task<CustomerViewVM?> GetCustomerViewVMAsync(int? id);
         //Task<CustomerVM?> GetCustomerVMAsync(int? id);
-        Task<List<Customer>> GetAllActiveCustomerAsync(int includeId);
+        Task<IList<Customer>> GetAllActiveCustomerAsync(int includeId);
         Task<bool> IsCustomerCodeExist(string code);
         Task<bool> IsCustomerInUse(int id);
         Task<bool> IsCustomerIdExistAsync(int id);

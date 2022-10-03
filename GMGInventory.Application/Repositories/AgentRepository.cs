@@ -47,7 +47,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Agents
                 .Where(s => s.IsActive || s.Id == IncludeId)
@@ -60,7 +60,7 @@ namespace GMGInventory.Application.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<AgentViewVM>> GetAllAgentVMAsync()
+        public async Task<IList<AgentViewVM>> GetAllAgentVMAsync()
         {
             var agents = await context.Agents.Include(s => s.Area).ToListAsync();
             var agentsViewVM = mapper.Map<List<AgentViewVM>>(agents);
@@ -99,7 +99,7 @@ namespace GMGInventory.Application.Repositories
             return agentViewVM;
         }
 
-        public async Task<List<AgentVM>> GetAllActiveAgentAsync(int includeId)
+        public async Task<IList<AgentVM>> GetAllActiveAgentAsync(int includeId)
 
         { 
             var agents =  await context.Agents.Where(s => s.IsActive || s.Id == includeId).ToListAsync();

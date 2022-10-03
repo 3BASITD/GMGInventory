@@ -37,10 +37,10 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetListJson()
+        public async Task<JsonResult> GetListJson()
         {
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
-            return Json(itemTypeRepository.GetListDataTables(dtForm));
+            return Json(await itemTypeRepository.GetListDTAsync(dtForm));
         }
 
         [HttpPost]
@@ -120,7 +120,7 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        public IActionResult DownloadFile()
+        public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Item Types");
             dt.Columns.AddRange(new DataColumn[3] {
@@ -128,7 +128,7 @@ namespace GMGInventory.Controllers
                 new DataColumn("Name"),
                 new DataColumn("Category")
             });
-            var itemTypes = itemTypeRepository.GetAllItemTypeVM().Where(s => s.IsActive == true).ToList();
+            var itemTypes = (await itemTypeRepository.GetListAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var itemType in itemTypes)
             {
                 dt.Rows.Add(itemType.Code, itemType.Name, itemType.Category);

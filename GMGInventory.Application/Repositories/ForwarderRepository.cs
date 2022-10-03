@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Forwarders
                                 .Select(s => new JsonOptionsModel
@@ -38,7 +38,7 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<List<ForwarderViewVM>> GetAllForwarderVMAsync()
+        public async Task<IList<ForwarderViewVM>> GetAllForwarderVMAsync()
         {
             var forwarders = await context.Forwarders
                 .Include(s => s.Customer)
@@ -80,7 +80,7 @@ namespace GMGInventory.Application.Repositories
             return forwardersViewVM;
         }
 
-        public async Task<List<Forwarder>> GetAllActiveForwarderAsync(int includeId)
+        public async Task<IList<Forwarder>> GetAllActiveForwarderAsync(int includeId)
         {
             //return await context.Suppliers.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
             var forwarders = await context.Forwarders.ToListAsync();

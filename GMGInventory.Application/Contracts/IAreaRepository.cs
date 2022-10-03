@@ -6,10 +6,10 @@ namespace GMGInventory.Application.Contracts
     public interface IAreaRepository : IGenericRepository<Area>
     {
 
-        Task<List<AreaViewVM>> GetAllAreaVMAsync();
+        Task<IList<AreaViewVM>> GetAllAreaVMAsync();
         Task<AreaViewVM?> GetAreaViewVMAsync(int? id);
         Task<AreaVM?> GetAreaVMAsync(int? id);
-        Task<List<Area>> GetAllActiveAreaAsync(int includeId);
+        Task<IList<Area>> GetAllActiveAreaAsync(int includeId);
         Task<bool> IsAreaCodeExist(string code);
         Task<bool> IsAreaInUse(int id);
         Task<bool> IsAreaIdExistAsync(int id);
@@ -17,6 +17,6 @@ namespace GMGInventory.Application.Contracts
         Task ReactivateAreaAsync(int id);
         Task AddAsync(AreaVM areaVM);
         Task UpdateAsync(int id, AreaVM areaVM);
-        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }

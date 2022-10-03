@@ -5,11 +5,11 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IForwarderRepository : IGenericRepository<Forwarder>
     {
-        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
-        Task<List<ForwarderViewVM>> GetAllForwarderVMAsync();
+        Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<IList<ForwarderViewVM>> GetAllForwarderVMAsync();
         Task<ForwarderViewVM?> GetForwarderViewVMAsync(int? id);
         Task<ForwarderVM?> GetForwarderVMAsync(int? id);
-        Task<List<Forwarder>> GetAllActiveForwarderAsync(int includeId);
+        Task<IList<Forwarder>> GetAllActiveForwarderAsync(int includeId);
         Task<bool> IsForwarderCodeExist(string code);
         Task<bool> IsForwarderInUse(int id);
         Task<bool> IsForwarderIdExistAsync(int id);

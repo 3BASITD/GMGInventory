@@ -28,7 +28,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<UserInformationVM>> GetUsersInformationVMAsync()
+        public async Task<IList<UserInformationVM>> GetUsersInformationVMAsync()
         {
             var users = userManager.Users.ToList();
             var usersVM = mapper.Map<List<UserInformationVM>>(users);
@@ -235,7 +235,7 @@ namespace GMGInventory.Application.Repositories
             await userManager.UpdateAsync(user);
         }
 
-        public async Task<List<AuditLog>> GetAuditLogAsync(string Id)
+        public async Task<IList<AuditLog>> GetAuditLogAsync(string Id)
         {
             return await context.AuditLogs
                 .Where(s => s.UserId == Id && s.Type != "None")

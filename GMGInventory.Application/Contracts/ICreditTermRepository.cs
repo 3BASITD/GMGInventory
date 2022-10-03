@@ -5,12 +5,12 @@ namespace GMGInventory.Application.Contracts
 {
     public interface ICreditTermRepository : IGenericRepository<CreditTerm>
     {
-        Task<List<CreditTermVM>> GetAllCreditTermVMAsync();
+        Task<IList<CreditTermVM>> GetAllCreditTermVMAsync();
         Task<CreditTermVM?> GetCreditTermVMAsync(int? id);
-        Task<List<CreditTerm>> GetAllActiveCreditTermAsync(int includeId);
+        Task<IList<CreditTerm>> GetAllActiveCreditTermAsync(int includeId);
         Task<bool> IsCreditTermCodeExist(int code);
         Task<bool> IsCreditTermInUse(int id);
 
-        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }

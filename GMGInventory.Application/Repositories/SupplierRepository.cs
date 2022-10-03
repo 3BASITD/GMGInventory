@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<JsonSupplierOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonSupplierOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Suppliers
                                 .Where(s => s.IsActive || s.Id == IncludeId)
@@ -41,7 +41,7 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<List<SupplierViewVM>> GetAllSupplierVMAsync()
+        public async Task<IList<SupplierViewVM>> GetAllSupplierVMAsync()
         {
             var suppliers = await context.Suppliers
                 .Include(s => s.Currency)
@@ -86,7 +86,7 @@ namespace GMGInventory.Application.Repositories
             return suppliersViewVM;
         }
 
-        public async Task<List<Supplier>> GetAllActiveSupplierAsync(int includeId)
+        public async Task<IList<Supplier>> GetAllActiveSupplierAsync(int includeId)
         {
             return await context.Suppliers.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
             //var areas = await context.Areas.ToListAsync();

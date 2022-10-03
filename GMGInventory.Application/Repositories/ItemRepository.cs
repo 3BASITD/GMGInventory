@@ -98,7 +98,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<List<JsonOptionsModel>> GetUnitOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetUnitOptions(int? IncludeId)
         {
             return await context.Units
                                 .Select(s => new JsonOptionsModel

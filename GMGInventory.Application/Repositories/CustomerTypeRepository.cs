@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<CustomerTypeVM>> GetAllCustomerTypeVMAsync()
+        public async Task<IList<CustomerTypeVM>> GetAllCustomerTypeVMAsync()
         {
             var customertype = await context.CustomerTypes.ToListAsync();
             var customertypeVM = mapper.Map<List<CustomerTypeVM>>(customertype);
@@ -51,7 +51,7 @@ namespace GMGInventory.Application.Repositories
             return customertypeVM;
         }
 
-        public async Task<List<CustomerType>> GetAllActiveCustomerTypeAsync(int includeId)
+        public async Task<IList<CustomerType>> GetAllActiveCustomerTypeAsync(int includeId)
         {
             //return await context.Regions.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
             var customertype = await context.CustomerTypes.ToListAsync();
@@ -68,7 +68,7 @@ namespace GMGInventory.Application.Repositories
             return await context.Customers.AnyAsync(s => s.CustomerTypeId == id);
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.CustomerTypes
                 .Select(s => new JsonOptionsModel

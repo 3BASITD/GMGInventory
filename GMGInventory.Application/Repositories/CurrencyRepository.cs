@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<CurrencyVM>> GetAllCurrencyVMAsync()
+        public async Task<IList<CurrencyVM>> GetAllCurrencyVMAsync()
         {
             var currencies = await context.Currencies.ToListAsync();
             var currenciesVM = mapper.Map<List<CurrencyVM>>(currencies);
@@ -51,7 +51,7 @@ namespace GMGInventory.Application.Repositories
             return currenciesVM;
         }
 
-        public async Task<List<Currency>> GetAllActiveCurrencyAsync(int includeId)
+        public async Task<IList<Currency>> GetAllActiveCurrencyAsync(int includeId)
         {
             //return await context.Currencies.Where(s =>  s.Id == includeId).ToListAsync();
             var currencies = await context.Currencies.ToListAsync();

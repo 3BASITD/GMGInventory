@@ -5,11 +5,11 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IRegionRepository : IGenericRepository<Region>
     {
-        Task<List<RegionVM>> GetAllRegionVMAsync();
+        Task<IList<RegionVM>> GetAllRegionVMAsync();
         Task<RegionVM?> GetRegionVMAsync(int? id);
-        Task<List<Region>> GetAllActiveRegionAsync(int includeId);
+        Task<IList<Region>> GetAllActiveRegionAsync(int includeId);
         Task<bool> IsRegionCodeExist(string code);
         Task<bool> IsRegionInUse(int id);
-        Task<List<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
     }
 }

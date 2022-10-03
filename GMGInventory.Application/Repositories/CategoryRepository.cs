@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Categories
                 .Where(s => s.IsActive || s.Id == IncludeId)
@@ -45,7 +45,7 @@ namespace GMGInventory.Application.Repositories
             return category?.Id;
         }
 
-        public async Task<List<GenericAuditVM>> GetAllGenericVMAsync()
+        public async Task<IList<GenericAuditVM>> GetAllGenericVMAsync()
         {
             var categories = await context.Categories.ToListAsync();
             var categoriesVM = mapper.Map<List<GenericAuditVM>>(categories);
@@ -81,7 +81,7 @@ namespace GMGInventory.Application.Repositories
             return categoryVM;
         }
 
-        public async Task<List<Category>> GetAllActiveCategoryAsync(int includeId)
+        public async Task<IList<Category>> GetAllActiveCategoryAsync(int includeId)
         {
             return await context.Categories.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
         }

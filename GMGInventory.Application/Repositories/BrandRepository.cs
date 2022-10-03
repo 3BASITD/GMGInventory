@@ -138,7 +138,7 @@ namespace GMGInventory.Application.Repositories
             return brandViewVM;
         }
 
-        public async Task<List<Brand>> GetAllActiveBrandAsync(int includeId)
+        public async Task<IList<Brand>> GetAllActiveBrandAsync(int includeId)
         {
             return await context.Brands.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
         }
@@ -202,7 +202,7 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Brands
                 .Where(s => s.IsActive || s.Id == IncludeId)

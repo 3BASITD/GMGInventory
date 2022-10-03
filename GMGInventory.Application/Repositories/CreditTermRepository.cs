@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<List<CreditTermVM>> GetAllCreditTermVMAsync()
+        public async Task<IList<CreditTermVM>> GetAllCreditTermVMAsync()
         {
             var creditterms = await context.CreditTerms.ToListAsync();
             var credittermsVM = mapper.Map<List<CreditTermVM>>(creditterms);
@@ -51,7 +51,7 @@ namespace GMGInventory.Application.Repositories
             return credittermsVM;
         }
 
-        public async Task<List<CreditTerm>> GetAllActiveCreditTermAsync(int includeId)
+        public async Task<IList<CreditTerm>> GetAllActiveCreditTermAsync(int includeId)
         {
             //return await context.Regions.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
             var creditterms = await context.CreditTerms.ToListAsync();
@@ -68,7 +68,7 @@ namespace GMGInventory.Application.Repositories
             return await context.Customers.AnyAsync(s => s.CreditTermId == id);
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.CreditTerms
                 .Select(s => new JsonOptionsModel

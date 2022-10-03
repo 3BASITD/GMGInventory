@@ -5,11 +5,11 @@ namespace GMGInventory.Application.Contracts
 {
     public interface ISupplierRepository : IGenericRepository<Supplier>
     {
-        Task<List<JsonSupplierOptionsModel>> GetOptions(int? IncludeId);
-        Task<List<SupplierViewVM>> GetAllSupplierVMAsync();
+        Task<IList<JsonSupplierOptionsModel>> GetOptions(int? IncludeId);
+        Task<IList<SupplierViewVM>> GetAllSupplierVMAsync();
         Task<SupplierViewVM?> GetSupplierViewVMAsync(int? id);
         Task<SupplierVM?> GetSupplierVMAsync(int? id);
-        Task<List<Supplier>> GetAllActiveSupplierAsync(int includeId);
+        Task<IList<Supplier>> GetAllActiveSupplierAsync(int includeId);
         Task<bool> IsSupplierCodeExist(string code);
         Task<bool> IsSupplierInUse(int id);
         Task<bool> IsSupplierIdExistAsync(int id);

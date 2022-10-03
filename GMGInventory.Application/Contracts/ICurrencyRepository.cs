@@ -6,9 +6,9 @@ namespace GMGInventory.Application.Contracts
     public interface ICurrencyRepository : IGenericRepository<Currency>
 
     {
-        Task<List<CurrencyVM>> GetAllCurrencyVMAsync();
+        Task<IList<CurrencyVM>> GetAllCurrencyVMAsync();
         Task<CurrencyVM?> GetCurrencyVMAsync(int? id);
-        Task<List<Currency>> GetAllActiveCurrencyAsync(int includeId);
+        Task<IList<Currency>> GetAllActiveCurrencyAsync(int includeId);
         Task<bool> IsCurrencyCodeExist(string code);
         Task<bool> IsCurrencyInUse(int id);
     }

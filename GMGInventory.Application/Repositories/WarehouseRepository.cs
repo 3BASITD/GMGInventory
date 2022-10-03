@@ -28,7 +28,7 @@ namespace GMGInventory.Application.Repositories
             this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
-        public async Task<List<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Warehouses
                                 .Where(s => s.IsActive || s.Id == IncludeId)
@@ -69,7 +69,7 @@ namespace GMGInventory.Application.Repositories
             return warehouseVM;
         }
 
-        public async Task<List<WarehouseViewVM>> GetAllAsync()
+        public async Task<IList<WarehouseViewVM>> GetAllAsync()
         {
             var warehouses = await context.Warehouses.ToListAsync();
             var warehousesVM = mapper.Map<List<WarehouseViewVM>>(warehouses);
@@ -85,7 +85,7 @@ namespace GMGInventory.Application.Repositories
             return mapper.Map<WarehouseFormVM>(warehouse);
         }
 
-        public async Task<List<Warehouse>> GetAllActiveWarehouseAsync(int includeId)
+        public async Task<IList<Warehouse>> GetAllActiveWarehouseAsync(int includeId)
         {
             return await context.Warehouses.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
         }
