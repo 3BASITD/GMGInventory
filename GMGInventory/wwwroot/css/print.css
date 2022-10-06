@@ -35,3 +35,7 @@ h3 {
 .right-text {
     text-align: right;
 }
+
+p {
+    margin-bottom: 5px;
+}

@@ -243,7 +243,7 @@
         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
         || User.IsInRole(Roles.SystemAdmin))
         {
-            var navAdministrationActive = (new List<string> { "Agent", "Area", "Brand", "Category", "ItemType", "User", "Supplier" }).Contains(currentController ?? "");
+            var navAdministrationActive = (new List<string> { "Agent", "Area", "Brand", "Category", "ItemType", "User", "Supplier", "AuditLog" }).Contains(currentController ?? "");
 
             <li class="nav-item @(navAdministrationActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navAdministrationActive ? "active" : "")">
@@ -553,7 +553,7 @@
                     </ul>
                 </li>
 
-                var navAccountingReportActive = (new List<string> { "CreditMemoListingReport", "DebitMemoListingReport" }).Contains(currentAction ?? "");
+                var navAccountingReportActive = (new List<string> { "CreditMemo", "DebitMemo" }).Contains(currentAction ?? "");
 
                 <li class="nav-item @(navAccountingReportActive ? "menu-open" : "")">
                     <a href="#" class="nav-link @(navAccountingReportActive ? "active" : "")">
@@ -565,15 +565,15 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a class="nav-link @(currentController=="AccountingReport" && currentAction == "CreditMemoListingReport" ? "active" : "")"
-                       asp-area="" asp-controller="AccountingReport" asp-action="CreditMemoListingReport">
+                            <a class="nav-link @(currentController=="AccountingReport" && currentAction == "CreditMemo" ? "active" : "")"
+                       asp-area="" asp-controller="AccountingReport" asp-action="CreditMemo">
                                 <i class="nav-icon fas fa-file"></i>
                                 <p>Credit Memo Listing Report</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(currentController=="AccountingReport" && currentAction == "DebitMemoListingReport" ? "active" : "")"
-                       asp-area="" asp-controller="AccountingReport" asp-action="DebitMemoListingReport">
+                            <a class="nav-link @(currentController=="AccountingReport" && currentAction == "DebitMemo" ? "active" : "")"
+                       asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">
                                 <i class="nav-icon fas fa-file"></i>
                                 <p>Debit Memo Listing Report</p>
                             </a>

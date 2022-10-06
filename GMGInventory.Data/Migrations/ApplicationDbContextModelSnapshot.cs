@@ -270,10 +270,10 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("MemoNumber")
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ReferenceNumber")
+                    b.Property<string>("MemoNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
@@ -287,6 +287,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreditDebitMemoTypeId");
+
+                    b.HasIndex("InvoiceId");
 
                     b.ToTable("CreditDebitMemos");
                 });
@@ -1470,7 +1472,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("ApprovedBy")
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("CurrencyId")
+                    b.Property<int>("CurrencyId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("CurrencyRate")
@@ -1724,7 +1726,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime>("DeliveryDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeliveryTypeId")
+                    b.Property<int>("DeliveryTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("DisapprovedBy")
@@ -1733,7 +1735,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DisapprovedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("PriceTypeId")
+                    b.Property<int>("PriceTypeId")
                         .HasColumnType("int");
 
                     b.Property<int?>("PurchaseOrderId")
@@ -1755,7 +1757,7 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("StatusId")
+                    b.Property<int>("StatusId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
@@ -2202,14 +2204,14 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("CustomerPaymentId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("int");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -2220,7 +2222,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PaymentId");
+                    b.HasIndex("CustomerPaymentId");
 
                     b.ToTable("SOACRChecks");
                 });
@@ -2871,42 +2873,42 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            ConcurrencyStamp = "a767ebac-b479-4940-8acf-2f3a2913d3fa",
+                            ConcurrencyStamp = "d5ab4b37-a03d-4d41-8107-a79f3ca79a98",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            ConcurrencyStamp = "84032a14-13f1-4668-a481-986b1fb20022",
+                            ConcurrencyStamp = "1614af10-d4d1-48c9-9a66-af10308c60b7",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            ConcurrencyStamp = "0364a9a9-6a03-4025-ad09-b1a61cb125d7",
+                            ConcurrencyStamp = "2d169c37-0b21-4530-ad72-becba7528d40",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            ConcurrencyStamp = "5486b36b-43fb-4534-abf5-c33fa7d73ef5",
+                            ConcurrencyStamp = "88f87a31-6caa-4232-b53b-14ec6729291e",
                             Name = "Sales Director",
                             NormalizedName = "SALES DIRECTOR"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            ConcurrencyStamp = "4ef7caa2-55f1-4a04-8cd6-c775f3937371",
+                            ConcurrencyStamp = "0791346f-1f49-40a0-971a-5e1c9ab548a0",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            ConcurrencyStamp = "4d312e95-8ce2-4199-8e19-ec438219dd15",
+                            ConcurrencyStamp = "60593060-0e1a-413d-858c-2c258dd22823",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER"
                         });
@@ -3145,16 +3147,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b96c4be8-1284-4a07-9234-85c54ef68b0f",
+                            ConcurrencyStamp = "950f94bf-a462-4d53-a053-5e5ddaaf31b1",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAEAACcQAAAAEN3QaRxHe6Lpo73oShuj6e5FftMJenTAJq6QRybxRke8g0z+xdcKBVT4DnMYAVVTug==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEFce2Clb8SkIuZWSKg7gYaT8aNjORFAb3/mqmjbqHKX5ZDFvTK6QDFhLNsqU7I6ndg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "07dcee4e-a0df-41c6-b3a0-48b550cc8dd6",
+                            SecurityStamp = "cd56835a-2b1f-4344-952e-395b07b3557a",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2022, 9, 29, 11, 14, 24, 321, DateTimeKind.Local).AddTicks(4779),
+                            DateCreated = new DateTime(2022, 10, 5, 9, 30, 45, 250, DateTimeKind.Local).AddTicks(4820),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3166,16 +3168,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e87ccbb3-4408-4739-9130-453f17047ae5",
+                            ConcurrencyStamp = "7a296caa-e979-41df-a867-6e32ca14ace3",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAEAACcQAAAAEIF1LYy56s1sBZzfkfrEzLZbhRQFZvUYequ3sYvgYCE8/UpsUABho3gb2sBr1lGzng==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEMlDFTFPZtASia7jKtxv8MzP4Zn+TIFwNwox4HuKjRCacGCtf84b3kR/pAqm5FRm2Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5f94a673-5910-45f1-b50c-75b4517c0dfa",
+                            SecurityStamp = "c1fb3cd6-4bda-4f05-8e0a-a40c4edef70b",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2022, 9, 29, 11, 14, 24, 329, DateTimeKind.Local).AddTicks(6010),
+                            DateCreated = new DateTime(2022, 10, 5, 9, 30, 45, 260, DateTimeKind.Local).AddTicks(5273),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3237,7 +3239,15 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.Invoice", "Invoice")
+                        .WithMany("CreditDebitMemos")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("CreditDebitMemoType");
+
+                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Customer", b =>
@@ -3580,7 +3590,9 @@ namespace GMGInventory.Data.Migrations
                 {
                     b.HasOne("GMGInventory.Data.Currency", "Currency")
                         .WithMany("PurchaseOrders")
-                        .HasForeignKey("CurrencyId");
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Warehouse", "Destination")
                         .WithMany("PurchaseOrders")
@@ -3674,11 +3686,15 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasOne("GMGInventory.Data.DeliveryType", "DeliveryType")
                         .WithMany("SalesOrders")
-                        .HasForeignKey("DeliveryTypeId");
+                        .HasForeignKey("DeliveryTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("GMGInventory.Data.PriceType", "PriceType")
                         .WithMany("SalesOrders")
-                        .HasForeignKey("PriceTypeId");
+                        .HasForeignKey("PriceTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("GMGInventory.Data.PurchaseOrder", "PurchaseOrder")
                         .WithMany("SalesOrders")
@@ -3686,7 +3702,9 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasOne("GMGInventory.Data.Status", "Status")
                         .WithMany("SalesOrders")
-                        .HasForeignKey("StatusId");
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Agent");
 
@@ -3827,13 +3845,13 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.SOACRCheck", b =>
                 {
-                    b.HasOne("GMGInventory.Data.Payment", "Payment")
+                    b.HasOne("GMGInventory.Data.CustomerPayment", "CustomerPayment")
                         .WithMany("SOACRChecks")
-                        .HasForeignKey("PaymentId")
+                        .HasForeignKey("CustomerPaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Payment");
+                    b.Navigation("CustomerPayment");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SOACRLineItem", b =>
@@ -4038,6 +4056,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("ShippingAddresses");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
+                {
+                    b.Navigation("SOACRChecks");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.CustomerType", b =>
                 {
                     b.Navigation("Customers");
@@ -4055,6 +4078,8 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
                 {
+                    b.Navigation("CreditDebitMemos");
+
                     b.Navigation("CustomerPaymentDetails");
 
                     b.Navigation("InvoiceLineItems");
@@ -4122,8 +4147,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("CustomerPaymentDetails");
 
                     b.Navigation("PaymentDetails");
-
-                    b.Navigation("SOACRChecks");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PriceType", b =>

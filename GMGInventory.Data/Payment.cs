@@ -7,7 +7,6 @@ namespace GMGInventory.Data
         public Payment()
         {
             this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
-            this.SOACRChecks = new HashSet<SOACRCheck>();
         }
 
         [ForeignKey("CustomerId")]
@@ -33,6 +32,5 @@ namespace GMGInventory.Data
 
         public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public ICollection<PaymentDetail> PaymentDetails { get; set; }
-        public ICollection<SOACRCheck> SOACRChecks { get; set; }
     }
 }

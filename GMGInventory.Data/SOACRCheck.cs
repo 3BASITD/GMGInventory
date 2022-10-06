@@ -4,9 +4,9 @@ namespace GMGInventory.Data
 {
     public class SOACRCheck : BaseEntity
     {
-        [ForeignKey("PaymentId")]
-        public int PaymentId { get; set; }
-        public Payment Payment { get; set; }
+        [ForeignKey("CustomerPaymentId")]
+        public int CustomerPaymentId { get; set; }
+        public CustomerPayment CustomerPayment { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string BankName { get; set; }

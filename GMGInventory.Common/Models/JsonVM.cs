@@ -116,6 +116,11 @@ namespace GMGInventory.Common.Models
         public int total_count { get; set; }
     }
 
+    public class ListFilterCustomerModel : ListFilterCommonModel
+    {
+        public int? Customer { get; set; }
+    }
+
     public class ListFilterCommonModel
     {
         DateTime? _DateFrom = null, _DateTo = null;

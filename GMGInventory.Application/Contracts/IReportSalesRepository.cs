@@ -5,21 +5,21 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IReportSalesRepository
     {
-        List<int> GetAgentSalesPerItems();
-        List<int> GetBrandSales();
-        List<int> GetBestSellingItem();
-        List<int> GetBestSellingItemInvoice();
-        List<int> GetCommission();
-        List<int> GetCustomerSalesAnalytics();
-        List<int> GetCustomerSales();
-        List<int> GetDailySalesReport();
-        List<int> GetDailySalesMargin();
-        List<int> GetSalesInvoiceListing();
-        List<int> GetSalesByAgentArea();
-        List<int> GetSalesMarginItem();
-        List<int> GetSalesReportBasis();
-        List<int> GetSalesReturnListing();
-        List<UnservedItemVM> GetUnservedItem(UnservedItemFilter filter);
+        IList<int> GetAgentSalesPerItems();
+        IList<int> GetBrandSales();
+        IList<int> GetBestSellingItem();
+        IList<int> GetBestSellingItemInvoice();
+        IList<int> GetCommission();
+        IList<int> GetCustomerSalesAnalytics();
+        IList<int> GetCustomerSales();
+        IList<int> GetDailySalesReport();
+        IList<int> GetDailySalesMargin();
+        IList<int> GetSalesInvoiceListing();
+        IList<int> GetSalesByAgentArea();
+        IList<int> GetSalesMarginItem();
+        IList<int> GetSalesReportBasis();
+        IList<int> GetSalesReturnListing();
+        IList<UnservedItemVM> GetUnservedItem(UnservedItemFilter filter);
         ForDataTables<UnservedItemVM> GetUnservedItemDT(DataTablesRequestForm form, UnservedItemFilter filter);
     }
 }

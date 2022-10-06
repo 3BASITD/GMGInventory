@@ -26,8 +26,8 @@ namespace GMGInventory.Data
         public Warehouse Destination { get; set; }
 
         [ForeignKey("CurrencyId")]
-        public int? CurrencyId { get; set; }
-        public Currency? Currency { get; set; }
+        public int CurrencyId { get; set; }
+        public Currency Currency { get; set; }
 
         [ForeignKey("StatusId")]
         public int StatusId { get; set; }

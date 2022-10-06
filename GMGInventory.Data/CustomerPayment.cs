@@ -4,6 +4,11 @@ namespace GMGInventory.Data
 {
     public class CustomerPayment : BaseEntity
     {
+        public CustomerPayment()
+        {
+            this.SOACRChecks = new HashSet<SOACRCheck>();
+        }
+
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
@@ -50,5 +55,7 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalInvoiceAmount { get; set; }
+
+        public ICollection<SOACRCheck> SOACRChecks { get; set; }
     }
 }

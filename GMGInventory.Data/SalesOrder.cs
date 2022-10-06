@@ -24,12 +24,12 @@ namespace GMGInventory.Data
         public string SalesOrderNumber { get; set; }
 
         [ForeignKey("DeliveryTypeId")]
-        public int? DeliveryTypeId { get; set; }
-        public DeliveryType? DeliveryType { get; set; }
+        public int DeliveryTypeId { get; set; }
+        public DeliveryType DeliveryType { get; set; }
 
         [ForeignKey("StatusId")]
-        public int? StatusId { get; set; }
-        public Status? Status { get; set; }
+        public int StatusId { get; set; }
+        public Status Status { get; set; }
 
         public DateTime RequiredDate { get; set; }
         public DateTime DeliveryDate { get; set; }
@@ -42,8 +42,8 @@ namespace GMGInventory.Data
         public decimal? DeclaredValue { get; set; }
 
         [ForeignKey("PriceTypeId")]
-        public int? PriceTypeId { get; set; }
-        public PriceType? PriceType { get; set; }
+        public int PriceTypeId { get; set; }
+        public PriceType PriceType { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalAmount { get; set; }

@@ -93,10 +93,10 @@ namespace GMGInventory.Data
                 foreach (var property in entry.Properties)
                 {
                     string propertyName = property.Metadata.Name;
-                    if ((auditEntry.TableName != "User" 
+                    if ((auditEntry.TableName != "User"
                         && propertyName != "UserCreated" && propertyName != "UserModified"
                         && propertyName != "DateCreated" && propertyName != "DateModified")
-                      ||(auditEntry.TableName == "User"
+                      || (auditEntry.TableName == "User"
                         && (propertyName == "Id" || propertyName == "UserName" || propertyName == "FirstName" || propertyName == "IsActive" || propertyName == "IsDarkMode" || propertyName == "LastName" || propertyName == "Nickname" || propertyName == "PasswordHash")))
                     {
                         var currentValue = propertyName == "PasswordHash" ? "*****" : property.CurrentValue ?? string.Empty;
@@ -117,7 +117,7 @@ namespace GMGInventory.Data
                                 auditEntry.OldValues[propertyName] = originalValue;
                                 break;
                             case EntityState.Modified:
-                                if (property.IsModified && (originalValue.Equals(currentValue) == false 
+                                if (property.IsModified && (originalValue.Equals(currentValue) == false
                                     || (propertyName == "PasswordHash" && property.CurrentValue.Equals(property.OriginalValue) == false)))
                                 {
                                     auditEntry.ChangedColumns.Add(propertyName);

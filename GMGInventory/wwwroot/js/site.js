@@ -228,3 +228,7 @@ function columnDTTotalDecimal(api, column) {
 
     $(api.column(column).footer()).html(FormatStringDecimal(total));
 }
+
+function formatDateEn(date) {
+    return date.toLocaleDateString('en-us', { day: 'numeric', month: 'long', year: 'numeric' });
+}

@@ -17,79 +17,79 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
         }
 
-        public List<int> GetAgentSalesPerItems()
+        public IList<int> GetAgentSalesPerItems()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetBrandSales()
+        public IList<int> GetBrandSales()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetBestSellingItem()
+        public IList<int> GetBestSellingItem()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetBestSellingItemInvoice()
+        public IList<int> GetBestSellingItemInvoice()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetCommission()
+        public IList<int> GetCommission()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetCustomerSalesAnalytics()
+        public IList<int> GetCustomerSalesAnalytics()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetCustomerSales()
+        public IList<int> GetCustomerSales()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetDailySalesReport()
+        public IList<int> GetDailySalesReport()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetDailySalesMargin()
+        public IList<int> GetDailySalesMargin()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetSalesInvoiceListing()
+        public IList<int> GetSalesInvoiceListing()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetSalesByAgentArea()
+        public IList<int> GetSalesByAgentArea()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetSalesMarginItem()
+        public IList<int> GetSalesMarginItem()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetSalesReportBasis()
+        public IList<int> GetSalesReportBasis()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<int> GetSalesReturnListing()
+        public IList<int> GetSalesReturnListing()
         {
             return context.Users.Select(s => s.AccessFailedCount).ToList(); // This is temporary
         }
 
-        public List<UnservedItemVM> GetUnservedItem(UnservedItemFilter filter)
+        public IList<UnservedItemVM> GetUnservedItem(UnservedItemFilter filter)
         {
-            List<UnservedItemVM> unservedItemVMs = new List<UnservedItemVM>();
+            List<UnservedItemVM> unservedItemVMs = new();
 
             using (SqlConnection conn = new SqlConnection(SystemFormat.SqlConnectionString))
             {
