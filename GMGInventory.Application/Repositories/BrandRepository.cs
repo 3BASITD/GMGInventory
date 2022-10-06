@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public IQueryable<BrandViewVM> GetAllBrandVM()
+         public async Task<IList<BrandViewVM>> GetListAsync()
         {
             var brands = from brand in context.Brands
                          select new BrandViewVM
@@ -42,15 +42,15 @@ namespace GMGInventory.Application.Repositories
                              UserCreated = userManager.FindByIdAsync(brand.UserCreated).Result.Nickname,
                              UserModified = brand.UserModified == null ? "-" : userManager.FindByIdAsync(brand.UserModified).Result.Nickname
                          };
-            return brands;
+            return await brands.ToListAsync();
         }
 
 
-        public ForDataTables<BrandViewVM> GetListDataTables(DataTablesRequestForm form)
+        public async Task<ForDataTables<BrandViewVM>> GetListDTAsync(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = GetAllBrandVM().ToList().AsQueryable();
+            var data = (await GetListAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -109,9 +109,9 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public BrandViewVM? GetBrandViewVM(int? id)
+        public async Task<BrandViewVM?> GetBrandViewVM(int? id)
         {
-            var brandVM = GetAllBrandVM().Where(s => s.Id == id).FirstOrDefault();
+            var brandVM = (await GetListAsync()).Where(s => s.Id == id).FirstOrDefault();
             if (brandVM == null)
             {
                 return null;
@@ -121,7 +121,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(BrandVM brandVM)
         {
-            return await GetAllBrandVM().AnyAsync(s => s.Code == brandVM.Code && s.Name == brandVM.Name && s.ItemType == s.ItemType);
+            return (await GetListAsync()).Any(s => s.Code == brandVM.Code && s.Name == brandVM.Name && s.ItemType == s.ItemType);
         }
 
         public async Task<BrandVM?> GetBrandVMAsync(int? id)

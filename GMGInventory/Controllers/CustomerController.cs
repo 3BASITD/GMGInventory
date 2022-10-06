@@ -175,26 +175,27 @@ namespace GMGInventory.Controllers
 
 
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            { 
+                await customerRepository.DeactivateCustomerAsync(id);
+                TempData["WarningMessage"] = "Customer has been deactivated";
+            }
 
+            return RedirectToAction(nameof(Index));
+        }
 
-        //[HttpPost]
-        //public JsonResult GetListJsonDetails()
-        //{
-        //    DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
-        //    return Json(soaRepository.GetListDataTablesDetails(dtForm));
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reactivate(int id)
+        {
 
-
-        //public ActionResult Details(int id)
-        //{
-        //    var payment = soaRepository.GetSoacrVM(id);
-        //    if (payment == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(payment);
-        //}
-
+            await customerRepository.ReactivateCustomerAsync(id);
+            TempData["SuccessMessage"] = "Customer reactivated successfully";
+            return RedirectToAction(nameof(Index));
+        }
 
     }
 }

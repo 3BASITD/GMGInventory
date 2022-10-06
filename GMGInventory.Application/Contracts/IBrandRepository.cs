@@ -5,9 +5,9 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IBrandRepository : IGenericRepository<Brand>
     {
-        IQueryable<BrandViewVM> GetAllBrandVM();
-        ForDataTables<BrandViewVM> GetListDataTables(DataTablesRequestForm form);
-        BrandViewVM? GetBrandViewVM(int? id);
+        Task<IList<BrandViewVM>> GetListAsync();
+        Task<ForDataTables<BrandViewVM>> GetListDTAsync(DataTablesRequestForm form);
+        Task<BrandViewVM?> GetBrandViewVM(int? id);
         Task<bool> UploadCombinationExistAsync(BrandVM brandVM);
         Task<BrandVM?> GetBrandVMAsync(int? id);
         Task<IList<Brand>> GetAllActiveBrandAsync(int includeId);

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -60,54 +61,249 @@ namespace GMGInventory.Application.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IList<AgentViewVM>> GetAllAgentVMAsync()
+        public async Task<int?> GetIdAsync(string? Name)
         {
-            var agents = await context.Agents.Include(s => s.Area).ToListAsync();
-            var agentsViewVM = mapper.Map<List<AgentViewVM>>(agents);
-            foreach (AgentViewVM ivm in agentsViewVM)
-            {
-                ivm.UserCreated = await GetUserName(ivm.UserCreated);
-                ivm.UserModified = await GetUserName(ivm.UserModified);
-            }
-            return agentsViewVM;
+            var agent = await context.Agents.Where(s => s.FullName == Name).FirstOrDefaultAsync();
+            return agent?.Id;
         }
 
-        public async Task<AgentViewVM?> GetAgentViewVMAsync(int? id)
+
+        public async Task<IList<AgentViewVM>> GetAllAsync(AgentFilterVM filter)
         {
-            var agents = await context.Agents
-                .Where(s => s.Id == id)
-                .Include(s => s.Area)
-                .FirstOrDefaultAsync();
-            if (agents == null)
+            var agents = from agent in context.Agents
+                         join areas in context.Areas
+                                    on agent.AreaId equals areas.Id
+                         join regions in context.Regions
+                                    on areas.RegionId equals regions.Id
+                         where ((filter.RegionId == null || filter.RegionId == regions.Id))
+
+                         select new AgentViewVM
+                         {
+                             Id = agent.Id,
+                             FirstName = agent.FirstName,
+                             MiddleName = agent.MiddleName,
+                             LastName = agent.LastName,
+                             Area = agent.Area.Name,
+                             AreaId = agent.Area.Id,
+                             Code = agent.Code,
+                             IsActive = agent.IsActive,
+                             DateCreated = agent.DateCreated.ToString(SystemFormat.StringDateTime),
+                             DateCreatedD = agent.DateCreated,
+                             DateModified = agent.DateModified == null ? "-" : agent.DateModified.Value.ToString(SystemFormat.StringDateTime),
+                             DateModifiedD = agent.DateModified == null ? null : agent.DateModified.Value,
+
+                             UserCreated = userManager.FindByIdAsync(agent.UserCreated).Result.Nickname,
+                             UserModified = agent.UserModified == null ? "-" : userManager.FindByIdAsync(agent.UserModified).Result.Nickname
+                         };
+            return await agents.ToListAsync();
+        }
+
+
+        public async Task<ForDataTables<AgentViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, AgentFilterVM filter)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetAllAsync(filter)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                    || x.FirstName.ToLower().Contains(form.SearchValue)
+                                    || x.MiddleName.ToLower().Contains(form.SearchValue)
+                                    || x.LastName.ToLower().Contains(form.SearchValue)
+                                    || x.Area.ToLower().Contains(form.SearchValue)
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                                    || x.DateModified.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderBy(s => s.Code); break;
+                        case "FirstName": data = data.OrderBy(s => s.FirstName); break;
+                        case "MiddleName": data = data.OrderBy(s => s.MiddleName); break;
+                        case "LastName": data = data.OrderBy(s => s.LastName); break;
+                        case "Area": data = data.OrderBy(s => s.Area); break;
+                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderByDescending(s => s.Code); break;
+                        case "FirstName": data = data.OrderByDescending(s => s.FirstName); break;
+                        case "MiddleName": data = data.OrderByDescending(s => s.MiddleName); break;
+                        case "LastName": data = data.OrderByDescending(s => s.LastName); break;
+                        case "Area": data = data.OrderByDescending(s => s.Area); break;
+                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderByDescending(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<AgentViewVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+
+
+
+
+
+        public async Task<IList<AgentViewVM>> GetListAsync()
+        {
+            var agents = from agent in context.Agents
+                         join areas in context.Areas
+                                    on agent.AreaId equals areas.Id
+                         join regions in context.Regions
+                                    on areas.RegionId equals regions.Id
+
+                         select new AgentViewVM
+                            {
+                                Id = agent.Id,
+                                FirstName = agent.FirstName,
+                                MiddleName = agent.MiddleName,
+                                LastName = agent.LastName,
+                                Area = agent.Area.Name,
+                                AreaId = agent.Area.Id,                        
+                                Code = agent.Code,
+                                IsActive = agent.IsActive,
+                                DateCreated = agent.DateCreated.ToString(SystemFormat.StringDateTime),
+                                DateCreatedD = agent.DateCreated,
+                                DateModified = agent.DateModified == null ? "-" : agent.DateModified.Value.ToString(SystemFormat.StringDateTime),
+                                DateModifiedD = agent.DateModified == null ? null : agent.DateModified.Value,
+                                
+                                UserCreated = userManager.FindByIdAsync(agent.UserCreated).Result.Nickname,
+                                UserModified = agent.UserModified == null ? "-" : userManager.FindByIdAsync(agent.UserModified).Result.Nickname
+                            };
+            return await agents.ToListAsync();
+        }
+
+        public async Task<ForDataTables<AgentViewVM>> GetListDTAsync(DataTablesRequestForm form)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetListAsync()).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                    || x.FirstName.ToLower().Contains(form.SearchValue)
+                                    || x.MiddleName.ToLower().Contains(form.SearchValue)
+                                    || x.LastName.ToLower().Contains(form.SearchValue)
+                                    || x.Area.ToLower().Contains(form.SearchValue)
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                                    || x.DateModified.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderBy(s => s.Code); break;
+                        case "FirstName": data = data.OrderBy(s => s.FirstName); break;
+                        case "MiddleName": data = data.OrderBy(s => s.MiddleName); break;
+                        case "LastName": data = data.OrderBy(s => s.LastName); break;
+                        case "Area": data = data.OrderBy(s => s.Area); break;
+                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderByDescending(s => s.Code); break;
+                        case "FirstName": data = data.OrderByDescending(s => s.FirstName); break;
+                        case "MiddleName": data = data.OrderByDescending(s => s.MiddleName); break;
+                        case "LastName": data = data.OrderByDescending(s => s.LastName); break;
+                        case "Area": data = data.OrderByDescending(s => s.Area); break;
+                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderByDescending(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<AgentViewVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+        public async Task<AgentViewVM?> GetAgentViewVM(int? id)
+        {
+            var agentVM = (await GetListAsync()).Where(s => s.Id == id).FirstOrDefault();
+            if (agentVM == null)
             {
                 return null;
             }
-            var agentsViewVM = mapper.Map<AgentViewVM>(agents);
-            agentsViewVM.UserCreated = await GetUserName(agentsViewVM.UserCreated);
-            agentsViewVM.UserModified = await GetUserName(agentsViewVM.UserModified);
-            return agentsViewVM;
+            return agentVM;
+        }
+
+        public async Task<bool> UploadCombinationExistAsync(AgentVM agentVM)
+        {
+            return (await GetListAsync()).Any(s => s.Code == agentVM.Code && s.FirstName == agentVM.FirstName &&
+            s.MiddleName == agentVM.MiddleName && s.LastName == agentVM.LastName && s.Area == s.Area);
         }
 
         public async Task<AgentVM?> GetAgentVMAsync(int? id)
         {
-            var agents = await context.Agents.Include(s => s.Area).Where(s => s.Id == id).FirstOrDefaultAsync();
-            if (agents == null)
+            var agent = await context.Agents.Include(s => s.Area).Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (agent == null)
             {
                 return null;
             }
-            var agentViewVM = mapper.Map<AgentVM>(agents);
+            var agentViewVM = mapper.Map<AgentVM>(agent);
             return agentViewVM;
         }
 
-        public async Task<IList<AgentVM>> GetAllActiveAgentAsync(int includeId)
-
-        { 
-            var agents =  await context.Agents.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
-            var agentViewVM = mapper.Map <List<AgentVM>>(agents);
-            return agentViewVM;
+        public async Task<IList<Agent>> GetAllActiveAgentAsync(int includeId)
+        {
+            return await context.Agents.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
         }
 
-        public async Task<bool> IsAgentCodeExist(string code)
+        public async Task<bool> IsCodeExist(string code)
         {
             return await context.Agents.AnyAsync(c => c.Code == code);
         }
@@ -125,39 +321,48 @@ namespace GMGInventory.Application.Repositories
         public async Task DeactivateAgentAsync(int id)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var agents = await context.Agents.FirstAsync(s => s.Id == id);
-            agents.IsActive = false;
+            var agent = await context.Agents.FirstAsync(s => s.Id == id);
+            agent.IsActive = false;
             await context.SaveChangesAsync(currentUserId);
         }
 
         public async Task ReactivateAgentAsync(int id)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var agents = await context.Agents.FirstAsync(s => s.Id == id);
-            agents.IsActive = true;
+            var agent = await context.Agents.FirstAsync(s => s.Id == id);
+            agent.IsActive = true;
             await context.SaveChangesAsync(currentUserId);
         }
 
         public async Task AddAsync(AgentVM agentVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var agents = mapper.Map<Agent>(agentVM);
-            agents.IsActive = true;
-            await context.Agents.AddAsync(agents);
+            
+            var agent = new Agent
+            {
+                Code = agentVM.Code,
+                FirstName = agentVM.FirstName,
+                MiddleName = agentVM.MiddleName,
+                LastName = agentVM.LastName,
+                AreaId = agentVM.AreaId,
+                IsActive = true
+            };
+            await context.Agents.AddAsync(agent);
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task UpdateAsync(int id, AgentVM agentVM)
+        public async Task UpdateAsync(AgentVM agentVM)
         {
-            var agents = context.Agents.Where(s => s.Id == id).FirstOrDefault();
-            if (agents == null)
+            var agent = context.Agents.Where(s => s.Id == agentVM.Id).FirstOrDefault();
+            if (agent == null)
             {
                 throw new DbUpdateConcurrencyException();
             }
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            mapper.Map(agentVM, agents);
-            context.Agents.Update(agents);
+            mapper.Map(agentVM, agent);
+            context.Agents.Update(agent);
             await context.SaveChangesAsync(currentUserId);
         }
+
     }
 }

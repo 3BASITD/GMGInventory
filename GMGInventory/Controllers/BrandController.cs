@@ -38,11 +38,12 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetListJson()
+        public async Task<JsonResult> GetListJson()
         {
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
-            return Json(brandRepository.GetListDataTables(dtForm));
+            return Json(await brandRepository.GetListDTAsync(dtForm));
         }
+
 
         [HttpPost]
         public async Task<JsonResult> CreateJson(BrandVM brandVM)
@@ -120,16 +121,15 @@ namespace GMGInventory.Controllers
             }
             return Json(responseModel);
         }
-
-        public IActionResult DownloadFile()
+        public async Task<IActionResult> DownloadFile()
         {
-            DataTable dt = new DataTable("ItemType");
+            DataTable dt = new DataTable("Item Types");
             dt.Columns.AddRange(new DataColumn[3] {
                 new DataColumn("Code"),
                 new DataColumn("Name"),
-                new DataColumn("ItemType")
+                new DataColumn("Item Type")
             });
-            var brands = brandRepository.GetAllBrandVM().Where(s => s.IsActive == true).ToList();
+            var brands = (await brandRepository.GetListAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var brand in brands)
             {
                 dt.Rows.Add(brand.Code, brand.Name, brand.ItemType);
@@ -147,7 +147,6 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)

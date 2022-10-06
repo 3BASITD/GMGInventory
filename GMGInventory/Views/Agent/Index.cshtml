@@ -1,26 +1,32 @@
 ﻿@model IEnumerable<AgentViewVM>
 
 @{
-    ViewData["Title"] = "Agent";
+    ViewData["Title"] = "Agents";
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
                 <span class="fas fa-plus"></span> New Agent
-            </a>
+            </button>
+            @await Html.PartialAsync("AgentFilter", ViewData["AgentFilter"])
+            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <span class="fas fa-upload"></span> Upload
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                <span class="fas fa-download"></span> Download
+            </button>
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover">
+        <table class="table table-head-fixed table-striped table-hover table-agent">
             <thead>
                 <tr>
                     <th>
                         @Html.DisplayNameFor(model => model.Code)
                     </th>
-
                     <th>
                         @Html.DisplayNameFor(model => model.FirstName)
                     </th>
@@ -48,57 +54,9 @@
                     <th>
                         @Html.DisplayNameFor(model => model.DateModified)
                     </th>
-
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.Code</td>
-                        <td>@item.FirstName</td>
-                        <td>@item.MiddleName</td>
-                        <td>@item.LastName</td>
-                        <td>@item.Area.Name</td>
-
-                        <td>
-                            @if (item.IsActive)
-                            {
-                                <span class="fas fa-check text-success"></span>
-                            }
-                            else
-                            {
-                                <span class="fas fa-times text-danger"></span>
-                            }
-                        </td>
-                        <td>@item.UserCreated</td>
-                        <td>@item.DateCreated</td>
-                        <td>@item.UserModified</td>
-                        <td>@item.DateModified</td>
-                        <td>
-                            <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id">
-                                <i class="fas fa-info-circle"></i>
-                            </a>
-                            @if (item.IsActive)
-                            {
-                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </a>
-                                <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button">
-                                    <i class="far fa-trash-alt"></i>
-                                </button>
-                            }
-                            else
-                            {
-                                <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
         </table>
     </div>
 </div>
@@ -111,55 +69,599 @@
     <input type="hidden" id="reactivateAgentId" name="Id" />
 </form>
 
-<form id="deleteAgentForm" asp-action="Delete">
-    <input type="hidden" id="deleteAgentId" name="Id" />
-</form>
 
-<form id="reactivateAgentForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateAgentId" name="Id" />
-</form>
 
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Agent</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="createForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="create-code" class="control-label mb-0 d-block">Code</label>
+                                <input name="code" id="create-code" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="create-firstname" class="control-label mb-0 d-block">First Name</label>
+                                <input name="firstname" id="create-firstname" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-firstname" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                              <div class="form-group">
+                                <label for="create-middlename" class="control-label mb-0 d-block">Middle Name</label>
+                                <input name="middlename" id="create-middlename" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-middlename" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                              <div class="form-group">
+                                <label for="create-lastname" class="control-label mb-0 d-block">Last Name</label>
+                                <input name="lastname" id="create-lastname" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-lastname" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="create-area" class="control-label mb-0 d-block">Area</label>
+                                <select name="area" id="create-area" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="create-area" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Agent</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="editForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                     <div class="form-group">
+                                <label for="edit-code" class="control-label mb-0 d-block">Code</label>
+                                <input name="code" id="edit-code" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-firstname" class="control-label mb-0 d-block">First Name</label>
+                                <input name="firstname" id="edit-firstname" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-firstname" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                              <div class="form-group">
+                                <label for="edit-middlename" class="control-label mb-0 d-block">Middle Name</label>
+                                <input name="middlename" id="edit-middlename" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-middlename" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                              <div class="form-group">
+                                <label for="edit-lastname" class="control-label mb-0 d-block">Last Name</label>
+                                <input name="lastname" id="edit-lastname" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-lastname" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-area" class="control-label mb-0 d-block">Area</label>
+                                <select name="area" id="edit-area" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="edit-area" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <input type="hidden" id="edit-id" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-edit"></span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Agent</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label mb-0" for="upload-file">Excel File</label>
+                    <input type="file" id="upload-file" name="file"
+                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                           class="form-control form-control-sm" />
+                </div>
+                <table class="table table-striped" id="upload-table">
+                    <thead>
+                        <tr><th>Row #</th><th>Code</th><th>FirstName</th><th>MiddleName</th><th>LastName</th><th>Area</th><th>Status</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                    <span class="fas fa-upload"></span> Upload
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agent Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Code</dt>
+                    <dd class="col-sm-8 modal-detail-code"></dd>
+                    <dt class="col-sm-4">First Name</dt>
+                    <dd class="col-sm-8 modal-detail-firstname"></dd>
+                    <dt class="col-sm-4">Middle Name</dt>
+                    <dd class="col-sm-8 modal-detail-middlename"></dd>
+                    <dt class="col-sm-4">Last Name</dt>
+                    <dd class="col-sm-8 modal-detail-lastname"></dd>
+                    <dt class="col-sm-4">Area</dt>
+                    <dd class="col-sm-8 modal-detail-area"></dd>
+                    <dt class="col-sm-4">Active</dt>
+                    <dd class="col-sm-8 modal-detail-isactive"></dd>
+                    <dt class="col-sm-4">User Created</dt>
+                    <dd class="col-sm-8 modal-detail-usercreated"></dd>
+                    <dt class="col-sm-4">Date Created</dt>
+                    <dd class="col-sm-8 modal-detail-datecreated"></dd>
+                    <dt class="col-sm-4">User Modified</dt>
+                    <dd class="col-sm-8 modal-detail-usermodified"></dd>
+                    <dt class="col-sm-4">Date Modified</dt>
+                    <dd class="col-sm-8 modal-detail-datemodified"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
-        $('.table').DataTable({
-            columnDefs: [
-                { orderable: false, targets: -1 },
-            ]
+
+    
+
+        // Load List on DataTable
+        var dataTable = $('.table-agent').on('preXhr.dt', function(e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+                data: function(data) {
+                    var regionId = $("#RegionId").val();
+
+                    if (regionId) data.RegionId = regionId;
+                },
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "code", name: "Code" },
+                { data: "firstName", name: "FirstName" },
+                { data: "middleName", name: "MiddleName" },
+                { data: "lastName", name: "LastName" },
+                { data: "area", name: "Area" },
+                {
+                    data: function(data, type, dataToSet) {
+                        if (data.isActive) {
+                            return '<span class="fas fa-check text-success"></span>';
+                        } else {
+                            return '<span class="fas fa-times text-danger"></span>';
+                        }
+                    },
+                    name: "IsActive"
+                },
+                { data: "userCreated", name: "UserCreated" },
+                { data: "dateCreated", name: "DateCreated" },
+                { data: "userModified", name: "UserModified" },
+                { data: "dateModified", name: "DateModified" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        if (data.isActive) {
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Agent" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        } else {
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Agent" data-microtip-position="left" role="tooltip"><i class="fas fa-check"></i></button>';
+                        }
+                        actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[1, "asc"]]
         });
 
-        $('.deleteBtn').click(function(e) {
-            swal({
-                title: "Delete / Deactivate Agent",
-                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true
-            }).then((confirm) => {
-                if (confirm) {
-                    var btn = $(this);
-                    var id = btn.data("id");
-                    $('#deleteAgentId').val(id);
-                    $('#deleteAgentForm').submit();
+
+
+        // Load functions upon DataTable load
+        dataTable.on("draw", function() {
+            hideLoader();
+
+            DatatablesSearchOnEnter('.table-agent', dataTable);
+
+            $('.deleteBtn').click(function(e) {
+                swal({
+                    title: "Delete / Deactivate Agent",
+                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#deleteAgentId').val(id);
+                        $('#deleteAgentForm').submit();
+                    }
+                });
+            });
+
+            $('.reactivateBtn').click(function(e) {
+                swal({
+                    title: "Reactivate Agent",
+                    text: "Are you sure you want to reactivate this record?",
+                    icon: "info",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#reactivateAgentId').val(id);
+                        $('#reactivateAgentForm').submit();
+                    }
+                });
+            });
+
+            $('.detailsBtn').click(function(e) {
+                var data = dataTable.row($(this).parents('tr')).data();
+                $(".modal-detail-code").html(data.code);
+                $(".modal-detail-firstname").html(data.firstName);
+                $(".modal-detail-middlename").html(data.middleName);
+                $(".modal-detail-lastname").html(data.lastName);
+                $(".modal-detail-area").html(data.area);
+                $(".modal-detail-isactive").html(data.isActive + (data.isActive ? '' : ' <span class="fas fa-question-circle text-primary" data-microtip-title="This was deleted but instead marked as Inactive because it was used in other records." data-microtip-position="left" role="tooltip"></span>'));
+                $(".modal-detail-usercreated").html(data.userCreated);
+                $(".modal-detail-datecreated").html(data.dateCreated);
+                $(".modal-detail-usermodified").html(data.userModified);
+                $(".modal-detail-datemodified").html(data.dateModified);
+            });
+
+            // Actions upon Display Edit Modal
+            $(".editBtn").click(function(e) {
+                var data = dataTable.row($(this).parents('tr')).data();
+
+                $("#edit-id").val(data.id);
+                $("#edit-code").val(data.code);
+                $("#edit-firstname").val(data.firstName);
+                $("#edit-middlename").val(data.middleName);
+                $("#edit-lastname").val(data.lastName);
+
+             // Load Select2 Area on Edit
+                if ($("#edit-area").attr("data-select2-id")) {
+                    $("#edit-area").select2("destroy");
+                    $("#edit-area").empty();
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions", "Area")",
+                    data: { includeId: data.areaId },
+                    success: function(data, status, xhr) {
+                        $("#edit-area").select2({
+                            data: data,
+                            allowClear: true,
+                            placeholder: {
+                                id: "",
+                                text: "<empty>"
+                            },
+                            dropdownParent: $('#editModal')
+                        });
+                    }
+                });
+            });
+
+
+
+            // Validation for Edit Modal
+            var validateEdit = $("#editForm").validate({
+                errorClass: 'text-danger text-xs',
+                rules: {
+                    code: { required: true, maxlength: 10 },
+                    firstName: { required: true, maxlength: 100 },
+                    lastName: { required: true, maxlength: 100 }
+                },
+                messages: {
+                    code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+               firstName: { required: "Please enter First Name.", maxlength: "First Name must not exceed 100 characters." },
+                lastName: { required: "Please enter Last Name.", maxlength: "Last Name must not exceed 100 characters." }
+                },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                    DoEdit();
                 }
             });
+
+            // Send Edit to Controller
+            function DoEdit() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EditJson")",
+                    data: {
+                        Id: $("#edit-id").val(),
+                        Code: $("#edit-code").val(),
+                   FirstName: $("#edit-firstname").val(),
+                  MiddleName: $("#edit-middlename").val(),
+                    LastName: $("#edit-lastname").val(),
+                      AreaId: $("#edit-area").val()
+                    },
+                    error: jQueryCommonError,
+                    success: function(data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#editModal").modal("hide");
+                            dataTable.ajax.reload();
+                            hideLoader()
+                        }
+                    }
+                });
+            }
         });
 
-        $('.reactivateBtn').click(function(e) {
-            swal({
-                title: "Reactivate Agent",
-                text: "Are you sure you want to reactivate this record?",
-                icon: "info",
-                buttons: true,
-                infoMode: true
-            }).then((confirm) => {
-                if (confirm) {
-                    var btn = $(this);
-                    var id = btn.data("id");
-                    $('#reactivateAgentId').val(id);
-                    $('#reactivateAgentForm').submit();
+        function ApplyFilter() {
+        $(".table-agent").DataTable().ajax.reload();
+        $("#filterModal").modal("hide");
+        }
+
+        // Load Select2 Area on Add
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Area")",
+            success: function(data, status, xhr) {
+                $("#create-area").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "<empty>"
+                    },
+                    dropdownParent: $('#createModal')
+                });
+            }
+        });
+
+
+        // Load Select2 Area
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Area")",
+            success: function(data, status, xhr) {
+                $("#create-area").select2({
+                    data: data,
+                    dropdownParent: $("#createModal")
+                });
+            }
+        });
+        // Actions upon Display Create Modal
+        $(".createBtn").click(function(e) {
+            $("#create-code").val("");
+            $("#create-firstname").val("");
+            $("#create-middlename").val("");
+            $("#create-lastname").val("");
+        });
+
+        // Validation for Create Modal
+        var validateCreate = $("#createForm").validate({
+            errorClass: 'text-danger text-xs',
+              rules: {
+                    code: { required: true, maxlength: 10 },
+                    firstName: { required: true, maxlength: 100 },
+                    lastName: { required: true, maxlength: 100 }
+                },
+                messages: {
+                    code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+               firstName: { required: "Please enter First Name.", maxlength: "First Name must not exceed 100 characters." },
+                lastName: { required: "Please enter Last Name.", maxlength: "Last Name must not exceed 100 characters." }
+                },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                DoCreate();
+            }
+        });
+
+        // Send Create to Controller
+        function DoCreate() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CreateJson")",
+                data: {
+                    Code: $("#create-code").val(),
+               FirstName: $("#create-firstname").val(),
+              MiddleName: $("#create-middlename").val(),
+                LastName: $("#create-lastname").val(),
+                  AreaId: $("#create-area").val()
+                },
+                error: jQueryCommonError,
+                success: function(data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#createModal").modal("hide");
+                        dataTable.ajax.reload();
+                        hideLoader()
+                    }
+                },
+                complete: function(xhr, status) {
+                    //$(".save-overlay").hideOverlay();
                 }
             });
+        }
+
+        var json_of_excel;
+        var colnumber = 7; // number of columns required for upload
+        var done_upload_excel = 0;
+        var duplicate_upload = 0;
+
+        var opts = {
+            readAsDefault: 'ArrayBuffer',
+            dragClass: 'drag',
+            on: {
+                load: function(e, file) {
+                    var result = new Uint8Array(e.target.result);
+                    var xlsread = XLSX.read(result, { type: 'array' });
+                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                    json_of_excel = xlsjson;
+                }
+            }
+        };
+        $("#upload-file").fileReaderJS(opts);
+
+        // Actions upon file selection
+        $("#upload-file").on("change", function() {
+            done_upload_excel = 0;
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
         });
+
+        // Actions upon Display Upload Modal
+        $(".uploadBtn").click(function(e) {
+            done_upload_excel = 0;
+            $("#upload-file").val("");
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        function DoUpload() {
+            if (!$("#upload-file").val()) {
+                toastr.error("Please select a file first");
+            } if (json_of_excel.length == 0) {
+                toastr.error("The excel file is empty");
+            } else {
+                var columns = Object.keys(json_of_excel[0]);
+                $("#upload-table tbody").html("");
+                $("#upload-table").show();
+                duplicate_upload = 0;
+                for (var i = 0; i < json_of_excel.length; i++) {
+                    var rowNum = json_of_excel[i].__rowNum__;
+                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                        var cellValue = json_of_excel[i][columns[colIndex]];
+                        if (cellValue == null)
+                            cellValue = "";
+                        row$.append($('<td/>').html(cellValue));
+                    }
+                    if (columns.includes("Code") == false
+                        || columns.includes("FirstName") == false
+                        || columns.includes("MiddleName") == false
+                        || columns.includes("LastName") == false
+                        || columns.includes("Area") == false) {
+                        row$.append($('<td/>').html("Unexpected columns"));
+                        UploadRowDone();
+                    } else {
+                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["FirstName"], json_of_excel[i]["MiddleName"], json_of_excel[i]["LastName"], json_of_excel[i]["Area"], rowNum);
+                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                    }
+                    $("#upload-table").append(row$);
+                }
+            }
+        }
+
+        function SaveXLSX(code, firstname, middlename, lastname, area, rownum) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UploadJson")",
+                data: {
+                    Code: code,
+               FirstName: firstname,
+              MiddleName: middlename,
+                LastName: lastname,
+                    Area: area
+                },
+                error: function(xhr, status, error) {
+                    $("#upload-row" + rownum).html(error);
+                },
+                success: function(data, status, xhr) {
+                    if (data.message == "Already exist") {
+                        $("#upload-row" + rownum + "tr").remove();
+                        duplicate_upload++;
+                    } else {
+                        $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                    }
+                },
+                complete: function(xhr, status) {
+                    UploadRowDone();
+                }
+            });
+        }
+
+        function UploadRowDone() {
+            done_upload_excel++;
+            if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                $("#upload-table").append('<tr><td>*</td><td colspan="3">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                $("#upload-file").val("");
+            }
+        }
+
+        $(".downloadBtn").click(function(e) {
+            window.location = "@Url.Action("DownloadFile")";
+        });
+
+
+      
     </script>
-}
+   }
+  

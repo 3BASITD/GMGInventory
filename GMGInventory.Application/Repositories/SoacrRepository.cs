@@ -28,40 +28,43 @@ namespace GMGInventory.Application.Repositories
         }
 
 
+
+
         public SoacrVM? GetSoacrVM(int? id)
         {
-            var soaVM = (from c in context.Customers
-                         join soa in context.SOACRs
-                                          on c.Id equals soa.CustomerId into custSoa
-                         from custSoaGrouping in custSoa.DefaultIfEmpty()
+            var soaVM = (from soa in context.SOACRs
+                                            .Include(s => s.Customer)
+                         join cp in context.CustomerPayments
+                                          on soa.Id equals cp.SOACRId into soacust
+                         from soacustGroup in soacust.DefaultIfEmpty()
                          join st in context.SOACRTypes
-                                          on custSoaGrouping.SOACRTypeId equals st.Id
-                         join sl in context.SOACRLineItems
-                                     on custSoaGrouping.Id equals sl.SOACRId into custSoaSL
-                         from custSoaGroupingSL in custSoaSL.DefaultIfEmpty()
-                         join i in context.Invoices
-                                          on custSoaGroupingSL.InvoiceId equals i.Id
+                                          on soa.SOACRTypeId equals st.Id
 
-                         where custSoaGrouping.Id == id
+                         let soalit = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.TBRAmount)
+                         let soalic = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.CreditAmount)
+                         let soalid = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.DebitAmount)
+                         let soalip = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.PaidAmount)
+                         let soalif = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.FreightCost)
+                         let soalib = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.Balance)
+
+
+                         where soa.Id == id
                          select new SoacrVM
                          {
-
-                             Id = custSoaGrouping.Id,
-                             CRNumber = custSoaGrouping.Id.ToString(),
-                             CustomerName = custSoaGrouping.Customer.Name,
+                             Id = soa.Id,
+                             CRNumber = soacustGroup.CRNumber,
+                             CustomerName = soa.Customer.Name,
                              Type = st.Code,
-                             SOAFrom = custSoaGrouping.SOAFrom.ToString(),
-                             SOATo = custSoaGrouping.SOATo.ToString(),
-                             TotalAmount = custSoaGrouping.TotalAmount.ToString(),
-                             TBR = custSoaGroupingSL.TBRAmount.ToString(),
-                             Credit = custSoaGroupingSL.CreditAmount.ToString(),
-                             Debit = custSoaGroupingSL.DebitAmount.ToString(),
-                             PaidAmount = custSoaGroupingSL.PaidAmount.ToString(),
-                             FreightCharge = custSoaGroupingSL.FreightCost.ToString(),
-                             Balance = custSoaGroupingSL.Balance,
-                             OverPayment = custSoaGrouping.OverPayment.ToString(),
-                             InvoiceNumber = i.InvoiceNumber.ToString(),
-                             InvoiceAmount = i.Amount.ToString()
+                             SOAFrom = soa.SOAFrom.ToString(),
+                             SOATo = soa.SOATo.ToString(),
+                             TotalAmount = soa.TotalAmount.ToString(),
+                             TBR = soalit.ToString(),
+                             Credit = soalic.ToString(),
+                             Debit = soalid.ToString(),
+                             PaidAmount = soalip.ToString(),
+                             FreightCharge = soalif.ToString(),
+                             Balance = soalib,
+                             OverPayment = soa.OverPayment.ToString()
 
                          }).FirstOrDefault();
             return soaVM;
@@ -72,43 +75,46 @@ namespace GMGInventory.Application.Repositories
         private IQueryable<SoacrVM> GetList()
         {
 
-            return from c in context.Customers
-                   join soa in context.SOACRs                
-                                    on c.Id equals soa.CustomerId into custSoa
-                   from custSoaGrouping in custSoa.DefaultIfEmpty()
+            return from soa in context.SOACRs
+                                            .Include(s => s.Customer)
+                   join cp in context.CustomerPayments
+                                    on soa.Id equals cp.SOACRId into soacust
+                   from soacustGroup in soacust.DefaultIfEmpty()
                    join st in context.SOACRTypes
-                                    on custSoaGrouping.SOACRTypeId equals st.Id
-                   join sl in context.SOACRLineItems
-                               on custSoaGrouping.Id equals sl.SOACRId into custSoaSL
-                   from custSoaGroupingSL in custSoaSL.DefaultIfEmpty()
-                   join i in context.Invoices
-                                    on custSoaGroupingSL.InvoiceId equals i.Id
-                   
+                                    on soa.SOACRTypeId equals st.Id
+
+
+                   let soalit = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.TBRAmount)
+                   let soalic = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.CreditAmount)
+                   let soalid = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.DebitAmount)
+                   let soalip = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.PaidAmount)
+                   let soalif = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.FreightCost)
+                   let soalib = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.Balance)
+
+
                    select new SoacrVM
                    {
 
-                       Id = custSoaGrouping.Id,
-                       CRNumber = custSoaGrouping.Id.ToString(),
-                       CustomerName = custSoaGrouping.Customer.Name,
+                       Id = soa.Id,
+                       CRNumber = soacustGroup.CRNumber,
+                       CustomerName = soa.Customer.Name,
                        Type = st.Code,
-                       SOAFrom = custSoaGrouping.SOAFrom.ToString(),
-                       SOATo = custSoaGrouping.SOATo.ToString(),
-                       TotalAmount = custSoaGrouping.TotalAmount.ToString(),
-                       TBR = custSoaGroupingSL.TBRAmount.ToString(),
-                       Credit = custSoaGroupingSL.CreditAmount.ToString(),
-                       Debit = custSoaGroupingSL.DebitAmount.ToString(),
-                       PaidAmount = custSoaGroupingSL.PaidAmount.ToString(),
-                       FreightCharge = custSoaGroupingSL.FreightCost.ToString(),
-                       Balance = custSoaGroupingSL.Balance,
-                       OverPayment = custSoaGrouping.OverPayment.ToString(),
-                       InvoiceNumber = i.InvoiceNumber.ToString(),
-                       InvoiceAmount = i.Amount.ToString()
+                       SOAFrom = soa.SOAFrom.ToString(),
+                       SOATo = soa.SOATo.ToString(),
+                       TotalAmount = soa.TotalAmount.ToString(),
+                       TBR = soalit.ToString(),
+                       Credit = soalic.ToString(),
+                       Debit = soalid.ToString(),
+                       PaidAmount = soalip.ToString(),
+                       FreightCharge = soalif.ToString(),
+                       Balance = soalib,
+                       OverPayment = soa.OverPayment.ToString()
 
                    };
         }
 
 
-            public ForDataTables<SoacrVM> GetListDataTables(DataTablesRequestForm form)
+        public ForDataTables<SoacrVM> GetListDataTables(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -189,5 +195,103 @@ namespace GMGInventory.Application.Repositories
                 Data = dataList
             };
         }
+
+
+
+        private async Task<IList<SoacrVM>> GetSoaDetailsAsync(int id)
+        {
+            var soaVM = from soa in context.SOACRs
+                                            .Include(s => s.Customer)
+                        join cp in context.CustomerPayments
+                                         on soa.Id equals cp.SOACRId into soacust
+                        from soacustGroup in soacust.DefaultIfEmpty()
+
+                        join sl in context.SOACRLineItems
+                                    on soa.Id equals sl.SOACRId
+                        join i in context.Invoices
+                                         on sl.InvoiceId equals i.Id
+                        where soa.Id == id
+                        select new SoacrVM
+                        {
+                            InvoiceNumber = i.InvoiceNumber,
+                            InvoiceAmount = i.Amount.ToString(),
+                            TBR = sl.TBRAmount.ToString(),
+                            Credit = sl.CreditAmount.ToString(),
+                            Debit = sl.DebitAmount.ToString(),
+                            PaidAmount = sl.PaidAmount.ToString(),
+                            FreightCharge = sl.FreightCost.ToString(),
+                            Balance = sl.Balance
+                        };
+            return await soaVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<SoacrVM>> GetSoaDetailsDTAsync(DataTablesRequestForm form, int id)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetSoaDetailsAsync(id)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.InvoiceNumber.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceAmount.ToString().Contains(form.SearchValue)
+                                    || x.TBR.ToString().Contains(form.SearchValue)
+                                    || x.Credit.ToString().Contains(form.SearchValue)
+                                    || x.Debit.ToString().Contains(form.SearchValue)
+                                    || x.PaidAmount.ToString().Contains(form.SearchValue)
+                                    || x.FreightCharge.ToString().Contains(form.SearchValue)
+                                    || x.Balance.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
+                        case "InvoiceAmount": data = data.OrderBy(s => s.InvoiceAmount); break;
+                        case "TBR": data = data.OrderBy(s => s.TBR); break;
+                        case "Credit": data = data.OrderBy(s => s.Credit); break;
+                        case "Debit": data = data.OrderBy(s => s.Debit); break;
+                        case "PaidAmount": data = data.OrderBy(s => s.PaidAmount); break;
+                        case "FreightCharge": data = data.OrderBy(s => s.FreightCharge); break;
+                        case "Balance": data = data.OrderBy(s => s.Balance); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
+                        case "InvoiceAmount": data = data.OrderByDescending(s => s.InvoiceAmount); break;
+                        case "TBR": data = data.OrderByDescending(s => s.TBR); break;
+                        case "Credit": data = data.OrderByDescending(s => s.Credit); break;
+                        case "Debit": data = data.OrderByDescending(s => s.Debit); break;
+                        case "PaidAmount": data = data.OrderByDescending(s => s.PaidAmount); break;
+                        case "FreightCharge": data = data.OrderByDescending(s => s.FreightCharge); break;
+                        case "Balance": data = data.OrderByDescending(s => s.Balance); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<SoacrVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+
+
     }
 }

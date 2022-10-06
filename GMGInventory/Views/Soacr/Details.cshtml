@@ -106,10 +106,10 @@
             showLoader();
         }).DataTable({
             ajax: {
-                url: "@Url.Action("GetListJson", "Soacr")",
+                url: "@Url.Action("GetSoaDetailsJson", "Soacr")",
                 type: "POST",
                 data: function(data) {
-                    data.SoacrId = @Model?.Id;
+                    data.Id = @Model?.Id;
                 },
             },
             serverSide: true,

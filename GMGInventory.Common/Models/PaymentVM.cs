@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GMGInventory.Common.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
@@ -11,22 +12,27 @@ namespace GMGInventory.Common.Models
         public string CRNumber { get; set; }
 
         [Display(Name = "SOA No")]
-        public string SOANo { get; set; }
+        public decimal SOANo { get; set; }
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
 
         [Display(Name = "Total Invoice Amount")]
-        public string TotalInvoiceAmount { get; set; }
+        public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
+        public decimal TotalInvoiceAmountD { get; set; }
 
         [Display(Name = "Amount Paid")]
-        public string AmountPaid { get; set; }
+        public string AmountPaid => string.Format(SystemFormat.StringDecimalComma, AmountPaidD);
+        public decimal AmountPaidD { get; set; }
 
         [Display(Name = "Over Payment")]
-        public string OverPayment { get; set; }
+        public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
+        public decimal OverPaymentD { get; set; }
 
         [Display(Name = "Transaction Date")]
-        public string TransactionDate { get; set; }
+        public string TransactionDate => TransactionDateD == null ? "-" : TransactionDateD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? TransactionDateD { get; set; }
+
 
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
@@ -68,10 +74,14 @@ namespace GMGInventory.Common.Models
         public string CheckNo { get; set; }
 
         [Display(Name = "Check Amount")]
-        public string CheckAmount { get; set; }
+        public string CheckAmount => string.Format(SystemFormat.StringDecimalComma, CheckAmountD);
+        public decimal CheckAmountD { get; set; }
+
 
         [Display(Name = "Check Date")]
-        public string CheckDate { get; set; }
+        public string CheckDate => CheckDateD == null ? "-" : CheckDateD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? CheckDateD { get; set; }
+
 
         // Invoices
 
