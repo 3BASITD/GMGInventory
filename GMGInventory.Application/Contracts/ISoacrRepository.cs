@@ -6,8 +6,10 @@ namespace GMGInventory.Application.Contracts
     {
         ForDataTables<SoacrVM> GetListDataTables(DataTablesRequestForm form);
 
-        //      ForDataTables<SOACrVM> GetListDataTablesDetails(DataTablesRequestForm form);
-
         SoacrVM? GetSoacrVM(int? id);
+        Task<ForDataTables<SoacrVM>> GetSoaDetailsDTAsync(DataTablesRequestForm form, int id);
+
+
+
     }
 }

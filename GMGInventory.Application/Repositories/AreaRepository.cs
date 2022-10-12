@@ -26,6 +26,14 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var area = await context.Areas.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return area?.Id;
+        }
+
+
         public async Task<IList<AreaViewVM>> GetAllAreaVMAsync()
         {
             var areas = await context.Areas.Include(s => s.Region).ToListAsync();

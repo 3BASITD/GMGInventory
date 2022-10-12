@@ -4,6 +4,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
+
+    public class AgentFilterVM
+    {
+        [Display(Name = "Region")]
+        public int? RegionId { get; set; }
+        public SelectList? Regions { get; set; }
+    }
+
     public class AgentVM 
     {
 
@@ -38,16 +46,22 @@ namespace GMGInventory.Common.Models
             }
         }
 
-        [Display(Name = "Area")]
+        [Display(Name = "AreaId")]
         public int AreaId { get; set; }
         public SelectList? Areas { get; set; }
+
+        [Display(Name = "Area")]
+        public string Area { get; set; }
 
     }
 
     public class AgentViewVM : GenericAuditVM
     {
         [Display(Name="Area")]
-        public AreaVM Area { get; set; }
+        public string Area { get; set; }
+
+        [Display(Name = "AreaId")]
+        public int AreaId { get; set; }
 
         [Display(Name = "First Name")]
         public string FirstName { get; set; }

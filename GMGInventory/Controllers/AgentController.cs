@@ -4,6 +4,8 @@ using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
+using ClosedXML.Excel;
 
 namespace GMGInventory.Controllers
 {
@@ -13,12 +15,14 @@ namespace GMGInventory.Controllers
     {
         private readonly IAgentRepository agentRepository;
         private readonly IAreaRepository areaRepository;
+        private readonly IRegionRepository regionRepository;
 
         public AgentController(IAgentRepository agentRepository
-            , IAreaRepository areaRepository)
+            , IAreaRepository areaRepository, IRegionRepository regionRepository)
         {
             this.agentRepository = agentRepository;
             this.areaRepository = areaRepository;
+            this.regionRepository = regionRepository;
         }
 
         public async Task<IActionResult> GetOptions2(string search, int page)
@@ -30,97 +34,133 @@ namespace GMGInventory.Controllers
         {
             return Json(await agentRepository.GetOptions(IncludeId));
         }
-
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult> Index()
         {
-            return View(await agentRepository.GetAllAgentVMAsync());
+            AgentFilterVM agentFilterVM = new AgentFilterVM();
+            agentFilterVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
+            ViewData["AgentFilter"] = agentFilterVM;
+            return View();
         }
 
-        public async Task<IActionResult> Details(int? id)
+
+        [HttpPost]
+        public async Task<JsonResult> GetListJson(AgentFilterVM filter)
         {
-            var agentVM = await agentRepository.GetAgentViewVMAsync(id);
-            if (agentVM == null)
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await agentRepository.GetAllForDataTablesAsync(form, filter));
+        }
+
+        //[HttpPost]
+        //public async Task<JsonResult> GetListJson()
+        //{
+        //    DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+        //    return Json(await agentRepository.GetListDTAsync(dtForm));
+        //}
+
+        [HttpPost]
+        public async Task<JsonResult> CreateJson(AgentVM agentVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await agentRepository.IsCodeExist(agentVM.Code))
             {
-                return NotFound();
+                responseModel.Status = "Error";
+                responseModel.Message = "Agent code already in use";
             }
-            return View(agentVM);
-        }
-
-        public async Task<IActionResult> Create()
-        {
-            var agentVM = new AgentVM
+            else
             {
-                Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name")
-            };
-            return View(agentVM);
+                await agentRepository.AddAsync(agentVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Agent successfully added";
+            }
+            return Json(responseModel);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AgentVM agentVM)
+        public async Task<JsonResult> UploadJson(AgentVM agentVM)
         {
-            if (ModelState.IsValid)
+            ResponseModel responseModel = new ResponseModel();
+            if (await agentRepository.UploadCombinationExistAsync(agentVM))
             {
-                if (await agentRepository.IsAgentCodeExist(agentVM.Code))
+                responseModel.Status = "Error";
+                responseModel.Message = "Already exist";
+            }
+            else if (await agentRepository.IsCodeExist(agentVM.Code))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Code already in use";
+            }
+            else
+            {
+                int? AreaId = await agentRepository.GetIdAsync(agentVM.Area);
+                if (AreaId == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Agent code already in use.");
-                    TempData["ErrorMessage"] = "Agent code already in use";
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Area";
                 }
                 else
                 {
+                    agentVM.AreaId = AreaId.Value;
                     await agentRepository.AddAsync(agentVM);
-                    TempData["SuccessMessage"] = "Agent successfully added";
-                    return RedirectToAction(nameof(Index));
+                    responseModel.Status = "Success";
+                    responseModel.Message = "Area added";
                 }
             }
-            agentVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(agentVM.AreaId), "Id", "Name", agentVM.AreaId);
-            return View(agentVM);
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            var agentVM = await agentRepository.GetAgentVMAsync(id);
-            if (agentVM == null)
-            {
-                return NotFound();
-            }
-            agentVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
-            return View(agentVM);
+            return Json(responseModel);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, AgentVM agentVM)
+        public async Task<JsonResult> EditJson(AgentVM agentVM)
         {
-            if (id != agentVM.Id)
+            ResponseModel responseModel = new ResponseModel();
+            try
             {
-                return NotFound();
+                await agentRepository.UpdateAsync(agentVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Agent successfully updated";
             }
-
-            if (ModelState.IsValid)
+            catch (Exception ex)
             {
-                try
+                if (!await agentRepository.Exists(agentVM.Id))
                 {
-                    await agentRepository.UpdateAsync(id, agentVM);
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Agent cannot be found";
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!await agentRepository.Exists(agentVM.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    responseModel.Status = "Error";
+                    responseModel.Message = ex.Message;
                 }
-                TempData["SuccessMessage"] = "Agent successfully updated";
-                return RedirectToAction(nameof(Index));
             }
-
-            agentVM.Areas= new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
-            return View(agentVM);
+            return Json(responseModel);
         }
+
+        public async Task<IActionResult> DownloadFile()
+        {
+            DataTable dt = new DataTable("Agent");
+            dt.Columns.AddRange(new DataColumn[3] {
+                new DataColumn("Code"),
+                new DataColumn("Full Name"),
+                new DataColumn("Area")
+            });
+            var agent = (await agentRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
+            foreach (var agents in agent)
+            {
+                dt.Rows.Add(agents.Code, agents.FullName, agents.AreaId);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Agents.xlsx");
+                }
+            }
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

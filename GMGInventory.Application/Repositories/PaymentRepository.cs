@@ -38,12 +38,12 @@ namespace GMGInventory.Application.Repositories
                              {
                                  Id = cp.Id,
                                  CRNumber = cp.CRNumber,
-                                 SOANo = cp.SOACRId.ToString(),
+                                 SOANo = cp.SOACRId,
                                  CustomerName = cp.Customer.Name,
-                                 TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString(),
-                                 AmountPaid = cp.TotalAmountPaid.ToString(),
-                                 OverPayment = cp.OverPayment.ToString(),
-                                 TransactionDate = cp.DateCreated.ToString(),
+                                 TotalInvoiceAmountD = cp.TotalInvoiceAmount,
+                                 AmountPaidD = cp.TotalAmountPaid,
+                                 OverPaymentD = cp.OverPayment,
+                                 TransactionDateD = cp.DateCreated,
                                  CreatedBy = cp.UserCreated,
                                  Remarks = cp.Remarks
 
@@ -62,12 +62,12 @@ namespace GMGInventory.Application.Repositories
                    {
                        Id = cp.Id,
                        CRNumber = cp.CRNumber,
-                       SOANo = cp.SOACRId.ToString(),
+                       SOANo = cp.SOACRId,
                        CustomerName = cp.Customer.Name,
-                       TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString(),
-                       AmountPaid = cp.TotalAmountPaid.ToString(),
-                       OverPayment = cp.OverPayment.ToString(),
-                       TransactionDate = cp.DateCreated.ToString(),
+                       TotalInvoiceAmountD = cp.TotalInvoiceAmount,
+                       AmountPaidD = cp.TotalAmountPaid,
+                       OverPaymentD = cp.OverPayment,
+                       TransactionDateD = cp.DateCreated,
                        CreatedBy = cp.UserCreated,
                        Remarks = cp.Remarks
 
@@ -88,7 +88,7 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.CRNumber.ToLower().Contains(form.SearchValue)
-                                    || x.SOANo.ToLower().Contains(form.SearchValue)
+                                    || x.SOANo.ToString().Contains(form.SearchValue)
                                     || x.CustomerName.ToLower().Contains(form.SearchValue)
                                     || x.TotalInvoiceAmount.ToLower().Contains(form.SearchValue)
                                     || x.AmountPaid.ToLower().Contains(form.SearchValue)
@@ -159,8 +159,8 @@ namespace GMGInventory.Application.Repositories
                              select new PaymentVM
                              {
                                  CheckNo = pd.CheckNumber.ToString(),
-                                 CheckAmount = pd.CheckAmount.ToString(),
-                                 CheckDate = pd.CheckDate.ToString(),
+                                 CheckAmountD = pd.CheckAmount,
+                                 CheckDateD = pd.CheckDate,
                                  BankName = pd.BankName.ToString(),
                                  BankBranch = pd.BankBranch.ToString()
 
@@ -230,18 +230,20 @@ namespace GMGInventory.Application.Repositories
             var customerVM = from cpd in context.CustomerPaymentDetails
                              join p in context.Invoices
                                               on cpd.InvoiceId equals p.Id
+                             join invt in context.InvoiceTypes
+                                              on p.InvoiceTypeId equals invt.Id
                              where cpd.Id == id
                              select new PaymentVM
                              {
                                  InvoiceNumber = p.InvoiceNumber,
                                  InvoiceDate = p.DateCreated.ToString(),
-                                 InvoiceType = p.InvoiceType.ToString(),
+                                 InvoiceType = invt.Name,
                                  InvoiceAmount = p.Amount.ToString(),
                                  BalanceAmount = p.PaidAmount.ToString(),
                                  PackNo = p.PackId.ToString(),
                                  SalesOrderNo = p.SalesOrderId.ToString()
 
-                   
+
 
                              };
             return await customerVM.ToListAsync();

@@ -33,23 +33,25 @@ namespace GMGInventory.Controllers
             return Json(soaRepository.GetListDataTables(dtForm));
         }
 
-        //[HttpPost]
-        //public JsonResult GetListJsonDetails()
-        //{
-        //    DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
-        //    return Json(soaRepository.GetListDataTablesDetails(dtForm));
-        //}
-
-
         public ActionResult Details(int id)
         {
-            var payment = soaRepository.GetSoacrVM(id);
-            if (payment == null)
+            var soa = soaRepository.GetSoacrVM(id);
+            if (soa == null)
             {
                 return NotFound();
             }
-            return View(payment);
+            return View(soa);
         }
+
+
+
+        [HttpPost]
+        public async Task<JsonResult> GetSoaDetailsJson(int id)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await soaRepository.GetSoaDetailsDTAsync(form, id));
+        }
+
 
 
     }

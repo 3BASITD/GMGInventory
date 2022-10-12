@@ -9,6 +9,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<AreaViewVM>> GetAllAreaVMAsync();
         Task<AreaViewVM?> GetAreaViewVMAsync(int? id);
         Task<AreaVM?> GetAreaVMAsync(int? id);
+        Task<int?> GetIdAsync(string? Name);
         Task<IList<Area>> GetAllActiveAreaAsync(int includeId);
         Task<bool> IsAreaCodeExist(string code);
         Task<bool> IsAreaInUse(int id);
