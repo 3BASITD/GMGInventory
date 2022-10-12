@@ -14,6 +14,9 @@ namespace GMGInventory.Common.Models
         public int RecordsTotal { get; set; }
         public int RecordsFiltered { get; set; }
         public IList<T> Data { get; set; }
+        public int TotalQuantity { get; set; }
+        public int TotalQuantity2 { get; set; }
+        public decimal TotalAmount { get; set; }
     }
 
     public class DataTablesRequestForm
@@ -114,6 +117,16 @@ namespace GMGInventory.Common.Models
         //public bool incomplete_results { get; set; }
         public IList<T> items { get; set; }
         public int total_count { get; set; }
+    }
+
+    public class ListFilterInventoryModel : ListFilterCommonModel
+    {
+        public int? Category { get; set; }
+        public int? ItemType { get; set; }
+        public int? Brand { get; set; }
+        public int? Item { get; set; }
+        public int? Supplier { get; set; }
+        public int? Warehouse { get; set; }
     }
 
     public class ListFilterCustomerModel : ListFilterCommonModel

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
-    public class CreditDebitMemoVM
+    public class CreditDebitMemoRVM
     {
         [Display(Name = "Memo Date")]
         public string MemoDate => MemoDateD.ToString(SystemFormat.StringDate);

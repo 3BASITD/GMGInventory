@@ -185,7 +185,7 @@ function FormatStringDecimal(num) {
 }
 
 function FormatStringInteger(num) {
-    return parseInt(num).toFixed(0).replace(/\B(?=(\d{3}))/g, ","); // add comma every 3 digits
+    return parseFloat(num).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add comma every 3 digits
 }
 
 function DateForInput(date) {

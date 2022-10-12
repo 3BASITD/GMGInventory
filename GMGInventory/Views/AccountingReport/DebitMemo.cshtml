@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CreditDebitMemoVM>
+﻿@model IEnumerable<CreditDebitMemoRVM>
 
 @{
     ViewData["Title"] = "Debit Memo Listing Report";
@@ -218,6 +218,12 @@
                     DateTo: $("#filter-to").val(),
                     Customer: $("#filter-customer").val()
                 },
+                beforeSend: function (xhr, settings) {
+                    $.LoadingOverlay("show", {
+                        image: "",
+                        fontawesome: "fas fa-print"
+                    });
+                },
                 error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     var html = '<h3>Debit Memo</h3>';
@@ -229,7 +235,7 @@
                     }
                     html += '</p>';
 
-                    html += '<table>';
+                    html += '<table class="table-items">';
                     html += '<thead>';
                     html += '<tr>';
                     html += '<th>Memo Date</th>';
@@ -264,23 +270,13 @@
                     $("#for-print").html(html);
                 },
                 complete: function (xhr, status) {
-                    setTimeout(function() {
-                        $("#for-print").printThis({
-                            importCSS: false,
-                            loadCSS: "/css/print.css",
-                            pageTitle: "GMG Inventory",
-                            beforePrint: function () {
-                                $.LoadingOverlay("show", {
-                                    image: "",
-                                    fontawesome: "fas fa-print"
-                                });
-                            },
-                            afterPrint: function () {
-                                hideLoader();
-                                $("#for-print").html("");
-                            }
-                        });
-                    }, 1000);
+                    printout("#for-print", {
+                        pageTitle: "GMG Inventory",
+                        importCSS: false,
+                        loadCSS: "/css/print.css"
+                    });
+                    hideLoader();
+                    $("#for-print").html("");
                 }
             });
 

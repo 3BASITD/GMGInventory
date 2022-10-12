@@ -44,6 +44,7 @@ builder.Services.AddScoped(typeof(IPurchaseOrderRepository), typeof(PurchaseOrde
 builder.Services.AddScoped(typeof(IPurchaseReturnRepository), typeof(PurchaseReturnReporitory));
 builder.Services.AddScoped(typeof(IRegionRepository), typeof(RegionRepository));
 builder.Services.AddScoped(typeof(IReportAccountingRepository), typeof(ReportAccountingRepository));
+builder.Services.AddScoped(typeof(IReportInventoryRepository), typeof(ReportInventoryRepository));
 builder.Services.AddScoped(typeof(IReportManagementRepository), typeof(ReportManagementRepository));
 builder.Services.AddScoped(typeof(IReportSalesRepository), typeof(ReportSalesRepository));
 builder.Services.AddScoped(typeof(ISalesOrderRepository), typeof(SalesOrderRepository));

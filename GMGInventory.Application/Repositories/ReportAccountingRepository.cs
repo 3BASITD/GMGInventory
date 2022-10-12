@@ -1,13 +1,8 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Diagnostics;
-using System.Globalization;
-using System.Security.AccessControl;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -20,7 +15,7 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
         }
 
-        public async Task<IList<CreditDebitMemoVM>> GetCreditMemo(ListFilterCustomerModel filter)
+        public async Task<IList<CreditDebitMemoRVM>> GetCreditMemo(ListFilterCustomerModel filter)
         {
             var credits = from credit in context.CreditDebitMemos
                                                 .Include(s => s.CreditDebitMemoType)
@@ -32,7 +27,7 @@ namespace GMGInventory.Application.Repositories
                           && credit.DateCreated <= filter.DateTo
                           && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
                           orderby credit.DateCreated descending
-                          select new CreditDebitMemoVM
+                          select new CreditDebitMemoRVM
                           {
                               AmountD = credit.Amount,
                               Customer = invoice.SalesOrder.Customer.Name,
@@ -42,7 +37,7 @@ namespace GMGInventory.Application.Repositories
             return await credits.ToListAsync();
         }
 
-        public async Task<ForDataTables<CreditDebitMemoVM>> GetCreditMemoDT(DataTablesRequestForm form, ListFilterCustomerModel filter)
+        public async Task<ForDataTables<CreditDebitMemoRVM>> GetCreditMemoDT(DataTablesRequestForm form, ListFilterCustomerModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -89,7 +84,7 @@ namespace GMGInventory.Application.Repositories
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
-            return new ForDataTables<CreditDebitMemoVM>
+            return new ForDataTables<CreditDebitMemoRVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
@@ -98,7 +93,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<CreditDebitMemoVM>> GetDebitMemo(ListFilterCustomerModel filter)
+        public async Task<IList<CreditDebitMemoRVM>> GetDebitMemo(ListFilterCustomerModel filter)
         {
             var debits = from debit in context.CreditDebitMemos
                                               .Include(s => s.CreditDebitMemoType)
@@ -110,7 +105,7 @@ namespace GMGInventory.Application.Repositories
                          && debit.DateCreated <= filter.DateTo
                          && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
                          orderby debit.DateCreated descending
-                         select new CreditDebitMemoVM
+                         select new CreditDebitMemoRVM
                          {
                              AmountD = debit.Amount,
                              Customer = invoice.SalesOrder.Customer.Name,
@@ -120,7 +115,7 @@ namespace GMGInventory.Application.Repositories
             return await debits.ToListAsync();
         }
 
-        public async Task<ForDataTables<CreditDebitMemoVM>> GetDebitMemoDT(DataTablesRequestForm form, ListFilterCustomerModel filter)
+        public async Task<ForDataTables<CreditDebitMemoRVM>> GetDebitMemoDT(DataTablesRequestForm form, ListFilterCustomerModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -167,7 +162,7 @@ namespace GMGInventory.Application.Repositories
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
-            return new ForDataTables<CreditDebitMemoVM>
+            return new ForDataTables<CreditDebitMemoRVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,

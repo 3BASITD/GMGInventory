@@ -1,0 +1,61 @@
+﻿@model BelowMaintainingPVM
+
+@{
+    Layout = "";
+    var title = "Items Below Maintaining Quantity";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Item</strong>
+        <span>@Model.Item</span>
+        <br />
+        <strong>Brand</strong>
+        <span>@Model.Brand</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>Brand</th>
+                <th>Item Code</th>
+                <th>Item Name</th>
+                <th>Part Number</th>
+                <th>Unit</th>
+                <th>Maintaining Quantity</th>
+                <th>Quantity on Hand</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.BelowMaintainings)
+            {
+                <tr>
+                    <td><nobr>@item.Brand</nobr></td>
+                    <td>@item.ItemCode</td>
+                    <td>@item.ItemName</td>
+                    <td>@item.PartNumber</td>
+                    <td><nobr>@item.Unit</nobr></td>
+                    <td class="right-text"><nobr>@item.MaintainingQuantity</nobr></td>
+                    <td class="right-text"><nobr>@item.QuantityOnHand</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="5" class="right-text">Total</th>
+                <th class="right-text">@Model.TotalMaintainingQuantity</th>
+                <th class="right-text">@Model.TotalQuantityOnHand</th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

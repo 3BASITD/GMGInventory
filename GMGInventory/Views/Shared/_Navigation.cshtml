@@ -17,7 +17,7 @@
 }
 
 <nav class="mt-2">
-    <ul class="nav nav-pills nav-sidebar flex-column nav-flat" data-widget="treeview" role="menu" data-accordion="false">
+    <ul class="nav nav-pills nav-sidebar @*flex-column *@ nav-flat" data-widget="treeview" role="menu" data-accordion="false">
 
         @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager)
         || User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SalesDirector)
@@ -489,7 +489,7 @@
             @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
            || User.IsInRole(Roles.SystemAdmin))
             {
-                var navInventoryReportActive = (new List<string> { "BelowMaintainingItem", "ReceivingListing", "ReceivingListingSupplier", "ReceivingSummary", "StockCard", "StockStatusReport", "SupplierPurchaseHistory" }).Contains(currentAction ?? "");
+                var navInventoryReportActive = (new List<string> { "BelowMaintainingItem", "ReceivingListing", "ReceivingListingSupplier", "ReceivingSummary", "StockCard", "StockStatus", "SupplierPurchase" }).Contains(currentAction ?? "");
 
                 <li class="nav-item @(navInventoryReportActive ? "menu-open" : "")">
                     <a href="#" class="nav-link @(navInventoryReportActive ? "active" : "")">
@@ -536,19 +536,19 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(currentController=="InventoryReport" && currentAction == "StockStatusReport" ? "active" : "")"
-                       asp-area="" asp-controller="InventoryReport" asp-action="StockStatusReport">
+                            <a class="nav-link @(currentController=="InventoryReport" && currentAction == "StockStatus" ? "active" : "")"
+                       asp-area="" asp-controller="InventoryReport" asp-action="StockStatus">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Stock Status Report</p>
+                                <p>Stock Status</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(currentController=="InventoryReport" && currentAction == "SupplierPurchaseHistory" ? "active" : "")"
-                       asp-area="" asp-controller="InventoryReport" asp-action="SupplierPurchaseHistory">
+                            <a class="nav-link @(currentController=="InventoryReport" && currentAction == "SupplierPurchase" ? "active" : "")"
+                       asp-area="" asp-controller="InventoryReport" asp-action="SupplierPurchase">
                                 <i class="nav-icon fas fa-file"></i>
                                 <p>Supplier Purchase History</p>
                             </a>
-                        </li>}
+                        </li>
 
                     </ul>
                 </li>

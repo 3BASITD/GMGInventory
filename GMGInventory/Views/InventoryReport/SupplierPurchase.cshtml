@@ -1,0 +1,329 @@
+﻿@model IEnumerable<SupplierPurchaseRVM>
+
+@{
+    ViewData["Title"] = "Supplier Purchase History";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                <span class="fas fa-print"></span> Print
+            </button>
+            <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
+                <span class="fas fa-download"></span> Download
+            </button>
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-purchase">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PurchaseDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Supplier)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Unit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Currency)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UnitPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TotalPrice)
+                    </th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th colspan="6">Total</th>
+                    <th></th>
+                    <th colspan="2"></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Report</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item" class="form-label mb-0">Item Code</label>
+                            <select id="filter-item" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item-name" class="form-label mb-0">Item Name</label>
+                            <input type="text" id="filter-item-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-supplier" class="form-label mb-0">Supplier</label>
+                            <select id="filter-supplier" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        SetDateFilter();
+        function SetDateFilter() {
+            if ($("#filter-to").val() == "") {
+                if ($("#filter-from").val() == "") {
+                    $("#filter-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter-from").val());
+                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    dt_from.setMonth(dt_from.getMonth() + 1);
+                    $("#filter-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter-from").val() == "") {
+                var dt_to = new Date($("#filter-to").val());
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
+                dt_to.setMonth(dt_to.getMonth() - 1);
+                $("#filter-from").val(DateForInput(dt_to));
+            }
+        }
+
+        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+
+        // Load Select2 for Item
+        $("#filter-item").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: 'All',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Item")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $("#filter-item").on("select2:select", function () {
+            $("#filter-item-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-item").on("select2:unselecting", function (e) {
+            $("#filter-item-name").val("");
+        });
+
+        // Load Select2 for Brand
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Brand")",
+            success: function (data, status, xhr) {
+                $("#filter-brand").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+            }
+        });
+
+        // Load Select2 for Supplier
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Supplier")",
+            success: function (data, status, xhr) {
+                $("#filter-supplier").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+            }
+        });
+
+        // Load List on DataTable
+        var purchaseDT = $('.table-purchase').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetSupplierPurchaseDT")",
+                type: "POST",
+                data: function (data) {
+                    var brandId = $("#filter-brand").val();
+                    var itemId = $("#filter-item").val();
+                    var supplierId = $("#filter-supplier").val();
+
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();                    
+                    if (brandId) data.Brand = brandId;
+                    if (itemId) data.Item = itemId;
+                    if (supplierId) data.Supplier = supplierId;
+                }
+            },
+            processing: true,
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "purchaseDate", name: "PurchaseDate" },
+                { data: "supplier", name: "Supplier" },
+                { data: "brand", name: "Brand" },
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "unit", name: "Unit" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "currency", name: "Currency" },
+                { data: "unitPrice", name: "UnitPrice", className: "text-end" },
+                { data: "totalPrice", name: "TotalPrice", className: "text-end" }
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var json = purchaseDT.ajax.json();
+                var api = this.api(), data;
+
+                $(api.column(6).footer()).html(FormatStringInteger(json.totalQuantity));
+                $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount));
+            },
+            order: [[0, "asc"]]
+        });
+
+        // Load functions upon DataTable load
+        purchaseDT.on("draw", function () {
+            hideLoader();
+
+            DatatablesSearchOnEnter('.table-purchase', purchaseDT);
+
+            $(".table-purchase thead th").removeClass("text-end");
+        });
+
+        $(".btnFilter").on("click", function () {
+            purchaseDT.ajax.reload();
+            $("#filterModal").modal("hide");
+        });
+
+        $(".downloadBtn").click(function (e) {
+            var urlQuery = [];
+            urlQuery.push("DateFrom=" + $("#filter-from").val());
+            urlQuery.push("DateTo=" + $("#filter-to").val());
+            if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+            if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
+            if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
+            window.location = "@Url.Action("DownloadSupplierPurchase")?" + urlQuery.join("&");
+        });
+
+        $(".printBtn").on("click", function () {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
+            });
+            var urlQuery = [];
+            urlQuery.push("DateFrom=" + $("#filter-from").val());
+            urlQuery.push("DateTo=" + $("#filter-to").val());
+            if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+            if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
+            if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
+            let win = window.open('@Url.Action("PrintSupplierPurchase")?' + urlQuery.join("&"), '');
+
+            $(win).on("pageshow", function () {
+                win.print();
+                win.close();
+                hideLoader();
+            });
+        });
+    </script>
+    }
