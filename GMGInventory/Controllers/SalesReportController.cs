@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using ClosedXML.Excel;
 using GMGInventory.Helpers;
+using GMGInventory.Application.Repositories;
 
 namespace GMGInventory.Controllers
 {
@@ -24,52 +25,50 @@ namespace GMGInventory.Controllers
             chelper = new();
         }
 
-        public IActionResult UnservedItem()
+        //"AgentSalesPerItem", "BrandSalesReport", "BestSellingItem", "BestSellingItemInvoice",
+        //"CommissionReport", "CustomerSalesAnalysisReport", "CustomerSalesReport", "DailySalesReport",
+        //"DailySalesMarginReport", "SalesInvoiceListingReport", "SalesAgentArea", "SalesMarginItem",
+        //"SalesReportBasis", "SalesReturnListingReport", "UnservedItem"
+
+
+        #region Sales Report by Customer
+        public IActionResult CustomerSales()
         {
             return View();
         }
 
-        [HttpPost]
-        public JsonResult GetUnservedItemDT(UnservedItemFilter filter)
+        public async Task<IActionResult> PrintCustomerSales(ListFilterSalesModel filter)
         {
-            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
-            return Json(reportSalesRepository.GetUnservedItemDT(dtForm, filter));
+            return View(await reportSalesRepository.PrintCustomerSales(filter));
         }
 
-        public IActionResult DownloadUnservedItem(UnservedItemFilter filter)
+        [HttpPost]
+        public async Task<JsonResult> GetCustomerSalesDT(ListFilterSalesModel filter)
         {
-            DataTable dt = new DataTable("Unserved Items");
-            UnservedItemVM unservedItemVM = new UnservedItemVM();
-            dt.Columns.AddRange(new DataColumn[12] {
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("Item")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("OrderDate")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("SalesOrderNumber")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("Customer")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("UnitPrice")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("Quantity")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("PackedQuantity")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("UnservedQuantity")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("Discount1")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("Discount2")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("Agent")),
-                new DataColumn(chelper.DisplayName<UnservedItemVM>("CreatedBy"))
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetCustomerSalesDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadCustomerSales(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Sales Report "
+                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                                       + "-"
+                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
+            CreditDebitMemoRVM debitVM = new CreditDebitMemoRVM();
+            dt.Columns.AddRange(new DataColumn[4] {
+                new DataColumn(chelper.DisplayName<SalesCustomerRVM>("CustomerCode")),
+                new DataColumn(chelper.DisplayName<SalesCustomerRVM>("CustomerName")),
+                new DataColumn(chelper.DisplayName<SalesCustomerRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<SalesCustomerRVM>("Amount"))
             });
-            var unservedItems = reportSalesRepository.GetUnservedItem(filter);
-            foreach (var unservedItem in unservedItems)
+            var debits = await reportSalesRepository.GetCustomerSales(filter);
+            foreach (var debit in debits)
             {
-                dt.Rows.Add(unservedItem.Item,
-                            unservedItem.OrderDate,
-                            unservedItem.SalesOrderNumber,
-                            unservedItem.Customer,
-                            unservedItem.UnitPrice,
-                            unservedItem.Quantity,
-                            unservedItem.PackedQuantity,
-                            unservedItem.UnservedQuantity,
-                            unservedItem.Discount1,
-                            unservedItem.Discount2,
-                            unservedItem.Agent,
-                            unservedItem.CreatedBy
-                            );
+                dt.Rows.Add(debit.CustomerCode,
+                            debit.CustomerName,
+                            debit.Brand,
+                            debit.Amount);
             }
 
             using (XLWorkbook wb = new())
@@ -80,9 +79,67 @@ namespace GMGInventory.Controllers
                     wb.SaveAs(stream);
                     return File(stream.ToArray(),
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        DateTime.Now.ToString("yyyyMMdd") + " Item Types.xlsx");
+                        DateTime.Now.ToString("yyyyMMdd") + " Sales Report by Customer.xlsx");
                 }
             }
         }
+        #endregion
+
+        #region Unserved Items
+        public IActionResult UnservedItem()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintUnservedItem(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintUnservedItem(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetUnservedItemDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetUnservedItemDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadUnservedItem(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Unserved Item "
+                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                                       + "-"
+                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
+            dt.Columns.AddRange(new DataColumn[6] {
+                new DataColumn(chelper.DisplayName<UnservedItemRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<UnservedItemRVM>("ItemCode")),
+                new DataColumn(chelper.DisplayName<UnservedItemRVM>("ItemName")),
+                new DataColumn(chelper.DisplayName<UnservedItemRVM>("Pending")),
+                new DataColumn(chelper.DisplayName<UnservedItemRVM>("Current")),
+                new DataColumn(chelper.DisplayName<UnservedItemRVM>("ReplenishDate"))
+            });
+            var items = await reportSalesRepository.GetUnservedItem(filter);
+            foreach (var item in items)
+            {
+                dt.Rows.Add(item.Brand,
+                            item.ItemCode,
+                            item.ItemName,
+                            item.Pending,
+                            item.Current,
+                            item.ReplenishDate);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Unserved Items.xlsx");
+                }
+            }
+        }
+        #endregion
     }
 }

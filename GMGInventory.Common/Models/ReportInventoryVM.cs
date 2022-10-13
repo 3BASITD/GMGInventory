@@ -282,7 +282,6 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Total Price")]
         public string TotalPrice => string.Format(SystemFormat.StringDecimalComma, TotalPriceD);
         public decimal TotalPriceD => QuantityD * UnitPriceD;
-
     }
 
     public class SupplierPurchasePVM

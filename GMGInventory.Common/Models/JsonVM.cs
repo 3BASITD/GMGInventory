@@ -121,12 +121,18 @@ namespace GMGInventory.Common.Models
 
     public class ListFilterInventoryModel : ListFilterCommonModel
     {
-        public int? Category { get; set; }
-        public int? ItemType { get; set; }
         public int? Brand { get; set; }
+        public int? Category { get; set; }
         public int? Item { get; set; }
+        public int? ItemType { get; set; }
         public int? Supplier { get; set; }
         public int? Warehouse { get; set; }
+    }
+
+    public class ListFilterSalesModel : ListFilterCommonModel
+    {
+        public int? Brand { get; set; }
+        public int? Customer { get; set; }
     }
 
     public class ListFilterCustomerModel : ListFilterCommonModel

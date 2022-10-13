@@ -15,6 +15,7 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
         }
 
+        #region Credit Memo
         public async Task<IList<CreditDebitMemoRVM>> GetCreditMemo(ListFilterCustomerModel filter)
         {
             var credits = from credit in context.CreditDebitMemos
@@ -41,10 +42,13 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
+            decimal totalAmount = 0;
 
             var data = (await GetCreditMemo(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
@@ -89,10 +93,27 @@ namespace GMGInventory.Application.Repositories
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
-                Data = dataList
+                Data = dataList,
+                TotalAmount = totalAmount
             };
         }
 
+        public async Task<CreditDebitMemoPVM> PrintCreditMemo(ListFilterCustomerModel filter)
+        {
+            var items = await GetCreditMemo(filter);
+            var customer = await context.Customers.Where(s => s.Id == filter.Customer).FirstOrDefaultAsync();
+            return new CreditDebitMemoPVM
+            {
+                Memos = items,
+                DateFromD = filter.DateFrom.GetValueOrDefault(),
+                DateToD = filter.DateTo.GetValueOrDefault(),
+                Customer = filter.Customer == null || customer == null ? "All" : customer.Name,
+                TotalAmountD = items.Sum(s => s.AmountD)
+            };
+        }
+        #endregion
+
+        #region Debit Memo
         public async Task<IList<CreditDebitMemoRVM>> GetDebitMemo(ListFilterCustomerModel filter)
         {
             var debits = from debit in context.CreditDebitMemos
@@ -119,10 +140,13 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
+            decimal totalAmount = 0;
 
             var data = (await GetDebitMemo(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
@@ -167,8 +191,24 @@ namespace GMGInventory.Application.Repositories
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
-                Data = dataList
+                Data = dataList,
+                TotalAmount = totalAmount
             };
         }
+
+        public async Task<CreditDebitMemoPVM> PrintDebitMemo(ListFilterCustomerModel filter)
+        {
+            var items = await GetDebitMemo(filter);
+            var customer = await context.Customers.Where(s => s.Id == filter.Customer).FirstOrDefaultAsync();
+            return new CreditDebitMemoPVM
+            {
+                Memos = items,
+                DateFromD = filter.DateFrom.GetValueOrDefault(),
+                DateToD = filter.DateTo.GetValueOrDefault(),
+                Customer = filter.Customer == null || customer == null ? "All" : customer.Name,
+                TotalAmountD = items.Sum(s => s.AmountD)
+            };
+        }
+        #endregion
     }
 }

@@ -30,9 +30,9 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        public async Task<JsonResult> GetCreditMemo(ListFilterCustomerModel filter)
+        public async Task<IActionResult> PrintCreditMemo(ListFilterCustomerModel filter)
         {
-            return Json(await reportAccountingRepository.GetCreditMemo(filter));
+            return View(await reportAccountingRepository.PrintCreditMemo(filter));
         }
 
         [HttpPost]
@@ -44,11 +44,10 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadCreditMemo(ListFilterCustomerModel filter)
         {
-            DataTable dt = new DataTable("Credit Memo (" 
+            DataTable dt = new DataTable("Credit Memo " 
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy") 
                                        + "-" 
-                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy")
-                                       + ")");
+                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             dt.Columns.AddRange(new DataColumn[4] {
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoDate")),
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoNumber")),
@@ -84,9 +83,9 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        public async Task<JsonResult> GetDebitMemo(ListFilterCustomerModel filter)
+        public async Task<IActionResult> PrintDebitMemo(ListFilterCustomerModel filter)
         {
-            return Json(await reportAccountingRepository.GetDebitMemo(filter));
+            return View(await reportAccountingRepository.PrintDebitMemo(filter));
         }
 
         [HttpPost]
@@ -98,11 +97,10 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadDebitMemo(ListFilterCustomerModel filter)
         {
-            DataTable dt = new DataTable("Debit Memo ("
+            DataTable dt = new DataTable("Debit Memo "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"
-                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy")
-                                       + ")");
+                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             CreditDebitMemoRVM debitVM = new CreditDebitMemoRVM();
             dt.Columns.AddRange(new DataColumn[4] {
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoDate")),
@@ -110,7 +108,7 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Customer")),
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Amount"))
             });
-            var debits = await reportAccountingRepository.GetCreditMemo(filter);
+            var debits = await reportAccountingRepository.GetDebitMemo(filter);
             foreach (var debit in debits)
             {
                 dt.Rows.Add(debit.MemoDate,

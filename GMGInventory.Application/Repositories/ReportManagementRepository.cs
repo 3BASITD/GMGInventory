@@ -18,14 +18,14 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
         }
 
-        private async Task<IList<ReportManagementCheckRegisterRVM>> GetCheckRegister(ListFilterCustomerModel filter)
+        private async Task<IList<CheckRegisterRVM>> GetCheckRegister(ListFilterCustomerModel filter)
         {
             var checks = from check in context.SOACRChecks
                                               .Include(s => s.CustomerPayment).ThenInclude(s => s.Customer)
                          where filter.DateFrom <= check.CheckDate
                          && check.CheckDate <= filter.DateTo
                          && (filter.Customer == null || check.CustomerPayment.Customer.Id == filter.Customer)
-                         select new ReportManagementCheckRegisterRVM
+                         select new CheckRegisterRVM
                          {
                              BankDetails = check.BankName + " - " + check.BankBranch,
                              CheckAmountD = check.CheckAmount,
@@ -36,17 +36,18 @@ namespace GMGInventory.Application.Repositories
             return await checks.ToListAsync();
         }
 
-        public async Task<IList<ReportManagementCheckRegisterRVM>> GetCheckRegisterByDate(ListFilterCustomerModel filter)
+        #region Check Register by Date / Customer
+        public async Task<IList<CheckRegisterRVM>> GetCheckRegisterByDate(ListFilterCustomerModel filter)
         {
             return (await GetCheckRegister(filter)).OrderBy(s => s.CheckDateD).ThenBy(s => s.Customer).ToList();
         }
 
-        public async Task<IList<ReportManagementCheckRegisterRVM>> GetCheckRegisterByCustomer(ListFilterCustomerModel filter)
+        public async Task<IList<CheckRegisterRVM>> GetCheckRegisterByCustomer(ListFilterCustomerModel filter)
         {
             return (await GetCheckRegister(filter)).OrderBy(s => s.Customer).ThenBy(s => s.CheckDateD).ToList();
         }
 
-        public async Task<ForDataTables<ReportManagementCheckRegisterRVM>> GetCheckRegisterDT(DataTablesRequestForm form, ListFilterCustomerModel filter)
+        public async Task<ForDataTables<CheckRegisterRVM>> GetCheckRegisterDT(DataTablesRequestForm form, ListFilterCustomerModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -99,7 +100,7 @@ namespace GMGInventory.Application.Repositories
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
-            return new ForDataTables<ReportManagementCheckRegisterRVM>
+            return new ForDataTables<CheckRegisterRVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
@@ -109,23 +110,52 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<ReportManagementRegisterSummaryRVM>> GetCheckRegisterSummary(ListFilterCommonModel filter)
+        public async Task<CheckRegisterPVM> PrintCheckRegisterByDate(ListFilterCustomerModel filter)
+        {
+            var items = await GetCheckRegisterByDate(filter);
+            var customer = await context.Customers.Where(s => s.Id == filter.Customer).FirstOrDefaultAsync();
+            return new CheckRegisterPVM
+            {
+                Registers = items,
+                DateFromD = filter.DateFrom.GetValueOrDefault(),
+                DateToD = filter.DateTo.GetValueOrDefault(),
+                TotalAmountD = items.Sum(s => s.CheckAmountD)
+            };
+        }
+
+        public async Task<CheckRegisterPVM> PrintCheckRegisterByCustomer(ListFilterCustomerModel filter)
+        {
+            var items = await GetCheckRegisterByCustomer(filter);
+            var customer = await context.Customers.Where(s => s.Id == filter.Customer).FirstOrDefaultAsync();
+            return new CheckRegisterPVM
+            {
+                Registers = items,
+                DateFromD = filter.DateFrom.GetValueOrDefault(),
+                DateToD = filter.DateTo.GetValueOrDefault(),
+                Customer = filter.Customer == null || customer == null ? "All" : customer.Name,
+                TotalAmountD = items.Sum(s => s.CheckAmountD)
+            };
+        }
+        #endregion
+
+        #region Check Register Summary
+        public async Task<IList<RegisterSummaryRVM>> GetCheckRegisterSummary(ListFilterCommonModel filter)
         {
             var checks = from check in context.SOACRChecks
                          group check by check.CheckDate.Date into d
                          where filter.DateFrom <= d.Key
                          && d.Key <= filter.DateTo
                          orderby d.Key ascending
-                         select new ReportManagementRegisterSummaryRVM
+                         select new RegisterSummaryRVM
                          {
                              CheckAmountD = d.Sum(s => s.CheckAmount),
                              CheckDateD = d.Key,
-                             NumberOfChecks = d.Count()
+                             NumberOfChecksD = d.Count()
                          };
             return await checks.ToListAsync();
         }
 
-        public async Task<ForDataTables<ReportManagementRegisterSummaryRVM>> GetCheckRegisterSummaryDT(DataTablesRequestForm form, ListFilterCommonModel filter)
+        public async Task<ForDataTables<RegisterSummaryRVM>> GetCheckRegisterSummaryDT(DataTablesRequestForm form, ListFilterCommonModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -138,13 +168,13 @@ namespace GMGInventory.Application.Repositories
             //get total amount of data in table
             totalAmount = data.Sum(s => s.CheckAmountD);
             //get total quantity of data in table
-            totalQuantity = data.Sum(s => s.NumberOfChecks);
+            totalQuantity = data.Sum(s => s.NumberOfChecksD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.CheckAmountD.ToString().Contains(form.SearchValue)
                                     || x.CheckDate.ToLower().Contains(form.SearchValue)
-                                    || x.NumberOfChecks.ToString().Contains(form.SearchValue));
+                                    || x.NumberOfChecksD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -157,7 +187,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "CheckAmount": data = data.OrderBy(s => s.CheckAmountD); break;
                         case "CheckDate": data = data.OrderBy(s => s.CheckDateD); break;
-                        case "NumberOfChecks": data = data.OrderBy(s => s.NumberOfChecks); break;
+                        case "NumberOfChecks": data = data.OrderBy(s => s.NumberOfChecksD); break;
                         default: break;
                     }
                 }
@@ -167,7 +197,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "CheckAmount": data = data.OrderByDescending(s => s.CheckAmountD); break;
                         case "CheckDate": data = data.OrderByDescending(s => s.CheckDateD); break;
-                        case "NumberOfChecks": data = data.OrderByDescending(s => s.NumberOfChecks); break;
+                        case "NumberOfChecks": data = data.OrderByDescending(s => s.NumberOfChecksD); break;
                         default: break;
                     }
                 }
@@ -175,7 +205,7 @@ namespace GMGInventory.Application.Repositories
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
-            return new ForDataTables<ReportManagementRegisterSummaryRVM>
+            return new ForDataTables<RegisterSummaryRVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
@@ -185,5 +215,18 @@ namespace GMGInventory.Application.Repositories
                 TotalQuantity = totalQuantity
             };
         }
+        public async Task<RegisterSummaryPVM> PrintCheckRegisterSummary(ListFilterCommonModel filter)
+        {
+            var items = await GetCheckRegisterSummary(filter);
+            return new RegisterSummaryPVM
+            {
+                Registers = items,
+                DateFromD = filter.DateFrom.GetValueOrDefault(),
+                DateToD = filter.DateTo.GetValueOrDefault(),
+                TotalChecksD = items.Sum(s => s.NumberOfChecksD),
+                TotalAmountD = items.Sum(s => s.CheckAmountD)
+            };
+        }
+        #endregion
     }
 }

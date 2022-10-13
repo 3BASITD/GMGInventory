@@ -7,8 +7,10 @@ namespace GMGInventory.Application.Contracts
     {
         Task<IList<CreditDebitMemoRVM>> GetCreditMemo(ListFilterCustomerModel filter);
         Task<ForDataTables<CreditDebitMemoRVM>> GetCreditMemoDT(DataTablesRequestForm form, ListFilterCustomerModel filter);
+        Task<CreditDebitMemoPVM> PrintCreditMemo(ListFilterCustomerModel filter);
 
         Task<IList<CreditDebitMemoRVM>> GetDebitMemo(ListFilterCustomerModel filter);
         Task<ForDataTables<CreditDebitMemoRVM>> GetDebitMemoDT(DataTablesRequestForm form, ListFilterCustomerModel filter);
+        Task<CreditDebitMemoPVM> PrintDebitMemo(ListFilterCustomerModel filter);
     }
 }

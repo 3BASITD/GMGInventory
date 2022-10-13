@@ -30,10 +30,10 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        public async Task<JsonResult> GetCheckRegisterByDate(ListFilterCustomerModel filter)
+        public async Task<IActionResult> PrintCheckRegisterByDate(ListFilterCustomerModel filter)
         {
             filter.Customer = null;
-            return Json(await reportManagementRepository.GetCheckRegisterByDate(filter));
+            return View(await reportManagementRepository.PrintCheckRegisterByDate(filter));
         }
 
         [HttpPost]
@@ -47,17 +47,16 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> DownloadCheckRegisterByDate(ListFilterCustomerModel filter)
         {
             filter.Customer = null;
-            DataTable dt = new DataTable("Check Register (" 
+            DataTable dt = new DataTable("Check Register " 
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy") 
                                        + "-" 
-                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy")
-                                       + ")");
+                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             dt.Columns.AddRange(new DataColumn[5] {
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("CheckDate")),
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("Customer")),
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("BankDetails")),
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("CheckNumber")),
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("CheckAmount"))
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("CheckDate")),
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("Customer")),
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("BankDetails")),
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("CheckNumber")),
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("CheckAmount"))
             });
             var checks = await reportManagementRepository.GetCheckRegisterByDate(filter);
             foreach (var check in checks)
@@ -89,9 +88,9 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        public async Task<JsonResult> GetCheckRegisterByCustomer(ListFilterCustomerModel filter)
+        public async Task<IActionResult> PrintCheckRegisterByCustomer(ListFilterCustomerModel filter)
         {
-            return Json(await reportManagementRepository.GetCheckRegisterByCustomer(filter));
+            return View(await reportManagementRepository.PrintCheckRegisterByCustomer(filter));
         }
 
         [HttpPost]
@@ -103,17 +102,16 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadCheckRegisterByCustomer(ListFilterCustomerModel filter)
         {
-            DataTable dt = new DataTable("Check Register ("
+            DataTable dt = new DataTable("Check Register "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"
-                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy")
-                                       + ")");
+                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             dt.Columns.AddRange(new DataColumn[5] {
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("Customer")),
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("CheckDate")),
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("BankDetails")),
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("CheckNumber")),
-                new DataColumn(chelper.DisplayName<ReportManagementCheckRegisterRVM>("CheckAmount"))
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("Customer")),
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("CheckDate")),
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("BankDetails")),
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("CheckNumber")),
+                new DataColumn(chelper.DisplayName<CheckRegisterRVM>("CheckAmount"))
             });
             var checks = await reportManagementRepository.GetCheckRegisterByCustomer(filter);
             foreach (var check in checks)
@@ -145,9 +143,9 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        public async Task<JsonResult> GetCheckRegisterSummary(ListFilterCustomerModel filter)
+        public async Task<IActionResult> PrintCheckRegisterSummary(ListFilterCustomerModel filter)
         {
-            return Json(await reportManagementRepository.GetCheckRegisterSummary(filter));
+            return View(await reportManagementRepository.PrintCheckRegisterSummary(filter));
         }
 
         [HttpPost]
@@ -159,15 +157,14 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadCheckRegisterSummary(ListFilterCustomerModel filter)
         {
-            DataTable dt = new DataTable("Check Register ("
+            DataTable dt = new DataTable("Check Register "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"
-                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy")
-                                       + ")");
+                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             dt.Columns.AddRange(new DataColumn[3] {
-                new DataColumn(chelper.DisplayName<ReportManagementRegisterSummaryRVM>("CheckDate")),
-                new DataColumn(chelper.DisplayName<ReportManagementRegisterSummaryRVM>("NumberOfChecks")),
-                new DataColumn(chelper.DisplayName<ReportManagementRegisterSummaryRVM>("CheckAmount"))
+                new DataColumn(chelper.DisplayName<RegisterSummaryRVM>("CheckDate")),
+                new DataColumn(chelper.DisplayName<RegisterSummaryRVM>("NumberOfChecks")),
+                new DataColumn(chelper.DisplayName<RegisterSummaryRVM>("CheckAmount"))
             });
             var checks = await reportManagementRepository.GetCheckRegisterSummary(filter);
             foreach (var check in checks)
