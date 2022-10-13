@@ -12,7 +12,7 @@ namespace GMGInventory.Common.Models
         public SelectList? Regions { get; set; }
     }
 
-    public class AgentVM 
+    public class AgentVM : GenericAuditVM
     {
 
         public int Id { get; set; }
@@ -52,6 +52,19 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Area")]
         public string Area { get; set; }
+
+        [Display(Name = "Customer Name")]
+        public string CustomerName { get; set; }
+
+        [Display(Name = "Customer Address")]
+        public string CustomerAddress { get; set; }
+
+        [Display(Name = "Customer Email")]
+        public string CustomerEmail { get; set; }
+
+        [Display(Name = "Customer Contact Number")]
+        public string CustomerContactNo { get; set; }
+
 
     }
 

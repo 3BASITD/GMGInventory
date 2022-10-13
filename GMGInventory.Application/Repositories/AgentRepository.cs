@@ -271,6 +271,97 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+
+
+        private async Task<IList<AgentVM>> GetAgentAsync(int id)
+        {
+            var agentVM = from agent in context.Agents
+                             join cust in context.Customers
+                                       on agent.Id equals cust.AgentId
+                             where agent.Id == id
+                             select new AgentVM
+                             {
+                                 CustomerName = cust.Name,
+                                 CustomerAddress = cust.Address,
+                                 CustomerEmail = cust.Email,
+                                 CustomerContactNo = cust.ContactNumber
+                             };
+            return await agentVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<AgentVM>> GetAgentDTAsync(DataTablesRequestForm form, int id)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetAgentAsync(id)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.CustomerName.ToString().Contains(form.SearchValue)
+                                    || x.CustomerAddress.ToString().Contains(form.SearchValue)
+                                    || x.CustomerEmail.ToString().Contains(form.SearchValue)
+                                    || x.CustomerContactNo.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
+                        case "CustomerAddress": data = data.OrderBy(s => s.CustomerAddress); break;
+                        case "CustomerEmail": data = data.OrderBy(s => s.CustomerEmail); break;
+                        case "CustomerContactNo": data = data.OrderBy(s => s.CustomerContactNo); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    
+                    {
+                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
+                        case "CustomerAddress": data = data.OrderByDescending(s => s.CustomerAddress); break;
+                        case "CustomerEmail": data = data.OrderByDescending(s => s.CustomerEmail); break;
+                        case "CustomerContactNo": data = data.OrderByDescending(s => s.CustomerContactNo); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<AgentVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+
+        public AgentVM? GetAgentDtlVM(int? id)
+        {
+            var agentVM = (from cust in context.Agents
+                                    .Include(s => s.Area)
+                                    .Include(s => s.Customers)
+
+
+                              where cust.Id == id
+                              select new AgentVM
+                              {
+                                  Id = cust.Id,
+                                  Code = cust.Code,
+
+                              }).FirstOrDefault();
+            return agentVM;
+        }
+
         public async Task<AgentViewVM?> GetAgentViewVM(int? id)
         {
             var agentVM = (await GetListAsync()).Where(s => s.Id == id).FirstOrDefault();

@@ -1,112 +1,322 @@
 ﻿@model IEnumerable<SoacrVM>
 
 @{
-    ViewData["Title"] = "SOACr";
+	ViewData["Title"] = "SOA";
 }
 
 <div class="card card-default">
-    <div class="card-header">
-        <span class="card-title">@ViewData["Title"]</span>
-    </div>
-    <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover table-soa">
-            <thead>
-                <tr>
-                  
-                    <th>
-                        @Html.DisplayNameFor(model => model.CRNumber)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.CustomerName)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Type)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.SOAFrom)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.SOATo)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.TotalAmount)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.TBR)
-                    </th>
-                     <th>
-                        @Html.DisplayNameFor(model => model.Credit)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Debit)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PaidAmount)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.FreightCharge)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Balance)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.OverPayment)
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-        </table>
-    </div>
+	<div class="card-header">
+		<span class="card-title">@ViewData["Title"]</span>
+		<div class="card-tools">
+@*			<button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+				<span class="fas fa-filter"></span> Generate SOA
+			</button>*@
+			<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+				<span class="fas fa-file-alt"></span> Generate SOA
+			</button>
+			<a class="btn btn-primary btn-sm float-right" asp-action="ContractReceipt">
+				<span class="fas fa-plus"></span> Generate Contract Receipt
+			</a>
+		</div> 
+	</div>
+	<div class="card-body">
+		<table class="table table-head-fixed table-striped table-hover table-soa">
+			<thead>
+				<tr>
+					<th>
+						@Html.DisplayNameFor(model => model.Id)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.CustomerName)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.Type)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.SOAFrom)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.SOATo)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.TotalAmount)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.TBR)
+					</th>
+					 <th>
+						@Html.DisplayNameFor(model => model.Credit)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.Debit)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.PaidAmount)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.FreightCharge)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.Balance)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.OverPayment)
+					</th>
+					<th></th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Filter Table</h5>
+				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-agent" class="form-label mb-0">Agent Code</label>
+							<select id="filter-agent" style="width:100%">
+								<option></option>
+							</select>
+						</div>
+					</div>
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-agent-name" class="form-label mb-0">Agent Name</label>
+							<input type="text" id="filter-agent-name" class="form-control form-control-sm" readonly="readonly" />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-customer" class="form-label mb-0">Customer Code</label>
+							<select id="filter-customer" style="width:100%">
+								<option></option>
+							</select>
+						</div>
+					</div>
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-customer-name" class="form-label mb-0">Customer Name</label>
+							<input type="text" id="filter-customer-name" class="form-control form-control-sm" readonly="readonly" />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-from" class="form-label mb-0">Date Delivered From</label>
+							<input type="date" id="filter-from" class="form-control form-control-sm" />
+						</div>
+					</div>
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-to" class="control-label mb-0">Date Delivered To</label>
+							<input type="date" id="filter-to" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 
 
 @section Scripts {
-    <script>
-        // Load List on DataTable
-        var dataTable = $('.table-soa').on('preXhr.dt', function(e, settings, data) {
-            showLoader();
-        }).DataTable({
-            ajax: {
-                url: "@Url.Action("GetListJson", "Soacr")",
-                type: "POST",
-            },
-            serverSide: true,
-            filter: true,
-            columns: [
-                { data: "id", name: "Id" },
-                { data: "customerName", name: "CustomerName" },
-                { data: "type", name: "Type" },
-                { data: "soaFrom", name: "SOAFrom" },
-                { data: "soaTo", name: "SOATo" },
-                { data: "totalAmount", name: "TotalAmount" },
-                { data: "tbr", name: "TBR" },
-                { data: "credit", name: "Credit" },
-                { data: "debit", name: "Debit" },
-                { data: "paidAmount", name: "PaidAmount" },
-                { data: "freightCharge", name: "FreightCharge" },
-                { data: "balance", name: "Balance" },
-                { data: "overPayment", name: "OverPayment" },
-                {
-                    orderable: false,
-                    data: function(data, type, dataToSet) {
-                      var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-                        return actions;
-                    }
-                }
-                
-            ]
-        });
+	<script>
+		SetDateFilter();
+		function SetDateFilter() {
+			if ($("#filter-to").val() == "") {
+				if ($("#filter-from").val() == "") {
+					$("#filter-to").val(DateForInput(new Date()));
+				} else {
+					var dt_from = new Date($("#filter-from").val());
+					dt_from.setFullYear(dt_from.getFullYear() + 1);
+					$("#filter-to").val(DateForInput(dt_from));
+				}
+			}
 
-        // load functions upon datatable load
-        datatable.on("draw", function () {
-            hideLoader();
+			if ($("#filter-from").val() == "") {
+				var dt_to = new Date($("#filter-to").val());
+				dt_to.setFullYear(dt_to.getFullYear() - 1);
+				$("#filter-from").val(DateForInput(dt_to));
+			}
+		}
 
-            DatatablesSearchOnEnter('.table-soa', dataTable);
-        });
+		$("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
-      
+		var loadfilterloaded = false;
+		function LoadFilterSelect2() {
+			if (loadfilterloaded) return;
+			loadfilterloaded = true;
 
-    </script>
-    }
+			// Load Select2 for Agent
+			$("#filter-agent").select2({
+				minimumInputLength: 1,
+				allowClear: true,
+				placeholder: '<empty>',
+				templateResult: function (repo) {
+					if (repo.loading) {
+						return repo.text;
+					}
+					return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+				},
+				ajax: {
+					url: "@Url.Action("GetOptions2", "Agent")",
+					dataType: 'json',
+					type: "POST",
+					data: function (params) {
+						return {
+							search: params.term,
+							page: params.page || 1
+						};
+					},
+					processResults: function (data, params) {
+						params.page = params.page || 1;
+						return {
+							results: data.items,
+							pagination: {
+								more: (params.page * 50) < data.total_count
+							}
+						};
+					},
+					cache: true
+				},
+				dropdownParent: $("#filterModal")
+			});
+
+			$("#filter-agent").on("select2:select", function () {
+				$("#filter-agent-name").val($(this).select2("data")[0].name);
+			});
+
+			$("#filter-agent").on("select2:unselecting", function (e) {
+				$("#filter-agent-name").val("");
+			});
+
+			// Load Select2 for Customer
+			$("#filter-customer").select2({
+				minimumInputLength: 1,
+				allowClear: true,
+				placeholder: '<empty>',
+				templateResult: function (repo) {
+					if (repo.loading) {
+						return repo.text;
+					}
+					return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+				},
+				ajax: {
+					url: "@Url.Action("GetOptions", "Customer")",
+					dataType: 'json',
+					type: "POST",
+					data: function (params) {
+						return {
+							search: params.term,
+							page: params.page || 1
+						};
+					},
+					processResults: function (data, params) {
+						params.page = params.page || 1;
+						return {
+							results: data.items,
+							pagination: {
+								more: (params.page * 50) < data.total_count
+							}
+						};
+					},
+					cache: true
+				},
+				dropdownParent: $("#filterModal")
+			});
+
+			$("#filter-customer").on("select2:select", function () {
+				$("#filter-customer-name").val($(this).select2("data")[0].name);
+			});
+
+			$("#filter-customer").on("select2:unselecting", function (e) {
+				$("#filter-customer-name").val("");
+			});
+		}
+
+		$(".btnFilter").on("click", function () {
+			soaDT.ajax.reload();
+			$("#filterModal").modal("hide");
+		});
+
+		// Load List on DataTable
+		var soaDT = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
+			showLoader();
+		}).DataTable({
+			ajax: {
+				url: "@Url.Action("GetListJson")",
+				data: function (data) {
+					var agentId = $("#filter-agent").val();
+					var customerId = $("#filter-customer").val();
+
+					if (agentId) data.AgentId = agentId;
+					if (customerId) data.CustomerId = customerId;
+
+					data.DateFrom = $("#filter-from").val();
+					data.DateTo = $("#filter-to").val();
+				},
+				type: "POST",
+			},
+			serverSide: true,
+			filter: true,
+			responsive: true,
+			autoWidth: false,
+			columns: [
+				{ data: "id", name: "Id" },
+				{ data: "customerName", name: "CustomerName" },
+				{ data: "type", name: "Type" },
+				{ data: "soaFrom", name: "SOAFrom" },
+				{ data: "soaTo", name: "SOATo" },
+				{ data: "totalAmount", name: "TotalAmount" },
+				{ data: "tbr", name: "TBR" },
+				{ data: "credit", name: "Credit" },
+				{ data: "debit", name: "Debit" },
+				{ data: "paidAmount", name: "PaidAmount" },
+				{ data: "freightCharge", name: "FreightCharge" },
+				{ data: "balance", name: "Balance" },
+				{ data: "overPayment", name: "OverPayment" },
+				{
+					orderable: false,
+					data: function(data, type, dataToSet) {
+					  var actions = '<div class="btn-group" role="group">';
+						actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+						return actions;
+					}
+				}
+			],
+			order: [[4, "desc"]]
+		});
+
+		// Load functions upon DataTable load
+		soaDT.on("draw", function () {
+			hideLoader();
+
+			DatatablesSearchOnEnter('.table-soa', soaDT);
+
+			LoadFilterSelect2();
+
+
+
+
+		});
+
+
+	</script>
+ }

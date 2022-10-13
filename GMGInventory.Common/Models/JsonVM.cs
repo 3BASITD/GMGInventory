@@ -94,6 +94,27 @@ namespace GMGInventory.Common.Models
         public string CreditTerm { get; set; }
     }
 
+    public class JsonInvoiceOptionsModel
+    {
+        public string Id { get; set; }
+        public string Customer { get; set; }
+        public string InvoiceNumber { get; set; }
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal TotalAmountD { get; set; }
+        public string TBR => string.Format(SystemFormat.StringDecimalComma, TBRD);
+        public decimal? TBRD { get; set; }
+        public string Credit => string.Format(SystemFormat.StringDecimalComma, CreditD);
+        public decimal? CreditD { get; set; }
+        public string Debit => string.Format(SystemFormat.StringDecimalComma, DebitD);
+        public decimal? DebitD { get; set; }
+        public string PaidAmount => string.Format(SystemFormat.StringDecimalComma, PaidAmountD);
+        public decimal? PaidAmountD { get; set; }
+        public string FreightCharge => string.Format(SystemFormat.StringDecimalComma, FreightChargeD);
+        public decimal? FreightChargeD { get; set; }
+        public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
+        public decimal? BalanceD { get; set; }
+    }
+
     public class JsonPurchaseOrderOptionsModel
     {
         public string Id { get; set; }

@@ -220,47 +220,6 @@
     </div>
 </div>
 
-<!-- Details Modal -->
-<div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Agent Details</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Code</dt>
-                    <dd class="col-sm-8 modal-detail-code"></dd>
-                    <dt class="col-sm-4">First Name</dt>
-                    <dd class="col-sm-8 modal-detail-firstname"></dd>
-                    <dt class="col-sm-4">Middle Name</dt>
-                    <dd class="col-sm-8 modal-detail-middlename"></dd>
-                    <dt class="col-sm-4">Last Name</dt>
-                    <dd class="col-sm-8 modal-detail-lastname"></dd>
-                    <dt class="col-sm-4">Area</dt>
-                    <dd class="col-sm-8 modal-detail-area"></dd>
-                    <dt class="col-sm-4">Active</dt>
-                    <dd class="col-sm-8 modal-detail-isactive"></dd>
-                    <dt class="col-sm-4">User Created</dt>
-                    <dd class="col-sm-8 modal-detail-usercreated"></dd>
-                    <dt class="col-sm-4">Date Created</dt>
-                    <dd class="col-sm-8 modal-detail-datecreated"></dd>
-                    <dt class="col-sm-4">User Modified</dt>
-                    <dd class="col-sm-8 modal-detail-usermodified"></dd>
-                    <dt class="col-sm-4">Date Modified</dt>
-                    <dd class="col-sm-8 modal-detail-datemodified"></dd>
-                </dl>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
 
@@ -307,7 +266,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions +=  '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-question-circle"></i></a>';
                         if (data.isActive) {
                             actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                             actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Agent" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
