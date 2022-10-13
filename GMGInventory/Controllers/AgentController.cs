@@ -50,12 +50,22 @@ namespace GMGInventory.Controllers
             return Json(await agentRepository.GetAllForDataTablesAsync(form, filter));
         }
 
-        //[HttpPost]
-        //public async Task<JsonResult> GetListJson()
-        //{
-        //    DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
-        //    return Json(await agentRepository.GetListDTAsync(dtForm));
-        //}
+        public ActionResult Details(int id)
+        {
+            var agent = agentRepository.GetAgentDtlVM(id);
+            if (agent == null)
+            {
+                return NotFound();
+            }
+            return View(agent);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetDetailsJson(int id)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await agentRepository.GetAgentDTAsync(form, id));
+        }
 
         [HttpPost]
         public async Task<JsonResult> CreateJson(AgentVM agentVM)

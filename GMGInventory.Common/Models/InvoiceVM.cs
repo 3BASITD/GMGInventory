@@ -33,6 +33,35 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Status")]
         public string Status { get; set; }
+
+        [Display(Name = "TBR")]
+        public string TBR => string.Format(SystemFormat.StringDecimalComma, TBRD);
+
+        public decimal? TBRD { get; set; }
+
+        [Display(Name = "Credit")]
+        public string Credit => string.Format(SystemFormat.StringDecimalComma, CreditD);
+
+        public decimal? CreditD { get; set; }
+
+        [Display(Name = "Debit")]
+        public string Debit => string.Format(SystemFormat.StringDecimalComma, DebitD);
+
+        public decimal? DebitD { get; set; }
+
+        [Display(Name = "Paid Amount")]
+        public string PaidAmount => string.Format(SystemFormat.StringDecimalComma, PaidAmountD);
+
+        public decimal? PaidAmountD { get; set; }
+
+        [Display(Name = "Freight Charge")]
+        public string FreightCharge => string.Format(SystemFormat.StringDecimalComma, FreightChargeD);
+
+        public decimal? FreightChargeD { get; set; }
+
+        [Display(Name = "Balance")]
+        public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
+        public decimal? BalanceD { get; set; }
     }
 
     public class InvoiceDetailsVM

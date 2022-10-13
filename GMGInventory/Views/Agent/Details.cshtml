@@ -1,0 +1,247 @@
+﻿@model AgentVM
+
+@{
+    ViewData["Title"] = "Agent Details";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Agent" asp-action="Index">Agents</a></li>
+}
+
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-3">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Code)
+                        </span>
+                        <b class="d-block">
+                            @Model?.Code
+                        </b>
+                    </p>
+
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.UserCreated)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model?.UserCreated) ? "-" : Model?.UserCreated)
+                    </b>
+                </p>
+
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Area)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model?.Area) ? "-" : Model?.Area)
+                    </b>
+                </p>
+
+            </div>
+            <div class="col-3">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.FirstName)
+                        </span>
+                        <b class="d-block">
+                            @(string.IsNullOrWhiteSpace(Model?.FirstName) ? "-" : Model?.FirstName)
+                        </b>
+                    </p>
+                
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model?.DateCreated) ? "-" : Model?.DateCreated)
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.IsActive)
+                    </span>
+                    <b class="d-block">
+                         
+                    @if (Model?.IsActive == true)
+           
+                            {
+                                <span class="fas fa-check text-success"></span>
+                            }
+                            else
+                            {
+                                <span class="fas fa-times text-danger"></span>
+                            }
+                    </b>
+                </p>
+           
+            </div>
+            <div class="col-3">
+
+                <p class="text-sm">
+                    <span class="text-muted">
+                         @Html.DisplayNameFor(model => model.MiddleName)
+                        </span>
+                        <b class="d-block">
+                            @(string.IsNullOrWhiteSpace(Model?.MiddleName) ? "-" : Model?.MiddleName)
+                    </b>
+                </p>
+
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.UserModified)
+                    </span>
+                    <b class="d-block">
+                        @Model?.UserModified
+                    </b>
+                </p>
+
+
+            </div>
+
+            <div class="col-3">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.LastName)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model?.LastName) ? "-" : Model?.LastName)
+                    </b>
+                </p>
+
+               <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateModified)
+                    </span>
+                    <b class="d-block">
+                        @Model?.DateModified
+                    </b>
+                </p>
+
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-danger card-tabs">
+                    <div class="card-header p-0 pt-1 pl-2">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-customers">
+                                <a class="nav-link active" id="nav-customers-tab" data-toggle="pill" role="tab"
+                                   data-bs-toggle="tab" data-bs-target="#nav-customers"
+                                   aria-controls="nav-customers" aria-selected="true">
+                                    Customers
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="nav-customers" role="tabpanel"
+                                 aria-labelledby="nav-customers-tab">
+                                <table class="table table-head-fixed table-striped table-hover table-customers">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Address</th>
+                                            <th>Email</th>
+                                            <th>Contact Number</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+          
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts {
+    <script>
+
+
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var selectedTab = e.currentTarget.dataset.bsTarget;
+            if (selectedTab == "#nav-customers") customersDT.ajax.reload();
+        });
+
+        var loaderDisplayed = [];
+
+        function ShowLoader(mod) {
+            if (loaderDisplayed.length === 0) {
+                showLoader();
+            }
+            loaderDisplayed.push(mod);
+        }
+
+        function HideLoader(mod) {
+            loaderDisplayed = loaderDisplayed.filter(s => s !== mod);
+            if (loaderDisplayed.length === 0) {
+                hideLoader();
+            }
+        }
+
+
+
+
+
+        //Customer Details
+        var customersDT = $('.table-customers').on('preXhr.dt', function (e, settings, data) {
+            ShowLoader("customers");
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetDetailsJson")",
+                type: "POST",
+                data: function (data) {
+                    data.Id = @Model?.Id;
+                }
+            },
+            searchDelay: 1000,
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "customerName", name: "CustomerName" },
+                { data: "customerAddress", name: "CustomerAddress" },
+                { data: "customerEmail", name: "CustomerEmail" },
+                { data: "customerContactNo", name: "CustomerContactNo" },
+
+            ],
+            order: [[0, "asc"]]
+        }).on("draw.dt", function () {
+            $('.table-customers .dataTables_filter input').unbind();
+            $('.table-customers .dataTables_filter input').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    customersDT.search($(this).val()).draw();
+                }
+            });
+
+            HideLoader("customers");
+
+        });
+
+
+
+    </script>
+}

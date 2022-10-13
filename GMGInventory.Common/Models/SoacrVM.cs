@@ -1,13 +1,25 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GMGInventory.Common.Constants;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
+    public class SoaFilterVM : ListFilterCommonModel
+    {
+        [Display(Name = "Customer")]
+        public int? CustomerId { get; set; }
+        public SelectList? Customers { get; set; }
+
+        [Display(Name = "Agent")]
+        public int? AgentId { get; set; }
+        public SelectList? Agents { get; set; }
+    }
     public class SoacrVM
     {
-        [Display(Name = "Counter Receipt #")]
+        [Display(Name = "SOA/CR #")]
         public int Id { get; set; }
 
-        [Display(Name = "SOA/CR #")]
+        [Display(Name = "Counter Receipt #")]
 
         public string CRNumber { get; set; }
 
@@ -20,54 +32,72 @@ namespace GMGInventory.Common.Models
         public string Type { get; set; }
 
         [Display(Name = "Date From")]
-
-        public string? SOAFrom { get; set; }
+        public string SOAFrom => SOAFromD == null ? "-" : SOAFromD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? SOAFromD { get; set; }
 
         [Display(Name = "Date To")]
+        public string SOATo => SOAToD == null ? "-" : SOAToD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? SOAToD { get; set; }
 
-        public string? SOATo { get; set; }
+        [Display(Name = "Total Amount")]
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
 
-        [Display(Name = "Total Amnt")]
-        public string? TotalAmount { get; set; }
+        public decimal? TotalAmountD { get; set; }
 
         [Display(Name = "TBR")]
-        public string TBR { get; set; }
+        public string TBR => string.Format(SystemFormat.StringDecimalComma, TBRD);
+
+        public decimal? TBRD { get; set; }
 
         [Display(Name = "Credit")]
-        public string Credit { get; set; }
+        public string Credit => string.Format(SystemFormat.StringDecimalComma, CreditD);
+
+        public decimal? CreditD { get; set; }
 
         [Display(Name = "Debit")]
-        public string Debit { get; set; }
+        public string Debit => string.Format(SystemFormat.StringDecimalComma, DebitD);
 
-        [Display(Name = "Paid Amnt")]
-        public string PaidAmount { get; set; }
+        public decimal? DebitD { get; set; }
+
+        [Display(Name = "Paid Amount")]
+        public string PaidAmount => string.Format(SystemFormat.StringDecimalComma, PaidAmountD);
+
+        public decimal? PaidAmountD { get; set; }
 
         [Display(Name = "Freight Charge")]
-        public string FreightCharge { get; set; }
+        public string FreightCharge => string.Format(SystemFormat.StringDecimalComma, FreightChargeD);
+
+        public decimal? FreightChargeD { get; set; }
 
         [Display(Name = "Balance")]
-        public decimal? Balance { get; set; }
+        public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
+        public decimal? BalanceD { get; set; }
 
         [Display(Name = "Over Payment")]
-        public string? OverPayment { get; set; }
+        public string? OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
+
+        public decimal OverPaymentD { get; set; }
+
+        //Invoices
+
+        [Display(Name = "Invoice Date")]
+        public string InvoiceDate => InvoiceDateD == null ? "-" : InvoiceDateD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? InvoiceDateD { get; set; }
 
         [Display(Name = "Invoice No")]
         public string InvoiceNumber { get; set; }
 
-        [Display(Name = "Invoice Amnt")]
-        public string InvoiceAmount { get; set; }
+        [Display(Name = "Invoice Type")]
+        public string InvoiceType { get; set; }
+
+        [Display(Name = "Invoice Amount")]
+        public string? InvoiceAmount => string.Format(SystemFormat.StringDecimalComma, InvoiceAmountD);
+        public decimal InvoiceAmountD { get; set; }
 
 
 
 
     }
 
-    //public class UnservedItemFilter
-    //{
-    //    public DateTime StartDate { get; set; } = DateTime.Now;
-    //    public DateTime EndDate { get; set; } = DateTime.Now;
-    //    public int? CategoryId { get; set; }
-    //    public int? ItemTypeId { get; set; }
-    //    public int? BrandId { get; set; }
-    //}
+
 }

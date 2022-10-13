@@ -19,6 +19,40 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
+
+        public async Task<Select2Model<JsonInvoiceOptionsModel>> GetOptions(string search, int page)
+        {
+          
+            var invoices = from inv in context.Invoices
+                        join soali in context.SOACRLineItems
+                                   on inv.Id equals soali.InvoiceId
+                        join soacr in context.SOACRs
+                                   on soali.SOACRId equals soacr.Id into soacrs
+                        from soacrsGroup in soacrs.DefaultIfEmpty()
+                        where  (string.IsNullOrWhiteSpace(search)
+                           || inv.InvoiceNumber.ToLower().Contains(search.ToLower()))
+                        select new JsonInvoiceOptionsModel
+                        {
+                            Id = inv.Id.ToString(),
+                            Customer = soacrsGroup.Customer.Name,
+                            InvoiceNumber = inv.InvoiceNumber,
+                            TotalAmountD = inv.Amount,
+                            TBRD = soali.TBRAmount,
+                            CreditD = soali.CreditAmount,
+                            DebitD = soali.DebitAmount,
+                            PaidAmountD = soali.PaidAmount,
+                            FreightChargeD = soali.FreightCost,
+                            BalanceD = soali.Balance
+                        };
+            var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonInvoiceOptionsModel>
+            {
+                //incomplete_results = false,
+                items = invoicesFiltered,
+                total_count = invoices.Count()
+            };
+        }
+
         public async Task<InvoiceDetailsVM?> GetDetailsAsync(int? Id)
         {
             var invoiceVM = (from invoice in context.Invoices

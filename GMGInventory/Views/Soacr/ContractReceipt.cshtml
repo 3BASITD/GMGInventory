@@ -1,0 +1,190 @@
+﻿@model IEnumerable<InvoiceVM>
+
+@{
+	ViewData["Title"] = "Contract Receipt";
+}
+
+<div class="card card-default">
+	<div class="card-header">
+		<span class="card-title">@ViewData["Title"]</span>
+		<div class="card-tools">
+@*			<button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+				<span class="fas fa-filter"></span> Generate SOA
+			</button>*@
+			<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+				<span class="fas fa-file-alt"></span> Filter
+			</button>
+		</div> 
+	</div>
+	<div class="card-body">
+		<table class="table table-head-fixed table-striped table-hover table-soa">
+			<thead>
+				<tr>
+					<th>
+						@Html.DisplayNameFor(model => model.InvoiceDate)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.InvoiceNumber)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.InvoiceType)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.TotalAmount)
+					</th>
+					<th></th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Filter Table</h5>
+				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-customer" class="form-label mb-0">Customer Code</label>
+							<select id="filter-customer" style="width:100%">
+								<option></option>
+							</select>
+						</div>
+					</div>
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-customer-name" class="form-label mb-0">Customer Name</label>
+							<input type="text" id="filter-customer-name" class="form-control form-control-sm" readonly="readonly" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+@section Scripts {
+	<script>
+
+
+		var loadfilterloaded = false;
+		function LoadFilterSelect2() {
+			if (loadfilterloaded) return;
+			loadfilterloaded = true;
+
+
+			// Load Select2 for Customer
+			$("#filter-customer").select2({
+				minimumInputLength: 1,
+				allowClear: true,
+				placeholder: '<empty>',
+				templateResult: function (repo) {
+					if (repo.loading) {
+						return repo.text;
+					}
+					return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+				},
+				ajax: {
+					url: "@Url.Action("GetOptions", "Customer")",
+					dataType: 'json',
+					type: "POST",
+					data: function (params) {
+						return {
+							search: params.term,
+							page: params.page || 1
+						};
+					},
+					processResults: function (data, params) {
+						params.page = params.page || 1;
+						return {
+							results: data.items,
+							pagination: {
+								more: (params.page * 50) < data.total_count
+							}
+						};
+					},
+					cache: true
+				},
+				dropdownParent: $("#filterModal")
+			});
+
+			$("#filter-customer").on("select2:select", function () {
+				$("#filter-customer-name").val($(this).select2("data")[0].name);
+			});
+
+			$("#filter-customer").on("select2:unselecting", function (e) {
+				$("#filter-customer-name").val("");
+			});
+		}
+
+		$(".btnFilter").on("click", function () {
+			soaDT.ajax.reload();
+			$("#filterModal").modal("hide");
+		});
+
+		// Load List on DataTable
+		var soaDT = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
+			showLoader();
+		}).DataTable({
+			ajax: {
+				url: "@Url.Action("GetContractReceiptJson")",
+				data: function (data) {
+					var customerId = $("#filter-customer").val();
+
+					if (customerId) data.CustomerId = customerId;
+
+				},
+				type: "POST",
+			},
+			serverSide: true,
+			filter: true,
+			responsive: true,
+			autoWidth: false,
+			columns: [
+				{ data: "invoiceDate", name: "InvoiceDate" },
+				{ data: "invoiceNumber", name: "InvoiceNumber" },
+				{ data: "invoiceType", name: "InvoiceType" },
+				{ data: "totalAmount", name: "TotalAmount" },
+				{
+					orderable: false,
+					data: function(data, type, dataToSet) {
+					  var actions = '<div class="btn-group" role="group">';
+						actions += '<a class="btn btn-info btn-xs" asp-action="ContractReceiptDetails" href="@Url.Action("ContractReceiptDetails")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+						return actions;
+					}
+				}
+			],
+			order: [[1, "desc"]]
+		});
+
+		// Load functions upon DataTable load
+		soaDT.on("draw", function () {
+			hideLoader();
+
+			DatatablesSearchOnEnter('.table-soa', soaDT);
+
+			LoadFilterSelect2();
+
+
+
+
+		});
+
+
+
+
+	</script>
+ }
