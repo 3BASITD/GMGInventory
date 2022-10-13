@@ -50,10 +50,10 @@ namespace GMGInventory.Controllers
                                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy")
                                        + ")");
             dt.Columns.AddRange(new DataColumn[4] {
-                new DataColumn(chelper.DisplayName<CreditDebitMemoVM>("MemoDate")),
-                new DataColumn(chelper.DisplayName<CreditDebitMemoVM>("MemoNumber")),
-                new DataColumn(chelper.DisplayName<CreditDebitMemoVM>("Customer")),
-                new DataColumn(chelper.DisplayName<CreditDebitMemoVM>("Amount"))
+                new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoDate")),
+                new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoNumber")),
+                new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Customer")),
+                new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Amount"))
             });
             var credits = await reportAccountingRepository.GetCreditMemo(filter);
             foreach (var credit in credits)
@@ -103,12 +103,12 @@ namespace GMGInventory.Controllers
                                        + "-"
                                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy")
                                        + ")");
-            CreditDebitMemoVM debitVM = new CreditDebitMemoVM();
+            CreditDebitMemoRVM debitVM = new CreditDebitMemoRVM();
             dt.Columns.AddRange(new DataColumn[4] {
-                new DataColumn(chelper.DisplayName<CreditDebitMemoVM>("MemoDate")),
-                new DataColumn(chelper.DisplayName<CreditDebitMemoVM>("MemoNumber")),
-                new DataColumn(chelper.DisplayName<CreditDebitMemoVM>("Customer")),
-                new DataColumn(chelper.DisplayName<CreditDebitMemoVM>("Amount"))
+                new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoDate")),
+                new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoNumber")),
+                new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Customer")),
+                new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Amount"))
             });
             var debits = await reportAccountingRepository.GetCreditMemo(filter);
             foreach (var debit in debits)

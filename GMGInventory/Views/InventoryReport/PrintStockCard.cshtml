@@ -1,0 +1,74 @@
+﻿@model StockCardPVM
+
+@{
+    Layout = "";
+    var title = "Stock Card";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Item</strong>
+        <span>@Model.Item</span>
+        <br />
+        <strong>Date From</strong>
+        <span>@Model.DateFrom</span>
+        <br />
+        <strong>Date To</strong>
+        <span>@Model.DateTo</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cards.First().Item)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cards.First().TransactionType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cards.First().DetailsRemarks)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cards.First().Date)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cards.First().In)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cards.First().Out)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Cards)
+            {
+                <tr>
+                    <td>@item.Item</td>
+                    <td>@item.TransactionType</td>
+                    <td>@item.DetailsRemarks</td>
+                    <td><nobr>@item.Date</nobr></td>
+                    <td class="right-text"><nobr>@item.In</nobr></td>
+                    <td class="right-text"><nobr>@item.Out</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalInQuantity</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalOutQuantity</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

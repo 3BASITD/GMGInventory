@@ -67,6 +67,18 @@ select.form-control-sm ~ .select2-container--default .select2-selection--single 
     border: 1px solid #6c757d;
 }
 
+.dark-mode .table tr th {
+    background-color: #3f474e;
+}
+
+.dark-mode .table tfoot tr th {
+    border-bottom-color: #6c757d !important;
+}
+
+.table tfoot tr th {
+    border-bottom-color: #dee2e6 !important;
+}
+
 button .fas, button .far,
 a .fas, a .far {
     margin-right: 5px;

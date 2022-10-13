@@ -46,7 +46,8 @@ namespace GMGInventory.Application.Repositories
                         let inventory = context.ItemInventories.Where(s => s.ItemId == item.Id).Sum(s => s.Quantity)
                         where item.IsActive == true
                            && (string.IsNullOrWhiteSpace(search)
-                           || item.Code.ToLower().Contains(search.ToLower()))
+                           || item.Code.ToLower().Contains(search.ToLower())
+                           || item.Name.ToLower().Contains(search.ToLower()))
                         select new JsonItemOptionsModel
                         {
                             Id = item.Id.ToString(),

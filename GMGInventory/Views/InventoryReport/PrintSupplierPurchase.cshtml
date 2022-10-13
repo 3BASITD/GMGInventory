@@ -1,0 +1,91 @@
+﻿@model SupplierPurchasePVM
+
+@{
+    Layout = "";
+    var title = "Supplier Purchase History";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Brand</strong>
+        <span>@Model.Brand</span>
+        <br />
+        <strong>Item</strong>
+        <span>@Model.Item</span>
+        <br />
+        <strong>Supplier</strong>
+        <span>@Model.Supplier</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().PurchaseDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().Supplier)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().Brand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().ItemCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().Unit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().Currency)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().UnitPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchases.First().TotalPrice)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Purchases)
+            {
+                <tr>
+                    <td><nobr>@item.PurchaseDate</nobr></td>
+                    <td><nobr>@item.Supplier</nobr></td>
+                    <td><nobr>@item.Brand</nobr></td>
+                    <td>@item.ItemCode</td>
+                    <td>@item.ItemName</td>
+                    <td><nobr>@item.Unit</nobr></td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td><nobr>@item.Currency</nobr></td>
+                    <td class="right-text"><nobr>@item.UnitPrice</nobr></td>
+                    <td class="right-text"><nobr>@item.TotalPrice</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalQuantity</nobr></th>
+                <th colspan="2"></th>
+                <th class="right-text"><nobr>@Model.TotalPrice</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

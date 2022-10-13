@@ -1,0 +1,87 @@
+﻿@model StockStatusPVM
+
+@{
+    Layout = "";
+    var title = "Stock Status";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Brand</strong>
+        <span>@Model.Brand</span>
+        <br />
+        <strong>Item</strong>
+        <span>@Model.Item</span>
+        <br />
+        <strong>Warehouse</strong>
+        <span>@Model.Warehouse</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().Brand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().ItemType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().ItemCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().PartNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().Unit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().QuantityOnHand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().UnitCost)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stocks.First().TotalCost)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Stocks)
+            {
+                <tr>
+                    <td><nobr>@item.Brand</nobr></td>
+                    <td><nobr>@item.ItemType</nobr></td>
+                    <td>@item.ItemCode</td>
+                    <td>@item.ItemName</td>
+                    <td>@item.PartNumber</td>
+                    <td><nobr>@item.Unit</nobr></td>
+                    <td class="right-text"><nobr>@item.QuantityOnHand</nobr></td>
+                    <td class="right-text"><nobr>@item.UnitCost</nobr></td>
+                    <td class="right-text"><nobr>@item.TotalCost</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalQuantity</nobr></th>
+                <th></th>
+                <th class="right-text"><nobr>@Model.TotalCost</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>
