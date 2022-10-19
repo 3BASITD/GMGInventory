@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
 using GMGInventory.Common.Models;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using ClosedXML.Excel;
 using GMGInventory.Helpers;
-using GMGInventory.Application.Repositories;
+using GMGInventory.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -26,12 +22,287 @@ namespace GMGInventory.Controllers
         }
 
         //"AgentSalesPerItem", "BrandSalesReport", "BestSellingItem", "BestSellingItemInvoice",
-        //"CommissionReport", "CustomerSalesAnalysisReport", "CustomerSalesReport", "DailySalesReport",
+        //"CommissionReport", "CustomerSalesAnalysisReport", "CustomerSalesRanking", "DailySalesReport",
         //"DailySalesMarginReport", "SalesInvoiceListingReport", "SalesAgentArea", "SalesMarginItem",
         //"SalesReportBasis", "SalesReturnListingReport", "UnservedItem"
 
 
-        #region Sales Report by Customer
+        #region Agent Sales per Item
+        public IActionResult AgentSalesPerItem()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintAgentSalesPerItem(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintAgentSalesPerItem(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetAgentSalesPerItemDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetAgentSalesPerItemDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadAgentSalesPerItem(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Agent Sales per Item");
+            dt.Columns.AddRange(new DataColumn[8] {
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Agent")),
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("ItemType")),
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("ItemCode")),
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("ItemName")),
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Quantity")),
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Price")),
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Amount"))
+            });
+            var sales = await reportSalesRepository.GetAgentSalesPerItem(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.Agent,
+                            sale.Brand,
+                            sale.ItemType,
+                            sale.ItemCode,
+                            sale.ItemName,
+                            sale.Quantity,
+                            sale.Price,
+                            sale.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Agent Sales per Item.xlsx");
+                }
+            }
+        }
+        #endregion
+
+        #region Brand Sales
+        public IActionResult BrandSales()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintBrandSales(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintBrandSales(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetBrandSalesDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetBrandSalesDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadBrandSales(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Brand Sales");
+            dt.Columns.AddRange(new DataColumn[4] {
+                new DataColumn(chelper.DisplayName<BrandSalesRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<BrandSalesRVM>("AgentCode")),
+                new DataColumn(chelper.DisplayName<BrandSalesRVM>("AgentName")),
+                new DataColumn(chelper.DisplayName<BrandSalesRVM>("Amount"))
+            });
+            var sales = await reportSalesRepository.GetBrandSales(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.Brand,
+                            sale.AgentCode,
+                            sale.AgentName,
+                            sale.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Brand Sales.xlsx");
+                }
+            }
+        }
+        #endregion
+
+        #region Best Selling Item
+        public IActionResult BestSellingItem()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintBestSellingItem(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintBestSellingItem(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetBestSellingItemDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetBestSellingItemDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadBestSellingItem(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Best Selling Item (" + filter.Basis + ")");
+            dt.Columns.AddRange(new DataColumn[7] {
+                new DataColumn(chelper.DisplayName<BestSellingItemRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<BestSellingItemRVM>("ItemCode")),
+                new DataColumn(chelper.DisplayName<BestSellingItemRVM>("ItemName")),
+                new DataColumn(chelper.DisplayName<BestSellingItemRVM>("PartNumber")),
+                new DataColumn(chelper.DisplayName<BestSellingItemRVM>("Unit")),
+                new DataColumn(filter.Basis == "Quantity" ? chelper.DisplayName<BestSellingItemRVM>("Quantity") : chelper.DisplayName<BestSellingItemRVM>("UnitPrice")),
+                new DataColumn(filter.Basis == "Quantity" ? chelper.DisplayName<BestSellingItemRVM>("CurrentQuantity") : chelper.DisplayName<BestSellingItemRVM>("Amount"))
+            });
+            var sales = await reportSalesRepository.GetBestSellingItem(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.Brand,
+                            sale.ItemCode,
+                            sale.ItemName,
+                            sale.PartNumber,
+                            sale.Unit,
+                            filter.Basis == "Quantity" ? sale.Quantity : sale.UnitPrice,
+                            filter.Basis == "Quantity" ? sale.CurrentQuantity : sale.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Best Selling Item (" + filter.Basis + ").xlsx");
+                }
+            }
+        }
+        #endregion
+
+        #region Commission
+        public IActionResult Commission()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintCommission(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintCommission(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetCommissionDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetCommissionDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadCommission(ListFilterSalesModel filter)
+        {
+            DataTable dt = new ("Commission");
+            dt.Columns.AddRange(new DataColumn[7] {
+                new DataColumn(chelper.DisplayName<CommissionRVM>("InvoiceDate")),
+                new DataColumn(chelper.DisplayName<CommissionRVM>("InvoiceNumber")),
+                new DataColumn(chelper.DisplayName<CommissionRVM>("Customer")),
+                new DataColumn(chelper.DisplayName<CommissionRVM>("Agent")),
+                new DataColumn(chelper.DisplayName<CommissionRVM>("CommissionRate")),
+                new DataColumn(chelper.DisplayName<CommissionRVM>("InvoiceAmount")),
+                new DataColumn(chelper.DisplayName<CommissionRVM>("CommissionAmount"))
+            });
+            var sales = await reportSalesRepository.GetCommission(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.InvoiceDate,
+                            sale.InvoiceNumber,
+                            sale.Customer,
+                            sale.Agent,
+                            sale.CommissionRate,
+                            sale.InvoiceAmount,
+                            sale.CommissionAmount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Commission.xlsx");
+                }
+            }
+        }
+        #endregion
+
+        #region Customer Sales Ranking
+        public IActionResult CustomerSalesRanking()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintCustomerSalesRanking(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintCustomerSalesRanking(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetCustomerSalesRankingDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetCustomerSalesRankingDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadCustomerSalesRanking(ListFilterSalesModel filter)
+        {
+            DataTable dt = new("Customer Sales Ranking");
+            dt.Columns.AddRange(new DataColumn[4] {
+                new DataColumn(chelper.DisplayName<CustomerSalesRankingRVM>("Rank")),
+                new DataColumn(chelper.DisplayName<CustomerSalesRankingRVM>("CustomerCode")),
+                new DataColumn(chelper.DisplayName<CustomerSalesRankingRVM>("CustomerName")),
+                new DataColumn(chelper.DisplayName<CustomerSalesRankingRVM>("Amount"))
+            });
+            var sales = await reportSalesRepository.GetCustomerSalesRanking(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.Rank,
+                            sale.CustomerCode,
+                            sale.CustomerName,
+                            sale.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Customer Sales Ranking.xlsx");
+                }
+            }
+        }
+        #endregion
+
+        #region Customer Sales
         public IActionResult CustomerSales()
         {
             return View();
@@ -57,10 +328,10 @@ namespace GMGInventory.Controllers
                                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             CreditDebitMemoRVM debitVM = new CreditDebitMemoRVM();
             dt.Columns.AddRange(new DataColumn[4] {
-                new DataColumn(chelper.DisplayName<SalesCustomerRVM>("CustomerCode")),
-                new DataColumn(chelper.DisplayName<SalesCustomerRVM>("CustomerName")),
-                new DataColumn(chelper.DisplayName<SalesCustomerRVM>("Brand")),
-                new DataColumn(chelper.DisplayName<SalesCustomerRVM>("Amount"))
+                new DataColumn(chelper.DisplayName<CustomerSalesRVM>("CustomerCode")),
+                new DataColumn(chelper.DisplayName<CustomerSalesRVM>("CustomerName")),
+                new DataColumn(chelper.DisplayName<CustomerSalesRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<CustomerSalesRVM>("Amount"))
             });
             var debits = await reportSalesRepository.GetCustomerSales(filter);
             foreach (var debit in debits)
@@ -84,6 +355,123 @@ namespace GMGInventory.Controllers
             }
         }
         #endregion
+
+        #region Daily Sales
+        public IActionResult DailySales()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintDailySales(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintDailySales(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetDailySalesDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetDailySalesDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadDailySales(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Daily Sales");
+            dt.Columns.AddRange(new DataColumn[8] {
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("InvoiceDate")),
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("InvoiceNumber")),
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("CustomerCode")),
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("CustomerName")),
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("Agent")),
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("Term")),
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("CommissionRate")),
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("Amount"))
+            });
+            var sales = await reportSalesRepository.GetDailySales(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.InvoiceDate,
+                            sale.InvoiceNumber,
+                            sale.CustomerCode,
+                            sale.CustomerName,
+                            sale.Agent,
+                            sale.Term,
+                            sale.CommissionRate,
+                            sale.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Daily Sales.xlsx");
+                }
+            }
+        }
+        #endregion
+
+        #region Sales by Agent-Area
+        public IActionResult SalesAgentArea()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintSalesAgentArea(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintSalesAgentArea(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetSalesAgentAreaDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetSalesAgentAreaDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadSalesAgentArea(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Sales by Agent-Area");
+            dt.Columns.AddRange(new DataColumn[5] {
+                new DataColumn(chelper.DisplayName<SalesAgentAreaRVM>("AgentCode")),
+                new DataColumn(chelper.DisplayName<SalesAgentAreaRVM>("AgentName")),
+                new DataColumn(chelper.DisplayName<SalesAgentAreaRVM>("Area")),
+                new DataColumn(chelper.DisplayName<SalesAgentAreaRVM>("Sales")),
+                new DataColumn(chelper.DisplayName<SalesAgentAreaRVM>("PercentSales"))
+            });
+            var sales = await reportSalesRepository.GetSalesAgentArea(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.AgentCode,
+                            sale.AgentName,
+                            sale.Area,
+                            sale.Sales,
+                            sale.PercentSales);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Sales by Agent-Area.xlsx");
+                }
+            }
+        }
+        #endregion
+
+
+
+
+
 
         #region Unserved Items
         public IActionResult UnservedItem()

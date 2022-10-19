@@ -1,8 +1,8 @@
-﻿@model SalesCustomerPVM
+﻿@model CustomerSalesPVM
 
 @{
     Layout = "";
-    var title = "Sales Report by Customer";
+    var title = "Customer Sales";
 }
 
 <!DOCTYPE html>
@@ -65,4 +65,8 @@
         </tfoot>
     </table>
 </body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
 </html>

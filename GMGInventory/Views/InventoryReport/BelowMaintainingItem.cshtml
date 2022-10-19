@@ -196,7 +196,7 @@
             footerCallback: function (row, data, start, end, display) {
                 var json = quantityDT.ajax.json();
                 var api = this.api(), data;
-                
+
                 $(api.column(5).footer()).html(FormatStringDecimal(json.totalQuantity));
                 $(api.column(6).footer()).html(FormatStringDecimal(json.totalQuantity2));
             },
@@ -232,13 +232,15 @@
             var urlQuery = [];
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
             if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
-            let win = window.open('@Url.Action("PrintBelowMaintaining")?' + urlQuery.join("&"), '');
-
-            $(win).on("pageshow", function () {
-                win.print();
-                win.close();
-                hideLoader();
-            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintBelowMaintaining")?' + urlQuery.join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         });
     </script>
     }

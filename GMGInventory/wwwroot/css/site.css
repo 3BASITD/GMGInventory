@@ -1,10 +1,17 @@
 /*html { -moz-transform: scale(1.0, 1.0); zoom: 1.0; zoom: 100%; }*/
-    html { -moz-transform: scale(0.9, 0.9); zoom: 0.9; zoom: 90%; }
+body { zoom: 100%; }
 @media only screen and (min-width: 992px) {
-    html { -moz-transform: scale(0.9, 0.9); zoom: 0.9; zoom: 90%; }
+    body { zoom: 90%; }
+    /*html { -moz-transform: scale(0.9, 0.9); zoom: 0.9; zoom: 90%; }*/
     .main-sidebar { height: 111vh; }
     .layout-fixed .wrapper .sidebar { height: calc(111vh - (3.5rem + 1px)); }
     .text-sm, .input-group-sm>.btn, .input-group-sm>.form-control, .input-group-sm>.form-select, .input-group-sm>.input-group-text { font-size: .86rem !important; }
+}
+
+.zoom-ignore {
+    zoom: 111%;
+    position: relative;
+    left: -5.5%;
 }
 
 .modal-backdrop {

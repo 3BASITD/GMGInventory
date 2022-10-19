@@ -321,7 +321,7 @@
             @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager)
            || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
             {
-                var navSalesReportActive = (new List<string> { "AgentSalesPerItem", "BrandSalesReport", "BestSellingItem", "BestSellingItemInvoice", "CommissionReport", "CustomerSalesAnalysisReport", "CustomerSales", "DailySalesReport", "DailySalesMarginReport", "SalesInvoiceListingReport", "SalesAgentArea", "SalesMarginItem", "SalesReportBasis", "SalesReturnListingReport", "UnservedItem" }).Contains(currentAction ?? "");
+                var navSalesReportActive = (new List<string> { @*"AgentSalesPerItem",*@ "BrandSales", "BestSellingItem", @*"BestSellingItemInvoice",*@ "Commission", "CustomerSalesRanking", @*"CustomerSalesAnalysis",*@ "CustomerSales", "DailySales", "DailySalesMargin", "SalesInvoiceListing", "SalesAgentArea", "SalesMarginItem", "SalesReportBasis", "SalesReturnListing", "UnservedItem" }).Contains(currentAction ?? "");
 
                 <li class="nav-item @(navSalesReportActive ? "menu-open" : "")">
                     <a href="#" class="nav-link @(navSalesReportActive ? "active": "")">
@@ -332,7 +332,7 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-                        @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
+                        @*@if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
                        || User.IsInRole(Roles.SystemAdmin))
                         {
                             <li class="nav-item">
@@ -342,15 +342,15 @@
                                     <p>Agent Sales per Items</p>
                                 </a>
                             </li>
-                        }
+                        }*@
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
                        || User.IsInRole(Roles.SystemAdmin))
                         {
                             <li class="nav-item">
-                                <a class="nav-link @(currentController=="SalesReport" && currentAction == "BrandSalesReport" ? "active" : "")"
-                       asp-area="" asp-controller="SalesReport" asp-action="BrandSalesReport">
+                                <a class="nav-link @(currentController=="SalesReport" && currentAction == "BrandSales" ? "active" : "")"
+                       asp-area="" asp-controller="SalesReport" asp-action="BrandSales">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Brand Sales Report</p>
+                                    <p>Brand Sales</p>
                                 </a>
                             </li>
                         }
@@ -365,7 +365,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
+                        @*@if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
                        || User.IsInRole(Roles.SystemAdmin))
                         {
                             <li class="nav-item">
@@ -375,25 +375,36 @@
                                     <p>Best Selling Item (Invoice)</p>
                                 </a>
                             </li>
-                        }
+                        }*@
                         <li class="nav-item">
-                            <a class="nav-link @(currentController=="SalesReport" && currentAction == "CommissionReport" ? "active" : "")"
-                       asp-area="" asp-controller="SalesReport" asp-action="CommissionReport">
+                            <a class="nav-link @(currentController=="SalesReport" && currentAction == "Commission" ? "active" : "")"
+                       asp-area="" asp-controller="SalesReport" asp-action="Commission">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Commission Report</p>
+                                <p>Commission</p>
                             </a>
                         </li>
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
                        || User.IsInRole(Roles.SystemAdmin))
                         {
                             <li class="nav-item">
-                                <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSalesAnalysisReport" ? "active" : "")"
-                       asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesAnalysisReport">
+                                <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSalesRanking" ? "active" : "")"
+                       asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesRanking">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Customer Sales Analysis Report</p>
+                                    <p>Customer Sales Ranking</p>
                                 </a>
                             </li>
                         }
+                        @*@if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
+                       || User.IsInRole(Roles.SystemAdmin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSalesAnalysis" ? "active" : "")"
+                       asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesAnalysis">
+                                    <i class="nav-icon fas fa-file"></i>
+                                    <p>Customer Sales Analysis</p>
+                                </a>
+                            </li>
+                        }*@
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
                        || User.IsInRole(Roles.SystemAdmin))
                         {
@@ -401,33 +412,33 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSales" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="CustomerSales">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Customer Sales Report</p>
+                                    <p>Customer Sales</p>
                                 </a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link @(currentController=="SalesReport" && currentAction == "DailySalesReport" ? "active" : "")"
-                       asp-area="" asp-controller="SalesReport" asp-action="DailySalesReport">
+                            <a class="nav-link @(currentController=="SalesReport" && currentAction == "DailySales" ? "active" : "")"
+                       asp-area="" asp-controller="SalesReport" asp-action="DailySales">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Daily Sales Report</p>
+                                <p>Daily Sales</p>
                             </a>
                         </li>
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
                        || User.IsInRole(Roles.SystemAdmin))
                         {
                             <li class="nav-item">
-                                <a class="nav-link @(currentController=="SalesReport" && currentAction == "DailySalesMarginReport" ? "active" : "")"
-                       asp-area="" asp-controller="SalesReport" asp-action="DailySalesMarginReport">
+                                <a class="nav-link @(currentController=="SalesReport" && currentAction == "DailySalesMargin" ? "active" : "")"
+                       asp-area="" asp-controller="SalesReport" asp-action="DailySalesMargin">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Daily Sales Margin Report</p>
+                                    <p>Daily Sales Margin</p>
                                 </a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesInvoiceListingReport" ? "active" : "")"
-                       asp-area="" asp-controller="SalesReport" asp-action="SalesInvoiceListingReport">
+                            <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesInvoiceListing" ? "active" : "")"
+                       asp-area="" asp-controller="SalesReport" asp-action="SalesInvoiceListing">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Sales Invoice Listing Report</p>
+                                <p>Sales Invoice Listing</p>
                             </a>
                         </li>
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
@@ -437,7 +448,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesAgentArea" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="SalesAgentArea">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Sales by Agent / Area</p>
+                                    <p>Sales by Agent-Area</p>
                                 </a>
                             </li>
                         }
@@ -464,10 +475,10 @@
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesReturnListingReport" ? "active" : "")"
-                       asp-area="" asp-controller="SalesReport" asp-action="SalesReturnListingReport">
+                            <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesReturnListing" ? "active" : "")"
+                       asp-area="" asp-controller="SalesReport" asp-action="SalesReturnListing">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Sales Return Listing Report</p>
+                                <p>Sales Return Listing</p>
                             </a>
                         </li>
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
@@ -568,20 +579,20 @@
                             <a class="nav-link @(currentController=="AccountingReport" && currentAction == "CreditMemo" ? "active" : "")"
                        asp-area="" asp-controller="AccountingReport" asp-action="CreditMemo">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Credit Memo Listing Report</p>
+                                <p>Credit Memo Listing</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(currentController=="AccountingReport" && currentAction == "DebitMemo" ? "active" : "")"
                        asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Debit Memo Listing Report</p>
+                                <p>Debit Memo Listing</p>
                             </a>
                         </li>
                     </ul>
                 </li>
 
-
+                @*
                 var navManagementReportsActive = (new List<string> { "CheckRegisterDate", "CheckRegisterCustomer", "CheckRegisterSummary" }).Contains(currentAction ?? "");
 
                 <li class="nav-item @(navManagementReportsActive ? "menu-open" : "")">
@@ -615,7 +626,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+        </li>*@
             }
         }
     </ul>

@@ -43,9 +43,8 @@ namespace GMGInventory.Application.Repositories
         {
             var packs = from pck in context.Packs
                                            .Include(s => s.Status)
-                                           .Include(s => s.SalesOrder)
-                                               .ThenInclude(s => s.Customer)
-                                           .Where(s => (filter.StatusId == null || s.StatusId == filter.StatusId)
+                                           .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
+                                           .Where(s => (filter.Status == null || s.StatusId == filter.Status)
                                                      && filter.DateFrom <= s.DateCreated
                                                      && s.DateCreated <= filter.DateTo)
                         join usr in userManager.Users on pck.UserCreated equals usr.Id

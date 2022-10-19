@@ -210,13 +210,15 @@
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
             if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
-            let win = window.open('@Url.Action("PrintReceivingSummary")?' + urlQuery.join("&"), '');
-
-            $(win).on("pageshow", function () {
-                win.print();
-                win.close();
-                hideLoader();
-            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintReceivingSummary")?' + urlQuery.join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         });
     </script>
     }
