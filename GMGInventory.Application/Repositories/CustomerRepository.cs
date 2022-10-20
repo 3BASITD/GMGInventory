@@ -82,7 +82,7 @@ namespace GMGInventory.Application.Repositories
                                   Address = cust.Address,
                                   Email = cust.Email,
                                   AgentId = cust.Agent.Id,
-                                  AgentName = cust.Agent.FullName,
+                                  AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
                                   AreaName = cust.Area.Name,
                                   CreditTermName = cust.CreditTerm.Name,
                                   RegionName = cust.Area.Region.Name,
@@ -112,7 +112,7 @@ namespace GMGInventory.Application.Repositories
                        Id = cust.Id,
                        Code = cust.Code,
                        Name = cust.Name,
-                       AgentName = cust.Agent.FullName,
+                       AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
                        CreditLimit = cust.CreditLimit,
                        OutstandingBalance = cust.OutstandingBalance,
                        IsActive = cust.IsActive

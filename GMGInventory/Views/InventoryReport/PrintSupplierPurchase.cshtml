@@ -66,7 +66,7 @@
             {
                 <tr>
                     <td><nobr>@item.PurchaseDate</nobr></td>
-                    <td><nobr>@item.Supplier</nobr></td>
+                    <td>@item.Supplier</td>
                     <td><nobr>@item.Brand</nobr></td>
                     <td>@item.ItemCode</td>
                     <td>@item.ItemName</td>
@@ -88,4 +88,8 @@
         </tfoot>
     </table>
 </body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
 </html>

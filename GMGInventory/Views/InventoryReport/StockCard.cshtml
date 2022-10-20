@@ -185,6 +185,7 @@
                     if (itemId) data.Item = itemId;
                 }
             },
+            processing: true,
             serverSide: true,
             filter: true,
             responsive: true,
@@ -238,13 +239,15 @@
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
-            let win = window.open('@Url.Action("PrintStockCard")?' + urlQuery.join("&"), '');
-
-            $(win).on("pageshow", function () {
-                win.print();
-                win.close();
-                hideLoader();
-            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintStockCard")?' + urlQuery.join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         });
     </script>
     }

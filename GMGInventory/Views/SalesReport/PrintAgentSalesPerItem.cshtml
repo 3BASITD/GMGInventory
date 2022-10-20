@@ -1,0 +1,93 @@
+﻿@model AgentSalesPerItemPVM
+
+@{
+    Layout = "";
+    var title = "Agent Sales per Item";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Agent</strong>
+        <span>@Model.Agent</span>
+        <br />
+        <strong>Brand</strong>
+        <span>@Model.Brand</span>
+        <br />
+        <strong>Item</strong>
+        <span>@Model.Item</span>
+        <br />
+        <strong>Date From</strong>
+        <span>@Model.DateFrom</span>
+        <br />
+        <strong>Date To</strong>
+        <span>@Model.DateTo</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Agent)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Brand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Amount)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Contents)
+            {
+                <tr>
+                    <td><nobr>@item.Agent</nobr></td>
+                    <td><nobr>@item.Brand</nobr></td>
+                    <td><nobr>@item.ItemType</nobr></td>
+                    <td>@item.ItemCode</td>
+                    <td>@item.ItemName</td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td class="right-text"><nobr>@item.Price</nobr></td>
+                    <td class="right-text"><nobr>@item.Amount</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="5" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalQuantity</nobr></th>
+                <th></th>
+                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
+</html>

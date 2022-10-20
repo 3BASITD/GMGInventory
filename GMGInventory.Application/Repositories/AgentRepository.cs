@@ -31,7 +31,8 @@ namespace GMGInventory.Application.Repositories
         {
             var customers = await context.Agents
                                          .Where(s => string.IsNullOrWhiteSpace(search)
-                                                 || (s.Code.ToLower().Contains(search.ToLower())))
+                                                 || (s.Code.ToLower().Contains(search.ToLower()))
+                                                 || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).ToLower().Contains(search.ToLower())))
                                          .Select(s => new JsonNameOptionsModel
                                          {
                                              Id = s.Id.ToString(),
@@ -55,7 +56,7 @@ namespace GMGInventory.Application.Repositories
                 .Select(s => new JsonOptionsModel
                 {
                     Id = s.Id.ToString(),
-                    Text = s.FullName,
+                    Text = s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
                 .ToListAsync();
@@ -63,7 +64,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var agent = await context.Agents.Where(s => s.FullName == Name).FirstOrDefaultAsync();
+            var agent = await context.Agents.Where(s => s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName == Name).FirstOrDefaultAsync();
             return agent?.Id;
         }
 

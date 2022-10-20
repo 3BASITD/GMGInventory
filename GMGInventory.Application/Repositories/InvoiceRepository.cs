@@ -22,7 +22,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonInvoiceOptionsModel>> GetOptions(string search, int page)
         {
-          
             var invoices = from inv in context.Invoices
                         join soali in context.SOACRLineItems
                                    on inv.Id equals soali.InvoiceId
@@ -53,6 +52,25 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetOptionsInvoiceNumber(string search, int page)
+        {
+            var invoices = from invoice in context.Invoices
+                           where (string.IsNullOrWhiteSpace(search)
+                              || invoice.InvoiceNumber.ToLower().Contains(search.ToLower()))
+                           select new JsonOptionsModel
+                           {
+                               Id = invoice.Id.ToString(),
+                               Text = invoice.InvoiceNumber
+                           };
+            var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
+                //incomplete_results = false,
+                items = invoicesFiltered,
+                total_count = invoices.Count()
+            };
+        }
+
         public async Task<InvoiceDetailsVM?> GetDetailsAsync(int? Id)
         {
             var invoiceVM = (from invoice in context.Invoices
@@ -63,7 +81,9 @@ namespace GMGInventory.Application.Repositories
                              where invoice.Id == Id
                              select new InvoiceDetailsVM
                              {
-                                 Agent = invoice.SalesOrder.Agent.FullName,
+                                 Agent = invoice.SalesOrder.Agent.FirstName 
+                                       + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) 
+                                       + " " + invoice.SalesOrder.Agent.LastName,
                                  ControlNumber = invoice.ControlNumber,
                                  CustomerAddress = invoice.SalesOrder.Customer.Address,
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
@@ -87,9 +107,8 @@ namespace GMGInventory.Application.Repositories
             var invoices = from inv in context.Invoices
                                               .Include(s => s.InvoiceType)
                                               .Include(s => s.Status)
-                                              .Include(s => s.SalesOrder)
-                                                  .ThenInclude(s => s.Customer)
-                           where (filter.StatusId == null || inv.StatusId == filter.StatusId)
+                                              .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
+                           where (filter.Status == null || inv.StatusId == filter.Status)
                            && filter.DateFrom <= inv.DateCreated
                            && inv.DateCreated <= filter.DateTo
                            select new InvoiceVM

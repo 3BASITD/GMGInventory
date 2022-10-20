@@ -24,27 +24,27 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<UnservedItemVM>> GetListAsync()
         {
             var salesOrder = from s in context.SalesOrders
-                                    .Include(s => s.Customer)
-                                    .Include(s => s.Agent)
-                   join l in context.SalesOrderLineItems
-                                    .Include(s => s.Item) on s.Id equals l.SalesOrderId
-                   join u in userManager.Users on s.UserCreated equals u.Id
-                   where l.Quantity - l.PackedQuantity > 0
-                   select new UnservedItemVM
-                   {
-                       Agent = s.Agent.Code,
-                       CreatedBy = u.Nickname,
-                       Customer = s.Customer.Name,
-                       Discount1D = l.Discount1,
-                       Discount2D = l.Discount2,
-                       Id = s.Id,
-                       Item = l.Item.Code,
-                       OrderDateD = s.DateCreated,
-                       PackedQuantity = l.PackedQuantity,
-                       Quantity = l.Quantity,
-                       SalesOrderNumber = s.SalesOrderNumber,
-                       UnitPriceD = l.SellingPrice
-                   };
+                                              .Include(s => s.Customer)
+                                              .Include(s => s.Agent)
+                             join l in context.SalesOrderLineItems
+                                              .Include(s => s.Item) on s.Id equals l.SalesOrderId
+                             join u in userManager.Users on s.UserCreated equals u.Id
+                             where l.Quantity - l.PackedQuantity > 0
+                             select new UnservedItemVM
+                             {
+                                 Agent = s.Agent.Code,
+                                 CreatedBy = u.Nickname,
+                                 Customer = s.Customer.Name,
+                                 Discount1D = l.Discount1,
+                                 Discount2D = l.Discount2,
+                                 Id = s.Id,
+                                 Item = l.Item.Code,
+                                 OrderDateD = s.DateCreated,
+                                 PackedQuantity = l.PackedQuantity,
+                                 Quantity = l.Quantity,
+                                 SalesOrderNumber = s.SalesOrderNumber,
+                                 UnitPriceD = l.SellingPrice
+                             };
             return await salesOrder.ToListAsync();
         }
 

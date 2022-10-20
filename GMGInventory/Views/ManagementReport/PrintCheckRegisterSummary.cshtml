@@ -1,0 +1,63 @@
+﻿@model RegisterSummaryPVM
+
+@{
+    Layout = "";
+    var title = "Check Register Summary";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Date From</strong>
+        <span>@Model.DateFrom</span>
+        <br />
+        <strong>Date To</strong>
+        <span>@Model.DateTo</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Registers.First().CheckDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Registers.First().NumberOfChecks)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Registers.First().CheckAmount)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Registers)
+            {
+                <tr>
+                    <td>@item.CheckDate</td>
+                    <td class="right-text"><nobr>@item.NumberOfChecks</nobr></td>
+                    <td class="right-text"><nobr>@item.CheckAmount</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalChecks</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
+</html>

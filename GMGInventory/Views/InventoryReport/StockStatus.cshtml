@@ -270,13 +270,15 @@
             if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
             if ($("#filter-warehouse").val()) { urlQuery.push("Warehouse=" + $("#filter-warehouse").val()); }
-            let win = window.open('@Url.Action("PrintStockStatus")?' + urlQuery.join("&"), '');
-
-            $(win).on("pageshow", function () {
-                win.print();
-                win.close();
-                hideLoader();
-            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintStockStatus")?' + urlQuery.join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         });
     </script>
     }

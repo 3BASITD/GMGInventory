@@ -17,6 +17,7 @@ namespace GMGInventory.Common.Models
         public int TotalQuantity { get; set; }
         public int TotalQuantity2 { get; set; }
         public decimal TotalAmount { get; set; }
+        public decimal TotalAmount2 { get; set; }
     }
 
     public class DataTablesRequestForm
@@ -142,12 +143,25 @@ namespace GMGInventory.Common.Models
 
     public class ListFilterInventoryModel : ListFilterCommonModel
     {
-        public int? Category { get; set; }
-        public int? ItemType { get; set; }
         public int? Brand { get; set; }
+        public int? Category { get; set; }
         public int? Item { get; set; }
+        public int? ItemType { get; set; }
         public int? Supplier { get; set; }
         public int? Warehouse { get; set; }
+    }
+
+    public class ListFilterSalesModel : ListFilterCommonModel
+    {
+        public int? Agent { get; set; }
+        public int? Area { get; set; }
+        public string? Basis { get; set; }
+        public int? Brand { get; set; }
+        public int? Customer { get; set; }
+        public string? InvoiceNumberFrom { get; set; }
+        public string? InvoiceNumberTo { get; set; }
+        public int? Item { get; set; }
+        public int? Region { get; set; }
     }
 
     public class ListFilterCustomerModel : ListFilterCommonModel
@@ -158,7 +172,7 @@ namespace GMGInventory.Common.Models
     public class ListFilterCommonModel
     {
         DateTime? _DateFrom = null, _DateTo = null;
-        public int? StatusId { get; set; }
+        public int? Status { get; set; }
         public DateTime? DateFrom {
             get
             {

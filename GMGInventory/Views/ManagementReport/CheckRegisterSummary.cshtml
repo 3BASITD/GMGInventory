@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ReportManagementRegisterSummaryRVM>
+﻿@model IEnumerable<RegisterSummaryRVM>
 
 @{
     ViewData["Title"] = "Check Register Summary";
@@ -150,73 +150,22 @@
         });
 
         $(".printBtn").on("click", function () {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetCheckRegisterSummary")",
-                data: {
-                    DateFrom: $("#filter-from").val(),
-                    DateTo: $("#filter-to").val()
-                },
-                beforeSend: function (xhr, settings) {
-                    $.LoadingOverlay("show", {
-                        image: "",
-                        fontawesome: "fas fa-print"
-                    });
-                },
-                error: jQueryCommonError,
-                success: function (data, status, xhr) {
-                    var html = '<h3>Check Register Summary</h3>';
-                    html += '<p>';
-                    html += '<strong>Date From</strong>&nbsp;&nbsp;' + formatDateEn(new Date($("#filter-from").val())) + '<br />';
-                    html += '<strong>Date To</strong>&nbsp;&nbsp;' + formatDateEn(new Date($("#filter-to").val()));
-                    html += '</p>';
-
-                    html += '<table class="table-items">';
-                    html += '<thead>';
-                    html += '<tr>';
-                    html += '<th>Check Date</th>';
-                    html += '<th>Number of Checks</th>';
-                    html += '<th>Check Amount</th>';
-                    html += '</tr>';
-                    html += '</thead>';
-
-                    html += '<tbody>';
-                    var totalAmount = 0;
-                    var totalQuantity = 0;
-                    $.each(data, function (i, item) {
-                        html += '<tr>';
-                        html += '<td>' + item.checkDate + '</td>';
-                        html += '<td class="right-text">' + item.numberOfChecks + '</td>';
-                        html += '<td class="right-text">' + item.checkAmount + '</td>';
-                        html += '</tr>';
-
-                        totalAmount += parseFloat(item.checkAmountD);
-                        totalQuantity += parseInt(item.numberOfChecks);
-                    });
-                    html += '</tbody>';
-
-                    html += '<tfoot>';
-                    html += '<tr>';
-                    html += '<th>Total</th>';
-                    html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
-                    html += '<th class="right-text">' + FormatStringDecimal(totalAmount) + '</th>';
-                    html += '</tr>';
-                    html += '</tfoot>';
-                    html += '</table>';
-
-                    $("#for-print").html(html);
-                },
-                complete: function (xhr, status) {
-                    printout("#for-print", {
-                        pageTitle: "GMG Inventory",
-                        importCSS: false,
-                        loadCSS: "/css/print.css"
-                    });
-                    hideLoader();
-                    $("#for-print").html("");
-                }
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
             });
-
+            var urlQuery = [];
+            urlQuery.push("DateFrom=" + $("#filter-from").val());
+            urlQuery.push("DateTo=" + $("#filter-to").val());
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintCheckRegisterSummary")?' + urlQuery.join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         });
     </script>
     }

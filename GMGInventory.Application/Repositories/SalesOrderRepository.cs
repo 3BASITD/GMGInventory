@@ -88,7 +88,7 @@ namespace GMGInventory.Application.Repositories
                            select new SalesOrderDetailsVM
                            {
                                AgentCode = order.Agent.Code,
-                               AgentName = order.Agent.FullName,
+                               AgentName = order.Agent.FirstName + (order.Agent.MiddleName == null ? "" : " " + order.Agent.MiddleName) + " " + order.Agent.LastName,
                                ApprovedBy = approve.Nickname,
                                ApprovedDateD = order.ApprovedDate,
                                CreditTerms = order.Customer.CreditTerm == null ? "-" : order.Customer.CreditTerm.Name,

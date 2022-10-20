@@ -9,7 +9,8 @@
     new HomeTaskRow { MD = "SYSTEM > Database", ST = "Done (May change on later works)" },
     new HomeTaskRow { MD = "SYSTEM > Profile", ST = "Done" },
     new HomeTaskRow { MD = "SYSTEM > Navigation with Account Access binding", ST = "Done" },
-    new HomeTaskRow { MD = "SYSTEM > Data transfer from Old System (since 2019)", ST = "Not Started" },
+    new HomeTaskRow { MD = "SYSTEM > Modules with Account Access binding", ST = "On-going" },
+    new HomeTaskRow { MD = "SYSTEM > Data transfer from Old System", ST = "Not Started" },
 
     new HomeTaskRow { MD = "SALES > Customer Purchase History", ST = "Done" },
     new HomeTaskRow { MD = "SALES > Pack Listing", ST = "On-going" },
@@ -41,23 +42,24 @@
     new HomeTaskRow { MD = "ADMINISTRATION > Suppliers", ST = "Done" },
     new HomeTaskRow { MD = "ADMINISTRATION > Audit Logs", ST = "Done" },
 
-    new HomeTaskRow { MD = "SALES REPORTS > Agent Sales per Items", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Brand Sales Report", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Best Selling Item", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Best Selling Item (Invoice)", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Commission Report", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales Analytis Report", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales Report", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Daily Sales Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Agent Sales per Items", ST = "Excluded" },
+    new HomeTaskRow { MD = "SALES REPORTS > Brand Sales", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Best Selling Item", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Best Selling Item (Invoice)", ST = "Excluded" },
+    new HomeTaskRow { MD = "SALES REPORTS > Commission", ST = "On-going" },
+    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales Analysis", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales Ranking", ST = "Excluded" },
+    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales", ST = "On-going" },
+    new HomeTaskRow { MD = "SALES REPORTS > Daily Sales", ST = "Done" },
     new HomeTaskRow { MD = "SALES REPORTS > Daily Sales Margin Report", ST = "Not Started" },
     new HomeTaskRow { MD = "SALES REPORTS > Sales Invoice Listing Report", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Sales by Agent / Area", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales by Agent-Area", ST = "Pending" },
     new HomeTaskRow { MD = "SALES REPORTS > Sales Margin Item", ST = "Not Started" },
     new HomeTaskRow { MD = "SALES REPORTS > Sales Report Basis", ST = "Not Started" },
     new HomeTaskRow { MD = "SALES REPORTS > Sales Return Listing Report", ST = "Not Started" },
-    new HomeTaskRow { MD = "SALES REPORTS > Unserved Item", ST = "Not Started" },
+    new HomeTaskRow { MD = "SALES REPORTS > Unserved Item", ST = "On-going" },
 
-    new HomeTaskRow { MD = "INVENTORY REPORTS > Below Maintaining Item", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Below Maintaining Item", ST = "Excluded" },
     new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Listing", ST = "Done" },
     new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Listing Supplier", ST = "Done" },
     new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Summary", ST = "On-going" },
@@ -65,12 +67,12 @@
     new HomeTaskRow { MD = "INVENTORY REPORTS > Stock Status", ST = "On-going" },
     new HomeTaskRow { MD = "INVENTORY REPORTS > Supplier Purchase History", ST = "Done" },
 
-    new HomeTaskRow { MD = "ACCOUNTING REPORTS > Credit Memo Listing Report", ST = "Not Started" },
-    new HomeTaskRow { MD = "ACCOUNTING REPORTS > Debit Memo Listing Report", ST = "Not Started" },
+    new HomeTaskRow { MD = "ACCOUNTING REPORTS > Credit Memo Listing Report", ST = "Done" },
+    new HomeTaskRow { MD = "ACCOUNTING REPORTS > Debit Memo Listing Report", ST = "Done" },
 
-    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register by Date", ST = "Not Started" },
-    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register by Customer", ST = "Not Started" },
-    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register Summary", ST = "Not Started" }
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register by Date", ST = "Excluded" },
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register by Customer", ST = "Excluded" },
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register Summary", ST = "Excluded" }
     };
 
     var TaskDone = TaskProgress.Count(s => s.ST == "Done");
@@ -78,6 +80,7 @@
     var TaskPending = TaskProgress.Count(s => s.ST == "Pending");
     var TaskOngoing = TaskProgress.Count(s => s.ST == "On-going");
     var TaskNotStarted = TaskProgress.Count(s => s.ST == "Not Started");
+    var TaskExcluded = TaskProgress.Count(s => s.ST == "Excluded");
     var TaskTotal = TaskProgress.Count();
 
     DateTime FromDate = new DateTime(2022, 7, 18);
@@ -115,7 +118,7 @@
                             <div class="progress-bar" style="width: @DonePercentage%"></div>
                         </div>
                         <span class="progress-description">
-                            @DonePercentage% Progress
+                            @DonePercentage%
                         </span>
                     </div>
                 </div>
@@ -153,7 +156,7 @@
                             <div class="progress-bar" style="width: @PendingPercentage%"></div>
                         </div>
                         <span class="progress-description">
-                            @PendingPercentage% 
+                            @PendingPercentage%
                         </span>
                     </div>
                 </div>
@@ -174,7 +177,7 @@
                             <div class="progress-bar" style="width: @OngoingPercentage%"></div>
                         </div>
                         <span class="progress-description">
-                            @OngoingPercentage% 
+                            @OngoingPercentage%
                         </span>
                     </div>
                 </div>
@@ -195,6 +198,34 @@
                         <span class="progress-description">
                             @NotStartedPercentage%
                         </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box bg-dark text-white">
+                    <span class="info-box-icon"><i class="fas fa-trash"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Excluded</span>
+                        <span class="info-box-number">@TaskExcluded</span>
+                        @{
+                            var ExcludedPercentage = string.Format("{0:0.00}", (((decimal)TaskExcluded / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @ExcludedPercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @ExcludedPercentage%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        You can also view this progress report via <a href="https://docs.google.com/spreadsheets/d/1nv3nGt35aktjUpMwZhoo7fWG3oKNF4WMLU7QkhU8ioE/edit?usp=sharing" target="_blank">Google Sheets</a>. User can add on the Additional Task tab of sheet. Will discuss added task if needed.
                     </div>
                 </div>
             </div>
@@ -221,7 +252,7 @@
                         Chart
                     </div>
                     <div class="card-body">
-                        <canvas id="progressChart" width="400" height="400"></canvas>
+                        <canvas id="progressChart" width="300" height="300" class="zoom-ignore"></canvas>
                     </div>
                 </div>
             </div>
@@ -250,6 +281,7 @@
                                : a.ST == "Done (May change on later works)" ? "table-warning"
                                : a.ST == "Pending" ? "table-info"
                                : a.ST == "On-going" ? "table-danger"
+                               : a.ST == "Excluded" ? "table-dark"
                                : "")">
                                 <td>@string.Format("{0:000}", TaskProgress.IndexOf(a) + 1)</td>
                                 <td>@a.MD</td>
@@ -257,6 +289,7 @@
                                    : a.ST == "Done (May change on later works)" ? "text-warning"
                                    : a.ST == "Pending" ? "text-info"
                                    : a.ST == "On-going" ? "text-danger"
+                                   : a.ST == "Excluded" ? "text-white"
                                    : "")">
                                     @a.ST
                                 </td>
@@ -272,9 +305,9 @@
 @section Scripts {
     <script>
         $('.table').DataTable();
-        var data = [@(TaskDone + TaskDoneMayChange)/*, @TaskDoneMayChange*/, @TaskPending, @TaskOngoing, @TaskNotStarted];
+        var data = [@(TaskDone + TaskDoneMayChange)/*, @TaskDoneMayChange*/, @TaskPending, @TaskOngoing, @TaskNotStarted, @TaskExcluded];
         var myData = {
-            labels: ['Done'/*, 'Done (May change on later works)'*/, 'Pending', 'On-going', 'Not Started'],
+            labels: ['Done'/*, 'Done (May change on later works)'*/, 'Pending', 'On-going', 'Not Started', 'Excluded'],
             datasets: [{
                 label: 'Status',
                 data: data,
@@ -283,6 +316,7 @@
                     //'rgba(255, 255, 0, 0.5)',
                     'rgba(0, 0, 255, 0.5)',
                     'rgba(255, 0, 0, 0.5)',
+                    'rgba(127, 127, 127, 0.5)',
                     'rgba(0, 0, 0, 0.5)'
                 ],
                 borderColor: [
@@ -290,6 +324,7 @@
                     //'rgba(255, 255, 0, 1)',
                     'rgba(0, 0, 255, 1)',
                     'rgba(255, 0, 0, 1)',
+                    'rgba(127, 127, 127, 1)',
                     'rgba(0, 0, 0, 1)'
                 ],
                 borderWidth: 1

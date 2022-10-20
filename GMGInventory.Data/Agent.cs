@@ -31,13 +31,13 @@ namespace GMGInventory.Data
         public int AreaId { get; set; }
         public Area Area { get; set; }
 
-        public string FullName
-        {
-            get
-            {
-                return FirstName + " " + MiddleName + " " + LastName;
-            }
-        }
+        //public string FullName
+        //{
+        //    get
+        //    {
+        //        return FirstName + (MiddleName == null ? "" : " " + MiddleName) + " " + LastName;
+        //    }
+        //}
 
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }

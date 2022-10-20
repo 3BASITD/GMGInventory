@@ -155,9 +155,8 @@ namespace GMGInventory.Controllers
             var agent = (await agentRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var agents in agent)
             {
-                dt.Rows.Add(agents.Code, agents.FullName, agents.AreaId);
+                dt.Rows.Add(agents.Code, agents.FirstName + (agents.MiddleName == null ? "" : " " + agents.MiddleName) + " " + agents.LastName, agents.AreaId);
             }
-
             using (XLWorkbook wb = new())
             {
                 wb.Worksheets.Add(dt);
@@ -165,8 +164,8 @@ namespace GMGInventory.Controllers
                 {
                     wb.SaveAs(stream);
                     return File(stream.ToArray(),
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        DateTime.Now.ToString("yyyyMMdd") + " Agents.xlsx");
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    DateTime.Now.ToString("yyyyMMdd") + " Agents.xlsx");
                 }
             }
         }

@@ -249,7 +249,7 @@
                     var supplierId = $("#filter-supplier").val();
 
                     data.DateFrom = $("#filter-from").val();
-                    data.DateTo = $("#filter-to").val();                    
+                    data.DateTo = $("#filter-to").val();
                     if (brandId) data.Brand = brandId;
                     if (itemId) data.Item = itemId;
                     if (supplierId) data.Supplier = supplierId;
@@ -317,13 +317,15 @@
             if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
-            let win = window.open('@Url.Action("PrintSupplierPurchase")?' + urlQuery.join("&"), '');
-
-            $(win).on("pageshow", function () {
-                win.print();
-                win.close();
-                hideLoader();
-            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintSupplierPurchase")?' + urlQuery.join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         });
     </script>
     }
