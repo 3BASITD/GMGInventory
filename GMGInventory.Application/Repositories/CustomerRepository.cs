@@ -47,6 +47,19 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId)
+        {
+            return await context.Customers
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
         public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers

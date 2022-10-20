@@ -47,6 +47,7 @@ namespace GMGInventory.Application.Repositories
                          select new SoacrVM
                          {
                              Id = soa.Id,
+                             CustomerId = soa.CustomerId,
                              CustomerName = soa.Customer.Name,
                              Type = st.Name,
                              SOAFromD = soa.SOAFrom,
@@ -104,8 +105,8 @@ namespace GMGInventory.Application.Repositories
 
                          where (filter.CustomerId == null || filter.CustomerId == soa.CustomerId)
                              && (filter.AgentId == null || filter.AgentId == agent.Id)
-                                && filter.DateFrom <= soa.SOAFrom
-                                && soa.SOAFrom <= filter.DateTo
+                                //&& filter.DateFrom <= soa.SOAFrom
+                                //&& soa.SOAFrom <= filter.DateTo
 
                          let soalit = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.TBRAmount)
                          let soalic = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).Sum(s => s.CreditAmount)
@@ -118,6 +119,7 @@ namespace GMGInventory.Application.Repositories
                          select new SoacrVM
                          {
                              Id = soa.Id,
+                             CustomerId = soa.CustomerId,
                              CustomerName = soa.Customer.Name,
                              Type = st.Code,
                              SOAFromD = soa.SOAFrom,
@@ -215,11 +217,54 @@ namespace GMGInventory.Application.Repositories
         }
 
 
-      
+        public SoacrLineItemVM? GetSoaInvoiceDtlVM(int? id)
+        {
+            var soaVM = (from soa in context.SOACRs
+                                            .Include(s => s.Customer)
+                         join sl in context.SOACRLineItems
+                                     on soa.Id equals sl.SOACRId into soali
+                         from soaliGroup in soali.DefaultIfEmpty()
+                         join i in context.Invoices
+                                          on soaliGroup.InvoiceId equals i.Id
+                         where soaliGroup.Id == id
+                         select new SoacrLineItemVM
+                         {
+                             Id = soaliGroup.Id,
+                             CustomerId = soa.CustomerId,
+                             TBRD = soaliGroup.TBRAmount,
+                             DebitD = soaliGroup.DebitAmount,
+                             CreditD = soaliGroup.CreditAmount
+
+                         }).FirstOrDefault();
+            return soaVM;
+        }
+
+        public async Task<IList<SoacrVM>> GetSOAInvoice(/*int id*/)
+        {
+            var inv = from soa in context.SOACRs
+                                            .Include(s => s.Customer)
+                      join sl in context.SOACRLineItems
+                                  on soa.Id equals sl.SOACRId into soali
+                      from soaliGroup in soali.DefaultIfEmpty()
+                      join i in context.Invoices
+                                       on soaliGroup.InvoiceId equals i.Id
+                      //where soa.Id == id
+                      select new SoacrVM
+                      {
+                          Id = soa.Id,
+                          InvoiceDateD = i.DateCreated,
+                          InvoiceNumber = i.InvoiceNumber,
+                          Type = i.InvoiceType.Name,
+                          InvoiceAmountD = i.Amount,
+                          FreightChargeD = soaliGroup.FreightCost
 
 
+                      };
+            return await inv.ToListAsync();
+        }
 
-        private async Task<IList<SoacrVM>> GetSoaDetailsAsync(int id)
+
+        public async Task<IList<SoacrVM>> GetSoaDetailsAsync(int id)
         {
             var soaVM = from soa in context.SOACRs
                                             .Include(s => s.Customer)
@@ -231,6 +276,8 @@ namespace GMGInventory.Application.Repositories
                         where soa.Id == id
                         select new SoacrVM
                         {
+                            Id = soa.Id,
+                            CustomerId = soa.CustomerId,
                             InvoiceNumber = i.InvoiceNumber,
                             InvoiceAmountD = i.Amount,
                             TBRD = soaliGroup.TBRAmount,
@@ -320,6 +367,7 @@ namespace GMGInventory.Application.Repositories
                            from soacrsGroup in soacrs.DefaultIfEmpty()
 
                            where (filter.CustomerId == null || filter.CustomerId == soacrsGroup.CustomerId)
+                           && soacrsGroup.SOACRTypeId == 2
 
                            select new InvoiceVM
                          {   Id = inv.Id,
@@ -478,6 +526,101 @@ namespace GMGInventory.Application.Repositories
                 Data = pageList
             };
         }
+
+
+
+        public async Task AddAsync(SoacrVM soaVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var soa = new SOACR
+            {
+                Id = soaVM.Id,
+                CustomerId = soaVM.CustomerId,
+                SOACRTypeId = 1,
+                SOAFrom = soaVM.SOAFromD,
+                SOATo = soaVM.SOAToD,
+                AmountToPay = soaVM.InvoiceAmountD,
+                TotalCMAAmount = soaVM.CreditD,
+                TotalDMAAmount = soaVM.DebitD,
+                TotalDMRAmount = soaVM.DMRD,
+                TotalBalance = soaVM.BalanceD,
+                TotalFreightCost = soaVM.FreightChargeD,
+                TotalAmount = soaVM.TotalAmountD,
+                OverPayment = soaVM.OverPaymentD
+            };
+            await context.SOACRs.AddAsync(soa);
+
+            await context.SaveChangesAsync(currentUserId);
+
+
+        }
+
+
+        public async Task AddCustomerPaymentAsync(PaymentVM paymentVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var cp = new CustomerPayment
+            {
+                Id = paymentVM.Id,
+                CustomerId = paymentVM.CustomerId,
+                CRNumber = paymentVM.CRNumber,
+                Remarks = paymentVM.Remarks,
+                OverPay = paymentVM.OverPaymentD,
+                TKTSolicitation = paymentVM.TKTD,
+                Tax = paymentVM.TaxD,
+                CashAdvance = paymentVM.CashAdvancedD,
+                Discount = paymentVM.DiscountD,
+                OffSet = paymentVM.OffsetD,
+                Cash = paymentVM.CashAmountD,
+                BackLoad = paymentVM.BackLoadD
+            };
+
+
+            await context.CustomerPayments.AddAsync(cp);
+            await context.SaveChangesAsync(currentUserId);
+
+
+        }
+
+        public async Task UpdateAsync(SoacrLineItemVM soaVM)
+        {
+            var soa = context.SOACRLineItems.Where(s => s.Id == soaVM.Id).FirstOrDefault();
+            if (soa == null)
+            {
+                throw new DbUpdateConcurrencyException();
+            }
+
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            soa.Id = soaVM.Id;
+            soa.TBRAmount = soaVM.TBRD;
+            soa.DebitAmount = soaVM.DebitD;
+            soa.CreditAmount = soaVM.CreditD;
+            soa.FreightCost = soaVM.FreightChargeD;
+
+
+            context.SOACRLineItems.Update(soa);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+
+
+
+
+        public async Task<bool> IsSOAIdExist(int id)
+        {
+            return await context.SOACRs.AnyAsync(c => c.Id == id);
+        }
+
+        public async Task<bool> IsCustomerPaymentIdExist(int id)
+        {
+            return await context.CustomerPayments.AnyAsync(c => c.Id == id);
+        }
+
+        public async Task<bool> IsSOALineItemIdExist(int id)
+        {
+            return await context.SOACRLineItems.AnyAsync(c => c.Id == id);
+        }
+
 
 
     }

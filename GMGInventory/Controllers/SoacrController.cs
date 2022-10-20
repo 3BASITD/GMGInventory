@@ -29,6 +29,70 @@ namespace GMGInventory.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<JsonResult> CreateJson(SoacrVM soaVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await soaRepository.IsSOAIdExist(soaVM.Id))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "SoA Id already used.";
+            }
+            else
+            {
+                await soaRepository.AddAsync(soaVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "SOA successfully added";
+            }
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreatePaymentJson(PaymentVM paymentVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await soaRepository.IsCustomerPaymentIdExist(paymentVM.Id))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Payment Id already used.";
+            }
+            else
+            {
+                await soaRepository.AddCustomerPaymentAsync(paymentVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Payment successfully added";
+            }
+            return Json(responseModel);
+        }
+
+
+
+        [HttpPost]
+        public async Task<JsonResult> EditInvoiceJson(SoacrLineItemVM soaVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            try
+            {
+                await soaRepository.UpdateAsync(soaVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Invoice successfully updated";
+            }
+            catch (Exception ex)
+            {
+                if (!await soaRepository.IsSOALineItemIdExist(soaVM.Id))
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Invoice cannot be found";
+                }
+                else
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = ex.Message;
+                }
+            }
+            return Json(responseModel);
+        }
+
 
         [HttpPost]
         public async Task<JsonResult> GetListJson(SoaFilterVM filter)
@@ -66,7 +130,23 @@ namespace GMGInventory.Controllers
             return Json(await soaRepository.GetSoaDetailsDTAsync(form, id));
         }
 
+        [HttpPost]
+        public async Task<JsonResult> GetSOAInvoice(int id)
+        {
+            //return Json(await soaRepository.GetSOAInvoice(/*id*/)); 
+            return Json(await soaRepository.GetSoaDetailsAsync(id));
+        }
 
+
+
+        public ActionResult EditInvoice(int id)
+        {
+            var inv = soaRepository.GetSoaInvoiceDtlVM(id); 
+            {
+                return NotFound();
+            }
+            return Json(inv);
+        }
         public async Task<ActionResult> ContractReceipt()
         {
             return View();
