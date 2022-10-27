@@ -17,11 +17,13 @@ namespace GMGInventory.Controllers
     {
         private readonly ISoacrRepository soaRepository;
         private readonly IInvoiceRepository invoiceRepository;
+        private readonly ISoacrLineItemRepository soacrLineItemRepository;
 
-        public SoacrController(ISoacrRepository soaRepository, IInvoiceRepository invoiceRepository)
+        public SoacrController(ISoacrRepository soaRepository, IInvoiceRepository invoiceRepository, ISoacrLineItemRepository soacrLineItemRepository)
         {
             this.soaRepository = soaRepository;
             this.invoiceRepository = invoiceRepository;
+            this.soacrLineItemRepository = soacrLineItemRepository;
         }
         public async Task<ActionResult> Index()
         { 
@@ -135,6 +137,27 @@ namespace GMGInventory.Controllers
         {
             //return Json(await soaRepository.GetSOAInvoice(/*id*/)); 
             return Json(await soaRepository.GetSoaDetailsAsync(id));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id, int soacrId)
+        {
+            if (await soacrLineItemRepository.IsSoaLineItemIdExistAsync(id) == false)
+            {
+                return NotFound();
+            }
+            else
+            {
+                await soacrLineItemRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Invoice successfully deleted";
+            }
+            return RedirectToAction(nameof(Details), new {id = soacrId});
+        }
+
+        public async Task<IActionResult> PrintSoaDetails(int id)
+        {
+            return View(await soaRepository.PrintSoaDetails(id));
         }
 
 

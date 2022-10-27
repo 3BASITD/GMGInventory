@@ -13,7 +13,7 @@ namespace GMGInventory.Common.Models
         public string CRNumber { get; set; }
 
         [Display(Name = "SOA No")]
-        public decimal SOANo { get; set; }
+        public int SOANo { get; set; }
 
         [Display(Name = "Customer Id")]
         public int CustomerId { get; set; }
@@ -80,6 +80,12 @@ namespace GMGInventory.Common.Models
 
         //Checks
 
+        [Display(Name = "Invoice Id")]
+        public int InvoiceId { get; set; }
+
+        [Display(Name = "Payment Id")]
+        public int PaymentId { get; set; }
+
         [Display(Name = "Bank Name")]
         public string BankName { get; set; }
 
@@ -95,14 +101,16 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Check Date")]
-        public string CheckDate => CheckDateD == null ? "-" : CheckDateD.Value.ToString(SystemFormat.StringDate);
-        public DateTime? CheckDateD { get; set; }
+        public string CheckDate => CheckDateD == null ? "-" : CheckDateD.ToString(SystemFormat.StringDate);
+        public DateTime CheckDateD { get; set; }
 
 
         // Invoices
 
         [Display(Name = "Invoice Date")]
-        public string InvoiceDate { get; set; }
+        public string InvoiceDate => InvoiceDateD == null ? "-" : InvoiceDateD.ToString(SystemFormat.StringDate);
+        public DateTime InvoiceDateD { get; set; }
+
 
         [Display(Name = "Invoice No")]
         public string InvoiceNumber { get; set; }
@@ -111,13 +119,16 @@ namespace GMGInventory.Common.Models
         public string? InvoiceType { get; set; }
 
         [Display(Name = "Invoice Amount")]
-        public string InvoiceAmount { get; set; }
+        public string InvoiceAmount => string.Format(SystemFormat.StringDecimalComma, InvoiceAmountD);
+        public decimal InvoiceAmountD { get; set; }
+
 
         [Display(Name = "Balance Amount")]
-        public string BalanceAmount { get; set; }
+        public string BalanceAmount => string.Format(SystemFormat.StringDecimalComma, BalanceAmountD);
+        public decimal BalanceAmountD { get; set; }
 
         [Display(Name = "Pack No")]
-        public string PackNo { get; set; }
+        public int PackNo { get; set; }
 
         [Display(Name = "SalesOrderNo")]
         public string SalesOrderNo { get; set; }

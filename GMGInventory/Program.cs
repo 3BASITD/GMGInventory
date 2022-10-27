@@ -51,6 +51,7 @@ builder.Services.AddScoped(typeof(ISalesOrderRepository), typeof(SalesOrderRepos
 builder.Services.AddScoped(typeof(ISalesOrderDeliveryRepository), typeof(SalesOrderDeliveryRepository));
 builder.Services.AddScoped(typeof(ISalesReturnRepository), typeof(SalesReturnRepository));
 builder.Services.AddScoped(typeof(ISoacrRepository), typeof(SoacrRepository));
+builder.Services.AddScoped(typeof(ISoacrLineItemRepository), typeof(SoacrLineItemRepository));
 builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
 builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));

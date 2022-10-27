@@ -15,9 +15,9 @@
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
                     <span class="fas fa-arrow-left"></span> Back to List
                 </a>
-                <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
+                @*<button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
                     <span class="fas fa-plus"></span> Add Shipping Details
-                </button>
+                </button>*@
                 <button type="button" class="btn btn-primary btn-sm float-right editBtn ml-2" data-bs-toggle="modal" data-bs-target="#editModal">
                     <span class="fas fa-edit"></span> Edit Customer
                 </button>
@@ -176,6 +176,14 @@
                         @Model?.CreditTermName
                     </b>
                 </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CommissionRate)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model?.CommissionRate) ? "-" : Model?.CommissionRate)
+                    </b>
+                </p>
             </div>
         </div>
         <div class="row">
@@ -211,6 +219,10 @@
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="nav-shipping" role="tabpanel"
                                  aria-labelledby="nav-shipping-tab">
+                                 <span><button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
+                                    <span class="fas fa-plus"></span> Add Shipping Details
+                                  </button></span>
+                                 
                                 <table class="table table-head-fixed table-striped table-hover table-shipping">
                                     <thead>
                                         <tr>
@@ -288,6 +300,25 @@
                                 <label for="edit-name" class="control-label mb-0 d-block">Customer Name</label>
                                 <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="edit-commission" class="form-label mb-0">Commission Rate</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="edit-commission" name="CommissionRate" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="edit-commission" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <label class="control-label mb-0 d-block" for="edit-usearearate"> Use Area Rate? </label>
+                                   <input class="form-check-input" type="checkbox" id="edit-usearearate"  name="UseAreaRate">
+                               @* <label for="create-is-active" class="control-label mb-0 d-block">Use Area Rate?</label>
+                                <input type="checkbox" name="IsActive" id="create-is-active" class="form-control form-control-sm" />*@
+                                <span data-valmsg-for="edit-usearearate" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
 
@@ -829,7 +860,18 @@
         });
 
 
-
+        $("#edit-usearearate").on("change", function() {
+        if ($(this).prop("checked"))
+            {
+                 $("#edit-commission").val("");
+                 $("#edit-commission").prop("readonly", "readonly")
+            }
+        else 
+            {
+                 $("#edit-commission").val(0);
+                 $("#edit-commission").removeAttr("readonly")
+            }
+        })
 
         $(".editBtn").click(function (e) {
             //var data = dataTable.row($(this).parents('tr')).data();
@@ -842,6 +884,7 @@
                     $("#edit-code").val(data.code);
                     $("#edit-area").val(data.areaId);
                     $("#edit-name").val(data.name);
+                    $("#edit-commission").val(data.commissionRateD);
                     $("#edit-customer-type").val(data.customerTypeId);
                     $("#edit-contact-person").val(data.contactPerson);
                     $("#edit-contact-number").val(data.contactNumber);
@@ -902,6 +945,8 @@
                     Code: $("#edit-code").val(),
                     Name: $("#edit-name").val(),
                     AreaId: $("#edit-area").val(),
+                    CommissionRateD: $("#edit-commission").val(),
+                    UseAreaRate: $("#edit-usearearate").prop("checked"),
                     CustomerTypeId: $("#edit-customer-type").val(),
                     ContactPerson: $("#edit-contact-person").val(),
                     ContactNumber: $("#edit-contact-number").val(),
@@ -970,7 +1015,7 @@
                 type: "POST",
                 url: "@Url.Action("CreateShippingJson")",
                 data: {
-                    Id: @Model.Id,
+                    Id: @Model?.Id,
                     ShippingAddress: $("#create-shipping-address").val(),
                     ShippingPhoneNo: $("#create-shipping-cnumber").val(),
                     ShippingContactPerson: $("#create-shipping-cperson").val(),
@@ -1029,7 +1074,7 @@
                 type: "POST",
                 url: "@Url.Action("CreateForwarderJson")",
                 data: {
-                    Id: @Model.Id,
+                    Id: @Model?.Id,
                     ForwarderAddress: $("#create-forwarder-address").val(),
                     ForwarderPhoneNo: $("#create-forwarder-cnumber").val(),
                     ForwarderName: $("#create-forwarder-name").val(),

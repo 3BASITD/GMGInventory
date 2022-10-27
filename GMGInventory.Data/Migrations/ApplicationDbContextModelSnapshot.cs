@@ -456,6 +456,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("TIN")
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("UseAreaRate")
+                        .HasColumnType("bit");
+
                     b.Property<string>("UserCreated")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -2876,42 +2879,42 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            ConcurrencyStamp = "8b0cb922-ac08-42ec-86f5-b7d815c7c98e",
+                            ConcurrencyStamp = "0c6e8a39-4dcf-43d7-b4de-dcbff33fed09",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            ConcurrencyStamp = "8ad0e291-9321-4aee-b4e0-2c5865079b24",
+                            ConcurrencyStamp = "a287212e-d522-4a82-90ae-b6c8e35eabca",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            ConcurrencyStamp = "5654e7c2-a00d-4dbb-a619-46c14bfd26d7",
+                            ConcurrencyStamp = "d4daac66-3d2d-4719-a73c-c98f9969aeed",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            ConcurrencyStamp = "3092035c-2779-4d5e-bf77-32ec2228d52c",
+                            ConcurrencyStamp = "362ec1b3-0a8a-4507-b753-43be8318fce5",
                             Name = "Sales Director",
                             NormalizedName = "SALES DIRECTOR"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            ConcurrencyStamp = "6d00f8e1-7bc8-4f74-93ac-6e0273f8780d",
+                            ConcurrencyStamp = "360021bd-6805-45b6-a2b6-4df08f689677",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            ConcurrencyStamp = "7be2aea5-0374-4861-bbbb-d618d687c22e",
+                            ConcurrencyStamp = "c5f37247-b499-4d6b-95b0-90bb0ad4e43c",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER"
                         });
@@ -3150,16 +3153,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3a67f403-772a-4233-8be9-0bc043b28d0b",
+                            ConcurrencyStamp = "d93240bb-7043-4976-b3e8-b415af3166e3",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAEAACcQAAAAEF0L2s9bcENC/sJnHrm6qmmKgW/wGzAYAtnAYBUOWrtFd/9wGnDcQpI08vism9uUrg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAENj0XZsxFBBbYsDfh5yGvtibI9ZuWkkIxBdH+QVnbp/wg/pIi9Yh4aqg1Qgw9ZDJzQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4928b518-7313-44fa-8a5c-6bff8ccde418",
+                            SecurityStamp = "2170b600-b7b6-46ac-8c74-f7d84c6b2a32",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2022, 10, 20, 11, 57, 39, 368, DateTimeKind.Local).AddTicks(1624),
+                            DateCreated = new DateTime(2022, 10, 26, 15, 34, 8, 669, DateTimeKind.Local).AddTicks(4024),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3171,16 +3174,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cf71c107-0232-4a43-bc18-d505b045f53c",
+                            ConcurrencyStamp = "913e4a18-6c0c-4234-81ed-1d1fceac6a79",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAEAACcQAAAAEEJFwbDlfC1FuF6MTWwtiRZMdcBUiVyq0jUEBhpPIGDgKhbI8mSNjhr7ZttCkNSVkg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAECHeY69sqM1XEXuiYNmO8Xkp3bxpkc9BvWzBuL5+0WvvXFpwkfQtMcesMT8HLq26lQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4d129ee1-ca1d-4f86-9fc5-7c5e81c7dec6",
+                            SecurityStamp = "542348fa-f7a1-4a41-b39f-b1ad68c0dc4a",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2022, 10, 20, 11, 57, 39, 378, DateTimeKind.Local).AddTicks(7455),
+                            DateCreated = new DateTime(2022, 10, 26, 15, 34, 8, 680, DateTimeKind.Local).AddTicks(6331),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,

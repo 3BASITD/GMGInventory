@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using GMGInventory.Common.Constants;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
@@ -30,6 +31,14 @@ namespace GMGInventory.Common.Models
         [MaxLength(50)]
         [Display(Name = "Email")]
         public string? Email { get; set; }
+
+        [Display(Name = "Commission Rate")]
+        public string CommissionRate => string.Format(SystemFormat.StringDecimalComma, CommissionRateD);
+        public decimal? CommissionRateD { get; set; }
+
+        [Display(Name = "Use Area Rate?")]
+        public bool UseAreaRate { get; set; }
+
 
         [Required]
         [Display(Name = "Agent Name")]

@@ -52,10 +52,7 @@
         <table class="table table-head-fixed table-striped table-hover table-soa">
             <thead>
                 <tr>
-                    <th>
 
-                    </th>
-                  
                     <th>
                         @Html.DisplayNameFor(model => model.InvoiceNumber)
                     </th>
@@ -90,7 +87,14 @@
     </div>
 </div>
 
+<form id="deleteSoaLineItemForm" asp-action="Delete">
+    <input type="hidden" id="deleteSoaLineItemId" name="Id"/>
+    <input type="hidden" id="deleteSoaCrId" name="soacrId" value="@Model?.Id"/>
+</form>
 
+<form id="reactivateSoaLineItemForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateSoaLineItemId" name="Id" />
+</form>
 
 <!-- Create New Payment Modal -->
 <div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static" >
@@ -123,6 +127,15 @@
                             </div>
                         </div>
                     </div>
+                 @*   <div class="row">
+                        <div class="col-md-12">
+                           <div class="form-group">
+                                <label for="create-invoice" class="control-label mb-0 d-block">Debit</label>
+                                <input type="number" name="Invoice" id="create-invoice" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-invoice" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>*@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -229,15 +242,14 @@
                                 <span data-valmsg-for="create-checknumber" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        @*<div class="col-md-4">
                             <div class="form-group">
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
                                    <span class="fas fa-file-alt"></span> Add
                                  </button>
                             </div>
-                        </div>
+                        </div>*@
                     </div>
-                    <h4>Total: 0.00</h4>
 
                 </div>
                 <div class="modal-footer">
@@ -321,14 +333,6 @@
             serverSide: true,
             filter: true,
             columns: [
-                {
-                    orderable: false,
-                    data: function (data, type, dataToSet) {
-                        var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
-                        return actions;
-                    }
-                },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
                 { data: "invoiceAmount", name: "InvoiceAmount" },
                 { data: "tbr", name: "TBR" },
@@ -336,13 +340,13 @@
                 { data: "debit", name: "Debit" },
                 { data: "paidAmount", name: "PaidAmount" },
                 { data: "freightCharge", name: "FreightCharge" },
-                { data: "balance", name: "Balance" },
+                { data: "balance", name: "Balance"/*, className: "text-end"*/},
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
                             actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                 
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Invoice" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions;
                     }
@@ -356,23 +360,57 @@
 
             DatatablesSearchOnEnter('.table-soa', itemTable);
 
-            $(".btn-remove-item").on("click", function () {
-                itemTable.row($(this).parents('tr')).remove().draw();
+            $(".printBtn").on("click", function () {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
             });
-            $(".table-soa thead th").removeClass("form-cell");
-            $(".table-soa thead th").removeClass("text-end");
-            $(".table-soa th").removeClass("balance");
+            var urlQuery = [];
+            //urlQuery.push("DateFrom=" + $("#filter-from").val());
+            //urlQuery.push("DateTo=" + $("#filter-to").val());
+            //if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+            //if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+            setTimeout(function () {
+                //let win = window.open('@Url.Action("PrintSoaDetails")?' + urlQuery.join("&"), '');
+                let win = window.open('@Url.Action("PrintSoaDetails")/@Model?.Id', '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
+            });
+
+            $('.deleteBtn').click(function(e) {
+                swal({
+                    title: "Delete Invoice",
+                    text: "Are you sure you want to delete this record?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#deleteSoaLineItemId').val(id);
+                        $('#deleteSoaLineItemForm').submit();
+                    }
+                });
+            });
+
 
 
             // Actions upon Display Edit Modal
             $(".editBtn").click(function (e) {
                 var data = itemTable.row($(this).parents('tr')).data();
-                
+                console.log(data);
                     $("#edit-id").val(data.id);
-                    $("#edit-tbr").val(data.tbrD);
+                    $("#edit-tbr").val(data.tbrd);
                     $("#edit-debit").val(data.debitD);
                     $("#edit-credit").val(data.creditD);
-                    $("#edit-freight-cost").val(data.freightchargeD);
+                    $("#edit-freight-cost").val(data.freightChargeD);
+                   // $("#edit-invoice").val(data.invoiceId);
 
             });
 
@@ -404,6 +442,7 @@
                     url: "@Url.Action("EditInvoiceJson")",
                     data: {
                         Id: $("#edit-id").val(),
+                        InvoiceId: $("#edit-invoice").val(),
                         TBRD: $("#edit-tbr").val(),
                         DebitD: $("#edit-debit").val(),
                         CreditD: $("#edit-credit").val(),
@@ -424,87 +463,11 @@
                 });
             }
 
-            $(".printBtn").on("click", function () {
 
-            $.ajax({
-                url: "@Url.Action("GetSOAInvoice", "Soacr")",
-                type: "POST",
-                data: function(data) {
-                    data.Id = @Model?.Id
-                    //Id: @Model?.Id
-                },
-                beforeSend: function (xhr, settings) {
-                    $.LoadingOverlay("show", {
-                        image: "",
-                        fontawesome: "fas fa-print"
-                    });
-                },
-                error: jQueryCommonError,
-                success: function (data, status, xhr) {
-                    var html = '<h3>Customer Statement of Account</h3>';
-
-                    html += '<table class="table-soa">';
-                    html += '<thead>';
-                    html += '<tr>';
-                    html += '<th>Invoice Date</th>';
-                    html += '<th>Invoice Number</th>';
-                    html += '<th>Type</th>';
-                    html += '<th>Trans Amount</th>';
-                    html += '<th>Waybill No</th>';
-                    html += '<th>Freight Cost</th>';
-                    html += '<th>Total</th>';
-                    html += '</tr>';
-                    html += '</thead>';
-
-                    html += '<tbody>';
-                    var totalAmount = 0;
-                    $.each(data, function (i, item) {
-                        html += '<tr>';
-                        html += '<td>' + item.invoiceDate + '</td>';
-                        html += '<td>' + item.invoiceNumber + '</td>';
-                        html += '<td>' + item.invoiceAmount + '</td>';
-                        html += '<td>' + item.invoiceAmount + '</td>';
-                        html += '<td>' + item.invoiceAmount + '</td>';
-                        html += '<td>' + item.freightCost + '</td>';
-                        html += '<td class="right-text">' + item.invoiceAmount + '</td>';
-                        html += '</tr>';
-
-                        totalAmount += parseFloat(item.invoiceAmount);
-                    });
-                    html += '</tbody>';
-
-                    html += '<tfoot>';
-                    html += '<tr>';
-                    html += '<th colspan="3" class="right-text">Total</th>';
-                    html += '<th class="right-text">' + FormatStringDecimal(totalAmount) + '</th>';
-                    html += '</tr>';
-                    html += '</tfoot>';
-                    html += '</table>';
-
-                    $("#for-print").html(html);
-                },
-                complete: function (xhr, status) {
-                    printout("#for-print", {
-                        pageTitle: "GMG Inventory",
-                        importCSS: false,
-                        loadCSS: "/css/print.css"
-                    });
-                    hideLoader();
-                    $("#for-print").html("");
-                }
-            });
-
-        });
-
-            
-       
-
-
-
-        });
-
-        // Actions upon Display Create Modal
+         // Actions upon Display Create Modal
         $(".createBtn").click(function(e) {
+            var data = itemTable.row($(this).parents('tr')).data();
+            //$("#create-invoice").val(data.invoiceId);
             $("#create-customer").val(@Model?.CustomerId);
             $("#create-customer-receipt").val("");
             $("#create-remarks").val("");
@@ -516,6 +479,11 @@
             $("#create-offset").val("");
             $("#create-cash-amount").val("");
             $("#create-backload").val("");
+            $("#create-bankname").val("");
+            $("#create-bankbranch").val("");
+            $("#create-checkdate").val("");
+            $("#create-checkamount").val("");
+            $("#create-checknumber").val("");
         });
 
         // Validation for Create Modal
@@ -557,9 +525,11 @@
         function DoCreate() {
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("CreatePaymentJson", "Soacr")",
+                url: "@Url.Action("CreatePaymentJson")",
                 data: {
+                    SOANo: @Model?.Id,
                     CustomerId: @Model?.CustomerId,
+                    InvoiceId: $("#create-invoice").val(),
                     CRNumber: $("#create-customer-receipt").val(),
                     Remarks: $("#create-remarks").val(),
                     OverPaymentD: $("#create-over-payment").val(),
@@ -569,7 +539,12 @@
                     DiscountD: $("#create-discount").val(),
                     OffsetD: $("#create-offset").val(),
                     CashAmountD: $("#create-cash-amount").val(),
-                    BackLoadD: $("#create-backload").val()
+                    BackLoadD: $("#create-backload").val(),
+                    BankName: $("#create-bankname").val(),
+                    BankBranch: $("#create-bankbranch").val(),
+                    CheckAmountD: $("#create-checkamount").val(),
+                    CheckDateD: $("#create-checkdate").val(),
+                    CheckNo: $("#create-checknumber").val()
                 },
                 error: jQueryCommonError,
                 success: function(data, status, xhr) {
@@ -585,7 +560,12 @@
             });
         }
       
-        
+            
+      
+
+        });
+
+       
 
     </script>
     }

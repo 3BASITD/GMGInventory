@@ -40,12 +40,17 @@ namespace GMGInventory.Application.Repositories
                                  CRNumber = cp.CRNumber,
                                  SOANo = cp.SOACRId,
                                  CustomerName = cp.Customer.Name,
-                                 TotalInvoiceAmountD = cp.TotalInvoiceAmount,
+                                 OverPaymentD = cp.OverPay,
+                                 TaxD = cp.Tax,
+                                 DiscountD = cp.Discount,
+                                 TKTD = cp.TKTSolicitation,
+                                 OffsetD = cp.OffSet,
+                                 BackLoadD = cp.BackLoad,
+                                 CashAmountD = cp.Cash,
+                                 CashAdvancedD = cp.CashAdvance,
+                                 Remarks = cp.Remarks,
                                  AmountPaidD = cp.TotalAmountPaid,
-                                 OverPaymentD = cp.OverPayment,
-                                 TransactionDateD = cp.DateCreated,
-                                 CreatedBy = cp.UserCreated,
-                                 Remarks = cp.Remarks
+                                 TotalInvoiceAmountD = cp.TotalInvoiceAmount
 
                              }).FirstOrDefault();
             return paymentVM;
@@ -55,8 +60,7 @@ namespace GMGInventory.Application.Repositories
         private IQueryable<PaymentVM> GetList()
         {
 
-            return 
-                   from cp in context.CustomerPayments
+            return from cp in context.CustomerPayments
                                      .Include (s => s.Customer)
                    select new PaymentVM
                    {
@@ -66,9 +70,9 @@ namespace GMGInventory.Application.Repositories
                        CustomerName = cp.Customer.Name,
                        TotalInvoiceAmountD = cp.TotalInvoiceAmount,
                        AmountPaidD = cp.TotalAmountPaid,
-                       OverPaymentD = cp.OverPayment,
+                       OverPaymentD = cp.OverPay,
                        TransactionDateD = cp.DateCreated,
-                       CreatedBy = cp.UserCreated,
+                       CreatedBy = userManager.FindByIdAsync(cp.UserCreated).Result.Nickname,
                        Remarks = cp.Remarks
 
 
@@ -112,7 +116,7 @@ namespace GMGInventory.Application.Repositories
                         case "TotalInvoiceAmount": data = data.OrderBy(s => s.TotalInvoiceAmount); break;
                         case "AmountPaid": data = data.OrderBy(s => s.AmountPaid); break;
                         case "OverPayment": data = data.OrderBy(s => s.OverPayment); break;
-                        case "TransactionDate": data = data.OrderBy(s => s.TransactionDate); break;
+                        case "TransactionDate": data = data.OrderBy(s => s.TransactionDateD); break;
                         case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderBy(s => s.Remarks); break;
 
@@ -129,7 +133,7 @@ namespace GMGInventory.Application.Repositories
                         case "TotalInvoiceAmount": data = data.OrderByDescending(s => s.TotalInvoiceAmount); break;
                         case "AmountPaid": data = data.OrderByDescending(s => s.AmountPaid); break;
                         case "OverPayment": data = data.OrderByDescending(s => s.OverPayment); break;
-                        case "TransactionDate": data = data.OrderByDescending(s => s.TransactionDate); break;
+                        case "TransactionDate": data = data.OrderByDescending(s => s.TransactionDateD); break;
                         case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
                         default: break;
@@ -150,19 +154,17 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<PaymentVM>> GetPaymentChecksAsync(int id)
         {
-            var customerVM = from cpd in context.CustomerPaymentDetails
-                             join p in context.Payments
-                                              on cpd.PaymentId equals p.Id
-                             join pd in context.PaymentDetails
-                                              on p.Id equals pd.PaymentId
-                             where cpd.Id == id
+            var customerVM = from cp in context.CustomerPayments
+                             join sc in context.SOACRChecks
+                                     on cp.Id equals sc.CustomerPaymentId
+                             where cp.Id == id
                              select new PaymentVM
                              {
-                                 CheckNo = pd.CheckNumber.ToString(),
-                                 CheckAmountD = pd.CheckAmount,
-                                 CheckDateD = pd.CheckDate,
-                                 BankName = pd.BankName.ToString(),
-                                 BankBranch = pd.BankBranch.ToString()
+                                 CheckNo = sc.CheckNumber,
+                                 CheckAmountD = sc.CheckAmount,
+                                 CheckDateD = sc.CheckDate,
+                                 BankName = sc.BankName,
+                                 BankBranch = sc.BankBranch
 
                              };
             return await customerVM.ToListAsync();
@@ -227,21 +229,25 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<PaymentVM>> GetPaymentInvoicesAsync(int id)
         {
-            var customerVM = from cpd in context.CustomerPaymentDetails
-                             join p in context.Invoices
-                                              on cpd.InvoiceId equals p.Id
-                             join invt in context.InvoiceTypes
-                                              on p.InvoiceTypeId equals invt.Id
-                             where cpd.Id == id
+            var customerVM = from inv in context.Invoices
+                             join soali in context.SOACRLineItems
+                                        on inv.Id equals soali.InvoiceId
+                             join soacr in context.SOACRs
+                                        on soali.SOACRId equals soacr.Id into soacrs
+                             from soacrsGroup in soacrs.DefaultIfEmpty()
+                             join c in context.CustomerPayments
+                                        on soacrsGroup.Id equals c.SOACRId
+
+                             where c.Id == id
                              select new PaymentVM
                              {
-                                 InvoiceNumber = p.InvoiceNumber,
-                                 InvoiceDate = p.DateCreated.ToString(),
-                                 InvoiceType = invt.Name,
-                                 InvoiceAmount = p.Amount.ToString(),
-                                 BalanceAmount = p.PaidAmount.ToString(),
-                                 PackNo = p.PackId.ToString(),
-                                 SalesOrderNo = p.SalesOrderId.ToString()
+                                 InvoiceNumber = inv.InvoiceNumber,
+                                 InvoiceDateD = inv.DateModified ?? inv.DateCreated,
+                                 InvoiceType = inv.InvoiceType.Name,
+                                 InvoiceAmountD = inv.Amount,
+                                 BalanceAmountD = inv.PaidAmount,
+                                 PackNo = inv.Pack.QuantityInvoiced,
+                                 SalesOrderNo = inv.SalesOrder.SalesOrderNumber
 
 
 
@@ -259,11 +265,13 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.CheckNo.ToString().Contains(form.SearchValue)
-                                    || x.CheckAmount.ToString().Contains(form.SearchValue)
-                                    || x.CheckDate.ToString().Contains(form.SearchValue)
-                                    || x.BankName.ToString().Contains(form.SearchValue)
-                                    || x.BankBranch.ToString().Contains(form.SearchValue));
+                data = data.Where(x => x.InvoiceNumber.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceDateD.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceType.ToLower().Contains(form.SearchValue)
+                                    || x.InvoiceAmountD.ToString().Contains(form.SearchValue)
+                                    || x.BalanceAmountD.ToString().Contains(form.SearchValue)
+                                    || x.PackNo.ToString().Contains(form.SearchValue)
+                                    || x.SalesOrderNo.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -274,11 +282,13 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "CheckNo": data = data.OrderBy(s => s.CheckNo); break;
-                        case "CheckAmount": data = data.OrderBy(s => s.CheckAmount); break;
-                        case "CheckDate": data = data.OrderBy(s => s.CheckDate); break;
-                        case "BankName": data = data.OrderBy(s => s.BankName); break;
-                        case "BankBranch": data = data.OrderBy(s => s.BankBranch); break;
+                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
+                        case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDate); break;
+                        case "InvoiceType": data = data.OrderBy(s => s.InvoiceType); break;
+                        case "InvoiceAmount": data = data.OrderBy(s => s.InvoiceAmount); break;
+                        case "BalanceAmount": data = data.OrderBy(s => s.BalanceAmount); break;
+                        case "PackNo": data = data.OrderBy(s => s.PackNo); break;
+                        case "SalesOrderNo": data = data.OrderBy(s => s.SalesOrderNo); break;
                         default: break;
                     }
                 }
@@ -286,11 +296,13 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "CheckNo": data = data.OrderByDescending(s => s.CheckNo); break;
-                        case "CheckAmount": data = data.OrderByDescending(s => s.CheckAmount); break;
-                        case "CheckDate": data = data.OrderByDescending(s => s.CheckDate); break;
-                        case "BankName": data = data.OrderByDescending(s => s.BankName); break;
-                        case "BankBranch": data = data.OrderByDescending(s => s.BankBranch); break;
+                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
+                        case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDate); break;
+                        case "InvoiceType": data = data.OrderByDescending(s => s.InvoiceType); break;
+                        case "InvoiceAmount": data = data.OrderByDescending(s => s.InvoiceAmount); break;
+                        case "BalanceAmount": data = data.OrderByDescending(s => s.BalanceAmount); break;
+                        case "PackNo": data = data.OrderByDescending(s => s.PackNo); break;
+                        case "SalesOrderNo": data = data.OrderByDescending(s => s.SalesOrderNo); break;
                         default: break;
                     }
                 }
