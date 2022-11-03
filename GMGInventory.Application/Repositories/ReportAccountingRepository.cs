@@ -16,6 +16,7 @@ namespace GMGInventory.Application.Repositories
         }
 
         #region Credit Memo
+
         public async Task<IList<CreditDebitMemoRVM>> GetCreditMemo(ListFilterCustomerModel filter)
         {
             var credits = from credit in context.CreditDebitMemos
@@ -111,9 +112,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Credit Memo
 
         #region Debit Memo
+
         public async Task<IList<CreditDebitMemoRVM>> GetDebitMemo(ListFilterCustomerModel filter)
         {
             var debits = from debit in context.CreditDebitMemos
@@ -209,6 +212,7 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Debit Memo
     }
 }

@@ -4,7 +4,6 @@ using GMGInventory.Application.Repositories;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +55,6 @@ builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepositor
 builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseRepository));
-
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

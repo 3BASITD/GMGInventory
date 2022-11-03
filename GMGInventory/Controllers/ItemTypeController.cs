@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
-using GMGInventory.Common.Models;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using GMGInventory.Common.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using ClosedXML.Excel;
 
 namespace GMGInventory.Controllers
 {
@@ -26,11 +22,9 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
-
             return Json(await itemTypeRepository.GetOptions(IncludeId));
         }
 
-       
         public IActionResult Index()
         {
             return View();
@@ -65,7 +59,7 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> UploadJson(ItemTypeVM itemTypeVM)
         {
             ResponseModel responseModel = new ResponseModel();
-            if(await itemTypeRepository.UploadCombinationExistAsync(itemTypeVM))
+            if (await itemTypeRepository.UploadCombinationExistAsync(itemTypeVM))
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Already exist";

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -68,7 +67,6 @@ namespace GMGInventory.Application.Repositories
                                     .Include(s => s.Agent)
                                     .Include(s => s.CreditTerm)
 
-
                               where cust.Id == id
                               select new CustomerVM
                               {
@@ -96,10 +94,10 @@ namespace GMGInventory.Application.Repositories
                                   CreditLimit = cust.CreditLimit,
                                   Remarks = cust.Remarks,
                                   IsActive = cust.IsActive
-
                               }).FirstOrDefault();
             return customerVM;
         }
+
         private IQueryable<CustomerVM> GetList()
         {
             return from cust in context.Customers
@@ -117,10 +115,7 @@ namespace GMGInventory.Application.Repositories
                        CreditLimit = cust.CreditLimit,
                        OutstandingBalance = cust.OutstandingBalance,
                        IsActive = cust.IsActive
-
                    };
-
-
         }
 
         public ForDataTables<CustomerVM> GetListDataTables(DataTablesRequestForm form)
@@ -180,8 +175,6 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-
-
         public async Task<IList<Customer>> GetAllActiveCustomerAsync(int includeId)
         {
             return await context.Customers.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
@@ -198,6 +191,7 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.Areas.AnyAsync(s => s.Id == id);
         }
+
         public async Task<bool> IsCodeExistAsync(string code)
         {
             return await context.Customers.AnyAsync(s => s.Code == code);
@@ -223,8 +217,6 @@ namespace GMGInventory.Application.Repositories
             customers.IsActive = true;
             await context.SaveChangesAsync(currentUserId);
         }
-
-
 
         public async Task UpdateAsync(CustomerVM custVM)
         {
@@ -256,7 +248,6 @@ namespace GMGInventory.Application.Repositories
             context.Customers.Update(cust);
             await context.SaveChangesAsync(currentUserId);
         }
-
 
         public async Task AddAsync(CustomerVM custVM)
         {
@@ -291,8 +282,6 @@ namespace GMGInventory.Application.Repositories
             };
             await context.Customers.AddAsync(cust);
             await context.SaveChangesAsync(currentUserId);
-
-
         }
 
         public async Task AddShippingAsync(CustomerVM shippingVM)
@@ -305,14 +294,9 @@ namespace GMGInventory.Application.Repositories
                 PhoneNumber = shippingVM.ShippingPhoneNo,
                 FaxNumber = shippingVM.ShippingFaxNo,
                 ContactPerson = shippingVM.ShippingContactPerson
-
-
-
             };
             await context.ShippingAddresses.AddAsync(shipping);
             await context.SaveChangesAsync(currentUserId);
-
-
         }
 
         public async Task AddForwarderAsync(CustomerVM forwarderVM)
@@ -325,15 +309,9 @@ namespace GMGInventory.Application.Repositories
                 Address = forwarderVM.ForwarderAddress,
                 PhoneNumber = forwarderVM.ForwarderPhoneNo,
                 FaxNumber = forwarderVM.ForwarderFaxNo
-
-
-
-
             };
             await context.Forwarders.AddAsync(forwarders);
             await context.SaveChangesAsync(currentUserId);
-
-
         }
 
         private async Task<IList<CustomerVM>> GetCustomerDetailsAsync(int id)
@@ -394,7 +372,6 @@ namespace GMGInventory.Application.Repositories
                         case "CreditLimit": data = data.OrderBy(s => s.CreditLimit); break;
                         case "OutstandingBalance": data = data.OrderBy(s => s.OutstandingBalance); break;
                         default: break;
-
                     }
                 }
                 else if (form.SortColumnDirection == "desc")
@@ -407,7 +384,6 @@ namespace GMGInventory.Application.Repositories
                         case "CreditLimit": data = data.OrderByDescending(s => s.CreditLimit); break;
                         case "OutstandingBalance": data = data.OrderByDescending(s => s.OutstandingBalance); break;
                         default: break;
-
                     }
                 }
             }
@@ -579,7 +555,6 @@ namespace GMGInventory.Application.Repositories
                                  TransactionDate = cp.DateCreated.ToString(),
                                  CreatedBy = cp.UserCreated,
                                  PaymentRemarks = cp.Remarks
-
                              };
             return await customerVM.ToListAsync();
         }
@@ -650,7 +625,6 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-
         private async Task<IList<CustomerVM>> GetCustomerReceivableAsync(int id)
         {
             var customerVM = from customer in context.Customers
@@ -667,7 +641,6 @@ namespace GMGInventory.Application.Repositories
                                  InvoiceNo = i.InvoiceNumber,
                                  InvoicedDate = i.DateCreated.ToString(),
                                  InvoicedAmount = i.Amount.ToString()
-
                              };
             return await customerVM.ToListAsync();
         }
@@ -722,6 +695,5 @@ namespace GMGInventory.Application.Repositories
                 Data = pageList
             };
         }
-
     }
 }

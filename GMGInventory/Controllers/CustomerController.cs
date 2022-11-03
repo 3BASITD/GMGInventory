@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using GMGInventory.Application.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
@@ -44,6 +39,7 @@ namespace GMGInventory.Controllers
         {
             return Json(await customerRepository.GetOptions2(IncludeId));
         }
+
         public ActionResult Index()
         {
             return View();
@@ -78,10 +74,10 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> CreateShippingJson(CustomerVM shippingVM)
         {
             ResponseModel responseModel = new ResponseModel();
-                await customerRepository.AddShippingAsync(shippingVM);
-                responseModel.Status = "Success";
-                responseModel.Message = "Shipping successfully added";
-            
+            await customerRepository.AddShippingAsync(shippingVM);
+            responseModel.Status = "Success";
+            responseModel.Message = "Shipping successfully added";
+
             return Json(responseModel);
         }
 
@@ -121,6 +117,7 @@ namespace GMGInventory.Controllers
             }
             return Json(responseModel);
         }
+
         public ActionResult Details(int id)
         {
             var cust = customerRepository.GetCustomerDtlVM(id);
@@ -162,7 +159,6 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetCustomerForwarderDTAsync(form, id));
         }
 
-
         [HttpPost]
         public async Task<JsonResult> GetPaymentJson(int id)
         {
@@ -177,13 +173,11 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetCustomerReceivableDTAsync(form, id));
         }
 
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            { 
+            {
                 await customerRepository.DeactivateCustomerAsync(id);
                 TempData["WarningMessage"] = "Customer has been deactivated";
             }
@@ -195,11 +189,9 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
-
             await customerRepository.ReactivateCustomerAsync(id);
             TempData["SuccessMessage"] = "Customer reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
-
     }
 }

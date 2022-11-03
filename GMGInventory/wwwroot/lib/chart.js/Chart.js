@@ -174,7 +174,6 @@ var colorName = {
 var conversions = createCommonjsModule(function (module) {
 /* MIT license */
 
-
 // NOTE: conversions should only return primitive values (i.e. arrays, or
 //       values that give correct `typeof` results).
 //       do not use box values types (i.e. Number(), String(), etc.)
@@ -1381,7 +1380,6 @@ var colorName$1 = {
 
 /* MIT license */
 
-
 var colorString = {
    getRgba: getRgba,
    getHsla: getHsla,
@@ -1528,7 +1526,7 @@ function getAlpha(string) {
 // generators
 function hexString(rgba, a) {
    var a = (a !== undefined && rgba.length === 3) ? a : rgba[3];
-   return "#" + hexDouble(rgba[0]) 
+   return "#" + hexDouble(rgba[0])
               + hexDouble(rgba[1])
               + hexDouble(rgba[2])
               + (
@@ -1610,7 +1608,6 @@ function hexDouble(num) {
   return (str.length < 2) ? "0" + str : str;
 }
 
-
 //create a list of reverse color names
 var reverseNames = {};
 for (var name in colorName$1) {
@@ -1618,8 +1615,6 @@ for (var name in colorName$1) {
 }
 
 /* MIT license */
-
-
 
 var Color = function (obj) {
 	if (obj instanceof Color) {
@@ -3618,7 +3613,6 @@ var DatasetController = function(chart, datasetIndex) {
 };
 
 helpers$1.extend(DatasetController.prototype, {
-
 	/**
 	 * Element type used to generate a meta dataset (e.g. Chart.element.Line).
 	 * @type {Chart.core.element}
@@ -4848,7 +4842,6 @@ function computeFlexCategoryTraits(index, ruler, options) {
 }
 
 var controller_bar = core_datasetController.extend({
-
 	dataElementType: elements.Rectangle,
 
 	/**
@@ -5148,7 +5141,6 @@ var controller_bar = core_datasetController.extend({
 
 		return values;
 	}
-
 });
 
 var valueOrDefault$4 = helpers$1.valueOrDefault;
@@ -5431,7 +5423,6 @@ core_defaults._set('doughnut', {
 });
 
 var controller_doughnut = core_datasetController.extend({
-
 	dataElementType: elements.Arc,
 
 	linkScales: helpers$1.noop,
@@ -5828,9 +5819,7 @@ function toClip(value) {
 	};
 }
 
-
 var controller_line = core_datasetController.extend({
-
 	datasetElementType: elements.Line,
 
 	dataElementType: elements.Point,
@@ -6225,7 +6214,6 @@ core_defaults._set('polarArea', {
 });
 
 var controller_polarArea = core_datasetController.extend({
-
 	dataElementType: elements.Arc,
 
 	linkScales: helpers$1.noop,
@@ -7906,7 +7894,6 @@ var platform = helpers$1.extend({
 	 * @param {function} listener - The listener function to remove from the event target.
 	 */
 	removeEventListener: function() {}
-
 }, implementation);
 
 core_defaults._set('global', {
@@ -8311,7 +8298,6 @@ function splitNewlines(str) {
 	}
 	return str;
 }
-
 
 /**
  * Private helper to create a tooltip item model
@@ -8744,7 +8730,6 @@ var exports$4 = core_element.extend({
 				labelColors.push(opts.callbacks.labelColor.call(me, tooltipItem, me._chart));
 				labelTextColors.push(opts.callbacks.labelTextColor.call(me, tooltipItem, me._chart));
 			});
-
 
 			// Build the Text Lines
 			model.title = me.getTitle(tooltipItems, data);
@@ -10281,7 +10266,6 @@ helpers$1.configMerge = mergeConfig;
 helpers$1.scaleMerge = mergeScaleConfig;
 
 var core_helpers = function() {
-
 	// -- Basic js utility methods
 
 	helpers$1.where = function(collection, filterCallback) {
@@ -10639,7 +10623,6 @@ var core_helpers = function() {
 		if (touches && touches.length > 0) {
 			mouseX = touches[0].clientX;
 			mouseY = touches[0].clientY;
-
 		} else {
 			mouseX = e.clientX;
 			mouseY = e.clientY;
@@ -10664,7 +10647,6 @@ var core_helpers = function() {
 			x: mouseX,
 			y: mouseY
 		};
-
 	};
 
 	// Private helper function to convert max-width/max-height values that may be percentages into a number
@@ -11403,7 +11385,6 @@ function skip(ticks, spacing, majorStart, majorEnd) {
 }
 
 var Scale = core_element.extend({
-
 	zeroLineIndex: 0,
 
 	/**
@@ -13193,7 +13174,6 @@ var scale_logarithmic = core_scale.extend({
 					me.max = Math.max(me.max, maxVal);
 				}
 			});
-
 		} else {
 			for (datasetIndex = 0; datasetIndex < datasets.length; datasetIndex++) {
 				meta = chart.getDatasetMeta(datasetIndex);
@@ -13465,7 +13445,6 @@ function determineLimits(angle, pos, size, min, max) {
  * Helper function to fit a radial linear scale with point labels
  */
 function fitWithPointLabels(scale) {
-
 	// Right, this is really confusing and there is a lot of maths going on here
 	// The gist of the problem is here: https://gist.github.com/nnnick/696cc9c55f4b0beb8fe9
 	//
@@ -15229,7 +15208,6 @@ function getBoxWidth(labelOpts, fontSize) {
  * IMPORTANT: this class is exposed publicly as Chart.Legend, backward compatibility required!
  */
 var Legend = core_element.extend({
-
 	initialize: function(config) {
 		var me = this;
 		helpers$1.extend(me, config);
@@ -15403,7 +15381,6 @@ var Legend = core_element.extend({
 			});
 
 			minSize.height += totalHeight;
-
 		} else {
 			var vPadding = labelOpts.padding;
 			var columnWidths = me.columnWidths = [];
@@ -15807,7 +15784,6 @@ var Title = core_element.extend({
 		me.afterUpdate();
 
 		return me.minSize;
-
 	},
 	afterUpdate: noop$2,
 
@@ -15999,7 +15975,6 @@ plugins.title = title;
  * @namespace Chart
  */
 
-
 core_controller.helpers = helpers$1;
 
 // @todo dispatch these helpers into appropriated helpers/helpers.* file and write unit tests!
@@ -16029,7 +16004,6 @@ core_controller.helpers.each(scales, function(scale, type) {
 });
 
 // Load to register built-in adapters (as side effects)
-
 
 // Loading built-in plugins
 
@@ -16147,5 +16121,4 @@ core_controller.helpers.each(
 );
 
 return src;
-
 })));

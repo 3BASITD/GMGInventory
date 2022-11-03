@@ -1,11 +1,8 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
@@ -107,7 +104,8 @@ namespace GMGInventory.Controllers
                 await salesOrderRepository.SaveItemsAsync(form.Items, (int)form.Id);
                 responseModel.Status = "Success";
                 responseModel.Message = "Order item(s) successfully saved";
-            } else
+            }
+            else
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Invalid Sales Order";

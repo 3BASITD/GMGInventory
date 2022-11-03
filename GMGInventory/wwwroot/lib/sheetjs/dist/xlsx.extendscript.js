@@ -292,7 +292,6 @@ var Buffer_from = (function() {
 	return function() {};
 })();
 
-
 function new_raw_buf(len) {
 	/* jshint -W056 */
 	if(has_buf) return Buffer.alloc ? Buffer.alloc(len) : new Buffer(len);
@@ -510,7 +509,6 @@ var SSF_default_map = {
 	82: 0                                   // 82 ->  0 ... 65536 -> 0 (omitted)
 };
 
-
 /* These formats technically refer to Accounting formats with no equivalent */
 var SSF_default_str = {
 	//  5 -- Currency,   0 decimal, black negative
@@ -639,7 +637,6 @@ function SSF_general_num(v) {
 	return SSF_strip_decimal(SSF_normalize_exp(o.toUpperCase()));
 }
 
-
 /*
 	"General" rules:
 	- text is passed through ("@")
@@ -734,7 +731,6 @@ if(ss0 >= 2) tt = ss0 === 3 ? 1000 : 100;
 	var outstr = outl > 0 ? pad0(out, outl) : "";
 	return outstr;
 }
-
 
 /*jshint -W086 */
 /*jshint +W086 */
@@ -2079,7 +2075,6 @@ function rebuild_cfb(cfb, f) {
 			elt.type = 2;
 		}
 	}
-
 }
 
 function _write(cfb, options) {
@@ -2827,7 +2822,6 @@ function parse_zip(file, options) {
 	return o;
 }
 
-
 /* head starts just after local file header signature */
 function parse_local_file(blob, csz, usz, o, EF) {
 	/* [local file header] */
@@ -3076,7 +3070,6 @@ function parse_quoted_printable(data) {
 	for(var oi = 0; oi < o.length; ++oi) o[oi] = o[oi].replace(/[=][0-9A-Fa-f]{2}/g, function($$) { return String.fromCharCode(parseInt($$.slice(1), 16)); });
 	return s2a(o.join("\r\n"));
 }
-
 
 function parse_mime(cfb, data, root) {
 	var fname = "", cte = "", ctype = "", fdata;
@@ -4584,7 +4577,6 @@ var parse_XLNameWideString = parse_XLWideString;
 var parse_RelID = parse_XLNullableWideString;
 var write_RelID = write_XLNullableWideString;
 
-
 /* [MS-XLS] 2.5.217 ; [MS-XLSB] 2.5.122 */
 function parse_RkNumber(data) {
 	var b = data.slice(data.l, data.l + 4);
@@ -4601,7 +4593,6 @@ function write_RkNumber(data, o) {
 	if (fInt) o.write_shift(-4, ((fX100 ? d100 : data) << 2) + (fX100 + 2));
 	else throw new Error("unsupported RkNumber " + data); // TODO
 }
-
 
 /* [MS-XLSB] 2.5.117 RfX */
 function parse_RfX(data ) {
@@ -5465,7 +5456,6 @@ function parse_rels(data, currentFilePath) {
 	return rels;
 }
 
-
 /* TODO */
 function write_rels(rels) {
 	var o = [XML_HEADER, writextag('Relationships', null, {
@@ -5935,7 +5925,6 @@ function parse_lpwstr(blob, type, pad) {
 	return str;
 }
 
-
 /* [MS-OSHARED] 2.3.3.1.11 VtString */
 /* [MS-OSHARED] 2.3.3.1.12 VtUnalignedString */
 function parse_VtStringBase(blob, stringType, pad) {
@@ -5965,7 +5954,6 @@ function parse_VtVecUnalignedLpstrValue(blob) {
 	for(var i = 0; i != length; ++i) ret[i] = blob.read_shift(0, 'lpstr-cp').replace(chr0,'');
 	return ret;
 }
-
 
 /* [MS-OSHARED] 2.3.3.1.13 VtHeadingPair */
 function parse_VtHeadingPair(blob) {
@@ -6538,7 +6526,6 @@ function parse_LongRGBA(blob) { var r = blob.read_shift(1), g = blob.read_shift(
 /* 2.5.177 LongRGB */
 function parse_LongRGB(blob, length) { var x = parse_LongRGBA(blob, length); x[3] = 0; return x; }
 
-
 /* [MS-XLS] 2.5.19 */
 function parse_XLSCell(blob) {
 	var rw = blob.read_shift(2); // 0-indexed
@@ -6561,8 +6548,6 @@ function parse_frtHeader(blob) {
 	blob.l += 8;
 	return {type: rt, flags: flags};
 }
-
-
 
 function parse_OptXLUnicodeString(blob, length, opts) { return length === 0 ? "" : parse_XLUnicodeString2(blob, length, opts); }
 
@@ -6732,14 +6717,12 @@ function write_BOF(wb, t, o) {
 	return out;
 }
 
-
 /* [MS-XLS] 2.4.146 */
 function parse_InterfaceHdr(blob, length) {
 	if(length === 0) return 0x04b0;
 	if((blob.read_shift(2))!==0x04b0){/* empty */}
 	return 0x04b0;
 }
-
 
 /* [MS-XLS] 2.4.349 */
 function parse_WriteAccess(blob, length, opts) {
@@ -6826,7 +6809,6 @@ function parse_ExtSST(blob, length) {
 	return extsst;
 }
 
-
 /* [MS-XLS] 2.4.221 TODO: check BIFF2-4 */
 function parse_Row(blob) {
 	var z = ({});
@@ -6844,7 +6826,6 @@ function parse_Row(blob) {
 	return z;
 }
 
-
 /* [MS-XLS] 2.4.125 */
 function parse_ForceFullCalculation(blob) {
 	var header = parse_frtHeader(blob);
@@ -6852,10 +6833,6 @@ function parse_ForceFullCalculation(blob) {
 	var fullcalc = blob.read_shift(4);
 	return fullcalc !== 0x0;
 }
-
-
-
-
 
 /* [MS-XLS] 2.4.215 rt */
 function parse_RecalcId(blob) {
@@ -6980,7 +6957,6 @@ function write_Label(R, C, v, os, opts) {
 	o.write_shift((1 + b8) * v.length, v, b8 ? 'utf16le' : 'sbcs');
 	return o;
 }
-
 
 /* [MS-XLS] 2.4.126 Number Formats */
 function parse_Format(blob, length, opts) {
@@ -7439,7 +7415,6 @@ function write_HLink(hl) {
 	for(var i = 0; i < 16; ++i) O.write_shift(1, parseInt(clsid[i], 16));
 	return bconcat([O, write_Hyperlink(hl[1])]);
 }
-
 
 /* [MS-XLS] 2.4.141 */
 function parse_HLinkTooltip(blob, length) {
@@ -8911,7 +8886,6 @@ var WK_ = (function() {
 		return ba.end();
 	}
 
-
 	function write_BOF_WK1(v) {
 		var out = new_buf(2);
 		out.write_shift(2, v);
@@ -9239,7 +9213,6 @@ var WK_ = (function() {
 		if(out.length == 1) o[1].f = "" + out[0];
 		else console.error("WK1 bad formula parse |" + out.join("|") + "|");
 	}
-
 
 	function parse_cell_3(blob) {
 		var o = [{c:0,r:0}, {t:'n',v:0}, 0];
@@ -9868,7 +9841,6 @@ var parse_rs = (function() {
 	};
 })();
 
-
 /* Parse a list of <r> tags */
 var rs_to_html = (function parse_rs_factory() {
 	var nlregex = /(\r\n|\n)/g;
@@ -10342,7 +10314,6 @@ function parse_FilePass(blob, length, opts) {
 	else parse_XORObfuscation(blob, opts.biff >= 8 ? length : length - 2, opts, o);
 	return o;
 }
-
 
 var RTF = (function() {
 	function rtf_to_sheet(d, opts) {
@@ -12383,7 +12354,6 @@ function parse_comments_bin(data, opts) {
 			case 0x0025: /* 'BrtACBegin' */ break;
 			case 0x0026: /* 'BrtACEnd' */ break;
 
-
 			default:
 				if(R.T){/* empty */}
 				else if(!pass || opts.WTF) throw new Error("Unexpected record 0x" + RT.toString(16));
@@ -12732,7 +12702,6 @@ function parse_PtgRef3d(blob, length, opts) {
 	return [type, ixti, loc];
 }
 
-
 /* [MS-XLS] 2.5.198.62 ; [MS-XLSB] 2.5.97.45 TODO */
 function parse_PtgFunc(blob, length, opts) {
 	//var ptg = blob[blob.l] & 0x1F;
@@ -12879,7 +12848,6 @@ function parse_PtgMemFunc(blob, length, opts) {
 	var cce = blob.read_shift(opts && opts.biff == 2 ? 1 : 2);
 	return [type, cce];
 }
-
 
 /* [MS-XLS] 2.5.198.86 ; [MS-XLSB] 2.5.97.69 */
 function parse_PtgRefErr(blob, length, opts) {
@@ -13312,7 +13280,6 @@ function stringify_formula(formula/*Array<any>*/, range, cell, supbooks, opts) {
 			case 'PtgAttrIfError': /* [MS-XLSB] 2.5.97.28 */
 				break;
 
-
 			case 'PtgRef': /* [MS-XLS] 2.5.198.84 */
 c = shift_cell_xls((f[1][1]), _range, opts);
 				stack.push(encode_cell_xls(c, biff));
@@ -13654,7 +13621,6 @@ function write_Formula(cell, R, C, opts, os) {
 	var out = bconcat([o1, o2, o3, bf]);
 	return out;
 }
-
 
 /* XLSB Parsed Formula records have the same shape */
 function parse_XLSBParsedFormula(data, length, opts) {
@@ -14845,7 +14811,6 @@ function csf_to_ods_3D(r) {
 var strs = {}; // shared strings
 var _ssfopts = {}; // spreadsheet formatting options
 
-
 /*global Map */
 var browser_has_Map = typeof Map !== 'undefined';
 
@@ -15798,7 +15763,6 @@ function write_BrtShortError(cell, ncell, o) {
 	return o;
 }
 
-
 /* [MS-XLSB] 2.4.311 BrtCellIsst */
 function parse_BrtCellIsst(data) {
 	var cell = parse_XLSBCell(data);
@@ -16746,7 +16710,6 @@ function parse_cs_bin(data, opts, idx, rels, wb) {
 	var pass = false;
 	recordhopper(data, function cs_parse(val, R, RT) {
 		switch(RT) {
-
 			case 0x0226: /* 'BrtDrawing' */
 				s['!rel'] = val; break;
 
@@ -17741,7 +17704,6 @@ function parse_xlml_xml(d, _opts) {
 		"True/False": '"True";"True";"False";@',
 		"On/Off": '"Yes";"Yes";"No";@'
 	});
-
 
 	var Rn;
 	var state = [], tmp;
@@ -19478,7 +19440,6 @@ if(options.bookFiles) WorkbookP.cfb = cfb;
 return WorkbookP;
 }
 
-
 function write_xlscfb(wb, opts) {
 	var o = opts || {};
 	var cfb = CFB.utils.cfb_new({root:"R"});
@@ -20956,7 +20917,6 @@ function write_FONTS_biff8(ba, data, opts) {
 	}, opts));
 }
 
-
 function write_FMTS_biff8(ba, NF, opts) {
 	if(!NF) return;
 	[[5,8],[23,26],[41,44],[/*63*/50,/*66],[164,*/392]].forEach(function(r) {
@@ -21489,7 +21449,6 @@ var number_formats_ods = {
 	quarter:       ["\\Qm", "m\\\"th quarter\""]
 };
 
-
 function parse_content_xml(d, _opts) {
 		var opts = _opts || {};
 		if(DENSE != null && opts.dense == null) opts.dense = DENSE;
@@ -21521,7 +21480,6 @@ function parse_content_xml(d, _opts) {
 		xlmlregex.lastIndex = 0;
 		str = str.replace(/<!--([\s\S]*?)-->/mg,"").replace(/<!DOCTYPE[^\[]*\[[^\]]*\]>/gm,"");
 		while((Rn = xlmlregex.exec(str))) switch((Rn[3]=Rn[3].replace(/_.*$/,""))) {
-
 			case 'table': case '工作表': // 9.1.2 <table:table>
 				if(Rn[1]==='/') {
 					if(range.e.c >= range.s.c && range.e.r >= range.s.r) ws['!ref'] = encode_range(range);
@@ -24448,7 +24406,6 @@ function writeFileSyncXLSX(wb, filename, opts) {
 	return writeSyncXLSX(wb, o);
 }
 
-
 function writeFileAsync(filename, wb, opts, cb) {
 	var o = opts||{}; o.type = 'file';
 	o.file = filename;
@@ -24494,7 +24451,6 @@ function make_json_row(sheet, r, R, cols, header, hdr, dense, o) {
 	}
 	return { row: row, isempty: isempty };
 }
-
 
 function sheet_to_json(sheet, opts) {
 	if(sheet == null || sheet["!ref"] == null) return [];

@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -26,7 +23,6 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
             this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
-
 
         public PaymentVM? GetPaymentVM(int? id)
         {
@@ -51,17 +47,14 @@ namespace GMGInventory.Application.Repositories
                                  Remarks = cp.Remarks,
                                  AmountPaidD = cp.TotalAmountPaid,
                                  TotalInvoiceAmountD = cp.TotalInvoiceAmount
-
                              }).FirstOrDefault();
             return paymentVM;
         }
 
-
         private IQueryable<PaymentVM> GetList()
         {
-
             return from cp in context.CustomerPayments
-                                     .Include (s => s.Customer)
+                                     .Include(s => s.Customer)
                    select new PaymentVM
                    {
                        Id = cp.Id,
@@ -74,10 +67,7 @@ namespace GMGInventory.Application.Repositories
                        TransactionDateD = cp.DateCreated,
                        CreatedBy = userManager.FindByIdAsync(cp.UserCreated).Result.Nickname,
                        Remarks = cp.Remarks
-
-
                    };
-
         }
 
         public ForDataTables<PaymentVM> GetListDataTables(DataTablesRequestForm form)
@@ -165,7 +155,6 @@ namespace GMGInventory.Application.Repositories
                                  CheckDateD = sc.CheckDate,
                                  BankName = sc.BankName,
                                  BankBranch = sc.BankBranch
-
                              };
             return await customerVM.ToListAsync();
         }
@@ -248,9 +237,6 @@ namespace GMGInventory.Application.Repositories
                                  BalanceAmountD = inv.PaidAmount,
                                  PackNo = inv.Pack.QuantityInvoiced,
                                  SalesOrderNo = inv.SalesOrder.SalesOrderNumber
-
-
-
                              };
             return await customerVM.ToListAsync();
         }
@@ -317,8 +303,5 @@ namespace GMGInventory.Application.Repositories
                 Data = pageList
             };
         }
-
-
     }
-
 }

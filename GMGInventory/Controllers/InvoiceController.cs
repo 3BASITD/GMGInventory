@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
-using GMGInventory.Common.Models;
-using GMGInventory.Common.Constants;
-using AutoMapper;
+﻿using GMGInventory.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
-using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
@@ -15,6 +9,7 @@ namespace GMGInventory.Controllers
     public class InvoiceController : Controller
     {
         private readonly IInvoiceRepository invoiceRepository;
+
         public InvoiceController(IInvoiceRepository invoiceRepository)
         {
             this.invoiceRepository = invoiceRepository;
@@ -29,6 +24,5 @@ namespace GMGInventory.Controllers
         {
             return Json(await invoiceRepository.GetOptionsInvoiceNumber(search, page));
         }
-
     }
 }

@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
-using GMGInventory.Common.Models;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Data;
-using ClosedXML.Excel;
+using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -25,6 +21,7 @@ namespace GMGInventory.Controllers
         }
 
         #region Check Register by Date
+
         public IActionResult CheckRegisterDate()
         {
             return View();
@@ -47,9 +44,9 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> DownloadCheckRegisterByDate(ListFilterCustomerModel filter)
         {
             filter.Customer = null;
-            DataTable dt = new DataTable("Check Register " 
-                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy") 
-                                       + "-" 
+            DataTable dt = new DataTable("Check Register "
+                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                                       + "-"
                                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             dt.Columns.AddRange(new DataColumn[5] {
                 new DataColumn(chelper.DisplayName<CheckRegisterRVM>("CheckDate")),
@@ -80,9 +77,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Check Register by Date
 
         #region Check Register by Customer
+
         public IActionResult CheckRegisterCustomer()
         {
             return View();
@@ -135,9 +134,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Check Register by Customer
 
         #region Check Register Summary
+
         public IActionResult CheckRegisterSummary()
         {
             return View();
@@ -186,6 +187,7 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Check Register Summary
     }
 }

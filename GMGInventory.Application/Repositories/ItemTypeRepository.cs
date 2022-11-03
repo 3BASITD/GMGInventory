@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using GMGInventory.Application.Configurations;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -7,7 +6,6 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -226,6 +224,5 @@ namespace GMGInventory.Application.Repositories
             context.ItemTypes.Update(itemType);
             await context.SaveChangesAsync(currentUserId);
         }
-
     }
 }

@@ -1,8 +1,6 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
-using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace GMGInventory.Controllers
 {

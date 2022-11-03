@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 namespace GMGInventory.Application.Repositories
 {

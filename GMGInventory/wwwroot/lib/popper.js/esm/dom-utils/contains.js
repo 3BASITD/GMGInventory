@@ -13,11 +13,9 @@ export default function contains(parent, child) {
           return true;
         } // $FlowFixMe[prop-missing]: need a better way to handle this...
 
-
         next = next.parentNode || next.host;
       } while (next);
     } // Give up, the result is false
-
 
   return false;
 }

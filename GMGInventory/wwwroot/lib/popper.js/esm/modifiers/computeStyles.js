@@ -75,7 +75,6 @@ export function mapToStyles(_ref2) {
       }
     } // $FlowFixMe[incompatible-cast]: force type refinement, we compare offsetParent with window above, but Flow doesn't detect it
 
-
     offsetParent = offsetParent;
 
     if (placement === top || (placement === left || placement === right) && variation === end) {
@@ -170,7 +169,6 @@ function computeStyles(_ref5) {
     'data-popper-placement': state.placement
   });
 } // eslint-disable-next-line import/no-unused-modules
-
 
 export default {
   name: 'computeStyles',

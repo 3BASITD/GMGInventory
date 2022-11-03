@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-         public async Task<IList<BrandViewVM>> GetListAsync()
+        public async Task<IList<BrandViewVM>> GetListAsync()
         {
             var brands = from brand in context.Brands
                          join userc in userManager.Users on brand.UserCreated equals userc.Id
@@ -47,7 +47,6 @@ namespace GMGInventory.Application.Repositories
                          };
             return await brands.ToListAsync();
         }
-
 
         public async Task<ForDataTables<BrandViewVM>> GetListDTAsync(DataTablesRequestForm form)
         {
@@ -223,6 +222,5 @@ namespace GMGInventory.Application.Repositories
             var brand = await context.Brands.Where(s => s.Name == Name).FirstOrDefaultAsync();
             return brand?.Id;
         }
-
     }
 }

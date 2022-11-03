@@ -6,7 +6,6 @@
  * Licensed under MIT
  * ======================================================================== */
 
-
  +function ($) {
  	'use strict';
 
@@ -176,5 +175,4 @@
 		$checkbox.bootstrapToggle('toggle')
 		e.preventDefault()
 	})
-
 }(jQuery);

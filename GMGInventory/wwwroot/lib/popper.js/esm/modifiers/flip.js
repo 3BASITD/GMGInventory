@@ -134,7 +134,6 @@ function flip(_ref) {
   }
 } // eslint-disable-next-line import/no-unused-modules
 
-
 export default {
   name: 'flip',
   enabled: true,

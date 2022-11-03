@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -32,7 +30,7 @@ namespace GMGInventory.Application.Repositories
         {
             var users = userManager.Users.ToList();
             var usersVM = mapper.Map<List<UserInformationVM>>(users);
-            foreach(var userVM in usersVM)
+            foreach (var userVM in usersVM)
             {
                 userVM.UserId = await GetUserIdByNameAsync(userVM.Username);
             }
@@ -48,7 +46,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<UserInformationForUpdateVM?> GetUserInformationVMToEditAsync(string id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return null;
             }
@@ -62,7 +60,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<UserInformationVM?> GetUserInformationVMByIdAsync(string id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return null;
             }
@@ -238,7 +236,7 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.AuditLogs
                 .Where(s => s.UserId == Id && s.Type != "None")
-                .OrderByDescending(s=>s.DateTime)
+                .OrderByDescending(s => s.DateTime)
                 .Take(100)
                 .ToListAsync();
         }

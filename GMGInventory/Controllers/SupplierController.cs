@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
-using GMGInventory.Common.Models;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
+using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
-using GMGInventory.Application.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace GMGInventory.Controllers
 {
@@ -91,7 +90,7 @@ namespace GMGInventory.Controllers
                 return NotFound();
             }
             supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
-           
+
             supplierVM.Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(-1), "Id", "Name");
             supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
 

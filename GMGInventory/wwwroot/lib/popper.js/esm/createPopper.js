@@ -103,7 +103,6 @@ export function popperGenerator(generatorOptions) {
               marginLeft = _getComputedStyle.marginLeft; // We no longer take into account `margins` on the popper, and it can
           // cause bugs with positioning, so we'll warn the consumer
 
-
           if ([marginTop, marginRight, marginBottom, marginLeft].some(function (margin) {
             return parseFloat(margin);
           })) {
@@ -136,7 +135,6 @@ export function popperGenerator(generatorOptions) {
 
           return;
         } // Store the reference and popper rects to be read by modifiers
-
 
         state.rects = {
           reference: getCompositeRect(reference, getOffsetParent(popper), state.options.strategy === 'fixed'),

@@ -63,7 +63,6 @@ function effect(_ref2) {
     return;
   } // CSS selector
 
-
   if (typeof arrowElement === 'string') {
     arrowElement = state.elements.popper.querySelector(arrowElement);
 
@@ -88,7 +87,6 @@ function effect(_ref2) {
 
   state.elements.arrow = arrowElement;
 } // eslint-disable-next-line import/no-unused-modules
-
 
 export default {
   name: 'arrow',

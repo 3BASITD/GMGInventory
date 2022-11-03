@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
-using GMGInventory.Application.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
-using ClosedXML.Excel;
 
 namespace GMGInventory.Controllers
 {
@@ -34,6 +33,7 @@ namespace GMGInventory.Controllers
         {
             return Json(await agentRepository.GetOptions(IncludeId));
         }
+
         public async Task<ActionResult> Index()
         {
             AgentFilterVM agentFilterVM = new AgentFilterVM();
@@ -41,7 +41,6 @@ namespace GMGInventory.Controllers
             ViewData["AgentFilter"] = agentFilterVM;
             return View();
         }
-
 
         [HttpPost]
         public async Task<JsonResult> GetListJson(AgentFilterVM filter)
@@ -169,7 +168,6 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

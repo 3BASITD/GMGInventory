@@ -1,6 +1,4 @@
-﻿using GMGInventory.Common.Constants;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GMGInventory.Data.Configurations.Entities

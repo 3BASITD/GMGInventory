@@ -346,7 +346,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     destinationItem.Quantity += item.Quantity;
                     context.ItemInventories.Update(destinationItem);
-                } else
+                }
+                else
                 {
                     destinationItem = new ItemInventory
                     {

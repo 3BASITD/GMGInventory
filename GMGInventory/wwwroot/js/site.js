@@ -63,7 +63,6 @@
     $.validator.addMethod('isNotZero', function (value, element, param) {
         return this.optional(element) || parseInt(value) !== 0;
     }, 'Should not be 0');
-
 });
 
 function userIsInRole(role) {

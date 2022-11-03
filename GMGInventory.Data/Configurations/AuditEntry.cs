@@ -10,6 +10,7 @@ namespace GMGInventory.Data
         {
             Entry = entry;
         }
+
         public EntityEntry Entry { get; }
         public string UserId { get; set; }
         public string TableName { get; set; }
@@ -18,6 +19,7 @@ namespace GMGInventory.Data
         public Dictionary<string, object> NewValues { get; } = new Dictionary<string, object>();
         public AuditType AuditType { get; set; }
         public List<string> ChangedColumns { get; } = new List<string>();
+
         public AuditLog ToAudit()
         {
             var audit = new AuditLog

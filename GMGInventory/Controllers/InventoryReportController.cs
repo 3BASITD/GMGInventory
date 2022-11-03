@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
-using GMGInventory.Common.Models;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Data;
-using ClosedXML.Excel;
+using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -25,6 +21,7 @@ namespace GMGInventory.Controllers
         }
 
         #region Items Below Maintaining Quantity
+
         public IActionResult BelowMaintainingItem()
         {
             return View();
@@ -78,9 +75,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Items Below Maintaining Quantity
 
         #region Receiving Listing
+
         public IActionResult ReceivingListing()
         {
             return View();
@@ -141,9 +140,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Receiving Listing
 
         #region Receiving Listing by Supplier
+
         public IActionResult ReceivingListingSupplier()
         {
             return View();
@@ -202,9 +203,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Receiving Listing by Supplier
 
         #region Receiving Summary
+
         public IActionResult ReceivingSummary()
         {
             return View();
@@ -261,9 +264,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Receiving Summary
 
         #region Stock Card Report
+
         public IActionResult StockCard()
         {
             return View();
@@ -318,9 +323,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Stock Card Report
 
         #region Stock Status
+
         public IActionResult StockStatus()
         {
             return View();
@@ -378,9 +385,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Stock Status
 
         #region Supplier Purchase History
+
         public IActionResult SupplierPurchase()
         {
             return View();
@@ -443,6 +452,7 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Supplier Purchase History
     }
 }

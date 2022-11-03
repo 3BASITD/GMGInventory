@@ -15,7 +15,6 @@ function getTrueOffsetParent(element) {
 } // `.offsetParent` reports `null` for fixed elements, while absolute elements
 // return the containing block
 
-
 function getContainingBlock(element) {
   var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
   var isIE = navigator.userAgent.indexOf('Trident') !== -1;
@@ -50,7 +49,6 @@ function getContainingBlock(element) {
   return null;
 } // Gets the closest ancestor positioned element. Handles some edge cases,
 // such as table ancestors and cross browser bugs.
-
 
 export default function getOffsetParent(element) {
   var window = getWindow(element);

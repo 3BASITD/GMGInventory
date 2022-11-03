@@ -995,7 +995,6 @@ S2.define('select2/results',[
           $option.attr('aria-selected', 'false');
         }
       });
-
     });
   };
 
@@ -1537,7 +1536,6 @@ S2.define('select2/selection/base',[
   };
 
   BaseSelection.prototype._attachCloseHandler = function (container) {
-
     $(document.body).on('mousedown.select2.' + container.id, function (e) {
       var $target = $(e.target);
 
@@ -4513,7 +4511,6 @@ S2.define('select2/dropdown/attachBody',[
 
   AttachBody.prototype._bindContainerResultHandlers =
       function (decorated, container) {
-
     // These should only be bound once
     if (this._containerResultsHandlersBound) {
       return;

@@ -1,12 +1,8 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -20,6 +16,7 @@ namespace GMGInventory.Application.Repositories
         }
 
         #region Agent Sales per Item
+
         public async Task<IList<AgentSalesPerItemRVM>> GetAgentSalesPerItem(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -138,9 +135,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Agent Sales per Item
 
         #region Brand Sales Report
+
         public async Task<IList<BrandSalesRVM>> GetBrandSales(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -251,9 +250,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Brand Sales Report
 
         #region Best Selling Item (Quantity / Amount)
+
         public async Task<IList<BestSellingItemRVM>> GetBestSellingItem(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -274,7 +275,6 @@ namespace GMGInventory.Application.Repositories
                                QuantityD = invoice.Quantity,
                                Unit = invoice.Item.Unit.Name,
                                UnitPriceD = invoice.UnitPrice
-
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
                              orderby invoice.Brand ascending, invoice.ItemCode ascending
@@ -313,7 +313,7 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetBestSellingItem(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total quantity of date in table 
+            //get total quantity of date in table
             totalQuantity = data.Sum(s => s.QuantityD);
             //get total current quantity of data in table
             totalCurrentQuantity = data.Sum(s => s.CurrentQuantityD);
@@ -405,9 +405,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Best Selling Item (Quantity / Amount)
 
         #region Commission
+
         public async Task<IList<CommissionRVM>> GetCommission(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -543,9 +545,11 @@ namespace GMGInventory.Application.Repositories
                 TotalCommissionAmountD = items.Sum(s => s.CommissionAmountD)
             };
         }
-        #endregion
+
+        #endregion Commission
 
         #region Customer Sales Ranking
+
         public async Task<IList<CustomerSalesRankingRVM>> GetCustomerSalesRanking(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -650,9 +654,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Customer Sales Ranking
 
         #region Customer Sales
+
         public async Task<IList<CustomerSalesRVM>> GetCustomerSales(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -761,9 +767,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Customer Sales
 
         #region Daily Sales
+
         public async Task<IList<DailySalesRVM>> GetDailySales(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -900,9 +908,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Daily Sales
 
         #region Sales Invoice
+
         public async Task<IList<SalesInvoiceRVM>> GetSalesInvoice(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -1040,9 +1050,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Sales Invoice
 
         #region Sales by Agent / Area
+
         public async Task<IList<SalesAgentAreaRVM>> GetSalesAgentArea(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -1161,9 +1173,11 @@ namespace GMGInventory.Application.Repositories
                 TotalSalesD = items.Sum(s => s.SalesD)
             };
         }
-        #endregion
+
+        #endregion Sales by Agent / Area
 
         #region Sales Report Basis
+
         public async Task<IList<SalesReportBasisRVM>> GetSalesReportBasis(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
@@ -1265,9 +1279,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Sales Report Basis
 
         #region Sales Return Listing
+
         public async Task<IList<SalesReturnRVM>> GetSalesReturn(ListFilterSalesModel filter)
         {
             var sreturns = from sreturn in context.SalesReturnLineItems
@@ -1409,10 +1425,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
 
+        #endregion Sales Return Listing
 
         #region Unserved Item
+
         public async Task<IList<UnservedItemRVM>> GetUnservedItem(ListFilterSalesModel filter)
         {
             var solines = from soline in context.SalesOrderLineItems
@@ -1514,6 +1531,7 @@ namespace GMGInventory.Application.Repositories
                 TotalPendingD = items.Sum(s => s.PendingD)
             };
         }
-        #endregion
+
+        #endregion Unserved Item
     }
 }

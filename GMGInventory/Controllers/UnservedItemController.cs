@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," 
-                     + Roles.SalesDirector + "," 
-                     + Roles.SystemAdmin + "," 
+    [Authorize(Roles = Roles.InventoryManager + ","
+                     + Roles.SalesDirector + ","
+                     + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
     public class UnservedItemController : Controller
     {
