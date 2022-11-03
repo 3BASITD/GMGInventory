@@ -148,12 +148,18 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public IList<SoacrVM> Contents { get; set; }
+
+        public IList<InvoiceVM> InvoiceContent { get; set; }
         public string DateFrom => DateFromD == null ? "-" : DateFromD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DateFromD { get; set; }
         public string DateTo => DateToD == null ? "-" : DateToD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DateToD { get; set; }
         public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
         public DateTime InvoiceDateD { get; set; }
+        public string CRDate => CRDateD.ToString(SystemFormat.StringDate);
+        public DateTime CRDateD { get; set; }
+        public string CustomerCode { get; set; }
+
         public string Customer { get; set; }
         public string CreditTerm { get; set; }
 
@@ -172,6 +178,10 @@ namespace GMGInventory.Common.Models
 
         public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
         public decimal TotalAmountD { get; set; }
+        public string InvoiceNumber { get; set; }
+
+        public string? InvoiceAmount => string.Format(SystemFormat.StringDecimalComma, InvoiceAmountD);
+        public decimal InvoiceAmountD { get; set; }
     }
 
 

@@ -1,0 +1,84 @@
+﻿@model SoaDetailsPVM
+
+@{
+    Layout = "";
+    var title = "Customer Counter Receipt";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Customer Code</strong>
+        <span>@Model.CustomerCode</span>
+        <br />
+        <strong>Customer Name</strong>
+        <span>@Model.Customer</span>
+        <br />
+        <strong>Counter Receipt Date</strong>
+        <span>@Model.CRDate</span>
+        <br />
+        <strong>Date to be Collected</strong>
+        <span> </span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceType)
+                </th>
+                <th>
+                    Open Amount
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().FreightCost)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().TotalAmount)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Contents)
+            {
+                <tr>
+                    <td>@item.InvoiceDate</td>
+                    <td>@item.InvoiceNumber</td>
+                    <td>@item.InvoiceType</td>
+                    <td>@item.InvoiceAmount</td>
+                    <td>@item.FreightCost</td>
+                    <td>@item.TotalAmount</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+                <th class="right-text"></th>
+                <th class="right-text"></th>
+                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
+</html>

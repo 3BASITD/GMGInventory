@@ -16,9 +16,9 @@
                 <span class="fas fa-print"></span> Print
             </button>
             
-             <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
-                    <span class="fas fa-edit"></span> Add Invoice
-             </a>
+            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
+                <span class="fas fa-file-alt"></span> Add Invoice
+            </button>
 
             <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
                 <span class="fas fa-file-alt"></span> Add Payment
@@ -42,6 +42,15 @@
                     </span>
                     <b class="d-block">
                         @Model?.CustomerName
+                    </b>
+                </p>
+
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Type)
+                    </span>
+                    <b class="d-block SoacrType">
+                        @Model?.Type
                     </b>
                 </p>
                 
@@ -317,6 +326,96 @@
     </div>
 </div>
 
+<!-- Add Invoice Modal   -->
+
+<div class="modal fade" id="createInvoiceModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static" >
+    <div class="modal-dialog" role="document">
+       <div class="modal-content">
+             <div class="modal-header">
+                <h5 class="modal-title">Add Invoice</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="createInvoiceForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-code" class="form-label mb-0">Code</label>
+                                <div>
+                                    <select id="add-code" name="Code" style="width: 100%;">
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-name" class="form-label mb-0">Invoice Number</label>
+                                <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                          <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-code" class="form-label mb-0">Date</label>
+                                <div>
+                                    <select id="add-code" name="Code" style="width: 100%;">
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-name" class="form-label mb-0">Invoice Date</label>
+                                <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                         <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-code" class="form-label mb-0">Type</label>
+                                <div>
+                                    <select id="add-code" name="Code" style="width: 100%;">
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-name" class="form-label mb-0">Invoice Type</label>
+                                <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                 
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-add">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
 
 @section Scripts {
     <script>
@@ -360,26 +459,45 @@
 
             DatatablesSearchOnEnter('.table-soa', itemTable);
 
-            $(".printBtn").on("click", function () {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fas fa-print"
-            });
-            var urlQuery = [];
-            //urlQuery.push("DateFrom=" + $("#filter-from").val());
-            //urlQuery.push("DateTo=" + $("#filter-to").val());
-            //if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
-            //if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
-            setTimeout(function () {
-                //let win = window.open('@Url.Action("PrintSoaDetails")?' + urlQuery.join("&"), '');
-                let win = window.open('@Url.Action("PrintSoaDetails")/@Model?.Id', '');
-                var wintimer = setInterval(function () {
-                    if (win.closed) {
-                        clearInterval(wintimer);
-                        hideLoader();
-                    }
-                }, 100);
-            }, 500);
+            $(".printBtn").on("click", function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                var urlQuery = [];
+                //urlQuery.push("DateFrom=" + $("#filter-from").val());
+                //urlQuery.push("DateTo=" + $("#filter-to").val());
+                //if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+                //if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+            if ($(".SoacrType").text().trim() == "Statement of Account") { 
+            setTimeout(function() {
+                    //let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
+
+                    let win = window.open('@Url.Action("PrintSoaDetails")/@Model?.Id', '');
+                    var wintimer = setInterval(function() {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+
+            }
+            else if ($(".SoacrType").text().trim() == "Counter Receipt") { 
+            setTimeout(function() {
+                    //let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
+
+                    let win = window.open('@Url.Action("PrintCRDetails")/@Model?.Id', '');
+                    var wintimer = setInterval(function() {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+
+            }
+
             });
 
             $('.deleteBtn').click(function(e) {

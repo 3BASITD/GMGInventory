@@ -9,14 +9,20 @@
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
             <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                <span class="fas fa-plus"></span> New SoA
+                <span class="fas fa-plus"></span> Generate SoA
             </button>
-            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-                <span class="fas fa-file-alt"></span> Generate SOA
-            </button>
-            <a class="btn btn-primary btn-sm float-right" asp-action="ContractReceipt">
-                <span class="fas fa-plus"></span> Generate Contract Receipt
+            <a class="btn btn-primary btn-sm float-right createBtn ml-2" asp-action="ContractReceipt">
+                <span class="fas fa-plus"></span> Generate Counter Receipt
             </a>
+
+            <a class="btn btn-primary btn-sm float-right createBtn ml-2" asp-action="Invoice">
+                <span class="fas fa-file-alt"></span> Invoice
+            </a>
+
+    @*        <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-file-alt"></span> Filter
+            </button>*@
+
         </div> 
     </div>
     <div class="card-body">
@@ -172,18 +178,19 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-from" class="form-label mb-0">Date Delivered From</label>
+                            <label for="filter-from" class="form-label mb-0">Date Invoiced From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
                     </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-to" class="control-label mb-0">Date Delivered To</label>
+                            <label for="filter-to" class="control-label mb-0">Date Invoiced To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
                         </div>
                     </div>
                 </div>
             </div>
+            
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
@@ -403,6 +410,30 @@
             DatatablesSearchOnEnter('.table-soa', soaDT);
 
             LoadFilterSelect2();
+
+            $(".printBtn").on("click", function () {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
+            });
+            var urlQuery = [];
+            //urlQuery.push("DateFrom=" + $("#filter-from").val());
+            //urlQuery.push("DateTo=" + $("#filter-to").val());
+            //if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+            //if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+            setTimeout(function () {
+                //let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
+                
+                let win = window.open('@Url.Action("PrintInvoice")?', '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
+            });
+
 
 
         });

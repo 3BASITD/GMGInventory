@@ -95,6 +95,12 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [HttpPost]
+        public async Task<JsonResult> GetList2Json(SoaFilterVM filter)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await soaRepository.GetAllForDataTables2Async(form, filter));
+        }
 
         [HttpPost]
         public async Task<JsonResult> GetListJson(SoaFilterVM filter)
@@ -158,6 +164,17 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> PrintSoaDetails(int id)
         {
             return View(await soaRepository.PrintSoaDetails(id));
+         
+        }
+
+        public async Task<IActionResult> PrintCRDetails(int id)
+        {
+            return View(await soaRepository.PrintCRDetails(id));
+
+        }
+        public async Task<IActionResult> PrintInvoice(SoaFilterVM filter)
+        {
+            return View(await soaRepository.PrintInvoice(filter));
         }
 
 
@@ -171,6 +188,11 @@ namespace GMGInventory.Controllers
             return Json(inv);
         }
         public async Task<ActionResult> ContractReceipt()
+        {
+            return View();
+        }
+
+        public async Task<ActionResult> Invoice()
         {
             return View();
         }

@@ -37,8 +37,17 @@ namespace GMGInventory.Application.Contracts
         Task<IList<SoacrVM>> GetSOAInvoice(/*int id*/);
 
         Task<SoaDetailsPVM> PrintSoaDetails(int id);
+        Task<SoaDetailsPVM> PrintCRDetails(int id);
 
         Task<IList<SoacrVM>> GetSoaDetails(int id);
+        Task<SoaDetailsPVM> PrintInvoice(SoaFilterVM filter);
+        Task<bool> IsSoacrTypeCR(int id);
+
+        //test
+
+        Task<IList<SoacrVM>> GetAll2Async(SoaFilterVM filter);
+        Task<ForDataTables<SoacrVM>> GetAllForDataTables2Async(DataTablesRequestForm form, SoaFilterVM filter);
+
 
 
     }
