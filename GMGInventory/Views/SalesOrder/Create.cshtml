@@ -682,14 +682,14 @@
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
-                            toastr.success(data.message, "Success");
-                            toastr.warning("Page will redirect to details", 'Page Redirect', {
-                                timeOut: 3000,
-                                onHidden: function () {
+                            //toastr.success(data.message, "Success");
+                            //toastr.warning("Page will redirect to details", 'Page Redirect', {
+                            //    timeOut: 3000,
+                            //    onHidden: function () {
                                     window.location = "@Url.Action("Details")/" + data.newRow;
-                                },
-                                progressBar: true
-                            });
+                            //    },
+                            //    progressBar: true
+                            //});
                         }
                     }
                 });

@@ -415,6 +415,65 @@ namespace GMGInventory.Controllers
         }
         #endregion
 
+        #region Sales Invoice
+        public IActionResult SalesInvoice()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintSalesInvoice(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintSalesInvoice(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetSalesInvoiceDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetSalesInvoiceDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadSalesInvoice(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Sales Invoice Listing");
+            dt.Columns.AddRange(new DataColumn[8] {
+                new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("InvoiceNumber")),
+                new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("ControlNumber")),
+                new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("InvoiceDate")),
+                new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("CustomerCode")),
+                new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("CustomerName")),
+                new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("Agent")),
+                new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("Status")),
+                new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("Amount"))
+            });
+            var sales = await reportSalesRepository.GetSalesInvoice(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.InvoiceNumber,
+                            sale.ControlNumber,
+                            sale.InvoiceDate,
+                            sale.CustomerCode,
+                            sale.CustomerName,
+                            sale.Agent,
+                            sale.Status,
+                            sale.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Sales Invoice Listing.xlsx");
+                }
+            }
+        }
+        #endregion
+
         #region Sales by Agent-Area
         public IActionResult SalesAgentArea()
         {
@@ -470,8 +529,125 @@ namespace GMGInventory.Controllers
 
 
 
+        #region Sales Report by Basis
+        public IActionResult SalesReportBasis()
+        {
+            return View();
+        }
 
+        public async Task<IActionResult> PrintSalesReportBasis(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintSalesReportBasis(filter));
+        }
 
+        [HttpPost]
+        public async Task<JsonResult> GetSalesReportBasisDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetSalesReportBasisDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadSalesReportBasis(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Sales Report by Basis");
+            dt.Columns.AddRange(new DataColumn[3] {
+                new DataColumn(filter.Basis + " " + chelper.DisplayName<SalesReportBasisRVM>("Code")),
+                new DataColumn(filter.Basis + " " + chelper.DisplayName<SalesReportBasisRVM>("Name")),
+                new DataColumn(chelper.DisplayName<SalesReportBasisRVM>("Amount"))
+            });
+            var sales = await reportSalesRepository.GetSalesReportBasis(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.Code,
+                            sale.Name,
+                            sale.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Sales Report by Basis.xlsx");
+                }
+            }
+        }
+        #endregion
+
+        #region Sales Return
+        public IActionResult SalesReturn()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> PrintSalesReturn(ListFilterSalesModel filter)
+        {
+            return View(await reportSalesRepository.PrintSalesReturn(filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetSalesReturnDT(ListFilterSalesModel filter)
+        {
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetSalesReturnDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadSalesReturn(ListFilterSalesModel filter)
+        {
+            DataTable dt = new DataTable("Sales Return Listing");
+            dt.Columns.AddRange(new DataColumn[14] {
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemType")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemCode")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemName")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Unit")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("SRNumber")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ReturnDate")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Customer")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Agent")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("SINumber")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ControlNumber")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("QuantityReturned")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("PriceReturned")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Amount"))
+            });
+            var sales = await reportSalesRepository.GetSalesReturn(filter);
+            foreach (var sale in sales)
+            {
+                dt.Rows.Add(sale.Brand,
+                            sale.ItemType,
+                            sale.ItemCode,
+                            sale.ItemName,
+                            sale.Unit,
+                            sale.SRNumber,
+                            sale.ReturnDate,
+                            sale.Customer,
+                            sale.Agent,
+                            sale.SINumber,
+                            sale.ControlNumber,
+                            sale.QuantityReturned,
+                            sale.PriceReturned,
+                            sale.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filter.DateFrom.GetValueOrDefault().ToString("MMddyy") + "-"
+                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy") + " Sales Return Listing.xlsx");
+                }
+            }
+        }
+        #endregion
 
         #region Unserved Items
         public IActionResult UnservedItem()

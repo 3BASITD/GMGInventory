@@ -126,7 +126,7 @@ namespace GMGInventory.Application.Repositories
                          where rturn.SalesReturnId == salesReturnId
                          select new SalesReturnItemVM
                          {
-                             SellingPriceD = rturn.Amount,
+                             SellingPriceD = rturn.SellingPrice,
                              Discount1D = rturn.Discount1,
                              Discount2D = rturn.Discount2,
                              Id = rturn.Id,
@@ -134,7 +134,7 @@ namespace GMGInventory.Application.Repositories
                              ItemCode = rturn.Item.Code,
                              ItemName = rturn.Item.Name,
                              Quantity = rturn.Quantity,
-                             ReferenceNumber = rturn.ReferenceNumber,
+                             ReferenceNumber = rturn.Invoice.Id + "",
                              Unit = rturn.Item.Unit.Code
                          };
             return await itemVM.ToListAsync();

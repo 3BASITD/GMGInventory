@@ -278,6 +278,49 @@ namespace GMGInventory.Common.Models
         public decimal TotalAmountD { get; set; }
     }
 
+    public class SalesInvoiceRVM
+    {
+        [Display(Name = "Invoice Number")]
+        public string InvoiceNumber { get; set; }
+    
+        [Display(Name = "Control Number")]
+        public string ControlNumber { get; set; }
+
+        [Display(Name = "Invoice Date")]
+        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
+        public DateTime InvoiceDateD { get; set; }
+
+        [Display(Name = "Customer Code")]
+        public string CustomerCode { get; set; }
+
+        [Display(Name = "Customer Name")]
+        public string CustomerName { get; set; }
+
+        [Display(Name = "Agent")]
+        public string Agent { get; set; }
+
+        [Display(Name = "Status")]
+        public string Status { get; set; }
+
+        [Display(Name = "Trans Amount")]
+        public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
+        public decimal AmountD { get; set; }
+    }
+
+    public class SalesInvoicePVM
+    {
+        public IList<SalesInvoiceRVM> Contents { get; set; }
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        public DateTime DateFromD { get; set; }
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        public DateTime DateToD { get; set; }
+        public string Customer { get; set; }
+        public string Agent { get; set; }
+        public string Status { get; set; }
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal TotalAmountD { get; set; }
+    }
+
     public class SalesAgentAreaRVM
     {
         [Display(Name = "Agent Code")]
@@ -294,7 +337,7 @@ namespace GMGInventory.Common.Models
         public decimal SalesD { get; set; }
 
         [Display(Name = "Percent of Sales")]
-        public string PercentSales => string.Format(SystemFormat.StringDecimalComma, PercentSalesD);
+        public string PercentSales => string.Format(SystemFormat.StringDecimalComma, PercentSalesD) + "%";
         public decimal PercentSalesD { get; set; }
     }
 
@@ -311,6 +354,97 @@ namespace GMGInventory.Common.Models
         public decimal TotalSalesD { get; set; }
     }
 
+
+    public class SalesReportBasisRVM
+    {
+        [Display(Name = "Code")]
+        public string Code { get; set; }
+
+        [Display(Name = "Name")]
+        public string Name { get; set; }
+
+        [Display(Name = "Amount")]
+        public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
+        public decimal AmountD { get; set; }
+    }
+
+    public class SalesReportBasisPVM
+    {
+        public IList<SalesReportBasisRVM> Contents { get; set; }
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        public DateTime DateFromD { get; set; }
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        public DateTime DateToD { get; set; }
+        public string Basis { get; set; }
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal TotalAmountD { get; set; }
+    }
+
+    public class SalesReturnRVM
+    {
+        [Display(Name = "Brand")]
+        public string Brand { get; set; }
+
+        [Display(Name = "Item Type")]
+        public string ItemType { get; set; }
+
+        [Display(Name = "Item Code")]
+        public string ItemCode { get; set; }
+
+        [Display(Name = "Item Name")]
+        public string ItemName { get; set; }
+
+        [Display(Name = "Unit")]
+        public string Unit { get; set; }
+
+        [Display(Name = "Sales Return Number")]
+        public string SRNumber { get; set; }
+
+        [Display(Name = "Return Date")]
+        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDate);
+        public DateTime ReturnDateD { get; set; }
+
+        [Display(Name = "Customer")]
+        public string Customer { get; set; }
+
+        [Display(Name = "Agent")]
+        public string Agent { get; set; }
+
+        [Display(Name = "Sale Invoice Number")]
+        public string SINumber { get; set; }
+
+        [Display(Name = "Control Number")]
+        public string ControlNumber { get; set; }
+
+        [Display(Name = "Quantity Returned")]
+        public string QuantityReturned => string.Format(SystemFormat.StringIntegerComma, QuantityReturnedD);
+        public int QuantityReturnedD { get; set; }
+
+        [Display(Name = "Price Returned")]
+        public string PriceReturned => string.Format(SystemFormat.StringDecimalComma, PriceReturnedD);
+        public decimal PriceReturnedD { get; set; }
+
+        [Display(Name = "Amount")]
+        public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
+        public decimal AmountD => QuantityReturnedD * PriceReturnedD;
+    }
+
+    public class SalesReturnPVM
+    {
+        public IList<SalesReturnRVM> Contents { get; set; }
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        public DateTime DateFromD { get; set; }
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        public DateTime DateToD { get; set; }
+        public string Customer { get; set; }
+        public string Item { get; set; }
+        public string TotalQuantityReturned => string.Format(SystemFormat.StringDecimalComma, TotalQuantityReturnedD);
+        public decimal TotalQuantityReturnedD { get; set; }
+        public string TotalPriceReturned => string.Format(SystemFormat.StringDecimalComma, TotalPriceReturnedD);
+        public decimal TotalPriceReturnedD { get; set; }
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal TotalAmountD { get; set; }
+    }
 
 
 

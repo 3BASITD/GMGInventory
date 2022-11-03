@@ -53,24 +53,26 @@
                         <td>@item.UserModified</td>
                         <td>@item.DateModified</td>
                         <td>
-                            <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id">
-                                <i class="fas fa-info-circle"></i>
-                            </a>
-                            @if (item.IsActive)
-                            {
-                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id">
-                                    <i class="fas fa-pencil-alt"></i>
+                            <div class="btn-group" role="group">
+                                <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id">
+                                    <i class="fas fa-info-circle"></i>
                                 </a>
-                                <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button">
-                                    <i class="far fa-trash-alt"></i>
-                                </button>
-                            }
-                            else
-                            {
-                                <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            }
+                                @if (item.IsActive)
+                                {
+                                    <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button">
+                                        <i class="far fa-trash-alt"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                }
+                            </div>
                         </td>
                     </tr>
                 }
@@ -103,7 +105,7 @@
             ]
         });
 
-        $('.deleteBtn').click(function(e) {
+        $('.deleteBtn').click(function (e) {
             swal({
                 title: "Delete / Deactivate Area",
                 text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
@@ -120,7 +122,7 @@
             });
         });
 
-        $('.reactivateBtn').click(function(e) {
+        $('.reactivateBtn').click(function (e) {
             swal({
                 title: "Reactivate Area",
                 text: "Are you sure you want to reactivate this record?",

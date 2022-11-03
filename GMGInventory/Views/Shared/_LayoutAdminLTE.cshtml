@@ -65,8 +65,8 @@
                     <div class="info">
                         <a asp-controller="Profile" asp-action="Index" class="d-block">
                             @(activeUser.FirstName != null || activeUser.LastName != null
-                            ? activeUser.FirstName + " " + activeUser.LastName
-                            : activeUser.Nickname)
+                                ? activeUser.FirstName + " " + activeUser.LastName
+                                : activeUser.Nickname)
                         </a>
                     </div>
                 </div>
@@ -113,15 +113,17 @@
 
             <section class="content">
                 <div class="container-fluid">
+                    @*
                     @if (TempData["SuccessMessage"] != null || TempData["WarningMessage"] != null || TempData["ErrorMessage"] != null)
                     {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            @(TempData["SuccessMessage"] ?? TempData["WarningMessage"] ?? TempData["ErrorMessage"])
-                            <button type="button" class="close" aria-label="Close" data-bs-dismiss="alert">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @(TempData["SuccessMessage"] ?? TempData["WarningMessage"] ?? TempData["ErrorMessage"])
+                    <button type="button" class="close" aria-label="Close" data-bs-dismiss="alert">
+                    <span aria-hidden="true">×</span>
+                    </button>
+                    </div>
                     }
+                    *@
                     @RenderBody()
                 </div>
             </section>
@@ -143,9 +145,9 @@
     <div id="for-print"></div>
     <input type="hidden" id="current-user-nickname" value="@activeUser.Nickname" />
     <input type="hidden" class="current-user-role" value="temp" />
-    @foreach(var role in @UserManager.GetRolesAsync(activeUser).Result.ToList())
+    @foreach (var role in @UserManager.GetRolesAsync(activeUser).Result.ToList())
     {
-        <input type="hidden" class="current-user-role" value="@role"  />
+        <input type="hidden" class="current-user-role" value="@role" />
     }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -170,16 +172,38 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
         @if (activeUser.IsDarkMode)
         {
             <text>
-            $(".table").each(function() {
-                $(this).addClass("table-dark");
-            });
+                    $(".table").each(function () {
+                        $(this).addClass("table-dark");
+                    });
             </text>
         }
-        });
+                        });
+
+        @if (TempData["SuccessMessage"] != null || TempData["WarningMessage"] != null || TempData["ErrorMessage"] != null)
+        {
+            if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                    toastr.success("@TempData["SuccessMessage"]", "Success");
+                </text>
+            }
+            else if (TempData["WarningMessage"] != null)
+            {
+                <text>
+                    toastr.warning("@TempData["WarningMessage"]", "Warning");
+                </text>
+            }
+            else if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                    toastr.error("@TempData["ErrorMessage"]", "Error");
+                </text>
+            }
+        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

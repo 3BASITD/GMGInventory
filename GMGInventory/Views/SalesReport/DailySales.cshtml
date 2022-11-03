@@ -94,8 +94,8 @@
                             <label for="filter-status" class="form-label mb-0">Status</label>
                             <select id="filter-status" class="form-control form-control-sm">
                                 <option value="">All</option>
-                                <option value="7">Draft</option>
-                                <option value="8">Invoiced</option>
+                                <option value="Draft">Draft</option>
+                                <option value="Invoiced">Invoiced</option>
                             </select>
                         </div>
                     </div>
@@ -198,7 +198,7 @@
                     data.DateTo = $("#filter-to").val();
                     if (invoiceFromId) data.InvoiceNumberFrom = invoiceFromId;
                     if (invoiceToId) data.InvoiceNumberTo = invoiceToId;
-                    if (statusId) data.Status = statusId;
+                    if (statusId) data.StatusCode = statusId;
                 }
             },
             processing: true,
@@ -244,7 +244,7 @@
             urlQuery.push("DateTo=" + $("#filter-to").val());
             if ($("#filter-invoice-from").select2("data")[0].text) { urlQuery.push("InvoiceNumberFrom=" + $("#filter-invoice-from").select2("data")[0].text); }
             if ($("#filter-invoice-to").select2("data")[0].text) { urlQuery.push("InvoiceNumberTo=" + $("#filter-invoice-to").select2("data")[0].text); }
-            if ($("#filter-status").val()) { urlQuery.push("Status=" + $("#filter-status").val()); }
+            if ($("#filter-status").val()) { urlQuery.push("StatusCode=" + $("#filter-status").val()); }
             window.location = "@Url.Action("DownloadDailySales")?" + urlQuery.join("&");
         });
 
@@ -258,7 +258,7 @@
             urlQuery.push("DateTo=" + $("#filter-to").val());
             if ($("#filter-invoice-from").select2("data")[0].text) { urlQuery.push("InvoiceNumberFrom=" + $("#filter-invoice-from").select2("data")[0].text); }
             if ($("#filter-invoice-to").select2("data")[0].text) { urlQuery.push("InvoiceNumberTo=" + $("#filter-invoice-to").select2("data")[0].text); }
-            if ($("#filter-status").val()) { urlQuery.push("Status=" + $("#filter-status").val()); }
+            if ($("#filter-status").val()) { urlQuery.push("StatusCode=" + $("#filter-status").val()); }
             setTimeout(function () {
                 let win = window.open('@Url.Action("PrintDailySales")?' + urlQuery.join("&"), '');
                 var wintimer = setInterval(function () {

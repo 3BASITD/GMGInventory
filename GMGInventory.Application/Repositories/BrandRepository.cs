@@ -29,6 +29,9 @@ namespace GMGInventory.Application.Repositories
          public async Task<IList<BrandViewVM>> GetListAsync()
         {
             var brands = from brand in context.Brands
+                         join userc in userManager.Users on brand.UserCreated equals userc.Id
+                         join userm in userManager.Users on brand.UserModified equals userm.Id into m
+                         from um in m.DefaultIfEmpty()
                          select new BrandViewVM
                          {
                              Id = brand.Id,
@@ -39,8 +42,8 @@ namespace GMGInventory.Application.Repositories
                              DateModified = brand.DateModified == null ? "-" : brand.DateModified.Value.ToString("yyyy/dd/MM hh:mm:ss tt"),
                              IsActive = brand.IsActive,
                              Name = brand.Name,
-                             UserCreated = userManager.FindByIdAsync(brand.UserCreated).Result.Nickname,
-                             UserModified = brand.UserModified == null ? "-" : userManager.FindByIdAsync(brand.UserModified).Result.Nickname
+                             UserCreated = userc.Nickname,
+                             UserModified = um == null ? "-" : um.Nickname
                          };
             return await brands.ToListAsync();
         }

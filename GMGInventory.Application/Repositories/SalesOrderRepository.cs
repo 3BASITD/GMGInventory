@@ -91,7 +91,7 @@ namespace GMGInventory.Application.Repositories
                                AgentName = order.Agent.FirstName + (order.Agent.MiddleName == null ? "" : " " + order.Agent.MiddleName) + " " + order.Agent.LastName,
                                ApprovedBy = approve.Nickname,
                                ApprovedDateD = order.ApprovedDate,
-                               CreditTerms = order.Customer.CreditTerm == null ? "-" : order.Customer.CreditTerm.Name,
+                               CreditTerms = order.Customer.CreditTerm.Name,
                                CustomerAddress = order.Customer.Address,
                                CustomerCode = order.Customer.Code,
                                CustomerName = order.Customer.Name,
@@ -314,13 +314,17 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
-            var previousOrders = context.SalesOrders.Count();
-            string soNumber = string.Format("{0:SO00000000}", previousOrders);
-            while (context.SalesOrders.Any(s => s.SalesOrderNumber == soNumber))
-            {
-                previousOrders++;
-                soNumber = string.Format("{0:SO00000000}", previousOrders);
-            }
+            //var previousOrders = context.SalesOrders.Count();
+            //string soNumber = string.Format("{0:SO00000000}", previousOrders);
+            //while (context.SalesOrders.Any(s => s.SalesOrderNumber == soNumber))
+            //{
+            //    previousOrders++;
+            //    soNumber = string.Format("{0:SO00000000}", previousOrders);
+            //}
+
+            var latestOrder = context.SalesOrders.OrderByDescending(s => s.SalesOrderNumber).Select(s => s.SalesOrderNumber).FirstOrDefault();
+            var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
+            string soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
 
             int statusId = context.Statuses.Where(s => s.Name == "Sales Order Submitted").Select(s => s.Id).First();
             if (orderVM == null)

@@ -33,23 +33,22 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<DailySalesRVM>> GetDailySalesDT(DataTablesRequestForm form, ListFilterSalesModel filter);
         Task<DailySalesPVM> PrintDailySales(ListFilterSalesModel filter);
 
+        Task<IList<SalesInvoiceRVM>> GetSalesInvoice(ListFilterSalesModel filter);
+        Task<ForDataTables<SalesInvoiceRVM>> GetSalesInvoiceDT(DataTablesRequestForm form, ListFilterSalesModel filter);
+        Task<SalesInvoicePVM> PrintSalesInvoice(ListFilterSalesModel filter);
+
         Task<IList<SalesAgentAreaRVM>> GetSalesAgentArea(ListFilterSalesModel filter);
         Task<ForDataTables<SalesAgentAreaRVM>> GetSalesAgentAreaDT(DataTablesRequestForm form, ListFilterSalesModel filter);
         Task<SalesAgentAreaPVM> PrintSalesAgentArea(ListFilterSalesModel filter);
 
-        IList<int> GetAgentSalesPerItems();
-        IList<int> GetBrandSales();
-        IList<int> GetBestSellingItem();
-        IList<int> GetBestSellingItemInvoice();
-        IList<int> GetCommission();
-        IList<int> GetCustomerSalesAnalytics();
-        IList<int> GetDailySalesReport();
-        IList<int> GetDailySalesMargin();
-        IList<int> GetSalesInvoiceListing();
-        IList<int> GetSalesByAgentArea();
-        IList<int> GetSalesMarginItem();
-        IList<int> GetSalesReportBasis();
-        IList<int> GetSalesReturnListing();
+        Task<IList<SalesReportBasisRVM>> GetSalesReportBasis(ListFilterSalesModel filter);
+        Task<ForDataTables<SalesReportBasisRVM>> GetSalesReportBasisDT(DataTablesRequestForm form, ListFilterSalesModel filter);
+        Task<SalesReportBasisPVM> PrintSalesReportBasis(ListFilterSalesModel filter);
+
+        Task<IList<SalesReturnRVM>> GetSalesReturn(ListFilterSalesModel filter);
+        Task<ForDataTables<SalesReturnRVM>> GetSalesReturnDT(DataTablesRequestForm form, ListFilterSalesModel filter);
+        Task<SalesReturnPVM> PrintSalesReturn(ListFilterSalesModel filter);
+
         Task<IList<UnservedItemRVM>> GetUnservedItem(ListFilterSalesModel filter);
         Task<ForDataTables<UnservedItemRVM>> GetUnservedItemDT(DataTablesRequestForm form, ListFilterSalesModel filter);
         Task<UnservedItemPVM> PrintUnservedItem(ListFilterSalesModel filter);

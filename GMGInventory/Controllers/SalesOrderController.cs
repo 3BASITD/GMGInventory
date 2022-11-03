@@ -58,6 +58,14 @@ namespace GMGInventory.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
+
+            var dtNow = DateTime.Now;
+            var newChecker = dtNow.AddMinutes(-1) <= order.OrderDateD && order.OrderDateD <= dtNow;
+            if (newChecker)
+            {
+                TempData["SuccessMessage"] = "Order successfully submitted";
+            }
+
             return View(order);
         }
 
