@@ -637,13 +637,15 @@ namespace GMGInventory.Application.Repositories
         public async Task<SoaDetailsPVM> PrintInvoice(SoaFilterVM filter)
         {
             var items = await GetContractInvoices(filter);
-            var agent = await context.Agents.Where(s => s.Id == filter.AgentId).FirstOrDefaultAsync();
+            var agent = await context.Customers.Where(s => s.AgentId == filter.AgentId).FirstOrDefaultAsync();
             var customer = await context.Customers.Where(s => s.Id == filter.CustomerId).FirstOrDefaultAsync();
 
             return new SoaDetailsPVM
             {
                 DateFromD = filter.DateFrom.GetValueOrDefault(),
                 DateToD = filter.DateTo.GetValueOrDefault(),
+                Customer = filter.CustomerId == null || customer == null ? "All" : customer.Name,
+                Agent = filter.AgentId == null || agent == null ? "All" : agent.Agent.FirstName,
                 InvoiceContent = items,
                 TotalAmountD = items.Sum(s => s.TotalAmountD)
             };
@@ -662,7 +664,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.AgentId == null || filter.AgentId == soacrsGroup.Customer.AgentId)
                            && filter.DateFrom <= (inv.DateModified ?? inv.DateCreated)
                            && (inv.DateModified ?? inv.DateCreated) <= filter.DateTo
-                           && soacrsGroup.SOACRTypeId == 2
+                           //&& soacrsGroup.SOACRTypeId == 2
 
                            select new InvoiceVM
                            {
@@ -852,20 +854,34 @@ namespace GMGInventory.Application.Repositories
 
                            select new SOACRLineItem
                            {
-                               SOACRId = soa.Id,
                                InvoiceId = invoice.Invoice.Id,
-                               InvoiceAmount = invoice.Quantity * invoice.UnitPrice,
-                               PaidAmount = 0,
-                               TBRAmount = 0,
-                               CreditAmount = 0,
-                               DebitAmount = 0,
-                               FreightCost = 0,
-                               FreightWaybill = "0",
-                               Balance = 0,
-                               IsPaid = false
+                               InvoiceAmount = invoice.Quantity * invoice.UnitPrice
                            };
 
-            await context.SOACRLineItems.AddRangeAsync(invoices);
+            var invoicesGrp = from invoice in await invoices.ToListAsync()
+                              group invoice by new
+                              {
+                                  invoice.InvoiceId
+                              }
+                              into i
+                              select new SOACRLineItem
+                              {
+                                  SOACRId = soa.Id,
+                                  InvoiceId = i.Key.InvoiceId,
+                                  InvoiceAmount = i.Sum(s => s.InvoiceAmount),
+                                  PaidAmount = 0,
+                                  TBRAmount = 0,
+                                  CreditAmount = 0,
+                                  DebitAmount = 0,
+                                  FreightCost = 0,
+                                  FreightWaybill = "0",
+                                  Balance = 0,
+                                  IsPaid = false
+                              };
+
+
+
+            await context.SOACRLineItems.AddRangeAsync(invoicesGrp);
 
             await context.SaveChangesAsync(currentUserId);
         }

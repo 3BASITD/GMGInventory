@@ -4,19 +4,22 @@
 	ViewData["Title"] = "Invoices";
 }
 
+@section Breadcrumb {
+	<li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">Soacr</a></li>
+}
+
 <div class="card card-default">
 	<div class="card-header">
 		<span class="card-title">@ViewData["Title"]</span>
 		<div class="card-tools">
-@*			<button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
-				<span class="fas fa-filter"></span> Generate SOA
-			</button>*@
-			<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-				<span class="fas fa-file-alt"></span> Filter
-			</button>
-
+			<a class="btn btn-light btn-sm float-right" asp-action="Index">
+				<span class="fas fa-arrow-left"></span> Back to List
+			</a>
 			<button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
 				<span class="fas fa-print"></span> Print
+			</button>
+			<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+				<span class="fas fa-file-alt"></span> Filter
 			</button>
 		</div> 
 	</div>
@@ -36,7 +39,6 @@
 					<th>
 						@Html.DisplayNameFor(model => model.TotalAmount)
 					</th>
-					<th></th>
 				</tr>
 			</thead>
 		</table>
@@ -244,13 +246,13 @@
 				url: "@Url.Action("GetContractReceiptJson")",
 				data: function (data) {
 					var agentId = $("#filter-agent").val();
-                    var customerId = $("#filter-customer").val();
+					var customerId = $("#filter-customer").val();
 
-                    if (agentId) data.AgentId = agentId;
-                    if (customerId) data.CustomerId = customerId;
+					if (agentId) data.AgentId = agentId;
+					if (customerId) data.CustomerId = customerId;
 
-                    data.DateFrom = $("#filter-from").val();
-                    data.DateTo = $("#filter-to").val();
+					data.DateFrom = $("#filter-from").val();
+					data.DateTo = $("#filter-to").val();
 
 				},
 				type: "POST",
@@ -263,15 +265,7 @@
 				{ data: "invoiceDate", name: "InvoiceDate" },
 				{ data: "invoiceNumber", name: "InvoiceNumber" },
 				{ data: "invoiceType", name: "InvoiceType" },
-				{ data: "totalAmount", name: "TotalAmount" },
-				{
-					orderable: false,
-					data: function(data, type, dataToSet) {
-					  var actions = '<div class="btn-group" role="group">';
-						actions += '<a class="btn btn-info btn-xs" asp-action="ContractReceiptDetails" href="@Url.Action("ContractReceiptDetails")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-						return actions;
-					}
-				}
+				{ data: "totalAmount", name: "TotalAmount" }
 			],
 			order: [[1, "desc"]]
 		});
@@ -292,7 +286,7 @@
 			var urlQuery = [];
 			urlQuery.push("DateFrom=" + $("#filter-from").val());
 			urlQuery.push("DateTo=" + $("#filter-to").val());
-			if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+			if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
 			if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
 			setTimeout(function () {
 				//let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
