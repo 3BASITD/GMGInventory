@@ -410,6 +410,9 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<decimal?>("CommissionRate")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(50)");
 
@@ -452,6 +455,9 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("TIN")
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("UseAreaRate")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()

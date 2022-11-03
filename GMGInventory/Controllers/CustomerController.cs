@@ -40,6 +40,10 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetOptions(search, page));
         }
 
+        public async Task<IActionResult> GetOptions2(int? IncludeId)
+        {
+            return Json(await customerRepository.GetOptions2(IncludeId));
+        }
         public ActionResult Index()
         {
             return View();

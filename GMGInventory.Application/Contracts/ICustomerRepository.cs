@@ -7,6 +7,8 @@ namespace GMGInventory.Application.Contracts
     {
         Task<Select2Model<JsonAddressOptionsModel>> GetOptions(string search, int page);
 
+        Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId);
+
         //Task<IList<CustomerViewVM>> GetAllCustomerVMAsync();
         //Task<CustomerViewVM?> GetCustomerViewVMAsync(int? id);
         //Task<CustomerVM?> GetCustomerVMAsync(int? id);

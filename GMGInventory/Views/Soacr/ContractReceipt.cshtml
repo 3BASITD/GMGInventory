@@ -14,6 +14,10 @@
 			<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
 				<span class="fas fa-file-alt"></span> Filter
 			</button>
+
+			@*<button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+				<span class="fas fa-print"></span> Print
+			</button>*@
 		</div> 
 	</div>
 	<div class="card-body">
@@ -50,6 +54,7 @@
 				</button>
 			</div>
 			<div class="modal-body">
+
 				<div class="row">
 					<div class="col-12 col-sm-6">
 						<div class="form-group">
@@ -66,7 +71,40 @@
 						</div>
 					</div>
 				</div>
+				@*<div class="row">
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-agent" class="form-label mb-0">Agent Code</label>
+							<select id="filter-agent" style="width:100%">
+								<option></option>
+							</select>
+						</div>
+					</div>
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-agent-name" class="form-label mb-0">Agent Name</label>
+							<input type="text" id="filter-agent-name" class="form-control form-control-sm" readonly="readonly" />
+						</div>
+					</div>
+				</div>
+
+
+				<div class="row">
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-from" class="form-label mb-0">Date Invoiced From</label>
+							<input type="date" id="filter-from" class="form-control form-control-sm" />
+						</div>
+					</div>
+					<div class="col-12 col-sm-6">
+						<div class="form-group">
+							<label for="filter-to" class="control-label mb-0">Date Invoiced To</label>
+							<input type="date" id="filter-to" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>*@
 			</div>
+			
 			<div class="modal-footer">
 				<button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
 			</div>
@@ -76,15 +114,78 @@
 
 
 
+
 @section Scripts {
 	<script>
 
+		//SetDateFilter();
+		//function SetDateFilter() {
+		//	if ($("#filter-to").val() == "") {
+		//		if ($("#filter-from").val() == "") {
+		//			$("#filter-to").val(DateForInput(new Date()));
+		//		} else {
+		//			var dt_from = new Date($("#filter-from").val());
+		//			dt_from.setFullYear(dt_from.getFullYear() + 1);
+		//			$("#filter-to").val(DateForInput(dt_from));
+		//		}
+		//	}
+
+		//	if ($("#filter-from").val() == "") {
+		//		var dt_to = new Date($("#filter-to").val());
+		//		dt_to.setFullYear(dt_to.getFullYear() - 1);
+		//		$("#filter-from").val(DateForInput(dt_to));
+		//	}
+		//}
+
+		//$("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
 		var loadfilterloaded = false;
 		function LoadFilterSelect2() {
 			if (loadfilterloaded) return;
 			loadfilterloaded = true;
 
+			//// Load Select2 for Agent
+			//$("#filter-agent").select2({
+			//	minimumInputLength: 1,
+			//	allowClear: true,
+			//	placeholder: '<empty>',
+			//	templateResult: function (repo) {
+			//		if (repo.loading) {
+			//			return repo.text;
+			//		}
+			//		return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+			//	},
+			//	ajax: {
+			//		url: "@Url.Action("GetOptions2", "Agent")",
+			//		dataType: 'json',
+			//		type: "POST",
+			//		data: function (params) {
+			//			return {
+			//				search: params.term,
+			//				page: params.page || 1
+			//			};
+			//		},
+			//		processResults: function (data, params) {
+			//			params.page = params.page || 1;
+			//			return {
+			//				results: data.items,
+			//				pagination: {
+			//					more: (params.page * 50) < data.total_count
+			//				}
+			//			};
+			//		},
+			//		cache: true
+			//	},
+			//	dropdownParent: $("#filterModal")
+			//});
+
+			//$("#filter-agent").on("select2:select", function () {
+			//	$("#filter-agent-name").val($(this).select2("data")[0].name);
+			//});
+
+			//$("#filter-agent").on("select2:unselecting", function (e) {
+			//	$("#filter-agent-name").val("");
+			//});
 
 			// Load Select2 for Customer
 			$("#filter-customer").select2({
@@ -142,9 +243,14 @@
 			ajax: {
 				url: "@Url.Action("GetContractReceiptJson")",
 				data: function (data) {
+					//var agentId = $("#filter-agent").val();
 					var customerId = $("#filter-customer").val();
 
+					//if (agentId) data.AgentId = agentId;
 					if (customerId) data.CustomerId = customerId;
+
+					//data.DateFrom = $("#filter-from").val();
+					//data.DateTo = $("#filter-to").val();
 
 				},
 				type: "POST",
@@ -177,6 +283,31 @@
 			DatatablesSearchOnEnter('.table-soa', soaDT);
 
 			LoadFilterSelect2();
+
+			// $(".printBtn").on("click", function () {
+			//$.LoadingOverlay("show", {
+			//	image: "",
+			//	fontawesome: "fas fa-print"
+			//});
+			//var urlQuery = [];
+			//urlQuery.push("DateFrom=" + $("#filter-from").val());
+			//urlQuery.push("DateTo=" + $("#filter-to").val());
+			//if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+			//if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+			//setTimeout(function () {
+			//	//let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
+			//	let win = window.open('@Url.Action("PrintInvoice")?' + urlQuery.join("&"), '');
+				
+			//	//let win = window.open('@Url.Action("PrintInvoice")?', '');
+			//	var wintimer = setInterval(function () {
+			//		if (win.closed) {
+			//			clearInterval(wintimer);
+			//			hideLoader();
+			//		}
+			//	}, 100);
+			//}, 500);
+			//});
+
 
 
 

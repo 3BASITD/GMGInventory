@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Common.Constants;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
@@ -12,7 +13,11 @@ namespace GMGInventory.Common.Models
         public string CRNumber { get; set; }
 
         [Display(Name = "SOA No")]
-        public decimal SOANo { get; set; }
+        public int SOANo { get; set; }
+
+        [Display(Name = "Customer Id")]
+        public int CustomerId { get; set; }
+        public SelectList? Customers { get; set; }
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
@@ -42,27 +47,44 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Tax")]
-        public string Tax { get; set; }
+        public string Tax => string.Format(SystemFormat.StringDecimalComma, TaxD);
+        public decimal TaxD { get; set; }
+        
 
         [Display(Name = "Discount")]
-        public string Discount { get; set; }
+        public string Discount => string.Format(SystemFormat.StringDecimalComma, DiscountD);
+        public decimal DiscountD { get; set; }
 
         [Display(Name = "Cash Amount")]
-        public string CashAmount { get; set; }
+        public string CashAmount => string.Format(SystemFormat.StringDecimalComma, CashAmountD);
+        public decimal CashAmountD { get; set; }
 
         [Display(Name = "TKT/ Solicitation")]
-        public string TKT { get; set; }
+        public string TKT => string.Format(SystemFormat.StringDecimalComma, TKTD);
+        public decimal TKTD { get; set; }
+
 
         [Display(Name = "Cash Advanced")]
-        public string CashAdvanced { get; set; }
+        public string CashAdvanced => string.Format(SystemFormat.StringDecimalComma, CashAdvancedD);
+
+        public decimal CashAdvancedD { get; set; }
+        
 
         [Display(Name = "Offset")]
-        public string Offset { get; set; }
+        public string Offset => string.Format(SystemFormat.StringDecimalComma, OffsetD);
+        public decimal OffsetD { get; set; }
 
         [Display(Name = "Back Load")]
-        public string BackLoad { get; set; }
+        public string BackLoad => string.Format(SystemFormat.StringDecimalComma, BackLoadD);
+        public decimal BackLoadD { get; set; }
 
         //Checks
+
+        [Display(Name = "Invoice Id")]
+        public int InvoiceId { get; set; }
+
+        [Display(Name = "Payment Id")]
+        public int PaymentId { get; set; }
 
         [Display(Name = "Bank Name")]
         public string BankName { get; set; }
@@ -79,14 +101,16 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Check Date")]
-        public string CheckDate => CheckDateD == null ? "-" : CheckDateD.Value.ToString(SystemFormat.StringDate);
-        public DateTime? CheckDateD { get; set; }
+        public string CheckDate => CheckDateD == null ? "-" : CheckDateD.ToString(SystemFormat.StringDate);
+        public DateTime CheckDateD { get; set; }
 
 
         // Invoices
 
         [Display(Name = "Invoice Date")]
-        public string InvoiceDate { get; set; }
+        public string InvoiceDate => InvoiceDateD == null ? "-" : InvoiceDateD.ToString(SystemFormat.StringDate);
+        public DateTime InvoiceDateD { get; set; }
+
 
         [Display(Name = "Invoice No")]
         public string InvoiceNumber { get; set; }
@@ -95,13 +119,16 @@ namespace GMGInventory.Common.Models
         public string? InvoiceType { get; set; }
 
         [Display(Name = "Invoice Amount")]
-        public string InvoiceAmount { get; set; }
+        public string InvoiceAmount => string.Format(SystemFormat.StringDecimalComma, InvoiceAmountD);
+        public decimal InvoiceAmountD { get; set; }
+
 
         [Display(Name = "Balance Amount")]
-        public string BalanceAmount { get; set; }
+        public string BalanceAmount => string.Format(SystemFormat.StringDecimalComma, BalanceAmountD);
+        public decimal BalanceAmountD { get; set; }
 
         [Display(Name = "Pack No")]
-        public string PackNo { get; set; }
+        public int PackNo { get; set; }
 
         [Display(Name = "SalesOrderNo")]
         public string SalesOrderNo { get; set; }
@@ -113,12 +140,4 @@ namespace GMGInventory.Common.Models
 
     }
 
-    //public class UnservedItemFilter
-    //{
-    //    public DateTime StartDate { get; set; } = DateTime.Now;
-    //    public DateTime EndDate { get; set; } = DateTime.Now;
-    //    public int? CategoryId { get; set; }
-    //    public int? ItemTypeId { get; set; }
-    //    public int? BrandId { get; set; }
-    //}
 }

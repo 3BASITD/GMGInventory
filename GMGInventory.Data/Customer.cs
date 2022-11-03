@@ -59,6 +59,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal CreditLimit { get; set; }
 
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal? CommissionRate { get; set; }
+
         [ForeignKey("AreaId")]
         public int AreaId { get; set; }
         public Area Area { get; set; }

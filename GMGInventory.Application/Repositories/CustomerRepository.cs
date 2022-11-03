@@ -47,6 +47,19 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId)
+        {
+            return await context.Customers
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
         public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers
@@ -74,6 +87,7 @@ namespace GMGInventory.Application.Repositories
                                   CreditTermName = cust.CreditTerm.Name,
                                   RegionName = cust.Area.Region.Name,
                                   CustomerTypeName = cust.CustomerType.Name,
+                                  CommissionRateD = cust.CommissionRate,
                                   FaxNumber = cust.FaxNumber,
                                   TIN = cust.TIN,
                                   VAT = cust.VAT,
@@ -223,6 +237,7 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             cust.Code = custVM.Code;
             cust.Name = custVM.Name;
+            cust.CommissionRate = custVM.CommissionRateD;
             cust.AreaId = custVM.AreaId;
             cust.CustomerTypeId = custVM.CustomerTypeId;
             cust.ContactPerson = custVM.ContactPerson;
@@ -237,6 +252,7 @@ namespace GMGInventory.Application.Repositories
             cust.CreditLimit = custVM.CreditLimit;
             cust.Remarks = custVM.Remarks;
             cust.IsActive = true;
+            cust.CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null;
             context.Customers.Update(cust);
             await context.SaveChangesAsync(currentUserId);
         }
@@ -245,6 +261,13 @@ namespace GMGInventory.Application.Repositories
         public async Task AddAsync(CustomerVM custVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            //var customerVM = (from cust in context.Customers
+            //                        .Include(s => s.Area)
+            //                        .Include(s => s.CustomerType)
+            //                        .Include(s => s.Agent)
+            //                        .Include(s => s.CreditTerm)
+
             var cust = new Customer
             {
                 Code = custVM.Code,
@@ -262,6 +285,8 @@ namespace GMGInventory.Application.Repositories
                 CreditTermId = custVM.CreditTermId,
                 CreditLimit = custVM.CreditLimit,
                 Remarks = custVM.Remarks,
+                CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null,
+
                 IsActive = true
             };
             await context.Customers.AddAsync(cust);

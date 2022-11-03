@@ -85,6 +85,10 @@ namespace GMGInventory.Application.Configurations
             CreateMap<CreditTerm, CreditTermVM>().ReverseMap();
             CreateMap<CreditTerm, GenericAuditVM>().ReverseMap();
 
+            // SOACRLineItem
+            CreateMap<SOACRLineItem, SoacrLineItemVM>().ReverseMap();
+            CreateMap<SOACRLineItem, GenericAuditVM>().ReverseMap();
+
             // Customer
             CreateMap<Customer, CustomerVM>().ReverseMap();
             CreateMap<Customer, CustomerViewVM>().ReverseMap();
