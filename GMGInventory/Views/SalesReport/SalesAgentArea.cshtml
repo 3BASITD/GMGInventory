@@ -38,13 +38,15 @@
                     <th>
                         @Html.DisplayNameFor(model => model.PercentSales)
                     </th>
+                    <th>
+                    </th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
                     <th colspan="3">Total</th>
                     <th></th>
-                    <th></th>
+                    <th colspan="2"></th>
                 </tr>
             </tfoot>
         </table>
@@ -119,16 +121,16 @@
                     $("#filter-to").val(DateForInput(new Date()));
                 } else {
                     var dt_from = new Date($("#filter-from").val());
-                    dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    //dt_from.setMonth(dt_from.getMonth() + 1);
+                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    dt_from.setMonth(dt_from.getMonth() + 1);
                     $("#filter-to").val(DateForInput(dt_from));
                 }
             }
 
             if ($("#filter-from").val() == "") {
                 var dt_to = new Date($("#filter-to").val());
-                dt_to.setFullYear(dt_to.getFullYear() - 1);
-                //dt_to.setMonth(dt_to.getMonth() - 1);
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
+                dt_to.setMonth(dt_to.getMonth() - 1);
                 $("#filter-from").val(DateForInput(dt_to));
             }
         }
@@ -199,7 +201,7 @@
             showLoader();
         }).DataTable({
             ajax: {
-                url: "@Url.Action("GetAgentSalesPerItemDT")",
+                url: "@Url.Action("GetSalesAgentAreaDT")",
                 type: "POST",
                 data: function (data) {
                     var agentId = $("#filter-agent").val();
@@ -221,7 +223,13 @@
                 { data: "agentName", name: "AgentName" },
                 { data: "area", name: "Area" },
                 { data: "sales", name: "Sales", className: "text-end" },
-                { data: "percentSales", name: "PercentSales", className: "text-end" }
+                { data: "percentSales", name: "PercentSales", className: "text-end" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        return "<div class='progress progress-xs'><div class='progress-bar progress-bar-striped bg-success' style='width: " + data.percentSales + "'></div></div>";
+                    }
+                }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var json = salesDT.ajax.json();
@@ -229,7 +237,7 @@
 
                 $(api.column(3).footer()).html(FormatStringDecimal(json.totalAmount));
             },
-            order: [[0, "desc"]]
+            order: [[1, "asc"]]
         });
 
         // Load functions upon DataTable load
@@ -252,7 +260,7 @@
             urlQuery.push("DateTo=" + $("#filter-to").val());
             if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
             if ($("#filter-area").val()) { urlQuery.push("Area=" + $("#filter-area").val()); }
-            window.location = "@Url.Action("DownloadAgentSalesPerItem")?" + urlQuery.join("&");
+            window.location = "@Url.Action("DownloadSalesAgentArea")?" + urlQuery.join("&");
         });
 
         $(".printBtn").on("click", function () {
@@ -266,7 +274,7 @@
             if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
             if ($("#filter-area").val()) { urlQuery.push("Area=" + $("#filter-area").val()); }
             setTimeout(function () {
-                let win = window.open('@Url.Action("PrintAgentSalesPerItem")?' + urlQuery.join("&"), '');
+                let win = window.open('@Url.Action("PrintSalesAgentArea")?' + urlQuery.join("&"), '');
                 var wintimer = setInterval(function () {
                     if (win.closed) {
                         clearInterval(wintimer);

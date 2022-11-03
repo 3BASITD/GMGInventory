@@ -7,6 +7,7 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -51,6 +52,9 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<ItemTypeViewVM>> GetListAsync()
         {
             var itemTypes = from itemType in context.ItemTypes
+                            join userc in userManager.Users on itemType.UserCreated equals userc.Id
+                            join userm in userManager.Users on itemType.UserModified equals userm.Id into m
+                            from um in m.DefaultIfEmpty()
                             select new ItemTypeViewVM
                             {
                                 Id = itemType.Id,
@@ -63,8 +67,8 @@ namespace GMGInventory.Application.Repositories
                                 DateModifiedD = itemType.DateModified == null ? null : itemType.DateModified.Value,
                                 IsActive = itemType.IsActive,
                                 Name = itemType.Name,
-                                UserCreated = userManager.FindByIdAsync(itemType.UserCreated).Result.Nickname,
-                                UserModified = itemType.UserModified == null ? "-" : userManager.FindByIdAsync(itemType.UserModified).Result.Nickname
+                                UserCreated = userc.Nickname,
+                                UserModified = um == null ? "-" : um.Nickname
                             };
             return await itemTypes.ToListAsync();
         }

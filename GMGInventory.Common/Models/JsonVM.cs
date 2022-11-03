@@ -172,7 +172,10 @@ namespace GMGInventory.Common.Models
     public class ListFilterCommonModel
     {
         DateTime? _DateFrom = null, _DateTo = null;
+
         public int? Status { get; set; }
+        public string? StatusCode { get; set; }
+
         public DateTime? DateFrom {
             get
             {

@@ -11,6 +11,7 @@ namespace GMGInventory.Data
             this.InvoiceLineItems = new HashSet<InvoiceLineItem>();
             this.InvoicePayments = new HashSet<InvoicePayment>();
             this.PaymentDetails = new HashSet<PaymentDetail>();
+            this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
             this.SOACRLineItems = new HashSet<SOACRLineItem>();
         }
 
@@ -53,6 +54,7 @@ namespace GMGInventory.Data
         public ICollection<InvoiceLineItem> InvoiceLineItems { get; set; }
         public ICollection<InvoicePayment> InvoicePayments { get; set; }
         public ICollection<PaymentDetail> PaymentDetails { get; set; }
+        public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
         public ICollection<SOACRLineItem> SOACRLineItems { get; set; }
 
     }

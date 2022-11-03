@@ -1,0 +1,91 @@
+﻿@model SalesInvoicePVM
+
+@{
+    Layout = "";
+    var title = "Sales Invoice Listing";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Agent</strong>
+        <span>@Model.Agent</span>
+        <br />
+        <strong>Customer</strong>
+        <span>@Model.Customer</span>
+        <br />
+        <strong>Status</strong>
+        <span>@Model.Status</span>
+        <br />
+        <strong>Date From</strong>
+        <span>@Model.DateFrom</span>
+        <br />
+        <strong>Date To</strong>
+        <span>@Model.DateTo</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ControlNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().CustomerCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().CustomerName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Agent)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Amount)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Contents)
+            {
+                <tr>
+                    <td><nobr>@item.InvoiceNumber</nobr></td>
+                    <td><nobr>@item.ControlNumber</nobr></td>
+                    <td><nobr>@item.InvoiceDate</nobr></td>
+                    <td><nobr>@item.CustomerCode</nobr></td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.Agent</td>
+                    <td><nobr>@item.Status</nobr></td>
+                    <td class="right-text"><nobr>@item.Amount</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="7" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
+</html>

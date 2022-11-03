@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -39,6 +40,14 @@ namespace GMGInventory.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
+
+            var dtNow = DateTime.Now;
+            var newChecker = dtNow.AddMinutes(-1) <= transfer.TransferDateD && transfer.TransferDateD <= dtNow;
+            if (newChecker)
+            {
+                TempData["SuccessMessage"] = "Transfer successfully added";
+            }
+
             return View(transfer);
         }
 

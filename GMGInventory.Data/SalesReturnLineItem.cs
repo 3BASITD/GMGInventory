@@ -8,8 +8,9 @@ namespace GMGInventory.Data
         public int SalesReturnId { get; set; }
         public SalesReturn SalesReturn { get; set; }
 
-        [Column(TypeName = "nvarchar(100)")]
-        public string ReferenceNumber { get; set; }
+        [ForeignKey("Invoice")]
+        public int InvoiceId { get; set; }
+        public Invoice Invoice { get; set; }
 
         [ForeignKey("ItemId")]
         public int ItemId { get; set; }
@@ -18,7 +19,7 @@ namespace GMGInventory.Data
         public int Quantity { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal Amount { get; set; }
+        public decimal SellingPrice { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount1 { get; set; }

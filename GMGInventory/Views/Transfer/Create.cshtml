@@ -364,10 +364,13 @@
                             toastr.error(data.message, "Error");
                         } else {
                             toastr.success(data.message, "Success");
-                            toastr.warning("Page will redirect to details", 'Page Redirect', { 
-                                timeOut: 3000,
-                                onHidden: function () { window.location = "@Url.Action("Details")/" + data.newRow; },
-                                progressBar: true });
+                            //toastr.warning("Page will redirect to details", 'Page Redirect', {
+                            //    timeOut: 3000,
+                            //    onHidden: function () {
+                                    window.location = "@Url.Action("Details")/" + data.newRow;
+                            //    },
+                            //    progressBar: true
+                            //});
                         }
                     },
                     complete: function (xhr, status) {

@@ -226,8 +226,8 @@
                 $("#replenish-supplier").select2({
                     data: data
                 });
-            $("#replenish-address1").val($("#replenish-supplier").select2("data")[0].address1);
-            $("#replenish-address2").val($("#replenish-supplier").select2("data")[0].address2);
+                $("#replenish-address1").val($("#replenish-supplier").select2("data")[0].address1);
+                $("#replenish-address2").val($("#replenish-supplier").select2("data")[0].address2);
             }
         });
 
@@ -497,7 +497,7 @@
             messages: {
                 ReplenishDate: { required: "Please enter date of replenish." },
                 Quantity: { required: "Please enter a currency rate", isNotZero: "Currency rate cannot be 0" },
-                ReferenceNumber: { maxlength: "Reference number must not exceed 50 characters."}
+                ReferenceNumber: { maxlength: "Reference number must not exceed 50 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -530,13 +530,14 @@
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
-                            toastr.success(data.message, "Success");
-                            toastr.warning("Page will redirect to details", 'Page Redirect', {
-                                timeOut: 3000,
-                                onHidden: function () { 
-                                    window.location = "@Url.Action("Details")/" + data.newRow; },
-                                progressBar: true
-                            });
+                            //toastr.success(data.message, "Success");
+                            //toastr.warning("Page will redirect to details", 'Page Redirect', {
+                            //    timeOut: 3000,
+                            //    onHidden: function () {
+                                    window.location = "@Url.Action("Details")/" + data.newRow;
+                                },
+                            //    progressBar: true
+                            //});
                         }
                     }
                 });

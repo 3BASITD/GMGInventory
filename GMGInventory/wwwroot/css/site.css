@@ -167,3 +167,8 @@ pre {
     position: fixed;
     left: -9999px;   
 }
+
+.table tr > td .progress {
+    margin: 5px 0;
+    min-width: 100px;
+}

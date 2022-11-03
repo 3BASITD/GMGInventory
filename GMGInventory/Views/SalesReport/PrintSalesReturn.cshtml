@@ -1,0 +1,114 @@
+﻿@model SalesReturnPVM
+
+@{
+    Layout = "";
+    var title = "Sales Return Listing";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Customer</strong>
+        <span>@Model.Customer</span>
+        <br />
+        <strong>Item</strong>
+        <span>@Model.Item</span>
+        <br />
+        <strong>Date From</strong>
+        <span>@Model.DateFrom</span>
+        <br />
+        <strong>Date To</strong>
+        <span>@Model.DateTo</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Brand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Unit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().SRNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ReturnDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Customer)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Agent)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().SINumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ControlNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().QuantityReturned)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().PriceReturned)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Amount)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Contents)
+            {
+                <tr>
+                    <td><nobr>@item.Brand</nobr></td>
+                    <td>@item.ItemType</td>
+                    <td>@item.ItemCode</td>
+                    <td>@item.ItemName</td>
+                    <td><nobr>@item.Unit</nobr></td>
+                    <td><nobr>@item.SRNumber</nobr></td>
+                    <td><nobr>@item.ReturnDate</nobr></td>
+                    <td>@item.Customer</td>
+                    <td><nobr>@item.Agent</nobr></td>
+                    <td><nobr>@item.SINumber</nobr></td>
+                    <td><nobr>@item.ControlNumber</nobr></td>
+                    <td class="right-text"><nobr>@item.QuantityReturned</nobr></td>
+                    <td class="right-text"><nobr>@item.PriceReturned</nobr></td>
+                    <td class="right-text"><nobr>@item.Amount</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="11" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalQuantityReturned</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalPriceReturned</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
+</html>
