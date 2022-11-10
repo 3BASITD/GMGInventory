@@ -48,6 +48,17 @@ namespace GMGInventory.Application.Contracts
         Task<IList<SoacrVM>> GetAll2Async(SoaFilterVM filter);
         Task<ForDataTables<SoacrVM>> GetAllForDataTables2Async(DataTablesRequestForm form, SoaFilterVM filter);
 
+        //CR
+        Task<IList<InvoiceVM>> GetContractInvoices2(SoaFilterVM filter);
+        Task<ForDataTables<InvoiceVM>> GetContractReceipt2DTAsync(DataTablesRequestForm form, SoaFilterVM filter);
+
+        //Add Invoice
+        Task<IList<InvoiceVM>> GetContractInvoicesCustomer(int id, int soaId);
+        Task<ForDataTables<InvoiceVM>> GetContractReceiptCustomerDTAsync(DataTablesRequestForm form, int id, int soaId);
+
+        Task AddInvoicesAsync(int soaId, int[] invoiceIds);
+        Task<int> AddCrAsync(SoacrVM soaVM, int[] invoiceIds);
+
 
 
     }

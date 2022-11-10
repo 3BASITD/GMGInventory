@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using GMGInventory.Common.Constants;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
@@ -22,11 +23,19 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Region")]
         public int RegionId { get; set; }
         public SelectList? Regions { get; set; }
+
+        [Display(Name = "Commission Rate")]
+        public string CommissionRateD => string.Format(SystemFormat.StringDecimalComma, CommissionRate);
+        public decimal CommissionRate { get; set; }
     }
 
     public class AreaViewVM : GenericAuditVM
     {
         [Display(Name = "Region")]
         public RegionVM Region { get; set; }
+
+        [Display(Name = "Commission Rate")]
+        public string CommissionRateD => string.Format(SystemFormat.StringDecimalComma, CommissionRate);
+        public decimal CommissionRate { get; set; }
     }
 }

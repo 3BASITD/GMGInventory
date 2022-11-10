@@ -12,7 +12,7 @@
 	<div class="card-header">
 		<span class="card-title">@ViewData["Title"]</span>
 		<div class="card-tools">
-			<a class="btn btn-light btn-sm float-right" asp-action="Index">
+			<a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
 				<span class="fas fa-arrow-left"></span> Back to List
 			</a>
 			<button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
@@ -278,7 +278,7 @@
 
 			LoadFilterSelect2();
 
-			 $(".printBtn").on("click", function () {
+			$(".printBtn").on("click", function () {
 			$.LoadingOverlay("show", {
 				image: "",
 				fontawesome: "fas fa-print"
@@ -286,15 +286,15 @@
 			var urlQuery = [];
 			urlQuery.push("DateFrom=" + $("#filter-from").val());
 			urlQuery.push("DateTo=" + $("#filter-to").val());
-			if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
-			if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+			if ($("#filter-agent").val()) { urlQuery.push("AgentId=" + $("#filter-agent").val()); }
+			if ($("#filter-customer").val()) { urlQuery.push("CustomerId=" + $("#filter-customer").val()); }
 			setTimeout(function () {
 				//let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
 				let win = window.open('@Url.Action("PrintInvoice")?' + urlQuery.join("&"), '');
 				
 				//let win = window.open('@Url.Action("PrintInvoice")?', '');
 				var wintimer = setInterval(function () {
-					if (win.closed) {
+					if ( !win || win.closed) {
 						clearInterval(wintimer);
 						hideLoader();
 					}
