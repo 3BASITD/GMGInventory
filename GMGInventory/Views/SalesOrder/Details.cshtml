@@ -82,14 +82,6 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AgentCode)
-                    </span>
-                    <b class="d-block">
-                        @Model?.AgentCode
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
                         @Html.DisplayNameFor(model => model.AgentName)
                     </span>
                     <b class="d-block">
@@ -154,22 +146,6 @@
                     </span>
                     <b class="d-block">
                         @Model?.OrderDate
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.RequiredDate)
-                    </span>
-                    <b class="d-block">
-                        @Model?.RequiredDate
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DeliveryDate)
-                    </span>
-                    <b class="d-block">
-                        @Model?.DeliveryDate
                     </b>
                 </p>
                 @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)

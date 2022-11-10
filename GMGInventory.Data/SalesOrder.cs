@@ -31,9 +31,6 @@ namespace GMGInventory.Data
         public int StatusId { get; set; }
         public Status Status { get; set; }
 
-        public DateTime RequiredDate { get; set; }
-        public DateTime DeliveryDate { get; set; }
-
         [ForeignKey("PurchaseOrderId")]
         public int? PurchaseOrderId { get; set; }
         public PurchaseOrder? PurchaseOrder { get; set; }

@@ -75,18 +75,6 @@
                             <span data-valmsg-for="order-delivery-type" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="order-required-date" class="form-label mb-0">Required Date</label>
-                            <input type="date" id="order-required-date" name="RequiredDate" class="form-control form-control-sm" />
-                            <span data-valmsg-for="order-required-date" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-delivery-date" class="form-label mb-0">Delivery Date</label>
-                            <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
-                            <span data-valmsg-for="order-delivery-date" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
@@ -639,15 +627,11 @@
             errorClass: 'text-danger text-xs',
             rules: {
                 CustomerCode: { required: true },
-                AgentCode: { required: true},
-                RequiredDate: { required: true },
-                DeliveryDate: { required: true }
+                AgentCode: { required: true}
             },
             messages: {
                 CustomerCode: { required: "Please select customer" },
-                AgentCode: { required: "Please select agent" },
-                RequiredDate: { required: "Please enter date required" },
-                DeliveryDate: { required: "Please enter date of delivery" }
+                AgentCode: { required: "Please select agent" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -671,8 +655,6 @@
                         Agent: $("#order-agent-code").val(),
                         GrossNet: $("#order-gross-net").val(),
                         PurchaseOrder: $("#order-purchase-number").val(),
-                        RequiredDate: $("#order-required-date").val(),
-                        DeliveryDate: $("#order-delivery-date").val(),
                         DeclaredValue: $("#order-declared-value").val(),
                         Items: itemsToOrder
                     },

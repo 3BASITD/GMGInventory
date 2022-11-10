@@ -31,13 +31,13 @@ namespace GMGInventory.Application.Repositories
                              from sdm in monitoring.DefaultIfEmpty()
                              where (filter.AgentId == null || filter.AgentId == so.AgentId)
                                 && (filter.CustomerId == null || filter.CustomerId == so.CustomerId)
-                                && filter.DateFrom <= so.DeliveryDate
-                                && so.DeliveryDate <= filter.DateTo
+                                && filter.DateFrom <= (sdm.DateModified ?? sdm.DateCreated)
+                                && (sdm.DateModified ?? sdm.DateCreated) <= filter.DateTo
                              select new SalesOrderDeliveryVM
                              {
                                  CustomerCode = so.Customer.Code,
                                  CustomerName = so.Customer.Name,
-                                 DateDeliveredD = so.DeliveryDate,
+                                 DateDeliveredD = sdm.DateModified ?? sdm.DateCreated,
                                  Forwarder = sdm == null ? "-" : sdm.Forwarder.Name,
                                  ForwarderId = sdm == null ? 0 : sdm.ForwarderId,
                                  Id = so.Id,
@@ -145,11 +145,6 @@ namespace GMGInventory.Application.Repositories
                     context.SalesOrderDeliveryMonitorings.Update(delivery);
                     message = "Delivery details updated successfully";
                 }
-
-                var salesOrder = context.SalesOrders.Where(s => s.Id == form.SalesOrderId).First();
-                salesOrder.DeliveryDate = form.DeliveryDate;
-                context.SalesOrders.Update(salesOrder);
-                await context.SaveChangesAsync(currentUserId);
 
                 return message;
             }

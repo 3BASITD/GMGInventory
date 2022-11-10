@@ -38,22 +38,6 @@
             <td>@Model?.CustomerName</td>
             <th>@Html.DisplayNameFor(model => model.DeclaredValue)</th>
             <td>@Model?.DeclaredValue</td>
-            <th>@Html.DisplayNameFor(model => model.RequiredDate)</th>
-            <td>@Model?.RequiredDate</td>
-        </tr>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.CustomerAddress)</th>
-            <td>@(string.IsNullOrWhiteSpace(Model?.CustomerAddress) ? "-" : Model.CustomerAddress)</td>
-            <th>PO Number</th>
-            <td>@(string.IsNullOrWhiteSpace(Model?.PONumber) ? "-" : Model.PONumber)</td>
-            <th>@Html.DisplayNameFor(model => model.DeliveryDate)</th>
-            <td>@Model?.DeliveryDate</td>
-        </tr>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.AgentCode)</th>
-            <td>@Model?.AgentCode</td>
-            <th>@Html.DisplayNameFor(model => model.DeliveryType)</th>
-            <td>@Model?.DeliveryType</td>
             @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
             {
                 <th>@Html.DisplayNameFor(model => model.ApprovedBy)</th>
@@ -71,10 +55,10 @@
             }
         </tr>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.AgentName)</th>
-            <td>@Model?.AgentName</td>
-            <th></th>
-            <td></td>
+            <th>@Html.DisplayNameFor(model => model.CustomerAddress)</th>
+            <td>@(string.IsNullOrWhiteSpace(Model?.CustomerAddress) ? "-" : Model.CustomerAddress)</td>
+            <th>PO Number</th>
+            <td>@(string.IsNullOrWhiteSpace(Model?.PONumber) ? "-" : Model.PONumber)</td>
             @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
             {
                 <th>@Html.DisplayNameFor(model => model.ApprovedDate)</th>
@@ -90,6 +74,14 @@
                 <th></th>
                 <td></td>
             }
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.AgentName)</th>
+            <td>@Model?.AgentName</td>
+            <th>@Html.DisplayNameFor(model => model.DeliveryType)</th>
+            <td>@Model?.DeliveryType</td>
+            <th></th>
+            <td></td>
         </tr>
     </table>
 

@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -95,7 +96,6 @@ namespace GMGInventory.Application.Repositories
                                CustomerCode = order.Customer.Code,
                                CustomerName = order.Customer.Name,
                                DeclaredValueD = order.DeclaredValue,
-                               DeliveryDateD = order.DeliveryDate,
                                DeliveryType = order.DeliveryType.Name,
                                DisapprovedBy = disapprove.Nickname,
                                DisapprovedDateD = order.DisapprovedDate,
@@ -103,7 +103,6 @@ namespace GMGInventory.Application.Repositories
                                Id = order.Id,
                                OrderDateD = order.DateCreated,
                                PONumber = order.PurchaseOrder == null ? "-" : order.PurchaseOrder.PONumber,
-                               RequiredDateD = order.RequiredDate,
                                SalesOrderBy = user.Nickname,
                                ShippingAddress = "",
                                SONumber = order.SalesOrderNumber,
@@ -133,16 +132,18 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.Customer)
                                                 .Include(s => s.Status)
                            join user in userManager.Users on order.UserCreated equals user.Id
+                           let auser = userManager.Users.Where(s => s.Id == order.ApprovedBy).Select(s => s.Nickname).First()
+                           let duser = userManager.Users.Where(s => s.Id == order.DisapprovedBy).Select(s => s.Nickname).First()
                            select new SalesOrderVM
                            {
                                Customer = order.Customer.Name,
-                               DeliveryDateD = order.DeliveryDate,
                                Id = order.Id,
                                OrderDateD = order.DateCreated,
-                               RequiredDateD = order.RequiredDate,
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
-                               TotalAmountD = order.TotalAmount
+                               TotalAmountD = order.TotalAmount,
+                               ApprovedDisapprovedBy = auser ?? duser ?? "-",
+                               ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate 
                            });
             return await orderVM.ToListAsync();
         }
@@ -158,9 +159,7 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue)
-                                    || x.DeliveryDate.ToLower().Contains(form.SearchValue)
                                     || x.OrderDate.ToLower().Contains(form.SearchValue)
-                                    || x.RequiredDate.ToLower().Contains(form.SearchValue)
                                     || x.SONumber.ToLower().Contains(form.SearchValue)
                                     || x.Status.ToLower().Contains(form.SearchValue)
                                     || x.TotalAmount.ToLower().Contains(form.SearchValue));
@@ -175,9 +174,7 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "DeliveryDate": data = data.OrderBy(s => s.DeliveryDateD); break;
                         case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
-                        case "RequiredDate": data = data.OrderBy(s => s.RequiredDateD); break;
                         case "SONumber": data = data.OrderBy(s => s.SONumber); break;
                         case "Status": data = data.OrderBy(s => s.Status); break;
                         case "TotalAmount": data = data.OrderBy(s => s.TotalAmountD); break;
@@ -189,9 +186,7 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "DeliveryDate": data = data.OrderByDescending(s => s.DeliveryDateD); break;
                         case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
-                        case "RequiredDate": data = data.OrderByDescending(s => s.RequiredDateD); break;
                         case "SONumber": data = data.OrderByDescending(s => s.SONumber); break;
                         case "Status": data = data.OrderByDescending(s => s.Status); break;
                         case "TotalAmount": data = data.OrderByDescending(s => s.TotalAmountD); break;
@@ -347,14 +342,12 @@ namespace GMGInventory.Application.Repositories
                     AgentId = form.Agent,
                     CustomerId = form.Customer,
                     DeclaredValue = form.DeclaredValue,
-                    DeliveryDate = form.DeliveryDate,
                     DeliveryTypeId = form.DeliveryType,
                     PriceTypeId = form.GrossNet,
                     PurchaseOrderId = form.PurchaseOrder,
                     QuantityInvoiced = 0,
                     QuantityOrdered = form.Items.Sum(s => s.Quantity),
                     QuantityPacked = 0,
-                    RequiredDate = form.RequiredDate,
                     SalesOrderNumber = soNumber,
                     StatusId = statusId,
                     TotalAmount = form.Items.Sum(s => s.GrossPrice)

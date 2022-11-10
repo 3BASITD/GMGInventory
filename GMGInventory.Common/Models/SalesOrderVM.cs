@@ -17,20 +17,19 @@ namespace GMGInventory.Common.Models
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
         public DateTime OrderDateD { get; set; }
 
-        [Display(Name = "Required Date")]
-        public string RequiredDate => RequiredDateD == null ? "-" : RequiredDateD.Value.ToString(SystemFormat.StringDate);
-        public DateTime? RequiredDateD { get; set; }
-
-        [Display(Name = "Delivery Date")]
-        public string DeliveryDate => DeliveryDateD == null ? "-" : DeliveryDateD.Value.ToString(SystemFormat.StringDate);
-        public DateTime? DeliveryDateD { get; set; }
-
         [Display(Name = "Total Amount")]
         public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
         public decimal TotalAmountD { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }
+
+        [Display(Name = "Approved / Disapproved By")]
+        public string ApprovedDisapprovedBy { get; set; }
+
+        [Display(Name = "Approved / Disapproved Date")]
+        public string ApprovedDisapprovedDate => ApprovedDisapprovedDateD == null ? "-" : ApprovedDisapprovedDateD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? ApprovedDisapprovedDateD { get; set; }
     }
 
     public class SalesOrderDetailsVM
@@ -74,14 +73,6 @@ namespace GMGInventory.Common.Models
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
         public DateTime OrderDateD { get; set; }
 
-        [Display(Name = "Required Date")]
-        public string RequiredDate => RequiredDateD == null ? "-" : RequiredDateD.Value.ToString(SystemFormat.StringDate);
-        public DateTime? RequiredDateD { get; set; }
-
-        [Display(Name = "Delivery Date")]
-        public string DeliveryDate => DeliveryDateD == null ? "-" : DeliveryDateD.Value.ToString(SystemFormat.StringDate);
-        public DateTime? DeliveryDateD { get; set; }
-
         [Display(Name = "Declared Value")]
         public string DeclaredValue => string.Format(SystemFormat.StringDecimalComma, DeclaredValueD ?? 0m);
         public decimal? DeclaredValueD { get; set; }
@@ -96,14 +87,14 @@ namespace GMGInventory.Common.Models
         public string ApprovedBy { get; set; }
 
         [Display(Name = "Approved Date")]
-        public string ApprovedDate => ApprovedDateD == null ? "-" : ApprovedDateD.Value.ToString(SystemFormat.StringDate);
+        public string ApprovedDate => ApprovedDateD == null ? "-" : ApprovedDateD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? ApprovedDateD { get; set; }
 
         [Display(Name = "Disapproved By")]
         public string DisapprovedBy { get; set; }
 
         [Display(Name = "Disapproved Date")]
-        public string DisapprovedDate => DisapprovedDateD == null ? "-" : DisapprovedDateD.Value.ToString(SystemFormat.StringDate);
+        public string DisapprovedDate => DisapprovedDateD == null ? "-" : DisapprovedDateD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DisapprovedDateD { get; set; }
     }
 
@@ -122,7 +113,6 @@ namespace GMGInventory.Common.Models
                 CustomerCode = value.CustomerCode;
                 CustomerName = value.CustomerName;
                 DeclaredValueD = value.DeclaredValueD;
-                DeliveryDateD = value.DeliveryDateD;
                 DeliveryType = value.DeliveryType;
                 DisapprovedBy = value.DisapprovedBy;
                 DisapprovedDateD = value.DisapprovedDateD;
@@ -130,7 +120,6 @@ namespace GMGInventory.Common.Models
                 Id = value.Id;
                 OrderDateD = value.OrderDateD;
                 PONumber = value.PONumber;
-                RequiredDateD = value.RequiredDateD;
                 SalesOrderBy = value.SalesOrderBy;
                 ShippingAddress = value.ShippingAddress;
                 SONumber = value.SONumber;
@@ -203,8 +192,6 @@ namespace GMGInventory.Common.Models
         public int Agent { get; set; }
         public int GrossNet { get; set; }
         public int? PurchaseOrder { get; set; }
-        public DateTime RequiredDate { get; set; }
-        public DateTime DeliveryDate { get; set; }
         public decimal DeclaredValue { get; set; }
         public IList<SalesOrderFormItemVM> Items { get; set; }
     }
