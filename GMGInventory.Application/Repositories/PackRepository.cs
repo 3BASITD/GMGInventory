@@ -22,7 +22,7 @@ namespace GMGInventory.Application.Repositories
         {
             var orderVM = (from order in context.Packs
                                                 .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
-                                                .Include(s=>s.SalesOrder).ThenInclude(s=>s.DeliveryType)
+                                                .Include(s => s.SalesOrder).ThenInclude(s => s.DeliveryType)
                            join user in userManager.Users on order.UserCreated equals user.Id
                            where order.Id == Id
                            select new PackDetailsVM

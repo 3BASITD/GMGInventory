@@ -10,7 +10,7 @@ namespace GMGInventory.Controllers
                      + Roles.InventoryManager + ","
                      + Roles.InvoicingClerk + ","
                      + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + "," 
+                     + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
     public class CustomerPurchaseHistoryController : Controller
     {

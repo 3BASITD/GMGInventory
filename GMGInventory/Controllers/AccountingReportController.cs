@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
-using GMGInventory.Common.Models;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Data;
-using ClosedXML.Excel;
+using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -25,6 +21,7 @@ namespace GMGInventory.Controllers
         }
 
         #region Credit Memo
+
         public IActionResult CreditMemo()
         {
             return View();
@@ -44,9 +41,9 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadCreditMemo(ListFilterCustomerModel filter)
         {
-            DataTable dt = new DataTable("Credit Memo " 
-                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy") 
-                                       + "-" 
+            DataTable dt = new DataTable("Credit Memo "
+                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                                       + "-"
                                        + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             dt.Columns.AddRange(new DataColumn[4] {
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoDate")),
@@ -75,9 +72,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Credit Memo
 
         #region Debit Memo
+
         public IActionResult DebitMemo()
         {
             return View();
@@ -129,6 +128,7 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Debit Memo
     }
 }

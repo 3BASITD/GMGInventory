@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     [Authorize(Roles = Roles.InvoicingClerk + ","
-                     + Roles.SystemAdmin + "," 
+                     + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
     public class PackController : Controller
     {

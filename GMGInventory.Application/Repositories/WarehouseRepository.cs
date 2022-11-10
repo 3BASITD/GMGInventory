@@ -103,7 +103,7 @@ namespace GMGInventory.Application.Repositories
         public async Task DeleteAsync(int id)
         {
             var warehouse = context.Warehouses.Where(s => s.Id == id).First();
-                context.Warehouses.Remove(warehouse);
+            context.Warehouses.Remove(warehouse);
             await context.SaveChangesAsync(currentUser);
         }
 

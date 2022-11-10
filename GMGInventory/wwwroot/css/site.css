@@ -1,17 +1,35 @@
 /*html { -moz-transform: scale(1.0, 1.0); zoom: 1.0; zoom: 100%; }*/
-body { zoom: 100%; }
+body {
+    zoom: 100%;
+}
+
 @media only screen and (min-width: 992px) {
-    body { zoom: 90%; }
+    body {
+        zoom: 90%;
+    }
     /*html { -moz-transform: scale(0.9, 0.9); zoom: 0.9; zoom: 90%; }*/
-    .main-sidebar { height: 111vh; }
-    .layout-fixed .wrapper .sidebar { height: calc(111vh - (3.5rem + 1px)); }
-    .text-sm, .input-group-sm>.btn, .input-group-sm>.form-control, .input-group-sm>.form-select, .input-group-sm>.input-group-text { font-size: .86rem !important; }
+    .main-sidebar {
+        height: 111vh;
+    }
+
+    .layout-fixed .wrapper .sidebar {
+        height: calc(111vh - (3.5rem + 1px));
+    }
+
+    .text-sm, .input-group-sm > .btn, .input-group-sm > .form-control, .input-group-sm > .form-select, .input-group-sm > .input-group-text {
+        font-size: .86rem !important;
+    }
 }
 
 .zoom-ignore {
     zoom: 111%;
     position: relative;
     left: -5.5%;
+}
+.zoom-ignore-modal {
+    zoom: 111%;
+    position: relative;
+    padding-bottom: 50px;
 }
 
 .modal-backdrop {
@@ -24,15 +42,14 @@ body { zoom: 100%; }
     background-color: #3f474e;
 }
 
-.text-sm .select2-container--default .select2-selection--single .select2-selection__arrow, 
-select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow, 
-.text-sm .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow, 
-select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow 
-{
+.text-sm .select2-container--default .select2-selection--single .select2-selection__arrow,
+select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow,
+.text-sm .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow,
+select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow {
     top: 0.12rem;
 }
 
-.select2-container--default .select2-selection--single, 
+.select2-container--default .select2-selection--single,
 .select2-container--bootstrap-5 .select2-selection--single {
     border: 1px solid #ced4da;
 }
@@ -52,9 +69,9 @@ select.form-control-sm ~ .select2-container--default .select2-selection--single 
     border-color: #6c757d !important;
 }
 
-.dark-mode .select2-selection--single .select2-selection__rendered {
-    color: #fff !important;
-}
+    .dark-mode .select2-selection--single .select2-selection__rendered {
+        color: #fff !important;
+    }
 
 .s2ph-bold ~ .select2 .select2-selection__placeholder,
 .s2-bold ~ .select2 .select2-selection__rendered {
@@ -69,7 +86,7 @@ select.form-control-sm ~ .select2-container--default .select2-selection--single 
     color: white;
 }
 
-.dark-mode .select2-container--default .select2-selection--single, 
+.dark-mode .select2-container--default .select2-selection--single,
 .dark-mode .select2-container--bootstrap-5 .select2-selection--single {
     border: 1px solid #6c757d;
 }
@@ -103,23 +120,23 @@ tr a .fas, tr a .far {
     font-size: 20px;
 }
 
-select.form-control-sm~.select2-container--default {
+select.form-control-sm ~ .select2-container--default {
     font-size: 100%;
 }
 
-.text-sm .select2-container--default .select2-selection--single .select2-selection__rendered,
-select.form-control-sm~.select2-container--default .select2-selection--single .select2-selection__rendered {
-    margin-top: -0.5rem;
-}
+    .text-sm .select2-container--default .select2-selection--single .select2-selection__rendered,
+    select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__rendered {
+        margin-top: -0.5rem;
+    }
 
 input:not(:focus)::-webkit-outer-spin-button,
 input:not(:focus)::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 input[type=number]:not(:focus) {
-  -moz-appearance: textfield;
+    -moz-appearance: textfield;
 }
 
 input[readonly=readonly] {
@@ -165,7 +182,7 @@ pre {
 
 #for-print {
     position: fixed;
-    left: -9999px;   
+    left: -9999px;
 }
 
 .table tr > td .progress {

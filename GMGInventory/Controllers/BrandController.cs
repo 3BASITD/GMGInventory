@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
-using GMGInventory.Common.Models;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using GMGInventory.Common.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using ClosedXML.Excel;
-using GMGInventory.Common.Constants;
 
 namespace GMGInventory.Controllers
 {
@@ -33,7 +28,6 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
-
             return Json(await brandRepository.GetOptions(IncludeId));
         }
 
@@ -43,7 +37,6 @@ namespace GMGInventory.Controllers
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await brandRepository.GetListDTAsync(dtForm));
         }
-
 
         [HttpPost]
         public async Task<JsonResult> CreateJson(BrandVM brandVM)
@@ -121,6 +114,7 @@ namespace GMGInventory.Controllers
             }
             return Json(responseModel);
         }
+
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Item Types");
@@ -147,6 +141,7 @@ namespace GMGInventory.Controllers
                 }
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)

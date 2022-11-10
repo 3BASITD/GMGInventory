@@ -1,5 +1,4 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +10,7 @@ namespace GMGInventory.Controllers
                      + Roles.InventoryManager + ","
                      + Roles.InvoicingClerk + ","
                      + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + "," 
+                     + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
     public class SalesOrderDeliveryController : Controller
     {
@@ -38,7 +37,7 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> EditJson(SalesOrderDeliveryFormVM form)
         {
             ResponseModel responseModel = new ResponseModel();
-                var msg = await salesOrderDeliveryRepository.EditAsync(form);
+            var msg = await salesOrderDeliveryRepository.EditAsync(form);
             if (msg == "Invalid")
             {
                 responseModel.Status = "Error";

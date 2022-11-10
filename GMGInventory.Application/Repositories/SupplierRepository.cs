@@ -62,7 +62,7 @@ namespace GMGInventory.Application.Repositories
                 .Include(s => s.Currency)
                 .Include(s => s.Area)
                 .Where(s => s.Id == id).FirstOrDefaultAsync();
-            if (suppliers== null)
+            if (suppliers == null)
             {
                 return null;
             }

@@ -1,5 +1,4 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +8,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize(Roles = Roles.Accounting + ","
                      + Roles.InvoicingClerk + ","
-                     + Roles.SystemAdmin + "," 
+                     + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
     public class SalesInvoiceController : Controller
     {

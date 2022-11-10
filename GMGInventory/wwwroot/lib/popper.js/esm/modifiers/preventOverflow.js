@@ -132,7 +132,6 @@ function preventOverflow(_ref) {
   state.modifiersData[name] = data;
 } // eslint-disable-next-line import/no-unused-modules
 
-
 export default {
   name: 'preventOverflow',
   enabled: true,

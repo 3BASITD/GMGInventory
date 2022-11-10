@@ -3,7 +3,6 @@ using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -19,30 +18,29 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-
         public async Task<Select2Model<JsonInvoiceOptionsModel>> GetOptions(string search, int page)
         {
             var invoices = from inv in context.Invoices
-                        join soali in context.SOACRLineItems
-                                   on inv.Id equals soali.InvoiceId
-                        join soacr in context.SOACRs
-                                   on soali.SOACRId equals soacr.Id into soacrs
-                        from soacrsGroup in soacrs.DefaultIfEmpty()
-                        where  (string.IsNullOrWhiteSpace(search)
-                           || inv.InvoiceNumber.ToLower().Contains(search.ToLower()))
-                        select new JsonInvoiceOptionsModel
-                        {
-                            Id = inv.Id.ToString(),
-                            Customer = soacrsGroup.Customer.Name,
-                            InvoiceNumber = inv.InvoiceNumber,
-                            TotalAmountD = inv.Amount,
-                            TBRD = soali.TBRAmount,
-                            CreditD = soali.CreditAmount,
-                            DebitD = soali.DebitAmount,
-                            PaidAmountD = soali.PaidAmount,
-                            FreightChargeD = soali.FreightCost,
-                            BalanceD = soali.Balance
-                        };
+                           join soali in context.SOACRLineItems
+                                      on inv.Id equals soali.InvoiceId
+                           join soacr in context.SOACRs
+                                      on soali.SOACRId equals soacr.Id into soacrs
+                           from soacrsGroup in soacrs.DefaultIfEmpty()
+                           where (string.IsNullOrWhiteSpace(search)
+                              || inv.InvoiceNumber.ToLower().Contains(search.ToLower()))
+                           select new JsonInvoiceOptionsModel
+                           {
+                               Id = inv.Id.ToString(),
+                               Customer = soacrsGroup.Customer.Name,
+                               InvoiceNumber = inv.InvoiceNumber,
+                               TotalAmountD = inv.Amount,
+                               TBRD = soali.TBRAmount,
+                               CreditD = soali.CreditAmount,
+                               DebitD = soali.DebitAmount,
+                               PaidAmountD = soali.PaidAmount,
+                               FreightChargeD = soali.FreightCost,
+                               BalanceD = soali.Balance
+                           };
             var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonInvoiceOptionsModel>
             {
@@ -81,8 +79,8 @@ namespace GMGInventory.Application.Repositories
                              where invoice.Id == Id
                              select new InvoiceDetailsVM
                              {
-                                 Agent = invoice.SalesOrder.Agent.FirstName 
-                                       + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) 
+                                 Agent = invoice.SalesOrder.Agent.FirstName
+                                       + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
                                        + " " + invoice.SalesOrder.Agent.LastName,
                                  ControlNumber = invoice.ControlNumber,
                                  CustomerAddress = invoice.SalesOrder.Customer.Address,

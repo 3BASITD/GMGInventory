@@ -26,13 +26,11 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-
         public async Task<int?> GetIdAsync(string? Name)
         {
             var area = await context.Areas.Where(s => s.Name == Name).FirstOrDefaultAsync();
             return area?.Id;
         }
-
 
         public async Task<IList<AreaViewVM>> GetAllAreaVMAsync()
         {
@@ -131,7 +129,6 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-
         public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Areas
@@ -144,6 +141,5 @@ namespace GMGInventory.Application.Repositories
                 })
                 .ToListAsync();
         }
-
     }
 }

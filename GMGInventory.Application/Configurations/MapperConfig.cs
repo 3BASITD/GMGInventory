@@ -16,7 +16,6 @@ namespace GMGInventory.Application.Configurations
                 .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
                 .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
                 .ReverseMap();
-            
 
             // Area
             CreateMap<Area, AreaVM>().ReverseMap();
@@ -25,7 +24,6 @@ namespace GMGInventory.Application.Configurations
                 .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
                 .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
                 .ReverseMap();
-
 
             // Brand
             CreateMap<Brand, BrandVM>().ReverseMap();
@@ -104,8 +102,6 @@ namespace GMGInventory.Application.Configurations
                 .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
                 .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
                 .ReverseMap();
-
-
         }
     }
 }

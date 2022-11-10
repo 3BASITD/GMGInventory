@@ -45,7 +45,6 @@
  */
 ;
 (function($) {
-
     function appendContent($el, content) {
         if (!content) return;
 
@@ -105,7 +104,6 @@
             printI.className = "MSIE";
             document.body.appendChild(printI);
             printI.src = iframeSrc;
-
         } else {
             // other browsers inherit document.domain, and IE works if document.domain is not explicitly set
             var $frame = $("<iframe id='" + strFrameName + "' name='printIframe' />");
@@ -130,7 +128,6 @@
 
         // $iframe.ready() and $iframe.load were inconsistent between browsers
         setTimeout(function() {
-
             // Add doctype to fix the style difference between printing and render
             function setDocType($iframe, doctype){
                 var win, doc;
@@ -308,7 +305,6 @@
                 if (!opt.debug) {
                     setTimeout(function() {
                         $iframe.remove();
-
                     }, 1000);
                 }
 
@@ -316,11 +312,8 @@
                 if (typeof opt.afterPrint === "function") {
                     opt.afterPrint();
                 }
-
             }, opt.printDelay);
-
         }, 333);
-
     };
 
     // defaults

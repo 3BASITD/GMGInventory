@@ -6,7 +6,6 @@ See http://github.com/bgrins/filereader.js for documentation.
 */
 
 (function (window, document) {
-
     var FileReader = window.FileReader;
     var FileReaderSyncSupport = false;
     var workerScript = "self.addEventListener('message', function(e) { var data=e.data; try { var reader = new FileReaderSync; postMessage({ result: reader[data.readAs](data.file), extra: data.extra, file: data.file})} catch(e){ postMessage({ result:'error', extra:data.extra, file:data.file}); } }, false);";
@@ -75,7 +74,6 @@ See http://github.com/bgrins/filereader.js for documentation.
         return;
     }
 
-
     // makeWorker is a little wrapper for generating web workers from strings
     function makeWorker(script) {
         var URL = window.URL || window.webkitURL;
@@ -93,7 +91,6 @@ See http://github.com/bgrins/filereader.js for documentation.
 
     // setupClipboard: bind to clipboard events (intended for document.body)
     function setupClipboard(element, opts) {
-
         if (!FileReaderJS.enabled) {
             return;
         }
@@ -110,7 +107,6 @@ See http://github.com/bgrins/filereader.js for documentation.
                 var file = items[i].getAsFile();
 
                 if (file) {
-
                     // Create a fake file name for images from clipboard, since this data doesn't get sent
                     var matches = new RegExp("/\(.*\)").exec(file.type);
                     if (!file.name && matches) {
@@ -132,7 +128,6 @@ See http://github.com/bgrins/filereader.js for documentation.
 
     // setupInput: bind the 'change' event to an input[type=file]
     function setupInput(input, opts) {
-
         if (!FileReaderJS.enabled) {
             return;
         }
@@ -154,7 +149,6 @@ See http://github.com/bgrins/filereader.js for documentation.
 
     // setupDrop: bind the 'drop' event for a DOM element
     function setupDrop(dropbox, opts) {
-
         if (!FileReaderJS.enabled) {
             return;
         }
@@ -255,7 +249,6 @@ See http://github.com/bgrins/filereader.js for documentation.
 
     // processFileList: read the files with FileReader, send off custom events.
     function processFileList(e, files, opts) {
-
         var filesLeft = files.length;
         var group = {
             groupID: getGroupID(),
@@ -309,7 +302,6 @@ See http://github.com/bgrins/filereader.js for documentation.
         }
 
         Array.prototype.forEach.call(files, function (file) {
-
             file.extra.started = new Date();
 
             if (opts.accept && !file.type.match(new RegExp(opts.accept))) {
@@ -334,7 +326,6 @@ See http://github.com/bgrins/filereader.js for documentation.
                 });
             }
             else {
-
                 var reader = new FileReader();
                 reader.originalEvent = e;
 
@@ -367,7 +358,6 @@ See http://github.com/bgrins/filereader.js for documentation.
 
     // noop: do nothing
     function noop() {
-
     }
 
     // extend: used to make deep copies of options object
@@ -428,5 +418,4 @@ See http://github.com/bgrins/filereader.js for documentation.
 
     // The interface is supported, bind the FileReaderJS callbacks
     FileReaderJS.enabled = true;
-
 })(this, document);

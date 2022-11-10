@@ -1,10 +1,6 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace GMGInventory.Controllers
 {
@@ -77,7 +73,7 @@ namespace GMGInventory.Controllers
             if (ModelState.IsValid)
             {
                 await userRepository.UpdateUserAsync(userInformationVM);
-                TempData["SuccessMessage"] = "User details of " +userInformationVM.Username + " was successfully updated";
+                TempData["SuccessMessage"] = "User details of " + userInformationVM.Username + " was successfully updated";
                 return RedirectToAction(nameof(Index));
             }
             return View(userInformationVM);
@@ -102,7 +98,7 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Password(UserResetPasswordVM userPasswordVM)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 await userRepository.ResetPassword(userPasswordVM);
                 TempData["SuccessMessage"] = "Password successfully reset";

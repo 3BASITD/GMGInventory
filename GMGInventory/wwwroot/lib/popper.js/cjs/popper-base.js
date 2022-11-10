@@ -146,7 +146,6 @@ function isElementScaled(element) {
 } // Returns the composite rect of an element relative to its offsetParent.
 // Composite means it takes into account transforms as well as layout.
 
-
 function getCompositeRect(elementOrVirtualElement, offsetParent, isFixed) {
   if (isFixed === void 0) {
     isFixed = false;
@@ -280,7 +279,6 @@ function getTrueOffsetParent(element) {
 } // `.offsetParent` reports `null` for fixed elements, while absolute elements
 // return the containing block
 
-
 function getContainingBlock(element) {
   var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
   var isIE = navigator.userAgent.indexOf('Trident') !== -1;
@@ -315,7 +313,6 @@ function getContainingBlock(element) {
   return null;
 } // Gets the closest ancestor positioned element. Handles some edge cases,
 // such as table ancestors and cross browser bugs.
-
 
 function getOffsetParent(element) {
   var window = getWindow(element);
@@ -615,11 +612,9 @@ function contains(parent, child) {
           return true;
         } // $FlowFixMe[prop-missing]: need a better way to handle this...
 
-
         next = next.parentNode || next.host;
       } while (next);
     } // Give up, the result is false
-
 
   return false;
 }
@@ -652,7 +647,6 @@ function getClientRectFromMixedType(element, clippingParent) {
 // clipping (or hiding) overflowing elements with a position different from
 // `initial`
 
-
 function getClippingParents(element) {
   var clippingParents = listScrollParents(getParentNode(element));
   var canEscapeClipping = ['absolute', 'fixed'].indexOf(getComputedStyle(element).position) >= 0;
@@ -662,13 +656,11 @@ function getClippingParents(element) {
     return [];
   } // $FlowFixMe[incompatible-return]: https://github.com/facebook/flow/issues/1414
 
-
   return clippingParents.filter(function (clippingParent) {
     return isElement(clippingParent) && contains(clippingParent, clipperElement) && getNodeName(clippingParent) !== 'body';
   });
 } // Gets the maximum area that the element is visible in due to any number of
 // clipping parents
-
 
 function getClippingRect(element, boundary, rootBoundary) {
   var mainClippingParents = boundary === 'clippingParents' ? getClippingParents(element) : [].concat(boundary);
@@ -927,7 +919,6 @@ function popperGenerator(generatorOptions) {
               marginLeft = _getComputedStyle.marginLeft; // We no longer take into account `margins` on the popper, and it can
           // cause bugs with positioning, so we'll warn the consumer
 
-
           if ([marginTop, marginRight, marginBottom, marginLeft].some(function (margin) {
             return parseFloat(margin);
           })) {
@@ -960,7 +951,6 @@ function popperGenerator(generatorOptions) {
 
           return;
         } // Store the reference and popper rects to be read by modifiers
-
 
         state.rects = {
           reference: getCompositeRect(reference, getOffsetParent(popper), state.options.strategy === 'fixed'),

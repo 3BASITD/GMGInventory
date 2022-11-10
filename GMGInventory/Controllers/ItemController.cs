@@ -1,7 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
@@ -269,7 +268,7 @@ namespace GMGInventory.Controllers
             var items = await itemRepository.GetAllFileAsync();
             foreach (var item in items)
             {
-                dt.Rows.Add(item.Code, 
+                dt.Rows.Add(item.Code,
                             item.Name,
                             item.PartNumber,
                             item.InterchangeNumber,

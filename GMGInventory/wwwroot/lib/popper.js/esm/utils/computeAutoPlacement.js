@@ -31,7 +31,6 @@ export default function computeAutoPlacement(state, options) {
     }
   } // $FlowFixMe[incompatible-type]: Flow seems to have problems with two array unions...
 
-
   var overflows = allowedPlacements.reduce(function (acc, placement) {
     acc[placement] = detectOverflow(state, {
       placement: placement,

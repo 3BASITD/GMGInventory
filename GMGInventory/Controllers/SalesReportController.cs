@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using System.Data;
-using ClosedXML.Excel;
+using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
-using GMGInventory.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -26,8 +25,8 @@ namespace GMGInventory.Controllers
         //"DailySalesMarginReport", "SalesInvoiceListingReport", "SalesAgentArea", "SalesMarginItem",
         //"SalesReportBasis", "SalesReturnListingReport", "UnservedItem"
 
-
         #region Agent Sales per Item
+
         public IActionResult AgentSalesPerItem()
         {
             return View();
@@ -84,9 +83,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Agent Sales per Item
 
         #region Brand Sales
+
         public IActionResult BrandSales()
         {
             return View();
@@ -135,9 +136,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Brand Sales
 
         #region Best Selling Item
+
         public IActionResult BestSellingItem()
         {
             return View();
@@ -192,9 +195,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Best Selling Item
 
         #region Commission
+
         public IActionResult Commission()
         {
             return View();
@@ -214,7 +219,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadCommission(ListFilterSalesModel filter)
         {
-            DataTable dt = new ("Commission");
+            DataTable dt = new("Commission");
             dt.Columns.AddRange(new DataColumn[7] {
                 new DataColumn(chelper.DisplayName<CommissionRVM>("InvoiceDate")),
                 new DataColumn(chelper.DisplayName<CommissionRVM>("InvoiceNumber")),
@@ -249,9 +254,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Commission
 
         #region Customer Sales Ranking
+
         public IActionResult CustomerSalesRanking()
         {
             return View();
@@ -300,9 +307,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Customer Sales Ranking
 
         #region Customer Sales
+
         public IActionResult CustomerSales()
         {
             return View();
@@ -354,9 +363,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Customer Sales
 
         #region Daily Sales
+
         public IActionResult DailySales()
         {
             return View();
@@ -413,9 +424,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Daily Sales
 
         #region Sales Invoice
+
         public IActionResult SalesInvoice()
         {
             return View();
@@ -472,9 +485,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Sales Invoice
 
         #region Sales by Agent-Area
+
         public IActionResult SalesAgentArea()
         {
             return View();
@@ -483,6 +498,11 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> PrintSalesAgentArea(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintSalesAgentArea(filter));
+        }
+
+        public async Task<IActionResult> GetSalesAgentArea(ListFilterSalesModel filter)
+        {
+            return Json(await reportSalesRepository.GetSalesAgentArea(filter));
         }
 
         [HttpPost]
@@ -525,11 +545,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
 
-
+        #endregion Sales by Agent-Area
 
         #region Sales Report by Basis
+
         public IActionResult SalesReportBasis()
         {
             return View();
@@ -576,9 +596,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Sales Report by Basis
 
         #region Sales Return
+
         public IActionResult SalesReturn()
         {
             return View();
@@ -647,9 +669,11 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Sales Return
 
         #region Unserved Items
+
         public IActionResult UnservedItem()
         {
             return View();
@@ -704,6 +728,7 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-        #endregion
+
+        #endregion Unserved Items
     }
 }

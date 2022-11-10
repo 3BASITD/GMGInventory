@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
-using GMGInventory.Common.Models;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using GMGInventory.Common.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace GMGInventory.Controllers
 {
@@ -26,7 +24,6 @@ namespace GMGInventory.Controllers
             this.regionRepository = regionRepository;
             this.mapper = mapper;
         }
-
 
         public async Task<IActionResult> Index()
         {
@@ -155,11 +152,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
-
             return Json(await areaRepository.GetOptions(IncludeId));
         }
-
-
-
     }
 }

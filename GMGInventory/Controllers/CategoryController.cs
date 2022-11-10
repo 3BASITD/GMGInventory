@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GMGInventory.Data;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using GMGInventory.Application.Contracts;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GMGInventory.Controllers
 {

@@ -60,6 +60,9 @@ namespace GMGInventory.Data
         public string? DisapprovedBy { get; set; }
         public DateTime? DisapprovedDate { get; set; }
 
+        [Column(TypeName = "nvarchar(150)")]
+        public string? Remarks { get; set; }
+
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<Pack> Packs { get; set; }
         public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }

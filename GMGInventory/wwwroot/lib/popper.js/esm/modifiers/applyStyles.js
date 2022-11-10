@@ -15,7 +15,6 @@ function applyStyles(_ref) {
     // effective way to apply styles to an HTMLElement
     // $FlowFixMe[cannot-write]
 
-
     Object.assign(element.style, style);
     Object.keys(attributes).forEach(function (name) {
       var value = attributes[name];
@@ -72,7 +71,6 @@ function effect(_ref2) {
     });
   };
 } // eslint-disable-next-line import/no-unused-modules
-
 
 export default {
   name: 'applyStyles',

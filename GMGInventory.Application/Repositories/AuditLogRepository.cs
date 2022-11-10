@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;

@@ -50,11 +50,11 @@ namespace GMGInventory.Application.Repositories
             regionsVM.UserModified = await GetUserName(regionsVM.UserModified);
             return regionsVM;
         }
-        
+
         public async Task<IList<Region>> GetAllActiveRegionAsync(int includeId)
         {
             //return await context.Regions.Where(s => s.IsActive || s.Id == includeId).ToListAsync();
-            var region =await context.Regions.ToListAsync();
+            var region = await context.Regions.ToListAsync();
             return region;
         }
 
@@ -79,12 +79,5 @@ namespace GMGInventory.Application.Repositories
                 })
                 .ToListAsync();
         }
-
-
     }
-
-
-
-
-
 }

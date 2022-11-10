@@ -1,11 +1,8 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
@@ -102,11 +99,12 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> DeleteDraftJson(int Id)
         {
             ResponseModel responseModel = new ResponseModel();
-            if(await purchaseOrderRepository.DeleteDraftAsync(Id))
+            if (await purchaseOrderRepository.DeleteDraftAsync(Id))
             {
                 responseModel.Status = "Success";
                 responseModel.Message = "Draft successfully removed";
-            } else
+            }
+            else
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Cannot remove draft. Please try again later";

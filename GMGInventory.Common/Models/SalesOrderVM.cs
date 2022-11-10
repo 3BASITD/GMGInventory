@@ -107,6 +107,43 @@ namespace GMGInventory.Common.Models
         public DateTime? DisapprovedDateD { get; set; }
     }
 
+    public class SalesOrderPrintVM : SalesOrderDetailsVM
+    {
+        public SalesOrderDetailsVM Details
+        {
+            set
+            {
+                AgentCode = value.AgentCode;
+                AgentName = value.AgentName;
+                ApprovedBy = value.ApprovedBy;
+                ApprovedDateD = value.ApprovedDateD;
+                CreditTerms = value.CreditTerms;
+                CustomerAddress = value.CustomerAddress;
+                CustomerCode = value.CustomerCode;
+                CustomerName = value.CustomerName;
+                DeclaredValueD = value.DeclaredValueD;
+                DeliveryDateD = value.DeliveryDateD;
+                DeliveryType = value.DeliveryType;
+                DisapprovedBy = value.DisapprovedBy;
+                DisapprovedDateD = value.DisapprovedDateD;
+                GrossNetPrice = value.GrossNetPrice;
+                Id = value.Id;
+                OrderDateD = value.OrderDateD;
+                PONumber = value.PONumber;
+                RequiredDateD = value.RequiredDateD;
+                SalesOrderBy = value.SalesOrderBy;
+                ShippingAddress = value.ShippingAddress;
+                SONumber = value.SONumber;
+                Status = value.Status;
+            }
+        }
+        public IList<SalesOrderItemVM> Items { get; set; }
+        public string TotalQuantity => string.Format(SystemFormat.StringIntegerComma, TotalQuantityD);
+        public int TotalQuantityD => Items.Sum(s => s.QuantityD);
+        public string TotalGrossPrice => string.Format(SystemFormat.StringDecimalComma, TotalGrossPriceD);
+        public decimal TotalGrossPriceD => Items.Sum(s => s.GrossPriceD);
+    }
+
     public class SalesOrderItemVM
     {
         public int Id { get; set; }
@@ -117,11 +154,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
-        [Display(Name = "Inventory Count")]
+        [Display(Name = "Inventory")]
         public int InventoryCount { get; set; }
 
         [Display(Name = "Quantity")]
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
 
         [Display(Name = "Packed Quantity")]
         public int PackedQuantity { get; set; }
@@ -136,7 +174,7 @@ namespace GMGInventory.Common.Models
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
         public decimal NetPriceD { get; set; }
 
-        [Display(Name = "Retail Price")]
+        [Display(Name = "Gross Price")]
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
 
@@ -152,9 +190,9 @@ namespace GMGInventory.Common.Models
         public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
-        [Display(Name = "Gross Price")]
+        [Display(Name = "Extended Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
-        public decimal GrossPriceD => Quantity * (((100m - Discount1D - Discount2D) * SellingPriceD) / 100m);
+        public decimal GrossPriceD => QuantityD * (((100m - Discount1D - Discount2D) * SellingPriceD) / 100m);
     }
 
     public class SalesOrderFormVM

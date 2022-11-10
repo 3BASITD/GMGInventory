@@ -79,12 +79,5 @@ namespace GMGInventory.Application.Repositories
                 })
                 .ToListAsync();
         }
-
-
     }
-
-
-
-
-
 }

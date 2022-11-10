@@ -38,7 +38,6 @@ function effect(_ref) {
   };
 } // eslint-disable-next-line import/no-unused-modules
 
-
 export default {
   name: 'eventListeners',
   enabled: true,

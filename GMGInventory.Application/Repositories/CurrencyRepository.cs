@@ -67,12 +67,5 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.Suppliers.AnyAsync(s => s.CurrencyId == id);
         }
-
-
     }
-
-
-
-
-
 }

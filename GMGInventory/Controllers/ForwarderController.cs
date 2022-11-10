@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
-using GMGInventory.Application.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using GMGInventory.Application.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace GMGInventory.Controllers
 {
@@ -46,7 +45,6 @@ namespace GMGInventory.Controllers
             var forwarderVM = new ForwarderVM
             {
                 Customers = new SelectList(await customerRepository.GetAllActiveCustomerAsync(-1), "Id", "Name"),
-               
             };
             return View(forwarderVM);
         }
@@ -64,14 +62,13 @@ namespace GMGInventory.Controllers
                 }
                 else
                 {
-
                     await forwarderRepository.AddAsync(forwarderVM);
                     TempData["SuccessMessage"] = "Forwarder successfully added";
                     return RedirectToAction(nameof(Index));
                 }
             }
             forwarderVM.Customers = new SelectList(await customerRepository.GetAllActiveCustomerAsync(forwarderVM.CustomerId), "Id", "Name", forwarderVM.CustomerId);
-           
+
             return View(forwarderVM);
         }
 
@@ -129,14 +126,12 @@ namespace GMGInventory.Controllers
                 return NotFound();
             }
             if (await forwarderRepository.IsForwarderInUse(id))
-     
+
             {
                 await forwarderRepository.DeleteAsync(id);
                 TempData["SuccessMessage"] = "Forwarder successfully deleted";
             }
             return RedirectToAction(nameof(Index));
         }
-
-        
     }
 }

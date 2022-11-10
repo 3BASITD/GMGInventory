@@ -44,7 +44,8 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="3">Total</th>
+                    <th colspan="2"></th>
+                    <th>Total</th>
                     <th></th>
                     <th colspan="2"></th>
                 </tr>
@@ -112,8 +113,35 @@
     </div>
 </div>
 
+<!-- Chart Modal -->
+<div class="modal fade" id="chartModal" role="dialog" aria-labelledby="chartModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title chart-title">Sales Chart</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="position: relative; height:500px; width:1000px">
+                    <canvas id="salesChart" class="zoom-ignore-modal"></canvas>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        console.log("Time loaded: " + new Date()) 
+        $("#filter-from").val('2022-04-01'); // for testing only, remove on prod
+        $("#filter-to").val('2022-04-31'); // for testing only, remove on prod
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -237,7 +265,24 @@
 
                 $(api.column(3).footer()).html(FormatStringDecimal(json.totalAmount));
             },
-            order: [[1, "asc"]]
+            order: [[1, "asc"]],
+            rowGroup: {
+                startRender: null,
+                endRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="3">Total for <strong>' + group + '</strong></td>')
+                        .append('<td class="text-end">' + rows.data()[0].agentTotalSales + '</td>')
+                        .append('<td></td>')
+                        .append('<td><button class="btn btn-warning btn-xs btn-chart" data-bs-toggle="modal" data-bs-target="#chartModal" data-agent-id="' + rows.data()[0].agentId + '" data-agent-name="' + rows.data()[0].agentName + '" data-microtip-title="Show Chart" data-microtip-position="left" role="tooltip"><i class="fas fa-chart-pie"></i></button></td>');
+                },
+                dataSrc: function (data) {
+                    if (data.agentCode.trim() == data.agentName.trim()) {
+                        return data.agentCode;
+                    } else {
+                        return data.agentCode + ' - ' + data.agentName;
+                    }
+                }
+            }
         });
 
         // Load functions upon DataTable load
@@ -247,6 +292,93 @@
             DatatablesSearchOnEnter('.table-sales', salesDT);
 
             $(".table-sales thead th").removeClass("text-end");
+
+            var chartData = [];
+            var chartLabels = [];
+            var chartBGColor = [];
+            var chartBDColor = [];
+            var chartHVColor = [];
+
+            var ctx = document.getElementById('salesChart');//.getContext('2d');
+            var salesChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Sales per Area',
+                        data: chartData,
+                        backgroundColor: chartBGColor,
+                        borderColor: chartBDColor,
+                        hoverBackgroundColor: chartHVColor,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    //title: {
+                    //    display: true,
+                    //    text: "Sales by Area"
+                    //},
+                    legend: {
+                        display: true,
+                        position: 'left'
+                    }, 
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+
+                                let label = data.labels[tooltipItem.index];
+                                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                return label + ' ' + FormatStringDecimal(value);
+
+                            }
+                        }
+                    }
+                }
+            });
+
+            var randomColors = function () {
+                var r = Math.floor(Math.random() * 200) + 55;
+                var g = Math.floor(Math.random() * 200) + 55;
+                var b = Math.floor(Math.random() * 200) + 55;
+                return r + "," + g + "," + b;
+            };
+
+            $(".btn-chart").on("click", function () {
+                var agentId = $(this).data("agent-id");
+                var agentName = $(this).data("agent-name");
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetSalesAgentArea")",
+                    data: {
+                        Agent: agentId,
+                        DateFrom: $("#filter-from").val(),
+                        DateTo: $("#filter-to").val()
+                    },
+                    success: function (data, status, xhr) {
+                        chartData = [];
+                        chartLabels = [];
+                        chartBGColor = [];
+                        chartBDColor = [];
+                        chartHVColor = [];
+                        for (d of data) {
+                            chartData.push(d.salesD);
+                            chartLabels.push(d.area + " (" + d.percentSales + ")");
+                            var color = randomColors();
+                            chartBGColor.push("rgb(" + color + ",0.75)");
+                            chartBDColor.push("rgb(" + color + ",0.75)");
+                            chartHVColor.push("rgb(" + color + ",1)");
+                        }
+                        salesChart.data.labels = chartLabels;
+                        salesChart.data.datasets[0].data = chartData;
+                        salesChart.data.datasets[0].backgroundColor = chartBGColor;
+                        salesChart.data.datasets[0].borderColor = chartBDColor;
+                        salesChart.data.datasets[0].hoverBackgroundColor = chartHVColor;
+                        salesChart.update();
+
+                        $(".chart-title").text("Sales by Area (" + agentName + " from " + formatDateEn(new Date($("#filter-from").val())) + " to " + formatDateEn(new Date($("#filter-to").val())) + ")");
+                    }
+                });
+            });
         });
 
         $(".btnFilter").on("click", function () {

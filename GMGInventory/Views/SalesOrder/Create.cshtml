@@ -104,28 +104,27 @@
                                     <thead>
                                         <tr>
                                             <th></th>
-                                            <th>Item Code</th>
-                                            <th>Item Name</th>
-                                            <th>Inventory Count</th>
                                             <th>Quantity</th>
                                             <th>Unit</th>
+                                            <th>Item Code</th>
+                                            <th>Item Name</th>
+                                            <th>Inventory</th>
                                             <th>Net Price</th>
-                                            <th>Retail Price</th>
+                                            <th>Gross Price</th> <!-- mas ok sana sabihing Retail Price kaso ayaw nila -->
                                             <th>Selling Price</th>
                                             <th>Discount 1</th>
                                             <th>Discount 2</th>
-                                            <th>Gross Price</th>
+                                            <th>Extended Price</th> <!-- mas ok sana sabihing Gross Price kaso ayaw nila -->
                                         </tr>
                                     </thead>
                                     <tfoot>
                                         <tr>
-                                            <th colspan="3"></th>
                                             <th>Total</th>
                                             <th class="total-quantity">0</th>
-                                            <th colspan="3"></th>
+                                            <th colspan="6"></th>
                                             <th class="total-selling-price">0.00</th>
                                             <th colspan="2"></th>
-                                            <th class="total-net-price">0.00</th>
+                                            <th class="total-gross-price">0.00</th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -178,7 +177,7 @@
                             </div>
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
-                                    <label for="add-retail-price" class="form-label mb-0">Retail Price</label>
+                                    <label for="add-retail-price" class="form-label mb-0">Gross Price</label>
                                     <input type="text" id="add-retail-price" class="form-control form-control-sm" readonly="readonly" />
                                 </div>
                             </div>
@@ -230,7 +229,7 @@
                             </div>
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
-                                    <label for="add-gross-price" class="form-label mb-0">Gross Price</label>
+                                    <label for="add-gross-price" class="form-label mb-0">Extended Price</label>
                                     <input type="number" id="add-gross-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
                                     <span data-valmsg-for="add-gross-price" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
@@ -527,9 +526,6 @@
                         return actions;
                     }
                 },
-                { data: "code", name: "Code", className: "form-cell" },
-                { data: "name", name: "Name", className: "form-cell" },
-                { data: "inventoryCount", name: "InventoryCount", className: "form-cell text-end" },
                 {
                     data: function (data, type, dataToSet) {
                         return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
@@ -538,6 +534,9 @@
                     className: "form-cell text-end"
                 },
                 { data: "unit", name: "Unit", className: "form-cell" },
+                { data: "code", name: "Code", className: "form-cell" },
+                { data: "name", name: "Name", className: "form-cell" },
+                { data: "inventoryCount", name: "InventoryCount", className: "form-cell text-end" },
                 { data: "netPrice", name: "NetPrice", className: "form-cell text-end" },
                 { data: "retailPrice", name: "RetailPrice", className: "form-cell text-end" },
                 {

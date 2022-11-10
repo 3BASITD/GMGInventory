@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
-using GMGInventory.Application.Contracts;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
@@ -14,6 +14,7 @@ namespace GMGInventory.Controllers
         {
             this.customerpaymentRepository = customerpaymentRepository;
         }
+
         public ActionResult Index()
         {
             return View();
@@ -24,11 +25,8 @@ namespace GMGInventory.Controllers
         {
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(customerpaymentRepository.GetListDataTables(dtForm));
-
-
         }
 
-  
         public ActionResult Details(int id)
         {
             var cust = customerpaymentRepository.GetPaymentVM(id);
@@ -39,7 +37,6 @@ namespace GMGInventory.Controllers
             return View(cust);
         }
 
-
         [HttpPost]
         public async Task<JsonResult> GetPaymentChecksJson(int id)
         {
@@ -47,19 +44,11 @@ namespace GMGInventory.Controllers
             return Json(await customerpaymentRepository.GetPaymentChecksDTAsync(form, id));
         }
 
-
-
         [HttpPost]
         public async Task<JsonResult> GetPaymentInvoicesJson(int id)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await customerpaymentRepository.GetPaymentInvoicesDTAsync(form, id));
         }
-
-
-
-
-
-
     }
 }

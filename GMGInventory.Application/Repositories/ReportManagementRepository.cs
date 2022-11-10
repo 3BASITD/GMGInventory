@@ -1,11 +1,8 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Globalization;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -37,6 +34,7 @@ namespace GMGInventory.Application.Repositories
         }
 
         #region Check Register by Date / Customer
+
         public async Task<IList<CheckRegisterRVM>> GetCheckRegisterByDate(ListFilterCustomerModel filter)
         {
             return (await GetCheckRegister(filter)).OrderBy(s => s.CheckDateD).ThenBy(s => s.Customer).ToList();
@@ -136,9 +134,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.CheckAmountD)
             };
         }
-        #endregion
+
+        #endregion Check Register by Date / Customer
 
         #region Check Register Summary
+
         public async Task<IList<RegisterSummaryRVM>> GetCheckRegisterSummary(ListFilterCommonModel filter)
         {
             var checks = from check in context.SOACRChecks
@@ -215,6 +215,7 @@ namespace GMGInventory.Application.Repositories
                 TotalQuantity = totalQuantity
             };
         }
+
         public async Task<RegisterSummaryPVM> PrintCheckRegisterSummary(ListFilterCommonModel filter)
         {
             var items = await GetCheckRegisterSummary(filter);
@@ -227,6 +228,7 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.CheckAmountD)
             };
         }
-        #endregion
+
+        #endregion Check Register Summary
     }
 }

@@ -1,9 +1,7 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
@@ -25,11 +23,11 @@ namespace GMGInventory.Controllers
             this.invoiceRepository = invoiceRepository;
             this.soacrLineItemRepository = soacrLineItemRepository;
         }
+
         public async Task<ActionResult> Index()
-        { 
+        {
             return View();
         }
-
 
         [HttpPost]
         public async Task<JsonResult> CreateJson(SoacrVM soaVM)
@@ -66,8 +64,6 @@ namespace GMGInventory.Controllers
             }
             return Json(responseModel);
         }
-
-
 
         [HttpPost]
         public async Task<JsonResult> EditInvoiceJson(SoacrLineItemVM soaVM)
@@ -129,8 +125,6 @@ namespace GMGInventory.Controllers
             return View(soa);
         }
 
-
-
         [HttpPost]
         public async Task<JsonResult> GetSoaDetailsJson(int id)
         {
@@ -141,7 +135,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<JsonResult> GetSOAInvoice(int id)
         {
-            //return Json(await soaRepository.GetSOAInvoice(/*id*/)); 
+            //return Json(await soaRepository.GetSOAInvoice(/*id*/));
             return Json(await soaRepository.GetSoaDetailsAsync(id));
         }
 
@@ -158,20 +152,19 @@ namespace GMGInventory.Controllers
                 await soacrLineItemRepository.DeleteAsync(id);
                 TempData["SuccessMessage"] = "Invoice successfully deleted";
             }
-            return RedirectToAction(nameof(Details), new {id = soacrId});
+            return RedirectToAction(nameof(Details), new { id = soacrId });
         }
 
         public async Task<IActionResult> PrintSoaDetails(int id)
         {
             return View(await soaRepository.PrintSoaDetails(id));
-         
         }
 
         public async Task<IActionResult> PrintCRDetails(int id)
         {
             return View(await soaRepository.PrintCRDetails(id));
-
         }
+
         public async Task<IActionResult> PrintInvoice(SoaFilterVM filter)
         {
             return View(await soaRepository.PrintInvoice(filter));
@@ -179,12 +172,13 @@ namespace GMGInventory.Controllers
 
         public ActionResult EditInvoice(int id)
         {
-            var inv = soaRepository.GetSoaInvoiceDtlVM(id); 
+            var inv = soaRepository.GetSoaInvoiceDtlVM(id);
             {
                 return NotFound();
             }
             return Json(inv);
         }
+
         public async Task<ActionResult> ContractReceipt()
         {
             return View();

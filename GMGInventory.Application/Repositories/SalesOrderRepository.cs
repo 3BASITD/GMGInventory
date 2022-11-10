@@ -1,5 +1,4 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -109,9 +108,23 @@ namespace GMGInventory.Application.Repositories
                                ShippingAddress = "",
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code
-
                            });
             return await orderVM.FirstOrDefaultAsync();
+        }
+
+        public async Task<SalesOrderPrintVM?> PrintDetailsAsync(int? Id)
+        {
+            var details = await GetDetailsAsync(Id);
+            if (details == null)
+            {
+                return null;
+            } else {
+                return new SalesOrderPrintVM
+                {
+                    Details = details,
+                    Items = await GetItemsAsync(Id ?? 0)
+                };
+            }
         }
 
         private async Task<IList<SalesOrderVM>> GetListAsync()
@@ -220,7 +233,7 @@ namespace GMGInventory.Application.Repositories
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
                              NetPriceD = price.NetSellingPrice,
-                             Quantity = order.Quantity,
+                             QuantityD = order.Quantity,
                              PackedQuantity = order.PackedQuantity,
                              RetailPriceD = price.RetailSellingPrice,
                              SellingPriceD = order.SellingPrice,
@@ -339,7 +352,7 @@ namespace GMGInventory.Application.Repositories
                     PriceTypeId = form.GrossNet,
                     PurchaseOrderId = form.PurchaseOrder,
                     QuantityInvoiced = 0,
-                    QuantityOrdered = form.Items.Sum(s=>s.Quantity),
+                    QuantityOrdered = form.Items.Sum(s => s.Quantity),
                     QuantityPacked = 0,
                     RequiredDate = form.RequiredDate,
                     SalesOrderNumber = soNumber,
@@ -351,7 +364,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 orderVM.StatusId = statusId;
-                orderVM.TotalAmount = form.Items.Sum(s=>s.GrossPrice);
+                orderVM.TotalAmount = form.Items.Sum(s => s.GrossPrice);
                 context.SalesOrders.Update(orderVM);
             }
             await context.SaveChangesAsync(currentUserId);

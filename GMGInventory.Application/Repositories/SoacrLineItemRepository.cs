@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -26,19 +25,9 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-
         public async Task<bool> IsSoaLineItemIdExistAsync(int id)
         {
             return await context.SOACRLineItems.AnyAsync(s => s.Id == id);
         }
-        
-
     }
-
-     
-
-
-
-
-
 }

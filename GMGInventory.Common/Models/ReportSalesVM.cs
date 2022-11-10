@@ -323,6 +323,8 @@ namespace GMGInventory.Common.Models
 
     public class SalesAgentAreaRVM
     {
+        public int AgentId { get; set; }
+
         [Display(Name = "Agent Code")]
         public string AgentCode { get; set; }
 
@@ -339,6 +341,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Percent of Sales")]
         public string PercentSales => string.Format(SystemFormat.StringDecimalComma, PercentSalesD) + "%";
         public decimal PercentSalesD { get; set; }
+
+        public string AgentTotalSales => string.Format(SystemFormat.StringDecimalComma, AgentTotalSalesD);
+        public decimal AgentTotalSalesD { get; set; }
     }
 
     public class SalesAgentAreaPVM
@@ -353,7 +358,6 @@ namespace GMGInventory.Common.Models
         public string TotalSales => string.Format(SystemFormat.StringDecimalComma, TotalSalesD);
         public decimal TotalSalesD { get; set; }
     }
-
 
     public class SalesReportBasisRVM
     {
@@ -445,12 +449,6 @@ namespace GMGInventory.Common.Models
         public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
         public decimal TotalAmountD { get; set; }
     }
-
-
-
-
-
-
 
     public class UnservedItemRVM
     {

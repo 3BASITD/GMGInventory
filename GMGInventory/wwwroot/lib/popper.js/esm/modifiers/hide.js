@@ -51,7 +51,6 @@ function hide(_ref) {
   });
 } // eslint-disable-next-line import/no-unused-modules
 
-
 export default {
   name: 'hide',
   enabled: true,

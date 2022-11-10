@@ -4,7 +4,6 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using static Humanizer.On;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -21,6 +20,7 @@ namespace GMGInventory.Application.Repositories
         }
 
         #region Items Below Maintaining Quantity
+
         public async Task<IList<BelowMaintainingRVM>> GetBelowMaintaining(ListFilterInventoryModel filter)
         {
             var items = from item in context.Items
@@ -130,9 +130,11 @@ namespace GMGInventory.Application.Repositories
                 TotalQuantityOnHandD = items.Sum(s => s.QuantityOnHandD)
             };
         }
-        #endregion
+
+        #endregion Items Below Maintaining Quantity
 
         #region Receiving Listing
+
         public async Task<IList<ReceivingRVM>> GetReceiving(ListFilterInventoryModel filter)
         {
             var purchases = from purchase in context.PurchaseOrders
@@ -251,9 +253,11 @@ namespace GMGInventory.Application.Repositories
                 TotalQuantityD = items.Sum(s => s.QuantityD)
             };
         }
-        #endregion
+
+        #endregion Receiving Listing
 
         #region Receiving Listing by Supplier
+
         public async Task<IList<ReceivingSupplierRVM>> GetReceivingSupplier(ListFilterInventoryModel filter)
         {
             var purchases = from purchase in context.PurchaseOrders
@@ -362,9 +366,11 @@ namespace GMGInventory.Application.Repositories
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }
-        #endregion
+
+        #endregion Receiving Listing by Supplier
 
         #region Receiving Summary
+
         public async Task<IList<ReceivingSummaryRVM>> GetReceivingSummary(ListFilterInventoryModel filter)
         {
             var temp = from purchase in context.PurchaseOrders
@@ -395,9 +401,6 @@ namespace GMGInventory.Application.Repositories
                                 QuantityD = p.Sum(s => s.Quantity),
                                 Unit = p.Key.Unit.Code
                             };
-
-
-
 
             //var purchases = from poline in context.PurchaseOrderLineItems
             //                                        .Include(s => s.Item).ThenInclude(s => s.Brand)
@@ -504,9 +507,11 @@ namespace GMGInventory.Application.Repositories
                 TotalQuantityD = items.Sum(s => s.QuantityD)
             };
         }
-        #endregion
+
+        #endregion Receiving Summary
 
         #region Stock Card
+
         public async Task<IList<StockCardRVM>> GetStockCard(ListFilterInventoryModel filter)
         {
             var cards1 = from card in context.InvoiceLineItems
@@ -689,9 +694,11 @@ namespace GMGInventory.Application.Repositories
                 TotalOutQuantityD = items.Sum(s => s.OutD)
             };
         }
-        #endregion
+
+        #endregion Stock Card
 
         #region Stock Status
+
         public async Task<IList<StockStatusRVM>> GetStockStatus(ListFilterInventoryModel filter)
         {
             var stocks = from item in context.Items
@@ -809,9 +816,11 @@ namespace GMGInventory.Application.Repositories
                 TotalCostD = items.Sum(s => s.TotalCostD)
             };
         }
-        #endregion
+
+        #endregion Stock Status
 
         #region Supplier Purchase History
+
         public async Task<IList<SupplierPurchaseRVM>> GetSupplierPurchase(ListFilterInventoryModel filter)
         {
             var purchases = from purchase in context.PurchaseOrderLineItems
@@ -933,6 +942,7 @@ namespace GMGInventory.Application.Repositories
                 TotalPriceD = items.Sum(s => s.TotalPriceD)
             };
         }
-        #endregion
+
+        #endregion Supplier Purchase History
     }
 }

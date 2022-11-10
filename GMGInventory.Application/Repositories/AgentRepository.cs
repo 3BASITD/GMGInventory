@@ -68,7 +68,6 @@ namespace GMGInventory.Application.Repositories
             return agent?.Id;
         }
 
-
         public async Task<IList<AgentViewVM>> GetAllAsync(AgentFilterVM filter)
         {
             var agents = from agent in context.Agents
@@ -100,7 +99,6 @@ namespace GMGInventory.Application.Repositories
                          };
             return await agents.ToListAsync();
         }
-
 
         public async Task<ForDataTables<AgentViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, AgentFilterVM filter)
         {
@@ -171,11 +169,6 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-
-
-
-
-
         public async Task<IList<AgentViewVM>> GetListAsync()
         {
             var agents = from agent in context.Agents
@@ -185,23 +178,23 @@ namespace GMGInventory.Application.Repositories
                                     on areas.RegionId equals regions.Id
 
                          select new AgentViewVM
-                            {
-                                Id = agent.Id,
-                                FirstName = agent.FirstName,
-                                MiddleName = agent.MiddleName,
-                                LastName = agent.LastName,
-                                Area = agent.Area.Name,
-                                AreaId = agent.Area.Id,                        
-                                Code = agent.Code,
-                                IsActive = agent.IsActive,
-                                DateCreated = agent.DateCreated.ToString(SystemFormat.StringDateTime),
-                                DateCreatedD = agent.DateCreated,
-                                DateModified = agent.DateModified == null ? "-" : agent.DateModified.Value.ToString(SystemFormat.StringDateTime),
-                                DateModifiedD = agent.DateModified == null ? null : agent.DateModified.Value,
-                                
-                                UserCreated = userManager.FindByIdAsync(agent.UserCreated).Result.Nickname,
-                                UserModified = agent.UserModified == null ? "-" : userManager.FindByIdAsync(agent.UserModified).Result.Nickname
-                            };
+                         {
+                             Id = agent.Id,
+                             FirstName = agent.FirstName,
+                             MiddleName = agent.MiddleName,
+                             LastName = agent.LastName,
+                             Area = agent.Area.Name,
+                             AreaId = agent.Area.Id,
+                             Code = agent.Code,
+                             IsActive = agent.IsActive,
+                             DateCreated = agent.DateCreated.ToString(SystemFormat.StringDateTime),
+                             DateCreatedD = agent.DateCreated,
+                             DateModified = agent.DateModified == null ? "-" : agent.DateModified.Value.ToString(SystemFormat.StringDateTime),
+                             DateModifiedD = agent.DateModified == null ? null : agent.DateModified.Value,
+
+                             UserCreated = userManager.FindByIdAsync(agent.UserCreated).Result.Nickname,
+                             UserModified = agent.UserModified == null ? "-" : userManager.FindByIdAsync(agent.UserModified).Result.Nickname
+                         };
             return await agents.ToListAsync();
         }
 
@@ -274,21 +267,19 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-
-
         private async Task<IList<AgentVM>> GetAgentAsync(int id)
         {
             var agentVM = from agent in context.Agents
-                             join cust in context.Customers
-                                       on agent.Id equals cust.AgentId
-                             where agent.Id == id
-                             select new AgentVM
-                             {
-                                 CustomerName = cust.Name,
-                                 CustomerAddress = cust.Address,
-                                 CustomerEmail = cust.Email,
-                                 CustomerContactNo = cust.ContactNumber
-                             };
+                          join cust in context.Customers
+                                    on agent.Id equals cust.AgentId
+                          where agent.Id == id
+                          select new AgentVM
+                          {
+                              CustomerName = cust.Name,
+                              CustomerAddress = cust.Address,
+                              CustomerEmail = cust.Email,
+                              CustomerContactNo = cust.ContactNumber
+                          };
             return await agentVM.ToListAsync();
         }
 
@@ -326,7 +317,7 @@ namespace GMGInventory.Application.Repositories
                 else if (form.SortColumnDirection == "desc")
                 {
                     switch (form.SortColumn)
-                    
+
                     {
                         case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
                         case "CustomerAddress": data = data.OrderByDescending(s => s.CustomerAddress); break;
@@ -347,21 +338,18 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-
         public AgentVM? GetAgentDtlVM(int? id)
         {
             var agentVM = (from cust in context.Agents
                                     .Include(s => s.Area)
                                     .Include(s => s.Customers)
 
-
-                              where cust.Id == id
-                              select new AgentVM
-                              {
-                                  Id = cust.Id,
-                                  Code = cust.Code,
-
-                              }).FirstOrDefault();
+                           where cust.Id == id
+                           select new AgentVM
+                           {
+                               Id = cust.Id,
+                               Code = cust.Code,
+                           }).FirstOrDefault();
             return agentVM;
         }
 
@@ -431,7 +419,7 @@ namespace GMGInventory.Application.Repositories
         public async Task AddAsync(AgentVM agentVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            
+
             var agent = new Agent
             {
                 Code = agentVM.Code,
@@ -457,6 +445,5 @@ namespace GMGInventory.Application.Repositories
             context.Agents.Update(agent);
             await context.SaveChangesAsync(currentUserId);
         }
-
     }
 }
