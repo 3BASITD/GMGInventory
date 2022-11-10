@@ -66,6 +66,17 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
+        public async Task<ActionResult> Print(int? Id)
+        {
+            var order = await salesOrderRepository.PrintDetailsAsync(Id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            return View(order);
+        }
+
         [HttpPost]
         public async Task<JsonResult> GetItemsJson(int salesOrderId)
         {

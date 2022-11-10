@@ -26,6 +26,11 @@ body {
     position: relative;
     left: -5.5%;
 }
+.zoom-ignore-modal {
+    zoom: 111%;
+    position: relative;
+    padding-bottom: 50px;
+}
 
 .modal-backdrop {
     width: 100% !important;

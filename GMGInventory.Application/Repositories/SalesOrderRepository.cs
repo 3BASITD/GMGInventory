@@ -112,6 +112,21 @@ namespace GMGInventory.Application.Repositories
             return await orderVM.FirstOrDefaultAsync();
         }
 
+        public async Task<SalesOrderPrintVM?> PrintDetailsAsync(int? Id)
+        {
+            var details = await GetDetailsAsync(Id);
+            if (details == null)
+            {
+                return null;
+            } else {
+                return new SalesOrderPrintVM
+                {
+                    Details = details,
+                    Items = await GetItemsAsync(Id ?? 0)
+                };
+            }
+        }
+
         private async Task<IList<SalesOrderVM>> GetListAsync()
         {
             var orderVM = (from order in context.SalesOrders
@@ -218,7 +233,7 @@ namespace GMGInventory.Application.Repositories
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
                              NetPriceD = price.NetSellingPrice,
-                             Quantity = order.Quantity,
+                             QuantityD = order.Quantity,
                              PackedQuantity = order.PackedQuantity,
                              RetailPriceD = price.RetailSellingPrice,
                              SellingPriceD = order.SellingPrice,

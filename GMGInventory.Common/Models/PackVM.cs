@@ -48,11 +48,11 @@ namespace GMGInventory.Common.Models
         public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDateTime);
         public DateTime SalesOrderDateD { get; set; }
 
-        [Display(Name = "Pack Date")]
+        [Display(Name = "Packed Date")]
         public string PackDate => PackDateD.ToString(SystemFormat.StringDateTime);
         public DateTime PackDateD { get; set; }
 
-        [Display(Name = "Pack By")]
+        [Display(Name = "Packed By")]
         public string PackBy { get; set; }
     }
 

@@ -1065,18 +1065,19 @@ namespace GMGInventory.Application.Repositories
                            && invoice.Invoice.Status.Code == "Invoiced"
                            select new SalesAgentAreaRVM
                            {
+                               AgentId = invoice.Invoice.SalesOrder.Agent.Id,
                                AgentCode = invoice.Invoice.SalesOrder.Agent.Code,
                                AgentName = invoice.Invoice.SalesOrder.Agent.FirstName
                                          + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
                                          + invoice.Invoice.SalesOrder.Agent.LastName,
                                Area = invoice.Invoice.SalesOrder.Customer.Area.Name,
-                               SalesD = invoice.UnitPrice * invoice.Quantity,
-                               PercentSalesD = 0
+                               SalesD = invoice.UnitPrice * invoice.Quantity
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
                              orderby invoice.AgentName ascending, invoice.Area ascending
                              group invoice by new
                              {
+                                 invoice.AgentId,
                                  invoice.AgentCode,
                                  invoice.AgentName,
                                  invoice.Area
@@ -1084,11 +1085,13 @@ namespace GMGInventory.Application.Repositories
                              let total = invoices.Where(s => s.AgentCode == i.Key.AgentCode).Sum(s => s.SalesD)
                              select new SalesAgentAreaRVM
                              {
+                                 AgentId = i.Key.AgentId,
                                  AgentCode = i.Key.AgentCode,
                                  AgentName = i.Key.AgentName,
                                  Area = i.Key.Area,
                                  SalesD = i.Sum(s => s.SalesD),
-                                 PercentSalesD = (i.Sum(s => s.SalesD) / total) * 100
+                                 PercentSalesD = (i.Sum(s => s.SalesD) / total) * 100,
+                                 AgentTotalSalesD = total
                              };
             return grpinvoice.ToList();
         }

@@ -500,6 +500,11 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintSalesAgentArea(filter));
         }
 
+        public async Task<IActionResult> GetSalesAgentArea(ListFilterSalesModel filter)
+        {
+            return Json(await reportSalesRepository.GetSalesAgentArea(filter));
+        }
+
         [HttpPost]
         public async Task<JsonResult> GetSalesAgentAreaDT(ListFilterSalesModel filter)
         {
