@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<SoacrVM>
 
 @{
-    ViewData["Title"] = "SOA";
+    ViewData["Title"] = "SOA/ CR";
 }
 
 
@@ -418,10 +418,10 @@
                 fontawesome: "fas fa-print"
             });
             var urlQuery = [];
-            //urlQuery.push("DateFrom=" + $("#filter-from").val());
-            //urlQuery.push("DateTo=" + $("#filter-to").val());
-            //if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
-            //if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+            urlQuery.push("DateFrom=" + $("#filter-from").val());
+            urlQuery.push("DateTo=" + $("#filter-to").val());
+            if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+            if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
             setTimeout(function () {
                 //let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
                 

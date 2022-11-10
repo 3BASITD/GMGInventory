@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Linq;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -665,7 +666,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<SoaDetailsPVM> PrintInvoice(SoaFilterVM filter)
         {
             var items = await GetContractInvoices(filter);
-            var agent = await context.Customers.Where(s => s.AgentId == filter.AgentId).FirstOrDefaultAsync();
+            var agent = await context.Agents.Where(s => s.Id == filter.AgentId).FirstOrDefaultAsync();
             var customer = await context.Customers.Where(s => s.Id == filter.CustomerId).FirstOrDefaultAsync();
 
 
@@ -674,7 +675,7 @@ namespace GMGInventory.Application.Repositories
                 DateFromD = filter.DateFrom.GetValueOrDefault(),
                 DateToD = filter.DateTo.GetValueOrDefault(),
                 Customer = filter.CustomerId == null || customer == null ? "All" : customer.Name,
-                Agent = filter.AgentId == null || agent == null ? "All" : agent.Agent.FirstName,
+                Agent = filter.AgentId == null || agent == null ? "All" : agent.FirstName+" " +agent.MiddleName+" "+agent.LastName,
                 InvoiceContent = items,
                 TotalAmountD = items.Sum(s => s.TotalAmountD)
 
@@ -690,6 +691,8 @@ namespace GMGInventory.Application.Repositories
                            join soacr in context.SOACRs
                                       on soali.SOACRId equals soacr.Id into soacrs
                            from soacrsGroup in soacrs.DefaultIfEmpty()
+                           join invli in context.InvoiceLineItems
+                                      on inv.Id equals invli.InvoiceId
 
                            where (filter.CustomerId == null || filter.CustomerId == soacrsGroup.CustomerId)
                            && (filter.AgentId == null || filter.AgentId == soacrsGroup.Customer.AgentId)
@@ -704,9 +707,33 @@ namespace GMGInventory.Application.Repositories
                                InvoiceDateD = inv.DateModified ?? inv.DateCreated,
                                InvoiceNumber = inv.InvoiceNumber,
                                InvoiceType = inv.InvoiceType.Name,
-                               TotalAmountD = inv.Amount
+                               TotalAmountD = invli.Quantity * invli.UnitPrice
                            };
-            return await contract.ToListAsync();
+
+            var contractGroup = from cont in await contract.ToListAsync()
+                                orderby cont.Id, cont.Customer, cont.InvoiceDateD
+                                group cont by new
+                                {
+                                    cont.Id,
+                                    cont.Customer,
+                                    cont.InvoiceDateD,
+                                    cont.InvoiceNumber,
+                                    cont.InvoiceType
+                                }
+                              into i
+                                select new InvoiceVM
+                                {
+                                    Id = i.Key.Id,
+                                    Customer = i.Key.Customer,
+                                    InvoiceDateD = i.Key.InvoiceDateD,
+                                    InvoiceNumber = i.Key.InvoiceNumber,
+                                    InvoiceType = i.Key.InvoiceType,
+                                    TotalAmountD = i.Sum(s => s.TotalAmountD)
+
+
+                                };
+
+            return contractGroup.ToList();
         }
 
         public async Task<ForDataTables<InvoiceVM>> GetContractReceiptDTAsync(DataTablesRequestForm form, SoaFilterVM filter)
@@ -763,6 +790,222 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<InvoiceVM>> GetContractInvoices2(SoaFilterVM filter)
+        {
+            var contract = from inv in context.Invoices
+                           join soali in context.SOACRLineItems
+                                      on inv.Id equals soali.InvoiceId
+                           join soacr in context.SOACRs
+                                      on soali.SOACRId equals soacr.Id into soacrs
+                           from soacrsGroup in soacrs.DefaultIfEmpty()
+                           join invli in context.InvoiceLineItems
+                                      on inv.Id equals invli.InvoiceId
+
+                           where (filter.CustomerId == soacrsGroup.CustomerId)
+
+                           && soacrsGroup.SOACRTypeId == 2
+
+                           select new InvoiceVM
+                           {
+                               Id = inv.Id,
+                               Customer = soacrsGroup.Customer.Name,
+                               InvoiceDateD = inv.DateModified ?? inv.DateCreated,
+                               InvoiceNumber = inv.InvoiceNumber,
+                               InvoiceType = inv.InvoiceType.Name,
+                               TotalAmountD = invli.Quantity * invli.UnitPrice
+                           };
+            //return await contract.ToListAsync();
+
+            var contractGroup = from cont in await contract.ToListAsync()
+                                orderby cont.Id, cont.Customer
+                                group cont by new
+                                {
+                                    cont.Id,
+                                    cont.Customer,
+                                    cont.InvoiceDateD,
+                                    cont.InvoiceNumber,
+                                    cont.InvoiceType
+                                }
+                                into i
+                                select new InvoiceVM
+                                {
+                                    Id = i.Key.Id,
+                                    Customer = i.Key.Customer,
+                                    InvoiceDateD = i.Key.InvoiceDateD,
+                                    InvoiceNumber = i.Key.InvoiceNumber,
+                                    InvoiceType = i.Key.InvoiceType,
+                                    TotalAmountD = i.Sum(s => s.TotalAmountD)
+
+
+                                };
+
+            return contractGroup.ToList();
+
+
+        }
+
+        public async Task<ForDataTables<InvoiceVM>> GetContractReceipt2DTAsync(DataTablesRequestForm form, SoaFilterVM filter)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetContractInvoices2(filter)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.InvoiceDate.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceNumber.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceType.ToLower().Contains(form.SearchValue)
+                                    || x.TotalAmount.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDate); break;
+                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
+                        case "InvoiceType": data = data.OrderBy(s => s.InvoiceType); break;
+                        case "TotalAmount": data = data.OrderBy(s => s.TotalAmount); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDate); break;
+                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
+                        case "InvoiceType": data = data.OrderByDescending(s => s.InvoiceType); break;
+                        case "TotalAmount": data = data.OrderByDescending(s => s.TotalAmount); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<InvoiceVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+        public async Task<IList<InvoiceVM>> GetContractInvoicesCustomer(int id, int soaId)
+        {
+            var soadetails = (await GetSoaDetails(soaId)).Select(s => s.InvoiceId);
+
+            var contract = from inv in context.Invoices
+                           join soali in context.SOACRLineItems
+                                      on inv.Id equals soali.InvoiceId
+                           join soacr in context.SOACRs
+                                      on soali.SOACRId equals soacr.Id into soacrs
+                           from soacrsGroup in soacrs.DefaultIfEmpty()
+                           join invli in context.InvoiceLineItems
+                                      on inv.Id equals invli.InvoiceId
+
+                           where soacrsGroup.CustomerId == id && (!soadetails.Any(s => s == inv.Id))
+                           && soacrsGroup.SOACRTypeId == 2
+
+                           select new InvoiceVM
+                           {
+                               Id = inv.Id,
+                               Customer = soacrsGroup.Customer.Name,
+                               InvoiceDateD = inv.DateModified ?? inv.DateCreated,
+                               InvoiceNumber = inv.InvoiceNumber,
+                               InvoiceType = inv.InvoiceType.Name,
+                               TotalAmountD = invli.Quantity * invli.UnitPrice
+                           };
+            //return await contract.ToListAsync();
+
+
+
+            var contractGroup = from cont in await contract.ToListAsync()
+                                orderby cont.Id, cont.Customer
+                                group cont by new
+                                {
+                                    cont.Id,
+                                    cont.Customer,
+                                    cont.InvoiceDateD,
+                                    cont.InvoiceNumber,
+                                    cont.InvoiceType
+                                }
+                                into i
+                                select new InvoiceVM
+                                {
+                                    Id = i.Key.Id,
+                                    Customer = i.Key.Customer,
+                                    InvoiceDateD = i.Key.InvoiceDateD,
+                                    InvoiceNumber = i.Key.InvoiceNumber,
+                                    InvoiceType = i.Key.InvoiceType,
+                                    TotalAmountD = i.Sum(s => s.TotalAmountD)
+
+
+                                };
+
+            return contractGroup.ToList();
+        }
+
+        public async Task<ForDataTables<InvoiceVM>> GetContractReceiptCustomerDTAsync(DataTablesRequestForm form, int id, int soaId)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetContractInvoicesCustomer(id, soaId)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.InvoiceDate.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceNumber.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceType.ToLower().Contains(form.SearchValue)
+                                    || x.TotalAmount.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDate); break;
+                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
+                        case "InvoiceType": data = data.OrderBy(s => s.InvoiceType); break;
+                        case "TotalAmount": data = data.OrderBy(s => s.TotalAmount); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDate); break;
+                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
+                        case "InvoiceType": data = data.OrderByDescending(s => s.InvoiceType); break;
+                        case "TotalAmount": data = data.OrderByDescending(s => s.TotalAmount); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<InvoiceVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
 
         public async Task<IList<InvoiceVM>> GetContractReceiptDetailsAsync(int id)
         {
@@ -856,7 +1099,30 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-
+        public async Task AddInvoicesAsync(int soaId, int[] invoiceIds)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            foreach (var invoiceId in invoiceIds)
+            {
+                var invoiceAmount = context.InvoiceLineItems.Where(s => s.InvoiceId == invoiceId).Sum(s => s.Quantity * s.UnitPrice);
+                var soali = new SOACRLineItem
+                {
+                    SOACRId = soaId,
+                    InvoiceId = invoiceId,
+                    InvoiceAmount = invoiceAmount,
+                    PaidAmount = 0,
+                    TBRAmount = 0,
+                    CreditAmount = 0,
+                    DebitAmount = 0,
+                    FreightCost = 0,
+                    FreightWaybill = "0",
+                    Balance = 0,
+                    IsPaid = false
+                };
+                await context.SOACRLineItems.AddAsync(soali);
+                await context.SaveChangesAsync(currentUserId);
+            }
+        }
 
         public async Task AddAsync(SoacrVM soaVM)
         {
@@ -866,7 +1132,6 @@ namespace GMGInventory.Application.Repositories
 
             var soa = new SOACR
             {
-                Id = soaVM.Id,
                 CustomerId = soaVM.CustomerId,
                 SOACRTypeId = 1,
                 SOAFrom = soaVM.SOAFromD,
@@ -883,7 +1148,6 @@ namespace GMGInventory.Application.Repositories
             await context.SOACRs.AddAsync(soa);
             await context.SaveChangesAsync(currentUserId);
 
-            
 
             var invoices = from invoice in context.InvoiceLineItems
                            where invoice.Invoice.SalesOrder.Customer.Id == soa.CustomerId
@@ -923,6 +1187,57 @@ namespace GMGInventory.Application.Repositories
 
             await context.SaveChangesAsync(currentUserId);
 
+
+
+        }
+
+        public async Task<int> AddCrAsync(SoacrVM soaVM, int[] invoiceIds)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var dateFrom = soaVM.SOAFromD;
+            var dateTo = soaVM.SOAToD;
+
+            var soa = new SOACR
+            {
+                CustomerId = soaVM.CustomerId,
+                SOACRTypeId = 2,
+                SOAFrom = null,
+                SOATo = null,
+                AmountToPay = soaVM.InvoiceAmountD,
+                TotalCMAAmount = soaVM.CreditD,
+                TotalDMAAmount = soaVM.DebitD,
+                TotalDMRAmount = soaVM.DMRD,
+                TotalBalance = soaVM.BalanceD,
+                TotalFreightCost = soaVM.FreightChargeD,
+                TotalAmount = soaVM.TotalAmountD,
+                OverPayment = soaVM.OverPaymentD,
+            };
+            await context.SOACRs.AddAsync(soa);
+            await context.SaveChangesAsync(currentUserId);
+
+
+            foreach (var invoiceId in invoiceIds)
+            {
+                var invoiceAmount = context.InvoiceLineItems.Where(s => s.InvoiceId == invoiceId).Sum(s => s.Quantity * s.UnitPrice);
+                var soali = new SOACRLineItem
+                {
+                    SOACRId = soa.Id,
+                    InvoiceId = invoiceId,
+                    InvoiceAmount = invoiceAmount,
+                    PaidAmount = 0,
+                    TBRAmount = 0,
+                    CreditAmount = 0,
+                    DebitAmount = 0,
+                    FreightCost = 0,
+                    FreightWaybill = "0",
+                    Balance = 0,
+                    IsPaid = false
+                };
+                await context.SOACRLineItems.AddAsync(soali);
+                await context.SaveChangesAsync(currentUserId);
+            }
+
+            return soa.Id;
 
         }
 

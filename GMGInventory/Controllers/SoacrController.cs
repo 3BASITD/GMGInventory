@@ -177,8 +177,6 @@ namespace GMGInventory.Controllers
             return View(await soaRepository.PrintInvoice(filter));
         }
 
-
-
         public ActionResult EditInvoice(int id)
         {
             var inv = soaRepository.GetSoaInvoiceDtlVM(id); 
@@ -205,11 +203,63 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<JsonResult> GetContractReceipt2Json(SoaFilterVM filter)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await soaRepository.GetContractReceipt2DTAsync(form, filter));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetCustomerInvoicesJson(int id, int soaId)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await soaRepository.GetContractReceiptCustomerDTAsync(form, id, soaId));
+        }
+
+
+        [HttpPost]
         public async Task<JsonResult> GetContractReceiptDetailsJson(int id)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await soaRepository.GetContractReceiptDetailsDTAsync(form, id));
         }
+
+        [HttpPost]
+        public async Task<JsonResult> AddInvoices(int soaId, int[] invoiceIds)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            responseModel.Status = "Success";
+            responseModel.Message = "Invoice Successfully Added";
+
+            await soaRepository.AddInvoicesAsync(soaId, invoiceIds);
+            return Json(responseModel);
+
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> CreateJsonCR(SoacrVM soaVM, int[] invoiceIds)
+        {
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            if (await soaRepository.IsSOAIdExist(soaVM.Id))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Counter Receipt Id already used.";
+            }
+            else
+            {
+                var soaId = await soaRepository.AddCrAsync(soaVM, invoiceIds);
+                await soaRepository.AddCrAsync(soaVM, invoiceIds);
+                responseModel.Status = "Success";
+                responseModel.Message = "Counter Receipt Successfully added";
+                responseModel.NewRow = soaId;
+            }
+            return Json(responseModel);
+        }
+
+       
+
+
 
     }
 }

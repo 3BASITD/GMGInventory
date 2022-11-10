@@ -29,7 +29,7 @@
         <strong>Agent:</strong>
         <span>@Model.Agent</span>
         <br />
-    <table class="table-soa">
+    <table class="table-items" >
         <thead>
             <tr>
 
@@ -54,14 +54,14 @@
                     <td>@item.InvoiceDate</td>
                     <td>@item.InvoiceNumber</td>
                     <td>@item.InvoiceType</td>
-                    <td>@item.TotalAmountD</td>
+                    <td>@item.TotalAmount</td>
                 </tr>
             }
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="1" class="right-text">Total</th>
-                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+                <th colspan="0" class="right-text">Total</th>
+                @*<th class="right-text"><nobr>@Model.TotalAmount</nobr></th>*@
                 <th class="right-text"></th>
                 <th class="right-text"></th>
                 <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>

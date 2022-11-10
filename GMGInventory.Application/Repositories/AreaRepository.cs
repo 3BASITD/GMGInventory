@@ -113,6 +113,7 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var area = mapper.Map<Area>(areaVM);
             area.IsActive = true;
+            area.CommissionRate = areaVM.CommissionRate;
             await context.Areas.AddAsync(area);
             await context.SaveChangesAsync(currentUserId);
         }
