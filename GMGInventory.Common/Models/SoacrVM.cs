@@ -137,10 +137,6 @@ namespace GMGInventory.Common.Models
 
 
 
-
-
-
-
     }
 
 
@@ -160,6 +156,7 @@ namespace GMGInventory.Common.Models
         public DateTime CRDateD { get; set; }
         public string CustomerCode { get; set; }
 
+        public int? CustomerId { get; set; }
         public string Customer { get; set; }
         public string CreditTerm { get; set; }
 

@@ -20,9 +20,13 @@
 			</button>
 			@if (Model?.Type == "Counter Receipt")
 			{
-				<button type="button" class="btn btn-primary btn-sm float-right createInvoiceBtn ml-2" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
+				@*<button type="button" class="btn btn-primary btn-sm float-right createInvoiceBtn ml-2" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
 					<span class="fas fa-file-alt"></span> Add Invoice
-				</button>
+				</button>*@
+
+				<a class="btn btn-primary btn-sm float-right ml-2" asp-action="AddInvoice" asp-route-id = "@Model.Id" asp-route-custId="@Model.CustomerId">
+					<span class="fas fa-plus"></span> Add Invoice
+				 </a>
 			}
 			
 
@@ -396,6 +400,7 @@
 				type: "POST",
 				data: function(data) {
 					data.Id = @Model?.Id;
+					data.custId = @Model?.CustomerId;
 				},
 			},
 			serverSide: true,
