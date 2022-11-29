@@ -4,7 +4,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IPaymentRepository
     {
-        ForDataTables<PaymentVM> GetListDataTables(DataTablesRequestForm form);
+        Task<ForDataTables<PaymentVM>> GetListDataTables(DataTablesRequestForm form);
 
         PaymentVM? GetPaymentVM(int? id);
 

@@ -101,14 +101,14 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Check Date")]
-        public string CheckDate => CheckDateD == null ? "-" : CheckDateD.ToString(SystemFormat.StringDate);
+        public string CheckDate => CheckDateD.ToString(SystemFormat.StringDate);
         public DateTime CheckDateD { get; set; }
 
 
         // Invoices
 
         [Display(Name = "Invoice Date")]
-        public string InvoiceDate => InvoiceDateD == null ? "-" : InvoiceDateD.ToString(SystemFormat.StringDate);
+        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
         public DateTime InvoiceDateD { get; set; }
 
 
@@ -116,7 +116,7 @@ namespace GMGInventory.Common.Models
         public string InvoiceNumber { get; set; }
 
         [Display(Name = "Invoice Type")]
-        public string? InvoiceType { get; set; }
+        public string InvoiceType { get; set; }
 
         [Display(Name = "Invoice Amount")]
         public string InvoiceAmount => string.Format(SystemFormat.StringDecimalComma, InvoiceAmountD);

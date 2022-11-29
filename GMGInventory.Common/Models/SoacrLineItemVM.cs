@@ -123,7 +123,7 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Check Date")]
-        public string CheckDate => CheckDateD == null ? "-" : CheckDateD.ToString(SystemFormat.StringDate);
+        public string CheckDate => CheckDateD.ToString(SystemFormat.StringDate);
         public DateTime CheckDateD { get; set; }
 
 

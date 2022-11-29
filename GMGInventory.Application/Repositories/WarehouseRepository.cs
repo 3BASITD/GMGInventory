@@ -142,7 +142,8 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<string> GetUserName(string? userId)
         {
-            var user = await userManager.FindByIdAsync(userId);
+            //var user = await userManager.FindByIdAsync(userId);
+            var user = await userManager.Users.Where(s => s.Id == userId).FirstOrDefaultAsync();
             return user != null ? user.Nickname : "-";
         }
     }

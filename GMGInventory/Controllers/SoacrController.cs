@@ -24,7 +24,7 @@ namespace GMGInventory.Controllers
             this.soacrLineItemRepository = soacrLineItemRepository;
         }
 
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             return View();
         }
@@ -173,18 +173,18 @@ namespace GMGInventory.Controllers
         public ActionResult EditInvoice(int id)
         {
             var inv = soaRepository.GetSoaInvoiceDtlVM(id);
-            {
+            if(inv == null) {
                 return NotFound();
             }
             return Json(inv);
         }
 
-        public async Task<ActionResult> ContractReceipt()
+        public ActionResult ContractReceipt()
         {
             return View();
         }
 
-        public async Task<ActionResult> Invoice()
+        public ActionResult Invoice()
         {
             return View();
         }

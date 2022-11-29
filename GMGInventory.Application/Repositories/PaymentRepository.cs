@@ -51,31 +51,33 @@ namespace GMGInventory.Application.Repositories
             return paymentVM;
         }
 
-        private IQueryable<PaymentVM> GetList()
+        private async Task<List<PaymentVM>> GetList()
         {
-            return from cp in context.CustomerPayments
+            var customerPayment = (from cp in context.CustomerPayments
                                      .Include(s => s.Customer)
-                   select new PaymentVM
-                   {
-                       Id = cp.Id,
-                       CRNumber = cp.CRNumber,
-                       SOANo = cp.SOACRId,
-                       CustomerName = cp.Customer.Name,
-                       TotalInvoiceAmountD = cp.TotalInvoiceAmount,
-                       AmountPaidD = cp.TotalAmountPaid,
-                       OverPaymentD = cp.OverPay,
-                       TransactionDateD = cp.DateCreated,
-                       CreatedBy = userManager.FindByIdAsync(cp.UserCreated).Result.Nickname,
-                       Remarks = cp.Remarks
-                   };
+                                   join user in userManager.Users on cp.UserCreated equals user.Id
+                                   select new PaymentVM
+                                   {
+                                       Id = cp.Id,
+                                       CRNumber = cp.CRNumber,
+                                       SOANo = cp.SOACRId,
+                                       CustomerName = cp.Customer.Name,
+                                       TotalInvoiceAmountD = cp.TotalInvoiceAmount,
+                                       AmountPaidD = cp.TotalAmountPaid,
+                                       OverPaymentD = cp.OverPay,
+                                       TransactionDateD = cp.DateCreated,
+                                       CreatedBy = user.Nickname,
+                                       Remarks = cp.Remarks
+                                   });
+            return await customerPayment.ToListAsync();
         }
 
-        public ForDataTables<PaymentVM> GetListDataTables(DataTablesRequestForm form)
+        public async Task<ForDataTables<PaymentVM>> GetListDataTables(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
             //var data = context.AuditLogs.Include(s=>s.User).AsQueryable();
-            var data = GetList();
+            var data = (await GetList()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found

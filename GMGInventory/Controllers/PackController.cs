@@ -52,5 +52,10 @@ namespace GMGInventory.Controllers
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await packRepository.GetItemsDTAsync(form, packId));
         }
+
+        public ActionResult Create()
+        {
+            return View();
+        }
     }
 }

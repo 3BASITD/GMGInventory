@@ -176,6 +176,8 @@ namespace GMGInventory.Application.Repositories
                                     on agent.AreaId equals areas.Id
                          join regions in context.Regions
                                     on areas.RegionId equals regions.Id
+                         join userc in userManager.Users on agent.UserCreated equals userc.Id
+                         let userm = userManager.Users.Where(s=>s.Id == agent.UserModified).First()
 
                          select new AgentViewVM
                          {
@@ -192,8 +194,8 @@ namespace GMGInventory.Application.Repositories
                              DateModified = agent.DateModified == null ? "-" : agent.DateModified.Value.ToString(SystemFormat.StringDateTime),
                              DateModifiedD = agent.DateModified == null ? null : agent.DateModified.Value,
 
-                             UserCreated = userManager.FindByIdAsync(agent.UserCreated).Result.Nickname,
-                             UserModified = agent.UserModified == null ? "-" : userManager.FindByIdAsync(agent.UserModified).Result.Nickname
+                             UserCreated = userc.Nickname,
+                             UserModified = userm == null ? "-" : userm.Nickname
                          };
             return await agents.ToListAsync();
         }
