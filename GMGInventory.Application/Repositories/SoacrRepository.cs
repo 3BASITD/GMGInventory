@@ -287,7 +287,7 @@ namespace GMGInventory.Application.Repositories
                              TotalAmountD = soa.TotalAmount,
                              TBRD = soalit.Sum(s => s.TBRAmount),
                              CreditD = soalit.Sum(s => s.CreditAmount),
-                             DebitD = soalit.Sum(s => s.CreditAmount),
+                             DebitD = soalit.Sum(s => s.DebitAmount),
                              PaidAmountD = soalit.Sum(s => s.PaidAmount),
                              FreightChargeD = soalit.Sum(s => s.FreightCost),
                              BalanceD = soalit.Sum(s => s.Balance),
@@ -441,7 +441,7 @@ namespace GMGInventory.Application.Repositories
                             InvoiceType = i.InvoiceType.Name,
                             CustomerId = soa.CustomerId,
                             InvoiceId = soaliGroup.InvoiceId,
-                            InvoiceNumber = i.InvoiceNumber,
+                            InvoiceNumber = i.InvoiceNumber.Remove(0, 4),
                             InvoiceAmountD = i.Amount - soaliGroup.FreightCost,
                             TBRD = soaliGroup.TBRAmount,
                             CreditD = soaliGroup.CreditAmount,
@@ -542,7 +542,7 @@ namespace GMGInventory.Application.Repositories
                             CustomerId = soa.CustomerId,
                             InvoiceId = soaliGroup.InvoiceId,
                             WaybillNo = soaliGroup.FreightWaybill ?? "-",
-                            InvoiceNumber = i.InvoiceNumber,
+                            InvoiceNumber = i.InvoiceNumber.Remove(0, 4),
                             InvoiceAmountD = i.Amount - soaliGroup.FreightCost,
                             InvoiceDateD = i.DateModified ?? i.DateCreated,
                             TBRD = soaliGroup.TBRAmount,
@@ -590,7 +590,9 @@ namespace GMGInventory.Application.Repositories
                 Agent = soaVM.Agent,
                 Customer = soaVM.Customer,
                 CreditTerm = soaVM.CreditTerm,
-                TotalAmountD = items.Sum(s => s.InvoiceAmountD)
+                TotalAmountD = items.Sum(s => s.TotalAmountD),
+                TotalInvoiceAmountD = items.Sum(s => s.InvoiceAmountD)
+
             };
         }
 
@@ -630,7 +632,8 @@ namespace GMGInventory.Application.Repositories
                 Agent = soaVM.Agent,
                 Customer = soaVM.Customer,
                 CreditTerm = soaVM.CreditTerm,
-                TotalAmountD = items.Sum(s => s.InvoiceAmountD),
+                TotalAmountD = items.Sum(s => s.TotalAmountD),
+                TotalInvoiceAmountD = items.Sum(s => s.InvoiceAmountD),
                 CRDateD = soaVM.CRDateD,
                 CustomerCode = soaVM.CustomerCode
             };
@@ -696,7 +699,7 @@ namespace GMGInventory.Application.Repositories
                                     Id = i.Key.Id,
                                     Customer = i.Key.Customer,
                                     InvoiceDateD = i.Key.InvoiceDateD,
-                                    InvoiceNumber = i.Key.InvoiceNumber,
+                                    InvoiceNumber = i.Key.InvoiceNumber.Remove(0, 4),
                                     InvoiceType = i.Key.InvoiceType,
                                     TotalAmountD = i.Sum(s => s.TotalAmountD)
 
