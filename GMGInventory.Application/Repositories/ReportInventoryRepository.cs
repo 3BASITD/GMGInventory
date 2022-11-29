@@ -517,12 +517,12 @@ namespace GMGInventory.Application.Repositories
             var cards1 = from card in context.InvoiceLineItems
                                             .Include(s => s.Item)
                                             .Include(s => s.Invoice).ThenInclude(s => s.SalesOrder).ThenInclude(s => s.Customer)
-                         where filter.DateFrom <= card.Invoice.DateCreated
-                         && card.Invoice.DateCreated <= filter.DateTo
-                         && (filter.Item == null || card.Item.Id == filter.Item)
+                         where filter.DateFrom <= (card.Invoice.DateModified ?? card.Invoice.DateCreated)
+                           && (card.Invoice.DateModified ?? card.Invoice.DateCreated) <= filter.DateTo &&
+                         (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
-                             DateD = card.Invoice.DateCreated,
+                             DateD = card.Invoice.DateModified ?? card.Invoice.DateCreated,
                              DetailsRemarks = "Sold to - " + card.Invoice.SalesOrder.Customer.Name,
                              InD = 0,
                              Item = card.Item.Name,
@@ -578,13 +578,14 @@ namespace GMGInventory.Application.Repositories
             var cards5 = from card in context.PhysicalCountHistories
                                             .Include(s => s.Item)
                                             .Include(s => s.Warehouse)
-                         where filter.DateFrom <= card.DateCreated
-                         && card.DateCreated <= filter.DateTo
-                         && (filter.Item == null || card.Item.Id == filter.Item)
+                         where filter.DateFrom <= (card.DateModified ?? card.DateCreated)
+                           && (card.DateModified ?? card.DateCreated) <= filter.DateTo
+                         &&
+                         (filter.Item == null || card.Item.Id == filter.Item)
                          join user in userManager.Users on card.UserCreated equals user.Id
                          select new StockCardRVM
                          {
-                             DateD = card.DateCreated,
+                             DateD = card.DateModified ?? card.DateCreated,
                              DetailsRemarks = "Adjusted by - " + user.Nickname,
                              InD = card.QuantityFrom < card.QuantityTo ? card.QuantityTo - card.QuantityFrom : 0,
                              Item = card.Item.Name,
@@ -607,7 +608,9 @@ namespace GMGInventory.Application.Repositories
                              OutD = 0,
                              TransactionType = "Sales Return"
                          }; */
-            return await cards1.Union(cards2).Union(cards5).ToListAsync();
+            //return await cards1.Union(cards2).Union(cards5).ToListAsync();
+            var union = cards1.Union(cards2).Union(cards5);
+            return await union.ToListAsync();
         }
 
         public async Task<ForDataTables<StockCardRVM>> GetStockCardDT(DataTablesRequestForm form, ListFilterInventoryModel filter)
@@ -701,10 +704,12 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<StockStatusRVM>> GetStockStatus(ListFilterInventoryModel filter)
         {
+
             var stocks = from item in context.Items
                                              .Include(s => s.Brand)
                                              .Include(s => s.ItemType)
                                              .Include(s => s.Unit)
+
                          let quantity = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id)
                                                .Sum(s => s.Quantity)
@@ -714,7 +719,7 @@ namespace GMGInventory.Application.Repositories
                                                .Average(s => s.PurchaseOrder.CurrencyRate * s.UnitPrice)
                          where (filter.Brand == null || item.Brand.Id == filter.Brand)
                          && (filter.Item == null || item.Id == filter.Item)
-                         //&& (filter.Warehouse == null || ite) // WAREHOUSE FILTER
+                         //&& (filter.Warehouse == null || item.) // WAREHOUSE FILTER
                          select new StockStatusRVM
                          {
                              Brand = item.Brand.Name,
@@ -726,7 +731,36 @@ namespace GMGInventory.Application.Repositories
                              Unit = item.Unit.Name,
                              UnitCostD = unitcost
                          };
-            return await stocks.ToListAsync();
+
+            var grpstocks = from stock in await stocks.ToListAsync()
+                            orderby stock.Brand ascending, stock.ItemCode ascending, stock.ItemName ascending, stock.PartNumber ascending
+                            group stock by new
+                            {
+                                stock.Brand,
+                                stock.ItemCode,
+                                stock.ItemName,
+                                stock.ItemType,
+                                stock.PartNumber,
+                                stock.QuantityOnHandD,
+                                stock.Unit,
+                                stock.UnitCostD
+                            } into i
+                            select new StockStatusRVM
+                            {
+                                Brand = i.Key.Brand,
+                                ItemCode = i.Key.ItemCode,
+                                ItemName = i.Key.ItemName,
+                                ItemType = i.Key.ItemType,
+                                PartNumber = i.Key.PartNumber,
+                                QuantityOnHandD = i.Sum(s => s.QuantityOnHandD),
+                                Unit = i.Key.Unit,
+                                UnitCostD = i.Average(s => s.UnitCostD),
+
+                            };
+
+
+
+            return grpstocks.ToList();
         }
 
         public async Task<ForDataTables<StockStatusRVM>> GetStockStatusDT(DataTablesRequestForm form, ListFilterInventoryModel filter)

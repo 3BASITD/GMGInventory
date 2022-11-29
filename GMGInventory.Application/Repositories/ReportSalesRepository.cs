@@ -418,7 +418,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Area == null || invoice.Invoice.SalesOrder.Agent.Area.Id == filter.Area)
                            && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
-                           && invoice.Invoice.Status.Code == "Invoiced"
+                           && invoice.Invoice.StatusId == 8
                            select new CommissionRVM
                            {
                                Agent = invoice.Invoice.SalesOrder.Agent.FirstName
@@ -1437,6 +1437,8 @@ namespace GMGInventory.Application.Repositories
         {
             var solines = from soline in context.SalesOrderLineItems
                           where soline.Quantity - soline.PackedQuantity > 0
+                          && filter.DateFrom <= (soline.DateModified ?? soline.DateCreated)
+                          && (soline.DateModified ?? soline.DateCreated) <= filter.DateTo
                           && (filter.Brand == null || soline.Item.Brand.Id == filter.Brand)
                           select new UnservedItemRVM
                           {

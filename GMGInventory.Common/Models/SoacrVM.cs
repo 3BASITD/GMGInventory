@@ -137,10 +137,6 @@ namespace GMGInventory.Common.Models
 
 
 
-
-
-
-
     }
 
 
@@ -160,6 +156,7 @@ namespace GMGInventory.Common.Models
         public DateTime CRDateD { get; set; }
         public string CustomerCode { get; set; }
 
+        public int? CustomerId { get; set; }
         public string Customer { get; set; }
         public string CreditTerm { get; set; }
 
@@ -175,9 +172,10 @@ namespace GMGInventory.Common.Models
         public string FreightCost => string.Format(SystemFormat.StringDecimalComma, FreightCostD);
         public decimal FreightCostD { get; set; }
 
-
-        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
-        public decimal TotalAmountD { get; set; }
+        public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
+        public decimal TotalInvoiceAmountD { get; set; }
+        public string? TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal? TotalAmountD { get; set; }
         public string InvoiceNumber { get; set; }
 
         public string? InvoiceAmount => string.Format(SystemFormat.StringDecimalComma, InvoiceAmountD);

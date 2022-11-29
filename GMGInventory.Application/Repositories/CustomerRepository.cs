@@ -34,7 +34,8 @@ namespace GMGInventory.Application.Repositories
                                              Text = s.Code,
                                              Name = s.Name,
                                              Address = s.Address,
-                                             CreditTerm = s.CreditTerm.Name
+                                             CreditTerm = s.CreditTerm.Name,
+                                             Agent = s.Agent.FirstName +' '+ s.Agent.MiddleName +' '+ s.Agent.LastName
                                          })
                                          .ToListAsync();
             var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
@@ -97,6 +98,7 @@ namespace GMGInventory.Application.Repositories
                               }).FirstOrDefault();
             return customerVM;
         }
+
 
         private IQueryable<CustomerVM> GetList()
         {

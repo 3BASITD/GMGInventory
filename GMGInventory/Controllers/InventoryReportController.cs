@@ -276,7 +276,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> PrintStockCard(ListFilterInventoryModel filter)
         {
-            return View(await reportInventoryRepository.GetStockCard(filter));
+            return View(await reportInventoryRepository.PrintStockCard(filter));
         }
 
         [HttpPost]
@@ -333,10 +333,12 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        public async Task<JsonResult> PrintStockStatus(ListFilterInventoryModel filter)
+        public async Task<IActionResult> PrintStockStatus(ListFilterInventoryModel filter)
         {
-            return Json(await reportInventoryRepository.PrintStockStatus(filter));
+            return View(await reportInventoryRepository.PrintStockStatus(filter));
         }
+
+
 
         [HttpPost]
         public async Task<JsonResult> GetStockStatusDT(ListFilterInventoryModel filter)

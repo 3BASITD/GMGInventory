@@ -162,7 +162,7 @@
 					//var agentId = $("#filter-agent").val();
 					var customerId = $("#filter-customer").val();
 
-					//if (agentId) data.AgentId = agentId;
+					////if (agentId) data.AgentId = agentId;
 					if (customerId) data.CustomerId = customerId;
 
 					//data.DateFrom = $("#filter-from").val();
@@ -202,40 +202,6 @@
 
 		});
 
-		
-		 // Actions upon Display Create Modal
-		$(".createBtn").click(function(e) {
-			$("#create-customer").prop("selectedIndex", 0).trigger("change");
-			$("#create-agent").prop("selectedIndex", 0).trigger("change");
-			$("#create-dateFrom").val("");
-			$("#create-dateTo").val("");
-		});
-	   
-
-
-		// Send Create to Controller
-		function DoCreate() {
-			$.ajax({
-				type: "POST",
-				url: "@Url.Action("CreateJson", "Soacr")",
-				data: {
-					CustomerId: $("#create-customer").val(),
-					SOAFromD: $("#create-dateFrom").val(),
-					SOAToD: $("#create-dateTo").val()
-				},
-				error: jQueryCommonError,
-				success: function(data, status, xhr) {
-					if (data.status == "Error") {
-						toastr.error(data.message, "Error");
-					} else {
-						toastr.success(data.message, "Success");
-						$("#createModal").modal("hide");
-						soaDT.ajax.reload();
-						hideLoader();
-					}
-				}
-			});
-		}
 
 
 		$(".btn-add").click(function(e) {

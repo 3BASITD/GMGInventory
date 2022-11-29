@@ -269,7 +269,7 @@
             var urlQuery = [];
             if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
-            if ($("#filter-warehouse").val()) { urlQuery.push("Warehouse=" + $("#filter-warehouse").val()); }
+           // if ($("#filter-warehouse").val()) { urlQuery.push("Warehouse=" + $("#filter-warehouse").val()); }
             setTimeout(function () {
                 let win = window.open('@Url.Action("PrintStockStatus")?' + urlQuery.join("&"), '');
                 var wintimer = setInterval(function () {
@@ -280,5 +280,7 @@
                 }, 100);
             }, 500);
         });
+
+      
     </script>
     }

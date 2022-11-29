@@ -29,10 +29,40 @@ namespace GMGInventory.Controllers
             return View();
         }
 
+
+        public async Task<IActionResult> AddInvoice(int id, int custId)
+        {
+            var soaInv = await soaRepository.GetContractInvoicesCustomer2(id, custId);
+            if (soaInv == null)
+            {
+                return NotFound();
+            }
+            return View(soaInv);
+
+
+        }
+
+        public async Task<IActionResult> AddCounterReceipt(int? id)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            var soaInv = await soaRepository.GetCounterReceiptInvoices(id);
+            if (soaInv == null)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Choose Invoices.";
+
+            }
+            return View(soaInv);
+
+
+        }
+
+
+
         [HttpPost]
         public async Task<JsonResult> CreateJson(SoacrVM soaVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            ResponseModel<int> responseModel = new ResponseModel<int>();
             if (await soaRepository.IsSOAIdExist(soaVM.Id))
             {
                 responseModel.Status = "Error";
@@ -40,9 +70,11 @@ namespace GMGInventory.Controllers
             }
             else
             {
+                var soaId = await soaRepository.AddAsync(soaVM);
                 await soaRepository.AddAsync(soaVM);
                 responseModel.Status = "Success";
                 responseModel.Message = "SOA successfully added";
+                responseModel.NewRow = soaId;
             }
             return Json(responseModel);
         }

@@ -1,0 +1,101 @@
+﻿@model SoaDetailsPVM
+
+@{
+	ViewData["Title"] = "Add Invoice";
+}
+
+<div class="card card-default">
+	<div class="card-header">
+		<span class="card-title">@ViewData["Title"]</span>
+		<div class="card-tools">
+			<button type="button" class="btn btn-primary btn-add">
+						<span class="fas fa-plus"></span> Add
+			</button>
+		</div>
+	</div>
+	<div class="card-body">
+		<table class="table table-head-fixed table-striped table-hover">
+			<thead>
+				<tr>
+		        <th></th>
+				<th>
+					@Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.Contents.First().InvoiceType)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.Contents.First().TotalAmount)
+				</th>
+				</tr>
+			</thead>
+			<tbody>
+			   @foreach (var item in Model.Contents)
+			{
+				<tr>
+					<td>
+						<input class="chkclassinvoice" type="checkbox" id="checkInvoice"  name="CheckInvoice" data-id = "@item.Id" />
+					</td>
+					<td>@item.InvoiceDate</td>
+					<td>@item.InvoiceNumber</td>
+					<td>@item.InvoiceType</td>
+					<td>@item.TotalAmount</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+
+@section Scripts {
+	<script>
+		var invoiceDT = $('.table').DataTable({
+			columnDefs: [
+				{ orderable: false, targets: -1 },
+			]
+		});
+
+		$(".btn-add").click(function(e) {
+
+			var invoiceIds = []; 
+			
+				invoiceDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+				var invlist = $(this.node()).find(".chkclassinvoice");
+				if (invlist.prop("checked"))
+				{ 
+					invoiceIds.push(invlist.data("id"));
+				}
+
+			} );
+
+			$.ajax({
+				type: "POST",
+				url: "@Url.Action("AddInvoices")",
+				data: {
+					soaId: @Model?.Id,
+					invoiceIds: invoiceIds
+
+				},
+				error: jQueryCommonError,
+				success: function(data, status, xhr) {
+					if (data.status == "Error") {
+						toastr.error(data.message, "Error");
+					} else {
+						toastr.success(data.message, "Success");
+						hideLoader();
+						window.location = '@Url.Action("Details", "Soacr")/' + @Model?.Id;
+					}
+				}
+			});
+
+		});
+
+		
+	</script>
+}
+
