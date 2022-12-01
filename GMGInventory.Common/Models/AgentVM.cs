@@ -15,13 +15,6 @@ namespace GMGInventory.Common.Models
     public class AgentVM
     {
 
-        public int Id { get; set; }
-
-        [Required]
-        [StringLength(10)]
-        [Display(Name = "Code")]
-        public string Code { get; set; }
-
         [Required]
         [StringLength(50)]
         [Display(Name = "First Name")]
@@ -37,14 +30,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Display(Name  = "Full Name")]
-        public string FullName
-        {
-            get
-            {
-                return FirstName + " " + MiddleName + " "+ LastName;
-            }
-        }
+        [Display(Name = "Full Name")]
+        public string FullName => FirstName + " " + MiddleName + " " + LastName;
 
         [Display(Name = "AreaId")]
         public int AreaId { get; set; }

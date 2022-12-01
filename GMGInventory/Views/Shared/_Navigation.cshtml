@@ -194,7 +194,7 @@
         @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager)
         || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
         {
-            var navCreditsCollectionActive = (new List<string> { "Customer", "Forwarder", "Payment", "Soacr" }).Contains(currentController ?? "");
+            var navCreditsCollectionActive = (new List<string> { "Customer", "Payment", "Soacr" }).Contains(currentController ?? "");
 
             <li class="nav-item @(navCreditsCollectionActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navCreditsCollectionActive ? "active" : "")">
@@ -210,13 +210,6 @@
                        asp-area="" asp-controller="Customer" asp-action="Index">
                             <i class="nav-icon fas fa-users"></i>
                             <p>Customer</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(currentController == "Forwarder" ? "active" : "")"
-                       asp-area="" asp-controller="Forwarder" asp-action="Index">
-                            <i class="nav-icon fas fa-shipping-fast"></i>
-                            <p>Forwarder</p>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -243,7 +236,7 @@
         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
         || User.IsInRole(Roles.SystemAdmin))
         {
-            var navAdministrationActive = (new List<string> { "Agent", "Area", "Brand", "Category", "ItemType", "User", "Supplier", "AuditLog" }).Contains(currentController ?? "");
+            var navAdministrationActive = (new List<string> { "Agent", "Area", "Brand", "Category", "Forwarder", "ItemType", "User", "Supplier", "AuditLog" }).Contains(currentController ?? "");
 
             <li class="nav-item @(navAdministrationActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navAdministrationActive ? "active" : "")">
@@ -280,6 +273,13 @@
                        asp-area="" asp-controller="Category" asp-action="Index">
                             <i class="nav-icon fas fa-network-wired"></i>
                             <p>Categories</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Forwarder" ? "active" : "")"
+                       asp-area="" asp-controller="Forwarder" asp-action="Index">
+                            <i class="nav-icon fas fa-shipping-fast"></i>
+                            <p>Forwarder</p>
                         </a>
                     </li>
                     <li class="nav-item">
