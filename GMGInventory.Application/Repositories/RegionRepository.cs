@@ -79,5 +79,11 @@ namespace GMGInventory.Application.Repositories
                 })
                 .ToListAsync();
         }
+
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var region = await context.Regions.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return region?.Id;
+        }
     }
 }

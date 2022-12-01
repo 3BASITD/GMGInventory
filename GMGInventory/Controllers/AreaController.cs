@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -25,96 +27,72 @@ namespace GMGInventory.Controllers
             this.mapper = mapper;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult> Index()
         {
-            return View(await areaRepository.GetAllAreaVMAsync());
+            return View();
         }
 
-        public async Task<IActionResult> Details(int? id)
+
+
+        [HttpPost]
+        public async Task<JsonResult> CreateJson(AreaVM areaVM)
         {
-            var areaVM = await areaRepository.GetAreaViewVMAsync(id);
-            if (areaVM == null)
+            ResponseModel responseModel = new ResponseModel();
+            if (await areaRepository.IsAreaCodeExist(areaVM.Code))
             {
-                return NotFound();
+                responseModel.Status = "Error";
+                responseModel.Message = "Area code already in use";
             }
-            return View(areaVM);
-        }
-
-        public async Task<IActionResult> Create()
-        {
-            var areaVM = new AreaVM
+            else
             {
-                Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name")
-            };
-            return View(areaVM);
+                await areaRepository.AddAsync(areaVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Area successfully added";
+            }
+            return Json(responseModel);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AreaVM areaVM)
+        public async Task<JsonResult> GetListJson()
         {
-            if (ModelState.IsValid)
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await areaRepository.GetAllForDataTablesAsync(form));
+        }
+
+        
+
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await areaRepository.GetOptions(IncludeId));
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> EditJson(AreaVM areaVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            try
             {
-                if (await areaRepository.IsAreaCodeExist(areaVM.Code))
+                await areaRepository.UpdateAsync(areaVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Area successfully updated";
+            }
+            catch (Exception ex)
+            {
+                if (!await areaRepository.Exists(areaVM.Id))
                 {
-                    ModelState.AddModelError(string.Empty, "Area code already in use.");
-                    TempData["ErrorMessage"] = "Area code already in use";
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Area cannot be found";
                 }
                 else
                 {
-                    await areaRepository.AddAsync(areaVM);
-                    TempData["SuccessMessage"] = "Area successfully added";
-                    return RedirectToAction(nameof(Index));
+                    responseModel.Status = "Error";
+                    responseModel.Message = ex.Message;
                 }
             }
-            areaVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(areaVM.RegionId), "Id", "Name", areaVM.RegionId);
-            return View(areaVM);
+            return Json(responseModel);
         }
 
-        public async Task<IActionResult> Edit(int? id)
-        {
-            var areaVM = await areaRepository.GetAreaVMAsync(id);
-            if (areaVM == null)
-            {
-                return NotFound();
-            }
-            areaVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
-            return View(areaVM);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, AreaVM areaVM)
-        {
-            if (id != areaVM.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await areaRepository.UpdateAsync(id, areaVM);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await areaRepository.Exists(areaVM.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                TempData["SuccessMessage"] = "Area successfully updated";
-                return RedirectToAction(nameof(Index));
-            }
-
-            areaVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
-            return View(areaVM);
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -150,9 +128,67 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> GetOptions(int? IncludeId)
+
+        public async Task<IActionResult> DownloadFile()
         {
-            return Json(await areaRepository.GetOptions(IncludeId));
+            DataTable dt = new DataTable("Area");
+            dt.Columns.AddRange(new DataColumn[4] {
+                new DataColumn("Code"),
+                new DataColumn("Name"),
+                new DataColumn("Commission Rate"),
+                new DataColumn("Region")
+
+            });
+            var area = (await areaRepository.GetAllAreaVMAsync()).Where(s => s.IsActive == true).ToList();
+            foreach (var areas in area)
+            {
+                dt.Rows.Add(areas.Code, areas.Name, areas.CommissionRate, areas.Region.Name);
+            }
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    DateTime.Now.ToString("yyyyMMdd") + " Areas.xlsx");
+                }
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UploadJson(AreaVM areaVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await areaRepository.UploadCombinationExistAsync(areaVM))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Already exist";
+            }
+            else if (await areaRepository.IsCodeExist(areaVM.Code))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Code already in use";
+            }
+            else
+            {
+                int? RegionId = await regionRepository.GetIdAsync(areaVM.RegionName);
+                if (RegionId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Region";
+                }
+                else
+                {
+                    areaVM.RegionId = RegionId.Value;
+                    await areaRepository.AddAsync(areaVM);
+                    responseModel.Status = "Success";
+                    responseModel.Message = "Area added";
+                }
+            }
+            return Json(responseModel);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace GMGInventory.Common.Models
         public SelectList? Regions { get; set; }
     }
 
-    public class AgentVM : GenericAuditVM
+    public class AgentVM
     {
 
         public int Id { get; set; }
@@ -27,7 +27,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Required]
+        //[Required]
         [StringLength(50)]
         [Display(Name = "Middle Name")]
         public string MiddleName { get; set; }
@@ -65,6 +65,23 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Contact Number")]
         public string CustomerContactNo { get; set; }
 
+        [Display(Name = "Active")]
+        public bool IsActive { get; set; }
+
+        [Display(Name = "User Created")]
+        public string UserCreated { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string DateCreated { get; set; }
+        public DateTime DateCreatedD { get; set; }
+
+        [Display(Name = "User Modified")]
+        public string UserModified { get; set; }
+
+        [Display(Name = "Date Modifed")]
+        public string DateModified { get; set; }
+        public DateTime? DateModifiedD { get; set; }
+
 
     }
 
@@ -84,6 +101,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
+        [Display(Name = "Areas")]
+        public AreaVM Areas { get; set; }
 
 
     }

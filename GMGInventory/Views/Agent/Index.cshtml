@@ -15,7 +15,7 @@
             <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
                 <span class="fas fa-upload"></span> Upload
             </button>
-            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
                 <span class="fas fa-download"></span> Download
             </button>
         </div>
@@ -203,7 +203,7 @@
                 </div>
                 <table class="table table-striped" id="upload-table">
                     <thead>
-                        <tr><th>Row #</th><th>Code</th><th>FirstName</th><th>MiddleName</th><th>LastName</th><th>Area</th><th>Status</th></tr>
+                        <tr><th>Row #</th><th>Code</th><th>First Name</th><th>Middle Name</th><th>Last Name</th><th>Area</th><th>Status</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -219,6 +219,7 @@
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script>
@@ -397,7 +398,7 @@
                     type: "POST",
                     url: "@Url.Action("EditJson")",
                     data: {
-                        Id: $("#edit-id").val(),
+                          Id: $("#edit-id").val(),
                         Code: $("#edit-code").val(),
                    FirstName: $("#edit-firstname").val(),
                   MiddleName: $("#edit-middlename").val(),
@@ -427,7 +428,7 @@
         // Load Select2 Area on Add
         $.ajax({
             type: "POST",
-            url: "@Url.Action("GetOptions", "Area")",
+            url: "@Url.Action("GetOptions", "Region")",
             success: function(data, status, xhr) {
                 $("#create-area").select2({
                     data: data,
@@ -510,7 +511,7 @@
         }
 
         var json_of_excel;
-        var colnumber = 7; // number of columns required for upload
+        var colnumber = 5; // number of columns required for upload
         var done_upload_excel = 0;
         var duplicate_upload = 0;
 
@@ -564,14 +565,14 @@
                         row$.append($('<td/>').html(cellValue));
                     }
                     if (columns.includes("Code") == false
-                        || columns.includes("FirstName") == false
-                        || columns.includes("MiddleName") == false
-                        || columns.includes("LastName") == false
+                        || columns.includes("First Name") == false
+                        || columns.includes("Middle Name") == false
+                        || columns.includes("Last Name") == false
                         || columns.includes("Area") == false) {
                         row$.append($('<td/>').html("Unexpected columns"));
                         UploadRowDone();
                     } else {
-                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["FirstName"], json_of_excel[i]["MiddleName"], json_of_excel[i]["LastName"], json_of_excel[i]["Area"], rowNum);
+                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["First Name"], json_of_excel[i]["Middle Name"], json_of_excel[i]["Last Name"], json_of_excel[i]["Area"],  rowNum);
                         row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
                     }
                     $("#upload-table").append(row$);
@@ -579,15 +580,15 @@
             }
         }
 
-        function SaveXLSX(code, firstname, middlename, lastname, area, rownum) {
+        function SaveXLSX(code, firstName, middleName, lastName, area, rownum) {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("UploadJson")",
                 data: {
                     Code: code,
-               FirstName: firstname,
-              MiddleName: middlename,
-                LastName: lastname,
+                    FirstName: firstName,
+                    MiddleName: middleName,
+                    LastName: lastName,
                     Area: area
                 },
                 error: function(xhr, status, error) {
@@ -610,7 +611,7 @@
         function UploadRowDone() {
             done_upload_excel++;
             if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
-                $("#upload-table").append('<tr><td>*</td><td colspan="3">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                $("#upload-table").append('<tr><td>*</td><td colspan="5">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
                 $("#upload-file").val("");
             }
         }

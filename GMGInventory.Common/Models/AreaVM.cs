@@ -22,11 +22,16 @@ namespace GMGInventory.Common.Models
         [Required]
         [Display(Name = "Region")]
         public int RegionId { get; set; }
+
+        public string RegionName { get; set; }
         public SelectList? Regions { get; set; }
 
         [Display(Name = "Commission Rate")]
-        public string CommissionRateD => string.Format(SystemFormat.StringDecimalComma, CommissionRate);
-        public decimal CommissionRate { get; set; }
+        public string CommissionRate => string.Format(SystemFormat.StringDecimalComma, CommissionRateD);
+        public decimal CommissionRateD { get; set; }
+
+
+
     }
 
     public class AreaViewVM : GenericAuditVM
@@ -34,8 +39,10 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Region")]
         public RegionVM Region { get; set; }
 
+        public string RegionName { get; set; }
+
         [Display(Name = "Commission Rate")]
-        public string CommissionRateD => string.Format(SystemFormat.StringDecimalComma, CommissionRate);
-        public decimal CommissionRate { get; set; }
+        public string CommissionRate => string.Format(SystemFormat.StringDecimalComma, CommissionRateD);
+        public decimal CommissionRateD { get; set; }
     }
 }

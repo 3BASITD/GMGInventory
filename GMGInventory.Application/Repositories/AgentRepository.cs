@@ -70,6 +70,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<AgentViewVM>> GetAllAsync(AgentFilterVM filter)
         {
+
             var agents = from agent in context.Agents
                          join areas in context.Areas
                                     on agent.AreaId equals areas.Id
@@ -77,15 +78,15 @@ namespace GMGInventory.Application.Repositories
                                     on areas.RegionId equals regions.Id
                          join userc in userManager.Users on agent.UserCreated equals userc.Id
                          join userm in userManager.Users on agent.UserModified equals userm.Id into m
-                         from um in m.DefaultIfEmpty()
-                         where ((filter.RegionId == null || filter.RegionId == regions.Id))
+                         from um in m.DefaultIfEmpty() 
+                         where ((filter.RegionId == null || filter.RegionId == regions.Id))   
 
                          select new AgentViewVM
                          {
                              Id = agent.Id,
                              FirstName = agent.FirstName,
-                             MiddleName = agent.MiddleName,
-                             LastName = agent.LastName,
+                             MiddleName = agent.MiddleName ?? "-",
+                             LastName = agent.LastName ?? "-",
                              Area = agent.Area.Name,
                              AreaId = agent.Area.Id,
                              Code = agent.Code,
@@ -366,7 +367,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> UploadCombinationExistAsync(AgentVM agentVM)
         {
             return (await GetListAsync()).Any(s => s.Code == agentVM.Code && s.FirstName == agentVM.FirstName &&
-            s.MiddleName == agentVM.MiddleName && s.LastName == agentVM.LastName && s.Area == s.Area);
+            s.MiddleName == agentVM.MiddleName && s.LastName == agentVM.LastName && s.AreaId == agentVM.AreaId);
         }
 
         public async Task<AgentVM?> GetAgentVMAsync(int? id)
@@ -440,10 +441,22 @@ namespace GMGInventory.Application.Repositories
             {
                 throw new DbUpdateConcurrencyException();
             }
+
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            mapper.Map(agentVM, agent);
+            agent.Id = agentVM.Id;
+            agent.Code = agentVM.Code;
+            agent.FirstName = agentVM.FirstName;
+            agent.MiddleName = agentVM.MiddleName;
+            agent.LastName = agentVM.LastName;
+            agent.AreaId = agentVM.AreaId;
+            agent.IsActive = true;
+
             context.Agents.Update(agent);
             await context.SaveChangesAsync(currentUserId);
         }
+
+        
+
+
     }
 }

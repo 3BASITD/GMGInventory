@@ -8,13 +8,22 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+           @*<a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
                 <span class="fas fa-plus"></span> New Area
-            </a>
+            </a>*@
+            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                <span class="fas fa-plus"></span> New Area
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <span class="fas fa-upload"></span> Upload
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
+                <span class="fas fa-download"></span> Download
+            </button>
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover">
+        <table class="table table-head-fixed table-striped table-hover table-area">
             <thead>
                 <tr>
                     <th>
@@ -44,54 +53,11 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.Code</td>
-                        <td>@item.Name</td>
-                        <td>@item.CommissionRateD %</td>
-                        <td>@item.Region.Name</td>
-                        <td>@item.UserCreated</td>
-                        <td>@item.DateCreated</td>
-                        <td>@item.UserModified</td>
-                        <td>@item.DateModified</td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id">
-                                    <i class="fas fa-info-circle"></i>
-                                </a>
-                                @if (item.IsActive)
-                                {
-                                    <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button">
-                                        <i class="far fa-trash-alt"></i>
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button data-id="@item.Id" class="btn btn-success btn-xs reactivateBtn" type="button">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
+
         </table>
     </div>
 </div>
 
-<form id="deleteAreaForm" asp-action="Delete">
-    <input type="hidden" id="deleteAreaId" name="Id" />
-</form>
-
-<form id="reactivateAreaForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateAreaId" name="Id" />
-</form>
 
 <form id="deleteAreaForm" asp-action="Delete">
     <input type="hidden" id="deleteAreaId" name="Id" />
@@ -100,47 +66,563 @@
 <form id="reactivateAreaForm" asp-action="Reactivate">
     <input type="hidden" id="reactivateAreaId" name="Id" />
 </form>
+
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Area</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="createForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="create-code" class="control-label mb-0 d-block">Code</label>
+                                <input name="code" id="create-code" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="create-name" class="control-label mb-0 d-block">Name</label>
+                                <input name="name" id="create-name" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                 <label for="create-commission" class="form-label mb-0">Commission Rate</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="create-commission" name="CommissionRate" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="create-commission" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="create-region" class="control-label mb-0 d-block">Region</label>
+                                <select name="region" id="create-region" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="create-region" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Area</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="editForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="edit-code" class="control-label mb-0 d-block">Code</label>
+                                <input name="code" id="edit-code" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-name" class="control-label mb-0 d-block">Name</label>
+                                <input name="name" id="edit-name" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                 <label for="edit-commission" class="form-label mb-0">Commission Rate</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="edit-commission" name="CommissionRate" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="edit-commission" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit-region" class="control-label mb-0 d-block">Region</label>
+                                <select name="region" id="edit-region" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="edit-region" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <input type="hidden" id="edit-id" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-edit"></span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Area Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Code</dt>
+                    <dd class="col-sm-8 modal-detail-code"></dd>
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8 modal-detail-name"></dd>
+                    <dt class="col-sm-4">Commission Rate</dt>
+                    <dd class="col-sm-8 modal-detail-commission"%></dd>
+                    <dt class="col-sm-4">User Created</dt>
+                    <dd class="col-sm-8 modal-detail-usercreated"></dd>
+                    <dt class="col-sm-4">Date Created</dt>
+                    <dd class="col-sm-8 modal-detail-datecreated"></dd>
+                    <dt class="col-sm-4">User Modified</dt>
+                    <dd class="col-sm-8 modal-detail-usermodified"></dd>
+                    <dt class="col-sm-4">Date Modified</dt>
+                    <dd class="col-sm-8 modal-detail-datemodified"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Area</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label mb-0" for="upload-file">Excel File</label>
+                    <input type="file" id="upload-file" name="file"
+                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                           class="form-control form-control-sm" />
+                </div>
+                <table class="table table-striped" id="upload-table">
+                    <thead>
+                        <tr><th>Row #</th><th>Code</th><th>Name</th><th>Commission Rate</th><th>Region</th><th>Status</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                    <span class="fas fa-upload"></span> Upload
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
-        $('.table').DataTable({
-            columnDefs: [
-                { orderable: false, targets: -1 },
-            ]
+
+        // Load List on DataTable
+        var dataTable = $('.table-area').on('preXhr.dt', function(e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+                data: function(data) {
+                    //var regionId = $("#RegionId").val();
+
+                    //if (regionId) data.RegionId = regionId;
+                },
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                { data: "commissionRate", name: "CommissionRate" },
+                { data: "regionName", name: "RegionName" },
+                { data: "userCreated", name: "UserCreated" },
+                { data: "dateCreated", name: "DateCreated" },
+                { data: "userModified", name: "UserModified" },
+                { data: "dateModified", name: "DateModified" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions +=  '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        if (data.isActive) {
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Area" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        } else {
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Area" data-microtip-position="left" role="tooltip"><i class="fas fa-check"></i></button>';
+                        }
+                        actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
         });
 
-        $('.deleteBtn').click(function (e) {
-            swal({
-                title: "Delete / Deactivate Area",
-                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true
-            }).then((confirm) => {
-                if (confirm) {
-                    var btn = $(this);
-                    var id = btn.data("id");
-                    $('#deleteAreaId').val(id);
-                    $('#deleteAreaForm').submit();
-                }
-            });
+       
+
+
+        // Load Select2 Region
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function(data, status, xhr) {
+                $("#create-region").select2({
+                    data: data,
+                    dropdownParent: $("#createModal")
+                });
+                //$("#edit-area").select2({
+                //    data: data,
+                //    dropdownParent: $("#editModal")
+                //});
+            }
         });
 
-        $('.reactivateBtn').click(function (e) {
-            swal({
-                title: "Reactivate Area",
-                text: "Are you sure you want to reactivate this record?",
-                icon: "info",
-                buttons: true,
-                infoMode: true
-            }).then((confirm) => {
-                if (confirm) {
-                    var btn = $(this);
-                    var id = btn.data("id");
-                    $('#reactivateAreaId').val(id);
-                    $('#reactivateAreaForm').submit();
+        // Load functions upon DataTable load
+        dataTable.on("draw", function() {
+            hideLoader();
+
+            DatatablesSearchOnEnter('.table-area', dataTable);
+
+             $('.deleteBtn').click(function(e) {
+                swal({
+                    title: "Delete / Deactivate Area",
+                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#deleteAreaId').val(id);
+                        $('#deleteAreaForm').submit();
+                    }
+                });
+            });
+
+            $('.reactivateBtn').click(function(e) {
+                swal({
+                    title: "Reactivate Area",
+                    text: "Are you sure you want to reactivate this record?",
+                    icon: "info",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#reactivateAreaId').val(id);
+                        $('#reactivateAreaForm').submit();
+                    }
+                });
+            });
+
+            $('.detailsBtn').click(function(e) {
+                var data = dataTable.row($(this).parents('tr')).data();
+                $(".modal-detail-code").html(data.code);
+                $(".modal-detail-name").html(data.name);
+                $(".modal-detail-commission").html(data.commissionRate);
+                $(".modal-detail-region").html(data.regionName);
+                $(".modal-detail-usercreated").html(data.userCreated);
+                $(".modal-detail-datecreated").html(data.dateCreated);
+                $(".modal-detail-usermodified").html(data.userModified);
+                $(".modal-detail-datemodified").html(data.dateModified);
+            });
+
+
+            // Actions upon Display Edit Modal
+            $(".editBtn").click(function(e) {
+                var data = dataTable.row($(this).parents('tr')).data();
+
+                $("#edit-id").val(data.id);
+                $("#edit-code").val(data.code);
+                $("#edit-name").val(data.name);
+                $("#edit-commission").val(data.commissionRate);
+
+                // Load Select2 Area on Edit
+                if ($("#edit-region").attr("data-select2-id")) {
+                    $("#edit-region").select2("destroy");
+                    $("#edit-region").empty();
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions", "Region")",
+                    data: { includeId: data.regionId },
+                    success: function(data, status, xhr) {
+                        $("#edit-region").select2({
+                            data: data,
+                            allowClear: true,
+                            placeholder: {
+                                id: "",
+                                text: "<empty>"
+                            },
+                            dropdownParent: $('#editModal')
+                        });
+                    }
+                });
+            });
+
+            // Validation for Edit Modal
+            var validateEdit = $("#editForm").validate({
+                errorClass: 'text-danger text-xs',
+                rules: {
+                    code: { required: true, maxlength: 10 },
+                    name: { required: true, maxlength: 100 }
+                },
+                messages: {
+                    code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 100 characters." }
+                },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                    DoEdit();
                 }
             });
+
+            // Send Edit to Controller
+            function DoEdit() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EditJson")",
+                    data: {
+                        Id: $("#edit-id").val(),
+                        Code: $("#edit-code").val(),
+                        Name: $("#edit-name").val(),
+             CommissionRateD: $("#edit-commission").val(),
+                    RegionId: $("#edit-region").val()
+                    },
+                    error: jQueryCommonError,
+                    success: function(data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#editModal").modal("hide");
+                            dataTable.ajax.reload();
+                            hideLoader()
+                        }
+                    }
+                });
+            }
+
+
         });
+
+
+
+
+      
+
+
+         // Actions upon Display Create Modal
+        $(".createBtn").click(function(e) {
+            $("#create-code").val("");
+            $("#create-name").val("");
+            $("#create-commission").val("");
+            $("#create-region").val("");
+        });
+
+        // Validation for Create Modal
+        var validateCreate = $("#createForm").validate({
+            errorClass: 'text-danger text-xs',
+              rules: {
+                    code: { required: true, maxlength: 10 },
+                    name: { required: true, maxlength: 100 }
+                },
+                messages: {
+                    code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 100 characters." }
+                },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                DoCreate();
+            }
+        });
+
+        // Send Create to Controller
+        function DoCreate() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CreateJson")",
+                data: {
+                    Code: $("#create-code").val(),
+                    Name: $("#create-name").val(),
+          CommissionRate: $("#create-commission").val(),
+                RegionId: $("#create-region").val()
+                },
+                error: jQueryCommonError,
+                success: function(data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#createModal").modal("hide");
+                        dataTable.ajax.reload();
+                        hideLoader()
+                    }
+                },
+                complete: function(xhr, status) {
+                    //$(".save-overlay").hideOverlay();
+                }
+            });
+        }
+
+
+
+
+        $(".downloadBtn").click(function(e) {
+            window.location = "@Url.Action("DownloadFile")";
+        });
+
+        var json_of_excel;
+        var colnumber = 4; // number of columns required for upload
+        var done_upload_excel = 0;
+        var duplicate_upload = 0;
+
+        var opts = {
+            readAsDefault: 'ArrayBuffer',
+            dragClass: 'drag',
+            on: {
+                load: function(e, file) {
+                    var result = new Uint8Array(e.target.result);
+                    var xlsread = XLSX.read(result, { type: 'array' });
+                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                    json_of_excel = xlsjson;
+                }
+            }
+        };
+        $("#upload-file").fileReaderJS(opts);
+
+        // Actions upon file selection
+        $("#upload-file").on("change", function() {
+            done_upload_excel = 0;
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        // Actions upon Display Upload Modal
+        $(".uploadBtn").click(function(e) {
+            done_upload_excel = 0;
+            $("#upload-file").val("");
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        function DoUpload() {
+            if (!$("#upload-file").val()) {
+                toastr.error("Please select a file first");
+            } if (json_of_excel.length == 0) {
+                toastr.error("The excel file is empty");
+            } else {
+                var columns = Object.keys(json_of_excel[0]);
+                $("#upload-table tbody").html("");
+                $("#upload-table").show();
+                duplicate_upload = 0;
+                for (var i = 0; i < json_of_excel.length; i++) {
+                    var rowNum = json_of_excel[i].__rowNum__;
+                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                        var cellValue = json_of_excel[i][columns[colIndex]];
+                        if (cellValue == null)
+                            cellValue = "";
+                        row$.append($('<td/>').html(cellValue));
+                    }
+                    if (columns.includes("Code") == false
+                        || columns.includes("Name") == false
+                        || columns.includes("Commission Rate") == false
+                        || columns.includes("Region") == false) {
+                        row$.append($('<td/>').html("Unexpected columns"));
+                        UploadRowDone();
+                    } else {
+                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Commission Rate"], json_of_excel[i]["Region"], rowNum);
+                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                    }
+                    $("#upload-table").append(row$);
+                }
+            }
+        }
+
+        function SaveXLSX(code, name, commissionRateD, regionName, rownum) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UploadJson")",
+                data: {
+                    Code: code,
+                    Name: name,
+                    CommissionRateD: commissionRateD,
+                    RegionName: regionName
+                },
+                error: function(xhr, status, error) {
+                    $("#upload-row" + rownum).html(error);
+                },
+                success: function(data, status, xhr) {
+                    if (data.message == "Already exist") {
+                        $("#upload-row" + rownum + "tr").remove();
+                        duplicate_upload++;
+                    } else {
+                        $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                    }
+                },
+                complete: function(xhr, status) {
+                    UploadRowDone();
+                }
+            });
+        }
+
+        function UploadRowDone() {
+            done_upload_excel++;
+            if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                $("#upload-table").append('<tr><td>*</td><td colspan="4">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                $("#upload-file").val("");
+            }
+        }
+
+
+     
+
     </script>
 }
