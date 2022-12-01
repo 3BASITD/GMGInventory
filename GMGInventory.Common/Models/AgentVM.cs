@@ -12,7 +12,7 @@ namespace GMGInventory.Common.Models
         public SelectList? Regions { get; set; }
     }
 
-    public class AgentVM
+    public class AgentVM : GenericAuditVM
     {
 
         [Required]
