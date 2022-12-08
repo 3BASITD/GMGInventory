@@ -159,14 +159,14 @@
 						<div class="col-md-6">
 							<div class="form-group">
 							   <label for="create-over-payment" class="control-label mb-0 d-block">Over Payment</label>
-								<input type="text" name="OverPayment" id="create-over-payment" class="form-control form-control-sm" />
+								<input type="number" name="OverPayment" id="create-over-payment" class="form-control form-control-sm" />
 								<span data-valmsg-for="create-over-payment" data-valmsg-replace="true" class="text-danger"></span>
 							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="form-group">
 							   <label for="create-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
-								<input type="text" name="TKT" id="create-tkt" class="form-control form-control-sm" />
+								<input type="number" name="TKT" id="create-tkt" class="form-control form-control-sm" />
 								<span data-valmsg-for="create-tkt" data-valmsg-replace="true" class="text-danger"></span>
 							</div>
 						</div>
@@ -175,14 +175,14 @@
 						<div class="col-md-6">
 							<div class="form-group">
 								<label for="create-tax" class="control-label mb-0 d-block">Tax</label>
-								<input type="text" name="TAX" id="create-tax" class="form-control form-control-sm" />
+								<input type="number" name="TAX" id="create-tax" class="form-control form-control-sm" />
 								<span data-valmsg-for="create-tax" data-valmsg-replace="true" class="text-danger"></span>
 							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="form-group">
 							   <label for="create-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
-								<input type="text" name="CashAdvanced" id="create-cash-advanced" class="form-control form-control-sm" />
+								<input type="number" name="CashAdvanced" id="create-cash-advanced" class="form-control form-control-sm" />
 								<span data-valmsg-for="create-cash-advanced" data-valmsg-replace="true" class="text-danger"></span>
 							</div>
 						</div>
@@ -261,13 +261,7 @@
 								<span data-valmsg-for="create-checknumber" data-valmsg-replace="true" class="text-danger"></span>
 							</div>
 						</div>
-						@*<div class="col-md-4">
-							<div class="form-group">
-								<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-								   <span class="fas fa-file-alt"></span> Add
-								 </button>
-							</div>
-						</div>*@
+						
 					</div>
 
 				</div>
@@ -586,7 +580,7 @@
 			errorClass: 'text-danger text-xs',
 			rules: {
 				CustomerReceipt: { required: true, maxlength: 50 },
-				Remarks: { maxlength: 100 },
+				Remarks: { required: true, maxlength: 100 },
 				OverPayment: { range: [0, 1999999.99] },
 				TKT: { range: [0, 1999999.99] },
 				TAX: { range: [0, 1999999.99] },
@@ -594,11 +588,16 @@
 				Discount: { range: [0, 1999999.99] },
 				Offset: { range: [0, 1999999.99] },
 				CashAmount: { range: [0, 1999999.99] },
-				BackLoad: { range: [0, 1999999.99] }
+				BackLoad: { range: [0, 1999999.99] },
+				BankName: { required: true},
+				BankBranch: { required: true },
+				CheckDate: { required: true},
+				CheckAmount: { required: true},
+				CheckNumber: { required: true}
 			},
 			messages: {
 				CustomerReceipt: { required: "Please enter Customer Receipt No.", maxlength: "Code must not exceed 50 characters."  },
-				Remarks: { maxlength: "Remarks must not exceed 100 characters." },
+				Remarks: { required: "Please enter Remarks.", maxlength: "Remarks must not exceed 100 characters." },
 				OverPayment: { range: "Over Payment must be between 0-1999999.99." },
 				TKT: { range: "TKT must be between 0-1999999.99." },
 				TAX: { range: "TAX must be between 0-1999999.99." },
@@ -606,7 +605,12 @@
 				Discount: { range: "Discount must be between 0-1999999.99." },
 				Offset: { range: "Offset must be between 0-1999999.99." },
 				CashAmount: { range: "Cash Amount must be between 0-1999999.99." },
-				BackLoad: { range: "Back Load must be between 0-1999999.99." }
+				BackLoad: { range: "Back Load must be between 0-1999999.99." },
+				BankName: { required: "Please enter Bank Name."},
+				BankBranch: { required: "Please enter Bank Branch." },
+				CheckDate: { required: "Please enter Check Date."},
+				CheckAmount: { required: "Please enter Check Amount."},
+				CheckNumber: { required: "Please enter Check Number."}
 				
 			},
 			submitHandler: function (form, event) {
@@ -654,6 +658,9 @@
 				}
 			});
 		}
+
+
+
 	  
 	
 		});

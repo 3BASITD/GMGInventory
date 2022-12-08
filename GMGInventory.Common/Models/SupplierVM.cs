@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using GMGInventory.Common.Constants;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
@@ -20,6 +21,7 @@ namespace GMGInventory.Common.Models
         [Required]
         [Display(Name = "Area")]
         public int AreaId { get; set; }
+        public string AreaName { get; set; }
         public SelectList? Areas { get; set; }
 
         [Required]
@@ -30,11 +32,13 @@ namespace GMGInventory.Common.Models
         [Required]
         [Display(Name = "Currency")]
         public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
         public SelectList? Currencies { get; set; }
 
         [Required]
         [Display(Name = "Credit Limit")]
-        public decimal CreditLimit { get; set; }
+        public string CreditLimit => string.Format(SystemFormat.StringIntegerComma, CreditLimitD);
+        public decimal CreditLimitD { get; set; }
 
         [Required]
         [MaxLength(250)]
@@ -78,18 +82,26 @@ namespace GMGInventory.Common.Models
 
     public class SupplierViewVM : GenericAuditVM
     {
+        [Required]
         [Display(Name = "Area")]
+        public int AreaId { get; set; }
+
+        public string AreaName { get; set; }
         public AreaVM Area { get; set; }
 
         [Display(Name = "Region")]
         public RegionVM Region { get; set; }
 
+        [Required]
         [Display(Name = "Currency")]
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
         public CurrencyVM Currency { get; set; }
 
 
         [Display(Name = "Credit Limit")]
-        public decimal CreditLimit { get; set; }
+        public string CreditLimit => string.Format(SystemFormat.StringIntegerComma, CreditLimitD);
+        public decimal CreditLimitD { get; set; }
 
 
         [Display(Name = "Address Line 1")]

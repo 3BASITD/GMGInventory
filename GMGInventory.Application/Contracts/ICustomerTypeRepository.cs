@@ -11,5 +11,6 @@ namespace GMGInventory.Application.Contracts
         Task<bool> IsCustomerTypeCodeExist(string code);
         Task<bool> IsCustomerTypeInUse(int id);
         Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<int?> GetIdAsync(string? Name);
     }
 }

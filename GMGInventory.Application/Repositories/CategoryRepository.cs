@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -44,6 +45,94 @@ namespace GMGInventory.Application.Repositories
             var category = await context.Categories.Where(s => s.Name == Name).FirstOrDefaultAsync();
             return category?.Id;
         }
+
+
+        
+        public async Task<IList<CategoryVM>> GetAllAsync()
+        {
+
+            var categories = from category in context.Categories
+                        
+                         join userc in userManager.Users on category.UserCreated equals userc.Id
+                         join userm in userManager.Users on category.UserModified equals userm.Id into m
+                         from um in m.DefaultIfEmpty()
+
+                         select new CategoryVM
+                         {
+                             Id = category.Id,
+                             Name = category.Name,
+                             Code = category.Code,
+                             IsActive = category.IsActive,
+                             DateCreated = category.DateCreated.ToString(SystemFormat.StringDateTime),
+                             DateCreatedD = category.DateCreated,
+                             DateModified = category.DateModified == null ? "-" : category.DateModified.Value.ToString(SystemFormat.StringDateTime),
+                             DateModifiedD = category.DateModified == null ? null : category.DateModified.Value,
+                             UserCreated = userc.Nickname,
+                             UserModified = um == null ? "-" : um.Nickname
+                         };
+            return await categories.ToListAsync();
+        }
+
+        public async Task<ForDataTables<CategoryVM>> GetAllForDataTablesAsync(DataTablesRequestForm form)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetAllAsync()).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                    || x.Name.ToLower().Contains(form.SearchValue)
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                                    || x.DateModified.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderBy(s => s.Code); break;
+                        case "Name": data = data.OrderBy(s => s.Name); break;
+                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Code": data = data.OrderByDescending(s => s.Code); break;
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
+                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderByDescending(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<CategoryVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
 
         public async Task<IList<GenericAuditVM>> GetAllGenericVMAsync()
         {
@@ -96,26 +185,49 @@ namespace GMGInventory.Application.Repositories
             return await context.ItemTypes.AnyAsync(s => s.CategoryId == id);
         }
 
+
         public async Task AddAsync(CategoryVM categoryVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var category = mapper.Map<Category>(categoryVM);
-            category.IsActive = true;
+            var category = new Category
+            {
+                Code = categoryVM.Code,
+                Name = categoryVM.Name,
+                IsActive = true
+
+            };
             await context.Categories.AddAsync(category);
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task UpdateAsync(int id, CategoryVM categoryVM)
+        public async Task UpdateAsync(CategoryVM categoryVM)
         {
-            var category = context.Categories.Where(s => s.Id == id).FirstOrDefault();
+            var category = context.Categories.Where(s => s.Id == categoryVM.Id).FirstOrDefault();
             if (category == null)
             {
                 throw new DbUpdateConcurrencyException();
             }
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            mapper.Map(categoryVM, category);
+            category.Id = categoryVM.Id;
+
+            category.Code = categoryVM.Code;
+            category.Name = categoryVM.Name;
+            category.IsActive = true;
             context.Categories.Update(category);
             await context.SaveChangesAsync(currentUserId);
         }
+
+
+        public async Task<bool> UploadCombinationExistAsync(CategoryVM categoryVM)
+        {
+            return (await GetAllGenericVMAsync()).Any(s => s.Code == categoryVM.Code && s.Name == categoryVM.Name);
+        }
+
+
+        public async Task<bool> IsCodeExist(string code)
+        {
+            return await context.Categories.AnyAsync(c => c.Code == code);
+        }
+
     }
 }

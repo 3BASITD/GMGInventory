@@ -147,6 +147,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Agent")]
         public string Agent { get; set; }
 
+        [Display(Name = "Area")]
+        public string Area { get; set; }
+
+        [Display(Name = "Agent Code")]
+        public string AgentCode { get; set; }
+
         [Display(Name = "Commission Rate")]
         public string CommissionRate => string.Format(SystemFormat.StringDecimalComma, CommissionRateD) + "%";
         public decimal CommissionRateD { get; set; }
@@ -158,6 +164,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Commission Amount")]
         public string CommissionAmount => string.Format(SystemFormat.StringDecimalComma, CommissionAmountD);
         public decimal CommissionAmountD => (CommissionRateD * InvoiceAmountD) / 100;
+
+        public string AgentTotalInvoice => string.Format(SystemFormat.StringDecimalComma, AgentTotalInvoiceD);
+        public decimal AgentTotalInvoiceD { get; set; }
+
+        public string AgentCommissionRate => string.Format(SystemFormat.StringDecimalComma, AgentCommissionRateD);
+        public decimal AgentCommissionRateD { get; set; }
     }
 
     public class CommissionPVM
@@ -168,12 +180,23 @@ namespace GMGInventory.Common.Models
         public string DateTo => DateToD.ToString(SystemFormat.StringDate);
         public DateTime DateToD { get; set; }
         public string Customer { get; set; }
+
         public string Agent { get; set; }
+        public string AgentCode { get; set; }
         public string Area { get; set; }
         public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
         public decimal TotalInvoiceAmountD { get; set; }
         public string TotalCommissionAmount => string.Format(SystemFormat.StringDecimalComma, TotalCommissionAmountD);
         public decimal TotalCommissionAmountD { get; set; }
+
+        public string AgentTotalInvoice => string.Format(SystemFormat.StringDecimalComma, AgentTotalInvoiceD);
+        public decimal AgentTotalInvoiceD { get; set; }
+
+
+        public string AgentCommissionRate => string.Format(SystemFormat.StringDecimalComma, AgentCommissionRateD);
+        public decimal AgentCommissionRateD { get; set; }
+
+
     }
 
     public class CustomerSalesRankingRVM

@@ -181,17 +181,17 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || x.CRNumber.ToLower().Contains(form.SearchValue)
+                                    || x.CRNumber.ToString().Contains(form.SearchValue)
                                     || x.Type.ToLower().Contains(form.SearchValue)
-                                    || x.SOAFrom.ToLower().Contains(form.SearchValue)
-                                    || x.SOATo.ToLower().Contains(form.SearchValue)
-                                    || x.TotalAmount.ToLower().Contains(form.SearchValue)
-                                    || x.TBR.ToLower().Contains(form.SearchValue)
-                                    || x.Credit.ToLower().Contains(form.SearchValue)
-                                    || x.Debit.ToLower().Contains(form.SearchValue)
-                                    || x.PaidAmount.ToLower().Contains(form.SearchValue)
-                                    || x.FreightCharge.ToLower().Contains(form.SearchValue)
-                                    || x.OverPayment.ToLower().Contains(form.SearchValue));
+                                    || x.SOAFrom.ToString().Contains(form.SearchValue)
+                                    || x.SOATo.ToString().Contains(form.SearchValue)
+                                    || x.TotalAmount.ToString().Contains(form.SearchValue)
+                                    || x.TBR.ToString().Contains(form.SearchValue)
+                                    || x.Credit.ToString().Contains(form.SearchValue)
+                                    || x.Debit.ToString().Contains(form.SearchValue)
+                                    || x.PaidAmount.ToString().Contains(form.SearchValue)
+                                    || x.FreightCharge.ToString().Contains(form.SearchValue)
+                                    || x.OverPayment.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -307,17 +307,17 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || x.CRNumber.ToLower().Contains(form.SearchValue)
+                                    || x.CRNumber.ToString().Contains(form.SearchValue)
                                     || x.Type.ToLower().Contains(form.SearchValue)
-                                    || x.SOAFrom.ToLower().Contains(form.SearchValue)
-                                    || x.SOATo.ToLower().Contains(form.SearchValue)
-                                    || x.TotalAmount.ToLower().Contains(form.SearchValue)
-                                    || x.TBR.ToLower().Contains(form.SearchValue)
-                                    || x.Credit.ToLower().Contains(form.SearchValue)
-                                    || x.Debit.ToLower().Contains(form.SearchValue)
-                                    || x.PaidAmount.ToLower().Contains(form.SearchValue)
-                                    || x.FreightCharge.ToLower().Contains(form.SearchValue)
-                                    || x.OverPayment.ToLower().Contains(form.SearchValue));
+                                    || x.SOAFrom.ToString().Contains(form.SearchValue)
+                                    || x.SOATo.ToString().Contains(form.SearchValue)
+                                    || x.TotalAmount.ToString().Contains(form.SearchValue)
+                                    || x.TBR.ToString().Contains(form.SearchValue)
+                                    || x.Credit.ToString().Contains(form.SearchValue)
+                                    || x.Debit.ToString().Contains(form.SearchValue)
+                                    || x.PaidAmount.ToString().Contains(form.SearchValue)
+                                    || x.FreightCharge.ToString().Contains(form.SearchValue)
+                                    || x.OverPayment.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();

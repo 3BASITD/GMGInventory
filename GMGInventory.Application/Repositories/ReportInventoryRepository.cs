@@ -704,11 +704,13 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<StockStatusRVM>> GetStockStatus(ListFilterInventoryModel filter)
         {
-
+            
             var stocks = from item in context.Items
                                              .Include(s => s.Brand)
                                              .Include(s => s.ItemType)
                                              .Include(s => s.Unit)
+                         join iteminv in context.ItemInventories
+                                      on item.Id equals iteminv.ItemId
 
                          let quantity = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id)
@@ -719,7 +721,7 @@ namespace GMGInventory.Application.Repositories
                                                .Average(s => s.PurchaseOrder.CurrencyRate * s.UnitPrice)
                          where (filter.Brand == null || item.Brand.Id == filter.Brand)
                          && (filter.Item == null || item.Id == filter.Item)
-                         //&& (filter.Warehouse == null || item.) // WAREHOUSE FILTER
+                         && (filter.Warehouse == null || iteminv.WarehouseId == filter.Warehouse) 
                          select new StockStatusRVM
                          {
                              Brand = item.Brand.Name,
@@ -729,7 +731,7 @@ namespace GMGInventory.Application.Repositories
                              PartNumber = item.PartNumber + "",
                              QuantityOnHandD = quantity,
                              Unit = item.Unit.Name,
-                             UnitCostD = unitcost
+                             UnitCostD = 0
                          };
 
             var grpstocks = from stock in await stocks.ToListAsync()
@@ -754,7 +756,7 @@ namespace GMGInventory.Application.Repositories
                                 PartNumber = i.Key.PartNumber,
                                 QuantityOnHandD = i.Sum(s => s.QuantityOnHandD),
                                 Unit = i.Key.Unit,
-                                UnitCostD = i.Average(s => s.UnitCostD),
+                                UnitCostD = 0//i.Average(s => s.UnitCostD)
 
                             };
 

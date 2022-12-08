@@ -1,12 +1,16 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
+    //[Authorize]
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository categoryRepository;
@@ -21,9 +25,62 @@ namespace GMGInventory.Controllers
             return Json(await categoryRepository.GetOptions(IncludeId));
         }
 
-        public async Task<IActionResult> Index()
+
+        public async Task<ActionResult> Index()
         {
-            return View(await categoryRepository.GetAllGenericVMAsync());
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetListJson()
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await categoryRepository.GetAllForDataTablesAsync(form));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreateJson(CategoryVM categoryVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await categoryRepository.IsCategoryCodeExist(categoryVM.Code))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Category code already in use";
+            }
+            else
+            {
+                await categoryRepository.AddAsync(categoryVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Category successfully added";
+            }
+            return Json(responseModel);
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> EditJson(CategoryVM categoryVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            try
+            {
+                await categoryRepository.UpdateAsync(categoryVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Area successfully updated";
+            }
+            catch (Exception ex)
+            {
+                if (!await categoryRepository.Exists(categoryVM.Id))
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Category cannot be found";
+                }
+                else
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = ex.Message;
+                }
+            }
+            return Json(responseModel);
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -41,69 +98,7 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CategoryVM categoryVM)
-        {
-            if (ModelState.IsValid)
-            {
-                if (await categoryRepository.IsCategoryCodeExist(categoryVM.Code))
-                {
-                    //ModelState.AddModelError(string.Empty, "Category code already in use.");
-                    TempData["ErrorMessage"] = "Category code already in use";
-                }
-                else
-                {
-                    await categoryRepository.AddAsync(categoryVM);
-                    TempData["SuccessMessage"] = "Category successfully added";
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            return View(categoryVM);
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            var categoryVM = await categoryRepository.GetCategoryVMAsync(id);
-            if (categoryVM == null)
-            {
-                return NotFound();
-            }
-            return View(categoryVM);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CategoryVM categoryVM)
-        {
-            if (id != categoryVM.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await categoryRepository.UpdateAsync(id, categoryVM);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await categoryRepository.Exists(categoryVM.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                TempData["SuccessMessage"] = "Category successfully updated";
-                return RedirectToAction(nameof(Index));
-            }
-            return View(categoryVM);
-        }
-
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -140,6 +135,59 @@ namespace GMGInventory.Controllers
             await categoryRepository.UpdateAsync(category);
             TempData["SuccessMessage"] = "Category successfully reactivated";
             return RedirectToAction(nameof(Index));
+        }
+
+
+        public async Task<IActionResult> DownloadFile()
+        {
+            DataTable dt = new DataTable("Category");
+            dt.Columns.AddRange(new DataColumn[3] {
+                new DataColumn("Code"),
+                new DataColumn("Name"),
+                new DataColumn("Is Active")
+
+            });
+            var category = (await categoryRepository.GetAllGenericVMAsync()).Where(s => s.IsActive == true).ToList();
+            foreach (var categories in category)
+            {
+                dt.Rows.Add(categories.Code, categories.Name, categories.IsActive);
+            }
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    DateTime.Now.ToString("yyyyMMdd") + " Category.xlsx");
+                }
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UploadJson(CategoryVM categoryVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await categoryRepository.UploadCombinationExistAsync(categoryVM))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Already exist";
+            }
+            else if (await categoryRepository.IsCodeExist(categoryVM.Code))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Code already in use";
+            }
+            else
+            {
+                    await categoryRepository.AddAsync(categoryVM);
+                    responseModel.Status = "Success";
+                    responseModel.Message = "Category added";
+                
+            }
+            return Json(responseModel);
         }
     }
 }

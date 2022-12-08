@@ -424,6 +424,8 @@ namespace GMGInventory.Application.Repositories
                                Agent = invoice.Invoice.SalesOrder.Agent.FirstName
                                      + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName)
                                      + " " + invoice.Invoice.SalesOrder.Agent.LastName,
+                               AgentCode = invoice.Invoice.SalesOrder.Agent.Code,
+                               Area = invoice.Invoice.SalesOrder.Customer.Area.Name,
                                CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
                                                ? invoice.Invoice.SalesOrder.Agent.CommissionRate
                                                : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
@@ -433,23 +435,29 @@ namespace GMGInventory.Application.Repositories
                                InvoiceNumber = invoice.Invoice.InvoiceNumber
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
-                             orderby invoice.Agent ascending, invoice.InvoiceDateD ascending, invoice.Customer ascending
+                             orderby invoice.Agent ascending, invoice.Area ascending
                              group invoice by new
                              {
                                  invoice.Agent,
+                                 invoice.AgentCode,
                                  invoice.CommissionRateD,
                                  invoice.Customer,
                                  invoice.InvoiceDateD,
                                  invoice.InvoiceNumber
                              } into i
+                             let total = invoices.Where(s => s.AgentCode == i.Key.AgentCode).Sum(s => s.InvoiceAmountD)
+                             //let totalcommission = invoices.Where(s => s.AgentCode == i.Key.AgentCode).Sum(s => s.CommissionAmountD)
                              select new CommissionRVM
                              {
                                  Agent = i.Key.Agent,
+                                 AgentCode = i.Key.AgentCode,
                                  CommissionRateD = i.Key.CommissionRateD,
                                  Customer = i.Key.Customer,
                                  InvoiceAmountD = i.Sum(s => s.InvoiceAmountD),
                                  InvoiceDateD = i.Key.InvoiceDateD,
                                  InvoiceNumber = i.Key.InvoiceNumber,
+                                 AgentTotalInvoiceD = total,
+                                 AgentCommissionRateD = total
                              };
             return grpinvoice.ToList();
         }
@@ -467,7 +475,7 @@ namespace GMGInventory.Application.Repositories
             //get total invoice amount of data in table
             totalInvoice = data.Sum(s => s.InvoiceAmountD);
             //get total commission amount of data in table
-            totalCommission = data.Sum(s => s.CommissionRateD);
+            //totalCommission = data.Sum(s => s.CommissionRateD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
@@ -522,8 +530,8 @@ namespace GMGInventory.Application.Repositories
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
                 Data = dataList,
-                TotalAmount = totalInvoice,
-                TotalAmount2 = totalCommission
+                TotalAmount = totalInvoice
+                //TotalAmount2 = totalCommission
             };
         }
 

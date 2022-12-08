@@ -1,10 +1,12 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -32,9 +34,35 @@ namespace GMGInventory.Controllers
             return Json(await supplierRepository.GetOptions(IncludeId));
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult> Index()
         {
-            return View(await supplierRepository.GetAllSupplierVMAsync());
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> CreateJson(SupplierVM supplierVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await supplierRepository.IsSupplierCodeExist(supplierVM.Code))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Supplier code already in use";
+            }
+            else
+            {
+                await supplierRepository.AddAsync(supplierVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Supplier successfully added";
+            }
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetListJson()
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await supplierRepository.GetAllForDataTablesAsync(form));
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -98,41 +126,32 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, SupplierVM supplierVM)
+        public async Task<JsonResult> EditJson(SupplierVM supplierVM)
         {
-            if (id != supplierVM.Id)
+            ResponseModel responseModel = new ResponseModel();
+            try
             {
-                return NotFound();
+                await supplierRepository.UpdateAsync(supplierVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Supplier successfully updated";
             }
-
-            if (ModelState.IsValid)
+            catch (Exception ex)
             {
-                try
+                if (!await supplierRepository.Exists(supplierVM.Id))
                 {
-                    await supplierRepository.UpdateAsync(id, supplierVM);
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Supplier cannot be found";
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!await supplierRepository.Exists(supplierVM.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    responseModel.Status = "Error";
+                    responseModel.Message = ex.Message;
                 }
-                TempData["SuccessMessage"] = "Supplier successfully updated";
-                return RedirectToAction(nameof(Index));
             }
-
-            supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
-            supplierVM.Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(-1), "Id", "Name");
-            supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
-            return View(supplierVM);
+            return Json(responseModel);
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -166,5 +185,90 @@ namespace GMGInventory.Controllers
             TempData["SuccessMessage"] = "Supplier reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
+
+        public async Task<IActionResult> DownloadFile()
+        {
+            DataTable dt = new DataTable("Supplier");
+            dt.Columns.AddRange(new DataColumn[15] {
+                new DataColumn("Code"),
+                new DataColumn("Name"),
+                new DataColumn("Contact Person"),
+                new DataColumn("Contact Number"),
+                new DataColumn("Email"),
+                new DataColumn("Address Line 1"),
+                new DataColumn("Address Line 2"),
+                new DataColumn("Barangay"),
+                new DataColumn("City/ Municipality"),
+                new DataColumn("Area"),
+                new DataColumn("Zip Code"),
+                new DataColumn("Credit Limit"),
+                new DataColumn("Currency"),
+                new DataColumn("Is Foreign"),
+                new DataColumn("Is Active")
+
+            });
+            var supplier = (await supplierRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
+            foreach (var suppliers in supplier)
+            {
+                dt.Rows.Add(suppliers.Code, suppliers.Name, suppliers.ContactPerson, suppliers.ContactNumber, suppliers.EmailAddress,
+                    suppliers.AddressLine1, suppliers.AddressLine2, suppliers.Barangay, suppliers.City, suppliers.AreaName,
+                    suppliers.ZipCode, suppliers.CreditLimit, suppliers.CurrencyName, suppliers.IsForeign, suppliers.IsActive);
+            }
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    DateTime.Now.ToString("yyyyMMdd") + " Suppliers.xlsx");
+                }
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UploadJson(SupplierVM supplierVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await supplierRepository.UploadCombinationExistAsync(supplierVM))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Already exist";
+            }
+            else if (await supplierRepository.IsCodeExist(supplierVM.Code))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Code already in use";
+            }
+            else
+            {
+                int? AreaId = await areaRepository.GetIdAsync(supplierVM.AreaName);
+                int? CurrencyId = await currencyRepository.GetIdAsync(supplierVM.CurrencyName);
+                if (AreaId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Area";
+                }
+                else if (CurrencyId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Currency";
+                }
+                else
+                {
+                    supplierVM.AreaId = AreaId.Value;
+                    supplierVM.CurrencyId = CurrencyId.Value;
+                    await supplierRepository.AddAsync(supplierVM);
+                    responseModel.Status = "Success";
+                    responseModel.Message = "Area added";
+                }
+            }
+            return Json(responseModel);
+        }
+
+
+
     }
 }

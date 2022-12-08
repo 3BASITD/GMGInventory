@@ -38,6 +38,8 @@ namespace GMGInventory.Application.Repositories
         {
 
             var agents = from area in context.Areas
+                         join region in context.Regions
+                                    on area.RegionId equals region.Id
                         
                          join userc in userManager.Users on area.UserCreated equals userc.Id
                          join userm in userManager.Users on area.UserModified equals userm.Id into m
@@ -49,7 +51,7 @@ namespace GMGInventory.Application.Repositories
                              Name = area.Name,
                              Code = area.Code,
                              CommissionRateD = area.CommissionRate,
-                             RegionName = area.Region.Name,
+                             RegionName = region.Name,
                              IsActive = area.IsActive,
                              DateCreated = area.DateCreated.ToString(SystemFormat.StringDateTime),
                              DateCreatedD = area.DateCreated,
@@ -177,7 +179,8 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsAreaInUse(int id)
         {
-            return await context.Regions.AnyAsync(s => s.Id == id);
+            return await context.Regions.AnyAsync(s => s.Id == id)
+             || await context.Customers.AnyAsync(s => s.AreaId == id);
         }
 
         public async Task<bool> IsAreaIdExistAsync(int id)
@@ -192,6 +195,7 @@ namespace GMGInventory.Application.Repositories
             area.IsActive = false;
             await context.SaveChangesAsync(currentUserId);
         }
+
 
         public async Task ReactivateAreaAsync(int id)
         {
@@ -267,6 +271,30 @@ namespace GMGInventory.Application.Repositories
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
                 .ToListAsync();
+        }
+
+
+        public async Task<Select2Model<JsonAddressOptionsModel>> GetOptions2(string search, int page)
+        {
+            var areas = await context.Areas
+                                         .Include(s => s.Region)
+                                         .Where(s => string.IsNullOrWhiteSpace(search)
+                                                 || (s.Code.ToLower().Contains(search.ToLower())))
+                                         .Select(s => new JsonAddressOptionsModel
+                                         {
+                                             Id = s.Id.ToString(),
+                                             Text = s.Code,
+                                             Name = s.Name,
+                                             Region  = s.Region.Name,
+                                         })
+                                         .ToListAsync();
+            var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonAddressOptionsModel>
+            {
+                //incomplete_results = false,
+                items = areasFiltered,
+                total_count = areas.Count
+            };
         }
     }
 }

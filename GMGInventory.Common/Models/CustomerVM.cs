@@ -91,7 +91,8 @@ namespace GMGInventory.Common.Models
 
         [Required]
         [Display(Name = "Credit Limit")]
-        public decimal CreditLimit { get; set; }
+        public string CreditLimit => string.Format(SystemFormat.StringDecimalComma, CreditLimitD);
+        public decimal CreditLimitD { get; set; }
 
         [MaxLength(100)]
         [MinLength(3)]
@@ -99,7 +100,8 @@ namespace GMGInventory.Common.Models
         public string? Remarks { get; set; }
 
         [Display(Name = "Outstanding Balance")]
-        public decimal? OutstandingBalance { get; set; }
+        public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
+        public decimal? OutstandingBalanceD { get; set; }
 
         [Display(Name = "VAT")]
         public string? VAT { get; set; }
@@ -129,8 +131,10 @@ namespace GMGInventory.Common.Models
         public string ForwarderFaxNo { get; set; }
 
 
+
         [Display(Name = "Invoiced Date")]
-        public string InvoicedDate { get; set; }
+        public string InvoicedDate => InvoicedDateD == null ? "-" : InvoicedDateD.ToString(SystemFormat.StringDate);
+        public DateTime InvoicedDateD { get; set; }
 
 
         [Display(Name = "Invoice No")]
@@ -138,28 +142,34 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Amount")]
-        public string InvoicedAmount { get; set; }
+
+        public string InvoicedAmount => string.Format(SystemFormat.StringDecimalComma, InvoicedAmountD);
+        public decimal? InvoicedAmountD { get; set; }
 
         [Display(Name = "Collector Receipt #")]
         public string CRNo { get; set; }
 
 
         [Display(Name = "SOA No")]
-        public string SOANo { get; set; }
+        public int SOANo { get; set; }
 
 
         [Display(Name = "Total Invoice Amount")]
-        public string TotalInvoiceAmount { get; set; }
+        public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
+        public decimal? TotalInvoiceAmountD { get; set; }
 
         [Display(Name = "Amount Paid")]
-        public string AmountPaid { get; set; }
+        public string AmountPaid => string.Format(SystemFormat.StringDecimalComma, AmountPaidD);
+        public decimal? AmountPaidD { get; set; }
 
         [Display(Name = "Over Payment")]
-        public string OverPayment { get; set; }
+        public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
+        public decimal? OverPaymentD { get; set; }
 
         [Display(Name = "Transaction Date")]
-        public string TransactionDate { get; set; }
-        
+        public string TransactionDate => TransactionDateD == null ? "-" : TransactionDateD.ToString(SystemFormat.StringDate);
+        public DateTime TransactionDateD { get; set; }
+
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
 
@@ -256,31 +266,40 @@ namespace GMGInventory.Common.Models
         public string ForwarderFaxNo { get; set; }
 
         [Display(Name = "Invoiced Date")]
-        public string InvoicedDate { get; set; }
+        public string InvoicedDate => InvoicedDateD == null ? "-" : InvoicedDateD.ToString(SystemFormat.StringDate);
+        public DateTime InvoicedDateD { get; set; }
+
 
         [Display(Name = "Invoice No")]
         public string InvoiceNo { get; set; }
 
+
         [Display(Name = "Amount")]
-        public string InvoicedAmount { get; set; }
+
+        public string InvoicedAmount => string.Format(SystemFormat.StringDecimalComma, InvoicedAmountD);
+        public decimal? InvoicedAmountD { get; set; }
 
         [Display(Name = "Collector Receipt #")]
         public string CRNo { get; set; }
 
         [Display(Name = "SOA No")]
-        public string SOANo { get; set; }
+        public int SOANo { get; set; }
 
         [Display(Name = "Total Invoice Amount")]
-        public string TotalInvoiceAmount { get; set; }
+        public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
+        public decimal? TotalInvoiceAmountD { get; set; }
 
         [Display(Name = "Amount Paid")]
-        public string AmountPaid { get; set; }
+        public string AmountPaid => string.Format(SystemFormat.StringDecimalComma, AmountPaidD);
+        public decimal? AmountPaidD { get; set; }
 
         [Display(Name = "Over Payment")]
-        public string OverPayment { get; set; }
+        public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
+        public decimal? OverPaymentD { get; set; }
 
         [Display(Name = "Transaction Date")]
-        public string TransactionDate { get; set; }
+        public string TransactionDate => TransactionDateD == null ? "-" : TransactionDateD.ToString(SystemFormat.StringDate);
+        public DateTime TransactionDateD { get; set; }
 
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }

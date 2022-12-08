@@ -20,6 +20,7 @@ namespace GMGInventory.Application.Contracts
         Task AddAsync(AreaVM areaVM);
         Task UpdateAsync(AreaVM areaVM);
         Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<Select2Model<JsonAddressOptionsModel>> GetOptions2(string search, int page);
         Task<bool> UploadCombinationExistAsync(AreaVM areaVM);
         Task<bool> IsCodeExist(string code);
     }

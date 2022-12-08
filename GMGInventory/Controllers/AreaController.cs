@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +11,8 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    //[Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
-    [Authorize]
+    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
+    //[Authorize]
     public class AreaController : Controller
     {
         private readonly IAreaRepository areaRepository;
@@ -64,6 +65,11 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
             return Json(await areaRepository.GetOptions(IncludeId));
+        }
+
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await areaRepository.GetOptions2(search, page));
         }
 
 
@@ -139,10 +145,10 @@ namespace GMGInventory.Controllers
                 new DataColumn("Region")
 
             });
-            var area = (await areaRepository.GetAllAreaVMAsync()).Where(s => s.IsActive == true).ToList();
+            var area = (await areaRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var areas in area)
             {
-                dt.Rows.Add(areas.Code, areas.Name, areas.CommissionRate, areas.Region.Name);
+                dt.Rows.Add(areas.Code, areas.Name, areas.CommissionRate, areas.RegionName);
             }
             using (XLWorkbook wb = new())
             {

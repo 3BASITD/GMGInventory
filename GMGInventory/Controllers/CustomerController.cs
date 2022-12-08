@@ -1,7 +1,9 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -40,16 +42,16 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetOptions2(IncludeId));
         }
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             return View();
         }
 
         [HttpPost]
-        public JsonResult GetListJson()
+        public async Task<JsonResult> GetListJson()
         {
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
-            return Json(customerRepository.GetListDataTables(dtForm));
+            return Json(await customerRepository.GetListDataTables(dtForm));
         }
 
         [HttpPost]
@@ -192,6 +194,116 @@ namespace GMGInventory.Controllers
             await customerRepository.ReactivateCustomerAsync(id);
             TempData["SuccessMessage"] = "Customer reactivated successfully";
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> DownloadFile()
+        {
+            DataTable dt = new DataTable("Customer");
+            dt.Columns.AddRange(new DataColumn[17] {
+                new DataColumn("Code"),
+                new DataColumn("Name"),
+                new DataColumn("Commission Rate"),
+                new DataColumn("Region"),
+                new DataColumn("Area"),
+                new DataColumn("Customer Type"),
+                new DataColumn("Contact Person"),
+                new DataColumn("Contact Number"),
+                new DataColumn("Address"),
+                new DataColumn("Email"),
+                new DataColumn("Agent"),
+                new DataColumn("Fax Number"),
+                new DataColumn("TIN"),
+                new DataColumn("VAT"),
+                new DataColumn("Credit Term"),
+                new DataColumn("Credit Limit"),
+                new DataColumn("Remarks")
+
+
+            });
+            var customer = (await customerRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
+            foreach (var customers in customer)
+            {
+                dt.Rows.Add(customers.Code, customers.Name, customers.CommissionRateD,
+                    customers.RegionName, customers.AreaName, customers.CustomerTypeName,
+                    customers.ContactPerson, customers.ContactNumber, customers.Address, customers.Email,
+                    customers.AgentName, customers.FaxNumber, customers.TIN, customers.VAT, customers.CreditTermName,
+                    customers.CreditLimit, customers.Remarks);
+            }
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    DateTime.Now.ToString("yyyyMMdd") + " Customers.xlsx");
+                }
+            }
+
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> UploadJson(CustomerVM customerVM)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await customerRepository.UploadCombinationExistAsync(customerVM))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Already exist";
+            }
+            else if (await customerRepository.IsCodeExistAsync(customerVM.Code))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Code already in use";
+            }
+            else
+            {
+                int? AreaId = await areaRepository.GetIdAsync(customerVM.AreaName);
+                int? RegionId = await regionRepository.GetIdAsync(customerVM.RegionName);
+                int? AgentId = await agentRepository.GetIdAsync(customerVM.AgentName);
+                int? CustomerTypeId = await customertypeRepository.GetIdAsync(customerVM.CustomerTypeName);
+                int? CreditTermId = await credittermRepository.GetIdAsync(customerVM.CreditTermName);
+
+                if (AreaId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Area";
+                }
+                else if (RegionId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Region";
+                }
+                else if (AgentId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Agent";
+                }
+                else if (CustomerTypeId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Customer Type";
+                }
+                else if (CreditTermId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Credit Term";
+                }
+                else
+                {
+                    customerVM.AreaId = AreaId.Value;
+                    customerVM.RegionId = RegionId.Value;
+                    customerVM.AgentId = AgentId.Value;
+                    customerVM.CustomerTypeId = CustomerTypeId.Value;
+                    customerVM.CreditTermId = CreditTermId.Value;
+                    await customerRepository.AddAsync(customerVM);
+                    responseModel.Status = "Success";
+                    responseModel.Message = "Customer added";
+                }
+            }
+            return Json(responseModel);
         }
     }
 }

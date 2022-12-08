@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ForwarderViewVM>
+﻿@model ForwarderViewVM
 
 @{
     ViewData["Title"] = "Forwarder";
@@ -8,13 +8,19 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+             <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
                 <span class="fas fa-plus"></span> New Forwarder
-            </a>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <span class="fas fa-upload"></span> Upload
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
+                <span class="fas fa-download"></span> Download
+            </button>
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover">
+        <table class="table table-head-fixed table-striped table-hover table-forwarder">
             <thead>
                 <tr>
 
@@ -40,40 +46,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
-                @if (Model == null)
-                {
-                    <tr><td colspan="9"><p class="text-center m-0">This record is empty</p></td></tr>
-                }
-                else
-                {
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Name</td>
-                            <td>@item.Address</td>
-                            <td>@item.UserCreated</td>
-                            <td>@item.DateCreated</td>
-                            <td>@item.UserModified</td>
-                            <td>@item.DateModified</td>
-                            <td>
-                                <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.Id">
-                                    <i class="fas fa-info-circle"></i>
-                                </a>
-                                
-                                <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.Id">
-                                        <i class="fas fa-pencil-alt"></i>
-                                </a>
-                                    <button data-id="@item.Id" class="btn btn-danger btn-xs deleteBtn" type="button">
-                                        <i class="far fa-trash-alt"></i>
-                                    </button>
-                                
-                           
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
+           
         </table>
     </div>
 </div>
@@ -84,37 +57,581 @@
 
 
 
-<form id="deleteForwarderForm" asp-action="Delete">
-    <input type="hidden" id="deleteForwarderId" name="Id" />
+<form id="reactivateForwarderForm" asp-action="Reactivate">
+    <input type="hidden" id="reactivateForwarderId" name="Id" />
 </form>
 
+
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Forwarder</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="createForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="create-name" class="control-label mb-0 d-block">Name</label>
+                                <input name="name" id="create-name" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="create-address" class="control-label mb-0 d-block">Address</label>
+                                <input name="address" id="create-address" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-address" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="create-customer" class="control-label mb-0 d-block">Customer</label>
+                                <select name="customer" id="create-customer" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="create-customer" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="create-phone" class="control-label mb-0 d-block">Phone Number</label>
+                                <input name="phone" id="create-phone" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-phone" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="create-fax" class="control-label mb-0 d-block">Fax Number</label>
+                                <input name="fax" id="create-fax" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-fax" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Forwarder</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="editForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                             <div class="form-group">
+                                <label for="edit-name" class="control-label mb-0 d-block">Name</label>
+                                <input name="name" id="edit-name" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-address" class="control-label mb-0 d-block">Address</label>
+                                <input name="address" id="edit-address" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-address" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-customer" class="control-label mb-0 d-block">Customer</label>
+                                <select name="customer" id="edit-customer" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="edit-customer" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-phone" class="control-label mb-0 d-block">Phone Number</label>
+                                <input type="number" name="phone" id="edit-phone" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-phone" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-fax" class="control-label mb-0 d-block">Fax Number</label>
+                                <input type="number" name="fax" id="edit-fax" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-fax" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <input type="hidden" id="edit-id" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-edit"></span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Area Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8 modal-detail-name"></dd>
+                    <dt class="col-sm-4">Address</dt>
+                    <dd class="col-sm-8 modal-detail-address"></dd>
+                    <dt class="col-sm-4">Customer</dt>
+                    <dd class="col-sm-8 modal-detail-customer"></dd>
+                    <dt class="col-sm-4">Phone Number</dt>
+                    <dd class="col-sm-8 modal-detail-phone"></dd>
+                    <dt class="col-sm-4">Fax Number</dt>
+                    <dd class="col-sm-8 modal-detail-fax"></dd>
+                    <dt class="col-sm-4">User Created</dt>
+                    <dd class="col-sm-8 modal-detail-usercreated"></dd>
+                    <dt class="col-sm-4">Date Created</dt>
+                    <dd class="col-sm-8 modal-detail-datecreated"></dd>
+                    <dt class="col-sm-4">User Modified</dt>
+                    <dd class="col-sm-8 modal-detail-usermodified"></dd>
+                    <dt class="col-sm-4">Date Modified</dt>
+                    <dd class="col-sm-8 modal-detail-datemodified"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" style="max-width: 40%;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Forwarder</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label mb-0" for="upload-file">Excel File</label>
+                    <input type="file" id="upload-file" name="file"
+                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                           class="form-control form-control-sm" />
+                </div>
+                <table class="table table-striped" id="upload-table">
+                    <thead>
+                        <tr><th>Row #</th><th>Name</th><th>Address</th><th>Customer</th><th>Phone Number</th><th>Fax Number</th><th>Status</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                    <span class="fas fa-upload"></span> Upload
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
 @section Scripts {
     <script>
 
-        $('.table').DataTable({
-            order: [[0, "desc"]]
+        // Load List on DataTable
+        var dataTable = $('.table-forwarder').on('preXhr.dt', function(e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+                data: function(data) {
+                    //var regionId = $("#RegionId").val();
+
+                    //if (regionId) data.RegionId = regionId;
+                },
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "name", name: "Name" },
+                { data: "address", name: "Address" },
+                { data: "userCreated", name: "UserCreated" },
+                { data: "dateCreated", name: "DateCreated" },
+                { data: "userModified", name: "UserModified" },
+                { data: "dateModified", name: "DateModified" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions +=  '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        if (data.isActive) {
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Forwarder" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        } else {
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Forwarder" data-microtip-position="left" role="tooltip"><i class="fas fa-check"></i></button>';
+                        }
+                        actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
         });
 
-        $('.deleteBtn').click(function(e) {
-            swal({
-                title: "Delete Forwarder",
-                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true
-            }).then((confirm) => {
-                if (confirm) {
-                    var btn = $(this);
-                    var id = btn.data("id");
-                    $('#deleteForwarderId').val(id);
-                    $('#deleteForwarderForm').submit();
+
+    // Load functions upon DataTable load
+    dataTable.on("draw", function() {
+    hideLoader();
+
+    DatatablesSearchOnEnter('.table-forwarder', dataTable);
+
+            $('.deleteBtn').click(function(e) {
+                swal({
+                    title: "Delete / Deactivate Forwarder",
+                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#deleteForwarderId').val(id);
+                        $('#deleteForwarderForm').submit();
+                    }
+                });
+            });
+
+
+
+            $('.reactivateBtn').click(function(e) {
+                swal({
+                    title: "Reactivate Forwarder",
+                    text: "Are you sure you want to reactivate this record?",
+                    icon: "info",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#reactivateForwarderId').val(id);
+                        $('#reactivateForwarderForm').submit();
+                    }
+                });
+            });
+
+
+              $('.detailsBtn').click(function(e) {
+                var data = dataTable.row($(this).parents('tr')).data();
+                $(".modal-detail-name").html(data.name);
+                $(".modal-detail-address").html(data.address);
+                $(".modal-detail-customer").html(data.customerName);
+                $(".modal-detail-phone").html(data.phoneNumber);
+                $(".modal-detail-fax").html(data.faxNumber);
+                $(".modal-detail-usercreated").html(data.userCreated);
+                $(".modal-detail-datecreated").html(data.dateCreated);
+                $(".modal-detail-usermodified").html(data.userModified);
+                $(".modal-detail-datemodified").html(data.dateModified);
+            });
+ 
+            // Actions upon Display Edit Modal
+            $(".editBtn").click(function(e) {
+                var data = dataTable.row($(this).parents('tr')).data();
+
+                $("#edit-id").val(data.id);
+                $("#edit-name").val(data.name);
+                $("#edit-address").val(data.address);
+                $("#edit-phone").val(data.phoneNumber);
+                $("#edit-fax").val(data.faxNumber);
+
+
+                // Load Select2 Area on Edit
+                if ($("#edit-customer").attr("data-select2-id")) {
+                    $("#edit-customer").select2("destroy");
+                    $("#edit-customer").empty();
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions2", "Customer")",
+                    data: { includeId: data.customerId },
+                    success: function(data, status, xhr) {
+                        $("#edit-customer").select2({
+                            data: data,
+                            allowClear: true,
+                            placeholder: {
+                                id: "",
+                                text: "<empty>"
+                            },
+                            dropdownParent: $('#editModal')
+                        });
+                    }
+                });
+            });
+
+            // Validation for Edit Modal
+            var validateEdit = $("#editForm").validate({
+                errorClass: 'text-danger text-xs',
+                rules: {
+                    name: { required: true, maxlength: 10 },
+                 address: { required: true, maxlength: 100 },
+                   phone: { required: true, maxlength: 20 },
+                     fax: { required: true, maxlength: 20 }
+                },
+                messages: {
+                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
+                 address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
+                   phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
+                     fax: { required: "Please enter Fax Number.", maxlength: "Fax number must not exceed 20 characters." }
+                },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                    DoEdit();
                 }
             });
+
+            // Send Edit to Controller
+            function DoEdit() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EditJson")",
+                    data: {
+                        Id: $("#edit-id").val(),
+                        Name: $("#edit-name").val(),
+                     Address: $("#edit-address").val(),
+                  CustomerId: $("#edit-customer").val(),
+                  PhoneNumber: $("#edit-phone").val(),
+                  FaxNumber: $("#edit-fax").val()
+                    },
+                    error: jQueryCommonError,
+                    success: function(data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#editModal").modal("hide");
+                            dataTable.ajax.reload();
+                            hideLoader()
+                        }
+                    }
+                });
+            }
+
+
+    });
+
+        // Load Select2 Customers
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions2", "Customer")",
+            success: function(data, status, xhr) {
+                $("#create-customer").select2({
+                    data: data,
+                    dropdownParent: $("#createModal")
+                });
+                $("#edit-customer").select2({
+                    data: data,
+                    dropdownParent: $("#editModal")
+                });
+            }
         });
 
-     
+    
+         // Actions upon Display Create Modal
+        $(".createBtn").click(function(e) {
+            $("#create-name").val("");
+            $("#create-address").val("");
+            $("#create-phone").val("");
+            $("#create-fax").val("");
+            $("#create-customer").val("");
+
+        });
+
+        // Validation for Create Modal
+        var validateCreate = $("#createForm").validate({
+            errorClass: 'text-danger text-xs',
+              rules: {
+                    name: { required: true, maxlength: 10 },
+                 address: { required: true, maxlength: 100 },
+                   phone: { required: true, maxlength: 20 },
+                     fax: { required: true, maxlength: 20 }
+                },
+                messages: {
+                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
+                 address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
+                   phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
+                     fax: { required: "Please enter Fax Number.", maxlength: "Fax number must not exceed 20 characters." }
+                },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                DoCreate();
+            }
+        });
+
+        // Send Create to Controller
+        function DoCreate() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CreateJson")",
+                data: {
+
+                    Name: $("#create-name").val(),
+                    Address: $("#create-address").val(),
+                    PhoneNumber: $("#create-phone").val(),
+                    FaxNumber: $("#create-fax").val(),
+                    CustomerId: $("#create-customer").val()
+
+                },
+                error: jQueryCommonError,
+                success: function(data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#createModal").modal("hide");
+                        dataTable.ajax.reload();
+                        hideLoader()
+                    }
+                },
+                complete: function(xhr, status) {
+                    //$(".save-overlay").hideOverlay();
+                }
+            });
+        }
+
+        
+        $(".downloadBtn").click(function(e) {
+            window.location = "@Url.Action("DownloadFile")";
+        });
+
+        var json_of_excel;
+        var colnumber = 5; // number of columns required for upload
+        var done_upload_excel = 0;
+        var duplicate_upload = 0;
+
+        var opts = {
+            readAsDefault: 'ArrayBuffer',
+            dragClass: 'drag',
+            on: {
+                load: function(e, file) {
+                    var result = new Uint8Array(e.target.result);
+                    var xlsread = XLSX.read(result, { type: 'array' });
+                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                    json_of_excel = xlsjson;
+                }
+            }
+        };
+        $("#upload-file").fileReaderJS(opts);
+
+        // Actions upon file selection
+        $("#upload-file").on("change", function() {
+            done_upload_excel = 0;
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        // Actions upon Display Upload Modal
+        $(".uploadBtn").click(function(e) {
+            done_upload_excel = 0;
+            $("#upload-file").val("");
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        function DoUpload() {
+            if (!$("#upload-file").val()) {
+                toastr.error("Please select a file first");
+            } if (json_of_excel.length == 0) {
+                toastr.error("The excel file is empty");
+            } else {
+                var columns = Object.keys(json_of_excel[0]);
+                $("#upload-table tbody").html("");
+                $("#upload-table").show();
+                duplicate_upload = 0;
+                for (var i = 0; i < json_of_excel.length; i++) {
+                    var rowNum = json_of_excel[i].__rowNum__;
+                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                        var cellValue = json_of_excel[i][columns[colIndex]];
+                        if (cellValue == null)
+                            cellValue = "";
+                        row$.append($('<td/>').html(cellValue));
+                    }
+                    if (columns.includes("Name") == false
+                        || columns.includes("Address") == false
+                        || columns.includes("Customer") == false
+                        || columns.includes("Phone Number") == false
+                        || columns.includes("Fax Number") == false) {
+                        row$.append($('<td/>').html("Unexpected columns"));
+                        UploadRowDone();
+                    } else {
+                        SaveXLSX(json_of_excel[i]["Name"], json_of_excel[i]["Address"], json_of_excel[i]["Customer"], json_of_excel[i]["Phone Number"],json_of_excel[i]["Fax Number"], rowNum);
+                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                    }
+                    $("#upload-table").append(row$);
+                }
+            }
+        }
+
+        function SaveXLSX(name, address, customerName, phoneNumber, faxNumber, rownum) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UploadJson")",
+                data: {
+                    Name: name,
+                    Address: address,
+                    CustomerName: customerName,
+                    PhoneNumber: phoneNumber,
+                    FaxNumber: faxNumber
+                },
+                error: function(xhr, status, error) {
+                    $("#upload-row" + rownum).html(error);
+                },
+                success: function(data, status, xhr) {
+                    if (data.message == "Already exist") {
+                        $("#upload-row" + rownum + "tr").remove();
+                        duplicate_upload++;
+                    } else {
+                        $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                    }
+                },
+                complete: function(xhr, status) {
+                    UploadRowDone();
+                }
+            });
+        }
+
+        function UploadRowDone() {
+            done_upload_excel++;
+            if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                $("#upload-table").append('<tr><td>*</td><td colspan="5">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                $("#upload-file").val("");
+            }
+        }
     </script>
 }

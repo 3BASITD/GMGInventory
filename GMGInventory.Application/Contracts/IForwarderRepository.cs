@@ -16,6 +16,10 @@ namespace GMGInventory.Application.Contracts
         Task DeactivateForwarderAsync(int id);
         Task ReactivateForwarderAsync(int id);
         Task AddAsync(ForwarderVM forwarderVM);
-        Task UpdateAsync(int id, ForwarderVM forwarderVM);
+        Task UpdateAsync(ForwarderVM forwarderVM);
+
+        Task<IList<ForwarderViewVM>> GetAllAsync();
+        Task<bool> UploadCombinationExistAsync(ForwarderVM forwarderVM);
+        Task<ForDataTables<ForwarderViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
     }
 }

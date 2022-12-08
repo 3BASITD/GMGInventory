@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,8 +8,8 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    //[Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
-    [Authorize]
+    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
+    //[Authorize]
     public class BrandController : Controller
     {
         private readonly IItemTypeRepository itemTypeRepository;

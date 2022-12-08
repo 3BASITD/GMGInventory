@@ -16,6 +16,11 @@ namespace GMGInventory.Application.Contracts
         Task DeactivateSupplierAsync(int id);
         Task ReactivateSupplierAsync(int id);
         Task AddAsync(SupplierVM supplierVM);
-        Task UpdateAsync(int id, SupplierVM supplierVM);
+        Task UpdateAsync(SupplierVM supplierVM);
+        Task<bool> IsCodeExist(string code);
+        Task<bool> UploadCombinationExistAsync(SupplierVM supplierVM);
+        Task<IList<SupplierViewVM>> GetAllAsync();
+        Task<ForDataTables<SupplierViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
+
     }
 }

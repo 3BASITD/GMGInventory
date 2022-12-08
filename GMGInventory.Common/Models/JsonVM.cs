@@ -93,6 +93,7 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
         public string Address { get; set; }
         public string CreditTerm { get; set; }
+        public string Region { get; set; }
 
         public string Agent { get; set; }
     }

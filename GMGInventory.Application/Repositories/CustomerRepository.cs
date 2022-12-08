@@ -60,6 +60,13 @@ namespace GMGInventory.Application.Repositories
                 .ToListAsync();
         }
 
+
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var customers = await context.Customers.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return customers?.Id;
+        }
+
         public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers
@@ -92,17 +99,16 @@ namespace GMGInventory.Application.Repositories
                                   VAT = cust.VAT,
                                   RegionId = cust.Area.RegionId,
                                   CreditTermId = cust.CreditTerm.Id,
-                                  CreditLimit = cust.CreditLimit,
+                                  CreditLimitD = cust.CreditLimit,
                                   Remarks = cust.Remarks,
                                   IsActive = cust.IsActive
                               }).FirstOrDefault();
             return customerVM;
         }
 
-
-        private IQueryable<CustomerVM> GetList()
+        public async Task<IList<CustomerVM>> GetAllAsync()
         {
-            return from cust in context.Customers
+            var customers =  from cust in context.Customers
                                     .Include(s => s.Area)
                                     .Include(s => s.CustomerType)
                                     .Include(s => s.Agent)
@@ -113,19 +119,38 @@ namespace GMGInventory.Application.Repositories
                        Id = cust.Id,
                        Code = cust.Code,
                        Name = cust.Name,
+                       CommissionRateD = cust.CommissionRate,
+                       RegionId = cust.Area.RegionId,
+                       RegionName = cust.Area.Region.Name,
+                       AreaId = cust.AreaId,
+                       AreaName = cust.Area.Name,
+                       CustomerTypeId = cust.CustomerTypeId,
+                       CustomerTypeName = cust.CustomerType.Name,
+                       ContactNumber = cust.ContactNumber,
+                       ContactPerson = cust.ContactPerson,
+                       Address = cust.Address,
+                       Email = cust.Email,
+                       AgentId = cust.AgentId,
                        AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
-                       CreditLimit = cust.CreditLimit,
-                       OutstandingBalance = cust.OutstandingBalance,
+                       FaxNumber = cust.FaxNumber,
+                       TIN = cust.TIN,
+                       VAT = cust.VAT,
+                       CreditTermId = cust.CreditTermId,
+                       CreditTermName = cust.CreditTerm.Name,
+                       CreditLimitD = cust.CreditLimit,
+                       OutstandingBalanceD = cust.OutstandingBalance,
+                       Remarks = cust.Remarks,
                        IsActive = cust.IsActive
                    };
+            return await customers.ToListAsync();
         }
 
-        public ForDataTables<CustomerVM> GetListDataTables(DataTablesRequestForm form)
+        public async Task<ForDataTables<CustomerVM>> GetListDataTables(DataTablesRequestForm form)
         {
             int totalRecord = 0;
             int filterRecord = 0;
             //var data = context.AuditLogs.Include(s=>s.User).AsQueryable();
-            var data = GetList();
+            var data = (await GetAllAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -133,7 +158,9 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
                                     || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.AgentName.ToLower().Contains(form.SearchValue));
+                                    || x.AgentName.ToLower().Contains(form.SearchValue)
+                                    || x.CreditLimit.ToString().Contains(form.SearchValue)
+                                    || x.OutstandingBalance.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -243,7 +270,7 @@ namespace GMGInventory.Application.Repositories
             cust.TIN = custVM.TIN;
             cust.VAT = custVM.VAT;
             cust.CreditTermId = custVM.CreditTermId;
-            cust.CreditLimit = custVM.CreditLimit;
+            cust.CreditLimit = custVM.CreditLimitD;
             cust.Remarks = custVM.Remarks;
             cust.IsActive = true;
             cust.CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null;
@@ -276,7 +303,7 @@ namespace GMGInventory.Application.Repositories
                 TIN = custVM.TIN,
                 VAT = custVM.VAT,
                 CreditTermId = custVM.CreditTermId,
-                CreditLimit = custVM.CreditLimit,
+                CreditLimit = custVM.CreditLimitD,
                 Remarks = custVM.Remarks,
                 CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null,
 
@@ -338,7 +365,7 @@ namespace GMGInventory.Application.Repositories
                                  TIN = cust.TIN,
                                  VAT = cust.VAT,
                                  CreditTermId = cust.CreditTermId,
-                                 CreditLimit = cust.CreditLimit,
+                                 CreditLimitD = cust.CreditLimit,
                                  Remarks = cust.Remarks,
                                  IsActive = true
                              };
@@ -545,17 +572,18 @@ namespace GMGInventory.Application.Repositories
             var customerVM = from customer in context.Customers
                              join cp in context.CustomerPayments
                                       on customer.Id equals cp.CustomerId
+                             join user in userManager.Users on cp.UserCreated equals user.Id
 
                              where cp.CustomerId == id
                              select new CustomerVM
                              {
                                  CRNo = cp.CRNumber,
-                                 SOANo = cp.SOACRId.ToString(),
-                                 TotalInvoiceAmount = cp.TotalInvoiceAmount.ToString(),
-                                 AmountPaid = cp.TotalAmountPaid.ToString(),
-                                 OverPayment = cp.OverPayment.ToString(),
-                                 TransactionDate = cp.DateCreated.ToString(),
-                                 CreatedBy = cp.UserCreated,
+                                 SOANo = cp.SOACRId,
+                                 TotalInvoiceAmountD = cp.TotalInvoiceAmount,
+                                 AmountPaidD = cp.TotalAmountPaid,
+                                 OverPaymentD = cp.OverPayment,
+                                 TransactionDateD = cp.DateCreated,
+                                 CreatedBy = user.Nickname,
                                  PaymentRemarks = cp.Remarks
                              };
             return await customerVM.ToListAsync();
@@ -629,20 +657,21 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<CustomerVM>> GetCustomerReceivableAsync(int id)
         {
-            var customerVM = from customer in context.Customers
-                             join p in context.Payments
-                                      on customer.Id equals p.CustomerId
-                             join pd in context.PaymentDetails
-                                      on p.Id equals pd.PaymentId
-                             join i in context.Invoices
-                                      on pd.InvoiceId equals i.Id
+            var customerVM = from inv in context.Invoices
+                             join soali in context.SOACRLineItems
+                                        on inv.Id equals soali.InvoiceId
+                             join soacr in context.SOACRs
+                                        on soali.SOACRId equals soacr.Id into soacrs
+                             from soacrsGroup in soacrs.DefaultIfEmpty()
+                             join c in context.CustomerPayments
+                                        on soacrsGroup.Id equals c.SOACRId
 
-                             where p.CustomerId == id
+                             where c.CustomerId == id
                              select new CustomerVM
                              {
-                                 InvoiceNo = i.InvoiceNumber,
-                                 InvoicedDate = i.DateCreated.ToString(),
-                                 InvoicedAmount = i.Amount.ToString()
+                                 InvoiceNo = inv.InvoiceNumber,
+                                 InvoicedDateD = inv.DateModified ?? inv.DateCreated,
+                                 InvoicedAmountD = inv.Amount
                              };
             return await customerVM.ToListAsync();
         }
@@ -658,7 +687,7 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.InvoiceNo.ToString().Contains(form.SearchValue)
-                                    || x.InvoicedDate.ToString().Contains(form.SearchValue)
+                                    || x.InvoicedDateD.ToString().Contains(form.SearchValue)
                                     || x.InvoicedAmount.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -671,7 +700,7 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "InvoiceNo": data = data.OrderBy(s => s.InvoiceNo); break;
-                        case "InvoicedDate": data = data.OrderBy(s => s.InvoicedDate); break;
+                        case "InvoicedDate": data = data.OrderBy(s => s.InvoicedDateD); break;
                         case "InvoicedAmount": data = data.OrderBy(s => s.InvoicedAmount); break;
                         default: break;
                     }
@@ -681,7 +710,7 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "InvoiceNo": data = data.OrderByDescending(s => s.InvoiceNo); break;
-                        case "InvoicedDate": data = data.OrderByDescending(s => s.InvoicedDate); break;
+                        case "InvoicedDate": data = data.OrderByDescending(s => s.InvoicedDateD); break;
                         case "InvoicedAmount": data = data.OrderByDescending(s => s.InvoicedAmount); break;
                         default: break;
                     }
@@ -696,6 +725,20 @@ namespace GMGInventory.Application.Repositories
                 RecordsFiltered = filterRecord,
                 Data = pageList
             };
+        }
+
+
+
+        public async Task<bool> UploadCombinationExistAsync(CustomerVM customerVM)
+        {
+            return (await GetAllAsync()).Any(s => s.Code == customerVM.Code && s.Name == customerVM.Name &&
+            s.CommissionRate == customerVM.CommissionRate && s.RegionName == customerVM.RegionName &&
+            s.AreaName == customerVM.AreaName && s.CustomerTypeName == customerVM.CustomerTypeName &&
+            s.ContactPerson == customerVM.ContactPerson && s.ContactNumber == customerVM.ContactNumber &&
+            s.Address == customerVM.Address && s.Email == customerVM.Email &&
+            s.AgentName == customerVM.AgentName && s.FaxNumber == customerVM.FaxNumber &&
+            s.TIN == customerVM.TIN && s.VAT == customerVM.VAT && s.CreditTermName == customerVM.CreditTermName &&
+            s.CreditLimit == customerVM.CreditLimit && s.Remarks == customerVM.Remarks) ;
         }
     }
 }

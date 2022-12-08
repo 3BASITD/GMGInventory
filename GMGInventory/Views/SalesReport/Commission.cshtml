@@ -24,17 +24,20 @@
             <thead>
                 <tr>
                     <th>
+                        @Html.DisplayNameFor(model => model.Agent)
+                    </th>
+                    
+                    <th>
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </th>
+                    
+                    <th>
                         @Html.DisplayNameFor(model => model.InvoiceDate)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.InvoiceNumber)
                     </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Customer)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Agent)
-                    </th>
+
                     <th>
                         @Html.DisplayNameFor(model => model.CommissionRate)
                     </th>
@@ -134,6 +137,9 @@
 
 @section Scripts {
     <script>
+        console.log("Time loaded: " + new Date()) 
+        $("#filter-from").val('2022-04-01'); // for testing only, remove on prod
+        $("#filter-to").val('2022-04-05'); // for testing only, remove on prod
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -141,7 +147,7 @@
                     $("#filter-to").val(DateForInput(new Date()));
                 } else {
                     var dt_from = new Date($("#filter-from").val());
-                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
                     dt_from.setMonth(dt_from.getMonth() + 1);
                     $("#filter-to").val(DateForInput(dt_from));
                 }
@@ -149,7 +155,7 @@
 
             if ($("#filter-from").val() == "") {
                 var dt_to = new Date($("#filter-to").val());
-                dt_to.setFullYear(dt_to.getFullYear() - 1);
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
                 dt_to.setMonth(dt_to.getMonth() - 1);
                 $("#filter-from").val(DateForInput(dt_to));
             }
@@ -283,20 +289,45 @@
             responsive: true,
             autoWidth: false,
             columns: [
+                { data: "agent", name: "Agent" },
+                { data: "customer", name: "Customer" },
                 { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
-                { data: "customer", name: "Customer" },
-                { data: "agent", name: "Agent" },
                 { data: "commissionRate", name: "CommissionRate", className: "text-end" },
                 { data: "invoiceAmount", name: "InvoiceAmount", className: "text-end" },
                 { data: "commissionAmount", name: "CommissionAmount", className: "text-end" }
             ],
+            //footerCallback: function (row, data, start, end, display) {
+            //    var json = salesDT.ajax.json();
+            //    var api = this.api(), data;
+                
+            //    $(api.column(5).footer()).html(FormatStringDecimal(json.totalAmount));
+            //    $(api.column(6).footer()).html(FormatStringDecimal(json.totalAmount2));
+            //}
             footerCallback: function (row, data, start, end, display) {
                 var json = salesDT.ajax.json();
                 var api = this.api(), data;
-                
+
                 $(api.column(5).footer()).html(FormatStringDecimal(json.totalAmount));
-                $(api.column(6).footer()).html(FormatStringDecimal(json.totalAmount2));
+               // $(api.column(6).footer()).html(FormatStringDecimal(json.totalAmount2));
+            },
+            order: [[1, "asc"]],
+            rowGroup: {
+                startRender: null,
+                endRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="5">Total for <strong>' + group + '</strong></td>')
+                        .append('<td class="text-end">' + rows.data()[0].agentTotalInvoice + '</td>');
+                        //.append('<td class="text-end">' + rows.data()[0].agentCommissionRate + '</td>');
+   
+                },
+                dataSrc: function (data) {
+                    if (data.agentCode.trim() == data.agent.trim()) {
+                        return data.agentCode;
+                    } else {
+                        return data.agentCode + ' - ' + data.agent;
+                    }
+                }
             }
         });
 
