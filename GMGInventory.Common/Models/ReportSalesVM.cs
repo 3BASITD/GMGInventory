@@ -134,6 +134,8 @@ namespace GMGInventory.Common.Models
 
     public class CommissionRVM
     {
+        public int AgentId { get; set; }
+
         [Display(Name = "Invoice Date")]
         public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
         public DateTime InvoiceDateD { get; set; }
@@ -164,6 +166,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Commission Amount")]
         public string CommissionAmount => string.Format(SystemFormat.StringDecimalComma, CommissionAmountD);
         public decimal CommissionAmountD => (CommissionRateD * InvoiceAmountD) / 100;
+
+        public string CommissionAmount2 => string.Format(SystemFormat.StringDecimalComma, CommissionAmount2D);
+        public decimal CommissionAmount2D { get; set; }
 
         public string AgentTotalInvoice => string.Format(SystemFormat.StringDecimalComma, AgentTotalInvoiceD);
         public decimal AgentTotalInvoiceD { get; set; }

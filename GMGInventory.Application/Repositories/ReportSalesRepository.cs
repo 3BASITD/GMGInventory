@@ -416,48 +416,57 @@ namespace GMGInventory.Application.Repositories
                            where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
                            && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
-                           && (filter.Area == null || invoice.Invoice.SalesOrder.Agent.Area.Id == filter.Area)
                            && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
-                           && invoice.Invoice.StatusId == 8
+                           && (filter.Area == null || invoice.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
+                           && invoice.Invoice.Status.Code == "Invoiced"
                            select new CommissionRVM
                            {
-                               Agent = invoice.Invoice.SalesOrder.Agent.FirstName
-                                     + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName)
-                                     + " " + invoice.Invoice.SalesOrder.Agent.LastName,
+                               AgentId = invoice.Invoice.SalesOrder.Agent.Id,
                                AgentCode = invoice.Invoice.SalesOrder.Agent.Code,
+                               Agent = invoice.Invoice.SalesOrder.Agent.FirstName
+                                         + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
+                                         + invoice.Invoice.SalesOrder.Agent.LastName,
                                Area = invoice.Invoice.SalesOrder.Customer.Area.Name,
+                               InvoiceDateD = invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated,
+                               InvoiceNumber = invoice.Invoice.InvoiceNumber,
+                               InvoiceAmountD = invoice.UnitPrice * invoice.Quantity,
                                CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
                                                ? invoice.Invoice.SalesOrder.Agent.CommissionRate
                                                : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
-                               Customer = invoice.Invoice.SalesOrder.Customer.Name,
-                               InvoiceAmountD = invoice.Quantity * invoice.UnitPrice,
-                               InvoiceDateD = invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated,
-                               InvoiceNumber = invoice.Invoice.InvoiceNumber
+                               CommissionAmount2D = (invoice.UnitPrice * invoice.Quantity) * (invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
+                                               ? invoice.Invoice.SalesOrder.Agent.CommissionRate
+                                               : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate) / 100,
+                               Customer = invoice.Invoice.SalesOrder.Customer.Name
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
-                             orderby invoice.Agent ascending, invoice.Area ascending
+                             orderby invoice.Agent ascending, invoice.Customer ascending
                              group invoice by new
                              {
-                                 invoice.Agent,
+                                 invoice.AgentId,
                                  invoice.AgentCode,
+                                 invoice.Agent,
                                  invoice.CommissionRateD,
+                                 invoice.Area,
                                  invoice.Customer,
                                  invoice.InvoiceDateD,
                                  invoice.InvoiceNumber
                              } into i
                              let total = invoices.Where(s => s.AgentCode == i.Key.AgentCode).Sum(s => s.InvoiceAmountD)
-                             //let totalcommission = invoices.Where(s => s.AgentCode == i.Key.AgentCode).Sum(s => s.CommissionAmountD)
+                             let totalcom = invoices.Where(s => s.AgentCode == i.Key.AgentCode).Sum(s => s.CommissionAmount2D)
                              select new CommissionRVM
                              {
-                                 Agent = i.Key.Agent,
+                                 AgentId = i.Key.AgentId,
                                  AgentCode = i.Key.AgentCode,
                                  CommissionRateD = i.Key.CommissionRateD,
+                                 Agent = i.Key.Agent,
+                                 Area = i.Key.Area,
                                  Customer = i.Key.Customer,
-                                 InvoiceAmountD = i.Sum(s => s.InvoiceAmountD),
                                  InvoiceDateD = i.Key.InvoiceDateD,
                                  InvoiceNumber = i.Key.InvoiceNumber,
+                                 InvoiceAmountD = i.Sum(s => s.InvoiceAmountD),
+                                 CommissionAmount2D = i.Sum(s => s.CommissionAmount2D),
                                  AgentTotalInvoiceD = total,
-                                 AgentCommissionRateD = total
+                                 AgentCommissionRateD = totalcom
                              };
             return grpinvoice.ToList();
         }
@@ -472,20 +481,19 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetCommission(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total invoice amount of data in table
+            //get total amount of data in table
             totalInvoice = data.Sum(s => s.InvoiceAmountD);
-            //get total commission amount of data in table
-            //totalCommission = data.Sum(s => s.CommissionRateD);
+            totalCommission = data.Sum(s => s.CommissionAmount2D);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue)
-                                    || x.CommissionAmountD.ToString().Contains(form.SearchValue)
-                                    || x.CommissionRateD.ToString().Contains(form.SearchValue)
                                     || x.Customer.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceAmountD.ToString().Contains(form.SearchValue)
-                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue));
+                                    || x.InvoiceDateD.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceNumber.ToString().Contains(form.SearchValue)
+                                    || x.CommissionRateD.ToString().Contains(form.SearchValue)
+                                    || x.CommissionAmount2D.ToString().Contains(form.SearchValue)
+                                    || x.InvoiceAmountD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -497,12 +505,12 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "Agent": data = data.OrderBy(s => s.Agent); break;
-                        case "CommissionRate": data = data.OrderBy(s => s.CommissionRateD); break;
-                        case "CommissionAmount": data = data.OrderBy(s => s.CommissionAmountD); break;
                         case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "InvoiceAmount": data = data.OrderBy(s => s.InvoiceAmountD); break;
                         case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDateD); break;
                         case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
+                        case "CommissionRate": data = data.OrderBy(s => s.CommissionRateD); break;
+                        case "CommissionAmount": data = data.OrderBy(s => s.CommissionAmount2D); break;
+                        case "InvoiceAmount": data = data.OrderBy(s => s.InvoiceAmountD); break;
                         default: break;
                     }
                 }
@@ -511,12 +519,12 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "Agent": data = data.OrderByDescending(s => s.Agent); break;
-                        case "CommissionRate": data = data.OrderByDescending(s => s.CommissionRateD); break;
-                        case "CommissionAmount": data = data.OrderByDescending(s => s.CommissionAmountD); break;
                         case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "InvoiceAmount": data = data.OrderByDescending(s => s.InvoiceAmountD); break;
                         case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDateD); break;
                         case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
+                        case "CommissionRate": data = data.OrderByDescending(s => s.CommissionRateD); break;
+                        case "CommissionAmount": data = data.OrderByDescending(s => s.CommissionAmount2D); break;
+                        case "InvoiceAmount": data = data.OrderByDescending(s => s.InvoiceAmountD); break;
                         default: break;
                     }
                 }
@@ -530,8 +538,8 @@ namespace GMGInventory.Application.Repositories
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
                 Data = dataList,
-                TotalAmount = totalInvoice
-                //TotalAmount2 = totalCommission
+                TotalAmount = totalInvoice,
+                TotalAmount2 = totalCommission
             };
         }
 
@@ -546,13 +554,16 @@ namespace GMGInventory.Application.Repositories
                 Contents = items,
                 DateFromD = filter.DateFrom.GetValueOrDefault(),
                 DateToD = filter.DateTo.GetValueOrDefault(),
-                Agent = filter.Agent == null || agent == null ? "All" : agent.FirstName + (agent.MiddleName == null ? "" : " " + agent.MiddleName) + " " + agent.LastName,
+                Agent = filter.Agent == null || agent == null
+                      ? "All"
+                      : (agent.FirstName + (agent.MiddleName == null ? "" : " " + agent.MiddleName) + " " + agent.LastName),
                 Area = filter.Area == null || area == null ? "All" : area.Name,
-                Customer = filter.Customer == null || customer == null ? "All" : customer.Name,
-                TotalInvoiceAmountD = items.Sum(s => s.InvoiceAmountD),
-                TotalCommissionAmountD = items.Sum(s => s.CommissionAmountD)
+                Customer = filter.Customer == null || customer == null ? "All" : customer.Name, 
+                AgentTotalInvoiceD = items.Sum(s => s.InvoiceAmountD),
+                AgentCommissionRateD = items.Sum(s => s.CommissionAmount2D)
             };
         }
+
 
         #endregion Commission
 
@@ -1443,21 +1454,45 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<UnservedItemRVM>> GetUnservedItem(ListFilterSalesModel filter)
         {
+
+
             var solines = from soline in context.SalesOrderLineItems
+                          join so in context.SalesOrders                              
+                                   on soline.SalesOrderId equals so.Id
                           where soline.Quantity - soline.PackedQuantity > 0
                           && filter.DateFrom <= (soline.DateModified ?? soline.DateCreated)
                           && (soline.DateModified ?? soline.DateCreated) <= filter.DateTo
                           && (filter.Brand == null || soline.Item.Brand.Id == filter.Brand)
+
                           select new UnservedItemRVM
                           {
                               Brand = soline.Item.Brand.Name,
-                              CurrentD = 0,
+                              CurrentD = soline.PackedQuantity,
                               ItemCode = soline.Item.Code,
                               ItemName = soline.Item.Name,
-                              PendingD = 0,
+                              PendingD = soline.Quantity - soline.PackedQuantity,
                               ReplenishDateD = soline.DateModified ?? soline.DateCreated
                           };
-            return await solines.ToListAsync();
+            var grpsolines = from soal in await solines.ToListAsync()
+                             orderby soal.Brand ascending, soal.ItemCode ascending, soal.ItemName ascending
+                             group soal by new
+                             {
+                                 soal.Brand,
+                                 soal.ItemCode,
+                                 soal.ItemName
+                             } into i
+                             let current = solines.Where(s => s.ItemCode == i.Key.ItemCode).Take(1).Max(s => s.ReplenishDateD)
+
+                             select new UnservedItemRVM
+                             {
+                                 Brand = i.Key.Brand,
+                                 ItemCode = i.Key.ItemCode,
+                                 ItemName = i.Key.ItemName,
+                                 ReplenishDateD = current,
+                                 CurrentD = i.Sum(s => s.CurrentD),
+                                 PendingD = i.Sum(s => s.PendingD)
+                             };
+            return grpsolines.ToList();
         }
 
         public async Task<ForDataTables<UnservedItemRVM>> GetUnservedItemDT(DataTablesRequestForm form, ListFilterSalesModel filter)
