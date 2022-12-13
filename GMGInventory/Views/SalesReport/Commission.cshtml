@@ -23,17 +23,18 @@
         <table class="table table-head-fixed table-striped table-hover table-sales">
             <thead>
                 <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Agent)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Customer)
-                    </th>
+                    
                     <th>
                         @Html.DisplayNameFor(model => model.InvoiceDate)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.InvoiceNumber)
+                    </th>                   
+                    <th>
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Agent)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.CommissionRate)
@@ -286,10 +287,10 @@
             responsive: true,
             autoWidth: false,
             columns: [
-                { data: "agent", name: "Agent" },
-                { data: "customer", name: "Customer" },
                 { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "customer", name: "Customer" },
+                { data: "agent", name: "Agent" },
                 { data: "commissionRate", name: "CommissionRate" },
                 { data: "invoiceAmount", name: "InvoiceAmount", className: "text-end" },
                 { data: "commissionAmount", name: "CommissionAmount", className: "text-end" }
@@ -301,7 +302,7 @@
                 $(api.column(5).footer()).html(FormatStringDecimal(json.totalAmount));
                 $(api.column(6).footer()).html(FormatStringDecimal(json.totalAmount2));
             },
-            order: [[1, "asc"]],
+            order: [[3, "asc"]],
             rowGroup: {
                 startRender: null,
                 endRender: function (rows, group) {

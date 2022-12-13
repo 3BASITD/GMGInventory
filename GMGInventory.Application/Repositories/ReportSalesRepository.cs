@@ -439,7 +439,7 @@ namespace GMGInventory.Application.Repositories
                                Customer = invoice.Invoice.SalesOrder.Customer.Name
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
-                             orderby invoice.Agent ascending, invoice.Customer ascending
+                             orderby invoice.Agent ascending, invoice.InvoiceDateD ascending
                              group invoice by new
                              {
                                  invoice.AgentId,
@@ -1455,18 +1455,21 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<UnservedItemRVM>> GetUnservedItem(ListFilterSalesModel filter)
         {
 
-
             var solines = from soline in context.SalesOrderLineItems
                           join so in context.SalesOrders                              
-                                   on soline.SalesOrderId equals so.Id
-                          where soline.Quantity - soline.PackedQuantity > 0
-                          && filter.DateFrom <= (soline.DateModified ?? soline.DateCreated)
-                          && (soline.DateModified ?? soline.DateCreated) <= filter.DateTo
+                                   on soline.SalesOrderId equals so.Id 
+                          join inv in context.Invoices
+                                   on so.Id equals inv.SalesOrderId into soas
+                          from soaliGroup in soas.DefaultIfEmpty()
+                          where soaliGroup.Id == null &&
+                          filter.DateFrom <= (so.DateModified ?? so.DateCreated)
+                          && (so.DateModified ?? so.DateCreated) <= filter.DateTo
                           && (filter.Brand == null || soline.Item.Brand.Id == filter.Brand)
 
                           select new UnservedItemRVM
                           {
                               Brand = soline.Item.Brand.Name,
+
                               CurrentD = soline.PackedQuantity,
                               ItemCode = soline.Item.Code,
                               ItemName = soline.Item.Name,
