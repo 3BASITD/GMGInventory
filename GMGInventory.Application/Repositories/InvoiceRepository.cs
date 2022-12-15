@@ -69,6 +69,18 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<JsonOptionsModel>> GetInvoiceTypeOptions(int? IncludeId)
+        {
+            return await context.PriceTypes
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Name,
+                                    Selected = IncludeId == s.Id
+                                })
+                                .ToListAsync();
+        }
+
         public async Task<InvoiceDetailsVM?> GetDetailsAsync(int? Id)
         {
             var invoiceVM = (from invoice in context.Invoices
@@ -90,6 +102,7 @@ namespace GMGInventory.Application.Repositories
                                  InvoiceBy = user.Nickname,
                                  InvoiceDateD = invoice.DateCreated,
                                  InvoiceNumber = invoice.InvoiceNumber,
+                                 InvoiceType = invoice.InvoiceType.Name,
                                  PackNumber = invoice.PackId,
                                  PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? "-" : invoice.SalesOrder.Customer.CreditTerm.Name,
                                  PONumber = invoice.SalesOrder.PurchaseOrder == null ? "-" : invoice.SalesOrder.PurchaseOrder.PONumber,
@@ -98,6 +111,31 @@ namespace GMGInventory.Application.Repositories
                                  Status = invoice.Status.Code
                              });
             return await invoiceVM.FirstOrDefaultAsync();
+        }
+
+        public async Task<InvoiceDetailsVM?> GetDetailsByPackAsync(int? Id)
+        {
+            var packVM = (from pack in context.Packs
+                                              .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
+                                              .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
+                                              .Include(s => s.SalesOrder).ThenInclude(s => s.PurchaseOrder)
+                          where pack.Id == Id
+                          select new InvoiceDetailsVM
+                          {
+                              Agent = pack.SalesOrder.Agent.FirstName
+                                    + (pack.SalesOrder.Agent.MiddleName == null ? "" : " " + pack.SalesOrder.Agent.MiddleName)
+                                    + " " + pack.SalesOrder.Agent.LastName,
+                              CustomerAddress = pack.SalesOrder.Customer.Address,
+                              CustomerCode = pack.SalesOrder.Customer.Code,
+                              CustomerName = pack.SalesOrder.Customer.Name,
+                              Id = pack.Id,
+                              PackNumber = pack.Id,
+                              PaymentTerms = pack.SalesOrder.Customer.CreditTerm == null ? "-" : pack.SalesOrder.Customer.CreditTerm.Name,
+                              PONumber = pack.SalesOrder.PurchaseOrder == null ? "-" : pack.SalesOrder.PurchaseOrder.PONumber,
+                              SONumber = pack.SalesOrder.SalesOrderNumber,
+                              Status = pack.Status.Code
+                          });
+            return await packVM.FirstOrDefaultAsync();
         }
 
         private async Task<IList<InvoiceVM>> GetListAsync(ListFilterCommonModel filter)

@@ -5,6 +5,7 @@ namespace GMGInventory.Application.Contracts
     public interface ISalesOrderRepository
     {
         Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page);
+        Task<Select2Model<JsonOptionsModel>> GetSalesOrderOptions(string search, int page);
         Task<IList<JsonOptionsModel>> GetPriceTypeOptions(int? IncludeId);
         Task<IList<JsonOptionsModel>> GetDeliveryTypeOptions(int? IncludeId);
         Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id);

@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +17,11 @@ namespace GMGInventory.Controllers
         public PackController(IPackRepository packRepository)
         {
             this.packRepository = packRepository;
+        }
+
+        public async Task<IActionResult> GetOptions(string search, int page)
+        {
+            return Json(await packRepository.GetOptions(search, page));
         }
 
         public ActionResult Index()
@@ -47,15 +53,27 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<JsonResult> GetItemsWithPriceJson(int packId)
+        {
+            return Json(await packRepository.GetItemsWithPriceAsync(packId));
+        }
+
+        [HttpPost]
         public async Task<JsonResult> GetItemsDTJson(int packId)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await packRepository.GetItemsDTAsync(form, packId));
         }
 
-        public ActionResult Create()
+        public async Task<ActionResult> Create(int? Id)
         {
-            return View();
+            var order = await packRepository.GetDetailsBySOAsync(Id);
+            if (order == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(order);
         }
     }
 }

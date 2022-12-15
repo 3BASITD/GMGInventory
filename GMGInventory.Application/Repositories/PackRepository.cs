@@ -18,6 +18,26 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page)
+        {
+            var orders = from order in context.Packs
+                         where order.Status.Code != "Posted"
+                         && order.SalesOrder.QuantityOrdered != order.SalesOrder.QuantityInvoiced
+                         && (string.IsNullOrWhiteSpace(search)
+                         || (order.Id.ToString().Contains(search.ToLower().Trim())))
+                         select new JsonOptionsModel
+                         {
+                             Id = order.Id.ToString(),
+                             Text = order.Id.ToString()
+                         };
+            var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = ordersFiltered,
+                total_count = orders.Count()
+            };
+        }
+
         public async Task<PackDetailsVM?> GetDetailsAsync(int? Id)
         {
             var orderVM = (from order in context.Packs
@@ -35,6 +55,24 @@ namespace GMGInventory.Application.Repositories
                                PackDateD = order.DateCreated,
                                SalesOrderDateD = order.SalesOrder.DateCreated,
                                SONumber = order.SalesOrder.SalesOrderNumber
+                           });
+            return await orderVM.FirstOrDefaultAsync();
+        }
+
+        public async Task<PackDetailsVM?> GetDetailsBySOAsync(int? Id)
+        {
+            var orderVM = (from order in context.SalesOrders
+                                                .Include(s => s.Customer)
+                                                .Include(s => s.DeliveryType)
+                           where order.Id == Id
+                           select new PackDetailsVM
+                           {
+                               CustomerCode = order.Customer.Code,
+                               CustomerName = order.Customer.Name,
+                               DeliveryType = order.DeliveryType.Name,
+                               Id = order.Id,
+                               SalesOrderDateD = order.DateCreated,
+                               SONumber = order.SalesOrderNumber
                            });
             return await orderVM.FirstOrDefaultAsync();
         }
@@ -138,6 +176,25 @@ namespace GMGInventory.Application.Repositories
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
                              Quantity = order.Quantity
+                         };
+            return await itemVM.ToListAsync();
+        }
+
+        public async Task<IList<PackItemVM>> GetItemsWithPriceAsync(int packId)
+        {
+            var itemVM = from pack in context.PackLineItems
+                         join order in context.SalesOrderLineItems on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
+                         where pack.PackId == packId
+                         select new PackItemVM
+                         {
+                             BoxNumber = pack.BoxNumber,
+                             Discount1D = order.Discount1,
+                             Discount2D = order.Discount2,
+                             Id = pack.Id,
+                             ItemCode = pack.Item.Code,
+                             ItemName = pack.Item.Name,
+                             Quantity = pack.Quantity,
+                             SellingPriceD = order.SellingPrice
                          };
             return await itemVM.ToListAsync();
         }
