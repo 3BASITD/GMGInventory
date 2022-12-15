@@ -2,7 +2,7 @@
 
 namespace GMGInventory.Common.Models
 {
-    public class CategoryVM
+    public class CategoryVM: GenericAuditVM
     {
         public int Id { get; set; }
 

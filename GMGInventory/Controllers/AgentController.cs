@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +9,8 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    //[Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
-    [Authorize]
+    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
+    //[Authorize]
     public class AgentController : Controller
     {
         private readonly IAgentRepository agentRepository;
@@ -100,7 +101,7 @@ namespace GMGInventory.Controllers
             }
             else
             {
-                int? AreaId = await agentRepository.GetIdAsync(agentVM.Area);
+                int? AreaId = await areaRepository.GetIdAsync(agentVM.Area);
                 if (AreaId == null)
                 {
                     responseModel.Status = "Error";
@@ -111,7 +112,7 @@ namespace GMGInventory.Controllers
                     agentVM.AreaId = AreaId.Value;
                     await agentRepository.AddAsync(agentVM);
                     responseModel.Status = "Success";
-                    responseModel.Message = "Area added";
+                    responseModel.Message = "Agent added";
                 }
             }
             return Json(responseModel);
@@ -143,18 +144,24 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+
+
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Agent");
-            dt.Columns.AddRange(new DataColumn[3] {
+            dt.Columns.AddRange(new DataColumn[5] {
                 new DataColumn("Code"),
-                new DataColumn("Full Name"),
+                new DataColumn("First Name"),
+                new DataColumn("Middle Name"),
+                new DataColumn("Last Name"),
                 new DataColumn("Area")
+
             });
+
             var agent = (await agentRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var agents in agent)
             {
-                dt.Rows.Add(agents.Code, agents.FirstName + (agents.MiddleName == null ? "" : " " + agents.MiddleName) + " " + agents.LastName, agents.AreaId);
+                dt.Rows.Add(agents.Code, agents.FirstName, (agents.MiddleName == null ? "" : " " + agents.MiddleName), agents.LastName, agents.AreaId);
             }
             using (XLWorkbook wb = new())
             {

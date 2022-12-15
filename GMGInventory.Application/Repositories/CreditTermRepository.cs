@@ -26,6 +26,12 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var cterms = await context.CreditTerms.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return cterms?.Id;
+        }
+
         public async Task<IList<CreditTermVM>> GetAllCreditTermVMAsync()
         {
             var creditterms = await context.CreditTerms.ToListAsync();

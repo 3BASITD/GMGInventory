@@ -20,7 +20,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Required]
+        //[Required]
         [StringLength(50)]
         [Display(Name = "Middle Name")]
         public string MiddleName { get; set; }
@@ -53,6 +53,7 @@ namespace GMGInventory.Common.Models
         public string CustomerContactNo { get; set; }
 
 
+
     }
 
     public class AgentViewVM : GenericAuditVM
@@ -71,6 +72,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
+        [Display(Name = "Areas")]
+        public AreaVM Areas { get; set; }
 
 
     }

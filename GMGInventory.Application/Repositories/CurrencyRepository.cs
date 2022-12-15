@@ -26,6 +26,26 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var currency = await context.Currencies.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return currency?.Id;
+        }
+
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.Currencies
+                //.Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .ToListAsync();
+        }
+
         public async Task<IList<CurrencyVM>> GetAllCurrencyVMAsync()
         {
             var currencies = await context.Currencies.ToListAsync();

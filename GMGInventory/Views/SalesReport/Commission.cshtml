@@ -23,12 +23,13 @@
         <table class="table table-head-fixed table-striped table-hover table-sales">
             <thead>
                 <tr>
+                    
                     <th>
                         @Html.DisplayNameFor(model => model.InvoiceDate)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.InvoiceNumber)
-                    </th>
+                    </th>                   
                     <th>
                         @Html.DisplayNameFor(model => model.Customer)
                     </th>
@@ -94,7 +95,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-customer" class="form-label mb-0">Customer</label>
@@ -134,6 +135,9 @@
 
 @section Scripts {
     <script>
+        console.log("Time loaded: " + new Date()) 
+        $("#filter-from").val('2022-04-01'); // for testing only, remove on prod
+        $("#filter-to").val('2022-04-31'); // for testing only, remove on prod
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -141,7 +145,7 @@
                     $("#filter-to").val(DateForInput(new Date()));
                 } else {
                     var dt_from = new Date($("#filter-from").val());
-                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
                     dt_from.setMonth(dt_from.getMonth() + 1);
                     $("#filter-to").val(DateForInput(dt_from));
                 }
@@ -149,7 +153,7 @@
 
             if ($("#filter-from").val() == "") {
                 var dt_to = new Date($("#filter-to").val());
-                dt_to.setFullYear(dt_to.getFullYear() - 1);
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
                 dt_to.setMonth(dt_to.getMonth() - 1);
                 $("#filter-from").val(DateForInput(dt_to));
             }
@@ -216,7 +220,7 @@
             }
         });
 
-        // Load Select2 for Customer
+         // Load Select2 for Customer
         $("#filter-customer").select2({
             minimumInputLength: 1,
             placeholder: '<empty>',
@@ -287,16 +291,33 @@
                 { data: "invoiceNumber", name: "InvoiceNumber" },
                 { data: "customer", name: "Customer" },
                 { data: "agent", name: "Agent" },
-                { data: "commissionRate", name: "CommissionRate", className: "text-end" },
+                { data: "commissionRate", name: "CommissionRate" },
                 { data: "invoiceAmount", name: "InvoiceAmount", className: "text-end" },
                 { data: "commissionAmount", name: "CommissionAmount", className: "text-end" }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var json = salesDT.ajax.json();
                 var api = this.api(), data;
-                
+
                 $(api.column(5).footer()).html(FormatStringDecimal(json.totalAmount));
                 $(api.column(6).footer()).html(FormatStringDecimal(json.totalAmount2));
+            },
+            order: [[3, "asc"]],
+            rowGroup: {
+                startRender: null,
+                endRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="5">Total for <strong>' + group + '</strong></td>')
+                        .append('<td class="text-end">' + rows.data()[0].agentTotalInvoice + '</td>')
+                        .append('<td class="text-end">' + rows.data()[0].agentCommissionRate + '</td>');
+                },
+                dataSrc: function (data) {
+                    if (data.agentCode.trim() == data.agent.trim()) {
+                        return data.agentCode;
+                    } else {
+                        return data.agentCode + ' - ' + data.agent;
+                    }
+                }
             }
         });
 
@@ -307,6 +328,8 @@
             DatatablesSearchOnEnter('.table-sales', salesDT);
 
             $(".table-sales thead th").removeClass("text-end");
+
+           
         });
 
         $(".btnFilter").on("click", function () {

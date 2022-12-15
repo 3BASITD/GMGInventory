@@ -34,7 +34,9 @@ namespace GMGInventory.Common.Models
         [Required]
         [Display(Name = "Customer")]
 
-        public int CustomerId { get; set; } 
+        public int CustomerId { get; set; }
+
+        public string CustomerName { get; set; }
         public SelectList? Customers { get; set; }
 
     }
@@ -52,6 +54,10 @@ namespace GMGInventory.Common.Models
         public string FaxNumber { get; set; }
 
         [Display(Name = "Customer")]
+
+        public int CustomerId { get; set; }
+
+        public string CustomerName { get; set; }
         public CustomerVM Customer { get; set; }
 
 

@@ -26,8 +26,11 @@ namespace GMGInventory.Application.Contracts
         Task UpdateAsync(CustomerVM custVM);
 
         //Task UpdateAsync(int id, CustomerVM customerVM);
-        ForDataTables<CustomerVM> GetListDataTables(DataTablesRequestForm form);
+        Task<ForDataTables<CustomerVM>> GetListDataTables(DataTablesRequestForm form);
+        Task<IList<CustomerVM>> GetAllAsync();
+        Task<bool> UploadCombinationExistAsync(CustomerVM customerVM);
         CustomerVM? GetCustomerDtlVM(int? id);
+        Task<int?> GetIdAsync(string? Name);
         Task<ForDataTables<CustomerVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerPaymentDTAsync(DataTablesRequestForm form, int id);

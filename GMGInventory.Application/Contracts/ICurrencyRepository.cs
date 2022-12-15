@@ -11,5 +11,8 @@ namespace GMGInventory.Application.Contracts
         Task<IList<Currency>> GetAllActiveCurrencyAsync(int includeId);
         Task<bool> IsCurrencyCodeExist(string code);
         Task<bool> IsCurrencyInUse(int id);
+        Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<int?> GetIdAsync(string? Name);
+
     }
 }

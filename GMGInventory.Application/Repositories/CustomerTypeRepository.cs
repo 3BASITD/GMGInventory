@@ -26,6 +26,11 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var ctype = await context.CustomerTypes.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return ctype?.Id;
+        }
         public async Task<IList<CustomerTypeVM>> GetAllCustomerTypeVMAsync()
         {
             var customertype = await context.CustomerTypes.ToListAsync();

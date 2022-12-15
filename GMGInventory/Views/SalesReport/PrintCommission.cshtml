@@ -36,16 +36,16 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
+                    @Html.DisplayNameFor(model => model.Contents.First().Agent)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().Customer)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().Agent)
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().CommissionRate)
@@ -62,10 +62,10 @@
             @foreach (var item in Model.Contents)
             {
                 <tr>
-                    <td><nobr>@item.InvoiceDate</nobr></td>
-                    <td>@item.InvoiceNumber</td>
+                    <td><nobr>@item.Agent</nobr></td>
                     <td>@item.Customer</td>
-                    <td>@item.Agent</td>
+                    <td>@item.InvoiceDate</td>
+                    <td>@item.InvoiceNumber</td>
                     <td class="right-text"><nobr>@item.CommissionRate</nobr></td>
                     <td class="right-text"><nobr>@item.InvoiceAmount</nobr></td>
                     <td class="right-text"><nobr>@item.CommissionAmount</nobr></td>
@@ -75,8 +75,8 @@
         <tfoot>
             <tr>
                 <th colspan="5" class="right-text">Total</th>
-                <th class="right-text"><nobr>@Model.TotalInvoiceAmount</nobr></th>
-                <th class="right-text"><nobr>@Model.TotalCommissionAmount</nobr></th>
+                <th class="right-text"><nobr>@Model.AgentTotalInvoice</nobr></th>
+                <th class="right-text"><nobr>@Model.AgentCommissionRate</nobr></th>
             </tr>
         </tfoot>
     </table>

@@ -12,5 +12,6 @@ namespace GMGInventory.Application.Contracts
         Task<bool> IsCreditTermInUse(int id);
 
         Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<int?> GetIdAsync(string? Name);
     }
 }

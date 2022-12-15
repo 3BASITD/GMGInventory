@@ -238,7 +238,7 @@ namespace GMGInventory.Controllers
                             sale.Agent,
                             sale.CommissionRate,
                             sale.InvoiceAmount,
-                            sale.CommissionAmount);
+                            sale.CommissionAmount2);
             }
 
             using (XLWorkbook wb = new())

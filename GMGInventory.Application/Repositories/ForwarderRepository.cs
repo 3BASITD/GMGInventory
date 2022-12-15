@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -37,6 +38,107 @@ namespace GMGInventory.Application.Repositories
                                 })
                                 .ToListAsync();
         }
+
+
+        public async Task<IList<ForwarderViewVM>> GetAllAsync()
+        {
+
+            var forwarders = from forward in context.Forwarders
+                         join cust in context.Customers
+                                    on forward.CustomerId equals cust.Id
+                         join userc in userManager.Users on forward.UserCreated equals userc.Id
+                         join userm in userManager.Users on forward.UserModified equals userm.Id into m
+                         from um in m.DefaultIfEmpty()
+
+                         select new ForwarderViewVM
+                         {
+                             Id = forward.Id,
+                             CustomerId = forward.CustomerId,
+                             CustomerName = cust.Name,
+                             Name = forward.Name,
+                             Address = forward.Address,
+                             IsActive = forward.IsActive,
+                             PhoneNumber = forward.PhoneNumber,
+                             FaxNumber = forward.FaxNumber,
+                             DateCreated = forward.DateCreated.ToString(SystemFormat.StringDateTime),
+                             DateCreatedD = forward.DateCreated,
+                             DateModified = forward.DateModified == null ? "-" : forward.DateModified.Value.ToString(SystemFormat.StringDateTime),
+                             DateModifiedD = forward.DateModified == null ? null : forward.DateModified.Value,
+                             UserCreated = userc.Nickname,
+                             UserModified = um == null ? "-" : um.Nickname
+                         };
+            return await forwarders.ToListAsync();
+        }
+
+        public async Task<ForDataTables<ForwarderViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetAllAsync()).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x =>  x.Name.ToLower().Contains(form.SearchValue)
+                                    || x.Address.ToLower().Contains(form.SearchValue)
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                                    || x.DateModified.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Name": data = data.OrderBy(s => s.Name); break;
+                        case "Address": data = data.OrderBy(s => s.Address); break;
+                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
+                        case "Address": data = data.OrderByDescending(s => s.Address); break;
+                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderByDescending(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<ForwarderViewVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+
+        public async Task<bool> UploadCombinationExistAsync(ForwarderVM forwarderVM)
+        {
+            return (await GetAllAsync()).Any(s => s.Name == forwarderVM.Name && s.Address == forwarderVM.Address &&
+            s.CustomerName == forwarderVM.CustomerName && s.PhoneNumber == forwarderVM.PhoneNumber && s.FaxNumber == forwarderVM.FaxNumber);
+        }
+
+
+
 
         public async Task<IList<ForwarderViewVM>> GetAllForwarderVMAsync()
         {
@@ -94,7 +196,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsForwarderInUse(int id)
         {
-            return await context.Forwarders.AnyAsync(s => s.Id == id);
+            return await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.ForwarderId == id);
         }
 
         public async Task<bool> IsForwarderIdExistAsync(int id)
@@ -106,7 +208,7 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var forwarders = await context.Forwarders.FirstAsync(s => s.Id == id);
-            // forwarders.IsActive = false;
+            forwarders.IsActive = false;
             await context.SaveChangesAsync(currentUserId);
         }
 
@@ -114,30 +216,48 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var forwarders = await context.Forwarders.FirstAsync(s => s.Id == id);
-            // forwarders.IsActive = true;
+            forwarders.IsActive = true;
             await context.SaveChangesAsync(currentUserId);
         }
 
         public async Task AddAsync(ForwarderVM forwarderVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var forwarders = mapper.Map<Forwarder>(forwarderVM);
-            // forwarders.IsActive = true;
-            await context.Forwarders.AddAsync(forwarders);
+
+            var forwarder = new Forwarder
+            {
+                Name = forwarderVM.Name,
+                Address = forwarderVM.Address,
+                PhoneNumber = forwarderVM.PhoneNumber,
+                FaxNumber = forwarderVM.FaxNumber,
+                CustomerId = forwarderVM.CustomerId,
+                IsActive = true
+            };
+            await context.Forwarders.AddAsync(forwarder);
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task UpdateAsync(int id, ForwarderVM forwarderVM)
+        public async Task UpdateAsync(ForwarderVM forwarderVM)
         {
-            var forwarders = context.Forwarders.Where(s => s.Id == id).FirstOrDefault();
-            if (forwarders == null)
+            var forwarder = context.Forwarders.Where(s => s.Id == forwarderVM.Id).FirstOrDefault();
+            if (forwarder == null)
             {
                 throw new DbUpdateConcurrencyException();
             }
+
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            mapper.Map(forwarderVM, forwarders);
-            context.Forwarders.Update(forwarders);
+            forwarder.Id = forwarderVM.Id;
+            forwarder.Name = forwarderVM.Name;
+            forwarder.Address = forwarderVM.Address;
+            forwarder.PhoneNumber = forwarderVM.PhoneNumber;
+            forwarder.FaxNumber = forwarderVM.FaxNumber;
+            forwarder.CustomerId = forwarderVM.CustomerId;
+            forwarder.IsActive = true;
+
+            context.Forwarders.Update(forwarder);
             await context.SaveChangesAsync(currentUserId);
         }
+
+
     }
 }
