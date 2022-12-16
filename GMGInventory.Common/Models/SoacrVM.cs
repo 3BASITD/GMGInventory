@@ -113,6 +113,10 @@ namespace GMGInventory.Common.Models
         public string InvoiceType { get; set; }
 
         [Display(Name = "Invoice Amount")]
+        public string? InvoiceAmountDeducted => string.Format(SystemFormat.StringDecimalComma, InvoiceAmountDeductedD);
+        public decimal InvoiceAmountDeductedD { get; set; }
+
+        [Display(Name = "Invoice Amount")]
         public string? InvoiceAmount => string.Format(SystemFormat.StringDecimalComma, InvoiceAmountD);
         public decimal InvoiceAmountD { get; set; }
 

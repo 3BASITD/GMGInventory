@@ -1,11 +1,12 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Roles.Accounting + "," + Roles.InventoryManager + "," + Roles.SalesDirector+ "," + Roles.SystemAdmin)]
     public class PaymentController : Controller
     {
         private readonly IPaymentRepository customerpaymentRepository;
