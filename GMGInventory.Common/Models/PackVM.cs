@@ -71,5 +71,25 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Quantity")]
         public int Quantity { get; set; }
+
+        [Display(Name = "Selling Price")]
+        public string SellingPrice => string.Format(SystemFormat.StringDecimalComma, SellingPriceD);
+        public decimal SellingPriceD { get; set; }
+
+        [Display(Name = "Gross Price")]
+        public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
+        public decimal GrossPriceD => SellingPriceD * Quantity;
+
+        [Display(Name = "Discount 1")]
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
+        public decimal Discount1D { get; set; }
+
+        [Display(Name = "Discount 2")]
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
+        public decimal Discount2D { get; set; }
+
+        [Display(Name = "Extended Price")]
+        public string ExtendedPrice => string.Format(SystemFormat.StringDecimalComma, ExtendedPriceD);
+        public decimal ExtendedPriceD => Quantity * (((100m - Discount1D - Discount2D) * SellingPriceD) / 100m);
     }
 }

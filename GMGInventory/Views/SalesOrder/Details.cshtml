@@ -32,9 +32,12 @@
             {
                 if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null && (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin)))
                 {
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
+                    @*<button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
                         <span class="fas fa-box-open"></span> Start Packing
-                    </button>
+                    </button>*@
+                    <a href="@Url.Action("Create", "Pack")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
+                        <span class="fas fa-box-open"></span> Start Packing
+                    </a>
                     <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                         <span class="fas fa-print"></span> Print
                     </button>

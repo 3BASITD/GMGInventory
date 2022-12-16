@@ -118,7 +118,7 @@ namespace GMGInventory.Data
                                 break;
                             case EntityState.Modified:
                                 if (property.IsModified && (originalValue.Equals(currentValue) == false
-                                    || (propertyName == "PasswordHash" && property.CurrentValue.Equals(property.OriginalValue) == false)))
+                                    || (propertyName == "PasswordHash" && property?.CurrentValue?.Equals(property.OriginalValue) == false)))
                                 {
                                     auditEntry.ChangedColumns.Add(propertyName);
                                     auditEntry.AuditType = Common.Constants.AuditType.Update;

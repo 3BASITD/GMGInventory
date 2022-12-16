@@ -139,6 +139,14 @@
                             @Model?.Remarks
                         </b>
                     </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.InvoiceType)
+                        </span>
+                        <b class="d-block">
+                            @Model?.InvoiceType
+                        </b>
+                    </p>
                 </div>
         </div>
         <div class="row">
@@ -259,7 +267,7 @@
             html += '<tr>';
             html += '<th>@Html.DisplayNameFor(model => model.Agent)</th><td>@Model?.Agent</td > ';
             html += '<th>@Html.DisplayNameFor(model => model.PackNumber)</th><td>@Model?.PackNumber</td > ';
-            //html += '<th></th><td></td > ';
+            html += '<th>@Html.DisplayNameFor(model => model.InvoiceType)</th><td>@Model?.InvoiceType</td > ';
                 html += '</tr>';
             html += '</table>';
 

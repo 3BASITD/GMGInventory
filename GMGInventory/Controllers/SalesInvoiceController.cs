@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,11 @@ namespace GMGInventory.Controllers
         public SalesInvoiceController(IInvoiceRepository invoiceRepository)
         {
             this.invoiceRepository = invoiceRepository;
+        }
+
+        public async Task<IActionResult> GetInvoiceTypeOptions(int? IncludeId)
+        {
+            return Json(await invoiceRepository.GetInvoiceTypeOptions(IncludeId));
         }
 
         public ActionResult Index()
@@ -52,6 +58,17 @@ namespace GMGInventory.Controllers
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await invoiceRepository.GetItemsDTAsync(form, invoiceId));
+        }
+
+        public async Task<ActionResult> Create(int? Id)
+        {
+            var order = await invoiceRepository.GetDetailsByPackAsync(Id);
+            if (order == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(order);
         }
     }
 }

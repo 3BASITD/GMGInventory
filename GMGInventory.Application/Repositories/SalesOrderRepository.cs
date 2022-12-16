@@ -29,9 +29,9 @@ namespace GMGInventory.Application.Repositories
                                               .Include(s => s.Supplier)
                                               .Include(s => s.Status)
                          join user in userManager.Users on order.UserCreated equals user.Id
-                         where string.IsNullOrWhiteSpace(search)
-                         && order.Status.Code != "Draft"
-                            || (order.PONumber.ToLower().Contains(search.ToLower()))
+                         where order.Status.Code != "Draft"
+                         && (string.IsNullOrWhiteSpace(search)
+                         || (order.PONumber.ToLower().Trim().Contains(search.ToLower().Trim())))
                          select new JsonPurchaseOrderOptionsModel
                          {
                              Id = order.Id.ToString(),
@@ -44,6 +44,28 @@ namespace GMGInventory.Application.Repositories
             return new Select2Model<JsonPurchaseOrderOptionsModel>
             {
                 //incomplete_results = false,
+                items = ordersFiltered,
+                total_count = orders.Count()
+            };
+        }
+
+        public async Task<Select2Model<JsonOptionsModel>> GetSalesOrderOptions(string search, int page)
+        {
+            var orders = from order in context.SalesOrders
+                         where order.Status.Code != "Submitted"
+                         && order.Status.Code != "Disapproved"
+                         && order.Status.Code != "Denied"
+                         && order.QuantityOrdered != order.QuantityPacked
+                         && (string.IsNullOrWhiteSpace(search)
+                         || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         select new JsonOptionsModel
+                         {
+                             Id = order.Id.ToString(),
+                             Text = order.SalesOrderNumber
+                         };
+            var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
                 items = ordersFiltered,
                 total_count = orders.Count()
             };
