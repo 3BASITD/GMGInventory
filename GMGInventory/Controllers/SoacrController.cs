@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + Roles.SystemAdmin)]
+    [Authorize(Roles = Roles.Accounting + "," + Roles.SystemAdmin)]
     public class SoacrController : Controller
     {
         private readonly ISoacrRepository soaRepository;
