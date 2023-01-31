@@ -75,5 +75,23 @@ namespace GMGInventory.Controllers
 
             return View(order);
         }
+
+        [HttpPost]
+        public async Task<JsonResult> SaveJson(PackFormVM form)
+        {
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            var orderId = await packRepository.SaveAsync(form);
+            if(orderId == -1)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Sales Order missing. Failed to submit.";
+            } else
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "Pack successfully submitted";
+            }
+            responseModel.NewRow = orderId;
+            return Json(responseModel);
+        }
     }
 }

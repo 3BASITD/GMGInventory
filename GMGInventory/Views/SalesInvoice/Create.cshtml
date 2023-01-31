@@ -452,9 +452,9 @@
             $(".quantity").on("input", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
-                var selling_price = rowdata.sellingPrice;
-                var discount1 = rowdata.discount1;
-                var discount2 = rowdata.discount2;
+                var selling_price = rowdata.sellingPriceD;
+                var discount1 = rowdata.discount1D;
+                var discount2 = rowdata.discount2D;
 
                 var extended_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * selling_price) / 100)));
                 $(this).parents("tr").find(".extendedprice").html(extended_price);
@@ -476,7 +476,7 @@
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 total_extended_price += parseFloat($(this.node()).find(".extendedprice").html().replace(",", ""));
             });
-            $(".total-gross-price").html(FormatStringDecimal(total_gross_price));
+            $(".total-extended").html(FormatStringDecimal(total_extended_price));
         }
 
         itemDT.clear().draw();

@@ -29,13 +29,10 @@ namespace GMGInventory.Controllers
             return Json(await forwarderRepository.GetOptions(IncludeId));
         }
 
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             return View();
         }
-
-
-
 
         [HttpPost]
         public async Task<JsonResult> GetListJson()

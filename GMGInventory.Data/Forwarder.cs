@@ -25,8 +25,8 @@ namespace GMGInventory.Data
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
 
-        public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
-
         public bool IsActive { get; set; }
+
+        public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
     }
 }

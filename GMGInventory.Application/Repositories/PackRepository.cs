@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,12 +10,15 @@ namespace GMGInventory.Application.Repositories
     public class PackRepository : IPackRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
 
         public PackRepository(ApplicationDbContext context
+            , IHttpContextAccessor httpContextAccessor
              , UserManager<User> userManager)
         {
             this.context = context;
+            this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
         }
 
@@ -185,6 +189,7 @@ namespace GMGInventory.Application.Repositories
             var itemVM = from pack in context.PackLineItems
                          join order in context.SalesOrderLineItems on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
                          where pack.PackId == packId
+                         && pack.Item.Id == order.Item.Id
                          select new PackItemVM
                          {
                              BoxNumber = pack.BoxNumber,
@@ -251,6 +256,56 @@ namespace GMGInventory.Application.Repositories
                 RecordsFiltered = filterRecord,
                 Data = pageList
             };
+        }
+
+        public async Task<int> SaveAsync(PackFormVM form)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var orderVM = await context.SalesOrders.Where(s => s.Id == form.SONumber).FirstOrDefaultAsync();
+            if (orderVM != null)
+            {
+                orderVM.QuantityPacked = form.Items.Sum(s => s.Quantity);
+                await context.SaveChangesAsync(currentUserId);
+
+                int statusId = await context.Statuses
+                                            .Where(s => s.Name == "Packing Submitted")
+                                            .Select(s => s.Id)
+                                            .FirstAsync();
+                Pack pack = new()
+                {
+                    SalesOrderId = orderVM.Id,
+                    StatusId = statusId,
+                    TotalQuantity = form.Items.Sum(s => s.Quantity)
+                };
+
+                await context.Packs.AddAsync(pack);
+                await context.SaveChangesAsync(currentUserId);
+
+                foreach (var item in form.Items)
+                {
+                    var soItem = await context.SalesOrderLineItems
+                                              .Where(s => s.SalesOrderId == orderVM.Id
+                                                       && s.ItemId == item.Item)
+                                              .FirstOrDefaultAsync();
+                    if (soItem != null)
+                    {
+                        soItem.PackedQuantity += item.Quantity;
+                    }
+
+                    PackLineItem packItem = new()
+                    {
+                        BoxNumber = item.BoxNumber,
+                        ItemId = item.Item,
+                        PackId = pack.Id,
+                        Quantity = item.Quantity
+                    };
+                    await context.PackLineItems.AddAsync(packItem);
+                }
+
+                await context.SaveChangesAsync(currentUserId);
+                return pack.Id;
+            }
+            return -1;
         }
     }
 }

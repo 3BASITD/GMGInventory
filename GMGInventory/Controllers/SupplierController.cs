@@ -34,7 +34,7 @@ namespace GMGInventory.Controllers
             return Json(await supplierRepository.GetOptions(IncludeId));
         }
 
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             return View();
         }

@@ -245,16 +245,46 @@ namespace GMGInventory.Application.Repositories
                              Discount1D = order.Discount1,
                              Discount2D = order.Discount2,
                              Id = order.ItemId,
-                             InventoryCount = inventory,
-                             InvoicedQuantity = order.InvoicedQuantity,
+                             InventoryCountD = inventory,
+                             InvoicedQuantityD = order.InvoicedQuantity,
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
                              NetPriceD = price.NetSellingPrice,
                              QuantityD = order.Quantity,
-                             PackedQuantity = order.PackedQuantity,
+                             PackedQuantityD = order.PackedQuantity,
                              RetailPriceD = price.RetailSellingPrice,
                              SellingPriceD = order.SellingPrice,
                              Unit = order.Item.Unit.Code,
+                         };
+            return await itemVM.ToListAsync();
+        }
+
+        public async Task<IList<SalesOrderItemVM>> GetItemsForPackAsync(int salesOrderId)
+        {
+            var itemVM = from order in context.SalesOrderLineItems
+                         from price in context.ItemPrices
+                                              .Where(s => s.ItemId == order.ItemId
+                                                       && s.DateCreated <= DateTime.Now)
+                                              .OrderByDescending(s => s.DateCreated)
+                                              .Take(1)
+                                              .DefaultIfEmpty()
+                         let inventory = context.ItemInventories.Where(s => s.ItemId == order.ItemId).Sum(s => s.Quantity)
+                         where order.SalesOrderId == salesOrderId
+                         && order.Quantity != order.PackedQuantity
+                         select new SalesOrderItemVM
+                         {
+                             Discount1D = order.Discount1,
+                             Discount2D = order.Discount2,
+                             Id = order.Id,
+                             InventoryCountD = inventory,
+                             ItemCode = order.Item.Code,
+                             ItemId = order.Item.Id,
+                             ItemName = order.Item.Name,
+                             NetPriceD = price.NetSellingPrice,
+                             PackedQuantityD = order.PackedQuantity,
+                             QuantityD = order.Quantity,
+                             RetailPriceD = price.RetailSellingPrice,
+                             SellingPriceD = order.SellingPrice
                          };
             return await itemVM.ToListAsync();
         }

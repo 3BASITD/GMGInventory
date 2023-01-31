@@ -92,4 +92,18 @@ namespace GMGInventory.Common.Models
         public string ExtendedPrice => string.Format(SystemFormat.StringDecimalComma, ExtendedPriceD);
         public decimal ExtendedPriceD => Quantity * (((100m - Discount1D - Discount2D) * SellingPriceD) / 100m);
     }
+
+    public class PackFormVM
+    {
+        public int? Id { get; set; }
+        public int SONumber { get; set; }
+        public IList<PackFormItemVM> Items { get; set; }
+    }
+
+    public class PackFormItemVM
+    {
+        public int Item { get; set; }
+        public int Quantity { get; set; }
+        public int BoxNumber { get; set; }
+    }
 }

@@ -89,6 +89,12 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<JsonResult> GetItemsForPackJson(int salesOrderId)
+        {
+            return Json(await salesOrderRepository.GetItemsForPackAsync(salesOrderId));
+        }
+
+        [HttpPost]
         public async Task<JsonResult> GetItemsDTJson(int salesOrderId)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);

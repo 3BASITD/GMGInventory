@@ -28,12 +28,10 @@ namespace GMGInventory.Controllers
             this.mapper = mapper;
         }
 
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             return View();
         }
-
-
 
         [HttpPost]
         public async Task<JsonResult> CreateJson(AreaVM areaVM)

@@ -9,96 +9,94 @@
 }
 
     <div class="card card-default">
-        <form id="form-order">
-            <div class="card-header">
-                <span class="card-title">@ViewData["Title"]</span>
-                <div class="card-tools">
-                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                    <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                        <span class="fas fa-arrow-left"></span> Back to List
-                    </a>
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack()">
+                    <span class="fas fa-paper-plane"></span> Submit
+                </button>
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="pack-so-number" class="form-label mb-0">Sales Order Number</label>
+                        <select id="pack-so-number" class="s2-bold s2ph-bold s2ph-dark" name="SONumber" style="width: 100%"></select>
+                        <span data-valmsg-for="pack-so-number" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="pack-so-number" class="form-label mb-0">Sales Order Number</label>
-                            <select id="pack-so-number" class="s2-bold s2ph-bold s2ph-dark" name="SONumber" style="width: 100%"></select>
-                            <span data-valmsg-for="pack-so-number" data-valmsg-replace="true" class="text-danger"></span>
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerCode)</span>
+                        <b class="d-block">@Model?.CustomerCode</b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerName)</span>
+                        <b class="d-block">@Model?.CustomerName</b>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.SalesOrderDate)</span>
+                        <b class="d-block">@Model?.SalesOrderDate</b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.DeliveryType)</span>
+                        <b class="d-block">@Model?.DeliveryType</b>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Packed Item(s)</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                    <span class="fas fa-plus"></span> Add Packed Item
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerCode)</span>
-                            <b class="d-block">@Model?.CustomerCode</b>
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerName)</span>
-                            <b class="d-block">@Model?.CustomerName</b>
-                        </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.SalesOrderDate)</span>
-                            <b class="d-block">@Model?.SalesOrderDate</b>
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.DeliveryType)</span>
-                            <b class="d-block">@Model?.DeliveryType</b>
-                        </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <span class="card-title">Packed Item(s)</span>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                        <span class="fas fa-plus"></span> Add Packed Item
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-item">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Box Number</th>
-                                            <th>Item Code</th>
-                                            <th>Item Name</th>
-                                            <th>Quantity</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th colspan="4">Total</th>
-                                            <th class="total-quantity">0</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Box Number</th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4">Total</th>
+                                        <th class="total-quantity">0</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 
     <!-- Save Packed Item Modal -->
     <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Packed Item</h5>
@@ -106,33 +104,31 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="form-item">
-                    <div class="modal-body">
-                        <table class="table table-head-fixed table-striped table-hover table-order">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Item Code</th>
-                                    <th>Item Name</th>
-                                    <th>Selling Price</th>
-                                    <th>Packed Quantity</th>
-                                    <th>Gross Price</th>
-                                    <th>Discount 1</th>
-                                    <th>Discount 2</th>
-                                    <th>Extended Price</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-add">
-                            <span class="fas fa-plus"></span> Add
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
-                </form>
+                <div class="modal-body">
+                    <table class="table table-head-fixed table-striped table-hover table-order">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Selling Price</th>
+                                <th>Discount 1</th>
+                                <th>Discount 2</th>
+                                <th>Ordered Quantity</th>
+                                <th>Inventory Quantity</th>
+                                <th>Gross Price</th>
+                                <th>Packed Quantity</th>
+                                <th>Remaining Quantity</th>
+                                <th>Extended Price</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -169,259 +165,51 @@
             window.location = "@Url.Action("Create", "Pack", new { id = "" })/" + $("#pack-so-number").val();
         });
 
-        // Load customer data for select2
-        $("#order-customer-code").select2({
-            minimumInputLength: 1,
-            placeholder: '<empty>',
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-            },
+        var orderDT = $('.table-order').DataTable({
             ajax: {
-                url: "@Url.Action("GetOptions", "Customer")",
-                dataType: 'json',
+                url: "@Url.Action("GetItemsForPackJson", "SalesOrder")",
+                data: { salesOrderId: @Model?.Id },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                },
                 type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            }
-        });
-
-        $("#order-customer-code").on("select2:select", function () {
-            $("#order-customer-name").val($(this).select2("data")[0].name);
-            $("#order-customer-address").val($(this).select2("data")[0].address);
-            $("#order-credit-term").val($(this).select2("data")[0].creditTerm);
-        });
-
-        $("#order-customer-code").on("select2:unselecting", function (e) {
-            $("#order-customer-name").val("");
-            $("#order-customer-address").val("");
-            $("#order-credit-term").val("");
-        });
-
-        // Load agent data for select2
-        $("#order-agent-code").select2({
-            minimumInputLength: 1,
-            placeholder: '<empty>',
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
             },
-            ajax: {
-                url: "@Url.Action("GetOptions2", "Agent")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        return actions;
+                    }
                 },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            }
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "sellingPrice", name: "SellingPrice", className: "text-end" },
+                { data: "discount1", name: "Discount1", className: "text-end" },
+                { data: "discount2", name: "Discount2", className: "text-end" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "inventoryCount", name: "InventoryCount", className: "text-end" },
+                { data: "netPrice", name: "NetPrice", className: "text-end" },
+                { data: "packedQuantity", name: "PackedQuantity", className: "text-end" },
+                { data: "remainingQuantity", name: "RemainingQuantity", className: "text-end" },
+                { data: "grossPrice", name: "GrossPrice", className: "text-end" }
+            ]
         });
 
-        $("#order-agent-code").on("select2:select", function () {
-            $("#order-agent-name").val($(this).select2("data")[0].name);
-        });
+        orderDT.on("draw", function () {
+            $(".table-order thead th").removeClass("text-end");
 
-        $("#order-agent-code").on("select2:unselecting", function (e) {
-            $("#order-agent-name").val("");
-        });
-
-        // Load price type data for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetPriceTypeOptions")",
-            success: function (data, status, xhr) {
-                $("#order-gross-net").select2({
-                    data: data,
-                    minimumResultsForSearch: -1
-                });
-            }
-        });
-
-        // Load purchase order data for select2
-        $("#order-purchase-number").select2({
-            minimumInputLength: 3,
-            allowClear: true,
-            placeholder: '<empty>',
-            ajax: {
-                url: "@Url.Action("GetOptions", "PurchaseOrder")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            }
-        });
-
-        // Load delivery type data for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetDeliveryTypeOptions")",
-            success: function (data, status, xhr) {
-                $("#order-delivery-type").select2({
-                    data: data,
-                    minimumResultsForSearch: Infinity
-                });
-            }
-        });
-
-        // Load item for select2
-        $("#add-code").select2({
-            minimumInputLength: 1,
-            allowClear: true,
-            placeholder: "<empty>",
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-            },
-            ajax: {
-                url: "@Url.Action("GetOptions", "Item")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            },
-            dropdownParent: $("#addModal")
-        });
-
-        $("#add-code").on("select2:select", function () {
-            $("#add-name").val($("#add-code").select2("data")[0].name);
-            $("#add-net-price").val($("#add-code").select2("data")[0].netPrice);
-            $("#add-retail-price").val($("#add-code").select2("data")[0].retailPrice);
-            $("#add-unit").val($("#add-code").select2("data")[0].unit);
-            //$("#add-unit").val($("#add-code").select2("data")[0].unit);
-            $("#add-code-error").html("");
-        });
-
-        $("#add-code").on("select2:unselecting", function (e) {
-            $("#add-name").val("");
-            $("#add-net-price").val("");
-            $("#add-retail-price").val("");
-            $("#add-unit").val("");
-        });
-
-        $("#add-quantity, #add-selling-price, #add-discount1, #add-discount2").on("input", function () {
-            var quantity = parseFloat($("#add-quantity").val());
-            var selling_price = parseFloat($("#add-selling-price").val());
-            var discount1 = parseFloat($("#add-discount1").val());
-            var discount2 = parseFloat($("#add-discount2").val());
-
-            $("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * selling_price) / 100)));
-        });
-
-        function clearItemForm() {
-            $("#add-code").val("").trigger("change");
-            $("#add-name").val("");
-            $("#add-net-price").val("0.00");
-            $("#add-retail-price").val("0.00");
-            $("#add-quantity").val("0");
-            $("#add-unit").val("");
-            $("#add-selling-price").val("0.00");
-            $("#add-discount1").val("0.00");
-            $("#add-discount2").val("0.00");
-            $("#add-gross-price").val("0.00");
-        }
-
-        $(".createBtn").on("click", clearItemForm);
-
-        // Validation for Add Item Modal
-        var validateAdd = $("#form-item").validate({
-            errorClass: 'text-danger text-xs',
-            rules: {
-                Code: { required: true },
-                Quantity: { required: true, isNotZero: true },
-                SellingPrice: { required: true, isNotZero: true }
-            },
-            messages: {
-                Code: { required: "Please select item to order." },
-                Quantity: { required: "Please enter a quantity", isNotZero: "Can not order an item with 0 quantity" },
-                SellingPrice: { required: "Please enter the selling price", isNotZero: "Can not sell for free" }
-            },
-            submitHandler: function (form, event) {
-                event.preventDefault();
-                AddItem();
-            }
-        });
-
-        function AddItem() {
-            var rowIndexes = [];
-            itemDT.rows(function (idx, data, node) {
-                if (data.id === $("#add-code").select2("data")[0].id) {
-                    rowIndexes.push(idx);
-                }
-                return false;
+            $(".btn-add-item").on("click", function () {
+                var rowdata = orderDT.row($(this).parents('tr')).data();
+                itemDT.row.add(rowdata).draw();
+                orderDT.row($(this).parents('tr')).remove().draw();
+                toastr.success("Added " + rowdata.itemCode + " on Packed Item(s)");
             });
-            if (rowIndexes.length > 0) {
-                toastr.warning("Can't add duplicate item");
-            } else {
-                itemDT.row.add({
-                    id: $("#add-code").select2("data")[0].id,
-                    boxNumber: "",
-                    code: $("#add-code").select2("data")[0].text,
-                    name: $("#add-code").select2("data")[0].name,
-                    quantity: $("#add-quantity").val() || 0
-                }).draw();
-                clearItemForm();
-            }
-        }
+        });
 
         var itemDT = $('.table-item').DataTable({
             data: [],
@@ -433,24 +221,24 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="right" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" value="' + data.boxNumber + '" class="form-control form-control-sm box-number" style="width: 100%;" />';
+                        return '<input type="number" min="0" max="1999999" value="1" class="form-control form-control-sm box-number" style="width: 100%;" />';
                     },
                     name: "BoxNumber",
                     className: "form-cell text-end"
                 },
-                { data: "code", name: "Code", className: "form-cell" },
-                { data: "name", name: "Name", className: "form-cell" },
+                { data: "itemCode", name: "ItemCode", className: "form-cell" },
+                { data: "itemName", name: "ItemName", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        return '<input type="number" min="0" max="1999999" value="' + Math.max(0, data.quantity - data.packedQuantity) + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                     },
-                    name: "Quantity",
+                    //name: "PackedQuantity",
                     className: "form-cell text-end"
                 }
             ],
@@ -463,120 +251,65 @@
 
         itemDT.on("draw", function () {
             $(".btn-remove-item").on("click", function () {
+                var rowdata = itemDT.row($(this).parents('tr')).data();
+                orderDT.row.add(rowdata).draw();
                 itemDT.row($(this).parents('tr')).remove().draw();
+                toastr.warning("Removed " + rowdata.itemCode + " on Packed Item(s)");
             });
 
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
 
-            $(".quantity, .sellingprice, .discount1, .discount2").on("input", function () {
-                var quantity = parseInt($(this).parents("tr").find(".quantity").val());
-                var selling_price = parseFloat($(this).parents("tr").find(".sellingprice").val());
-                var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
-                var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
-
-                var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * selling_price) / 100)));
-                $(this).parents("tr").find(".grossprice").html(gross_price);
+            $(".quantity").on("input", function () {
                 ComputeTotalQuantity();
-                ComputeTotalSellingPrice();
-                ComputeTotalGrossPrice();
             });
         });
 
         function ComputeTotalQuantity() {
             total_quantity = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 total_quantity += parseInt($(this.node()).find(".quantity").val());
-            } );
+            });
             $(".total-quantity").html(FormatStringInteger(total_quantity));
-        }
-
-        function ComputeTotalSellingPrice() {
-            total_selling_price = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                total_selling_price += parseFloat($(this.node()).find(".sellingprice").val());
-            } );
-            $(".total-selling-price").html(FormatStringDecimal(total_selling_price));
-        }
-
-        function ComputeTotalGrossPrice() {
-            total_gross_price = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",",""));
-            } );
-            $(".total-gross-price").html(FormatStringDecimal(total_gross_price));
         }
 
         itemDT.clear().draw();
 
-        function GetItemsToOrder() {
-            var item_to_order = [];
+        function GetItemsToPack() {
+            var item_to_pack = [];
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
+                var row_box_number = parseInt($(this.node()).find(".box-number").val());
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                var row_sellingprice = parseFloat($(this.node()).find(".sellingprice").val());
-                var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
-                var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
-                item_to_order.push({
-                    item: row_data.id,
+                item_to_pack.push({
+                    boxNumber: row_box_number,
+                    item: row_data.itemId,
                     quantity: row_quantity,
-                    sellingPrice: row_sellingprice,
-                    discount1: row_discount1,
-                    discount2: row_discount2
                 });
             });
-            return item_to_order;
+            return item_to_pack;
         }
 
-        // Validation for Create
-        var validateCreate = $("#form-order").validate({
-            errorClass: 'text-danger text-xs',
-            rules: {
-                CustomerCode: { required: true },
-                AgentCode: { required: true}
-            },
-            messages: {
-                CustomerCode: { required: "Please select customer" },
-                AgentCode: { required: "Please select agent" }
-            },
-            submitHandler: function (form, event) {
-                event.preventDefault();
-                SaveOrder();
-            }
-        });
-
-        function SaveOrder() {
-            var itemsToOrder = GetItemsToOrder();
-            if (itemsToOrder.length == 0) {
-                toastr.warning("No item to order. Add an item to the list to continue");
-            } else if (itemsToOrder.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't order an item with 0 quantity");
+        function SavePack() {
+            var itemsToPack = GetItemsToPack();
+            if (itemsToPack.length == 0) {
+                toastr.warning("No item to pack. Add an item to the list to continue");
+            } else if (itemsToPack.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                toastr.warning("Some items have 0 quantity. Can't pack an item with 0 quantity");
             } else {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("SaveJson")",
                     data: {
-                        Customer: $("#order-customer-code").val(),
-                        DeliveryType: $("#order-delivery-type").val(),
-                        Agent: $("#order-agent-code").val(),
-                        GrossNet: $("#order-gross-net").val(),
-                        PurchaseOrder: $("#order-purchase-number").val(),
-                        DeclaredValue: $("#order-declared-value").val(),
-                        Items: itemsToOrder
+                        SONumber: @Model?.Id,
+                        Items: itemsToPack
                     },
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
-                            //toastr.success(data.message, "Success");
-                            //toastr.warning("Page will redirect to details", 'Page Redirect', {
-                            //    timeOut: 3000,
-                            //    onHidden: function () {
-                                    window.location = "@Url.Action("Details")/" + data.newRow;
-                            //    },
-                            //    progressBar: true
-                            //});
+                            window.location = "@Url.Action("Details")/" + data.newRow;
                         }
                     }
                 });

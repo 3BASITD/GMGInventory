@@ -25,8 +25,7 @@ namespace GMGInventory.Controllers
             return Json(await categoryRepository.GetOptions(IncludeId));
         }
 
-
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             return View();
         }

@@ -137,6 +137,8 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
 
@@ -144,17 +146,24 @@ namespace GMGInventory.Common.Models
         public string ItemName { get; set; }
 
         [Display(Name = "Inventory")]
-        public int InventoryCount { get; set; }
+        public string InventoryCount => string.Format(SystemFormat.StringIntegerComma, InventoryCountD);
+        public int InventoryCountD { get; set; }
 
         [Display(Name = "Quantity")]
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
 
         [Display(Name = "Packed Quantity")]
-        public int PackedQuantity { get; set; }
+        public string PackedQuantity => string.Format(SystemFormat.StringIntegerComma, PackedQuantityD);
+        public int PackedQuantityD { get; set; }
 
         [Display(Name = "Invoiced Quantity")]
-        public int InvoicedQuantity { get; set; }
+        public string InvoicedQuantity => string.Format(SystemFormat.StringIntegerComma, InvoicedQuantityD);
+        public int InvoicedQuantityD { get; set; }
+
+        [Display(Name = "Remaining Quantity")]
+        public string RemainingQuantity => string.Format(SystemFormat.StringIntegerComma, RemainingQuantityD);
+        public int RemainingQuantityD => QuantityD - PackedQuantityD;
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }
