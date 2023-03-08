@@ -160,6 +160,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "brand", name: "Brand" },
                 { data: "itemCode", name: "ItemCode" },
@@ -181,8 +184,6 @@
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-sales', salesDT);
 
             $(".table-sales thead th").removeClass("text-end");
         });

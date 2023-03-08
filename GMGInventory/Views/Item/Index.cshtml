@@ -427,12 +427,13 @@
                     if (warehouseId) data.WarehouseId = warehouseId;
                 }
             },
-            //processing: true,
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
@@ -461,8 +462,6 @@
 
         itemDT.on("init.dt", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-item', itemDT);
 
             LoadSelect2();
 

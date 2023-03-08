@@ -193,6 +193,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
@@ -204,8 +207,6 @@
 
         itemDT.on("draw", function() {
             HideTabLoader("items");
-
-            DatatablesSearchOnEnter('.table-warehouse-items', itemDT);
         });
 
         var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
@@ -222,6 +223,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "source", name: "Source" },
                 { data: "destination", name: "Destination" },
@@ -236,8 +240,6 @@
 
         transferDT.on("draw", function () {
             HideTabLoader("transfer");
-
-            DatatablesSearchOnEnter('.table-transfer', transferDT);
         });
     </script>
 }

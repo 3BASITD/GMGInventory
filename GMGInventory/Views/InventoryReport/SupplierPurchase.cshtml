@@ -260,6 +260,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "purchaseDate", name: "PurchaseDate" },
                 { data: "supplier", name: "Supplier" },
@@ -285,8 +288,6 @@
         // Load functions upon DataTable load
         purchaseDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-purchase', purchaseDT);
 
             $(".table-purchase thead th").removeClass("text-end");
         });

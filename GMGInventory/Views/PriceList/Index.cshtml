@@ -74,6 +74,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "brand", name: "Brand" },
                 { data: "modelNumber", name: "ModelNumber" },
@@ -99,8 +102,6 @@
 
         dataTable.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table', dataTable);
         });
 
         function ApplyFilter() {

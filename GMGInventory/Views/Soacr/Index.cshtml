@@ -204,6 +204,9 @@
 			filter: true,
 			responsive: true,
 			autoWidth: false,
+			search: {
+				return: true,
+			},
 			columns: [
 				{ data: "id", name: "Id" },
 				{ data: "customerName", name: "CustomerName" },
@@ -234,8 +237,6 @@
 		// Load functions upon DataTable load
 		soaDT.on("draw", function () {
 			hideLoader();
-
-			DatatablesSearchOnEnter('.table-soa', soaDT);
 
 			LoadFilterSelect2();
 

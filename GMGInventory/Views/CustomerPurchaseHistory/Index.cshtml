@@ -182,7 +182,7 @@
 
         var loadfilterloaded = false;
         function LoadFilterSelect2() {
-            if(loadfilterloaded) return;
+            if (loadfilterloaded) return;
             loadfilterloaded = true;
             // Load Select2 for Customer
             $("#filter-customer").select2({
@@ -346,6 +346,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "soNumber", name: "SONumber" },
@@ -367,13 +370,6 @@
         // Load functions upon DataTable load
         historyDT.on("draw", function () {
             hideLoader();
-
-            $('.table-history .dataTables_filter input').unbind();
-            $('.table-history .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    historyDT.search($(this).val()).draw();
-                }
-            });
 
             LoadFilterSelect2();
         });

@@ -218,6 +218,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "brand", name: "Brand" },
                 { data: "itemType", name: "ItemType" },
@@ -242,8 +245,6 @@
         // Load functions upon DataTable load
         stockDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-stock', stockDT);
 
             $(".table-stock thead th").removeClass("text-end");
         });

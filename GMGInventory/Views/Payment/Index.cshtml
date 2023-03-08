@@ -59,8 +59,13 @@
                 url: "@Url.Action("GetListJson", "Payment")",
                 type: "POST",
             },
-            serverSide: true,
             filter: true,
+            serverSide: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "crNumber", name: "CRNumber" },
                 { data: "soaNo", name: "SOANo" },
@@ -87,8 +92,6 @@
         // load functions upon datatable load
         dataTable.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-payment', dataTable);
         });
 
        

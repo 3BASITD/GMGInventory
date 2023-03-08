@@ -395,6 +395,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 {
                     orderable: false,
@@ -489,8 +492,6 @@
 
         itemDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-item', itemDT);
 
             $(".btn-remove-item").on("click", function () {
                 itemDT.row($(this).parents('tr')).remove().draw();

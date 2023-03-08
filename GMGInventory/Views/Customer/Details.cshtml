@@ -721,11 +721,14 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
+            //searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "shippingAddress", name: "ShippingAddress" },
                 { data: "shippingContactPerson", name: "ShippingContactPerson" },
@@ -758,11 +761,14 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
+            //searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "forwarderName", name: "ForwarderName" },
                 { data: "forwarderAddress", name: "ForwarderAddress" },
@@ -794,11 +800,14 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
+            //searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "crNo", name: "CRNo" },
                 { data: "soaNo", name: "SOANo" },
@@ -835,11 +844,14 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
+            //searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "invoicedDate", name: "InvoicedDate" },
                 { data: "invoiceNo", name: "InvoiceNo" },

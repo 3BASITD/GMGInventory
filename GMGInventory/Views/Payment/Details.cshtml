@@ -206,6 +206,9 @@
             autoWidth: false,
             serverSide: true,
             filter: true,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "bankName", name: "BankName" },
                 { data: "bankBranch", name: "BankBranch" },
@@ -218,8 +221,6 @@
 
         itemTableChecks.on("draw", function() {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-payment-checks', itemTableChecks);
         });
 
 
@@ -237,6 +238,9 @@
             autoWidth: false,
             serverSide: true,
             filter: true,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "invoiceNumber", name: "InvoiceNumber" },
                 { data: "invoiceDate", name: "InvoiceDate" },

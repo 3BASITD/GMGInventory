@@ -401,6 +401,9 @@
 			filter: true,
 			responsive: true,
 			autoWidth: false,
+            search: {
+                return: true,
+            },
 			columns: [
 				{ data: "invoiceNumber", name: "InvoiceNumber" },
 				{ data: "invoiceAmount", name: "InvoiceAmount" },
@@ -426,8 +429,6 @@
 
 		itemTable.on("draw", function () {
 			hideLoader();
-
-			DatatablesSearchOnEnter('.table-soa', itemTable);
 
 			$(".printBtn").on("click", function() {
 				$.LoadingOverlay("show", {
@@ -684,6 +685,9 @@
 			filter: true,
 			responsive: true,
 			autoWidth: false,
+			search: {
+				return: true,
+			},
 			columns: [
 				{
 					orderable: false,
@@ -704,10 +708,6 @@
 		// Load functions upon DataTable load
 		invoiceDT.on("draw", function () {
 			hideLoader();
-
-			DatatablesSearchOnEnter('.table-invoice', invoiceDT);
-
-
 		});
 
 		$(".createInvoiceBtn").click(function(e) {

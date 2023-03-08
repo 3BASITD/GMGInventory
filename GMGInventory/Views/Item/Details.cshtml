@@ -422,11 +422,13 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
@@ -444,8 +446,6 @@
         }).on("draw.dt", function () {
 
             HideTabLoader("warehouse");
-
-            DatatablesSearchOnEnter('.table-warehouse', warehouseDT);
 
             // Actions upon Display Edit Quantity Modal
             $(".quantityBtn").click(function(e) {
@@ -514,11 +514,13 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "purchaseNumber", name: "PurchaseNumber" },
                 { data: "warehouse", name: "Warehouse" },
@@ -536,8 +538,6 @@
             order: [[9, "desc"]]
         }).on("draw.dt", function() {
             HideTabLoader("purchase");
-            
-            DatatablesSearchOnEnter('.table-purchase', purchaseDT);
         });
 
 
@@ -552,11 +552,13 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "salesNumber", name: "SalesNumber" },
                 { data: "customer", name: "Customer" },
@@ -573,8 +575,6 @@
             order: [[9, "desc"]]
         }).on("draw.dt", function() {
             HideTabLoader("sales");
-
-            DatatablesSearchOnEnter('.table-sales', salesDT);
         });
 
 
@@ -589,11 +589,13 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "warehouse", name: "Warehouse" },
                 { data: "quantityFrom", name: "QuantityFrom", className: "text-end" },
@@ -606,8 +608,6 @@
             order: [[4, "desc"]]
         }).on("draw.dt", function() {
             HideTabLoader("count");
-
-            DatatablesSearchOnEnter('.table-count', countDT);
         });
 
 
@@ -622,11 +622,13 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "retailPrice", name: "RetailPrice", className: "text-end" },
                 { data: "netPrice", name: "NetPrice", className: "text-end" },
@@ -636,8 +638,6 @@
             order: [[3, "desc"]]
         }).on("draw.dt", function() {
             HideTabLoader("price");
-
-            DatatablesSearchOnEnter('.table-price', priceDT);
         });
 
 
@@ -652,11 +652,13 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "transferNumber", name: "TransferNumber" },
                 { data: "source", name: "Source" },
@@ -669,8 +671,6 @@
             order: [[4, "desc"]]
         }).on("draw.dt", function() {
             HideTabLoader("transfer");
-
-            DatatablesSearchOnEnter('.table-transfer', transferDT);
         });
 
 
@@ -685,11 +685,13 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "returnNumber", name: "ReturnNumber" },
                 { data: "itemCode", name: "ItemCode" },
@@ -702,8 +704,6 @@
             order: [[5, "desc"]]
         }).on("draw.dt", function() {
             HideTabLoader("return");
-
-            DatatablesSearchOnEnter('.table-return', returnDT);
         });
     </script>
 }

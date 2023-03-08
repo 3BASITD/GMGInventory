@@ -87,8 +87,8 @@ namespace GMGInventory.Application.Repositories
                                            .Include(s => s.Status)
                                            .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
                                            .Where(s => (filter.Status == null || s.StatusId == filter.Status)
-                                                     && filter.DateFrom <= s.DateCreated
-                                                     && s.DateCreated <= filter.DateTo)
+                                                     && filter.DateFrom <= s.DateCreated.Date
+                                                     && s.DateCreated.Date <= filter.DateTo)
                         join usr in userManager.Users on pck.UserCreated equals usr.Id
                         select new PackVM
                         {
@@ -197,6 +197,7 @@ namespace GMGInventory.Application.Repositories
                              Discount2D = order.Discount2,
                              Id = pack.Id,
                              ItemCode = pack.Item.Code,
+                             ItemId = order.ItemId,
                              ItemName = pack.Item.Name,
                              Quantity = pack.Quantity,
                              SellingPriceD = order.SellingPrice

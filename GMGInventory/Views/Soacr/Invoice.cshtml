@@ -261,6 +261,9 @@
 			filter: true,
 			responsive: true,
 			autoWidth: false,
+			search: {
+				return: true,
+			},
 			columns: [
 				{ data: "invoiceDate", name: "InvoiceDate" },
 				{ data: "invoiceNumber", name: "InvoiceNumber" },
@@ -273,8 +276,6 @@
 		// Load functions upon DataTable load
 		soaDT.on("draw", function () {
 			hideLoader();
-
-			DatatablesSearchOnEnter('.table-soa', soaDT);
 
 			LoadFilterSelect2();
 

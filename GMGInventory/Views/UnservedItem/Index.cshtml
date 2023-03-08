@@ -68,6 +68,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "item", name: "Item" },
                 { data: "orderDate", name: "OrderDate" },
@@ -100,8 +103,6 @@
         // Load functions upon DataTable load
         dataTable.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-unserved', dataTable);
         });
     </script>
     }

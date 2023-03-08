@@ -25,6 +25,11 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetInvoiceTypeOptions(IncludeId));
         }
 
+        public async Task<IActionResult> GetInvoiceByCustomer(string search, int page, int customer)
+        {
+            return Json(await invoiceRepository.GetInvoiceByCustomer(search, page, customer));
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -69,6 +74,25 @@ namespace GMGInventory.Controllers
             }
 
             return View(order);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> SaveJson(InvoiceFormVM form)
+        {
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            var orderId = await invoiceRepository.SaveAsync(form);
+            if (orderId == -1)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Sales Order missing. Failed to submit.";
+            }
+            else
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "Pack successfully submitted";
+            }
+            responseModel.NewRow = orderId;
+            return Json(responseModel);
         }
     }
 }

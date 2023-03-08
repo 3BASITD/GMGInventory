@@ -49,6 +49,15 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
 
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? ApprovedBy { get; set; }
+        public DateTime? ApprovedDate { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? DisapprovedBy { get; set; }
+        public DateTime? DisapprovedDate { get; set; }
+
         public ICollection<CreditDebitMemo> CreditDebitMemos { get; set; }
         public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public ICollection<InvoiceLineItem> InvoiceLineItems { get; set; }

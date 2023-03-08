@@ -521,8 +521,13 @@
 				url: "@Url.Action("GetListJson", "Customer")",
 				type: "POST",
 			},
-			serverSide: true,
-			filter: true,
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
 			columns: [
 				{ data: "code", name: "Code" },
 				{ data: "name", name: "Name" },

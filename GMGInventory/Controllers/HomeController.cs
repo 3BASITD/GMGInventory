@@ -20,7 +20,12 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Progress()
+        {
+            return View();
+        }
+
+        public IActionResult PrintSample()
         {
             return View();
         }

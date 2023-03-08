@@ -942,7 +942,7 @@ namespace GMGInventory.Application.Repositories
                                 Quantity = rturnItem.Quantity,
                                 ReturnBy = user.Nickname,
                                 ReturnDateD = rturn.DateCreated,
-                                ReturnNumber = rturn.Number
+                                ReturnNumber = rturn.SalesReturnNumber
                             };
             return await returnsVM.ToListAsync();
         }

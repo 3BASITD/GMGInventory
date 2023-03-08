@@ -58,6 +58,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "soNumber", name: "SONumber" },
                 { data: "customer", name: "Customer" },
@@ -87,8 +90,6 @@
 
         orderDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-order', orderDT);
 
             $('.deleteBtn').click(function (e) {
                 swal({

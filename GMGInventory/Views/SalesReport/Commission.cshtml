@@ -135,9 +135,8 @@
 
 @section Scripts {
     <script>
-        console.log("Time loaded: " + new Date()) 
-        $("#filter-from").val('2022-04-01'); // for testing only, remove on prod
-        $("#filter-to").val('2022-04-31'); // for testing only, remove on prod
+        //$("#filter-from").val('2022-04-01'); // for testing only, remove on prod
+        //$("#filter-to").val('2022-04-31'); // for testing only, remove on prod
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -286,6 +285,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
@@ -324,8 +326,6 @@
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-sales', salesDT);
 
             $(".table-sales thead th").removeClass("text-end");
 

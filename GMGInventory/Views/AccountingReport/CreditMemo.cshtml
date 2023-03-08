@@ -184,6 +184,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "memoDate", name: "MemoDate" },
                 { data: "memoNumber", name: "MemoNumber" },
@@ -202,8 +205,6 @@
         // Load functions upon DataTable load
         memoDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-memo', memoDT);
 
             $(".table-memo thead th").removeClass("text-end");
         });

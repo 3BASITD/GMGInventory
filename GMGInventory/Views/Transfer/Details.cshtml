@@ -102,6 +102,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
@@ -113,8 +116,6 @@
 
         itemDT.on("draw", function() {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-item', itemDT);
         });
     </script>
 }

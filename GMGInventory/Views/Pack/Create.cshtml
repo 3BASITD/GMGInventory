@@ -177,6 +177,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 {
                     orderable: false,
@@ -227,7 +230,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" value="1" class="form-control form-control-sm box-number" style="width: 100%;" />';
+                        return '<input type="number" min="0" max="' + data.quantity + '" value="1" class="form-control form-control-sm box-number" style="width: 100%;" />';
                     },
                     name: "BoxNumber",
                     className: "form-cell text-end"

@@ -155,6 +155,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
@@ -178,8 +181,6 @@
 
         dataTable.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-update', dataTable);
 
             $(".table-update thead th").removeClass("text-end");
 

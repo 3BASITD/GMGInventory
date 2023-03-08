@@ -28,7 +28,10 @@
         //});
     });
 
+    var ajax_time = Date.now();
+
     $(document).ajaxStart(function (event, jqxhr, settings) {
+        ajax_time = Date.now();
     });
 
     $(document).ajaxSend(function (event, jqxhr, settings) {
@@ -50,6 +53,15 @@
     $(document).ajaxStop(function (event, jqxhr, settings) {
         $.LoadingOverlay("hide");
         reloadInputNumberRule();
+
+        var ajax_run_time = Date.now() - ajax_time;
+        var ajax_run_hh = Math.floor(ajax_run_time / 1000 / 60 / 60);
+        ajax_run_time -= ajax_run_hh * 1000 * 60 * 60;
+        var ajax_run_mm = Math.floor(ajax_run_time / 1000 / 60);
+        ajax_run_time -= ajax_run_mm * 1000 * 60;
+        var ajax_run_ss = Math.floor(ajax_run_time / 1000);
+        ajax_run_time -= ajax_run_ss * 1000;
+        console.log("Ajax Load Time > " + String(ajax_run_hh).padStart(2, "0") + ":" + String(ajax_run_mm).padStart(2, "0") + ":" + String(ajax_run_ss).padStart(2, "0") + ":" + String(ajax_run_time).padStart(3, "0"));
     });
 
     $.validator.addMethod('lessThan', function (value, element, param) {

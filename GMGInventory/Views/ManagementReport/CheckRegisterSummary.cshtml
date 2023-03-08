@@ -109,10 +109,14 @@
                     data.DateTo = $("#filter-to").val();
                 }
             },
+            processing: true,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "checkDate", name: "CheckDate" },
                 { data: "numberOfChecks", name: "NumberOfChecks", className: "text-end" },
@@ -131,8 +135,6 @@
         // Load functions upon DataTable load
         registerDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-register', registerDT);
 
             $(".table-register thead th").removeClass("text-end");
         });

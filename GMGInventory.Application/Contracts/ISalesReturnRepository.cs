@@ -7,5 +7,6 @@ namespace GMGInventory.Application.Contracts
         Task<SalesReturnVM?> GetDetailsAsync(int? Id);
         Task<ForDataTables<SalesReturnVM>> GetListDTAsync(DataTablesRequestForm form);
         Task<IList<SalesReturnItemVM>> GetItemsAsync(int salesReturnId);
+        Task<int> SaveAsync(SalesReturnFormVM form);
     }
 }

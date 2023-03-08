@@ -242,6 +242,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
@@ -282,8 +285,6 @@
         // Load functions upon DataTable load
         dataTable.on("draw", function() {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-itemtype', dataTable);
 
             $('.deleteBtn').click(function(e) {
                 swal({

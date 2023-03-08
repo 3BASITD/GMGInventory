@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +53,18 @@ namespace GMGInventory.Controllers
         public ActionResult Create()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> SaveJson(SalesReturnFormVM form)
+        {
+            ResponseModel<int> responseModel = new ();
+            var orderId = await salesReturnRepository.SaveAsync(form);
+            responseModel.Status = "Success";
+            responseModel.Message = "Pack successfully submitted";
+            responseModel.NewRow = orderId;
+
+            return Json(responseModel);
         }
     }
 }

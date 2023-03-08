@@ -107,6 +107,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "id", name: "Id" },
                 { data: "source", name: "Source" },
@@ -129,8 +132,6 @@
 
         dataTable.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-transfer', dataTable);
 
             // Actions upon Display Update Modal
             $('.btn-update').click(function (e) {

@@ -25,6 +25,18 @@ namespace GMGInventory.Data
         public int TotalQuantity { get; set; }
         public int QuantityInvoiced { get; set; }
 
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? ApprovedBy { get; set; }
+        public DateTime? ApprovedDate { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? DisapprovedBy { get; set; }
+        public DateTime? DisapprovedDate { get; set; }
+
+        [Column(TypeName = "nvarchar(150)")]
+        public string? Remarks { get; set; }
+
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<PackLineItem> PackLineItems { get; set; }
         public ICollection<PackReturn> PackReturns { get; set; }

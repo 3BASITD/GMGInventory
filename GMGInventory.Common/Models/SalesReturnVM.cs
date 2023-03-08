@@ -65,4 +65,23 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Reference Number")]
         public string ReferenceNumber { get; set; }
     }
+
+    public class SalesReturnFormVM
+    {
+        public int? Id { get; set; }
+        public int Customer { get; set; }
+        public string Remarks { get; set; }
+        public IList<SalesReturnFormItemVM> Items { get; set; }
+    }
+
+    public class SalesReturnFormItemVM
+    {
+        public int Item { get; set; }
+        public int Quantity { get; set; }
+        public decimal SellingPrice { get; set; }
+        public decimal Discount1 { get; set; }
+        public decimal Discount2 { get; set; }
+        public bool IsDefective { get; set; }
+        public int? Invoice { get; set; }
+    }
 }

@@ -1,0 +1,351 @@
+﻿@using GMGInventory.Controllers
+@{
+    ViewData["Title"] = "Project Progress";
+
+    var TaskProgress = new List<HomeTaskRow>(){
+    new HomeTaskRow { MD = "SYSTEM > Login", ST = "Done" },
+    new HomeTaskRow { MD = "SYSTEM > Logout", ST = "Done" },
+    new HomeTaskRow { MD = "SYSTEM > System Template", ST = "Done (May change on later works)" },
+    new HomeTaskRow { MD = "SYSTEM > Database", ST = "Done (May change on later works)" },
+    new HomeTaskRow { MD = "SYSTEM > Profile", ST = "Done" },
+    new HomeTaskRow { MD = "SYSTEM > Navigation with Account Access binding", ST = "Done" },
+    new HomeTaskRow { MD = "SYSTEM > Modules with Account Access binding", ST = "On-going" },
+    new HomeTaskRow { MD = "SYSTEM > Data transfer from Old System", ST = "Not Started" },
+
+    new HomeTaskRow { MD = "SALES > Customer Purchase History", ST = "Done" },
+    new HomeTaskRow { MD = "SALES > Pack Listing", ST = "Done" },
+    new HomeTaskRow { MD = "SALES > Sales Invoice", ST = "Done" },
+    new HomeTaskRow { MD = "SALES > Sales Order", ST = "Done" },
+    new HomeTaskRow { MD = "SALES > Sales Order Delivery", ST = "Done" },
+    new HomeTaskRow { MD = "SALES > Sales Return", ST = "Done" },
+
+    new HomeTaskRow { MD = "INVENTORY > Item", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY > Price List", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY > Price Update", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY > Purchase Return", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY > Replenish", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY > Warehouse", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY > Warehouse Transfer", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY > Unserved Item", ST = "Done" },
+
+    new HomeTaskRow { MD = "CREDITS & COLLECTION > Customer", ST = "Done" },
+    new HomeTaskRow { MD = "CREDITS & COLLECTION > Forwarder", ST = "Done" },
+    new HomeTaskRow { MD = "CREDITS & COLLECTION > Payment", ST = "Done" },
+    new HomeTaskRow { MD = "CREDITS & COLLECTION > SOA / Counter Receipt", ST = "Done" },
+
+    new HomeTaskRow { MD = "ADMINISTRATION > Agents", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Areas", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Brands", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Categories", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Item Types", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Users", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Suppliers", ST = "Done" },
+    new HomeTaskRow { MD = "ADMINISTRATION > Audit Logs", ST = "Done" },
+
+    new HomeTaskRow { MD = "SALES REPORTS > Agent Sales per Items", ST = "Excluded" },
+    new HomeTaskRow { MD = "SALES REPORTS > Brand Sales", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Best Selling Item", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Best Selling Item (Invoice)", ST = "Excluded" },
+    new HomeTaskRow { MD = "SALES REPORTS > Commission", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales Analysis", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales Ranking", ST = "Excluded" },
+    new HomeTaskRow { MD = "SALES REPORTS > Customer Sales", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Daily Sales", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Daily Sales Margin", ST = "Excluded" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales Invoice Listing", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales by Agent-Area", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales Margin Item", ST = "Excluded" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales Report Basis", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Sales Return Listing", ST = "Done" },
+    new HomeTaskRow { MD = "SALES REPORTS > Unserved Item", ST = "On-going" },
+
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Below Maintaining Item", ST = "Excluded" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Listing", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Listing Supplier", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Receiving Summary", ST = "Done" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Stock Card", ST = "On-going" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Stock Status", ST = "On-going" },
+    new HomeTaskRow { MD = "INVENTORY REPORTS > Supplier Purchase History", ST = "Done" },
+
+    new HomeTaskRow { MD = "ACCOUNTING REPORTS > Credit Memo Listing Report", ST = "Done" },
+    new HomeTaskRow { MD = "ACCOUNTING REPORTS > Debit Memo Listing Report", ST = "Done" },
+
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register by Date", ST = "Excluded" },
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register by Customer", ST = "Excluded" },
+    new HomeTaskRow { MD = "MANAGEMENT REPORTS > Check Register Summary", ST = "Excluded" }
+    };
+
+    var TaskDone = TaskProgress.Count(s => s.ST == "Done");
+    var TaskDoneMayChange = TaskProgress.Count(s => s.ST == "Done (May change on later works)");
+    var TaskPending = TaskProgress.Count(s => s.ST == "Pending");
+    var TaskOngoing = TaskProgress.Count(s => s.ST == "On-going");
+    var TaskNotStarted = TaskProgress.Count(s => s.ST == "Not Started");
+    var TaskExcluded = TaskProgress.Count(s => s.ST == "Excluded");
+    var TaskTotal = TaskProgress.Count();
+
+    DateTime FromDate = new DateTime(2022, 7, 18);
+    DateTime ToDate = DateTime.Now;
+
+    double calcBusinessDays = 1 + ((ToDate - FromDate).TotalDays * 5 - (FromDate.DayOfWeek - ToDate.DayOfWeek) * 2) / 7;
+
+    if (ToDate.DayOfWeek == DayOfWeek.Saturday) calcBusinessDays--;
+    if (FromDate.DayOfWeek == DayOfWeek.Sunday) calcBusinessDays--;
+
+    int totalDays = (int)calcBusinessDays, until = 105;
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+}
+
+<div class="row">
+    <div class="col-md-8 text-md">
+        <div class="alert alert-primary">
+            <h5><i class="icon fas fa-calendar-day"></i> Project Start Date</h5>
+            @FromDate.ToString("MMMM dd, yyyy")
+            <div class="progress progress-xxs">
+                <div class="progress-bar progress-bar-striped @(totalDays > until ? "bg-error": "bg-success")" style="width: @(((decimal)totalDays/(decimal)105) * (decimal)100)%"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="info-box bg-success">
+                    <span class="info-box-icon"><i class="fas fa-battery-full"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Done</span>
+                        <span class="info-box-number">@TaskDone</span>
+                        @{
+                            var DonePercentage = string.Format("{0:0.00}", (((decimal)TaskDone / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @DonePercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @DonePercentage%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box bg-warning">
+                    <span class="info-box-icon"><i class="fas fa-battery-full"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text" title="Done (May change on later works)">Done (May change on later works)</span>
+                        <span class="info-box-number">@TaskDoneMayChange</span>
+                        @{
+                            var DoneMayChangePercentage = string.Format("{0:0.00}", (((decimal)TaskDoneMayChange / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @DoneMayChangePercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @DoneMayChangePercentage%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box bg-info">
+                    <span class="info-box-icon"><i class="fas fa-battery-quarter"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Pending</span>
+                        <span class="info-box-number">@TaskPending</span>
+                        @{
+                            var PendingPercentage = string.Format("{0:0.00}", (((decimal)TaskPending / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @PendingPercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @PendingPercentage%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="info-box bg-danger">
+                    <span class="info-box-icon"><i class="fas fa-battery-three-quarters"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">On-going</span>
+                        <span class="info-box-number">@TaskOngoing</span>
+                        @{
+                            var OngoingPercentage = string.Format("{0:0.00}", (((decimal)TaskOngoing / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @OngoingPercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @OngoingPercentage%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box bg-secondary">
+                    <span class="info-box-icon"><i class="fas fa-battery-empty"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Not Started</span>
+                        <span class="info-box-number">@TaskNotStarted</span>
+                        @{
+                            var NotStartedPercentage = string.Format("{0:0.00}", (((decimal)TaskNotStarted / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @NotStartedPercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @NotStartedPercentage%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box bg-dark text-white">
+                    <span class="info-box-icon"><i class="fas fa-trash"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Excluded</span>
+                        <span class="info-box-number">@TaskExcluded</span>
+                        @{
+                            var ExcludedPercentage = string.Format("{0:0.00}", (((decimal)TaskExcluded / (decimal)TaskTotal) * (decimal)100));
+                        }
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @ExcludedPercentage%"></div>
+                        </div>
+                        <span class="progress-description">
+                            @ExcludedPercentage%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        You can also view this progress report via <a href="https://docs.google.com/spreadsheets/d/1nv3nGt35aktjUpMwZhoo7fWG3oKNF4WMLU7QkhU8ioE/edit?usp=sharing" target="_blank">Google Sheets</a>. User can add on the Additional Task tab of sheet. Will discuss added task if needed.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-label mb-0">Select Chart Type:</label>
+                    <select class="form-control form-control-sm" id="chartType" onchange="updateChartType()">
+                        <option value="pie">Pie</option>
+                        <option value="radar">Radar</option>
+                        <option value="bar">Bar</option>
+                        <option value="line">Line</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        Chart
+                    </div>
+                    <div class="card-body">
+                        <canvas id="progressChart" width="300" height="300" class="zoom-ignore"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                List of Progress
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>####</th>
+                            <th>Module</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in TaskProgress)
+                        {
+                            <tr class="@(a.ST == "Done" ? "table-success"
+                               : a.ST == "Done (May change on later works)" ? "table-warning"
+                               : a.ST == "Pending" ? "table-info"
+                               : a.ST == "On-going" ? "table-danger"
+                               : a.ST == "Excluded" ? "table-dark"
+                               : "")">
+                                <td>@string.Format("{0:000}", TaskProgress.IndexOf(a) + 1)</td>
+                                <td>@a.MD</td>
+                                <td class="@(a.ST == "Done" ? "text-success"
+                                   : a.ST == "Done (May change on later works)" ? "text-warning"
+                                   : a.ST == "Pending" ? "text-info"
+                                   : a.ST == "On-going" ? "text-danger"
+                                   : a.ST == "Excluded" ? "text-white"
+                                   : "")">
+                                    @a.ST
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('.table').DataTable();
+        var data = [@(TaskDone + TaskDoneMayChange)/*, @TaskDoneMayChange*/, @TaskPending, @TaskOngoing, @TaskNotStarted, @TaskExcluded];
+        var myData = {
+            labels: ['Done'/*, 'Done (May change on later works)'*/, 'Pending', 'On-going', 'Not Started', 'Excluded'],
+            datasets: [{
+                label: 'Status',
+                data: data,
+                backgroundColor: [
+                    'rgba(0, 255, 0, 0.5)',
+                    //'rgba(255, 255, 0, 0.5)',
+                    'rgba(0, 0, 255, 0.5)',
+                    'rgba(255, 0, 0, 0.5)',
+                    'rgba(127, 127, 127, 0.5)',
+                    'rgba(0, 0, 0, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(0, 255, 0, 1)',
+                    //'rgba(255, 255, 0, 1)',
+                    'rgba(0, 0, 255, 1)',
+                    'rgba(255, 0, 0, 1)',
+                    'rgba(127, 127, 127, 1)',
+                    'rgba(0, 0, 0, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        var ctx = document.getElementById('progressChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: myData
+        });
+
+        function updateChartType() {
+            myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: document.getElementById("chartType").value,
+                data: myData,
+            });
+        };
+    </script>
+}

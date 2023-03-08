@@ -9,7 +9,7 @@
 }
 
     <div class="card card-default">
-        <form id="form-order">
+        <form id="form-invoice">
             <div class="card-header">
                 <span class="card-title">@ViewData["Title"]</span>
                 <div class="card-tools">
@@ -26,14 +26,16 @@
                     <div class="col-12 col-md-4 col-sm-6">
                         <div class="form-group">
                             <label for="invoice-pack-number" class="form-label mb-0">Pack Number</label>
-                            <select id="invoice-pack-number" class="s2-bold s2ph-bold s2ph-dark" name="SONumber" style="width: 100%"></select>
+                            <select id="invoice-pack-number" class="s2-bold s2ph-bold s2ph-dark" name="PackNumber" style="width: 100%"></select>
                             <span data-valmsg-for="invoice-pack-number" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-12 col-md-4 col-sm-6">
                         <div class="form-group">
                             <label for="invoice-control-number" class="form-label mb-0">BIR Invoice Number</label>
-                            <input type="text" id="invoice-control-number" class="form-control form-control-sm" />
+                            <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" />
                             <span data-valmsg-for="invoice-control-number" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                     </div>
@@ -41,6 +43,13 @@
                         <div class="form-group">
                             <label for="invoice-invoice-type" class="form-label mb-0">Invoice Type</label>
                             <select id="invoice-invoice-type" class="form-control form-control-sm"></select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="invoice-remarks" class="form-label mb-0">Remarks</label>
+                            <input type="text" id="invoice-remarks" class="form-control form-control-sm" />
+                            <span data-valmsg-for="invoice-remarks" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col-12 col-md-4 col-sm-6">
@@ -122,97 +131,6 @@
         </form>
     </div>
 
-    <!-- Save Invoice Item Modal -->
-    @*<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Invoice Item</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="form-item">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-code" class="form-label mb-0">Code</label>
-                                    <div>
-                                        <select id="add-code" name="Code" style="width: 100%;">
-                                            <option></option>
-                                        </select>
-                                    </div>
-                                    <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-name" class="form-label mb-0">Name</label>
-                                    <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
-                                    <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-gross-price" class="form-label mb-0">Gross Price</label>
-                                    <input type="text" id="add-gross-price" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-quantity" class="form-label mb-0">Quantity</label>
-                                    <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-discount1" class="form-label mb-0">Discount 1</label>
-                                    <div class="input-group input-group-sm">
-                                        <input type="number" step="0.01" min="0" max="100" id="add-discount1" name="Discount1" class="form-control form-control-sm" />
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                    <span data-valmsg-for="add-discount1" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-discount2" class="form-label mb-0">Discount 2</label>
-                                    <div class="input-group input-group-sm">
-                                        <input type="number" step="0.01" min="0" max="100" id="add-discount2" name="Discount2" class="form-control form-control-sm" />
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                    <span data-valmsg-for="add-discount2" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-gross-price" class="form-label mb-0">Extended Price</label>
-                                    <input type="number" id="add-gross-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
-                                    <span data-valmsg-for="add-gross-price" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-add">
-                            <span class="fas fa-plus"></span> Add
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>*@
     <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
@@ -309,54 +227,6 @@
 
         $(".createBtn").on("click", clearItemForm);
 
-        // Validation for Add Item Modal
-        var validateAdd = $("#form-item").validate({
-            errorClass: 'text-danger text-xs',
-            rules: {
-                Code: { required: true },
-                Quantity: { required: true, isNotZero: true },
-                SellingPrice: { required: true, isNotZero: true }
-            },
-            messages: {
-                Code: { required: "Please select item to order." },
-                Quantity: { required: "Please enter a quantity", isNotZero: "Can not order an item with 0 quantity" },
-                SellingPrice: { required: "Please enter the selling price", isNotZero: "Can not sell for free" }
-            },
-            submitHandler: function (form, event) {
-                event.preventDefault();
-                AddItem();
-            }
-        });
-
-        function AddItem() {
-            var rowIndexes = [];
-            itemDT.rows(function (idx, data, node) {
-                if (data.id === $("#add-code").select2("data")[0].id) {
-                    rowIndexes.push(idx);
-                }
-                return false;
-            });
-            if (rowIndexes.length > 0) {
-                toastr.warning("Can't add duplicate item");
-            } else {
-                itemDT.row.add({
-                    id: $("#add-code").select2("data")[0].id,
-                    code: $("#add-code").select2("data")[0].text,
-                    name: $("#add-code").select2("data")[0].name,
-                    inventoryCount: 0,
-                    quantity: $("#add-quantity").val() || 0,
-                    unit: $("#add-code").select2("data")[0].unit,
-                    netPrice: Round2Decimal($("#add-net-price").val() || "0.00"),
-                    retailPrice: Round2Decimal($("#add-retail-price").val() || "0.00"),
-                    sellingPrice: Round2Decimal($("#add-selling-price").val() || "0.00"),
-                    discount1: Round2Decimal($("#add-discount1").val() || "0.00"),
-                    discount2: Round2Decimal($("#add-discount2").val() || "0.00"),
-                    grossPrice: Round2Decimal($("#add-gross-price").val() || "0.00"),
-                }).draw();
-                clearItemForm();
-            }
-        }
-        
         var packDT = $('.table-pack').DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsWithPriceJson", "Pack")",
@@ -369,6 +239,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 {
                     orderable: false,
@@ -481,60 +354,52 @@
 
         itemDT.clear().draw();
 
-        function GetItemsToOrder() {
-            var item_to_order = [];
+        function GetItemsToInvoice() {
+            var item_to_invoice = [];
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                var row_sellingprice = parseFloat($(this.node()).find(".sellingprice").val());
-                var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
-                var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
-                item_to_order.push({
-                    item: row_data.id,
-                    quantity: row_quantity,
-                    sellingPrice: row_sellingprice,
-                    discount1: row_discount1,
-                    discount2: row_discount2
+                item_to_invoice.push({
+                    item: row_data.itemId,
+                    quantity: row_quantity
                 });
             });
-            return item_to_order;
+            return item_to_invoice;
         }
 
         // Validation for Create
-        var validateCreate = $("#form-order").validate({
+        var validateCreate = $("#form-invoice").validate({
             errorClass: 'text-danger text-xs',
             rules: {
-                CustomerCode: { required: true },
-                AgentCode: { required: true }
+                ControlNumber: { required: true, maxlength: 50 },
+                AgentCode: { maxlength: 250 }
             },
             messages: {
-                CustomerCode: { required: "Please select customer" },
-                AgentCode: { required: "Please select agent" }
+                ControlNumber: { required: "Please enter BIR Invoice Number", maxlength: "BIR Invoice Number must not exceed 50 characters." },
+                Remarks: { maxlength: "BIR Invoice Number must not exceed 250 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
-                SaveOrder();
+                SaveInvoice();
             }
         });
 
-        function SaveOrder() {
-            var itemsToOrder = GetItemsToOrder();
-            if (itemsToOrder.length == 0) {
-                toastr.warning("No item to order. Add an item to the list to continue");
-            } else if (itemsToOrder.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't order an item with 0 quantity");
+        function SaveInvoice() {
+            var itemsToInvoice = GetItemsToInvoice();
+            if (itemsToInvoice.length == 0) {
+                toastr.warning("No item to invoice. Add an item to the list to continue");
+            } else if (itemsToInvoice.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                toastr.warning("Some items have 0 quantity. Can't invoice an item with 0 quantity");
             } else {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("SaveJson")",
                     data: {
-                        Customer: $("#order-customer-code").val(),
-                        DeliveryType: $("#order-delivery-type").val(),
-                        Agent: $("#order-agent-code").val(),
-                        GrossNet: $("#order-gross-net").val(),
-                        PurchaseOrder: $("#order-purchase-number").val(),
-                        DeclaredValue: $("#order-declared-value").val(),
-                        Items: itemsToOrder
+                        PackId: @Model?.PackNumber,
+                        BIRInvoiceNumber: $("#invoice-control-number").val(),
+                        InvoiceType: $("#invoice-invoice-type").val(),
+                        Remarks: $("#invoice-remarks").val(),
+                        Items: itemsToInvoice
                     },
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {

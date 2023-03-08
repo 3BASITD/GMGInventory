@@ -187,6 +187,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "customer", name: "Customer" },
                 { data: "checkDate", name: "CheckDate" },
@@ -206,8 +209,6 @@
         // Load functions upon DataTable load
         registerDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-register', registerDT);
 
             $(".table-register thead th").removeClass("text-end");
         });

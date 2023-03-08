@@ -538,7 +538,7 @@ namespace GMGInventory.Application.Repositories
                          select new StockCardRVM
                          {
                              DateD = card.PurchaseOrder.ReplenishDate,
-                             DetailsRemarks = "Purchase from - ",
+                             DetailsRemarks = "Purchase from - " + card.PurchaseOrder.Supplier.Name,
                              InD = card.Quantity,
                              Item = card.Item.Name,
                              OutD = 0,
@@ -609,8 +609,10 @@ namespace GMGInventory.Application.Repositories
                              TransactionType = "Sales Return"
                          }; */
             //return await cards1.Union(cards2).Union(cards5).ToListAsync();
-            var union = cards1.Union(cards2).Union(cards5);
-            return await union.ToListAsync();
+            var union = await cards1.ToListAsync();
+            union.AddRange(await cards2.ToListAsync());
+            union.AddRange(await cards5.ToListAsync());
+            return union;
         }
 
         public async Task<ForDataTables<StockCardRVM>> GetStockCardDT(DataTablesRequestForm form, ListFilterInventoryModel filter)

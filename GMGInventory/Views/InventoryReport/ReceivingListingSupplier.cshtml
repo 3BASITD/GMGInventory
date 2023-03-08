@@ -164,6 +164,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "supplier", name: "Supplier" },
                 { data: "date", name: "Date" },
@@ -186,8 +189,6 @@
         // Load functions upon DataTable load
         receiveDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-receive', receiveDT);
 
             $(".table-receive thead th").removeClass("text-end");
         });

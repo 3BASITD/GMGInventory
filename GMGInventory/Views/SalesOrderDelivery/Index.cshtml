@@ -353,6 +353,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "salesOrderDate", name: "SalesOrderDate" },
                 { data: "soNumber", name: "SONumber" },
@@ -378,8 +381,6 @@
         // Load functions upon DataTable load
         deliveryDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-delivery', deliveryDT);
 
             LoadFilterSelect2();
 

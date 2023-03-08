@@ -58,6 +58,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "supplier", name: "Supplier" },
                 { data: "poNumber", name: "PONumber" },
@@ -83,8 +86,6 @@
 
         replenishDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-replenish', replenishDT);
 
             $('.deleteBtn').click(function (e) {
                 swal({

@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,12 +10,15 @@ namespace GMGInventory.Application.Repositories
     public class InvoiceRepository : IInvoiceRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
 
         public InvoiceRepository(ApplicationDbContext context
-             , UserManager<User> userManager)
+            , IHttpContextAccessor httpContextAccessor
+            , UserManager<User> userManager)
         {
             this.context = context;
+            this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
         }
 
@@ -59,6 +63,26 @@ namespace GMGInventory.Application.Repositories
                            {
                                Id = invoice.Id.ToString(),
                                Text = invoice.InvoiceNumber
+                           };
+            var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
+                //incomplete_results = false,
+                items = invoicesFiltered,
+                total_count = invoices.Count()
+            };
+        }
+
+        public async Task<Select2Model<JsonOptionsModel>> GetInvoiceByCustomer(string search, int page, int customer)
+        {
+            var invoices = from invoice in context.Invoices
+                           where invoice.SalesOrder.Customer.Id == customer
+                              && (string.IsNullOrWhiteSpace(search)
+                              || invoice.ControlNumber.ToLower().Contains(search.ToLower()))
+                           select new JsonOptionsModel
+                           {
+                               Id = invoice.Id.ToString(),
+                               Text = invoice.ControlNumber
                            };
             var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonOptionsModel>
@@ -145,8 +169,8 @@ namespace GMGInventory.Application.Repositories
                                               .Include(s => s.Status)
                                               .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
                            where (filter.Status == null || inv.StatusId == filter.Status)
-                           && filter.DateFrom <= inv.DateCreated
-                           && inv.DateCreated <= filter.DateTo
+                           && filter.DateFrom <= inv.DateCreated.Date
+                           && inv.DateCreated.Date <= filter.DateTo
                            select new InvoiceVM
                            {
                                Customer = inv.SalesOrder.Customer.Code,
@@ -247,10 +271,12 @@ namespace GMGInventory.Application.Repositories
                              Discount1D = orderl.Discount1,
                              Discount2D = orderl.Discount2,
                              Id = invoicel.Id,
+                             ItemId = item.Id,
                              ItemCode = item.Code,
                              ItemName = item.Name,
                              NetPriceD = invoicel.UnitPrice,
-                             Quantity = invoicel.Quantity
+                             Quantity = invoicel.Quantity,
+                             ReferenceNumber = invoicel.Invoice.ControlNumber
                          };
             return await itemVM.ToListAsync();
         }
@@ -315,6 +341,82 @@ namespace GMGInventory.Application.Repositories
                 RecordsFiltered = filterRecord,
                 Data = pageList
             };
+        }
+
+        public async Task<int> SaveAsync(InvoiceFormVM form)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var packVM = await context.Packs.Where(s => s.Id == form.PackId).FirstOrDefaultAsync();
+            if (packVM != null)
+            {
+                var salesOrder = await context.SalesOrders.Where(s => s.Id == packVM.SalesOrderId).FirstAsync();
+                salesOrder.QuantityInvoiced += form.Items.Sum(s => s.Quantity);
+                await context.SaveChangesAsync(currentUserId);
+
+                int statusId = await context.Statuses
+                                            .Where(s => s.Name == "Invoice Submitted")
+                                            .Select(s => s.Id)
+                                            .FirstAsync();
+
+                if (salesOrder.QuantityPacked == salesOrder.QuantityInvoiced)
+                {
+                    salesOrder.StatusId = statusId;
+                    await context.SaveChangesAsync(currentUserId);
+                }
+
+                List<InvoiceLineItem> invoiceLineItems = new();
+                foreach (var item in form.Items)
+                {
+                    var soItem = await context.SalesOrderLineItems
+                                              .Where(s => s.SalesOrderId == packVM.SalesOrderId && s.ItemId == item.Item)
+                                              .FirstAsync();
+                    InvoiceLineItem lineItem = new()
+                    {
+                        InvoiceId = 0,
+                        ItemId = item.Item,
+                        Quantity = item.Quantity,
+                        UnitPrice = soItem.SellingPrice
+                    };
+                    invoiceLineItems.Add(lineItem);
+                }
+
+                var invoiceType = await context.InvoiceTypes.Where(s => s.Id == form.InvoiceType).FirstAsync();
+
+                var lastInvoice = await context.Invoices
+                                               .Where(s => s.InvoiceTypeId == form.InvoiceType)
+                                               .OrderByDescending(s => s.InvoiceNumber)
+                                               .FirstAsync();
+                var lastInvoiceNumber = lastInvoice.InvoiceNumber.Replace(invoiceType.Code + "-", "");
+                var newInvoiceNumber = Int32.Parse(lastInvoiceNumber) + 1;
+
+                Invoice invoice = new()
+                {
+                    Amount = invoiceLineItems.Sum(s => s.UnitPrice),
+                    ControlNumber = form.BIRInvoiceNumber,
+                    InvoiceNumber = invoiceType.Code + "-" + string.Format("{0:0000000}", newInvoiceNumber),
+                    InvoiceTypeId = form.InvoiceType,
+                    IsGenerated = false,
+                    IsPaid = false,
+                    PackId = form.PackId,
+                    PaidAmount = 0,
+                    Remarks = form.Remarks,
+                    SalesOrderId = packVM.SalesOrder.Id,
+                    StatusId = statusId
+                };
+
+                await context.Invoices.AddAsync(invoice);
+                await context.SaveChangesAsync(currentUserId);
+
+                foreach (var item in invoiceLineItems)
+                {
+                    item.InvoiceId = invoice.Id;
+                    await context.InvoiceLineItems.AddAsync(item);
+                }
+
+                await context.SaveChangesAsync(currentUserId);
+                return invoice.Id;
+            }
+            return -1;
         }
     }
 }

@@ -139,9 +139,8 @@
 
 @section Scripts {
     <script>
-        console.log("Time loaded: " + new Date()) 
-        $("#filter-from").val('2022-04-01'); // for testing only, remove on prod
-        $("#filter-to").val('2022-04-31'); // for testing only, remove on prod
+        //$("#filter-from").val('2022-04-01'); // for testing only, remove on prod
+        //$("#filter-to").val('2022-04-31'); // for testing only, remove on prod
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -149,16 +148,16 @@
                     $("#filter-to").val(DateForInput(new Date()));
                 } else {
                     var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
+                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    //dt_from.setMonth(dt_from.getMonth() + 1);
                     $("#filter-to").val(DateForInput(dt_from));
                 }
             }
 
             if ($("#filter-from").val() == "") {
                 var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
+                dt_to.setFullYear(dt_to.getFullYear() - 1);
+                //dt_to.setMonth(dt_to.getMonth() - 1);
                 $("#filter-from").val(DateForInput(dt_to));
             }
         }
@@ -246,6 +245,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "agentCode", name: "AgentCode" },
                 { data: "agentName", name: "AgentName" },
@@ -288,8 +290,6 @@
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-sales', salesDT);
 
             $(".table-sales thead th").removeClass("text-end");
 

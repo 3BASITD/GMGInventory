@@ -121,6 +121,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "soNumber", name: "SONumber" },
                 { data: "packNumber", name: "PackNumber" },
@@ -136,7 +139,7 @@
                         @*if (data.status == "Draft" && data.packedBy == $("#current-user-nickname").val()) {
                             actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }*@
-                        if (data.status == "Posted" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin"))) {
+                                if (data.status == "Posted" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin"))) {
                             actions += '<a href="@Url.Action("Create","SalesInvoice")/' + data.id + '" class="btn btn-primary btn-xs invoiceBtn" type="button" data-microtip-title="Start Invoice" data-microtip-position="left" role="tooltip"><i class="fas fa-file-invoice"></i></a>';
                         }
                         return actions + "</div>";
@@ -149,8 +152,6 @@
         // Load functions upon DataTable load
         packDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-pack', packDT);
         });
     </script>
     }

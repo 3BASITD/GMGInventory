@@ -126,16 +126,16 @@
                     $("#filter-to").val(DateForInput(new Date()));
                 } else {
                     var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
+                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    //dt_from.setMonth(dt_from.getMonth() + 1);
                     $("#filter-to").val(DateForInput(dt_from));
                 }
             }
 
             if ($("#filter-from").val() == "") {
                 var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
+                dt_to.setFullYear(dt_to.getFullYear() - 1);
+                //dt_to.setMonth(dt_to.getMonth() - 1);
                 $("#filter-from").val(DateForInput(dt_to));
             }
         }
@@ -181,6 +181,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "brand", name: "Brand" },
                 { data: "itemCode", name: "ItemCode" },
@@ -206,8 +209,6 @@
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-sales', salesDT);
 
             $(".table-sales thead th").removeClass("text-end");
 

@@ -184,7 +184,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Area Details</h5>
+                <h5 class="modal-title">Forwarder Details</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -276,6 +276,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "name", name: "Name" },
                 { data: "address", name: "Address" },
@@ -306,8 +309,6 @@
     // Load functions upon DataTable load
     dataTable.on("draw", function() {
     hideLoader();
-
-    DatatablesSearchOnEnter('.table-forwarder', dataTable);
 
             $('.deleteBtn').click(function(e) {
                 swal({

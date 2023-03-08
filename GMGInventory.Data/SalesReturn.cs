@@ -10,7 +10,7 @@ namespace GMGInventory.Data
         }
 
         [Column(TypeName = "nvarchar(50)")]
-        public string Number { get; set; }
+        public string SalesReturnNumber { get; set; }
 
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }

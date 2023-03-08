@@ -216,11 +216,13 @@
                     data.Id = @Model?.Id;
                 }
             },
-            searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "customerName", name: "CustomerName" },
                 { data: "customerAddress", name: "CustomerAddress" },
@@ -230,12 +232,6 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            $('.table-customers .dataTables_filter input').unbind();
-            $('.table-customers .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    customersDT.search($(this).val()).draw();
-                }
-            });
 
             HideLoader("customers");
 

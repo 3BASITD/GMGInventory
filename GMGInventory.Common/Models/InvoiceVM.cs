@@ -119,6 +119,8 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
 
@@ -143,5 +145,24 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Gross Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
         public decimal GrossPriceD => Quantity * (((100m - Discount1D - Discount2D) * NetPriceD) / 100m);
+
+        [Display(Name = "Reference Number")]
+        public string ReferenceNumber { get; set; }
+    }
+
+    public class InvoiceFormVM
+    {
+        public int? Id { get; set; }
+        public int PackId { get; set; }
+        public string BIRInvoiceNumber { get; set; }
+        public int InvoiceType { get; set; }
+        public string Remarks { get; set; }
+        public IList<InvoiceFormItemVM> Items { get; set; }
+    }
+
+    public class InvoiceFormItemVM
+    {
+        public int Item { get; set; }
+        public int Quantity { get; set; }
     }
 }
