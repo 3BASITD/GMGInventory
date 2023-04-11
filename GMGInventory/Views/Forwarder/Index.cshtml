@@ -8,7 +8,7 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-             <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
                 <span class="fas fa-plus"></span> New Forwarder
             </button>
             <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
@@ -46,7 +46,7 @@
                     <th></th>
                 </tr>
             </thead>
-           
+
         </table>
     </div>
 </div>
@@ -135,7 +135,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                             <div class="form-group">
+                            <div class="form-group">
                                 <label for="edit-name" class="control-label mb-0 d-block">Name</label>
                                 <input name="name" id="edit-name" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
@@ -260,13 +260,13 @@
     <script>
 
         // Load List on DataTable
-        var dataTable = $('.table-forwarder').on('preXhr.dt', function(e, settings, data) {
+        var dataTable = $('.table-forwarder').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     //var regionId = $("#RegionId").val();
 
                     //if (regionId) data.RegionId = regionId;
@@ -290,12 +290,12 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions +=  '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Forwarder" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Forwarder" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         } else {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Forwarder" data-microtip-position="left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Forwarder" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
@@ -306,11 +306,11 @@
         });
 
 
-    // Load functions upon DataTable load
-    dataTable.on("draw", function() {
-    hideLoader();
+        // Load functions upon DataTable load
+        dataTable.on("draw", function () {
+            hideLoader();
 
-            $('.deleteBtn').click(function(e) {
+            $('.deleteBtn').click(function (e) {
                 swal({
                     title: "Delete / Deactivate Forwarder",
                     text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
@@ -329,7 +329,7 @@
 
 
 
-            $('.reactivateBtn').click(function(e) {
+            $('.reactivateBtn').click(function (e) {
                 swal({
                     title: "Reactivate Forwarder",
                     text: "Are you sure you want to reactivate this record?",
@@ -347,7 +347,7 @@
             });
 
 
-              $('.detailsBtn').click(function(e) {
+            $('.detailsBtn').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
                 $(".modal-detail-name").html(data.name);
                 $(".modal-detail-address").html(data.address);
@@ -359,9 +359,9 @@
                 $(".modal-detail-usermodified").html(data.userModified);
                 $(".modal-detail-datemodified").html(data.dateModified);
             });
- 
+
             // Actions upon Display Edit Modal
-            $(".editBtn").click(function(e) {
+            $(".editBtn").click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
 
                 $("#edit-id").val(data.id);
@@ -380,7 +380,7 @@
                     type: "POST",
                     url: "@Url.Action("GetOptions2", "Customer")",
                     data: { includeId: data.customerId },
-                    success: function(data, status, xhr) {
+                    success: function (data, status, xhr) {
                         $("#edit-customer").select2({
                             data: data,
                             allowClear: true,
@@ -399,20 +399,21 @@
                 errorClass: 'text-danger text-xs',
                 rules: {
                     name: { required: true, maxlength: 10 },
-                 address: { required: true, maxlength: 100 },
-                   phone: { required: true, maxlength: 20 },
-                     fax: { required: true, maxlength: 20 }
+                    address: { required: true, maxlength: 100 },
+                    phone: { required: true, maxlength: 20 },
+                    fax: { required: true, maxlength: 20 }
                 },
                 messages: {
                     name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
-                 address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
-                   phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
-                     fax: { required: "Please enter Fax Number.", maxlength: "Fax number must not exceed 20 characters." }
+                    address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
+                    phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
+                    fax: { required: "Please enter Fax Number.", maxlength: "Fax number must not exceed 20 characters." }
                 },
-            submitHandler: function (form, event) {
-                event.preventDefault();
+                submitHandler: function (form, event) {
+                    event.preventDefault();
                     DoEdit();
-                }
+                },
+                showErrors: validateShowErrors
             });
 
             // Send Edit to Controller
@@ -423,17 +424,17 @@
                     data: {
                         Id: $("#edit-id").val(),
                         Name: $("#edit-name").val(),
-                     Address: $("#edit-address").val(),
-                  CustomerId: $("#edit-customer").val(),
-                  PhoneNumber: $("#edit-phone").val(),
-                  FaxNumber: $("#edit-fax").val()
+                        Address: $("#edit-address").val(),
+                        CustomerId: $("#edit-customer").val(),
+                        PhoneNumber: $("#edit-phone").val(),
+                        FaxNumber: $("#edit-fax").val()
                     },
                     error: jQueryCommonError,
-                    success: function(data, status, xhr) {
+                    success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            toastr.success(data.message, "Success");
+                            toastrNoDuplicate(data.message, "Success", "success");
                             $("#editModal").modal("hide");
                             dataTable.ajax.reload();
                             hideLoader()
@@ -443,13 +444,13 @@
             }
 
 
-    });
+        });
 
         // Load Select2 Customers
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions2", "Customer")",
-            success: function(data, status, xhr) {
+            success: function (data, status, xhr) {
                 $("#create-customer").select2({
                     data: data,
                     dropdownParent: $("#createModal")
@@ -461,9 +462,9 @@
             }
         });
 
-    
-         // Actions upon Display Create Modal
-        $(".createBtn").click(function(e) {
+
+        // Actions upon Display Create Modal
+        $(".createBtn").click(function (e) {
             $("#create-name").val("");
             $("#create-address").val("");
             $("#create-phone").val("");
@@ -475,22 +476,23 @@
         // Validation for Create Modal
         var validateCreate = $("#createForm").validate({
             errorClass: 'text-danger text-xs',
-              rules: {
-                    name: { required: true, maxlength: 10 },
-                 address: { required: true, maxlength: 100 },
-                   phone: { required: true, maxlength: 20 },
-                     fax: { required: true, maxlength: 20 }
-                },
-                messages: {
-                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
-                 address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
-                   phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
-                     fax: { required: "Please enter Fax Number.", maxlength: "Fax number must not exceed 20 characters." }
-                },
+            rules: {
+                name: { required: true, maxlength: 10 },
+                address: { required: true, maxlength: 100 },
+                phone: { required: true, maxlength: 20 },
+                fax: { required: true, maxlength: 20 }
+            },
+            messages: {
+                name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
+                address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
+                phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
+                fax: { required: "Please enter Fax Number.", maxlength: "Fax number must not exceed 20 characters." }
+            },
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoCreate();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         // Send Create to Controller
@@ -508,24 +510,24 @@
 
                 },
                 error: jQueryCommonError,
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                     } else {
-                        toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                         $("#createModal").modal("hide");
                         dataTable.ajax.reload();
                         hideLoader()
                     }
                 },
-                complete: function(xhr, status) {
+                complete: function (xhr, status) {
                     //$(".save-overlay").hideOverlay();
                 }
             });
         }
 
-        
-        $(".downloadBtn").click(function(e) {
+
+        $(".downloadBtn").click(function (e) {
             window.location = "@Url.Action("DownloadFile")";
         });
 
@@ -538,7 +540,7 @@
             readAsDefault: 'ArrayBuffer',
             dragClass: 'drag',
             on: {
-                load: function(e, file) {
+                load: function (e, file) {
                     var result = new Uint8Array(e.target.result);
                     var xlsread = XLSX.read(result, { type: 'array' });
                     var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
@@ -549,14 +551,14 @@
         $("#upload-file").fileReaderJS(opts);
 
         // Actions upon file selection
-        $("#upload-file").on("change", function() {
+        $("#upload-file").on("change", function () {
             done_upload_excel = 0;
             $("#upload-table tbody").html("");
             $("#upload-table").hide();
         });
 
         // Actions upon Display Upload Modal
-        $(".uploadBtn").click(function(e) {
+        $(".uploadBtn").click(function (e) {
             done_upload_excel = 0;
             $("#upload-file").val("");
             $("#upload-table tbody").html("");
@@ -565,9 +567,9 @@
 
         function DoUpload() {
             if (!$("#upload-file").val()) {
-                toastr.error("Please select a file first");
+                toastrNoDuplicate("Please select a file first", "Warning", "warning");
             } if (json_of_excel.length == 0) {
-                toastr.error("The excel file is empty");
+                toastrNoDuplicate("The excel file is empty", "Warning", "warning");
             } else {
                 var columns = Object.keys(json_of_excel[0]);
                 $("#upload-table tbody").html("");
@@ -591,7 +593,7 @@
                         row$.append($('<td/>').html("Unexpected columns"));
                         UploadRowDone();
                     } else {
-                        SaveXLSX(json_of_excel[i]["Name"], json_of_excel[i]["Address"], json_of_excel[i]["Customer"], json_of_excel[i]["Phone Number"],json_of_excel[i]["Fax Number"], rowNum);
+                        SaveXLSX(json_of_excel[i]["Name"], json_of_excel[i]["Address"], json_of_excel[i]["Customer"], json_of_excel[i]["Phone Number"], json_of_excel[i]["Fax Number"], rowNum);
                         row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
                     }
                     $("#upload-table").append(row$);
@@ -610,10 +612,10 @@
                     PhoneNumber: phoneNumber,
                     FaxNumber: faxNumber
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     $("#upload-row" + rownum).html(error);
                 },
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.message == "Already exist") {
                         $("#upload-row" + rownum + "tr").remove();
                         duplicate_upload++;
@@ -621,7 +623,7 @@
                         $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
                     }
                 },
-                complete: function(xhr, status) {
+                complete: function (xhr, status) {
                     UploadRowDone();
                 }
             });

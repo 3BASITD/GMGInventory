@@ -346,7 +346,8 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 AddItem();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function AddItem() {
@@ -358,7 +359,7 @@
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastr.warning("Can't add duplicate item");
+                        toastrNoDuplicate($("#add-code").select2("data")[0].text " has already been added", "Duplicate", "warning");
             } else {
                 itemDT.row.add({
                     id: $("#add-code").select2("data")[0].id,
@@ -388,7 +389,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -505,15 +506,16 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 SaveReplenish(event.originalEvent.submitter.value);
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function SaveReplenish(submitter) {
             var itemsToReplenish = GetItemsToReplenish();
             if (itemsToReplenish.length == 0) {
-                toastr.warning("No item to replenish. Add an item to the list to continue");
+                        toastrNoDuplicate("No item to replenish. Add an item to the list to continue", "Warning", "warning");
             } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity");
+                        toastrNoDuplicate("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning", "warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -531,13 +533,14 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            //toastr.success(data.message, "Success");
+                            //toastrNoDuplicate(data.message, "Success", "success");
+                            //toastrNoDuplicate("Page will redirect to details", "Warning", "warning");
                             //toastr.warning("Page will redirect to details", 'Page Redirect', {
                             //    timeOut: 3000,
                             //    onHidden: function () {
-                                    window.location = "@Url.Action("Details")/" + data.newRow;
+                            window.location = "@Url.Action("Details")/" + data.newRow;
                             //    },
                             //    progressBar: true
                             //});

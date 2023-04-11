@@ -162,7 +162,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="create-retail-price" class="control-label mb-0 d-block">Retail Price</label>
+                                <label for="create-retail-price" class="control-label mb-0 d-block">Gross Price</label>
                                 <input type="number" step="0.01" min="0" max="1999999.99" name="RetailPrice" id="create-retail-price" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-retail-price" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -447,12 +447,12 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.isActive) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         } else {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
                         }
                         return actions + "</div>";
                     }
@@ -539,7 +539,8 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoEdit();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         // Send Edit to Controller
@@ -563,9 +564,9 @@
                 error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                     } else {
-                        toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                         $("#editModal").modal("hide");
                         itemDT.ajax.reload();
                     }
@@ -615,7 +616,8 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoCreate();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         // Send Create to Controller
@@ -640,9 +642,9 @@
                 error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                     } else {
-                        toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                         $("#createModal").modal("hide");
                         itemDT.ajax.reload();
                     }
@@ -692,9 +694,9 @@
 
         function DoUpload() {
             if (!$("#upload-file").val()) {
-                toastr.error("Please select a file first");
+                toastrNoDuplicate("Please select a file first", "Warning", "warning");
             } if (json_of_excel.length == 0) {
-                toastr.error("The excel file is empty");
+                toastrNoDuplicate("The excel file is empty", "Warning", "warning");
             } else {
                 var columns = Object.keys(json_of_excel[0]);
                 $("#upload-table tbody").html("");

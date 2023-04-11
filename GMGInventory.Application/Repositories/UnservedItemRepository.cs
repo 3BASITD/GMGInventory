@@ -20,27 +20,24 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<UnservedItemVM>> GetListAsync()
         {
-            var salesOrder = from s in context.SalesOrders
-                                              .Include(s => s.Customer)
-                                              .Include(s => s.Agent)
-                             join l in context.SalesOrderLineItems
-                                              .Include(s => s.Item) on s.Id equals l.SalesOrderId
-                             join u in userManager.Users on s.UserCreated equals u.Id
-                             where l.Quantity - l.PackedQuantity > 0
+            var salesOrder = from l in context.SalesOrderLineItems
+                             join u in userManager.Users on l.SalesOrder.UserCreated equals u.Id
+                             where l.UnservedQuantity > 0
                              select new UnservedItemVM
                              {
-                                 Agent = s.Agent.Code,
+                                 Agent = l.SalesOrder.Agent.Code,
                                  CreatedBy = u.Nickname,
-                                 Customer = s.Customer.Name,
+                                 Customer = l.SalesOrder.Customer.Name,
                                  Discount1D = l.Discount1,
                                  Discount2D = l.Discount2,
-                                 Id = s.Id,
+                                 Id = l.SalesOrder.Id,
                                  Item = l.Item.Code,
-                                 OrderDateD = s.DateCreated,
-                                 PackedQuantity = l.PackedQuantity,
-                                 Quantity = l.Quantity,
-                                 SalesOrderNumber = s.SalesOrderNumber,
-                                 UnitPriceD = l.SellingPrice
+                                 OrderDateD = l.SalesOrder.DateCreated,
+                                 PackedQuantityD = l.PackedQuantity,
+                                 QuantityD = l.Quantity,
+                                 SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
+                                 UnitPriceD = l.SellingPrice,
+                                 UnservedQuantityD = l.UnservedQuantity
                              };
             return await salesOrder.ToListAsync();
         }
@@ -62,11 +59,11 @@ namespace GMGInventory.Application.Repositories
                                     || x.Discount2D.ToString().Contains(form.SearchValue)
                                     || x.Item.ToLower().Contains(form.SearchValue)
                                     || x.OrderDate.ToLower().Contains(form.SearchValue)
-                                    || x.PackedQuantity.ToString().Contains(form.SearchValue)
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.PackedQuantityD.ToString().Contains(form.SearchValue)
+                                    || x.QuantityD.ToString().Contains(form.SearchValue)
                                     || x.SalesOrderNumber.ToLower().Contains(form.SearchValue)
                                     || x.UnitPriceD.ToString().Contains(form.SearchValue)
-                                    || x.UnservedQuantity.ToString().Contains(form.SearchValue));
+                                    || x.UnservedQuantityD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -84,11 +81,11 @@ namespace GMGInventory.Application.Repositories
                         case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
                         case "Item": data = data.OrderBy(s => s.Item); break;
                         case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
-                        case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantity); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantityD); break;
+                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
                         case "SalesOrderNumber": data = data.OrderBy(s => s.SalesOrderNumber); break;
                         case "UnitPrice": data = data.OrderBy(s => s.UnitPriceD); break;
-                        case "UnservedQuantity": data = data.OrderBy(s => s.UnservedQuantity); break;
+                        case "UnservedQuantity": data = data.OrderBy(s => s.UnservedQuantityD); break;
                         default: break;
                     }
                 }
@@ -103,11 +100,11 @@ namespace GMGInventory.Application.Repositories
                         case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
                         case "Item": data = data.OrderByDescending(s => s.Item); break;
                         case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
-                        case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantity); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantityD); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
                         case "SalesOrderNumber": data = data.OrderByDescending(s => s.SalesOrderNumber); break;
                         case "UnitPrice": data = data.OrderByDescending(s => s.UnitPriceD); break;
-                        case "UnservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantity); break;
+                        case "UnservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantityD); break;
                         default: break;
                     }
                 }

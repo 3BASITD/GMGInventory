@@ -9,10 +9,10 @@
     <li class="breadcrumb-item"><a asp-controller="SalesOrder" asp-action="Index">Sales Orders</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title po-title">@ViewData["Title"]</span>
-            <div class="card-tools">
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title po-title">@ViewData["Title"]</span>
+        <div class="card-tools">
             @if (Model.Status == "Submitted")
             {
                 <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
@@ -20,6 +20,9 @@
                 </button>
                 @if (User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
                 {
+                    <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                        <span class="fas fa-print"></span> Print
+                    </button> <!-- print pending -->
                     <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
                         <span class="fas fa-check"></span> Approve
                     </button>
@@ -33,15 +36,22 @@
                 if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null && (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin)))
                 {
                     @*<button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
-                        <span class="fas fa-box-open"></span> Start Packing
-                    </button>*@
+            <span class="fas fa-box-open"></span> Start Packing
+            </button>*@
                     <a href="@Url.Action("Create", "Pack")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
                         <span class="fas fa-box-open"></span> Start Packing
                     </a>
+                    
                     <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                         <span class="fas fa-print"></span> Print
                     </button>
                 }
+                if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null && (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin)) && Model?.ResubmitId == null)
+                {
+                        <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
+                            <span class="fas fa-edit"></span> Update to Resubmit
+                        </a>
+                    }
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -49,6 +59,25 @@
         </div>
     </div>
     <div class="card-body">
+        @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
+        {
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-sm" role="alert">
+                        <strong>Disapproved:</strong>
+                        @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                    </div>
+                </div>
+        @if (Model?.ResubmitId != null) {
+                <div class="col-12">
+                    <div class="alert alert-info text-sm" role="alert">
+                        <strong>Resubmitted:</strong>
+                            This has been resubmitted. You can view the details <a href="@Url.Action("Details", "SalesOrder", new {Id = Model?.ResubmitId})">here</a>.
+                    </div>
+                </div>
+        }
+            </div>
+        }
         <div class="row">
             <div class="col-4">
                 <p class="text-sm">
@@ -85,14 +114,22 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AgentName)
+                        @Html.DisplayNameFor(model => model.AgentCode)
                     </span>
                     <b class="d-block">
-                        @Model?.AgentName
+                        @Model?.AgentCode
                     </b>
                 </p>
             </div>
             <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.OutstandingBalance)
+                    </span>
+                    <b class="d-block">
+                        @Model?.OutstandingBalance
+                    </b>
+                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.GrossNetPrice)
@@ -125,16 +162,24 @@
                         @(string.IsNullOrEmpty(Model?.PONumber?.Trim()) ? "-" : Model.PONumber)
                     </b>
                 </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DeliveryType)
-                    </span>
-                    <b class="d-block">
-                        @Model?.DeliveryType
-                    </b>
-                </p>
             </div>
             <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Forwarder)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Forwarder
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrEmpty(Model?.Remarks.Trim()) ? "-" : Model.Remarks)
+                    </b>
+                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.SalesOrderBy)
@@ -214,21 +259,25 @@
                                     <th>Unit</th>
                                     <th>Item Code</th>
                                     <th>Item Name</th>
-                                    <th>Inventory</th>
-                                    <th>Net Price</th>
-                                    <th>Gross Price</th>
-                                    <th>Selling Price</th>
+                                    <th>Inventory Count</th>
+                                    <th>Unit Price</th>
                                     <th>Discount 1</th>
                                     <th>Discount 2</th>
                                     <th>Extended Price</th>
+                                    <th>Served Quantity</th>
+                                    <th>Unserved Quantity</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                            <th>Total</th>
-                                            <th class="total-quantity">0</th>
-                                            <th colspan="9"></th>
-                                            <th class="total-gross-price">0.00</th>
+                                    <th>Total</th>
+                                    <th class="total-quantity">0</th>
+                                    <th colspan="7"></th>
+                                    <th class="total-gross-price">0.00</th>
+                                    <th class="total-served">0</th>
+                                    <th class="total-unserved">0</th>
+                                    <th></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -277,6 +326,7 @@
                             <div class="form-group">
                                 <label for="add-quantity" class="form-label mb-0">Quantity</label>
                                 <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                <span class="text-xs text-muted">Items in Inventory: <strong class="add-inventory"></strong></span>
                                 <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
@@ -290,7 +340,7 @@
                     <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
-                                <label for="add-unit-price" class="form-label mb-0">Unit Price</label>
+                                <label for="add-unit-price" class="form-label mb-0">Unit Price <span class="add-price-source"></span></label>
                                 <input type="number" step="0.01" min="0" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
                                 <span data-valmsg-for="add-unit-price" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -319,9 +369,9 @@
                         </div>
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
-                                <label for="add-net-price" class="form-label mb-0">Net Price</label>
-                                <input type="number" id="add-net-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="add-net-price" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="add-gross-price" class="form-label mb-0">Extended Price</label>
+                                <input type="number" id="add-gross-price" name="ExtendedPrice" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="add-gross-price" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -339,12 +389,87 @@
     </div>
 </div>
 
+<!-- Update Served Item Modal -->
+<div class="modal fade" id="servedModal" role="dialog" aria-labelledby="servedModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Sales Order Item Served Quantity</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="served-code" class="form-label mb-0">Item Code</label>
+                            <input type="text" id="served-code" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="served-name" class="form-label mb-0">Item Name</label>
+                            <input type="text" id="served-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="served-quantity" class="form-label mb-0">Quantity</label>
+                            <input type="text" id="served-quantity" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="served-toadd" class="form-label mb-0">Served Quantity to Add</label>
+                            <input type="number" min="0" max="1999999" id="served-toadd" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="served-inventory" class="form-label mb-0">Inventory Count</label>
+                            <input type="text" id="served-inventory" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="served-served" class="form-label mb-0">Served Quantity</label>
+                            <input type="text" id="served-served" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="served-unserved" class="form-label mb-0">Unserved Quantity</label>
+                            <input type="text" id="served-unserved" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-update-served">
+                    <span class="fas fa-pencil-alt"></span> Update
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <form id="approve-form" asp-action="Approve">
     <input type="hidden" id="approve-id" name="Id" value="@Model?.Id" />
 </form>
 
 <form id="disapprove-form" asp-action="Disapprove">
     <input type="hidden" id="disapprove-id" name="Id" value="@Model?.Id" />
+    <input type="hidden" id="disapprove-reason" name="Reason" />
 </form>
 
 @section Scripts {
@@ -386,13 +511,29 @@
 
         $("#add-code").on("select2:select", function () {
             $("#add-name").val($("#add-code").select2("data")[0].name);
+            if ($("#add-code").select2("data")[0].retailPriceD > $("#add-code").select2("data")[0].netPriceD) {
+                $("#add-unit-price").val($("#add-code").select2("data")[0].retailPriceD);
+                $("#add-gross-price").val($("#add-code").select2("data")[0].retailPriceD);
+                $(".add-price-source").text("(Gross)");
+            } else {
+                $("#add-unit-price").val($("#add-code").select2("data")[0].netPriceD);
+                $("#add-gross-price").val($("#add-code").select2("data")[0].netPriceD);
+                $(".add-price-source").text("(Net)");
+            }
             $("#add-unit").val($("#add-code").select2("data")[0].unit);
+            $(".add-inventory").text($("#add-code").select2("data")[0].inventoryCount);
+            $("#add-quantity").val("1");
             $("#add-code-error").html("");
         });
 
         $("#add-code").on("select2:unselecting", function (e) {
             $("#add-name").val("");
+            $("#add-unit-price").val("");
+            $(".add-price-source").text("");
             $("#add-unit").val("");
+            $(".add-inventory").text("0");
+            $("#add-quantity").val("0");
+            $("#add-gross-price").val("0.00");
         });
 
         $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2").on("input", function () {
@@ -401,18 +542,20 @@
             var discount1 = parseFloat($("#add-discount1").val());
             var discount2 = parseFloat($("#add-discount2").val());
 
-            $("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+            $("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
         });
 
         function clearItemForm() {
             $("#add-code").val("").trigger("change");
             $("#add-name").val("");
+            $("#add-unit-price").val("0.00");
+            $(".add-price-source").text("");
             $("#add-quantity").val("0");
             $("#add-unit").val("");
-            $("#add-unit-price").val("0");
-            $("#add-discount1").val("0");
-            $("#add-discount2").val("0");
-            $("#add-net-price").val("0");
+            $(".add-inventory").text("0");
+            $("#add-discount1").val("0.00");
+            $("#add-discount2").val("0.00");
+            $("#add-gross-price").val("0.00");
         }
 
         $(".createBtn").on("click", clearItemForm);
@@ -428,41 +571,49 @@
             messages: {
                 Code: { required: "Please select item to replenish." },
                 Quantity: { required: "Please enter a quantity", isNotZero: "Can not replenish an item with 0 quantity" },
-                UnitPrice: { required: "Please enter the unit cost" }
+                UnitPrice: { required: "Please enter the unit cost", isNotZero: "Can not sell for free" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
                 AddItem();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
-                if (data.id === $("#add-code").select2("data")[0].id) {
+                if (data.itemId == $("#add-code").select2("data")[0].id) {
                     rowIndexes.push(idx);
                 }
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastr.warning("Can't add duplicate item");
+                toastrNoDuplicate($("#add-code").select2("data")[0].text + " has already been added", "Duplicate", "warning");
             } else {
                 itemDT.row.add({
-                    id: $("#add-code").select2("data")[0].id,
+                    itemId: $("#add-code").select2("data")[0].id,
                     itemCode: $("#add-code").select2("data")[0].text,
                     itemName: $("#add-code").select2("data")[0].name,
+                    inventoryCount: $("#add-code").select2("data")[0].inventoryCount,
                     quantity: $("#add-quantity").val() || 0,
                     unit: $("#add-code").select2("data")[0].unit,
-                    unitPrice: Round2Decimal($("#add-unit-price").val() || 0),
-                    unitPriceD: $("#add-unit-price").val() || 0,
+                    sellingPrice: Round2Decimal($("#add-unit-price").val() || 0),
+                    sellingPriceD: $("#add-unit-price").val() || 0,
                     discount1: Round2Decimal($("#add-discount1").val() || 0),
                     discount1D: $("#add-discount1").val() || 0,
                     discount2: Round2Decimal($("#add-discount2").val() || 0),
                     discount2D: $("#add-discount2").val() || 0,
-                    netPrice: Round2Decimal($("#add-net-price").val() || 0),
-                    netPriceD: $("#add-net-price").val() || 0
+                    grossPrice: Round2Decimal($("#add-gross-price").val() || 0),
+                    grossPriceD: $("#add-gross-price").val() || 0,
+                    servedQuantity: 0,
+                    serverQuantityD: 0,
+                    unservedQuantity: 0,
+                    unservedQuantityD: 0
                 }).draw();
                 clearItemForm();
+
+                toastrNoDuplicate("Added " + $("#add-code").select2("data")[0].text + " on Sales Order Item(s)", "Success", "success");
             }
         }
 
@@ -485,7 +636,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     },
                     className: "form-cell"
@@ -502,15 +653,19 @@
                     className: "form-cell text-end"
                 },
                 { data: "unit", name: "Unit", className: "form-cell" },
-                { data: "itemCode", name: "ItemCode", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode",
+                    className: "form-cell"
+                },
                 { data: "itemName", name: "ItemName", className: "form-cell" },
                 { data: "inventoryCount", name: "InventoryCount", className: "form-cell" },
-                { data: "netPrice", name: "NetPrice", className: "form-cell text-end" },
-                { data: "retailPrice", name: "RetailPrice", className: "form-cell text-end" },
                 {
                     data: function (data, type, dataToSet) {
                         if ($("#po-status").val() == "Submitted") {
-                            return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm sellingprice" style="width: 100%;" />';
+                            return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
                         } else {
                             return data.sellingPrice
                         }
@@ -540,22 +695,48 @@
                     name: "Discount2",
                     className: "form-cell text-end"
                 },
-                { data: "grossPrice", name: "GrossPrice", className: "form-cell text-end grossprice" }
+                { data: "grossPrice", name: "GrossPrice", className: "form-cell text-end grossprice" },
+                { data: "servedQuantity", name: "ServedQuantity", className: "form-cell text-end servedquantity" },
+                { data: "unservedQuantity", name: "UnservedQuantity", className: "form-cell text-end unservedquantity" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        if (data.quantityD != data.servedQuantityD + data.unservedQuantityD || data.unservedQuantityD != 0) {
+                            actions += '<button type="button" class="btn btn-warning btn-xs btn-update-serve" data-microtip-title="Update Served Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                        }
+                        return actions;
+                    },
+                    className: "form-cell"
+                }
             ],
             order: [[0, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 1);
-                columnDTTotalDecimal(api, 11);
+                columnDTTotalDecimal(api, 9);
+                columnDTTotalInteger(api, 10);
+                columnDTTotalInteger(api, 11);
             }
         });
 
         itemDT.on("draw", function () {
             if ($("#po-status").val() == "Submitted") {
-                itemDT.column(0).visible(true);
+                itemDT.column(0).visible(true); // remove button
+                itemDT.column(10).visible(false); // served quantity
+                itemDT.column(11).visible(false); // unserved quantity
+                itemDT.column(12).visible(false); // update served quantity button
+            } else if ($("#po-status").val() == "Approved") {
+                itemDT.column(0).visible(false);
+                itemDT.column(10).visible(true);
+                itemDT.column(11).visible(true);
+                itemDT.column(12).visible(true);
             } else {
                 itemDT.column(0).visible(false);
+                itemDT.column(10).visible(false);
+                itemDT.column(11).visible(false);
+                itemDT.column(12).visible(false);
             }
             //itemDT.ajax.reload();
 
@@ -570,24 +751,87 @@
 
             //ComputeTotalQuantity();
             //ComputeTotalGrossPrice();
-            $(".quantity, .sellingprice, .discount1, .discount2").on("input", function () {
+            $(".quantity, .unitprice, .discount1, .discount2").on("input", function () {
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
-                var selling_price = parseFloat($(this).parents("tr").find(".sellingprice").val());
+                var unit_price = parseFloat($(this).parents("tr").find(".unitprice").val());
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
 
-                var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * selling_price) / 100)));
+                var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
                 $(this).parents("tr").find(".grossprice").html(gross_price);
                 ComputeTotalQuantity();
                 ComputeTotalGrossPrice();
             });
+
+            $(".btn-update-serve").on("click", function () {
+                var itemdata = itemDT.row($(this).parents('tr')).data();
+                console.log(itemdata);
+                $("#served-code").data("id", itemdata.id);
+                $("#served-code").val(itemdata.itemCode);
+                $("#served-name").val(itemdata.itemName);
+                $("#served-quantity").val(itemdata.quantity);
+                $("#served-toadd").val(0);
+                $("#served-toadd").attr("max", itemdata.unservedQuantity);
+                $("#served-inventory").val(itemdata.inventoryCount);
+                $("#served-inventory").data("prime", itemdata.inventoryCount);
+                $("#served-served").val(itemdata.servedQuantity);
+                $("#served-served").data("prime", itemdata.servedQuantity);
+                $("#served-unserved").val(itemdata.unservedQuantity);
+                $("#served-unserved").data("prime", itemdata.unservedQuantity);
+                $("#servedModal").modal("show");
+            });
+        });
+
+        $("#served-toadd").on("input", function () {
+            var toadd = parseInt($(this).val());
+            var inventory = parseInt($("#served-inventory").data("prime"));
+            var served = parseInt($("#served-served").data("prime"));
+            var unserved = parseInt($("#served-unserved").data("prime"));
+            if (toadd > unserved) {
+                toadd = unserved;
+            }
+            if (toadd == 0) {
+                $("#served-inventory").val(inventory);
+                $("#served-served").val(served);
+                $("#served-unserved").val(unserved);
+            } else {
+                $("#served-inventory").val(inventory + " → " + (inventory - toadd));
+                $("#served-served").val(served + " → " + (served + toadd));
+                $("#served-unserved").val(unserved + " → " + (unserved - toadd));
+            }
+        });
+
+        $(".btn-update-served").on("click", function () {
+            if (parseInt($("#served-toadd").val()) <= 0) {
+                toastrNoDuplicate("Nothing to add", "Served Quantity", "warning");
+            } else if (parseInt($("#served-inventory").data("prime")) <= 0) {
+                toastrNoDuplicate($("#served-code").val() + " needs replenishment.", "Inventory Count", "warning");
+            } else {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UpdateServedSOItem")",
+                data: {
+                    salesOrderLineItemId: $("#served-code").data("id"),
+                    quantity: $("#served-toadd").val()
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastrNoDuplicate(data.message, "Error", "error");
+                    } else {
+                        $("#servedModal").modal("hide");
+                        itemDT.ajax.reload();
+                        toastrNoDuplicate(data.message, "Success", "success");
+                    }
+                }
+            });
+            }
         });
 
         function ComputeTotalQuantity() {
             total_quantity = 0;
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 total_quantity += parseInt($(this.node()).find(".quantity").val());
-                console.log($(this.node()).find(".quantity"));
             });
             $(".total-quantity").html(FormatStringInteger(total_quantity));
         }
@@ -605,13 +849,13 @@
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                var row_sellprice = parseFloat($(this.node()).find(".sellingprice").val());
+                var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
                 item_to_replenish.push({
-                    item: row_data.id,
+                    item: row_data.itemId,
                     quantity: row_quantity,
-                    sellingPrice: row_sellprice,
+                    unitPrice: row_unitprice,
                     discount1: row_discount1,
                     discount2: row_discount2
                 });
@@ -622,9 +866,9 @@
         $(".btn-details-submit").on("click", function () {
             var itemsToReplenish = GetItemsToOrder();
             if (itemsToReplenish.length == 0) {
-                toastr.warning("No item to replenish. Add an item to the list to continue");
+                toastrNoDuplicate("No item to replenish. Add an item to the list to continue", "Warning", "warning");
             } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity");
+                toastrNoDuplicate("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning", "warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -636,43 +880,51 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            toastr.success(data.message, "Success");
+                            toastrNoDuplicate(data.message, "Success", "success");
                         }
                     }
                 });
             }
         });
-            
-            $('.btn-details-approve').click(function (e) {
-                swal({
-                    title: "Approve Sales Order",
-                    text: "Continue to approve this sales order?",
-                    icon: "success",
-                    buttons: true,
-                    successMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $('#approve-form').submit();
-                    }
-                });
+
+        $('.btn-details-approve').click(function (e) {
+            swal({
+                title: "Approve Sales Order",
+                text: "Continue to approve this sales order?",
+                icon: "success",
+                buttons: true,
+                successMode: true
+            }).then((confirm) => {
+                if (confirm) {
+                    $('#approve-form').submit();
+                }
             });
-            
-            $('.btn-details-disapprove').click(function (e) {
-                swal({
-                    title: "Disapprove Sales Order",
-                    text: "Continue to disapprove this sales order?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $('#disapprove-form').submit();
+        });
+
+        $('.btn-details-disapprove').click(function (e) {
+            swal({
+                title: "Disapprove Sales Order",
+                text: "Continue to disapprove this sales order?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+                content: {
+                    element: "input",
+                    attributes: {
+                        placeholder: "Reason for Disapproving",
+                        type: "text"
                     }
-                });
+                }
+            }).then((confirm) => {
+                if (confirm) {
+                    $("#disapprove-reason").val(confirm);
+                    $('#disapprove-form').submit();
+                }
             });
-            
+        });
+
 
         $(".btn-details-print").on("click", function () {
             $.LoadingOverlay("show", {

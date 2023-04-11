@@ -53,8 +53,8 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        <span class="text-muted">@Html.DisplayNameFor(model => model.DeliveryType)</span>
-                        <b class="d-block">@Model?.DeliveryType</b>
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.Forwarder)</span>
+                        <b class="d-block">@Model?.Forwarder</b>
                     </p>
                 </div>
             </div>
@@ -185,11 +185,16 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
                         return actions;
                     }
                 },
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode"
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "sellingPrice", name: "SellingPrice", className: "text-end" },
                 { data: "discount1", name: "Discount1", className: "text-end" },
@@ -210,7 +215,7 @@
                 var rowdata = orderDT.row($(this).parents('tr')).data();
                 itemDT.row.add(rowdata).draw();
                 orderDT.row($(this).parents('tr')).remove().draw();
-                toastr.success("Added " + rowdata.itemCode + " on Packed Item(s)");
+                toastrNoDuplicate("Added " + rowdata.itemCode + " on Packed Item(s)", "Success", "success");
             });
         });
 
@@ -224,7 +229,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="right" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -257,7 +262,7 @@
                 var rowdata = itemDT.row($(this).parents('tr')).data();
                 orderDT.row.add(rowdata).draw();
                 itemDT.row($(this).parents('tr')).remove().draw();
-                toastr.warning("Removed " + rowdata.itemCode + " on Packed Item(s)");
+                toastrNoDuplicate("Removed " + rowdata.itemCode + " on Packed Item(s)", "Warning", "warning");
             });
 
             $(".table-item thead th").removeClass("form-cell");
@@ -296,9 +301,9 @@
         function SavePack() {
             var itemsToPack = GetItemsToPack();
             if (itemsToPack.length == 0) {
-                toastr.warning("No item to pack. Add an item to the list to continue");
+                toastrNoDuplicate("No item to pack. Add an item to the list to continue", "Warning", "warning");
             } else if (itemsToPack.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't pack an item with 0 quantity");
+                toastrNoDuplicate("Some items have 0 quantity. Can't pack an item with 0 quantity", "Warning", "warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -310,7 +315,7 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
                             window.location = "@Url.Action("Details")/" + data.newRow;
                         }

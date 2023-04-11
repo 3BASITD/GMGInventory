@@ -26,7 +26,9 @@ namespace GMGInventory.Application.Repositories
             var items = from item in context.Items
                                             .Include(s => s.Brand)
                                             .Include(s => s.Unit)
-                        let inventory = context.ItemInventories.Where(s => s.ItemId == item.Id).Sum(s => s.Quantity)
+                        let inventory = context.ItemInventories
+                                               .Where(s => s.ItemId == item.Id && s.Warehouse.Code == "MAIN")
+                                               .Sum(s => s.Quantity)
                         where item.IsActive == true
                            && (filter.Brand == null || item.BrandId == filter.Brand)
                            && (filter.Item == null || item.Id == filter.Item)
@@ -144,8 +146,8 @@ namespace GMGInventory.Application.Repositories
                                                   .Include(s => s.Item).ThenInclude(s => s.ItemType)
                                                   .Include(s => s.Item).ThenInclude(s => s.Unit) on purchase.Id equals poline.PurchaseOrderId
                             where purchase.Status.Code == "Posted"
-                            && filter.DateFrom <= purchase.ReplenishDate
-                            && purchase.ReplenishDate <= filter.DateTo
+                            && filter.DateFrom <= purchase.ReplenishDate.Date
+                            && purchase.ReplenishDate.Date <= filter.DateTo
                             && (filter.Brand == null || poline.Item.BrandId == filter.Brand)
                             orderby purchase.ReplenishDate ascending,
                                     poline.Item.Brand.Code ascending,
@@ -262,8 +264,8 @@ namespace GMGInventory.Application.Repositories
         {
             var purchases = from purchase in context.PurchaseOrders
                             join poline in context.PurchaseOrderLineItems on purchase.Id equals poline.PurchaseOrderId
-                            where filter.DateFrom <= purchase.ReplenishDate
-                            && purchase.ReplenishDate <= filter.DateTo
+                            where filter.DateFrom <= purchase.ReplenishDate.Date
+                            && purchase.ReplenishDate.Date <= filter.DateTo
                             && (filter.Supplier == null || purchase.SupplierId == filter.Supplier)
                             orderby purchase.Supplier.Name ascending, purchase.ReplenishDate ascending
                             select new ReceivingSupplierRVM
@@ -386,8 +388,8 @@ namespace GMGInventory.Application.Repositories
                        };
 
             var purchases = from purchase in await temp.ToListAsync()
-                            where filter.DateFrom <= purchase.ReplenishDate
-                            && purchase.ReplenishDate <= filter.DateTo
+                            where filter.DateFrom <= purchase.ReplenishDate.Date
+                            && purchase.ReplenishDate.Date <= filter.DateTo
                             && (filter.Brand == null || purchase.Item.Brand.Id == filter.Brand)
                             group purchase by purchase.Item into p
                             orderby p.Key.Brand.Code ascending, p.Key.Code ascending
@@ -517,8 +519,8 @@ namespace GMGInventory.Application.Repositories
             var cards1 = from card in context.InvoiceLineItems
                                             .Include(s => s.Item)
                                             .Include(s => s.Invoice).ThenInclude(s => s.SalesOrder).ThenInclude(s => s.Customer)
-                         where filter.DateFrom <= (card.Invoice.DateModified ?? card.Invoice.DateCreated)
-                           && (card.Invoice.DateModified ?? card.Invoice.DateCreated) <= filter.DateTo &&
+                         where filter.DateFrom <= (card.Invoice.DateModified ?? card.Invoice.DateCreated).Date
+                           && (card.Invoice.DateModified ?? card.Invoice.DateCreated).Date <= filter.DateTo &&
                          (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
@@ -532,8 +534,8 @@ namespace GMGInventory.Application.Repositories
             var cards2 = from card in context.PurchaseOrderLineItems
                                             .Include(s => s.Item)
                                             .Include(s => s.PurchaseOrder).ThenInclude(s => s.Supplier)
-                         where filter.DateFrom <= card.PurchaseOrder.ReplenishDate
-                         && card.PurchaseOrder.ReplenishDate <= filter.DateTo
+                         where filter.DateFrom <= card.PurchaseOrder.ReplenishDate.Date
+                         && card.PurchaseOrder.ReplenishDate.Date <= filter.DateTo
                          && (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
@@ -548,8 +550,8 @@ namespace GMGInventory.Application.Repositories
             var cards3 = from card in context.TransferItemDetails
                                             .Include(s => s.Item)
                                             .Include(s => s.TransferItem).ThenInclude(s => s.Source)
-                         where filter.DateFrom <= card.TransferItem.TransferDate
-                         && card.TransferItem.TransferDate <= filter.DateTo
+                         where filter.DateFrom <= card.TransferItem.TransferDate.Date
+                         && card.TransferItem.TransferDate.Date <= filter.DateTo
                          && (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
@@ -563,8 +565,8 @@ namespace GMGInventory.Application.Repositories
             var cards4 = from card in context.TransferItemDetails
                                             .Include(s => s.Item)
                                             .Include(s => s.TransferItem).ThenInclude(s => s.Destination)
-                         where filter.DateFrom <= card.TransferItem.TransferDate
-                         && card.TransferItem.TransferDate <= filter.DateTo
+                         where filter.DateFrom <= card.TransferItem.TransferDate.Date
+                         && card.TransferItem.TransferDate.Date <= filter.DateTo
                          && (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
@@ -578,8 +580,8 @@ namespace GMGInventory.Application.Repositories
             var cards5 = from card in context.PhysicalCountHistories
                                             .Include(s => s.Item)
                                             .Include(s => s.Warehouse)
-                         where filter.DateFrom <= (card.DateModified ?? card.DateCreated)
-                           && (card.DateModified ?? card.DateCreated) <= filter.DateTo
+                         where filter.DateFrom <= (card.DateModified ?? card.DateCreated).Date
+                           && (card.DateModified ?? card.DateCreated).Date <= filter.DateTo
                          &&
                          (filter.Item == null || card.Item.Id == filter.Item)
                          join user in userManager.Users on card.UserCreated equals user.Id
@@ -596,8 +598,8 @@ namespace GMGInventory.Application.Repositories
             var cards6 = from card in context.SalesReturnLineItems
                                             .Include(s => s.Item)
                                             .Include(s => s.SalesReturn).ThenInclude(s => s.Customer)
-                         where filter.DateFrom <= card.DateCreated
-                         && card.DateCreated <= filter.DateTo
+                         where filter.DateFrom <= card.DateCreated.Date
+                         && card.DateCreated.Date <= filter.DateTo
                          && (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {

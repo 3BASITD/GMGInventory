@@ -184,7 +184,7 @@ namespace GMGInventory.Application.Repositories
                          {
                              Id = agent.Id,
                              FirstName = agent.FirstName,
-                             MiddleName = agent.MiddleName,
+                             MiddleName = agent.MiddleName + "",
                              LastName = agent.LastName,
                              Area = agent.Area.Name,
                              AreaId = agent.Area.Id,

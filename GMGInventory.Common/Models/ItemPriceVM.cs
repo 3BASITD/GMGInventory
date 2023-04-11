@@ -72,4 +72,12 @@ namespace GMGInventory.Common.Models
         public bool IsLatest { get; set; }
         public int Temp { get; set; }
     }
+
+    public class ItemPricePVM
+    {
+        public string Brand { get; set; }
+        public string Category { get; set; }
+        public string ItemType { get; set; }
+        public IList<ItemPriceVM> Contents { get; set; }
+    }
 }

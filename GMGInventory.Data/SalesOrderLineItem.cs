@@ -13,6 +13,8 @@ namespace GMGInventory.Data
         public Item Item { get; set; }
 
         public int Quantity { get; set; }
+        public int ServedQuantity { get; set; }
+        public int UnservedQuantity { get; set; }
         public int PackedQuantity { get; set; }
         public int InvoicedQuantity { get; set; }
 

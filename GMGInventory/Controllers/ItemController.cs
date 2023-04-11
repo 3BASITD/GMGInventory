@@ -116,6 +116,12 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public ActionResult DetailsJson(int id)
+        {
+            return Json(itemRepository.GetItemViewVM(id));
+        }
+
+        [HttpPost]
         public async Task<JsonResult> EditDetailQuantity(int id, int quantity, string remarks)
         {
             ResponseModel responseModel = new ResponseModel();
@@ -217,7 +223,8 @@ namespace GMGInventory.Controllers
                                         Name = itemVM.Name,
                                         PartNumber = itemVM.PartNumber,
                                         Size = itemVM.Size,
-                                        UnitId = UnitId.Value
+                                        UnitId = UnitId.Value,
+                                        Quantity = itemVM.Quantity
                                     });
                                     responseModel.Status = "Success";
                                     responseModel.Message = "Item updated";
@@ -237,7 +244,8 @@ namespace GMGInventory.Controllers
                                         PartNumber = itemVM.PartNumber,
                                         RetailPriceD = 0,
                                         Size = itemVM.Size,
-                                        UnitId = UnitId.Value
+                                        UnitId = UnitId.Value,
+                                        Quantity = itemVM.Quantity
                                     });
                                     responseModel.Status = "Success";
                                     responseModel.Message = "Item added";
@@ -253,7 +261,7 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Items");
-            dt.Columns.AddRange(new DataColumn[10] {
+            dt.Columns.AddRange(new DataColumn[11] {
                 new DataColumn("Code"),
                 new DataColumn("Name"),
                 new DataColumn("Part Number"),
@@ -263,7 +271,8 @@ namespace GMGInventory.Controllers
                 new DataColumn("Item Type"),
                 new DataColumn("Brand"),
                 new DataColumn("Size"),
-                new DataColumn("Unit")
+                new DataColumn("Unit"),
+                new DataColumn("Quantity on Hand")
             });
             var items = await itemRepository.GetAllFileAsync();
             foreach (var item in items)
@@ -277,7 +286,8 @@ namespace GMGInventory.Controllers
                             item.ItemType,
                             item.Brand,
                             item.Size,
-                            item.Unit);
+                            item.Unit,
+                            item.Quantity);
             }
 
             using (XLWorkbook wb = new())

@@ -8,9 +8,9 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         @*<div class="card-tools">
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
-                <span class="fas fa-filter"></span> Filter
-            </button>
+        <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+        <span class="fas fa-filter"></span> Filter
+        </button>
         </div>*@
     </div>
     <div class="card-body">
@@ -161,7 +161,7 @@
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
-                { data: "retailPrice",  name: "RetailPrice",  className: "text-end" },
+                { data: "retailPrice", name: "RetailPrice", className: "text-end" },
                 { data: "netPrice", name: "NetPrice", className: "text-end" },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
@@ -170,7 +170,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (data.isLatest) {
-                            actions += '<button class="btn btn-warning btn-xs btn-update" data-bs-toggle="modal" data-bs-target="#updateModal" data-microtip-title="Update Price" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs btn-update" data-bs-toggle="modal" data-bs-target="#updateModal" data-microtip-title="Update Price" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                         }
                         return actions;
                     }
@@ -214,7 +214,8 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     DoUpdate();
-                }
+                },
+                showErrors: validateShowErrors
             });
 
             // Send Update to Controller
@@ -230,9 +231,9 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                             $("#updateModal").modal("hide");
                             dataTable.ajax.reload();
                         }

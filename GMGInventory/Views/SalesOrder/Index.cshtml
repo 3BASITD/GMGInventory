@@ -48,7 +48,7 @@
 @section Scripts {
     <script>
         var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
-                showLoader();
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
@@ -73,13 +73,13 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '"  data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '"  data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.status == "Submitted" && data.orderBy == $("#current-user-nickname").val()) {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button"  data-microtip-title="Delete Sales Order" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button"  data-microtip-title="Delete Sales Order" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }
                         if (data.status == "Approved" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin"))) {
-                            //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="left" role="tooltip"><i class="fas fa-box-open"></i></button>';
-                            actions += '<a href="@Url.Action("Create","Pack")/' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="left" role="tooltip"><i class="fas fa-box-open"></i></a>';
+                            //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></button>';
+                            actions += '<a href="@Url.Action("Create","Pack")/' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></a>';
                         }
                         return actions + "</div>";
                     }
@@ -109,9 +109,8 @@
                             error: jQueryCommonError,
                             success: function (data, status, xhr) {
                                 if (data.status == "Error") {
-                                    toastr.error(data.message, "Error");
+                                    toastrNoDuplicate(data.message, "Error", "error");
                                 } else {
-                                    toastr.success(data.message, "Success");
                                     orderDT.ajax.reload();
                                 }
                             }

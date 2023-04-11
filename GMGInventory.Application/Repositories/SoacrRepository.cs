@@ -102,8 +102,8 @@ namespace GMGInventory.Application.Repositories
 
                        where (filter.CustomerId == null || filter.CustomerId == soa.CustomerId)
                            && (filter.AgentId == null || filter.AgentId == agent.Id)
-                       && filter.DateFrom <= (inv.DateModified ?? inv.DateCreated)
-                       && (inv.DateModified ?? inv.DateCreated) <= filter.DateTo
+                       && filter.DateFrom <= (inv.DateModified ?? inv.DateCreated).Date
+                       && (inv.DateModified ?? inv.DateCreated).Date <= filter.DateTo
 
                        let soalit = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).ToList()
 
@@ -191,7 +191,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.Debit.ToString().Contains(form.SearchValue)
                                     || x.PaidAmount.ToString().Contains(form.SearchValue)
                                     || x.FreightCharge.ToString().Contains(form.SearchValue)
-                                    || x.OverPayment.ToString().Contains(form.SearchValue));
+                                    || x.OverPayment.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -671,8 +671,8 @@ namespace GMGInventory.Application.Repositories
 
                            where (filter.CustomerId == null || filter.CustomerId == soacrsGroup.CustomerId)
                            && (filter.AgentId == null || filter.AgentId == soacrsGroup.Customer.AgentId)
-                           && filter.DateFrom <= (inv.DateModified ?? inv.DateCreated)
-                           && (inv.DateModified ?? inv.DateCreated) <= filter.DateTo
+                           && filter.DateFrom <= (inv.DateModified ?? inv.DateCreated).Date
+                           && (inv.DateModified ?? inv.DateCreated).Date <= filter.DateTo
                            //&& soacrsGroup.SOACRTypeId == 2
 
                            select new InvoiceVM

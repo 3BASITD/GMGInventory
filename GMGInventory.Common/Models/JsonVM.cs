@@ -94,8 +94,9 @@ namespace GMGInventory.Common.Models
         public string Address { get; set; }
         public string CreditTerm { get; set; }
         public string Region { get; set; }
-
         public string Agent { get; set; }
+        public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
+        public decimal OutstandingBalanceD { get; set; }
     }
 
     public class JsonInvoiceOptionsModel

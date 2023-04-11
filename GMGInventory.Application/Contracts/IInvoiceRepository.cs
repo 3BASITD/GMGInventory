@@ -9,10 +9,12 @@ namespace GMGInventory.Application.Contracts
         Task<Select2Model<JsonOptionsModel>> GetInvoiceByCustomer(string search, int page, int customer);
         Task<IList<JsonOptionsModel>> GetInvoiceTypeOptions(int? IncludeId);
         Task<InvoiceDetailsVM?> GetDetailsAsync(int? Id);
+        Task<InvoiceDetailsWithItemsVM> GetDetailsWithItemsAsync(int Id);
         Task<InvoiceDetailsVM?> GetDetailsByPackAsync(int? Id);
         Task<ForDataTables<InvoiceVM>> GetListDTAsync(DataTablesRequestForm form, ListFilterCommonModel filter);
         Task<IList<InvoiceItemVM>> GetItemsAsync(int invoiceId);
         Task<ForDataTables<InvoiceItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int invoiceId);
         Task<int> SaveAsync(InvoiceFormVM form);
+        Task<int> UpdateAsync(InvoiceFormUpdateVM form);
     }
 }

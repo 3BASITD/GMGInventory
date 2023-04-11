@@ -64,8 +64,8 @@
         console.log("Ajax Load Time > " + String(ajax_run_hh).padStart(2, "0") + ":" + String(ajax_run_mm).padStart(2, "0") + ":" + String(ajax_run_ss).padStart(2, "0") + ":" + String(ajax_run_time).padStart(3, "0"));
     });
 
-    $.validator.addMethod('lessThan', function (value, element, param) {
-        return this.optional(element) || parseInt(value) < parseInt($(param).val());
+    $.validator.addMethod('lessThanOrEqual', function (value, element, param) {
+        return this.optional(element) || parseInt(value) <= parseInt($(param).val());
     }, 'Should not be greater than');
 
     $.validator.addMethod('notEqualTo', function (value, element, param) {
@@ -76,6 +76,28 @@
         return this.optional(element) || parseInt(value) !== 0;
     }, 'Should not be 0');
 });
+
+function toastrNoDuplicate(message, title, type) {
+    var hasDuplicate = false;
+    $.each($(".toast-message"), function (i, v) {
+        if (message == $(v).text()) {
+            hasDuplicate = true;
+        }
+    });
+    if (!hasDuplicate) {
+        if (type == "success") toastr.success(message, title);
+        if (type == "error") toastr.error(message, title);
+        if (type == "warning") toastr.warning(message, title);
+        if (type == "info") toastr.info(message, title);
+    }
+}
+
+function validateShowErrors(m, l) {
+    $.each(l, function (i, v) {
+        toastrNoDuplicate(v.message, "Required field &lt;" + $(v.element.labels[0]).text() + "&gt;", "warning");
+    });
+    this.defaultShowErrors();
+}
 
 function userIsInRole(role) {
     var isInRole = false;
@@ -153,6 +175,7 @@ function jQueryCommonError(xhr, status, error) {
     } else {
         toastr.warning(xhr.status, xhr.statusText);
     }
+    hideLoader();
 }
 
 jQuery.fn.extend({

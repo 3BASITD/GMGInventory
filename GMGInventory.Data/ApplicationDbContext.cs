@@ -17,7 +17,6 @@ namespace GMGInventory.Data
 
             builder.ApplyConfiguration(new CreditDebitMemoTypeSeedConfiguration());
             builder.ApplyConfiguration(new CustomerTypeSeedConfiguration());
-            builder.ApplyConfiguration(new DeliveryTypeSeedConfiguration());
             builder.ApplyConfiguration(new InvoiceTypeSeedConfiguration());
             builder.ApplyConfiguration(new PriceTypeSeedConfiguration());
             builder.ApplyConfiguration(new RegionSeedConfiguration());
@@ -150,7 +149,6 @@ namespace GMGInventory.Data
         public DbSet<CustomerPayment> CustomerPayments { get; set; }
         public DbSet<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public DbSet<CustomerType> CustomerTypes { get; set; }
-        public DbSet<DeliveryType> DeliveryTypes { get; set; }
         public DbSet<Forwarder> Forwarders { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceLineItem> InvoiceLineItems { get; set; }

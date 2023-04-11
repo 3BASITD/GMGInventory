@@ -30,7 +30,10 @@
                         @Html.DisplayNameFor(model => model.CustomerName)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.DateDelivered)
+                        @Html.DisplayNameFor(model => model.DatePickup)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateDeliver)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Forwarder)
@@ -40,6 +43,9 @@
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Remarks)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PONumber)
                     </th>
                     <th></th>
                 </tr>
@@ -94,6 +100,16 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
+                            <label for="filter-region" class="form-label mb-0">Region</label>
+                            <select id="filter-region" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
                             <label for="filter-from" class="form-label mb-0">Date Delivered From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
@@ -126,6 +142,11 @@
             <form id="editForm">
                 <div class="modal-body">
                     <div class="form-group">
+                        <label for="delivery-pickup-date" class="form-label mb-0">Pick-up Date</label>
+                        <input type="date" id="delivery-pickup-date" name="PickupDate" class="form-control form-control-sm" />
+                        <span data-valmsg-for="delivery-pickup-date" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
                         <label for="delivery-date" class="form-label mb-0">Delivery Date</label>
                         <input type="date" id="delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
                         <span data-valmsg-for="delivery-date" data-valmsg-replace="true" class="text-danger"></span>
@@ -133,8 +154,8 @@
                     <div class="form-group">
                         <label for="delivery-forwarder" class="form-label mb-0">Forwarder</label>
                         <div>
-                        <select id="delivery-forwarder" name="Forwarder" style="width:100%">
-                            <option></option>
+                            <select id="delivery-forwarder" name="Forwarder" style="width:100%">
+                                <option></option>
                             </select>
                         </div>
                         <span data-valmsg-for="delivery-forwarder" data-valmsg-replace="true" class="text-danger"></span>
@@ -201,6 +222,43 @@
                         </tr>
                     </tfoot>
                 </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Modal -->
+<div class="modal fade" id="actionModal" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-4">@Html.DisplayNameFor(model => model.CreatedBy)</div>
+                    <div class="col-8"><strong class="action-created-by"></strong></div>
+                </div>
+                <div class="row">
+                    <div class="col-4">@Html.DisplayNameFor(model => model.CreatedDate)</div>
+                    <div class="col-8"><strong class="action-created-date"></strong></div>
+                </div>
+                <div class="row">
+                    <div class="col-4">@Html.DisplayNameFor(model => model.ModifiedBy)</div>
+                    <div class="col-8"><strong class="action-modified-by"></strong></div>
+                </div>
+                <div class="row">
+                    <div class="col-4">@Html.DisplayNameFor(model => model.ModifiedDate)</div>
+                    <div class="col-8"><strong class="action-modified-date"></strong></div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -324,6 +382,37 @@
             $("#filter-customer").on("select2:unselecting", function (e) {
                 $("#filter-customer-name").val("");
             });
+
+            // Load region data for select2
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Region")",
+                success: function (data, status, xhr) {
+                    $("#filter-region").select2({
+                        allowClear: true,
+                        placeholder: '<empty>',
+                        data: data,
+                        minimumResultsForSearch: Infinity
+                    });
+                }
+            });
+
+            // Load forwarder data for select2 on edit
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Forwarder")",
+                success: function (data, status, xhr) {
+                    $("#delivery-forwarder").select2({
+                        data: data,
+                        allowClear: true,
+                        placeholder: {
+                            id: "",
+                            text: "<empty>"
+                        },
+                        dropdownParent: $("#editModal")
+                    });
+                }
+            });
         }
 
         $(".btnFilter").on("click", function () {
@@ -340,9 +429,11 @@
                 data: function (data) {
                     var agentId = $("#filter-agent").val();
                     var customerId = $("#filter-customer").val();
+                    var regionId = $("#filter-region").val();
 
                     if (agentId) data.AgentId = agentId;
                     if (customerId) data.CustomerId = customerId;
+                    if (regionId) data.RegionId = regionId;
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
@@ -361,21 +452,24 @@
                 { data: "soNumber", name: "SONumber" },
                 { data: "customerCode", name: "CustomerCode" },
                 { data: "customerName", name: "CustomerName" },
-                { data: "dateDelivered", name: "DateDelivered" },
+                { data: "datePickup", name: "DatePickup" },
+                { data: "dateDeliver", name: "DateDeliver" },
                 { data: "forwarder", name: "Forwarder" },
                 { data: "waybillNumber", name: "WaybillNumber" },
                 { data: "remarks", name: "Remarks" },
+                { data: "poNumber", name: "PONumber" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button class="btn btn-info btn-xs viewBtn" onclick="ShowItemList(' + data.id + ')" data-microtip-title="View Item(s)" data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
-                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                        actions += '<button class="btn btn-primary btn-xs viewBtn" onclick="ShowItemList(' + data.id + ')" data-microtip-title="View Item(s)" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                        actions += '<button class="btn btn-info btn-xs actionBtn" onclick="ShowAction(\'' + data.createdBy + '\', \'' + data.createdDate + '\', \'' + data.modifiedBy + '\', \'' + data.modifiedDate + '\')" data-microtip-title="History" data-microtip-position="top-left" role="tooltip"><i class="fas fa-history"></i></button>';
                         return actions + "</div>";
                     }
                 }
             ],
-            order: [[4, "desc"]]
+            order: [[0, "desc"]]
         });
 
         // Load functions upon DataTable load
@@ -389,44 +483,45 @@
                 var data = deliveryDT.row($(this).parents('tr')).data();
 
                 $("#delivery-sales-order-id").val(data.id);
-                $("#delivery-date").val(DateForInput(data.dateDeliveredD));
+                $("#delivery-date").val(DateForInput(data.dateDeliverD));
+                $("#delivery-pickup-date").val(DateForInput(data.datePickupD));
                 $("#delivery-waybill").val(data.waybillNumber == "-" ? "" : data.waybillNumber);
                 $("#delivery-remarks").val(data.remarks == "-" ? "" : data.remarks);
 
                 // Load forwarder data for select2 on edit
-                if ($("#delivery-forwarder").attr("data-select2-id")) {
-                    $("#delivery-forwarder").select2("destroy");
-                    $("#delivery-forwarder").empty();
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "Forwarder")",
-                    data: { includeId: data.forwarderId },
-                    success: function (data, status, xhr) {
-                        $("#delivery-forwarder").select2({
-                            data: data,
-                            allowClear: true,
-                            placeholder: {
-                                id: "",
-                                text: "<empty>"
-                            },
-                            dropdownParent: $("#editModal")
-                        });
-                    }
-                });
+                //if ($("#delivery-forwarder").attr("data-select2-id")) {
+                //    $("#delivery-forwarder").select2("destroy");
+                //    $("#delivery-forwarder").empty();
+                //}
+                //$.ajax({
+                //    type: "POST",
+                //    url: "@Url.Action("GetOptions", "Forwarder")",
+                //    data: { includeId: data.forwarderId },
+                //    success: function (data, status, xhr) {
+                //        $("#delivery-forwarder").select2({
+                //            data: data,
+                //            allowClear: true,
+                //            placeholder: {
+                //                id: "",
+                //                text: "<empty>"
+                //            },
+                //            dropdownParent: $("#editModal")
+                //        });
+                //    }
+                //});
+                $("#delivery-forwarder").val(data.forwarderId);
+                $("#delivery-forwarder").trigger("change");
             });
 
             // Validation for Edit Modal
             var validateEdit = $("#editForm").validate({
                 errorClass: 'text-danger text-xs',
                 rules: {
-                    DeliveryDate: { required: true },
                     Forwarder: { required: true },
                     Waybill: { required: true, maxlength: 50 },
                     Remarks: { maxlength: 250 }
                 },
                 messages: {
-                    DeliveryDate: { required: "Please enter date of delivery." },
                     Forwarder: { required: "Please select a forwarder." },
                     Waybill: { required: "Please enter waybill number.", maxlength: "Waybill must not exceed 50 characters." },
                     Remarks: { maxlength: "Remarks must not exceed 250 characters." }
@@ -434,7 +529,8 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     DoEdit();
-                }
+                },
+                showErrors: validateShowErrors
             });
 
             // Send Edit to Controller
@@ -444,7 +540,8 @@
                     url: "@Url.Action("EditJson")",
                     data: {
                         SalesOrderId: $("#delivery-sales-order-id").val(),
-                        DeliveryDate: $("#delivery-date").val(),
+                        DateDeliver: $("#delivery-date").val(),
+                        DatePickup: $("#delivery-pickup-date").val(),
                         Forwarder: $("#delivery-forwarder").val(),
                         Waybill: $("#delivery-waybill").val(),
                         Remarks: $("#delivery-remarks").val()
@@ -452,9 +549,9 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            toastr.success(data.message, "Success");
+                            toastrNoDuplicate(data.message, "Success", "success");
                             $("#editModal").modal("hide");
                             deliveryDT.ajax.reload();
                         }
@@ -511,6 +608,14 @@
 
                 $("#viewModal").modal("show");
             });
+        }
+
+        function ShowAction(usercreated, datecreated, usermodified, datemodified) {
+            $(".action-created-by").text(usercreated);
+            $(".action-created-date").text(datecreated);
+            $(".action-modified-by").text(usermodified);
+            $(".action-modified-date").text(datemodified);
+            $("#actionModal").modal("show");
         }
     </script>
     }

@@ -137,7 +137,7 @@
             <div class="col-12">
                 <div class="card card-danger card-tabs">
                     <div class="card-header p-0 pt-1 pl-2 pr-2">
-                        <ul class="nav nav-tabs nav-fill" role="tablist">
+                        <ul class="nav nav-tabs nav-fill nav-item" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active" id="nav-warehouse-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-warehouse"
@@ -400,7 +400,7 @@
             window.location = window.location.href.replace("@Model?.Id",$("#item-code").val());
         });
 
-        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+        $('.nav-item a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
             var selectedTab = e.currentTarget.dataset.bsTarget;
             if (selectedTab == "#nav-warehouse") warehouseDT.ajax.reload();
             if (selectedTab == "#nav-purchase") purchaseDT.ajax.reload();
@@ -437,7 +437,7 @@
                     orderable: false,
                     data: function(data, type, dataToSet) {
                         var actions = '';
-                        actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                        actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="top-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
                         return actions;
                     }
                 }
@@ -477,7 +477,8 @@
             submitHandler: function(form) {
                 DoQuantity();
                 return false;
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         // Send Quantity to Controller
@@ -493,9 +494,9 @@
                 error: jQueryCommonError,
                 success: function(data, status, xhr) {
                     if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                     } else {
-                        toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                         $("#quantityModal").modal("hide");
                         warehouseDT.ajax.reload();
                     }

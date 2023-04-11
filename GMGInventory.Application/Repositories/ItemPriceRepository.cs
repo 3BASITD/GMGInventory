@@ -160,6 +160,22 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<ItemPricePVM> GetAllItemPricePrintAsync(ItemFilterVM filter)
+        {
+            var items = await GetAllItemPriceAsync(filter);
+            var brand = await context.Brands.Where(s => s.Id == filter.BrandId).FirstOrDefaultAsync();
+            var category = await context.Categories.Where(s => s.Id == filter.CategoryId).FirstOrDefaultAsync();
+            var itemType = await context.ItemTypes.Where(s => s.Id == filter.ItemTypeId).FirstOrDefaultAsync();
+
+            return new ItemPricePVM
+            {
+                Contents = items,
+                Brand = filter.BrandId == null || brand == null ? "All" : brand.Name,
+                Category = filter.CategoryId == null || category == null ? "All" : category.Name,
+                ItemType = filter.ItemTypeId == null || itemType == null ? "All" : itemType.Name
+            };
+        }
+
         public async Task<IList<ItemPriceUpdateVM>> GetAllItemPriceUpdateAsync(ItemFilterVM filter)
         {
             var pricesVM = await (from item in context.Items

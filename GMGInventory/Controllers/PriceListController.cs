@@ -42,5 +42,10 @@ namespace GMGInventory.Controllers
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemPriceRepository.GetAllItemPriceDataTablesAsync(form, filter));
         }
+
+        public async Task<ActionResult> Print(ItemFilterVM filter)
+        {
+            return View(await itemPriceRepository.GetAllItemPricePrintAsync(filter));
+        }
     }
 }

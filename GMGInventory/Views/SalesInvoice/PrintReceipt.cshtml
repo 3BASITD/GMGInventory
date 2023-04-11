@@ -1,0 +1,256 @@
+﻿@model InvoiceDetailsWithItemsVM
+
+@{
+    Layout = "";
+    var title = "Sales Invoice";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/printreceipt.css" asp-append-version="true" />
+</head>
+<body>
+    @if (Model?.InvoiceType == "Sales Invoice")
+    {
+        <!-- SALES INVOICE -->
+        <table style="margin-top: 115px;">
+            <tbody>
+                <tr>
+                    <td style="width: 100px;"></td> <!-- INDENT -->
+                    <td>@Model?.CustomerName</td>
+                    <td style="width: 130px;">@Model?.InvoiceDateD.ToString("MMMM dd")</td>
+                    <td style="width: 50px;">@Model?.InvoiceDateD.ToString("yy")</td>
+                </tr>
+                <tr>
+                    <td style="width: 100px;"></td> <!-- INDENT -->
+                    <td>@(Model?.TIN == "0" ? "" : Model?.TIN)</td>
+                    <td style="width: 180px;" colspan="2">@Model?.PaymentTerms</td>
+                </tr>
+                <tr>
+                    <td style="width: 100px;"></td> <!-- INDENT -->
+                    <td></td>
+                    <td style="width: 180px;" colspan="2"></td>
+                </tr>
+                <tr>
+                    <td style="width: 100px;"></td> <!-- INDENT -->
+                    <td>@Model?.CustomerAddress</td>
+                    <td style="width: 180px;" colspan="2">@Model?.Agent</td>
+                </tr>
+            </tbody>
+        </table>
+        <table style="margin-top: 26px;">
+            <tbody>
+                @if (Model != null)
+                {
+                    int rowctr = 0, otherQuantity = 0;
+                    decimal otherGrossPrice = 0;
+                    @foreach (var item in Model.Items)
+                    {
+                        rowctr++;
+                        if (rowctr < 18 || Model.Items.Count == 18)
+                        {
+                            <tr>
+                                <td style="width: 75px;">@item.Quantity</td>
+                                <td style="width: 50px;">@item.Unit</td>
+                                <td>@item.ItemName</td>
+                                <td style="width: 80px;" class="currency">@item.NetPrice</td>
+                                <td style="width: 125px;" class="currency">@item.GrossPriceNoDiscount</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            otherQuantity += item.Quantity;
+                            otherGrossPrice += item.GrossPriceNoDiscountD;
+                        }
+                    }
+
+                    @if (otherQuantity > 0)
+                    {
+                        <tr>
+                            <td style="width: 75px;">@otherQuantity</td>
+                            <td colspan="3">+@(Model.Items.Count - 17) more item(s)</td>
+                            <td style="width: 125px;" class="currency">@string.Format("{0:#,##0.00}",otherGrossPrice)</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @for (int rem = 0; rem <= 17 - Model.Items.Count; rem++)
+                        {
+                            <tr>
+                                <td style="width: 75px;"></td>
+                                <td style="width: 50px;"></td>
+                                <td></td>
+                                <td style="width: 80px;" class="currency"></td>
+                                <td style="width: 125px;" class="currency"></td>
+                            </tr>
+                        }
+                    }
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency">Total:</td>
+                        <td style="width: 125px;" class="currency">@Model.Total</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency">LESS @Model.DiscountPercent:</td>
+                        <td style="width: 125px;" class="currency">@Model.DiscountAmount</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency">Total Amount:</td>
+                        <td style="width: 125px;" class="currency">@Model.TotalAmount</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency"></td>
+                        <td style="width: 125px;" class="currency"></td> <!-- Total Sales(VAT Inclusive) -->
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency"></td>
+                        <td style="width: 125px;" class="currency">@Model.VATExclusive</td> <!--Less: VAT -->
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency"></td>
+                        <td style="width: 125px;" class="currency"></td> <!-- Amount: Net of VAT -->
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency"></td>
+                        <td style="width: 125px;" class="currency"></td> <!-- Less: Discount -->
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency"></td>
+                        <td style="width: 125px;" class="currency"></td> <!-- Amount Due -->
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency"></td>
+                        <td style="width: 125px;" class="currency">@Model.VATAmount</td> <!-- Add: VAT -->
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td style="width: 80px;" class="currency"></td>
+                        <td style="width: 125px;" class="currency">@Model.TotalAmount</td> <!-- TOTAL AMOUNT DUE -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <!-- DELIVERY RECEIPT -->
+        <table style="margin-top: 115px;">
+            <tbody>
+                <tr>
+                    <td style="width: 100px;"></td> <!-- INDENT -->
+                    <td>@Model?.CustomerName</td>
+                    <td style="width: 180px;">@Model?.InvoiceDateD.ToString("MM/dd/yy")</td>
+                </tr>
+                <tr>
+                    <td style="width: 100px;"></td> <!-- INDENT -->
+                    <td>@(Model?.TIN == "0" ? "" : Model?.CustomerAddress)</td>
+                    <td style="width: 180px;" colspan="2">@Model?.PaymentTerms</td>
+                </tr>
+                <tr>
+                    <td style="width: 100px;"></td> <!-- INDENT -->
+                    <td></td>
+                    <td style="width: 180px;" colspan="2">@Model?.Agent</td>
+                </tr>
+            </tbody>
+        </table>
+        @*<table style="margin-top: 26px;">*@
+        <table>
+            <tbody>
+                <tr>
+                    <td style="width: 75px;"></td>
+                    <td style="width: 50px;"></td>
+                    <td style="width: 75px;"></td>
+                    <td></td>
+                    <td style="width: 80px;" class="currency"></td>
+                    <td style="width: 125px;" class="currency"></td>
+                </tr>
+                @if (Model != null)
+                {
+                    int rowctr = 0, otherQuantity = 0;
+                    decimal otherGrossPrice = 0;
+                    @foreach (var item in Model.Items)
+                    {
+                        rowctr++;
+                        if (rowctr < 9 || Model.Items.Count == 9)
+                        {
+                            <tr>
+                                <td style="width: 75px;">@item.Quantity</td>
+                                <td style="width: 50px;">@item.Unit</td>
+                                <td colspan="2">@item.ItemName</td>
+                                <td style="width: 80px;" class="currency">@item.NetPrice</td>
+                                <td style="width: 125px;" class="currency">@item.GrossPriceNoDiscount</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            otherQuantity += item.Quantity;
+                            otherGrossPrice += item.GrossPriceNoDiscountD;
+                        }
+                    }
+
+                    @if (otherQuantity > 0)
+                    {
+                        <tr>
+                            <td style="width: 75px;">@otherQuantity</td>
+                            <td colspan="4">+@(Model.Items.Count - 8) more item(s)</td>
+                            <td style="width: 125px;" class="currency">@string.Format("{0:#,##0.00}",otherGrossPrice)</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        for (int rem = 0; rem <= 8 - Model.Items.Count; rem++)
+                        {
+                            <tr>
+                                <td style="width: 75px;"></td>
+                                <td style="width: 50px;"></td>
+                                <td style="width: 75px;"></td>
+                                <td></td>
+                                <td style="width: 80px;" class="currency"></td>
+                                <td style="width: 125px;" class="currency"></td>
+                            </tr>
+                        }
+                    }
+                    <tr>
+                        <td style="width: 75px;" class="currency">Subtotal:</td>
+                        <td style="width: 125px;" colspan="2" class="currency">@Model.VATExclusive</td>
+                        <td>&nbsp;</td>
+                        <td style="width: 80px;" class="currency">Total:</td>
+                        <td style="width: 125px;" class="currency">@Model.Total</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75px;" class="currency">12% VAT:</td>
+                        <td style="width: 125px;" colspan="2" class="currency">@Model.VATAmount</td>
+                        <td>&nbsp;</td>
+                        <td style="width: 80px;" class="currency">LESS @Model.DiscountPercent:</td>
+                        <td style="width: 125px;" class="currency">@Model.DiscountAmount</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75px;" class="currency">Total Amount:</td>
+                        <td style="width: 125px;" colspan="2" class="currency">@Model.TotalAmount</td>
+                        <td>&nbsp;</td>
+                        <td style="width: 80px;" class="currency"></td>
+                        <td style="width: 125px;" class="currency">@Model.TotalAmount</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
+</html>

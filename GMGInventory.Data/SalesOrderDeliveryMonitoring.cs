@@ -23,6 +23,10 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
 
+        public DateTime? DatePickup { get; set; }
+
+        public DateTime? DateDeliver { get; set; }
+
         public ICollection<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
     }
 }

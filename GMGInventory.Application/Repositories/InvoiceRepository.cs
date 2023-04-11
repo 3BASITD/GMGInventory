@@ -95,7 +95,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetInvoiceTypeOptions(int? IncludeId)
         {
-            return await context.PriceTypes
+            return await context.InvoiceTypes
                                 .Select(s => new JsonOptionsModel
                                 {
                                     Id = s.Id.ToString(),
@@ -127,14 +127,57 @@ namespace GMGInventory.Application.Repositories
                                  InvoiceDateD = invoice.DateCreated,
                                  InvoiceNumber = invoice.InvoiceNumber,
                                  InvoiceType = invoice.InvoiceType.Name,
+                                 InvoiceTypeId = invoice.InvoiceType.Id,
                                  PackNumber = invoice.PackId,
                                  PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? "-" : invoice.SalesOrder.Customer.CreditTerm.Name,
                                  PONumber = invoice.SalesOrder.PurchaseOrder == null ? "-" : invoice.SalesOrder.PurchaseOrder.PONumber,
                                  Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
-                                 Status = invoice.Status.Code
+                                 Status = invoice.Status.Code,
+                                 TIN = invoice.SalesOrder.Customer.TIN + ""
                              });
             return await invoiceVM.FirstOrDefaultAsync();
+        }
+
+        public async Task<InvoiceDetailsWithItemsVM> GetDetailsWithItemsAsync(int Id)
+        {
+            var invoiceVM = (from invoice in context.Invoices
+                                                    .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
+                                                    .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
+                                                    .Include(s => s.SalesOrder).ThenInclude(s => s.PurchaseOrder)
+                             join user in userManager.Users on invoice.UserCreated equals user.Id
+                             where invoice.Id == Id
+                             select new InvoiceDetailsWithItemsVM
+                             {
+                                 Agent = invoice.SalesOrder.Agent.FirstName
+                                       + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
+                                       + " " + invoice.SalesOrder.Agent.LastName,
+                                 ControlNumber = invoice.ControlNumber,
+                                 CustomerAddress = invoice.SalesOrder.Customer.Address,
+                                 CustomerCode = invoice.SalesOrder.Customer.Code,
+                                 CustomerName = invoice.SalesOrder.Customer.Name,
+                                 Id = invoice.Id,
+                                 InvoiceBy = user.Nickname,
+                                 InvoiceDateD = invoice.DateCreated,
+                                 InvoiceNumber = invoice.InvoiceNumber,
+                                 InvoiceType = invoice.InvoiceType.Name,
+                                 InvoiceTypeId = invoice.InvoiceTypeId,
+                                 PackNumber = invoice.PackId,
+                                 PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? "-" : invoice.SalesOrder.Customer.CreditTerm.Name,
+                                 PONumber = invoice.SalesOrder.PurchaseOrder == null ? "-" : invoice.SalesOrder.PurchaseOrder.PONumber,
+                                 Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
+                                 SONumber = invoice.SalesOrder.SalesOrderNumber,
+                                 Status = invoice.Status.Code,
+                                 TIN = invoice.SalesOrder.Customer.TIN + ""
+                             });
+            var invoiceDetails = await invoiceVM.FirstAsync();
+            var items = await GetItemsAsync(Id);
+            invoiceDetails.Items = items;
+            invoiceDetails.TotalD = items.Sum(s => s.GrossPriceNoDiscountD);
+            invoiceDetails.DiscountAmountD = items.Sum(s => s.GrossPriceD);
+            invoiceDetails.DiscountPercentD = 100 - (items.Sum(s => s.GrossPriceD) / items.Sum(s => s.GrossPriceNoDiscountD) * 100);
+            invoiceDetails.TotalAmountD = items.Sum(s => s.GrossPriceNoDiscountD);
+            return invoiceDetails;
         }
 
         public async Task<InvoiceDetailsVM?> GetDetailsByPackAsync(int? Id)
@@ -157,7 +200,8 @@ namespace GMGInventory.Application.Repositories
                               PaymentTerms = pack.SalesOrder.Customer.CreditTerm == null ? "-" : pack.SalesOrder.Customer.CreditTerm.Name,
                               PONumber = pack.SalesOrder.PurchaseOrder == null ? "-" : pack.SalesOrder.PurchaseOrder.PONumber,
                               SONumber = pack.SalesOrder.SalesOrderNumber,
-                              Status = pack.Status.Code
+                              Status = pack.Status.Code,
+                              TIN = pack.SalesOrder.Customer.TIN + ""
                           });
             return await packVM.FirstOrDefaultAsync();
         }
@@ -276,7 +320,8 @@ namespace GMGInventory.Application.Repositories
                              ItemName = item.Name,
                              NetPriceD = invoicel.UnitPrice,
                              Quantity = invoicel.Quantity,
-                             ReferenceNumber = invoicel.Invoice.ControlNumber
+                             ReferenceNumber = invoicel.Invoice.ControlNumber,
+                             Unit = item.Unit.Code
                          };
             return await itemVM.ToListAsync();
         }
@@ -399,7 +444,7 @@ namespace GMGInventory.Application.Repositories
                     IsPaid = false,
                     PackId = form.PackId,
                     PaidAmount = 0,
-                    Remarks = form.Remarks,
+                    Remarks = form.Remarks + "",
                     SalesOrderId = packVM.SalesOrder.Id,
                     StatusId = statusId
                 };
@@ -417,6 +462,25 @@ namespace GMGInventory.Application.Repositories
                 return invoice.Id;
             }
             return -1;
+        }
+
+        public async Task<int> UpdateAsync(InvoiceFormUpdateVM form)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            var invoice = await context.Invoices.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+            if (invoice == null)
+            {
+                return -1;
+            }
+            else
+            {
+                invoice.ControlNumber = form.BIRInvoiceNumber;
+                invoice.InvoiceTypeId = form.InvoiceType;
+                invoice.Remarks = form.Remarks + "";
+                await context.SaveChangesAsync(currentUserId);
+                return 1;
+            }
         }
     }
 }

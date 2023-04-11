@@ -41,8 +41,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
 
-        [Display(Name = "Delivery Type")]
-        public string DeliveryType { get; set; }
+        [Display(Name = "Forwarder")]
+        public string Forwarder { get; set; }
 
         [Display(Name = "Sales Order Date")]
         public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDateTime);

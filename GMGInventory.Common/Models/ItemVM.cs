@@ -47,6 +47,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Size")]
         public string Size { get; set; }
 
+        [Display(Name = "Quantity on Hand")]
+        public int Quantity { get; set; }
+
         public int UnitId { get; set; }
         public int CategoryId { get; set; }
         public int ItemTypeId { get; set; }
@@ -60,7 +63,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Warehouse")]
         public string Warehouse { get; set; }
 
-        [Display(Name = "Retail Price")]
+        [Display(Name = "Gross Price")]
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
 
         [Display(Name = "Net Price")]
@@ -143,7 +146,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Category")]
         public string Category { get; set; }
 
-        [Display(Name = "Retail Price")]
+        [Display(Name = "Gross Price")]
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
 
@@ -170,6 +173,7 @@ namespace GMGInventory.Common.Models
         public string Brand { get; set; }
         public string Size { get; set; }
         public string Unit { get; set; }
+        public int Quantity { get; set; }
         public bool IsActive { get; set; }
     }
 

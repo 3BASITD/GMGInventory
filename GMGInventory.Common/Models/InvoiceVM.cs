@@ -83,6 +83,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Address")]
         public string CustomerAddress { get; set; }
 
+        [Display(Name = "TIN")]
+        public string TIN { get; set; }
+
         [Display(Name = "Payment Terms")]
         public string PaymentTerms { get; set; }
 
@@ -111,8 +114,41 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
 
+        public int InvoiceTypeId { get; set; }
+
         [Display(Name = "Invoice Type")]
         public string InvoiceType { get; set; }
+    }
+
+    public class InvoiceDetailsWithItemsVM : InvoiceDetailsVM
+    {
+        public IList<InvoiceItemVM> Items { get; set; }
+
+        [Display(Name = "Total")]
+        public string Total => string.Format(SystemFormat.StringDecimalComma, TotalD);
+        public decimal TotalD { get; set; }
+
+        [Display(Name = "Discount %")]
+        public string DiscountPercent => string.Format(SystemFormat.StringDecimalComma, DiscountPercentD) + "%";
+
+        public decimal DiscountPercentD { get; set; }
+
+        [Display(Name = "Discount Amount")]
+        public string DiscountAmount => string.Format(SystemFormat.StringDecimalComma, DiscountAmountD);
+        public decimal DiscountAmountD { get; set; }
+
+        [Display(Name = "VAT Exclusive")]
+        public string VATExclusive => string.Format(SystemFormat.StringDecimalComma, VATExclusiveD);
+        public decimal VATExclusiveD => TotalAmountD * 0.88m;
+
+        [Display(Name = "VAT Amount")]
+        public string VATAmount => string.Format(SystemFormat.StringDecimalComma, VATAmountD);
+        public decimal VATAmountD => TotalAmountD * 0.12m;
+
+        [Display(Name = "Total Amount")]
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal TotalAmountD { get; set; }
+
     }
 
     public class InvoiceItemVM
@@ -130,6 +166,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Quantity")]
         public int Quantity { get; set; }
 
+        [Display(Name = "Unit")]
+        public string Unit { get; set; }
+
         [Display(Name = "Net Price")]
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
         public decimal NetPriceD { get; set; }
@@ -146,8 +185,21 @@ namespace GMGInventory.Common.Models
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
         public decimal GrossPriceD => Quantity * (((100m - Discount1D - Discount2D) * NetPriceD) / 100m);
 
+        [Display(Name = "Gross Price (No Discount)")]
+        public string GrossPriceNoDiscount => string.Format(SystemFormat.StringDecimalComma, GrossPriceNoDiscountD);
+        public decimal GrossPriceNoDiscountD => Quantity * NetPriceD;
+
         [Display(Name = "Reference Number")]
         public string ReferenceNumber { get; set; }
+    }
+
+    public class InvoiceFormUpdateVM
+    {
+        public int Id { get; set; }
+        public string BIRInvoiceNumber { get; set; }
+        public int InvoiceType { get; set; }
+        public string Remarks { get; set; }
+
     }
 
     public class InvoiceFormVM

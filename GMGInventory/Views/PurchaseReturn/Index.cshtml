@@ -174,7 +174,7 @@
         });
 
         var itemDT = $('.table-replenish').on('preXhr.dt', function (e, settings, data) {
-                showLoader();
+            showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson", "PurchaseOrder")",
@@ -227,7 +227,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -245,7 +245,7 @@
 
         $(".btn-post").on("click", function () {
             if ($("#po-number").val() == "") {
-                toastr.warning("Please select PO Number first");
+                toastrNoDuplicate("Please select PO Number first", "Warning", "warning");
             } else {
                 var item_to_return = [];
                 itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -269,7 +269,7 @@
                     $("#save-remarks").val("");
                     $("#saveModal").modal("show");
                 } else {
-                    toastr.warning("No change in quantity. Nothing to return");
+                    toastrNoDuplicate("No change in quantity. Nothing to return", "Warning", "warning");
                 }
             }
         });
@@ -295,25 +295,25 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            toastr.success(data.message, "Success");
+                            toastrNoDuplicate(data.message, "Success", "success");
                             $("#saveModal").modal("hide");
                             itemDT.ajax.reload();
                         }
                     }
                 });
             } else {
-                toastr.warning("Seems like the list of items to return have been cleared out.");
+                toastrNoDuplicate("Seems like the list of items to return have been cleared out", "Warning", "warning");
             }
         });
 
         var historyDT;
         $(".btn-history").on("click", function () {
             if ($("#po-number").val() == "") {
-                toastr.warning("Please select PO Number first");
+                toastrNoDuplicate("Please select PO Number first", "Warning", "warning");
             } else {
-                if($.fn.DataTable.isDataTable('.table-return-history')) {
+                if ($.fn.DataTable.isDataTable('.table-return-history')) {
                     historyDT.destroy();
                     $('.table-return-history tbody').empty();
                 }

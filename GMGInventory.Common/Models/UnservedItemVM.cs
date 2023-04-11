@@ -25,13 +25,16 @@ namespace GMGInventory.Common.Models
         public decimal UnitPriceD { get; set; }
 
         [Display(Name = "Quantity")]
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
 
         [Display(Name = "Packed Quantity")]
-        public int PackedQuantity { get; set; }
+        public string PackedQuantity => string.Format(SystemFormat.StringIntegerComma, PackedQuantityD);
+        public int PackedQuantityD { get; set; }
 
         [Display(Name = "Unserved Quantity")]
-        public int UnservedQuantity => Quantity - PackedQuantity;
+        public string UnservedQuantity => string.Format(SystemFormat.StringIntegerComma, UnservedQuantityD);
+        public int UnservedQuantityD { get; set; }
 
         [Display(Name = "Discount 1")]
         public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);

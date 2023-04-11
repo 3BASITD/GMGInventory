@@ -1,759 +1,759 @@
 ﻿@model SoacrVM
 
 @{
-	ViewData["Title"] = "SOACr Details";
+    ViewData["Title"] = "SOACr Details";
 }
 @section Breadcrumb {
-	<li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">Soacr</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">Soacr</a></li>
 }
 
-<div class="card card-default">
-   <div class="card-header">
-			<span class="card-title">@ViewData["Title"]</span>
-			<div class="card-tools"> 
-			<a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
-				<span class="fas fa-arrow-left"></span> Back to List
-			</a>
-		  
-			<button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
-				<span class="fas fa-print"></span> Print
-			</button>
-			@if (Model?.Type == "Counter Receipt")
-			{
-				@*<button type="button" class="btn btn-primary btn-sm float-right createInvoiceBtn ml-2" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
-					<span class="fas fa-file-alt"></span> Add Invoice
-				</button>*@
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
 
-				<a class="btn btn-primary btn-sm float-right ml-2" asp-action="AddInvoice" asp-route-id = "@Model.Id" asp-route-custId="@Model.CustomerId">
-					<span class="fas fa-plus"></span> Add Invoice
-				 </a>
-			}
-			
+                <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            @if (Model?.Type == "Counter Receipt")
+            {
+                @*<button type="button" class="btn btn-primary btn-sm float-right createInvoiceBtn ml-2" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
+            <span class="fas fa-file-alt"></span> Add Invoice
+            </button>*@
 
-			<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-				<span class="fas fa-file-alt"></span> Add Payment
-			</button>
-			</div>
-	</div>
-	 <div class="card-body">
-		<div class="row">
-			<div class="col-md-4">
-				<p class="text-sm">
-					<span class="text-muted">
-						@Html.DisplayNameFor(model => model.Id)
-					</span>
-					<b class="d-block">
-						@Model?.Id
-					</b>
-				</p>
-				<p class="text-sm">
-					<span class="text-muted">
-						@Html.DisplayNameFor(model => model.CustomerName)
-					</span>
-					<b class="d-block">
-						@Model?.CustomerName
-					</b>
-				</p>
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="AddInvoice" asp-route-id="@Model.Id" asp-route-custId="@Model.CustomerId">
+                    <span class="fas fa-plus"></span> Add Invoice
+                </a>
+            }
 
-				<p class="text-sm">
-					<span class="text-muted">
-						@Html.DisplayNameFor(model => model.Type)
-					</span>
-					<b class="d-block SoacrType">
-						@Model?.Type
-					</b>
-				</p>
-				
-			  </div>
-		</div>
-	</div>
-	<div class="card-body">
-		<table class="table table-head-fixed table-striped table-hover table-soa">
-			<thead>
-				<tr>
 
-					<th>
-						@Html.DisplayNameFor(model => model.InvoiceNumber)
-					</th>
-					<th>
-						@Html.DisplayNameFor(model => model.InvoiceAmount)
-					</th>
-					<th>
-						@Html.DisplayNameFor(model => model.TBR)
-					</th>
-					<th>
-						@Html.DisplayNameFor(model => model.Credit)
-					</th>
-					<th>
-						@Html.DisplayNameFor(model => model.Debit)
-					</th>
-					<th>
-						@Html.DisplayNameFor(model => model.PaidAmount)
-					</th>
-					<th>
-						@Html.DisplayNameFor(model => model.FreightCharge)
-					</th>
-					 <th>
-						@Html.DisplayNameFor(model => model.Balance)
-					</th>
-					<th>
+            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                <span class="fas fa-file-alt"></span> Add Payment
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Id)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Id
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CustomerName)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CustomerName
+                    </b>
+                </p>
 
-					</th>
-					
-				</tr>
-			</thead>
-		</table>
-	</div>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Type)
+                    </span>
+                    <b class="d-block SoacrType">
+                        @Model?.Type
+                    </b>
+                </p>
+
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-soa">
+            <thead>
+                <tr>
+
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TBR)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Credit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Debit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PaidAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.FreightCharge)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Balance)
+                    </th>
+                    <th>
+
+                    </th>
+
+                </tr>
+            </thead>
+        </table>
+    </div>
 </div>
 
 <form id="deleteSoaLineItemForm" asp-action="Delete">
-	<input type="hidden" id="deleteSoaLineItemId" name="Id"/>
-	<input type="hidden" id="deleteSoaCrId" name="soacrId" value="@Model?.Id"/>
+    <input type="hidden" id="deleteSoaLineItemId" name="Id" />
+    <input type="hidden" id="deleteSoaCrId" name="soacrId" value="@Model?.Id" />
 </form>
 
 <form id="reactivateSoaLineItemForm" asp-action="Reactivate">
-	<input type="hidden" id="reactivateSoaLineItemId" name="Id" />
+    <input type="hidden" id="reactivateSoaLineItemId" name="Id" />
 </form>
 
 <!-- Create New Payment Modal -->
-<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static" >
-	<div class="modal-dialog" style="max-width: 50%;" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Payment</h5>
-				<button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<form autocomplete="off" id="createForm">
-				<div class="modal-body" >
-					<div class="row">
-						<div class="col-md-4">
-							<div class="form-group">
-								<label for="create-customer-receipt" class="control-label mb-0 d-block">Customer Receipt No</label>
-								<input type="text" name="CustomerReceipt" id="create-customer-receipt" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-customer-receipt" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-					
-					</div>
-					<div class="row">
-						  <div class="col-md-12">
-							<div class="form-group">
-								<label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
-								<input type="text" name="Remarks" id="create-remarks" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-remarks" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-					</div>
-				 @*   <div class="row">
-						<div class="col-md-12">
-						   <div class="form-group">
-								<label for="create-invoice" class="control-label mb-0 d-block">Debit</label>
-								<input type="number" name="Invoice" id="create-invoice" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-invoice" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-					</div>*@
-					<div class="row">
-						<div class="col-md-6">
-							<div class="form-group">
-							   <label for="create-over-payment" class="control-label mb-0 d-block">Over Payment</label>
-								<input type="number" name="OverPayment" id="create-over-payment" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-over-payment" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group">
-							   <label for="create-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
-								<input type="number" name="TKT" id="create-tkt" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-tkt" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-6">
-							<div class="form-group">
-								<label for="create-tax" class="control-label mb-0 d-block">Tax</label>
-								<input type="number" name="TAX" id="create-tax" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-tax" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group">
-							   <label for="create-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
-								<input type="number" name="CashAdvanced" id="create-cash-advanced" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-cash-advanced" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-6">
-							<div class="form-group">
-								<label for="create-discount" class="control-label mb-0 d-block">Discount</label>
-								<input type="number" name="Discount" id="create-discount" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-discount" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group">
-								<label for="create-offset" class="control-label mb-0 d-block">Offset</label>
-								<input type="number" name="Offset" id="create-offset" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-offset" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-6">
-							<div class="form-group">
-								<label for="create-cash-amount" class="control-label mb-0 d-block">Cash Amount</label>
-								<input type="number" name="CashAmount" id="create-cash-amount" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-cash-amount" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group">
-								<label for="create-backload" class="control-label mb-0 d-block">Back Load</label>
-								<input type="number" name="BackLoad" id="create-backload" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-backload" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-					</div>
+<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" style="max-width: 50%;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="createForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="create-customer-receipt" class="control-label mb-0 d-block">Customer Receipt No</label>
+                                <input type="text" name="CustomerReceipt" id="create-customer-receipt" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-customer-receipt" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
 
-					<h4>Check</h4>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
+                                <input type="text" name="Remarks" id="create-remarks" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-remarks" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    @*   <div class="row">
+                    <div class="col-md-12">
+                    <div class="form-group">
+                    <label for="create-invoice" class="control-label mb-0 d-block">Debit</label>
+                    <input type="number" name="Invoice" id="create-invoice" class="form-control form-control-sm" />
+                    <span data-valmsg-for="create-invoice" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    </div>
+                    </div>*@
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create-over-payment" class="control-label mb-0 d-block">Over Payment</label>
+                                <input type="number" name="OverPayment" id="create-over-payment" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-over-payment" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
+                                <input type="number" name="TKT" id="create-tkt" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-tkt" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create-tax" class="control-label mb-0 d-block">Tax</label>
+                                <input type="number" name="TAX" id="create-tax" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-tax" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
+                                <input type="number" name="CashAdvanced" id="create-cash-advanced" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-cash-advanced" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create-discount" class="control-label mb-0 d-block">Discount</label>
+                                <input type="number" name="Discount" id="create-discount" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-discount" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create-offset" class="control-label mb-0 d-block">Offset</label>
+                                <input type="number" name="Offset" id="create-offset" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-offset" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create-cash-amount" class="control-label mb-0 d-block">Cash Amount</label>
+                                <input type="number" name="CashAmount" id="create-cash-amount" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-cash-amount" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create-backload" class="control-label mb-0 d-block">Back Load</label>
+                                <input type="number" name="BackLoad" id="create-backload" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-backload" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
 
-					<div class="row">
-						<div class="col-md-4">
-							<div class="form-group">
-								<label for="create-bankname" class="control-label mb-0 d-block">Bank Name</label>
-								<input type="text" name="BankName" id="create-bankname" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-bankname" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group">
-								<label for="create-checkdate" class="control-label mb-0 d-block">Check Date</label>
-								<input type="date" name="CheckDate" id="create-checkdate" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-checkdate" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group">
-								<label for="create-checkamount" class="control-label mb-0 d-block">Check Amount</label>
-								<input type="number" name="CheckAmount" id="create-checkamount" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-checkamount" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-					</div>
+                    <h4>Check</h4>
 
-					<div class="row">
-						<div class="col-md-4">
-							<div class="form-group">
-								<label for="create-bankbranch" class="control-label mb-0 d-block">Bank Branch</label>
-								<input type="text" name="BankBranch" id="create-bankbranch" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-bankbranch" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group">
-								<label for="create-checknumber" class="control-label mb-0 d-block">Check Number</label>
-								<input type="text" name="CheckNumber" id="create-checknumber" class="form-control form-control-sm" />
-								<span data-valmsg-for="create-checknumber" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-						</div>
-						
-					</div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="create-bankname" class="control-label mb-0 d-block">Bank Name</label>
+                                <input type="text" name="BankName" id="create-bankname" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-bankname" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="create-checkdate" class="control-label mb-0 d-block">Check Date</label>
+                                <input type="date" name="CheckDate" id="create-checkdate" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-checkdate" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="create-checkamount" class="control-label mb-0 d-block">Check Amount</label>
+                                <input type="number" name="CheckAmount" id="create-checkamount" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-checkamount" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
 
-				</div>
-				<div class="modal-footer">
-					<button type="submit" class="btn btn-primary">
-						<span class="fas fa-plus"></span> Add
-					</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-						<span class="fas fa-times"></span> Cancel
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="create-bankbranch" class="control-label mb-0 d-block">Bank Branch</label>
+                                <input type="text" name="BankBranch" id="create-bankbranch" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-bankbranch" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="create-checknumber" class="control-label mb-0 d-block">Check Number</label>
+                                <input type="text" name="CheckNumber" id="create-checknumber" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-checknumber" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 
 <!-- Edit Modal -->
 <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-	<div class="modal-dialog modal-sm" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Edit Invoice</h5>
-				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<form autocomplete="off" id="editForm">
-				<div class="modal-body">
-					<div class="row">
-						<div class="col-md-12">
-							<div class="form-group">
-								<label for="edit-tbr" class="control-label mb-0 d-block">TBR</label>
-								<input type="number" name="TBR" id="edit-tbr" class="form-control form-control-sm" />
-								<span data-valmsg-for="edit-tbr" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-							<div class="form-group">
-								<label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
-								<input type="number" name="Debit" id="edit-debit" class="form-control form-control-sm" />
-								<span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-							<div class="form-group">
-								<label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
-								<input type="number" name="Credit" id="edit-credit" class="form-control form-control-sm" />
-								<span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-							<div class="form-group">
-								<label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
-								<input type="number" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />
-								<span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
-							</div>
-							<input type="hidden" id="edit-id" />
-							<input type="hidden" id="edit-invoice" />
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Invoice</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="editForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="edit-tbr" class="control-label mb-0 d-block">TBR</label>
+                                <input type="number" name="TBR" id="edit-tbr" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-tbr" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
+                                <input type="number" name="Debit" id="edit-debit" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
+                                <input type="number" name="Credit" id="edit-credit" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
+                                <input type="number" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                            <input type="hidden" id="edit-id" />
+                            <input type="hidden" id="edit-invoice" />
 
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="submit" class="btn btn-primary">
-						<span class="fas fa-edit"></span> Update
-					</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-						<span class="fas fa-times"></span> Cancel
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-edit"></span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- Add Invoice Modal   -->
 
-<div class="modal fade" id="createInvoiceModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static" >
-	<div class="modal-dialog" role="document">
-	   <div class="modal-content">
-			 <div class="modal-header">
-				<h5 class="modal-title">Add Invoice</h5>
-				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<form autocomplete="off" id="createInvoiceForm">
+<div class="modal fade" id="createInvoiceModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Invoice</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="createInvoiceForm">
 
-				<div class="modal-body">
+                <div class="modal-body">
 
-					<table class="table table-head-fixed table-striped table-hover table-invoice">
-						<thead>
-							<tr>
-								<th></th>
-								<th>
-									 @Html.DisplayNameFor(model => model.InvoiceDate)
-								</th>
-								<th>
-									 @Html.DisplayNameFor(model => model.InvoiceNumber)
-								</th>
-								<th>
-									 @Html.DisplayNameFor(model => model.InvoiceType)
-								</th>
-								<th>
-									 @Html.DisplayNameFor(model => model.TotalAmount)
-								</th>
-							</tr>
-						</thead>
-					</table>
-				 
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary btn-add">
-						<span class="fas fa-plus"></span> Add
-					</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-						<span class="fas fa-times"></span> Cancel
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
+                    <table class="table table-head-fixed table-striped table-hover table-invoice">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.InvoiceDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.InvoiceNumber)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.InvoiceType)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.TotalAmount)
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-add">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 
 
 
 @section Scripts {
-	<script>
-		var itemTable = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
-			showLoader();
-		}).DataTable({
-			ajax: {
-				url: "@Url.Action("GetSoaDetailsJson", "Soacr")",
-				type: "POST",
-				data: function(data) {
-					data.Id = @Model?.Id;
-					data.custId = @Model?.CustomerId;
-				},
-			},
-			serverSide: true,
-			filter: true,
-			responsive: true,
-			autoWidth: false,
+    <script>
+        var itemTable = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetSoaDetailsJson", "Soacr")",
+                type: "POST",
+                data: function (data) {
+                    data.Id = @Model?.Id;
+                    data.custId = @Model?.CustomerId;
+                },
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
             search: {
                 return: true,
             },
-			columns: [
-				{ data: "invoiceNumber", name: "InvoiceNumber" },
-				{ data: "invoiceAmount", name: "InvoiceAmount" },
-				{ data: "tbr", name: "TBR" },
-				{ data: "credit", name: "Credit" },
-				{ data: "debit", name: "Debit" },
-				{ data: "paidAmount", name: "PaidAmount" },
-				{ data: "freightCharge", name: "FreightCharge" },
-				{ data: "balance", name: "Balance"/*, className: "text-end"*/},
-				{
-					orderable: false,
-					data: function (data, type, dataToSet) {
-						var actions = '';
-							actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-							actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
-						actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
-						return actions;
-					}
-				}
-			   
-			]
-		});
+            columns: [
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "invoiceAmount", name: "InvoiceAmount" },
+                { data: "tbr", name: "TBR" },
+                { data: "credit", name: "Credit" },
+                { data: "debit", name: "Debit" },
+                { data: "paidAmount", name: "PaidAmount" },
+                { data: "freightCharge", name: "FreightCharge" },
+                { data: "balance", name: "Balance"/*, className: "text-end"*/ },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        return actions;
+                    }
+                }
 
-		itemTable.on("draw", function () {
-			hideLoader();
+            ]
+        });
 
-			$(".printBtn").on("click", function() {
-				$.LoadingOverlay("show", {
-					image: "",
-					fontawesome: "fas fa-print"
-				});
-				var urlQuery = [];
-				//urlQuery.push("DateFrom=" + $("#filter-from").val());
-				//urlQuery.push("DateTo=" + $("#filter-to").val());
-				//if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
-				//if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
-			if ($(".SoacrType").text().trim() == "Statement of Account") { 
-			setTimeout(function() {
-					//let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
+        itemTable.on("draw", function () {
+            hideLoader();
 
-					let win = window.open('@Url.Action("PrintSoaDetails")/@Model?.Id', '');
-					var wintimer = setInterval(function() {
-						if (win.closed) {
-							clearInterval(wintimer);
-							hideLoader();
-						}
-					}, 100);
-				}, 500);
+            $(".printBtn").on("click", function () {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                var urlQuery = [];
+                //urlQuery.push("DateFrom=" + $("#filter-from").val());
+                //urlQuery.push("DateTo=" + $("#filter-to").val());
+                //if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+                //if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+                if ($(".SoacrType").text().trim() == "Statement of Account") {
+                    setTimeout(function () {
+                        //let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
 
-			}
-			else if ($(".SoacrType").text().trim() == "Counter Receipt") { 
-			setTimeout(function() {
-					//let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
+                        let win = window.open('@Url.Action("PrintSoaDetails")/@Model?.Id', '');
+                        var wintimer = setInterval(function () {
+                            if (win.closed) {
+                                clearInterval(wintimer);
+                                hideLoader();
+                            }
+                        }, 100);
+                    }, 500);
 
-					let win = window.open('@Url.Action("PrintCRDetails")/@Model?.Id', '');
-					var wintimer = setInterval(function() {
-						if (win.closed) {
-							clearInterval(wintimer);
-							hideLoader();
-						}
-					}, 100);
-				}, 500);
+                }
+                else if ($(".SoacrType").text().trim() == "Counter Receipt") {
+                    setTimeout(function () {
+                        //let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
 
-			}
+                        let win = window.open('@Url.Action("PrintCRDetails")/@Model?.Id', '');
+                        var wintimer = setInterval(function () {
+                            if (win.closed) {
+                                clearInterval(wintimer);
+                                hideLoader();
+                            }
+                        }, 100);
+                    }, 500);
 
-			});
+                }
 
-			$('.deleteBtn').click(function(e) {
-				swal({
-					title: "Delete Invoice",
-					text: "Are you sure you want to delete this record?",
-					icon: "warning",
-					buttons: true,
-					dangerMode: true
-				}).then((confirm) => {
-					if (confirm) {
-						var btn = $(this);
-						var id = btn.data("id");
-						$('#deleteSoaLineItemId').val(id);
-						$('#deleteSoaLineItemForm').submit();
-					}
-				});
-			});
+            });
 
-
-
-			// Actions upon Display Edit Modal
-			$(".editBtn").click(function (e) {
-				var data = itemTable.row($(this).parents('tr')).data();
-				console.log(data);
-				console.log(data.invoiceId);
-					$("#edit-id").val(data.id);
-					$("#edit-tbr").val(data.tbrd);
-					$("#edit-debit").val(data.debitD);
-					$("#edit-credit").val(data.creditD);
-					$("#edit-freight-cost").val(data.freightChargeD);
-					$("#edit-invoice").val(data.invoiceId);
-
-			});
-
-			// Validation for Edit Modal
-			var validateEdit = $("#editForm").validate({
-				errorClass: 'text-danger text-xs',
-				rules: {
-					TBR: { range: [0, 1999999.99] },
-					Debit: { range: [0, 1999999.99] },
-					Credit: { range: [0, 1999999.99] },
-					FreightCost: { range: [0, 1999999.99] }
-				},
-				messages: {
-					TBR: { range: "Credit Limit must be between 0-1999999.99." },
-					Debit: { range: "Credit Limit must be between 0-1999999.99." },
-					Credit: { range: "Credit Limit must be between 0-1999999.99." },
-					FreightCost: { range: "Credit Limit must be between 0-1999999.99." }
-				},
-				submitHandler: function (form, event) {
-					event.preventDefault();
-					DoEdit();
-				}
-			});
-
-			// Send Edit to Controller
-			function DoEdit() {
-				$.ajax({
-					type: "POST",
-					url: "@Url.Action("EditInvoiceJson")",
-					data: {
-						Id: $("#edit-id").val(),
-						InvoiceId: $("#edit-invoice").val(),
-						TBRD: $("#edit-tbr").val(),
-						DebitD: $("#edit-debit").val(),
-						CreditD: $("#edit-credit").val(),
-						FreightChargeD: $("#edit-freight-cost").val()
-					},
-					error: jQueryCommonError,
-					success: function (data, status, xhr) {
-						if (data.status == "Error") {
-							toastr.error(data.message, "Error");
-						} else {
-							toastr.success(data.message, "Success");
-							$("#editModal").modal("hide");
-							itemTable.ajax.reload();
-						}
-					},
-					complete: function (xhr, status) {
-					}
-				});
-			}
-
-
-		 // Actions upon Display Create Modal
-		$(".createBtn").click(function(e) {
-			var data = itemTable.row($(this).parents('tr')).data();
-			//$("#create-invoice").val(data.invoiceId);
-			$("#create-customer").val(@Model?.CustomerId);
-			$("#create-customer-receipt").val("");
-			$("#create-remarks").val("");
-			$("#create-over-payment").val("");
-			$("#create-tkt").val("");
-			$("#create-tax").val("");
-			$("#create-cash-advanced").val("");
-			$("#create-discount").val("");
-			$("#create-offset").val("");
-			$("#create-cash-amount").val("");
-			$("#create-backload").val("");
-			$("#create-bankname").val("");
-			$("#create-bankbranch").val("");
-			$("#create-checkdate").val("");
-			$("#create-checkamount").val("");
-			$("#create-checknumber").val("");
-		});
-
-		// Validation for Create Modal
-		var validateCreate = $("#createForm").validate({
-			errorClass: 'text-danger text-xs',
-			rules: {
-				CustomerReceipt: { required: true, maxlength: 50 },
-				Remarks: { required: true, maxlength: 100 },
-				OverPayment: { range: [0, 1999999.99] },
-				TKT: { range: [0, 1999999.99] },
-				TAX: { range: [0, 1999999.99] },
-				CashAdvanced: { range: [0, 1999999.99] },
-				Discount: { range: [0, 1999999.99] },
-				Offset: { range: [0, 1999999.99] },
-				CashAmount: { range: [0, 1999999.99] },
-				BackLoad: { range: [0, 1999999.99] },
-				BankName: { required: true},
-				BankBranch: { required: true },
-				CheckDate: { required: true},
-				CheckAmount: { required: true},
-				CheckNumber: { required: true}
-			},
-			messages: {
-				CustomerReceipt: { required: "Please enter Customer Receipt No.", maxlength: "Code must not exceed 50 characters."  },
-				Remarks: { required: "Please enter Remarks.", maxlength: "Remarks must not exceed 100 characters." },
-				OverPayment: { range: "Over Payment must be between 0-1999999.99." },
-				TKT: { range: "TKT must be between 0-1999999.99." },
-				TAX: { range: "TAX must be between 0-1999999.99." },
-				CashAdvanced: { range: "Cash Advanced must be between 0-1999999.99."},
-				Discount: { range: "Discount must be between 0-1999999.99." },
-				Offset: { range: "Offset must be between 0-1999999.99." },
-				CashAmount: { range: "Cash Amount must be between 0-1999999.99." },
-				BackLoad: { range: "Back Load must be between 0-1999999.99." },
-				BankName: { required: "Please enter Bank Name."},
-				BankBranch: { required: "Please enter Bank Branch." },
-				CheckDate: { required: "Please enter Check Date."},
-				CheckAmount: { required: "Please enter Check Amount."},
-				CheckNumber: { required: "Please enter Check Number."}
-				
-			},
-			submitHandler: function (form, event) {
-				event.preventDefault();
-				DoCreate();
-			}
-		});
-
-
-		// Send Create to Controller
-		function DoCreate() {
-			$.ajax({
-				type: "POST",
-				url: "@Url.Action("CreatePaymentJson")",
-				data: {
-					SOANo: @Model?.Id,
-					CustomerId: @Model?.CustomerId,
-					InvoiceId: $("#create-invoice").val(),
-					CRNumber: $("#create-customer-receipt").val(),
-					Remarks: $("#create-remarks").val(),
-					OverPaymentD: $("#create-over-payment").val(),
-					TKTD: $("#create-tkt").val(),
-					TaxD: $("#create-tax").val(),
-					CashAdvancedD: $("#create-cash-advanced").val(),
-					DiscountD: $("#create-discount").val(),
-					OffsetD: $("#create-offset").val(),
-					CashAmountD: $("#create-cash-amount").val(),
-					BackLoadD: $("#create-backload").val(),
-					BankName: $("#create-bankname").val(),
-					BankBranch: $("#create-bankbranch").val(),
-					CheckAmountD: $("#create-checkamount").val(),
-					CheckDateD: $("#create-checkdate").val(),
-					CheckNo: $("#create-checknumber").val()
-				},
-				error: jQueryCommonError,
-				success: function(data, status, xhr) {
-					if (data.status == "Error") {
-						toastr.error(data.message, "Error");
-					} else {
-						toastr.success(data.message, "Success");
-						$("#createModal").modal("hide");
-						itemTable.ajax.reload();
-						hideLoader();
-					}
-				}
-			});
-		}
+            $('.deleteBtn').click(function (e) {
+                swal({
+                    title: "Delete Invoice",
+                    text: "Are you sure you want to delete this record?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#deleteSoaLineItemId').val(id);
+                        $('#deleteSoaLineItemForm').submit();
+                    }
+                });
+            });
 
 
 
-	  
-	
-		});
+            // Actions upon Display Edit Modal
+            $(".editBtn").click(function (e) {
+                var data = itemTable.row($(this).parents('tr')).data();
+                console.log(data);
+                console.log(data.invoiceId);
+                $("#edit-id").val(data.id);
+                $("#edit-tbr").val(data.tbrd);
+                $("#edit-debit").val(data.debitD);
+                $("#edit-credit").val(data.creditD);
+                $("#edit-freight-cost").val(data.freightChargeD);
+                $("#edit-invoice").val(data.invoiceId);
 
-		
+            });
+
+            // Validation for Edit Modal
+            var validateEdit = $("#editForm").validate({
+                errorClass: 'text-danger text-xs',
+                rules: {
+                    TBR: { range: [0, 1999999.99] },
+                    Debit: { range: [0, 1999999.99] },
+                    Credit: { range: [0, 1999999.99] },
+                    FreightCost: { range: [0, 1999999.99] }
+                },
+                messages: {
+                    TBR: { range: "Credit Limit must be between 0-1999999.99." },
+                    Debit: { range: "Credit Limit must be between 0-1999999.99." },
+                    Credit: { range: "Credit Limit must be between 0-1999999.99." },
+                    FreightCost: { range: "Credit Limit must be between 0-1999999.99." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoEdit();
+                },
+                showErrors: validateShowErrors
+            });
+
+            // Send Edit to Controller
+            function DoEdit() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EditInvoiceJson")",
+                    data: {
+                        Id: $("#edit-id").val(),
+                        InvoiceId: $("#edit-invoice").val(),
+                        TBRD: $("#edit-tbr").val(),
+                        DebitD: $("#edit-debit").val(),
+                        CreditD: $("#edit-credit").val(),
+                        FreightChargeD: $("#edit-freight-cost").val()
+                    },
+                    error: jQueryCommonError,
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#editModal").modal("hide");
+                            itemTable.ajax.reload();
+                        }
+                    },
+                    complete: function (xhr, status) {
+                    }
+                });
+            }
 
 
-		var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
-			showLoader();
-		}).DataTable({
-			ajax: {
-				url: "@Url.Action("GetCustomerInvoicesJson")",
-				data: function (data) {
-					data.Id = @Model?.CustomerId;
-					data.soaId = @Model?.Id;
+            // Actions upon Display Create Modal
+            $(".createBtn").click(function (e) {
+                var data = itemTable.row($(this).parents('tr')).data();
+                //$("#create-invoice").val(data.invoiceId);
+                $("#create-customer").val(@Model?.CustomerId);
+                $("#create-customer-receipt").val("");
+                $("#create-remarks").val("");
+                $("#create-over-payment").val("");
+                $("#create-tkt").val("");
+                $("#create-tax").val("");
+                $("#create-cash-advanced").val("");
+                $("#create-discount").val("");
+                $("#create-offset").val("");
+                $("#create-cash-amount").val("");
+                $("#create-backload").val("");
+                $("#create-bankname").val("");
+                $("#create-bankbranch").val("");
+                $("#create-checkdate").val("");
+                $("#create-checkamount").val("");
+                $("#create-checknumber").val("");
+            });
 
-				},
-				type: "POST",
-			},
-			serverSide: true,
-			filter: true,
-			responsive: true,
-			autoWidth: false,
-			search: {
-				return: true,
-			},
-			columns: [
-				{
-					orderable: false,
-					data: function(data, type, dataToSet) {
-					  var input = '<input class="chkclassinvoice" type="checkbox" id="checkInvoice"  name="CheckInvoice" data-id = "'+data.id+'">';
-						
-						return input;
-					}
-				},
-				{ data: "invoiceDate", name: "InvoiceDate" },
-				{ data: "invoiceNumber", name: "InvoiceNumber" },
-				{ data: "invoiceType", name: "InvoiceType" },
-				{ data: "totalAmount", name: "TotalAmount" }
-			],
-			order: [[1, "desc"]]
-		});
+            // Validation for Create Modal
+            var validateCreate = $("#createForm").validate({
+                errorClass: 'text-danger text-xs',
+                rules: {
+                    CustomerReceipt: { required: true, maxlength: 50 },
+                    Remarks: { required: true, maxlength: 100 },
+                    OverPayment: { range: [0, 1999999.99] },
+                    TKT: { range: [0, 1999999.99] },
+                    TAX: { range: [0, 1999999.99] },
+                    CashAdvanced: { range: [0, 1999999.99] },
+                    Discount: { range: [0, 1999999.99] },
+                    Offset: { range: [0, 1999999.99] },
+                    CashAmount: { range: [0, 1999999.99] },
+                    BackLoad: { range: [0, 1999999.99] },
+                    BankName: { required: true },
+                    BankBranch: { required: true },
+                    CheckDate: { required: true },
+                    CheckAmount: { required: true },
+                    CheckNumber: { required: true }
+                },
+                messages: {
+                    CustomerReceipt: { required: "Please enter Customer Receipt No.", maxlength: "Code must not exceed 50 characters." },
+                    Remarks: { required: "Please enter Remarks.", maxlength: "Remarks must not exceed 100 characters." },
+                    OverPayment: { range: "Over Payment must be between 0-1999999.99." },
+                    TKT: { range: "TKT must be between 0-1999999.99." },
+                    TAX: { range: "TAX must be between 0-1999999.99." },
+                    CashAdvanced: { range: "Cash Advanced must be between 0-1999999.99." },
+                    Discount: { range: "Discount must be between 0-1999999.99." },
+                    Offset: { range: "Offset must be between 0-1999999.99." },
+                    CashAmount: { range: "Cash Amount must be between 0-1999999.99." },
+                    BackLoad: { range: "Back Load must be between 0-1999999.99." },
+                    BankName: { required: "Please enter Bank Name." },
+                    BankBranch: { required: "Please enter Bank Branch." },
+                    CheckDate: { required: "Please enter Check Date." },
+                    CheckAmount: { required: "Please enter Check Amount." },
+                    CheckNumber: { required: "Please enter Check Number." }
 
-		// Load functions upon DataTable load
-		invoiceDT.on("draw", function () {
-			hideLoader();
-		});
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoCreate();
+                },
+                showErrors: validateShowErrors
+            });
 
-		$(".createInvoiceBtn").click(function(e) {
-			invoiceDT.ajax.reload();
-		});
+
+            // Send Create to Controller
+            function DoCreate() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("CreatePaymentJson")",
+                    data: {
+                        SOANo: @Model?.Id,
+                        CustomerId: @Model?.CustomerId,
+                        InvoiceId: $("#create-invoice").val(),
+                        CRNumber: $("#create-customer-receipt").val(),
+                        Remarks: $("#create-remarks").val(),
+                        OverPaymentD: $("#create-over-payment").val(),
+                        TKTD: $("#create-tkt").val(),
+                        TaxD: $("#create-tax").val(),
+                        CashAdvancedD: $("#create-cash-advanced").val(),
+                        DiscountD: $("#create-discount").val(),
+                        OffsetD: $("#create-offset").val(),
+                        CashAmountD: $("#create-cash-amount").val(),
+                        BackLoadD: $("#create-backload").val(),
+                        BankName: $("#create-bankname").val(),
+                        BankBranch: $("#create-bankbranch").val(),
+                        CheckAmountD: $("#create-checkamount").val(),
+                        CheckDateD: $("#create-checkdate").val(),
+                        CheckNo: $("#create-checknumber").val()
+                    },
+                    error: jQueryCommonError,
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#createModal").modal("hide");
+                            itemTable.ajax.reload();
+                            hideLoader();
+                        }
+                    }
+                });
+            }
 
 
-		$(".btn-add").click(function(e) {
 
-			var invoiceIds = []; 
-			
-				invoiceDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-				var invlist = $(this.node()).find(".chkclassinvoice");
-				if (invlist.prop("checked"))
-				{ 
-					invoiceIds.push(invlist.data("id"));
-				}
 
-			} );
 
-			$.ajax({
-				type: "POST",
-				url: "@Url.Action("AddInvoices")",
-				data: {
-					soaId: @Model?.Id,
-					invoiceIds: invoiceIds
+        });
 
-				},
-				error: jQueryCommonError,
-				success: function(data, status, xhr) {
-					if (data.status == "Error") {
-						toastr.error(data.message, "Error");
-					} else {
-						toastr.success(data.message, "Success");
-						$("#createInvoiceModal").modal("hide");
-						itemTable.ajax.reload();
-						hideLoader();
-						//window.location = '@Url.Action("ContractReceiptDetails")/' + Id;
-					}
-				}
-			});
 
-		});
 
-	</script>
+
+        var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetCustomerInvoicesJson")",
+                data: function (data) {
+                    data.Id = @Model?.CustomerId;
+                    data.soaId = @Model?.Id;
+
+                },
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var input = '<input class="chkclassinvoice" type="checkbox" id="checkInvoice"  name="CheckInvoice" data-id = "' + data.id + '">';
+
+                        return input;
+                    }
+                },
+                { data: "invoiceDate", name: "InvoiceDate" },
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "invoiceType", name: "InvoiceType" },
+                { data: "totalAmount", name: "TotalAmount" }
+            ],
+            order: [[1, "desc"]]
+        });
+
+        // Load functions upon DataTable load
+        invoiceDT.on("draw", function () {
+            hideLoader();
+        });
+
+        $(".createInvoiceBtn").click(function (e) {
+            invoiceDT.ajax.reload();
+        });
+
+
+        $(".btn-add").click(function (e) {
+
+            var invoiceIds = [];
+
+            invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var invlist = $(this.node()).find(".chkclassinvoice");
+                if (invlist.prop("checked")) {
+                    invoiceIds.push(invlist.data("id"));
+                }
+
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("AddInvoices")",
+                data: {
+                    soaId: @Model?.Id,
+                    invoiceIds: invoiceIds
+
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#createInvoiceModal").modal("hide");
+                        itemTable.ajax.reload();
+                        hideLoader();
+                        //window.location = '@Url.Action("ContractReceiptDetails")/' + Id;
+                    }
+                }
+            });
+
+        });
+
+    </script>
 	}
 
 
-				

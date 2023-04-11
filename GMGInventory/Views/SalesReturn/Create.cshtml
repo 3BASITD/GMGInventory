@@ -8,91 +8,91 @@
 
     <div class="card card-default">
         <form id="form-return">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                <button type="submit" class="btn btn-primary btn-sm float-right btn-save ml-2">
-                    <span class="fas fa-save"></span> Save
-                </button>
-                <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-12 col-md-4 col-sm-6">
-                    <div class="form-group">
-                        <label for="return-customer-code" class="form-label mb-0">Customer Code</label>
-                        <select id="return-customer-code" name="Customer" style="width: 100%;">
-                            <option></option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <div class="form-group">
-                        <label for="return-customer-name" class="form-label mb-0">Customer Name</label>
-                        <input type="text" id="return-customer-name" class="form-control form-control-sm" readonly="readonly" />
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <div class="form-group">
-                        <label for="return-customer-address" class="form-label mb-0">Customer Address</label>
-                        <input type="text" id="return-customer-address" class="form-control form-control-sm" readonly="readonly" />
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <div class="form-group">
-                        <label for="return-remarks" class="form-label mb-0">Remarks</label>
-                        <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" />
-                    </div>
+            <div class="card-header">
+                <span class="card-title">@ViewData["Title"]</span>
+                <div class="card-tools">
+                    <button type="submit" class="btn btn-primary btn-sm float-right btn-save ml-2">
+                        <span class="fas fa-save"></span> Save
+                    </button>
+                    <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                        <span class="fas fa-arrow-left"></span> Back to List
+                    </a>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header bg-light">
-                            <span class="card-title">Sales Return Item(s)</span>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm float-right btn-tbr ml-2" data-microtip-title="(To Be Returned) Add Item selection from All Items" data-microtip-position="top-left" role="tooltip">
-                                    <span class="fas fa-plus"></span> TBR
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm float-right btn-invoice ml-2" data-microtip-title="Add Item selection from Invoice" data-microtip-position="top-left" role="tooltip">
-                                    <span class="fas fa-file-invoice-dollar"></span> Invoice
-                                </button>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="return-customer-code" class="form-label mb-0">Customer Code</label>
+                            <select id="return-customer-code" name="Customer" style="width: 100%;">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="return-customer-name" class="form-label mb-0">Customer Name</label>
+                            <input type="text" id="return-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="return-customer-address" class="form-label mb-0">Customer Address</label>
+                            <input type="text" id="return-customer-address" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="return-remarks" class="form-label mb-0">Remarks</label>
+                            <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <span class="card-title">Sales Return Item(s)</span>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-primary btn-sm float-right btn-tbr ml-2" data-microtip-title="(To Be Returned) Add Item selection from All Items" data-microtip-position="top-left" role="tooltip">
+                                        <span class="fas fa-plus"></span> TBR
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-sm float-right btn-invoice ml-2" data-microtip-title="Add Item selection from Invoice" data-microtip-position="top-left" role="tooltip">
+                                        <span class="fas fa-file-invoice-dollar"></span> Invoice
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-head-fixed table-striped table-hover table-return">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Defective</th>
+                                            <th>Item Code</th>
+                                            <th>Item Name</th>
+                                            <th>Quantity to Return</th>
+                                            <th>Unit Price</th>
+                                            <th>Discount 1</th>
+                                            <th>Discount 2</th>
+                                            <th>Extended Price</th>
+                                            <th>Reference Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="4">Total</th>
+                                            <th class="total-quantity">0</th>
+                                            <th colspan="3"></th>
+                                            <th class="total-gross-price">0</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <table class="table table-head-fixed table-striped table-hover table-return">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Defective</th>
-                                        <th>Item Code</th>
-                                        <th>Item Name</th>
-                                        <th>Quantity to Return</th>
-                                        <th>Unit Price</th>
-                                        <th>Discount 1</th>
-                                        <th>Discount 2</th>
-                                        <th>Extended Price</th>
-                                        <th>Reference Number</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="4">Total</th>
-                                        <th class="total-quantity">0</th>
-                                        <th colspan="3"></th>
-                                        <th class="total-gross-price">0</th>
-                                        <th></th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         </form>
     </div>
 
@@ -155,80 +155,80 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-            <form autocomplete="off" id="form-item">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="item-code" class="control-label mb-0 d-block">Code</label>
-                                <select id="item-code" name="Code" style="width: 100%;">
-                                    <option></option>
-                                </select>
-                                <span data-valmsg-for="item-code" data-valmsg-replace="true" class="text-danger"></span>
+                <form autocomplete="off" id="form-item">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="item-code" class="control-label mb-0 d-block">Code</label>
+                                    <select id="item-code" name="Code" style="width: 100%;">
+                                        <option></option>
+                                    </select>
+                                    <span data-valmsg-for="item-code" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="item-name" class="control-label mb-0 d-block">Name</label>
+                                    <input type="text" id="item-name" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="item-name" class="control-label mb-0 d-block">Name</label>
-                                <input type="text" id="item-name" class="form-control form-control-sm" readonly="readonly" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="item-unit-price" class="control-label mb-0 d-block">Unit Price</label>
+                                    <input type="number" min="0" max="1999999.99" step="0.01" id="item-unit-price" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="item-unit-price" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="item-quantity" class="control-label mb-0 d-block">Quantity</label>
+                                    <input type="number" min="0" max="1999999" step="1" name="Quantity" id="item-quantity" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="item-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="item-discount1" class="control-label mb-0 d-block">Discount 1</label>
+                                    <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount1" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="item-discount1" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="item-discount2" class="control-label mb-0 d-block">Discount 2</label>
+                                    <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount2" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="item-discount2" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="item-gross-price" class="control-label mb-0 d-block">Gross Price</label>
+                                    <input type="number" id="item-gross-price" step="0.01" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="item-extended-price" class="control-label mb-0 d-block">Extended Price</label>
+                                    <input type="number" id="item-extended-price" step="0.01" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="item-unit-price" class="control-label mb-0 d-block">Unit Price</label>
-                                <input type="number" min="0" max="1999999.99" step="0.01" id="item-unit-price" class="form-control form-control-sm" />
-                                <span data-valmsg-for="item-unit-price" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="item-quantity" class="control-label mb-0 d-block">Quantity</label>
-                                <input type="number" min="0" max="1999999" step="1" name="Quantity" id="item-quantity" class="form-control form-control-sm" />
-                                <span data-valmsg-for="item-quantity" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Close
+                        </button>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="item-discount1" class="control-label mb-0 d-block">Discount 1</label>
-                                <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount1" class="form-control form-control-sm" />
-                                <span data-valmsg-for="item-discount1" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="item-discount2" class="control-label mb-0 d-block">Discount 2</label>
-                                <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount2" class="form-control form-control-sm" />
-                                <span data-valmsg-for="item-discount2" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="item-gross-price" class="control-label mb-0 d-block">Gross Price</label>
-                                <input type="number" id="item-gross-price" step="0.01" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="item-extended-price" class="control-label mb-0 d-block">Extended Price</label>
-                                <input type="number" id="item-extended-price" step="0.01" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-plus"></span> Add
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Close
-                    </button>
-                </div>
                 </form>
             </div>
         </div>
@@ -308,7 +308,7 @@
 
         $(".btn-invoice").on("click", function () {
             if ($("#return-customer-code").val() == "") {
-                toastr.warning("Please select customer first");
+                toastrNoDuplicate("Please select customer first", "Warning", "warning");
             } else {
                 $("#invoice-invoice").html("");
                 invoiceDT.ajax.reload();
@@ -318,7 +318,7 @@
 
         $(".btn-tbr").on("click", function () {
             if ($("#return-customer-code").val() == "") {
-                toastr.warning("Please select customer first");
+                toastrNoDuplicate("Please select customer first", "Warning", "warning");
             } else {
                 $("#item-code").val("").trigger("change");
                 ResetTBR();
@@ -404,13 +404,14 @@
                 Quantity: { required: true }
             },
             messages: {
-                Code: { required: "Please select customer" },
+                Code: { required: "Please select an item" },
                 Quantity: { required: "Cannot return 0 quantity" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
                 AddItem();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function AddItem() {
@@ -430,7 +431,7 @@
                 quantity: parseInt($("#item-quantity").val()),
                 referenceNumber: "TBR"
             };
-            
+
             returnDT.row.add(item).draw();
             $("#item-code").val("").trigger("change");
             ResetTBR();
@@ -463,7 +464,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
                         return actions;
                     }
                 },
@@ -487,7 +488,7 @@
                 if (rowdata) {
                     returnDT.row.add(rowdata).draw();
                     invoiceDT.row($(this).parents('tr')).remove().draw();
-                    toastr.success("Added " + rowdata.itemCode + " on Return Item(s)");
+                    toastrNoDuplicate("Added " + rowdata.itemCode + " on Return Item(s)", "Success", "success");
                 }
             });
         });
@@ -501,7 +502,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -527,7 +528,7 @@
             ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
-                
+
                 columnDTTotalInteger(api, 4);
                 columnDTTotalDecimal(api, 8);
             }
@@ -540,7 +541,7 @@
 
             $(".table-return thead th").removeClass("form-cell");
             $(".table-return thead th").removeClass("text-end");
-            
+
             $(".quantity").on("input", function () {
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
                 var rowdata = returnDT.row($(this).parents('tr')).data();
@@ -566,9 +567,9 @@
 
         function ComputeTotalGrossPrice() {
             total_gross_price = 0;
-            returnDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",",""));
-            } );
+            returnDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",", ""));
+            });
             $(".total-gross-price").html(FormatStringDecimal(total_gross_price));
         }
 
@@ -607,15 +608,16 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 SaveReturn();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function SaveReturn() {
             var itemsToReturn = GetItemsToReturn();
             if (itemsToReturn.length == 0) {
-                toastr.warning("No item to return. Add an item to the list to continue");
+                toastrNoDuplicate("No item to return. Add an item to the list to continue", "Warning", "warning");
             } else if (itemsToReturn.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't return an item with 0 quantity");
+                toastrNoDuplicate("Some items have 0 quantity. Can't return an item with 0 quantity", "Warning", "warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -628,7 +630,7 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
                             window.location = "@Url.Action("Details")/" + data.newRow;
                         }

@@ -27,8 +27,8 @@ namespace GMGInventory.Application.Repositories
                                 && (filter.CategoryId == null || filter.CategoryId == sl.Item.CategoryId)
                                 && (filter.ItemTypeId == null || filter.ItemTypeId == sl.Item.ItemTypeId)
                                 && (filter.BrandId == null || filter.BrandId == sl.Item.BrandId)
-                                && filter.DateFrom <= iv.DateCreated
-                                && iv.DateCreated <= filter.DateTo
+                                && filter.DateFrom <= iv.DateCreated.Date
+                                && iv.DateCreated.Date <= filter.DateTo
                                 //&& iv.Status.Name == "Invoice Submitted"
                                 && iv.StatusId == 8
                              select new CustomerPurchaseVM

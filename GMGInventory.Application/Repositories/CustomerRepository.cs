@@ -35,7 +35,8 @@ namespace GMGInventory.Application.Repositories
                                              Name = s.Name,
                                              Address = s.Address,
                                              CreditTerm = s.CreditTerm.Name,
-                                             Agent = s.Agent.FirstName +' '+ s.Agent.MiddleName +' '+ s.Agent.LastName
+                                             Agent = s.Agent.FirstName +' '+ s.Agent.MiddleName +' '+ s.Agent.LastName,
+                                             OutstandingBalanceD = s.OutstandingBalance
                                          })
                                          .ToListAsync();
             var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();

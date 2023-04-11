@@ -49,10 +49,10 @@
                     </p>
                     <p class="text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.DeliveryType)
+                            @Html.DisplayNameFor(model => model.Forwarder)
                         </span>
                         <b class="d-block">
-                            @Model?.DeliveryType
+                            @Model?.Forwarder
                         </b>
                     </p>
                 </div>
@@ -143,7 +143,12 @@
             },
             columns: [
                 { data: "boxNumber", name: "BoxNumber" },
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode"
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" }
             ],
@@ -177,7 +182,7 @@
             html += '<th>@Html.DisplayNameFor(model => model.PackDate)</th><td>@Model?.PackDate</td>';
             html += '</tr>';
             html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.DeliveryType)</th><td>@Model?.DeliveryType</td > ';
+            html += '<th>@Html.DisplayNameFor(model => model.Forwarder)</th><td>@Model?.Forwarder</td > ';
             html += '<th>@Html.DisplayNameFor(model => model.PackBy)</th><td>@Model?.PackBy</td > ';
             html += '</tr>';
             html += '</table>';

@@ -65,6 +65,12 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetItemsDTAsync(form, invoiceId));
         }
 
+        public async Task<ActionResult> PrintReceipt(int Id)
+        {
+            var invoice = await invoiceRepository.GetDetailsWithItemsAsync(Id);
+            return View(invoice);
+        }
+
         public async Task<ActionResult> Create(int? Id)
         {
             var order = await invoiceRepository.GetDetailsByPackAsync(Id);
@@ -90,6 +96,25 @@ namespace GMGInventory.Controllers
             {
                 responseModel.Status = "Success";
                 responseModel.Message = "Pack successfully submitted";
+            }
+            responseModel.NewRow = orderId;
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UpdateJson(InvoiceFormUpdateVM form)
+        {
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            var orderId = await invoiceRepository.UpdateAsync(form);
+            if (orderId == -1)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Sales Invoice missing. Failed to submit.";
+            }
+            else
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "Sales Invoice successfully saved.";
             }
             responseModel.NewRow = orderId;
             return Json(responseModel);

@@ -25,8 +25,8 @@ namespace GMGInventory.Application.Repositories
                                                  .Include(s => s.SalesOrder)
                                                  .ThenInclude(s => s.Customer) on credit.InvoiceId equals invoice.Id
                           where credit.CreditDebitMemoType.Name == "Credit"
-                          && filter.DateFrom <= credit.DateCreated
-                          && credit.DateCreated <= filter.DateTo
+                          && filter.DateFrom <= credit.DateCreated.Date
+                          && credit.DateCreated.Date <= filter.DateTo
                           && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
                           orderby credit.DateCreated descending
                           select new CreditDebitMemoRVM
@@ -125,8 +125,8 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.SalesOrder)
                                                 .ThenInclude(s => s.Customer) on debit.InvoiceId equals invoice.Id
                          where debit.CreditDebitMemoType.Name == "Debit"
-                         && filter.DateFrom <= debit.DateCreated
-                         && debit.DateCreated <= filter.DateTo
+                         && filter.DateFrom <= debit.DateCreated.Date
+                         && debit.DateCreated.Date <= filter.DateTo
                          && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
                          orderby debit.DateCreated descending
                          select new CreditDebitMemoRVM

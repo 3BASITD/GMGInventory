@@ -8,12 +8,16 @@
     <li class="breadcrumb-item"><a asp-controller="SalesInvoice" asp-action="Index">Sales Invoice</a></li>
 }
 
-    <div class="card card-default">
+<div class="card card-default">
+    <form id="form-invoice">
         <div class="card-header">
             <span class="card-title po-title">@ViewData["Title"]</span>
             <div class="card-tools">
                 <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                     <span class="fas fa-print"></span> Print
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-save"></span> Save
                 </button>
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
                     <span class="fas fa-arrow-left"></span> Back to List
@@ -22,12 +26,12 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-4">
+                <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.InvoiceNumber)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.InvoiceNumber
                         </b>
                     </p>
@@ -35,7 +39,7 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.CustomerCode)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.CustomerCode
                         </b>
                     </p>
@@ -43,7 +47,7 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.CustomerName)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.CustomerName
                         </b>
                     </p>
@@ -51,7 +55,7 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.CustomerAddress)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.CustomerAddress
                         </b>
                     </p>
@@ -59,25 +63,28 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.Agent)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.Agent
                         </b>
                     </p>
                 </div>
-                <div class="col-4">
+                <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ControlNumber)
+                        @*<span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ControlNumber)
                         </span>
                         <b class="d-block">
-                            @Model?.ControlNumber
-                        </b>
+                        @Model?.ControlNumber
+                        </b>*@
+                        <label for="invoice-control-number" class="form-label fw-normal mb-0">BIR Invoice Number</label>
+                        <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" value="@Model?.ControlNumber" />
+                        <span data-valmsg-for="invoice-control-number" data-valmsg-replace="true" class="text-danger"></span>
                     </p>
                     <p class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.PaymentTerms)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.PaymentTerms
                         </b>
                     </p>
@@ -85,7 +92,7 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.SONumber)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.SONumber
                         </b>
                     </p>
@@ -93,7 +100,7 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.PONumber)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.PONumber
                         </b>
                     </p>
@@ -101,17 +108,17 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.PackNumber)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.PackNumber
                         </b>
                     </p>
                 </div>
-                <div class="col-4">
+                <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.Status)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.Status
                         </b>
                     </p>
@@ -119,7 +126,7 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.InvoiceDate)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.InvoiceDate
                         </b>
                     </p>
@@ -127,46 +134,51 @@
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.InvoiceBy)
                         </span>
-                        <b class="d-block">
+                        <b class="d-block form-gayahin">
                             @Model?.InvoiceBy
                         </b>
                     </p>
                     <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Remarks)
+                        @*<span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Remarks)
                         </span>
-                        <b class="d-block">
-                            @Model?.Remarks
-                        </b>
+                        <b class="d-block form-gayahin">
+                        @Model?.Remarks
+                        </b>*@
+                        <label for="invoice-remarks" class="form-label fw-normal mb-0">Remarks</label>
+                        <input type="text" id="invoice-remarks" class="form-control form-control-sm" value="@(Model?.Remarks == "-" ? "" : Model?.Remarks)" />
+                        <span data-valmsg-for="invoice-remarks" data-valmsg-replace="true" class="text-danger"></span>
                     </p>
                     <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.InvoiceType)
+                        @* <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.InvoiceType)
                         </span>
-                        <b class="d-block">
-                            @Model?.InvoiceType
-                        </b>
+                        <b class="d-block form-gayahin">
+                        @Model?.InvoiceType
+                        </b>*@
+                        <label for="invoice-invoice-type" class="form-label fw-normal mb-0">Invoice Type</label>
+                        <select id="invoice-invoice-type" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
                     </p>
                 </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <span class="card-title">Pack Item(s)</span>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-head-fixed table-striped table-hover table-item">
-                            <thead>
-                                <tr>
-                                    <th>Item Code</th>
-                                    <th>Item Name</th>
-                                    <th>Quantity</th>
-                                    <th>Net Price</th>
-                                    <th>Discount 1</th>
-                                    <th>Discount 2</th>
-                                    <th>Gross Price</th>
-                                </tr>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Pack Item(s)</span>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item">
+                                <thead>
+                                    <tr>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Quantity</th>
+                                        <th>Gross Price</th>
+                                        <th>Discount 1</th>
+                                        <th>Discount 2</th>
+                                        <th>Extended Price</th>
+                                    </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
@@ -177,16 +189,36 @@
                                         <th>0.00</th>
                                     </tr>
                                 </tfoot>
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
 
 @section Scripts {
     <script>
+        // Load invoice type data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetInvoiceTypeOptions")",
+            success: function (data, status, xhr) {
+                $("#invoice-invoice-type").select2({
+                    data: data,
+                    minimumResultsForSearch: -1
+                });
+            },
+            complete: function (xhr, status) {
+                $("#invoice-invoice-type").val(@Model?.InvoiceTypeId);
+                $("#invoice-invoice-type").data("current-invoice-type", @Model?.InvoiceTypeId);
+                $("#invoice-invoice-type").trigger("change");
+            }
+        });
+        $("#invoice-control-number").data("current-control-number", "@Model?.ControlNumber");
+        $("#invoice-remarks").data("current-remarks", "@(Model?.Remarks == "-" ? "" : Model?.Remarks)");
+
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
@@ -205,7 +237,12 @@
                 return: true,
             },
             columns: [
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode"
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "netPrice", name: "NetPrice", className: "text-end" },
@@ -214,7 +251,7 @@
                 { data: "grossPrice", name: "GrossPrice", className: "text-end" }
             ],
             order: [[0, "asc"]],
-                    footerCallback: function (row, data, start, end, display) {
+            footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
                 var numVal = function (i) {
                     switch (typeof i) {
@@ -231,7 +268,7 @@
                 }
                 var totalQuantity = api.column(2).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
                 var totalGrossPrice = api.column(6).data().reduce(function (a, b) { return numVal(a) + numVal(b); }, 0);
-                
+
                 $(api.column(2).footer()).html(FormatStringInteger(totalQuantity));
                 $(api.column(6).footer()).html(FormatStringDecimal(totalGrossPrice));
             }
@@ -243,89 +280,158 @@
             $(".table-item thead th").removeClass("text-end");
         });
 
-        $(".btn-details-print").on("click", function () {
-            var html = '<h3>Sales Invoice Details</h3>';
-            html += '<table class="table-header w100">';
-            html += '<tr>';
+        // Validation for Save
+        var validateCreate = $("#form-invoice").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                ControlNumber: { required: true, maxlength: 50 },
+                AgentCode: { maxlength: 250 }
+            },
+            messages: {
+                ControlNumber: { required: "Please enter BIR Invoice Number", maxlength: "BIR Invoice Number must not exceed 50 characters." },
+                Remarks: { maxlength: "BIR Invoice Number must not exceed 250 characters." }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                SaveInvoice(true);
+            },
+            showErrors: validateShowErrors
+        });
 
-            html += '<th>@Html.DisplayNameFor(model => model.InvoiceNumber)</th><td>@Model?.InvoiceNumber</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.ControlNumber)</th><td>@Model?.ControlNumber</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.Status)</th><td>@Model?.Status</td>';
-            html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.CustomerCode)</th><td>@Model?.CustomerCode</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.PaymentTerms)</th><td>@Model?.PaymentTerms</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.InvoiceDate)</th><td>@Model?.InvoiceDate</td>';
-            html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.CustomerName)</th><td>@Model?.CustomerName</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.SONumber)</th><td>@Model?.SONumber</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.InvoiceBy)</th><td>@Model?.InvoiceBy</td>';
-            html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.CustomerAddress)</th><td>@Model?.CustomerAddress</td > ';
-            html += '<th>@Html.DisplayNameFor(model => model.PONumber)</th><td>@Model?.PONumber</td > ';
-            html += '<th>@Html.DisplayNameFor(model => model.Remarks)</th><td>@Model?.Remarks</td > ';
-                html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.Agent)</th><td>@Model?.Agent</td > ';
-            html += '<th>@Html.DisplayNameFor(model => model.PackNumber)</th><td>@Model?.PackNumber</td > ';
-            html += '<th>@Html.DisplayNameFor(model => model.InvoiceType)</th><td>@Model?.InvoiceType</td > ';
-                html += '</tr>';
-            html += '</table>';
-
-            html += '<table class="table-items">';
-            html += '<tr>';
-            html += '<thead>';
-            html += '<th>Item Code</th>';
-            html += '<th>Item Name</th>';
-            html += '<th>Quantity</th>';
-            html += '<th>Net Price</th>';
-            html += '<th>Discount 1</th>';
-            html += '<th>Discount 2</th>';
-            html += '<th>Gross Price</th>';
-            html += '</thead>';
-            html += '</tr>';
-            var totalQuantity = 0, totalGrossPrice = 0;
-            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var row_data = this.data();
-                html += '<tr>';
-                html += '<td>' + row_data.itemCode + '</td>';
-                html += '<td>' + row_data.itemName + '</td>';
-                html += '<td class="right-text">' + row_data.quantity + '</td>';
-                html += '<td class="right-text">' + row_data.netPrice + '</td>';
-                html += '<td class="right-text">' + row_data.discount1 + '</td>';
-                html += '<td class="right-text">' + row_data.discount2 + '</td>';
-                html += '<td class="right-text">' + row_data.grossPrice + '</td>';
-                html += '</tr>';
-                
-                totalQuantity += parseInt(row_data.quantity);
-                totalGrossPrice += parseFloat(row_data.grossPriceD);
-            });
-            html += '<tr>';
-            html += '<tfoot>';
-            html += '<th colspan="2" class="right-text">Total</th>';
-            html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
-            html += '<th colspan="3"></th>';
-            html += '<th class="right-text">' + FormatStringDecimal(totalGrossPrice) + '</th>';
-            html += '</tfoot>';
-            html += '</tr>';
-            html += '</table>';
-            $("#for-print").html(html);
-            $("#for-print").printThis({
-                importCSS: false,
-                loadCSS: "/css/print.css",
-                pageTitle: "GMG Inventory",
-                beforePrint: function () {
-                    $.LoadingOverlay("show", {
-                        image: "",
-                        fontawesome: "fas fa-print"
-                    });
+        function SaveInvoice(showmessage) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UpdateJson")",
+                data: {
+                    Id: @Model?.Id,
+                    BIRInvoiceNumber: $("#invoice-control-number").val(),
+                    InvoiceType: $("#invoice-invoice-type").val(),
+                    Remarks: $("#invoice-remarks").val()
                 },
-                afterPrint: function () {
-                    hideLoader();
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    if (showmessage) {
+                        if (data.status == "Error") {
+                            toastrNoDuplicate(data.message, "Error", "error");
+                        } else {
+                            toastrNoDuplicate(data.message, "Success", "success");
+                        }
+                    }
                 }
             });
+        }
+
+        $(".btn-details-print").on("click", function () {
+            var invoice_type_changed = $("#invoice-invoice-type").val() != $("#invoice-invoice-type").data("current-invoice-type");
+            var control_number_changed = $("#invoice-control-number").val() != $("#invoice-control-number").data("current-control-number");
+            var remarks_changed = $("#invoice-remarks").val() != $("#invoice-remarks").data("current-remarks");
+
+            if (invoice_type_changed || control_number_changed || remarks_changed) {
+                if (invoice_type_changed) { $("#invoice-invoice-type").data("current-invoice-type", $("#invoice-invoice-type").val()); }
+                if (control_number_changed) { $("#invoice-control-number").data("current-control-number", $("#invoice-control-number").val()); }
+                if (remarks_changed) { $("#invoice-remarks").data("current-remarks", $("#invoice-remarks").val()); }
+
+                SaveInvoice(control_number_changed || remarks_changed);
+            }
+
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
+            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintReceipt")/' + @Model?.Id, '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         });
+
+                                                                                //$(".btn-details-print").on("click", function () {
+                                                                                //    var html = '<h3>Sales Invoice Details</h3>';
+                                                                                //    html += '<table class="table-header w100">';
+                                                                                //    html += '<tr>';
+
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.InvoiceNumber)</th><td>@Model?.InvoiceNumber</td>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.ControlNumber)</th><td>@Model?.ControlNumber</td>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.Status)</th><td>@Model?.Status</td>';
+                                                                                //    html += '</tr>';
+                                                                                //    html += '<tr>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.CustomerCode)</th><td>@Model?.CustomerCode</td>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.PaymentTerms)</th><td>@Model?.PaymentTerms</td>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.InvoiceDate)</th><td>@Model?.InvoiceDate</td>';
+                                                                                //    html += '</tr>';
+                                                                                //    html += '<tr>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.CustomerName)</th><td>@Model?.CustomerName</td>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.SONumber)</th><td>@Model?.SONumber</td>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.InvoiceBy)</th><td>@Model?.InvoiceBy</td>';
+                                                                                //    html += '</tr>';
+                                                                                //    html += '<tr>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.CustomerAddress)</th><td>@Model?.CustomerAddress</td > ';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.PONumber)</th><td>@Model?.PONumber</td > ';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.Remarks)</th><td>@Model?.Remarks</td > ';
+                                                                                //        html += '</tr>';
+                                                                                //    html += '<tr>';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.Agent)</th><td>@Model?.Agent</td > ';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.PackNumber)</th><td>@Model?.PackNumber</td > ';
+                                                                                //    html += '<th>@Html.DisplayNameFor(model => model.InvoiceType)</th><td>@Model?.InvoiceType</td > ';
+                                                                                //        html += '</tr>';
+                                                                                //    html += '</table>';
+
+                                                                                //    html += '<table class="table-items">';
+                                                                                //    html += '<tr>';
+                                                                                //    html += '<thead>';
+                                                                                //    html += '<th>Item Code</th>';
+                                                                                //    html += '<th>Item Name</th>';
+                                                                                //    html += '<th>Quantity</th>';
+                                                                                //    html += '<th>Net Price</th>';
+                                                                                //    html += '<th>Discount 1</th>';
+                                                                                //    html += '<th>Discount 2</th>';
+                                                                                //    html += '<th>Gross Price</th>';
+                                                                                //    html += '</thead>';
+                                                                                //    html += '</tr>';
+                                                                                //    var totalQuantity = 0, totalGrossPrice = 0;
+                                                                                //    itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                                                                                //        var row_data = this.data();
+                                                                                //        html += '<tr>';
+                                                                                //        html += '<td>' + row_data.itemCode + '</td>';
+                                                                                //        html += '<td>' + row_data.itemName + '</td>';
+                                                                                //        html += '<td class="right-text">' + row_data.quantity + '</td>';
+                                                                                //        html += '<td class="right-text">' + row_data.netPrice + '</td>';
+                                                                                //        html += '<td class="right-text">' + row_data.discount1 + '</td>';
+                                                                                //        html += '<td class="right-text">' + row_data.discount2 + '</td>';
+                                                                                //        html += '<td class="right-text">' + row_data.grossPrice + '</td>';
+                                                                                //        html += '</tr>';
+
+                                                                                //        totalQuantity += parseInt(row_data.quantity);
+                                                                                //        totalGrossPrice += parseFloat(row_data.grossPriceD);
+                                                                                //    });
+                                                                                //    html += '<tr>';
+                                                                                //    html += '<tfoot>';
+                                                                                //    html += '<th colspan="2" class="right-text">Total</th>';
+                                                                                //    html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
+                                                                                //    html += '<th colspan="3"></th>';
+                                                                                //    html += '<th class="right-text">' + FormatStringDecimal(totalGrossPrice) + '</th>';
+                                                                                //    html += '</tfoot>';
+                                                                                //    html += '</tr>';
+                                                                                //    html += '</table>';
+                                                                                //    $("#for-print").html(html);
+                                                                                //    $("#for-print").printThis({
+                                                                                //        importCSS: false,
+                                                                                //        loadCSS: "/css/print.css",
+                                                                                //        pageTitle: "GMG Inventory",
+                                                                                //        beforePrint: function () {
+                                                                                //            $.LoadingOverlay("show", {
+                                                                                //                image: "",
+                                                                                //                fontawesome: "fas fa-print"
+                                                                                //            });
+                                                                                //        },
+                                                                                //        afterPrint: function () {
+                                                                                //            hideLoader();
+                                                                                //        }
+                                                                                //    });
+                                                                                //});
     </script>
 }

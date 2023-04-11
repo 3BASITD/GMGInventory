@@ -46,14 +46,14 @@ namespace GMGInventory.Application.Repositories
         {
             var orderVM = (from order in context.Packs
                                                 .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
-                                                .Include(s => s.SalesOrder).ThenInclude(s => s.DeliveryType)
+                                                .Include(s => s.SalesOrder).ThenInclude(s => s.Forwarder)
                            join user in userManager.Users on order.UserCreated equals user.Id
                            where order.Id == Id
                            select new PackDetailsVM
                            {
                                CustomerCode = order.SalesOrder.Customer.Code,
                                CustomerName = order.SalesOrder.Customer.Name,
-                               DeliveryType = order.SalesOrder.DeliveryType.Name,
+                               Forwarder = order.SalesOrder.Forwarder.Name,
                                Id = order.Id,
                                PackBy = user.Nickname,
                                PackDateD = order.DateCreated,
@@ -67,13 +67,13 @@ namespace GMGInventory.Application.Repositories
         {
             var orderVM = (from order in context.SalesOrders
                                                 .Include(s => s.Customer)
-                                                .Include(s => s.DeliveryType)
+                                                .Include(s => s.Forwarder)
                            where order.Id == Id
                            select new PackDetailsVM
                            {
                                CustomerCode = order.Customer.Code,
                                CustomerName = order.Customer.Name,
-                               DeliveryType = order.DeliveryType.Name,
+                               Forwarder = order.Forwarder.Name,
                                Id = order.Id,
                                SalesOrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber
@@ -177,6 +177,7 @@ namespace GMGInventory.Application.Repositories
                          {
                              BoxNumber = order.BoxNumber,
                              Id = order.Id,
+                             ItemId = order.Item.Id,
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
                              Quantity = order.Quantity

@@ -12,232 +12,232 @@
                 <span class="card-title">@ViewData["Title"]</span>
                 <div class="card-tools">
                     <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                    <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                        <span class="fas fa-arrow-left"></span> Back to List
-                    </a>
-                </div>
+                        <span class="fas fa-save"></span> @(TempData["SalesOrderId"] != null ? "Resubmit" : "Submit")
+                </button>
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="order-customer-code" class="form-label mb-0">Customer Code</label>
-                            <select id="order-customer-code" name="CustomerCode" style="width: 100%"></select>
-                            <span data-valmsg-for="order-customer-code" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-customer-name" class="form-label mb-0">Customer Name</label>
-                            <input type="text" id="order-customer-name" class="form-control form-control-sm" readonly="readonly" />
-                            <span data-valmsg-for="order-customer-name" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-customer-address" class="form-label mb-0">Customer Address</label>
-                            <input type="text" id="order-customer-address" class="form-control form-control-sm" readonly="readonly" />
-                            <span data-valmsg-for="order-customer-address" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-agent-code" class="form-label mb-0">Agent Code</label>
-                            <select id="order-agent-code" name="AgentCode" style="width: 100%"></select>
-                            <span data-valmsg-for="order-agent-code" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-agent-name" class="form-label mb-0">Agent Name</label>
-                            <input type="text" id="order-agent-name" class="form-control form-control-sm" readonly="readonly" />
-                            <span data-valmsg-for="order-agent-name" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="order-customer-code" class="form-label mb-0">Customer Code</label>
+                        <select id="order-customer-code" name="CustomerCode" style="width: 100%"></select>
+                        <span data-valmsg-for="order-customer-code" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="order-gross-net" class="form-label mb-0">Gross / Net Price</label>
-                            <select id="order-gross-net" class="form-control form-control-sm"></select>
-                            <span data-valmsg-for="order-gross-net" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-credit-term" class="form-label mb-0">Credit Term</label>
-                            <input type="text" id="order-credit-term" class="form-control form-control-sm" readonly="readonly" />
-                            <span data-valmsg-for="order-credit-term" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-declared-value" class="form-label mb-0">Declared Value</label>
-                            <input type="number" id="order-declared-value" step="0.01" min="0" max="1999999" class="form-control form-control-sm" />
-                            <span data-valmsg-for="order-declared-value" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-purchase-number" class="form-label mb-0">Purchase Order Number</label>
-                            <select id="order-purchase-number" style="width: 100%"></select>
-                            <span data-valmsg-for="order-purchase-number" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="order-delivery-type" class="form-label mb-0">Delivery Type</label>
-                            <select id="order-delivery-type" style="width: 100%"></select>
-                            <span data-valmsg-for="order-delivery-type" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
+                    <div class="form-group">
+                        <label for="order-customer-name" class="form-label mb-0">Customer Name</label>
+                        <input type="text" id="order-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                        <span data-valmsg-for="order-customer-name" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-customer-address" class="form-label mb-0">Customer Address</label>
+                        <input type="text" id="order-customer-address" class="form-control form-control-sm" readonly="readonly" />
+                        <span data-valmsg-for="order-customer-address" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-agent-code" class="form-label mb-0">Agent Code</label>
+                        <select id="order-agent-code" name="AgentCode" style="width: 100%"></select>
+                        <span data-valmsg-for="order-agent-code" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-agent-name" class="form-label mb-0">Agent Name</label>
+                        <input type="text" id="order-agent-name" class="form-control form-control-sm" readonly="readonly" />
+                        <span data-valmsg-for="order-agent-name" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <span class="card-title">Sales Order Item(s)</span>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                        <span class="fas fa-plus"></span> Add Sales Order Item
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-item">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Quantity</th>
-                                            <th>Unit</th>
-                                            <th>Item Code</th>
-                                            <th>Item Name</th>
-                                            <th>Inventory</th>
-                                            <th>Net Price</th>
-                                            <th>Gross Price</th> <!-- mas ok sana sabihing Retail Price kaso ayaw nila -->
-                                            <th>Selling Price</th>
-                                            <th>Discount 1</th>
-                                            <th>Discount 2</th>
-                                            <th>Extended Price</th> <!-- mas ok sana sabihing Gross Price kaso ayaw nila -->
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Total</th>
-                                            <th class="total-quantity">0</th>
-                                            <th colspan="6"></th>
-                                            <th class="total-selling-price">0.00</th>
-                                            <th colspan="2"></th>
-                                            <th class="total-gross-price">0.00</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="order-customer-balance" class="form-label mb-0">Outstanding Balance</label>
+                        <input type="text" id="order-customer-balance" class="form-control form-control-sm" readonly="readonly" />
+                        <span data-valmsg-for="order-customer-balance" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-gross-net" class="form-label mb-0">Gross / Net Price</label>
+                        <select id="order-gross-net" class="form-control form-control-sm"></select>
+                        <span data-valmsg-for="order-gross-net" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-credit-term" class="form-label mb-0">Credit Term</label>
+                        <input type="text" id="order-credit-term" class="form-control form-control-sm" readonly="readonly" />
+                        <span data-valmsg-for="order-credit-term" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-declared-value" class="form-label mb-0">Declared Value</label>
+                        <input type="number" id="order-declared-value" step="0.01" min="0" max="1999999" class="form-control form-control-sm" />
+                        <span data-valmsg-for="order-declared-value" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-purchase-number" class="form-label mb-0">Purchase Order Number</label>
+                        <select id="order-purchase-number" style="width: 100%"></select>
+                        <span data-valmsg-for="order-purchase-number" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="order-forwarder" class="form-label mb-0">Forwarder</label>
+                        <select id="order-forwarder" style="width: 100%"></select>
+                        <span data-valmsg-for="order-forwarder" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-remarks" class="form-label mb-0">Remarks</label>
+                        <input type="text" id="order-remarks" class="form-control form-control-sm" />
+                        <span data-valmsg-for="order-remarks" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
             </div>
-        </form>
-    </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Sales Order Item(s)</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                    <span class="fas fa-plus"></span> Add Sales Order Item
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Quantity</th>
+                                        <th>Unit</th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Inventory Count</th>
+                                        <th>Unit Price</th>
+                                        <th>Discount 1</th>
+                                        <th>Discount 2</th>
+                                        <th>Extended Price</th> <!-- mas ok sana sabihing Gross Price kaso ayaw nila -->
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>Total</th>
+                                        <th class="total-quantity">0</th>
+                                        <th colspan="7"></th>
+                                        <th class="total-gross-price">0.00</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 
-    <!-- Save Order Item Modal -->
-    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Sales Order Item</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+<!-- Save Order Item Modal -->
+<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Sales Order Item</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form-item">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-code" class="form-label mb-0">Code</label>
+                                <div>
+                                    <select id="add-code" name="Code" style="width: 100%;">
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-name" class="form-label mb-0">Name</label>
+                                <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-quantity" class="form-label mb-0">Quantity</label>
+                                <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                <span class="text-xs text-muted">Items in Inventory: <strong class="add-inventory"></strong></span>
+                                <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-unit" class="form-label mb-0">Unit</label>
+                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-unit-price" class="form-label mb-0">Unit Price <span class="add-price-source"></span></label>
+                                <input type="number" step="0.01" min="0.00" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
+                                <span data-valmsg-for="add-unit-price" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-discount1" class="form-label mb-0">Discount 1</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="add-discount1" name="Discount1" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="add-discount1" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-discount2" class="form-label mb-0">Discount 2</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="add-discount2" name="Discount2" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="add-discount2" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-gross-price" class="form-label mb-0">Extended Price</label>
+                                <input type="number" id="add-gross-price" name="ExtendedPrice" class="form-control form-control-sm" readonly="readonly" />
+                                <span data-valmsg-for="add-gross-price" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-add">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
                     </button>
                 </div>
-                <form id="form-item">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-code" class="form-label mb-0">Code</label>
-                                    <div>
-                                        <select id="add-code" name="Code" style="width: 100%;">
-                                            <option></option>
-                                        </select>
-                                    </div>
-                                    <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-name" class="form-label mb-0">Name</label>
-                                    <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
-                                    <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-net-price" class="form-label mb-0">Net Price</label>
-                                    <input type="text" id="add-net-price" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-retail-price" class="form-label mb-0">Gross Price</label>
-                                    <input type="text" id="add-retail-price" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-quantity" class="form-label mb-0">Quantity</label>
-                                    <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-unit" class="form-label mb-0">Unit</label>
-                                    <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-selling-price" class="form-label mb-0">Selling Price</label>
-                                    <input type="number" step="0.01" min="0.00" max="1999999.99" id="add-selling-price" name="SellingPrice" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="add-selling-price" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-discount1" class="form-label mb-0">Discount 1</label>
-                                    <div class="input-group input-group-sm">
-                                        <input type="number" step="0.01" min="0" max="100" id="add-discount1" name="Discount1" class="form-control form-control-sm" />
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                    <span data-valmsg-for="add-discount1" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-discount2" class="form-label mb-0">Discount 2</label>
-                                    <div class="input-group input-group-sm">
-                                        <input type="number" step="0.01" min="0" max="100" id="add-discount2" name="Discount2" class="form-control form-control-sm" />
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                    <span data-valmsg-for="add-discount2" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="add-gross-price" class="form-label mb-0">Extended Price</label>
-                                    <input type="number" id="add-gross-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
-                                    <span data-valmsg-for="add-gross-price" data-valmsg-replace="true" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-add">
-                            <span class="fas fa-plus"></span> Add
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 
-    @section Scripts {
+    @if (TempData["SalesOrderId"] != null)
+    {
+        <input type="hidden" id="resubmitSOId" value="@TempData["SalesOrderId"]" />
+    }
+</div>
+
+@section Scripts {
     <script>
         // Load customer data for select2
         $("#order-customer-code").select2({
@@ -275,12 +275,18 @@
         $("#order-customer-code").on("select2:select", function () {
             $("#order-customer-name").val($(this).select2("data")[0].name);
             $("#order-customer-address").val($(this).select2("data")[0].address);
+            $("#order-customer-balance").val($(this).select2("data")[0].outstandingBalance);
             $("#order-credit-term").val($(this).select2("data")[0].creditTerm);
+
+            if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
+                toastrNoDuplicate("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance", "warning");
+            }
         });
 
         $("#order-customer-code").on("select2:unselecting", function (e) {
             $("#order-customer-name").val("");
             $("#order-customer-address").val("");
+            $("#order-customer-balance").val("");
             $("#order-credit-term").val("");
         });
 
@@ -365,14 +371,14 @@
             }
         });
 
-        // Load delivery type data for select2
+        // Load forwarder data for select2
         $.ajax({
             type: "POST",
-            url: "@Url.Action("GetDeliveryTypeOptions")",
+            url: "@Url.Action("GetOptions", "Forwarder")",
             success: function (data, status, xhr) {
-                $("#order-delivery-type").select2({
+                $("#order-forwarder").select2({
                     data: data,
-                    minimumResultsForSearch: Infinity
+                    //minimumResultsForSearch: Infinity
                 });
             }
         });
@@ -414,37 +420,48 @@
 
         $("#add-code").on("select2:select", function () {
             $("#add-name").val($("#add-code").select2("data")[0].name);
-            $("#add-net-price").val($("#add-code").select2("data")[0].netPrice);
-            $("#add-retail-price").val($("#add-code").select2("data")[0].retailPrice);
+            if ($("#add-code").select2("data")[0].retailPriceD > $("#add-code").select2("data")[0].netPriceD) {
+                $("#add-unit-price").val($("#add-code").select2("data")[0].retailPriceD);
+                $("#add-gross-price").val($("#add-code").select2("data")[0].retailPriceD);
+                $(".add-price-source").text("(Gross)");
+            } else {
+                $("#add-unit-price").val($("#add-code").select2("data")[0].netPriceD);
+                $("#add-gross-price").val($("#add-code").select2("data")[0].netPriceD);
+                $(".add-price-source").text("(Net)");
+            }
             $("#add-unit").val($("#add-code").select2("data")[0].unit);
-            //$("#add-unit").val($("#add-code").select2("data")[0].unit);
+            $(".add-inventory").text($("#add-code").select2("data")[0].inventoryCount);
+            $("#add-quantity").val("1");
             $("#add-code-error").html("");
         });
 
         $("#add-code").on("select2:unselecting", function (e) {
             $("#add-name").val("");
-            $("#add-net-price").val("");
-            $("#add-retail-price").val("");
+            $("#add-unit-price").val("");
+            $(".add-price-source").text("");
             $("#add-unit").val("");
+            $(".add-inventory").text("0");
+            $("#add-quantity").val("0");
+            $("#add-gross-price").val("0.00");
         });
 
-        $("#add-quantity, #add-selling-price, #add-discount1, #add-discount2").on("input", function () {
+        $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2").on("input", function () {
             var quantity = parseFloat($("#add-quantity").val());
-            var selling_price = parseFloat($("#add-selling-price").val());
+            var unit_price = parseFloat($("#add-unit-price").val());
             var discount1 = parseFloat($("#add-discount1").val());
             var discount2 = parseFloat($("#add-discount2").val());
 
-            $("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * selling_price) / 100)));
+            $("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
         });
 
         function clearItemForm() {
             $("#add-code").val("").trigger("change");
             $("#add-name").val("");
-            $("#add-net-price").val("0.00");
-            $("#add-retail-price").val("0.00");
+            $("#add-unit-price").val("0.00");
+            $(".add-price-source").text("");
             $("#add-quantity").val("0");
             $("#add-unit").val("");
-            $("#add-selling-price").val("0.00");
+            $(".add-inventory").text("0");
             $("#add-discount1").val("0.00");
             $("#add-discount2").val("0.00");
             $("#add-gross-price").val("0.00");
@@ -458,17 +475,18 @@
             rules: {
                 Code: { required: true },
                 Quantity: { required: true, isNotZero: true },
-                SellingPrice: { required: true, isNotZero: true }
+                UnitPrice: { required: true, isNotZero: true }
             },
             messages: {
                 Code: { required: "Please select item to order." },
                 Quantity: { required: "Please enter a quantity", isNotZero: "Can not order an item with 0 quantity" },
-                SellingPrice: { required: "Please enter the selling price", isNotZero: "Can not sell for free" }
+                UnitPrice: { required: "Please enter the unit price", isNotZero: "Can not sell for free" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
                 AddItem();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function AddItem() {
@@ -480,24 +498,97 @@
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastr.warning("Can't add duplicate item");
+                toastrNoDuplicate($("#add-code").select2("data")[0].text + " has already been added", "Duplicate", "warning");
             } else {
                 itemDT.row.add({
                     id: $("#add-code").select2("data")[0].id,
                     code: $("#add-code").select2("data")[0].text,
                     name: $("#add-code").select2("data")[0].name,
-                    inventoryCount: 0,
+                    inventoryCount: $("#add-code").select2("data")[0].inventoryCount,
                     quantity: $("#add-quantity").val() || 0,
                     unit: $("#add-code").select2("data")[0].unit,
-                    netPrice: Round2Decimal($("#add-net-price").val() || "0.00"),
-                    retailPrice: Round2Decimal($("#add-retail-price").val() || "0.00"),
-                    sellingPrice: Round2Decimal($("#add-selling-price").val() || "0.00"),
+                    unitPrice: Round2Decimal($("#add-unit-price").val() || "0.00"),
                     discount1: Round2Decimal($("#add-discount1").val() || "0.00"),
                     discount2: Round2Decimal($("#add-discount2").val() || "0.00"),
-                    grossPrice: Round2Decimal($("#add-gross-price").val() || "0.00"),
+                    grossPrice: Round2Decimal($("#add-gross-price").val() || "0.00")
                 }).draw();
                 clearItemForm();
+                toastrNoDuplicate("Added " + $("#add-code").select2("data")[0].text + " on Sales Order Item(s)", "Success", "success");
             }
+        }
+
+        if ($("#resubmitSOId").length) {
+            // for resubmitting a disapproved sales order
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DetailsJson")",
+                data: {
+                    Id: $("#resubmitSOId").val()
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    var customerOption = new Option(data.customerCode, data.customerId, true, true);
+                    $("#order-customer-code").append(customerOption);
+                    $("#order-customer-code").trigger('change');
+                    $("#order-customer-code").select2("data")[0].name = data.customerName;
+                    $("#order-customer-code").select2("data")[0].outstandingBalanceD = data.outstandingBalanceD;
+
+                    $("#order-customer-balance").val(data.outstandingBalance);
+
+                    var forwarderOption = new Option(data.forwarder, data.forwarderId, true, true);
+                    $("#order-forwarder").append(forwarderOption);
+                    $("#order-forwarder").trigger('change');
+
+                    $("#order-customer-name").val(data.customerName);
+
+                    $("#order-gross-net").val(data.grossNetPriceId).trigger("change");
+
+                    $("#order-remarks").val(data.remarks);
+
+                    $("#order-customer-address").val(data.customerAddress);
+
+                    $("#order-credit-term").val(data.creditTerms);
+
+                    var agentOption = new Option(data.agentCode, data.agentId, true, true);
+                    $("#order-agent-code").append(agentOption);
+                    $("#order-agent-code").trigger('change');
+
+                    $("#order-declared-value").val(data.declaredValueD.toFixed(2));
+
+                    $("#order-agent-name").val(data.agentName);
+
+                    if (data.poId) {
+                        var POOption = new Option(data.poNumber, data.poId, true, true);
+                        $("#order-purchase-number").append(POOption);
+                        $("#order-purchase-number").trigger('change');
+                    }
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetItemsJson")",
+                data: {
+                    salesOrderId: $("#resubmitSOId").val()
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    $.each(data, function (i, v) {
+                        itemDT.row.add({
+                            id: v.itemId,
+                            code: v.itemCode,
+                            name: v.itemName,
+                            inventoryCount: v.inventoryCountD,
+                            quantity: v.quantityD,
+                            unit: v.unit,
+                            unitPrice: v.sellingPriceD.toFixed(2),
+                            discount1: v.discount1D.toFixed(2),
+                            discount2: v.discount2D.toFixed(2),
+                            grossPrice: v.grossPrice
+                        }).draw();
+                    });
+                }
+            });
         }
 
         var itemDT = $('.table-item').DataTable({
@@ -510,7 +601,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -522,16 +613,20 @@
                     className: "form-cell text-end"
                 },
                 { data: "unit", name: "Unit", className: "form-cell" },
-                { data: "code", name: "Code", className: "form-cell" },
-                { data: "name", name: "Name", className: "form-cell" },
-                { data: "inventoryCount", name: "InventoryCount", className: "form-cell text-end" },
-                { data: "netPrice", name: "NetPrice", className: "form-cell text-end" },
-                { data: "retailPrice", name: "RetailPrice", className: "form-cell text-end" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + data.sellingPrice + '" class="form-control form-control-sm sellingprice" style="width: 100%;" />';
+                        return data.code + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.id + ')"><i class="fas fa-info-circle text-info"></i></span>'
                     },
-                    name: "SellingPrice",
+                    name: "Code",
+                    className: "form-cell"
+                },
+                { data: "name", name: "Name", className: "form-cell" },
+                { data: "inventoryCount", name: "InventoryCount", className: "form-cell text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + data.unitPrice + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
+                    },
+                    name: "UnitPrice",
                     className: "form-cell text-end"
                 },
                 {
@@ -551,8 +646,8 @@
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
-                columnDTTotalInteger(api, 4);
-                columnDTTotalDecimal(api, 11);
+                columnDTTotalInteger(api, 1);
+                columnDTTotalDecimal(api, 9);
             }
         });
 
@@ -565,39 +660,29 @@
 
             $(".quantity, .sellingprice, .discount1, .discount2").on("input", function () {
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
-                var selling_price = parseFloat($(this).parents("tr").find(".sellingprice").val());
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
 
-                var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * selling_price) / 100)));
+                var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
                 $(this).parents("tr").find(".grossprice").html(gross_price);
                 ComputeTotalQuantity();
-                ComputeTotalSellingPrice();
                 ComputeTotalGrossPrice();
             });
         });
 
         function ComputeTotalQuantity() {
             total_quantity = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 total_quantity += parseInt($(this.node()).find(".quantity").val());
-            } );
+            });
             $(".total-quantity").html(FormatStringInteger(total_quantity));
-        }
-
-        function ComputeTotalSellingPrice() {
-            total_selling_price = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                total_selling_price += parseFloat($(this.node()).find(".sellingprice").val());
-            } );
-            $(".total-selling-price").html(FormatStringDecimal(total_selling_price));
         }
 
         function ComputeTotalGrossPrice() {
             total_gross_price = 0;
-            itemDT.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",",""));
-            } );
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",", ""));
+            });
             $(".total-gross-price").html(FormatStringDecimal(total_gross_price));
         }
 
@@ -608,13 +693,13 @@
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                var row_sellingprice = parseFloat($(this.node()).find(".sellingprice").val());
+                var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
                 item_to_order.push({
                     item: row_data.id,
                     quantity: row_quantity,
-                    sellingPrice: row_sellingprice,
+                    unitPrice: row_unitprice,
                     discount1: row_discount1,
                     discount2: row_discount2
                 });
@@ -627,7 +712,7 @@
             errorClass: 'text-danger text-xs',
             rules: {
                 CustomerCode: { required: true },
-                AgentCode: { required: true}
+                AgentCode: { required: true }
             },
             messages: {
                 CustomerCode: { required: "Please select customer" },
@@ -636,45 +721,67 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 SaveOrder();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function SaveOrder() {
             var itemsToOrder = GetItemsToOrder();
             if (itemsToOrder.length == 0) {
-                toastr.warning("No item to order. Add an item to the list to continue");
+                toastrNoDuplicate("No item to order. Add an item to the list to continue", "Warning", "warning");
             } else if (itemsToOrder.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't order an item with 0 quantity");
-            } else {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("SaveJson")",
-                    data: {
-                        Customer: $("#order-customer-code").val(),
-                        DeliveryType: $("#order-delivery-type").val(),
-                        Agent: $("#order-agent-code").val(),
-                        GrossNet: $("#order-gross-net").val(),
-                        PurchaseOrder: $("#order-purchase-number").val(),
-                        DeclaredValue: $("#order-declared-value").val(),
-                        Items: itemsToOrder
+                toastrNoDuplicate("Some items have 0 quantity. Can't order an item with 0 quantity", "Warning", "warning");
+            } else if ($("#order-customer-code").select2("data")[0].outstandingBalanceD > 0) {
+                swal({
+                    title: "Customer's Outstanding Balance",
+                    text: "(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance + ". Are you sure you want to continue submitting it?",
+                    icon: "info",
+                    buttons: {
+                        cancel: "No",
+                        continue: "Yes"
                     },
-                    error: jQueryCommonError,
-                    success: function (data, status, xhr) {
-                        if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
-                        } else {
-                            //toastr.success(data.message, "Success");
-                            //toastr.warning("Page will redirect to details", 'Page Redirect', {
-                            //    timeOut: 3000,
-                            //    onHidden: function () {
-                                    window.location = "@Url.Action("Details")/" + data.newRow;
-                            //    },
-                            //    progressBar: true
-                            //});
-                        }
+                    infoMode: true
+                }).then((value) => {
+                    if (value == "continue") {
+                        DoSave();
                     }
                 });
+            } else {
+                DoSave();
             }
+        }
+
+        function DoSave() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveJson")",
+                data: {
+                    Customer: $("#order-customer-code").val(),
+                    Forwarder: $("#order-forwarder").val(),
+                    Agent: $("#order-agent-code").val(),
+                    GrossNet: $("#order-gross-net").val(),
+                    PurchaseOrder: $("#order-purchase-number").val(),
+                    DeclaredValue: $("#order-declared-value").val(),
+                    Remarks: $("#order-remarks").val(),
+                    Items: GetItemsToOrder(),
+                    ResubmitId: "@(TempData["SalesOrderId"])"
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastrNoDuplicate(data.message, "Error", "error");
+                    } else {
+                        //toastrNoDuplicate(data.message, "Success", "success");
+                        //toastr.warning("Page will redirect to details", 'Page Redirect', {
+                        //    timeOut: 3000,
+                        //    onHidden: function () {
+                        window.location = "@Url.Action("Details")/" + data.newRow;
+                        //    },
+                        //    progressBar: true
+                        //});
+                    }
+                }
+            });
         }
     </script>
         }

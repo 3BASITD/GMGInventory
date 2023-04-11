@@ -8,167 +8,167 @@
     <li class="breadcrumb-item"><a asp-controller="SalesInvoice" asp-action="Index">Sales Invoice</a></li>
 }
 
-    <div class="card card-default">
-        <form id="form-invoice">
-            <div class="card-header">
-                <span class="card-title">@ViewData["Title"]</span>
-                <div class="card-tools">
-                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                    <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                        <span class="fas fa-arrow-left"></span> Back to List
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="invoice-pack-number" class="form-label mb-0">Pack Number</label>
-                            <select id="invoice-pack-number" class="s2-bold s2ph-bold s2ph-dark" name="PackNumber" style="width: 100%"></select>
-                            <span data-valmsg-for="invoice-pack-number" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="invoice-control-number" class="form-label mb-0">BIR Invoice Number</label>
-                            <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" />
-                            <span data-valmsg-for="invoice-control-number" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="invoice-invoice-type" class="form-label mb-0">Invoice Type</label>
-                            <select id="invoice-invoice-type" class="form-control form-control-sm"></select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="invoice-remarks" class="form-label mb-0">Remarks</label>
-                            <input type="text" id="invoice-remarks" class="form-control form-control-sm" />
-                            <span data-valmsg-for="invoice-remarks" data-valmsg-replace="true" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerName)</span>
-                            <b class="d-block">@Model?.CustomerName</b>
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerCode)</span>
-                            <b class="d-block">@Model?.CustomerCode</b>
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerAddress)</span>
-                            <b class="d-block">@Model?.CustomerAddress</b>
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.SONumber)</span>
-                            <b class="d-block">@Model?.SONumber</b>
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.PaymentTerms)</span>
-                            <b class="d-block">@Model?.PaymentTerms</b>
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <p class="text-sm">
-                            <span class="text-muted">@Html.DisplayNameFor(model => model.Agent)</span>
-                            <b class="d-block">@Model?.Agent</b>
-                        </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <span class="card-title">Invoiced Item(s)</span>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                        <span class="fas fa-plus"></span> Add Invoiced Item
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-item">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Quantity</th>
-                                            <th>Item Code</th>
-                                            <th>Item Name</th>
-                                            <th>Gross Price</th>
-                                            <th>Discount 1</th>
-                                            <th>Discount 2</th>
-                                            <th>Extended Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Total</th>
-                                            <th class="total-quantity">0</th>
-                                            <th colspan="5"></th>
-                                            <th class="total-extended">0.00</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Invoice Item</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="form-item">
-                    <div class="modal-body">
-                        <table class="table table-head-fixed table-striped table-hover table-pack">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Item Code</th>
-                                    <th>Item Name</th>
-                                    <th>Selling Price</th>
-                                    <th>Packed Quantity</th>
-                                    <th>Gross Price</th>
-                                    <th>Discount 1</th>
-                                    <th>Discount 2</th>
-                                    <th>Extended Price</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Close
-                        </button>
-                    </div>
-                </form>
+<div class="card card-default">
+    <form id="form-invoice">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-paper-plane"></span> Submit
+                </button>
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
             </div>
         </div>
-    </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="invoice-pack-number" class="form-label fw-normal mb-0">Pack Number</label>
+                        <select id="invoice-pack-number" class="s2-bold s2ph-bold s2ph-dark" name="PackNumber" style="width: 100%"></select>
+                        <span data-valmsg-for="invoice-pack-number" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="invoice-control-number" class="form-label fw-normal mb-0">BIR Invoice Number</label>
+                        <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" />
+                        <span data-valmsg-for="invoice-control-number" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="invoice-invoice-type" class="form-label fw-normal mb-0">Invoice Type</label>
+                        <select id="invoice-invoice-type" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="invoice-remarks" class="form-label fw-normal mb-0">Remarks</label>
+                        <input type="text" id="invoice-remarks" class="form-control form-control-sm" />
+                        <span data-valmsg-for="invoice-remarks" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerName)</span>
+                        <b class="d-block">@Model?.CustomerName</b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerCode)</span>
+                        <b class="d-block">@Model?.CustomerCode</b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerAddress)</span>
+                        <b class="d-block">@Model?.CustomerAddress</b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.SONumber)</span>
+                        <b class="d-block">@Model?.SONumber</b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.PaymentTerms)</span>
+                        <b class="d-block">@Model?.PaymentTerms</b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">@Html.DisplayNameFor(model => model.Agent)</span>
+                        <b class="d-block">@Model?.Agent</b>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Invoiced Item(s)</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                    <span class="fas fa-plus"></span> Add Invoiced Item
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Quantity</th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Gross Price</th>
+                                        <th>Discount 1</th>
+                                        <th>Discount 2</th>
+                                        <th>Extended Price</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>Total</th>
+                                        <th class="total-quantity">0</th>
+                                        <th colspan="5"></th>
+                                        <th class="total-extended">0.00</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 
-    @section Scripts {
+<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Invoice Item</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form-item">
+                <div class="modal-body">
+                    <table class="table table-head-fixed table-striped table-hover table-pack">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Selling Price</th>
+                                <th>Packed Quantity</th>
+                                <th>Gross Price</th>
+                                <th>Discount 1</th>
+                                <th>Discount 2</th>
+                                <th>Extended Price</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Close
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
     <script>
         $("#invoice-pack-number").select2({
             minimumInputLength: 1,
@@ -247,11 +247,16 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="left" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-plus"></i></button>';
                         return actions;
                     }
                 },
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode"
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "sellingPrice", name: "SellingPrice", className: "text-end" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
@@ -269,7 +274,7 @@
                 var rowdata = packDT.row($(this).parents('tr')).data();
                 itemDT.row.add(rowdata).draw();
                 packDT.row($(this).parents('tr')).remove().draw();
-                toastr.success("Added " + rowdata.itemCode + " on Invoice Item");
+                toastrNoDuplicate("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success", "success");
             });
         });
 
@@ -283,18 +288,25 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        //return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        return '<input type="number" min="0" max="' + data.quantity + '" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                     },
                     name: "Quantity",
                     className: "form-cell text-end"
                 },
-                { data: "itemCode", name: "ItemCode", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode",
+                    className: "form-cell"
+                },
                 { data: "itemName", name: "ItemName", className: "form-cell" },
                 { data: "sellingPrice", name: "SellingPrice", className: "form-cell text-end" },
                 { data: "discount1", name: "Discount1", className: "form-cell text-end" },
@@ -317,7 +329,7 @@
                 var rowdata = itemDT.row($(this).parents('tr')).data();
                 packDT.row.add(rowdata).draw();
                 itemDT.row($(this).parents('tr')).remove().draw();
-                toastr.warning("Removed " + rowdata.itemCode + " on Invoice Item");
+                toastrNoDuplicate("Removed " + rowdata.itemCode + " on Invoice Item", "Warning", "warning");
                 ComputeTotalQuantity();
                 ComputeTotalExtendedPrice();
             });
@@ -381,15 +393,16 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 SaveInvoice();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function SaveInvoice() {
             var itemsToInvoice = GetItemsToInvoice();
             if (itemsToInvoice.length == 0) {
-                toastr.warning("No item to invoice. Add an item to the list to continue");
+                toastrNoDuplicate("No item to invoice. Add an item to the list to continue", "Warning", "warning");
             } else if (itemsToInvoice.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't invoice an item with 0 quantity");
+                toastrNoDuplicate("Some items have 0 quantity. Can't invoice an item with 0 quantity", "Warning", "warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -404,9 +417,9 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            //toastr.success(data.message, "Success");
+                            //toastrNoDuplicate(data.message, "Success", "success");
                             //toastr.warning("Page will redirect to details", 'Page Redirect', {
                             //    timeOut: 3000,
                             //    onHidden: function () {

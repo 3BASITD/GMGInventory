@@ -38,6 +38,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
+        
+        public int CustomerId { get; set; }
 
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
@@ -48,11 +50,19 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Address")]
         public string CustomerAddress { get; set; }
 
-        [Display(Name = "Delivery Type")]
-        public string DeliveryType { get; set; }
+        [Display(Name = "Outstanding Balance")]
+        public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
+        public decimal OutstandingBalanceD { get; set; }
+
+        public int ForwarderId { get; set; }
+
+        [Display(Name = "Forwarder")]
+        public string Forwarder { get; set; }
 
         [Display(Name = "Shipping Address")]
         public string ShippingAddress { get; set; }
+
+        public int AgentId { get; set; }
 
         [Display(Name = "Agent Code")]
         public string AgentCode { get; set; }
@@ -60,11 +70,15 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Agent Name")]
         public string AgentName { get; set; }
 
+        public int GrossNetPriceId { get; set; }
+
         [Display(Name = "Gross/Net Price")]
         public string GrossNetPrice { get; set; }
 
         [Display(Name = "Credit Terms")]
         public string CreditTerms { get; set; }
+
+        public int? POId { get; set; }
 
         [Display(Name = "Purchase Order Number")]
         public string? PONumber { get; set; }
@@ -79,6 +93,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order By")]
         public string SalesOrderBy { get; set; }
+
+        [Display(Name = "Remarks")]
+        public string Remarks { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }
@@ -96,6 +113,11 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Disapproved Date")]
         public string DisapprovedDate => DisapprovedDateD == null ? "-" : DisapprovedDateD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DisapprovedDateD { get; set; }
+
+        [Display(Name = "Disapproved Reason")]
+        public string DisapprovedReason { get; set; }
+
+        public int? ResubmitId { get; set; }
     }
 
     public class SalesOrderPrintVM : SalesOrderDetailsVM
@@ -105,21 +127,29 @@ namespace GMGInventory.Common.Models
             set
             {
                 AgentCode = value.AgentCode;
+                AgentId = value.AgentId;
                 AgentName = value.AgentName;
                 ApprovedBy = value.ApprovedBy;
                 ApprovedDateD = value.ApprovedDateD;
                 CreditTerms = value.CreditTerms;
                 CustomerAddress = value.CustomerAddress;
                 CustomerCode = value.CustomerCode;
+                CustomerId = value.CustomerId;
                 CustomerName = value.CustomerName;
                 DeclaredValueD = value.DeclaredValueD;
-                DeliveryType = value.DeliveryType;
+                ForwarderId = value.ForwarderId;
+                Forwarder = value.Forwarder;
                 DisapprovedBy = value.DisapprovedBy;
                 DisapprovedDateD = value.DisapprovedDateD;
+                DisapprovedReason = value.DisapprovedReason;
+                GrossNetPriceId = value.GrossNetPriceId;
                 GrossNetPrice = value.GrossNetPrice;
                 Id = value.Id;
                 OrderDateD = value.OrderDateD;
+                OutstandingBalanceD = value.OutstandingBalanceD;
+                POId = value.POId;
                 PONumber = value.PONumber;
+                Remarks = value.Remarks;
                 SalesOrderBy = value.SalesOrderBy;
                 ShippingAddress = value.ShippingAddress;
                 SONumber = value.SONumber;
@@ -152,6 +182,14 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Quantity")]
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
+
+        [Display(Name = "Served Quantity")]
+        public string ServedQuantity => string.Format(SystemFormat.StringIntegerComma, ServedQuantityD);
+        public int ServedQuantityD { get; set; }
+
+        [Display(Name = "Unserved Quantity")]
+        public string UnservedQuantity => string.Format(SystemFormat.StringIntegerComma, UnservedQuantityD);
+        public int UnservedQuantityD { get; set; }
 
         [Display(Name = "Packed Quantity")]
         public string PackedQuantity => string.Format(SystemFormat.StringIntegerComma, PackedQuantityD);
@@ -197,11 +235,13 @@ namespace GMGInventory.Common.Models
     {
         public int? Id { get; set; }
         public int Customer { get; set; }
-        public int DeliveryType { get; set; }
+        public int Forwarder { get; set; }
         public int Agent { get; set; }
         public int GrossNet { get; set; }
         public int? PurchaseOrder { get; set; }
         public decimal DeclaredValue { get; set; }
+        public string Remarks { get; set; }
+        public int? ResubmitId { get; set; }
         public IList<SalesOrderFormItemVM> Items { get; set; }
     }
 
@@ -209,9 +249,9 @@ namespace GMGInventory.Common.Models
     {
         public int Item { get; set; }
         public int Quantity { get; set; }
-        public decimal SellingPrice { get; set; }
+        public decimal UnitPrice { get; set; }
         public decimal Discount1 { get; set; }
         public decimal Discount2 { get; set; }
-        public decimal GrossPrice => Quantity * (((100m - Discount1 - Discount2) * SellingPrice) / 100m);
+        public decimal GrossPrice => Quantity * (((100m - Discount1 - Discount2) * UnitPrice) / 100m);
     }
 }

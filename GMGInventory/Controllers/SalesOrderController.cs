@@ -1,4 +1,6 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -36,11 +38,6 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderRepository.GetPriceTypeOptions(IncludeId));
         }
 
-        public async Task<IActionResult> GetDeliveryTypeOptions(int? IncludeId)
-        {
-            return Json(await salesOrderRepository.GetDeliveryTypeOptions(IncludeId));
-        }
-
         public ActionResult Index()
         {
             return View();
@@ -69,6 +66,12 @@ namespace GMGInventory.Controllers
             }
 
             return View(order);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> DetailsJson(int? Id)
+        {
+            return Json(await salesOrderRepository.GetDetailsAsync(Id));
         }
 
         public async Task<ActionResult> Print(int? Id)
@@ -101,8 +104,14 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderRepository.GetItemsDTAsync(form, salesOrderId));
         }
 
-        public ActionResult Create()
+        public async Task<ActionResult> Create(int? Id)
         {
+            var order = await salesOrderRepository.GetDetailsAsync(Id);
+            if (Id != null && (order == null || order.DisapprovedBy == null || order.DisapprovedDateD == null))
+            {
+                return RedirectToAction("Details", new { Id = Id });
+            }
+            TempData["SalesOrderId"] = Id;
             return View();
         }
 
@@ -171,29 +180,12 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> DisapproveJson(int Id)
-        {
-            ResponseModel responseModel = new ResponseModel();
-            if (await salesOrderRepository.DisapproveAsync(Id))
-            {
-                responseModel.Status = "Success";
-                responseModel.Message = "Order successfully disapproved";
-            }
-            else
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Cannot disapprove order. Please try again later";
-            }
-            return Json(responseModel);
-        }
-
-        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Disapprove(int Id)
+        public async Task<ActionResult> Disapprove(int Id, string Reason)
         {
             if (ModelState.IsValid)
             {
-                if (await salesOrderRepository.DisapproveAsync(Id))
+                if (await salesOrderRepository.DisapproveAsync(Id, Reason))
                 {
                     TempData["SuccessMessage"] = "Sales order disapproved successfully";
                 }
@@ -203,6 +195,23 @@ namespace GMGInventory.Controllers
                 }
             }
             return RedirectToAction(nameof(Details), new { id = Id });
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> UpdateServedSOItem(int salesOrderLineItemId, int quantity)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            if (await salesOrderRepository.UpdateServedSOItem(salesOrderLineItemId, quantity))
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "Served Quantity successfully updated";
+            }
+            else
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Cannot update served quantity. Please try again later";
+            }
+            return Json(responseModel);
         }
     }
 }

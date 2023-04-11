@@ -83,24 +83,12 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonOptionsModel>> GetDeliveryTypeOptions(int? IncludeId)
-        {
-            return await context.DeliveryTypes
-                                .Select(s => new JsonOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.Name,
-                                    Selected = IncludeId == s.Id
-                                })
-                                .ToListAsync();
-        }
-
         public async Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
             var orderVM = (from order in context.SalesOrders
                                                 .Include(s => s.Agent)
                                                 .Include(s => s.Customer).ThenInclude(s => s.CreditTerm)
-                                                .Include(s => s.DeliveryType)
+                                                .Include(s => s.Forwarder)
                                                 .Include(s => s.PriceType)
                                                 .Include(s => s.PurchaseOrder)
                            join user in userManager.Users on order.UserCreated equals user.Id
@@ -110,21 +98,30 @@ namespace GMGInventory.Application.Repositories
                            select new SalesOrderDetailsVM
                            {
                                AgentCode = order.Agent.Code,
+                               AgentId = order.Agent.Id,
                                AgentName = order.Agent.FirstName + (order.Agent.MiddleName == null ? "" : " " + order.Agent.MiddleName) + " " + order.Agent.LastName,
                                ApprovedBy = approve.Nickname,
                                ApprovedDateD = order.ApprovedDate,
                                CreditTerms = order.Customer.CreditTerm.Name,
                                CustomerAddress = order.Customer.Address,
                                CustomerCode = order.Customer.Code,
+                               CustomerId = order.Customer.Id,
                                CustomerName = order.Customer.Name,
                                DeclaredValueD = order.DeclaredValue,
-                               DeliveryType = order.DeliveryType.Name,
                                DisapprovedBy = disapprove.Nickname,
                                DisapprovedDateD = order.DisapprovedDate,
+                               DisapprovedReason = order.DisapprovedReason + "",
+                               Forwarder = order.Forwarder.Name,
+                               ForwarderId = order.Forwarder.Id,
                                GrossNetPrice = order.PriceType.Name,
+                               GrossNetPriceId = order.PriceType.Id,
                                Id = order.Id,
                                OrderDateD = order.DateCreated,
+                               OutstandingBalanceD = order.Customer.OutstandingBalance,
+                               POId = order.PurchaseOrder == null ? null : order.PurchaseOrder.Id,
                                PONumber = order.PurchaseOrder == null ? "-" : order.PurchaseOrder.PONumber,
+                               Remarks = order.Remarks + "",
+                               ResubmitId = order.ResubmittedSalesOrderId,
                                SalesOrderBy = user.Nickname,
                                ShippingAddress = "",
                                SONumber = order.SalesOrderNumber,
@@ -139,7 +136,9 @@ namespace GMGInventory.Application.Repositories
             if (details == null)
             {
                 return null;
-            } else {
+            }
+            else
+            {
                 return new SalesOrderPrintVM
                 {
                     Details = details,
@@ -165,7 +164,7 @@ namespace GMGInventory.Application.Repositories
                                Status = order.Status.Code,
                                TotalAmountD = order.TotalAmount,
                                ApprovedDisapprovedBy = auser ?? duser ?? "-",
-                               ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate 
+                               ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate
                            });
             return await orderVM.ToListAsync();
         }
@@ -231,30 +230,35 @@ namespace GMGInventory.Application.Repositories
         {
             var itemVM = from order in context.SalesOrderLineItems
                                               .Include(s => s.Item)
-                                                .ThenInclude(s => s.Unit)
+                                              .ThenInclude(s => s.Unit)
                          from price in context.ItemPrices
                                               .Where(s => s.ItemId == order.ItemId
                                                        && s.DateCreated <= DateTime.Now)
                                               .OrderByDescending(s => s.DateCreated)
                                               .Take(1)
                                               .DefaultIfEmpty()
-                         let inventory = context.ItemInventories.Where(s => s.ItemId == order.ItemId).Sum(s => s.Quantity)
+                         let inventory = context.ItemInventories
+                                                .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code == "MAIN")
+                                                .Sum(s => s.Quantity)
                          where order.SalesOrderId == salesOrderId
                          select new SalesOrderItemVM
                          {
                              Discount1D = order.Discount1,
                              Discount2D = order.Discount2,
-                             Id = order.ItemId,
+                             Id = order.Id,
                              InventoryCountD = inventory,
                              InvoicedQuantityD = order.InvoicedQuantity,
                              ItemCode = order.Item.Code,
+                             ItemId = order.Item.Id,
                              ItemName = order.Item.Name,
                              NetPriceD = price.NetSellingPrice,
                              QuantityD = order.Quantity,
                              PackedQuantityD = order.PackedQuantity,
                              RetailPriceD = price.RetailSellingPrice,
                              SellingPriceD = order.SellingPrice,
+                             ServedQuantityD = order.ServedQuantity,
                              Unit = order.Item.Unit.Code,
+                             UnservedQuantityD = order.UnservedQuantity
                          };
             return await itemVM.ToListAsync();
         }
@@ -268,7 +272,9 @@ namespace GMGInventory.Application.Repositories
                                               .OrderByDescending(s => s.DateCreated)
                                               .Take(1)
                                               .DefaultIfEmpty()
-                         let inventory = context.ItemInventories.Where(s => s.ItemId == order.ItemId).Sum(s => s.Quantity)
+                         let inventory = context.ItemInventories
+                                                .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code == "MAIN")
+                                                .Sum(s => s.Quantity)
                          where order.SalesOrderId == salesOrderId
                          && order.Quantity != order.PackedQuantity
                          select new SalesOrderItemVM
@@ -311,7 +317,9 @@ namespace GMGInventory.Application.Repositories
                                     || x.RetailPriceD.ToString().Contains(form.SearchValue)
                                     || x.SellingPriceD.ToString().Contains(form.SearchValue)
                                     || x.Unit.ToLower().Contains(form.SearchValue)
-                                    || x.GrossPriceD.ToString().Contains(form.SearchValue));
+                                    || x.GrossPriceD.ToString().Contains(form.SearchValue)
+                                    || x.ServedQuantityD.ToString().Contains(form.SearchValue)
+                                    || x.UnservedQuantityD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -332,8 +340,10 @@ namespace GMGInventory.Application.Repositories
                         case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
                         case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantity); break;
                         case "SellingPrice": data = data.OrderBy(s => s.SellingPriceD); break;
+                        case "ServedQuantity": data = data.OrderBy(s => s.ServedQuantityD); break;
                         case "RetailPrice": data = data.OrderBy(s => s.RetailPriceD); break;
                         case "Unit": data = data.OrderBy(s => s.Unit); break;
+                        case "UnservedQuantity": data = data.OrderBy(s => s.UnservedQuantityD); break;
                         case "GrossPrice": data = data.OrderBy(s => s.GrossPriceD); break;
                         default: break;
                     }
@@ -352,8 +362,10 @@ namespace GMGInventory.Application.Repositories
                         case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
                         case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantity); break;
                         case "SellingPrice": data = data.OrderByDescending(s => s.SellingPriceD); break;
+                        case "ServedQuantity": data = data.OrderByDescending(s => s.ServedQuantityD); break;
                         case "RetailPrice": data = data.OrderByDescending(s => s.RetailPriceD); break;
                         case "Unit": data = data.OrderByDescending(s => s.Unit); break;
+                        case "UnservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantityD); break;
                         case "GrossPrice": data = data.OrderByDescending(s => s.GrossPriceD); break;
                         default: break;
                     }
@@ -394,25 +406,48 @@ namespace GMGInventory.Application.Repositories
                     AgentId = form.Agent,
                     CustomerId = form.Customer,
                     DeclaredValue = form.DeclaredValue,
-                    DeliveryTypeId = form.DeliveryType,
+                    ForwarderId = form.Forwarder,
                     PriceTypeId = form.GrossNet,
                     PurchaseOrderId = form.PurchaseOrder,
                     QuantityInvoiced = 0,
                     QuantityOrdered = form.Items.Sum(s => s.Quantity),
                     QuantityPacked = 0,
+                    Remarks = form.Remarks,
                     SalesOrderNumber = soNumber,
                     StatusId = statusId,
                     TotalAmount = form.Items.Sum(s => s.GrossPrice)
                 };
                 await context.SalesOrders.AddAsync(orderVM);
+                await context.SaveChangesAsync(currentUserId);
+
+
+                var previous = await context.SalesOrders.Where(s=>s.Id == form.ResubmitId).FirstOrDefaultAsync();
+                if(previous != null)
+                {
+                    previous.ResubmittedSalesOrderId = orderVM.Id;
+                    await context.SaveChangesAsync(currentUserId);
+                }
+
+                SalesOrderDeliveryMonitoring salesOrderDelivery = new()
+                {
+                    DateDeliver = null,
+                    DatePickup = null,
+                    ForwarderId = orderVM.ForwarderId,
+                    Remarks = orderVM.Remarks + "",
+                    SalesOrderId = orderVM.Id,
+                    Waybill = ""
+                };
+
+                await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
+                await context.SaveChangesAsync(currentUserId);
             }
             else
             {
                 orderVM.StatusId = statusId;
                 orderVM.TotalAmount = form.Items.Sum(s => s.GrossPrice);
                 context.SalesOrders.Update(orderVM);
+                await context.SaveChangesAsync(currentUserId);
             }
-            await context.SaveChangesAsync(currentUserId);
 
             await SaveItemsAsync(form.Items, orderVM.Id);
 
@@ -439,7 +474,9 @@ namespace GMGInventory.Application.Repositories
                                    PackedQuantity = 0,
                                    Quantity = s.Quantity,
                                    SalesOrderId = salesOrderId,
-                                   SellingPrice = s.SellingPrice
+                                   SellingPrice = s.UnitPrice,
+                                   ServedQuantity = 0,
+                                   UnservedQuantity = 0
                                });
             context.SalesOrderLineItems.AddRange(itemsVM);
 
@@ -453,7 +490,7 @@ namespace GMGInventory.Application.Repositories
                 dbitem.Discount1 = di.Discount1;
                 dbitem.Discount2 = di.Discount2;
                 dbitem.Quantity = di.Quantity;
-                dbitem.SellingPrice = di.SellingPrice;
+                dbitem.SellingPrice = di.UnitPrice;
 
                 context.SalesOrderLineItems.Update(dbitem);
             }
@@ -488,11 +525,55 @@ namespace GMGInventory.Application.Repositories
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);
 
+                List<SalesOrderLineItem> salesOrderLineItems = context.SalesOrderLineItems.Where(s => s.SalesOrderId == orderVM.Id).ToList();
+                foreach (var salesOrderLineItem in salesOrderLineItems)
+                {
+                    var itemInventory = await context.ItemInventories
+                                                     .Where(s => s.ItemId == salesOrderLineItem.ItemId && s.Warehouse.Name == "MAIN")
+                                                     .FirstOrDefaultAsync();
+                    //if (itemInventory != null && itemInventory.Quantity >= salesOrderLineItem.Quantity)
+                    //{
+                    //    itemInventory.Quantity = itemInventory.Quantity - salesOrderLineItem.Quantity;
+                    //    context.ItemInventories.Update(itemInventory);
+                    //    await context.SaveChangesAsync(currentUserId);
+                    //}
+                    //else
+                    //{
+                    //    return false;
+                    //}
+                    if (itemInventory == null)
+                    {
+                        salesOrderLineItem.UnservedQuantity = salesOrderLineItem.Quantity;
+                    }
+                    else
+                    {
+                        if (itemInventory.Quantity >= salesOrderLineItem.Quantity)
+                        {
+                            salesOrderLineItem.ServedQuantity = salesOrderLineItem.Quantity;
+                            itemInventory.Quantity -= salesOrderLineItem.Quantity;
+                        }
+                        else if (itemInventory.Quantity < 0)
+                        {
+                            salesOrderLineItem.UnservedQuantity = salesOrderLineItem.Quantity;
+                        } 
+                        else
+                        {
+                            salesOrderLineItem.ServedQuantity = itemInventory.Quantity;
+                            salesOrderLineItem.UnservedQuantity = salesOrderLineItem.Quantity - itemInventory.Quantity;
+                            itemInventory.Quantity = 0;
+                        }
+                        context.ItemInventories.Update(itemInventory);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+                    context.SalesOrderLineItems.Update(salesOrderLineItem);
+                    await context.SaveChangesAsync(currentUserId);
+                }
+
                 return true;
             }
         }
 
-        public async Task<bool> DisapproveAsync(int salesOrderId)
+        public async Task<bool> DisapproveAsync(int salesOrderId, string reason)
         {
             var orderVM = context.SalesOrders.Where(s => s.Id == salesOrderId).FirstOrDefault();
             if (orderVM == null)
@@ -502,16 +583,62 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.Statuses.Where(s => s.Name == "Sales Order Disapproved").Select(s => s.Id).First();
+                int statusId = await context.Statuses.Where(s => s.Name == "Sales Order Disapproved").Select(s => s.Id).FirstAsync();
                 orderVM.ApprovedBy = null;
                 orderVM.ApprovedDate = null;
                 orderVM.DisapprovedBy = currentUserId;
                 orderVM.DisapprovedDate = DateTime.Now;
+                orderVM.DisapprovedReason = reason;
                 orderVM.StatusId = statusId;
 
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);
 
+                var delivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == salesOrderId).FirstOrDefaultAsync();
+                if(delivery != null)
+                {
+                    context.SalesOrderDeliveryMonitorings.Remove(delivery);
+                    await context.SaveChangesAsync(currentUserId);
+                }
+
+                return true;
+            }
+        }
+
+        public async Task<bool> UpdateServedSOItem(int salesOrderLineItemId, int quantity)
+        {
+            var soItem = await context.SalesOrderLineItems
+                                      .Where(s => s.Id == salesOrderLineItemId)
+                                      .FirstOrDefaultAsync();
+            if (soItem == null || soItem.UnservedQuantity < quantity)
+            {
+                return false;
+            }
+            else
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                var inventory = await context.ItemInventories
+                                             .Where(s => s.ItemId == soItem.ItemId && s.Warehouse.Name == "MAIN")
+                                             .FirstOrDefaultAsync();
+                if (inventory == null)
+                {
+                    return false;
+                }
+                else if (inventory.Quantity >= quantity)
+                {
+                    soItem.ServedQuantity += quantity;
+                    soItem.UnservedQuantity -= quantity;
+                    inventory.Quantity -= quantity;
+                }
+                else
+                {
+                    soItem.ServedQuantity += inventory.Quantity;
+                    soItem.UnservedQuantity -= inventory.Quantity;
+                    inventory.Quantity = 0;
+                }
+                context.SalesOrderLineItems.Update(soItem);
+                context.ItemInventories.Update(inventory);
+                await context.SaveChangesAsync(currentUserId);
                 return true;
             }
         }

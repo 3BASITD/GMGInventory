@@ -8,7 +8,12 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"])
+            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                <span class="fas fa-print"></span> Print
+            </button>
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterPriceModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
         </div>
     </div>
     <div class="card-body">
@@ -51,6 +56,46 @@
     </div>
 </div>
 
+<div class="modal fade" id="filterPriceModal" role="dialog" aria-labelledby="filterPriceModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-category" class="form-label mb-0">Category</label>
+                            <select id="filter-category" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-type" class="form-label mb-0">Item Type</label>
+                            <select id="filter-type" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         var dataTable = $('.table').on('preXhr.dt', function (e, settings, data) {
@@ -59,10 +104,10 @@
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
-                data: function(data) {
-                    var categoryId = $("#CategoryId").val();
-                    var itemTypeId = $("#ItemTypeId").val();
-                    var brandId = $("#BrandId").val();
+                data: function (data) {
+                    var categoryId = $("#filter-category").val();
+                    var itemTypeId = $("#filter-type").val();
+                    var brandId = $("#filter-brand").val();
 
                     if (categoryId) data.CategoryId = categoryId;
                     if (itemTypeId) data.ItemTypeId = itemTypeId;
@@ -86,12 +131,12 @@
                 { data: "partNumber", name: "PartNumber" },
                 { data: "unit", name: "Unit" },
                 {
-                    data: function(data, type, dataToSet) { return data.retailPrice.toFixed(2); },
+                    data: function (data, type, dataToSet) { return data.retailPrice.toFixed(2); },
                     name: "RetailPrice",
                     className: "text-end"
                 },
                 {
-                    data: function(data, type, dataToSet) { return data.netPrice.toFixed(2); },
+                    data: function (data, type, dataToSet) { return data.netPrice.toFixed(2); },
                     name: "NetPrice",
                     className: "text-end"
                 },
@@ -106,7 +151,102 @@
 
         function ApplyFilter() {
             $(".table").DataTable().ajax.reload();
-            $("#filterModal").modal("hide");
+            $("#filterPriceModal").modal("hide");
+        }
+
+        // Load Select2 for Category
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Category")",
+            success: function (data, status, xhr) {
+                $("#filter-category").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterPriceModal')
+                });
+            }
+        });
+
+        // Load Select2 for Item Type
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "ItemType")",
+            success: function (data, status, xhr) {
+                $("#filter-type").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterPriceModal')
+                });
+            }
+        });
+
+        // Load Select2 for Brand
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Brand")",
+            success: function (data, status, xhr) {
+                $("#filter-brand").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterPriceModal')
+                });
+            }
+        });
+
+        $(".printBtn").on("click", function () {
+            if (dataTable.page.info().recordsTotal > 1000) {
+                swal({
+                    title: "A lot of records to print",
+                    text: "You are trying to print " + dataTable.page.info().recordsTotal + " record(s). Genererating a page to print for this much will take a while. Would you like to continue?",
+                    icon: "info",
+                    buttons: {
+                        cancel: "No",
+                        filter: "Do Filter",
+                        continue: "Yes"
+                    },
+                    infoMode: true
+                }).then((value) => {
+                    if (value == "filter") {
+                        $("#filterPriceModal").modal("show");
+                    } else if (value == "continue") {
+                        DoPrint();
+                    }
+                });
+            } else {
+                DoPrint();
+            }
+        });
+
+        function DoPrint() {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
+            });
+            var urlQuery = [];
+            if ($("#filter-category").val()) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
+            if ($("#filter-type").val()) { urlQuery.push("ItemTypeId=" + $("#filter-type").val()); }
+            if ($("#filter-brand").val()) { urlQuery.push("BrandId=" + $("#filter-brand").val()); }
+            setTimeout(function () {
+                let win = window.open('@Url.Action("Print")?' + urlQuery.join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         }
     </script>
 }

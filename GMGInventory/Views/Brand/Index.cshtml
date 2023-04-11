@@ -267,12 +267,12 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details data-microtip-position="left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Brand" data-microtip-position="left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Brand" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         } else {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Brand" data-microtip-position="left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Brand" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions;
@@ -324,7 +324,7 @@
                 $(".modal-detail-code").html(data.code);
                 $(".modal-detail-name").html(data.name);
                 $(".modal-detail-itemType").html(data.itemType);
-                $(".modal-detail-isactive").html(data.isActive + (data.isActive ? '' : ' <span class="fas fa-question-circle text-primary" data-microtip-title="This was deleted but instead marked as Inactive because it was used in other records." data-microtip-position="left" role="tooltip"></span>'));
+                $(".modal-detail-isactive").html(data.isActive + (data.isActive ? '' : ' <span class="fas fa-question-circle text-primary" data-microtip-title="This was deleted but instead marked as Inactive because it was used in other records." data-microtip-position="top-left" role="tooltip"></span>'));
                 $(".modal-detail-usercreated").html(data.userCreated);
                 $(".modal-detail-datecreated").html(data.dateCreated);
                 $(".modal-detail-usermodified").html(data.userModified);
@@ -378,7 +378,8 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     DoEdit();
-                }
+                },
+                showErrors: validateShowErrors
             });
 
             // Send Edit to Controller
@@ -445,7 +446,8 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoCreate();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         // Send Create to Controller

@@ -1,0 +1,32 @@
+﻿@{
+    Layout = "";
+    var title = "Print Sample";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/printreceipt.css" asp-append-version="true" />
+</head>
+<body>
+    <table style="width: 200px;">
+        <tbody>
+            @for (int ctr = 20; ctr <= 25; ctr++)
+            {
+                <tr><td style="height:@(ctr)px">@(ctr)px A B C D E F G</td></tr>
+                <tr><td style="height:@(ctr)px">@(ctr)px A B C D E F G A B C D E F G</td></tr>
+                <tr><td style="height:@(ctr)px">@(ctr)px A B C D E F G A B C D E F G A B C D E F G</td></tr>
+            }
+        </tbody>
+    </table>
+    <table>
+</body>
+<script type="text/javascript">
+        //window.print();
+    /*window.onafterprint = window.close;*/
+</script>
+</html>

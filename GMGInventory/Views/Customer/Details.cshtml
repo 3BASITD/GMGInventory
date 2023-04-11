@@ -944,7 +944,8 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoEdit();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
 
@@ -976,9 +977,9 @@
                 error: jQueryCommonError,
                 success: function(data, status, xhr) {
                     if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                     } else {
-                        toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                         $("#editModal").modal("hide");
                         
                        // dataTable.ajax.reload();
@@ -1020,7 +1021,8 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoShipping();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         // Send Shipping to Controller
@@ -1038,9 +1040,9 @@
                 error: jQueryCommonError,
                 success: function(data, status, xhr) {
                     if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                     } else {
-                        toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                         $("#shippingModal").modal("hide");
                         shippingDT.ajax.reload();
                         
@@ -1079,7 +1081,8 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoForwarder();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         // Send Forwarder to Controller
@@ -1097,9 +1100,9 @@
                 error: jQueryCommonError,
                 success: function(data, status, xhr) {
                     if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                     } else {
-                        toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                         $("#forwarderModal").modal("hide");
                         forwarderDT.ajax.reload();
                         

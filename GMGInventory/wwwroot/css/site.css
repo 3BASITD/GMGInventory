@@ -189,3 +189,8 @@ pre {
     margin: 5px 0;
     min-width: 100px;
 }
+
+.clickable {
+    cursor: pointer;
+    display: inline-block;
+}

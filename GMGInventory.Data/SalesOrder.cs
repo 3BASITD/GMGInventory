@@ -23,9 +23,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string SalesOrderNumber { get; set; }
 
-        [ForeignKey("DeliveryTypeId")]
-        public int DeliveryTypeId { get; set; }
-        public DeliveryType DeliveryType { get; set; }
+        [ForeignKey("ForwarderId")]
+        public int ForwarderId { get; set; }
+        public Forwarder Forwarder { get; set; }
 
         [ForeignKey("StatusId")]
         public int StatusId { get; set; }
@@ -59,6 +59,11 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(150)")]
         public string? Remarks { get; set; }
+
+        [Column(TypeName = "nvarchar(150)")]
+        public string? DisapprovedReason { get; set; }
+
+        public int? ResubmittedSalesOrderId { get; set; }
 
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<Pack> Packs { get; set; }

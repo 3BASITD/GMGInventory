@@ -229,16 +229,25 @@
             errorClass: 'text-danger text-xs',
             rules: {
                 Code: { required: true },
-                TransferQuantity: { required: true, isNotZero: true }
+                TransferQuantity: {
+                    required: true,
+                    isNotZero: true,
+                    lessThanOrEqual: "#source-current-quantity"
+                }
             },
             messages: {
                 Code: { required: "Please select item to transfer." },
-                TransferQuantity: { required: "Please enter a quantity", isNotZero: "Can not transfer an item with 0 quantity" },
+                TransferQuantity: {
+                    required: "Please enter a quantity",
+                    isNotZero: "Can not transfer an item with 0 quantity",
+                    lessThanOrEqual: "Can not transfer more than the source quantity"
+                },
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
                 AddItem();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         function AddItem() {
@@ -250,7 +259,7 @@
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastr.warning("Can't add duplicate item");
+                toastrNoDuplicate($("#source-code").select2("data")[0].text + " has already been added", "Duplicate", "warning");
             } else {
                 destinationDT.row.add({
                     id: $("#source-code").select2("data")[0].id,
@@ -261,6 +270,8 @@
                     unit: $("#source-code").select2("data")[0].unit
                 }).draw();
                 AddItemFormReset();
+
+                toastrNoDuplicate("Added " + $("#source-code").select2("data")[0].text + " on Transfer Item(s)", "Success", "success");
             }
         }
 
@@ -288,7 +299,8 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 SaveTransfer();
-            }
+            },
+            showErrors: validateShowErrors
         });
 
         var destinationDT = $('.table-item-destination').DataTable({
@@ -301,7 +313,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
                     }
                 },
@@ -310,7 +322,7 @@
                 { data: "sourceQuantity", name: "SourceQuantity", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" value="' + data.transferQuantity + '" class="form-control form-control-sm" style="width: 100%;" />';
+                        return '<input type="number" min="0" max="' + data.sourceQuantity + '" value="' + data.transferQuantity + '" class="form-control form-control-sm" style="width: 100%;" />';
                     },
                     name: "TransferQuantity"
                 },
@@ -367,7 +379,7 @@
                             //toastr.warning("Page will redirect to details", 'Page Redirect', {
                             //    timeOut: 3000,
                             //    onHidden: function () {
-                                    window.location = "@Url.Action("Details")/" + data.newRow;
+                            window.location = "@Url.Action("Details")/" + data.newRow;
                             //    },
                             //    progressBar: true
                             //});

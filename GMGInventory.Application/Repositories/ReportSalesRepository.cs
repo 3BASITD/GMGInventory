@@ -20,8 +20,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<AgentSalesPerItemRVM>> GetAgentSalesPerItem(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || invoice.Item.Brand.Id == filter.Brand)
                            && (filter.Item == null || invoice.Item.Id == filter.Item)
@@ -143,8 +143,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<BrandSalesRVM>> GetBrandSales(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || invoice.Item.Brand.Id == filter.Brand)
                            && invoice.Invoice.Status.Code == "Invoiced"
@@ -258,9 +258,11 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<BestSellingItemRVM>> GetBestSellingItem(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           let inventory = context.ItemInventories.Where(s => s.ItemId == invoice.Item.Id).Sum(s => s.Quantity)
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           let inventory = context.ItemInventories
+                                                  .Where(s => s.ItemId == invoice.Item.Id && s.Warehouse.Code == "MAIN")
+                                                  .Sum(s => s.Quantity)
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || invoice.Item.Brand.Id == filter.Brand)
                            && invoice.Invoice.Status.Code == "Invoiced"
@@ -413,8 +415,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<CommissionRVM>> GetCommission(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
                            && (filter.Area == null || invoice.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
@@ -572,8 +574,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<CustomerSalesRankingRVM>> GetCustomerSalesRanking(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && (filter.Region == null || (invoice.Invoice.SalesOrder.Customer.Area != null && invoice.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region))
                            && invoice.Invoice.Status.Code == "Invoiced"
                            select new CustomerSalesRankingRVM
@@ -681,8 +683,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<CustomerSalesRVM>> GetCustomerSales(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && (filter.Brand == null || invoice.Item.Brand.Id == filter.Brand)
                            && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
                            && invoice.Invoice.Status.Code == "Invoiced"
@@ -794,8 +796,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<DailySalesRVM>> GetDailySales(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && invoice.Invoice.InvoiceNumber.CompareTo(filter.InvoiceNumberFrom) >= 0
                            && invoice.Invoice.InvoiceNumber.CompareTo(filter.InvoiceNumberTo) <= 0
                            && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
@@ -935,8 +937,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<SalesInvoiceRVM>> GetSalesInvoice(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
                            && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
@@ -1077,8 +1079,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<SalesAgentAreaRVM>> GetSalesAgentArea(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Area == null || invoice.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
                            && invoice.Invoice.Status.Code == "Invoiced"
@@ -1206,8 +1208,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<SalesReportBasisRVM>> GetSalesReportBasis(ListFilterSalesModel filter)
         {
             var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated)
-                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date
+                           && (invoice.Invoice.DateModified ?? invoice.Invoice.DateCreated).Date <= filter.DateTo
                            && invoice.Invoice.Status.Code == "Invoiced"
                            select new SalesReportBasisRVM
                            {
@@ -1312,8 +1314,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<SalesReturnRVM>> GetSalesReturn(ListFilterSalesModel filter)
         {
             var sreturns = from sreturn in context.SalesReturnLineItems
-                           where filter.DateFrom <= (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated)
-                           && (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated) <= filter.DateTo
+                           where filter.DateFrom <= (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated).Date
+                           && (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated).Date <= filter.DateTo
                            && (filter.Customer == null || sreturn.SalesReturn.Customer.Id == filter.Customer)
                            && (filter.Item == null || sreturn.Item.Id == filter.Item)
                            select new SalesReturnRVM
@@ -1466,18 +1468,17 @@ namespace GMGInventory.Application.Repositories
                           from soaliGroup in soas.DefaultIfEmpty()
                               //where soaliGroup.Id == null &&
                           where soaliGroup == null &&
-                          filter.DateFrom <= (so.DateModified ?? so.DateCreated)
-                          && (so.DateModified ?? so.DateCreated) <= filter.DateTo
+                          filter.DateFrom <= (so.DateModified ?? so.DateCreated).Date
+                          && (so.DateModified ?? so.DateCreated).Date <= filter.DateTo
                           && (filter.Brand == null || soline.Item.Brand.Id == filter.Brand)
 
                           select new UnservedItemRVM
                           {
                               Brand = soline.Item.Brand.Name,
-
-                              CurrentD = soline.PackedQuantity,
+                              CurrentD = soline.ServedQuantity,
                               ItemCode = soline.Item.Code,
                               ItemName = soline.Item.Name,
-                              PendingD = soline.Quantity - soline.PackedQuantity,
+                              PendingD = soline.UnservedQuantity,
                               ReplenishDateD = soline.DateModified ?? soline.DateCreated
                           };
             var solineslist = await solines.ToListAsync();
