@@ -7,11 +7,17 @@
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
-        @*<div class="card-tools">
-        <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
-        <span class="fas fa-filter"></span> Filter
-        </button>
-        </div>*@
+        <div class="card-tools">
+            <button type="button" class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <span class="fas fa-upload"></span> Upload
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                <span class="fas fa-download"></span> Download
+            </button>
+        </div>
     </div>
     <div class="card-body">
         <table class="table table-head-fixed table-striped table-hover table-update">
@@ -91,7 +97,7 @@
     </div>
 </div>
 
-@*<!-- Filter Modal -->
+<!-- Filter Modal -->
 <div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
@@ -130,10 +136,97 @@
             </div>
         </div>
     </div>
-</div>*@
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Item</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label mb-0" for="upload-file">Excel File</label>
+                    <input type="file" id="upload-file" name="file"
+                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                           class="form-control form-control-sm" />
+                </div>
+                <table class="table table-striped" id="upload-table">
+                    <thead>
+                        <tr><th>Row #</th><th>Code</th><th>Gross Price</th><th>Net Price</th><th>Status</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                    <span class="fas fa-upload"></span> Upload
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
+        // Load Select2 for Category
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Category")",
+            success: function (data, status, xhr) {
+                $("#filter-category").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+            }
+        });
+
+        // Load Select2 for Item Type
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "ItemType")",
+            success: function (data, status, xhr) {
+                $("#filter-item-type").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+            }
+        });
+
+        // Load Select2 for Brand
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Brand")",
+            success: function (data, status, xhr) {
+                $("#filter-brand").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+            }
+        });
+
         var dataTable = $('.table-update').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
@@ -141,9 +234,9 @@
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
                 data: function (data) {
-                    var categoryId = $("#CategoryId").val();
-                    var itemTypeId = $("#ItemTypeId").val();
-                    var brandId = $("#BrandId").val();
+                    var categoryId = $("#filter-category").val();
+                    var itemTypeId = $("#filter-item-type").val();
+                    var brandId = $("#filter-brand").val();
 
                     if (categoryId) data.CategoryId = categoryId;
                     if (itemTypeId) data.ItemTypeId = itemTypeId;
@@ -233,7 +326,7 @@
                         if (data.status == "Error") {
                             toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                            toastrNoDuplicate(data.message, "Success", "success");
                             $("#updateModal").modal("hide");
                             dataTable.ajax.reload();
                         }
@@ -245,8 +338,118 @@
         });
 
         function ApplyFilter() {
-            $(".table").DataTable().ajax.reload();
+            dataTable.ajax.reload();
             $("#filterModal").modal("hide");
         }
+
+        var json_of_excel_headers;
+        var json_of_excel;
+        var colnumber = 4; // number of columns required for upload
+        var done_upload_excel = 0;
+
+        var opts = {
+            readAsDefault: 'ArrayBuffer',
+            dragClass: 'drag',
+            on: {
+                load: function (e, file) {
+                    var result = new Uint8Array(e.target.result);
+
+                    var xlsread = XLSX.read(result, { type: 'array' });
+                    json_of_excel = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                }
+            }
+        };
+        $("#upload-file").fileReaderJS(opts);
+
+        // Actions upon file selection
+        $("#upload-file").on("change", function () {
+            done_upload_excel = 0;
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        // Actions upon Display Upload Modal
+        $(".uploadBtn").click(function (e) {
+            done_upload_excel = 0;
+            $("#upload-file").val("");
+            $("#upload-table tbody").html("");
+            $("#upload-table").hide();
+        });
+
+        function DoUpload() {
+            if (!$("#upload-file").val()) {
+                toastrNoDuplicate("Please select a file first", "Warning", "warning");
+            } if (json_of_excel.length == 0) {
+                toastrNoDuplicate("The excel file is empty", "Warning", "warning");
+            } else {
+                var columns = Object.keys(json_of_excel[0]);
+                $("#upload-table tbody").html("");
+                $("#upload-table").show();
+                for (var i = 0; i < json_of_excel.length; i++) {
+                    var rowNum = json_of_excel[i].__rowNum__;
+                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                        var cellValue = json_of_excel[i][columns[colIndex]];
+                        if (cellValue == null)
+                            cellValue = "";
+                        if (colIndex == 0 || colIndex == 2 || colIndex == 3)
+                            row$.append($('<td/>').html(cellValue));
+                    }
+                    if (columns.includes("Code") == false
+                        || columns.includes("Name") == false
+                        || columns.includes("Gross Price") == false
+                        || columns.includes("Net Price") == false) {
+                        row$.append($('<td/>').html("Unexpected columns"));
+                        UploadRowDone();
+                    } else {
+                        SaveXLSX(json_of_excel[i]["Code"],
+                            json_of_excel[i]["Gross Price"],
+                            json_of_excel[i]["Net Price"],
+                            rowNum);
+                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                    }
+                    $("#upload-table").append(row$);
+                }
+            }
+        }
+
+        function SaveXLSX(code, retailprice, netprice, rownum) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UploadJson")",
+                data: {
+                    Code: code,
+                    RetailPrice: retailprice,
+                    NetPrice: netprice
+                },
+                error: function (xhr, status, error) {
+                    $("#upload-row" + rownum + "td").html("Error: " + status + " " + error);
+                },
+                success: function (data, status, xhr) {
+                    $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                },
+                complete: function (xhr, status) {
+                    UploadRowDone();
+                }
+            });
+        }
+
+        function UploadRowDone() {
+            done_upload_excel++;
+            $.LoadingOverlay("progress", parseInt((done_upload_excel / json_of_excel.length) * 100));
+            if (done_upload_excel == json_of_excel.length) {
+                dataTable.ajax.reload();
+                $("#upload-file").val("");
+            }
+        }
+
+        $(".downloadBtn").click(function (e) {
+            var urlQuery = [];
+            if ($("#filter-category").val()) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
+            if ($("#filter-item-type").val()) { urlQuery.push("ItemTypeId=" + $("#filter-item-type").val()); }
+            if ($("#filter-brand").val()) { urlQuery.push("BrandId=" + $("#filter-brand").val()); }
+            window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+        });
     </script>
 }

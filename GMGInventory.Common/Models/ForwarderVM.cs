@@ -31,19 +31,10 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Fax Number")]
         public string FaxNumber { get; set; }
 
-        [Required]
-        [Display(Name = "Customer")]
-
-        public int CustomerId { get; set; }
-
-        public string CustomerName { get; set; }
-        public SelectList? Customers { get; set; }
-
     }
 
         public class ForwarderViewVM : GenericAuditVM
     {
-
         [Display(Name = "Address")]
         public string Address { get; set; }
 
@@ -52,15 +43,6 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Fax Number")]
         public string FaxNumber { get; set; }
-
-        [Display(Name = "Customer")]
-
-        public int CustomerId { get; set; }
-
-        public string CustomerName { get; set; }
-        public CustomerVM Customer { get; set; }
-
-
     }
 
 

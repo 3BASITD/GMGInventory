@@ -41,6 +41,11 @@ h3 {
         padding: 2px;
     }
 
+    .table-items.no-border th, .table-items.no-border td {
+        border: none;
+        padding: 2px;
+    }
+
 .right-text {
     text-align: right;
 }

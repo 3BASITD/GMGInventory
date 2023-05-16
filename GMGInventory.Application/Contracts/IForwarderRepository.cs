@@ -18,7 +18,7 @@ namespace GMGInventory.Application.Contracts
         Task AddAsync(ForwarderVM forwarderVM);
         Task UpdateAsync(ForwarderVM forwarderVM);
 
-        Task<IList<ForwarderViewVM>> GetAllAsync();
+        Task<IList<ForwarderViewVM>> GetAllForwarderAsync();
         Task<bool> UploadCombinationExistAsync(ForwarderVM forwarderVM);
         Task<ForDataTables<ForwarderViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
     }

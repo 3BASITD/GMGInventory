@@ -134,10 +134,9 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Forwarder");
-            dt.Columns.AddRange(new DataColumn[5] {
+            dt.Columns.AddRange(new DataColumn[4] {
                 new DataColumn("Name"),
                 new DataColumn("Address"),
-                new DataColumn("Customer"),
                 new DataColumn("Phone Number"),
                 new DataColumn("Fax Number")
 
@@ -145,7 +144,7 @@ namespace GMGInventory.Controllers
             var forwarder = (await forwarderRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var forwarders in forwarder)
             {
-                dt.Rows.Add(forwarders.Name, forwarders.Address, forwarders.CustomerName, forwarders.PhoneNumber, forwarders.FaxNumber);
+                dt.Rows.Add(forwarders.Name, forwarders.Address, forwarders.PhoneNumber, forwarders.FaxNumber);
             }
             using (XLWorkbook wb = new())
             {
@@ -177,19 +176,9 @@ namespace GMGInventory.Controllers
             }
             else
             {
-                int? CustomerId = await customerRepository.GetIdAsync(forwarderVM.CustomerName);
-                if (CustomerId == null)
-                {
-                    responseModel.Status = "Error";
-                    responseModel.Message = "Unknown Customer";
-                }
-                else
-                {
-                    forwarderVM.CustomerId = CustomerId.Value;
-                    await forwarderRepository.AddAsync(forwarderVM);
-                    responseModel.Status = "Success";
-                    responseModel.Message = "Forwarder added";
-                }
+                await forwarderRepository.AddAsync(forwarderVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Forwarder added";
             }
             return Json(responseModel);
         }

@@ -84,23 +84,17 @@
                             </div>
                             <div class="form-group">
                                 <label for="create-address" class="control-label mb-0 d-block">Address</label>
-                                <input name="address" id="create-address" class="form-control form-control-sm" />
+                                <input type="text" name="address" id="create-address" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label for="create-customer" class="control-label mb-0 d-block">Customer</label>
-                                <select name="customer" id="create-customer" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-customer" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
                                 <label for="create-phone" class="control-label mb-0 d-block">Phone Number</label>
-                                <input name="phone" id="create-phone" class="form-control form-control-sm" />
+                                <input type="text" name="phone" id="create-phone" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-phone" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label for="create-fax" class="control-label mb-0 d-block">Fax Number</label>
-                                <input name="fax" id="create-fax" class="form-control form-control-sm" />
+                                <input type="text" name="fax" id="create-fax" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-fax" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
 
@@ -142,23 +136,17 @@
                             </div>
                             <div class="form-group">
                                 <label for="edit-address" class="control-label mb-0 d-block">Address</label>
-                                <input name="address" id="edit-address" class="form-control form-control-sm" />
+                                <input type="text" name="address" id="edit-address" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label for="edit-customer" class="control-label mb-0 d-block">Customer</label>
-                                <select name="customer" id="edit-customer" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-customer" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
                                 <label for="edit-phone" class="control-label mb-0 d-block">Phone Number</label>
-                                <input type="number" name="phone" id="edit-phone" class="form-control form-control-sm" />
+                                <input type="text" name="phone" id="edit-phone" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-phone" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label for="edit-fax" class="control-label mb-0 d-block">Fax Number</label>
-                                <input type="number" name="fax" id="edit-fax" class="form-control form-control-sm" />
+                                <input type="text" name="fax" id="edit-fax" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-fax" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                             <input type="hidden" id="edit-id" />
@@ -195,8 +183,6 @@
                     <dd class="col-sm-8 modal-detail-name"></dd>
                     <dt class="col-sm-4">Address</dt>
                     <dd class="col-sm-8 modal-detail-address"></dd>
-                    <dt class="col-sm-4">Customer</dt>
-                    <dd class="col-sm-8 modal-detail-customer"></dd>
                     <dt class="col-sm-4">Phone Number</dt>
                     <dd class="col-sm-8 modal-detail-phone"></dd>
                     <dt class="col-sm-4">Fax Number</dt>
@@ -237,7 +223,7 @@
                 </div>
                 <table class="table table-striped" id="upload-table">
                     <thead>
-                        <tr><th>Row #</th><th>Name</th><th>Address</th><th>Customer</th><th>Phone Number</th><th>Fax Number</th><th>Status</th></tr>
+                        <tr><th>Row #</th><th>Name</th><th>Address</th><th>Phone Number</th><th>Fax Number</th><th>Status</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -350,10 +336,9 @@
             $('.detailsBtn').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
                 $(".modal-detail-name").html(data.name);
-                $(".modal-detail-address").html(data.address);
-                $(".modal-detail-customer").html(data.customerName);
-                $(".modal-detail-phone").html(data.phoneNumber);
-                $(".modal-detail-fax").html(data.faxNumber);
+                $(".modal-detail-address").html(data.address == "" ? "-" : data.address);
+                $(".modal-detail-phone").html(data.phoneNumber == "" ? "-" : data.phoneNumber);
+                $(".modal-detail-fax").html(data.faxNumber == "" ? "-" : data.faxNumber);
                 $(".modal-detail-usercreated").html(data.userCreated);
                 $(".modal-detail-datecreated").html(data.dateCreated);
                 $(".modal-detail-usermodified").html(data.userModified);
@@ -369,29 +354,6 @@
                 $("#edit-address").val(data.address);
                 $("#edit-phone").val(data.phoneNumber);
                 $("#edit-fax").val(data.faxNumber);
-
-
-                // Load Select2 Area on Edit
-                if ($("#edit-customer").attr("data-select2-id")) {
-                    $("#edit-customer").select2("destroy");
-                    $("#edit-customer").empty();
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions2", "Customer")",
-                    data: { includeId: data.customerId },
-                    success: function (data, status, xhr) {
-                        $("#edit-customer").select2({
-                            data: data,
-                            allowClear: true,
-                            placeholder: {
-                                id: "",
-                                text: "<empty>"
-                            },
-                            dropdownParent: $('#editModal')
-                        });
-                    }
-                });
             });
 
             // Validation for Edit Modal
@@ -401,13 +363,13 @@
                     name: { required: true, maxlength: 10 },
                     address: { required: true, maxlength: 100 },
                     phone: { required: true, maxlength: 20 },
-                    fax: { required: true, maxlength: 20 }
+                    fax: { maxlength: 20 }
                 },
                 messages: {
                     name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
                     address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
                     phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
-                    fax: { required: "Please enter Fax Number.", maxlength: "Fax number must not exceed 20 characters." }
+                    fax: { maxlength: "Fax number must not exceed 20 characters." }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -425,7 +387,6 @@
                         Id: $("#edit-id").val(),
                         Name: $("#edit-name").val(),
                         Address: $("#edit-address").val(),
-                        CustomerId: $("#edit-customer").val(),
                         PhoneNumber: $("#edit-phone").val(),
                         FaxNumber: $("#edit-fax").val()
                     },
@@ -446,22 +407,6 @@
 
         });
 
-        // Load Select2 Customers
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions2", "Customer")",
-            success: function (data, status, xhr) {
-                $("#create-customer").select2({
-                    data: data,
-                    dropdownParent: $("#createModal")
-                });
-                $("#edit-customer").select2({
-                    data: data,
-                    dropdownParent: $("#editModal")
-                });
-            }
-        });
-
 
         // Actions upon Display Create Modal
         $(".createBtn").click(function (e) {
@@ -469,7 +414,6 @@
             $("#create-address").val("");
             $("#create-phone").val("");
             $("#create-fax").val("");
-            $("#create-customer").val("");
 
         });
 
@@ -480,13 +424,13 @@
                 name: { required: true, maxlength: 10 },
                 address: { required: true, maxlength: 100 },
                 phone: { required: true, maxlength: 20 },
-                fax: { required: true, maxlength: 20 }
+                fax: { maxlength: 20 }
             },
             messages: {
                 name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
                 address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
                 phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
-                fax: { required: "Please enter Fax Number.", maxlength: "Fax number must not exceed 20 characters." }
+                fax: { maxlength: "Fax number must not exceed 20 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -505,8 +449,7 @@
                     Name: $("#create-name").val(),
                     Address: $("#create-address").val(),
                     PhoneNumber: $("#create-phone").val(),
-                    FaxNumber: $("#create-fax").val(),
-                    CustomerId: $("#create-customer").val()
+                    FaxNumber: $("#create-fax").val()
 
                 },
                 error: jQueryCommonError,
@@ -532,7 +475,7 @@
         });
 
         var json_of_excel;
-        var colnumber = 5; // number of columns required for upload
+        var colnumber = 4; // number of columns required for upload
         var done_upload_excel = 0;
         var duplicate_upload = 0;
 
@@ -587,13 +530,12 @@
                     }
                     if (columns.includes("Name") == false
                         || columns.includes("Address") == false
-                        || columns.includes("Customer") == false
                         || columns.includes("Phone Number") == false
                         || columns.includes("Fax Number") == false) {
                         row$.append($('<td/>').html("Unexpected columns"));
                         UploadRowDone();
                     } else {
-                        SaveXLSX(json_of_excel[i]["Name"], json_of_excel[i]["Address"], json_of_excel[i]["Customer"], json_of_excel[i]["Phone Number"], json_of_excel[i]["Fax Number"], rowNum);
+                        SaveXLSX(json_of_excel[i]["Name"], json_of_excel[i]["Address"], json_of_excel[i]["Phone Number"], json_of_excel[i]["Fax Number"], rowNum);
                         row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
                     }
                     $("#upload-table").append(row$);
@@ -601,14 +543,13 @@
             }
         }
 
-        function SaveXLSX(name, address, customerName, phoneNumber, faxNumber, rownum) {
+        function SaveXLSX(name, address, phoneNumber, faxNumber, rownum) {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("UploadJson")",
                 data: {
                     Name: name,
                     Address: address,
-                    CustomerName: customerName,
                     PhoneNumber: phoneNumber,
                     FaxNumber: faxNumber
                 },

@@ -8,47 +8,47 @@
     <li class="breadcrumb-item"><a asp-controller="Customer" asp-action="Index">Customers</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
-                <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
-                    <span class="fas fa-plus"></span> Add Shipping Details
-                </button>
-                <button type="button" class="btn btn-primary btn-sm float-right editBtn ml-2" data-bs-toggle="modal" data-bs-target="#editModal">
-                    <span class="fas fa-edit"></span> Edit Customer
-                </button>
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+            <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
+                <span class="fas fa-plus"></span> Add Shipping Details
+            </button>
+            <button type="button" class="btn btn-primary btn-sm float-right editBtn ml-2" data-bs-toggle="modal" data-bs-target="#editModal">
+                <span class="fas fa-edit"></span> Edit Customer
+            </button>
 
-            </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-4">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Code)
-                        </span>
-                        <b class="d-block">
-                            @Model?.Code
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.RegionName)
-                        </span>
-                        <b class="d-block">
-                            @Model?.RegionName
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ContactPerson)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Code)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Code
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.RegionName)
+                    </span>
+                    <b class="d-block">
+                        @Model?.RegionName
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ContactPerson)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
                     </b>
                 </p>
                 <p class="text-sm">
@@ -132,16 +132,16 @@
                         @Html.DisplayNameFor(model => model.IsActive)
                     </span>
                     <b class="d-block">
-                         
-                    @if (Model?.IsActive == true)
-           
-                            {
-                                <span class="fas fa-check text-success"></span>
-                            }
-                            else
-                            {
-                                <span class="fas fa-times text-danger"></span>
-                            }
+
+                        @if (Model?.IsActive == true)
+
+                        {
+                            <span class="fas fa-check text-success"></span>
+                        }
+                        else
+                        {
+                            <span class="fas fa-times text-danger"></span>
+                        }
                     </b>
                 </p>
                 <p class="text-sm">
@@ -186,85 +186,148 @@
                 </p>
             </div>
         </div>
+        @*<div class="row">
+        <div class="col-12">
+        <div class="card card-danger card-tabs">
+        <div class="card-header p-0 pt-1 pl-2 pr-2">
+        <ul class="nav nav-tabs nav-fill" role="tablist">
+        <li class="nav-item">
+        <a class="nav-link active" id="nav-shipping-tab" role="tab"
+        data-bs-toggle="tab" data-bs-target="#nav-shipping"
+        aria-controls="nav-shipping" aria-selected="true">
+        Shipping Details
+        </a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" id="nav-receivables-tab" role="tab"
+        data-bs-toggle="tab" data-bs-target="#nav-receivables"
+        aria-controls="nav-receivables" aria-selected="true">
+        Receivables
+        </a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" id="nav-payments-tab" role="tab"
+        data-bs-toggle="tab" data-bs-target="#nav-payments"
+        aria-controls="nav-payments" aria-selected="true">
+        Payments
+        </a>
+        </li>
+
+        </ul>
+        </div>
+        <div class="card-body">
+        <div class="tab-content">
+        <div class="tab-pane fade show active" id="nav-shipping" role="tabpanel"
+        aria-labelledby="nav-shipping-tab">
+
+        <table class="table table-head-fixed table-striped table-hover table-shipping">
+        <thead>
+        <tr>
+        <th>Address</th>
+        <th>Contact Person</th>
+        <th>Fax Number</th>
+        <th>Phone Number</th>
+        </tr>
+        </thead>
+        </table>
+        </div>
+        <div class="tab-pane fade" id="nav-receivables" role="tabpanel" aria-labelledby="nav-receivables-tab">
+        <table class="table table-head-fixed table-striped table-hover table-receivables">
+        <thead>
+        <tr>
+        <th>Invoiced Date</th>
+        <th>Invoiced Number</th>
+        <th>Amount</th>
+        </tr>
+        </thead>
+        </table>
+        </div>
+        <div class="tab-pane fade" id="nav-payments" role="tabpanel" aria-labelledby="nav-payments-tab">
+        <table class="table table-head-fixed table-striped table-hover table-payments">
+        <thead>
+        <tr>
+        <th>Collector Receipt #</th>
+        <th>SOA No</th>
+        <th>Total Invoice Amount</th>
+        <th>Amount Paid</th>
+        <th>Over Payment</th>
+        <th>Transaction Date</th>
+        <th>Created By</th>
+        <th>Remarks</th>
+        </tr>
+        </thead>
+        </table>
+        </div>
+
+
+        </div>
+
+        </div>
+        </div>
+        </div>
+        </div>*@
         <div class="row">
             <div class="col-12">
-                <div class="card card-danger card-tabs">
-                    <div class="card-header p-0 pt-1 pl-2 pr-2">
-                        <ul class="nav nav-tabs nav-fill" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="nav-shipping-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-shipping"
-                                   aria-controls="nav-shipping" aria-selected="true">
-                                    Shipping Details
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="nav-receivables-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-receivables"
-                                   aria-controls="nav-receivables" aria-selected="true">
-                                    Receivables
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="nav-payments-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-payments"
-                                   aria-controls="nav-payments" aria-selected="true">
-                                    Payments
-                                </a>
-                            </li>
-
-                        </ul>
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        Shipping Address Details
                     </div>
                     <div class="card-body">
-                        <div class="tab-content">
-                            <div class="tab-pane fade show active" id="nav-shipping" role="tabpanel"
-                                 aria-labelledby="nav-shipping-tab">
-                                 @*<span><button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
-                                    <span class="fas fa-plus"></span> Add Shipping Details
-                                  </button></span>*@
-                                 
-                                <table class="table table-head-fixed table-striped table-hover table-shipping">
-                                    <thead>
-                                        <tr>
-                                            <th>Address</th>
-                                            <th>Contact Person</th>
-                                            <th>Fax Number</th>
-                                            <th>Phone Number</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                            <div class="tab-pane fade" id="nav-receivables" role="tabpanel" aria-labelledby="nav-receivables-tab">
-                                <table class="table table-head-fixed table-striped table-hover table-receivables">
-                                    <thead>
-                                        <tr>
-                                            <th>Invoiced Date</th>
-                                            <th>Invoiced Number</th>
-                                            <th>Amount</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                            <div class="tab-pane fade" id="nav-payments" role="tabpanel" aria-labelledby="nav-payments-tab">
-                                <table class="table table-head-fixed table-striped table-hover table-payments">
-                                    <thead>
-                                        <tr>
-                                            <th>Collector Receipt #</th>
-                                            <th>SOA No</th>
-                                            <th>Total Invoice Amount</th>
-                                            <th>Amount Paid</th>
-                                            <th>Over Payment</th>
-                                            <th>Transaction Date</th>
-                                            <th>Created By</th>
-                                            <th>Remarks</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-
-
-                        </div>
-
+                        <table class="table table-head-fixed table-striped table-hover table-shipping">
+                            <thead>
+                                <tr>
+                                    <th>Address</th>
+                                    <th>Contact Person</th>
+                                    <th>Fax Number</th>
+                                    <th>Phone Number</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        Receivables
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-receivables">
+                            <thead>
+                                <tr>
+                                    <th>Invoiced Date</th>
+                                    <th>Invoiced Number</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        Payments
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-payments">
+                            <thead>
+                                <tr>
+                                    <th>Collector Receipt #</th>
+                                    <th>SOA No</th>
+                                    <th>Total Invoice Amount</th>
+                                    <th>Amount Paid</th>
+                                    <th>Over Payment</th>
+                                    <th>Transaction Date</th>
+                                    <th>Created By</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -315,8 +378,8 @@
                         <div class="col-md-1">
                             <div class="form-group">
                                 <label class="control-label mb-0 d-block" for="edit-usearearate"> Use Area Rate? </label>
-                                   <input class="form-check-input" type="checkbox" id="edit-usearearate"  name="UseAreaRate">
-                               @* <label for="create-is-active" class="control-label mb-0 d-block">Use Area Rate?</label>
+                                <input class="form-check-input" type="checkbox" id="edit-usearearate" name="UseAreaRate">
+                                @* <label for="create-is-active" class="control-label mb-0 d-block">Use Area Rate?</label>
                                 <input type="checkbox" name="IsActive" id="create-is-active" class="form-control form-control-sm" />*@
                                 <span data-valmsg-for="edit-usearearate" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -477,17 +540,17 @@
                                 <span data-valmsg-for="create-shipping-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                     
+
                     </div>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                             <label for="create-shipping-cperson" class="control-label mb-0 d-block">Contact Person</label>
+                                <label for="create-shipping-cperson" class="control-label mb-0 d-block">Contact Person</label>
                                 <input type="text" name="ShippingContactPerson" id="create-shipping-cperson" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-shipping-cperson" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                       
+
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -497,7 +560,7 @@
                                 <span data-valmsg-for="create-shipping-cnumber" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -507,10 +570,10 @@
                                 <span data-valmsg-for="create-shipping-fnumber" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
                     </div>
-                   
-                    
+
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
@@ -548,17 +611,17 @@
                                 <span data-valmsg-for="create-forwarder-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                     
+
                     </div>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                             <label for="create-forwarder-address" class="control-label mb-0 d-block">Address</label>
+                                <label for="create-forwarder-address" class="control-label mb-0 d-block">Address</label>
                                 <input type="text" name="ForwarderAddress" id="create-forwarder-address" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-forwarder-address" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                       
+
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -568,7 +631,7 @@
                                 <span data-valmsg-for="create-forwarder-cnumber" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -578,10 +641,10 @@
                                 <span data-valmsg-for="create-forwarder-fnumber" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
                     </div>
-                   
-                    
+
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
@@ -872,16 +935,14 @@
         });
 
 
-        $("#edit-usearearate").on("change", function() {
-        if ($(this).prop("checked"))
-            {
-                 $("#edit-commission").val("");
-                 $("#edit-commission").prop("readonly", "readonly")
+        $("#edit-usearearate").on("change", function () {
+            if ($(this).prop("checked")) {
+                $("#edit-commission").val("");
+                $("#edit-commission").prop("readonly", "readonly")
             }
-        else 
-            {
-                 $("#edit-commission").val(0);
-                 $("#edit-commission").removeAttr("readonly")
+            else {
+                $("#edit-commission").val(0);
+                $("#edit-commission").removeAttr("readonly")
             }
         })
 
@@ -916,7 +977,7 @@
                 }
             });
 
-            });
+        });
 
 
         // Validation for Edit Modal
@@ -949,7 +1010,7 @@
         });
 
 
-         // Send Edit to Controller
+        // Send Edit to Controller
         function DoEdit() {
             $.ajax({
                 type: "POST",
@@ -975,14 +1036,14 @@
                     IsActive: $("#edit-isactive").val()
                 },
                 error: jQueryCommonError,
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastrNoDuplicate(data.message, "Error", "error");
                     } else {
                         toastrNoDuplicate(data.message, "Success", "success");
                         $("#editModal").modal("hide");
-                        
-                       // dataTable.ajax.reload();
+
+                        // dataTable.ajax.reload();
                         hideLoader();
                         lo
                     }
@@ -993,13 +1054,13 @@
 
 
 
-       // Actions upon Display Shipping Modal
-        $(".shippingBtn").click(function(e) {
+        // Actions upon Display Shipping Modal
+        $(".shippingBtn").click(function (e) {
             $("#create-shipping-address").val("");
             $("#create-shipping-cperson").val("");
             $("#create-shipping-cnumber").val("");
             $("#create-shipping-fnumber").val("");
-       
+
         });
 
         // Validation for Shipping Modal
@@ -1038,28 +1099,28 @@
                     ShippingFaxNo: $("#create-shipping-fnumber").val()
                 },
                 error: jQueryCommonError,
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastrNoDuplicate(data.message, "Error", "error");
                     } else {
                         toastrNoDuplicate(data.message, "Success", "success");
                         $("#shippingModal").modal("hide");
                         shippingDT.ajax.reload();
-                        
+
                         hideLoader()
                     }
                 }
             });
         }
 
-        
-       // Actions upon Display Forwarder Modal
-        $(".forwarderBtn").click(function(e) {
+
+        // Actions upon Display Forwarder Modal
+        $(".forwarderBtn").click(function (e) {
             $("#create-forwarder-address").val("");
             $("#create-forwarder-name").val("");
             $("#create-forwarder-cnumber").val("");
             $("#create-forwarder-fnumber").val("");
-       
+
         });
 
         // Validation for Forwarder Modal
@@ -1098,14 +1159,14 @@
                     ForwarderFaxNo: $("#create-forwarder-fnumber").val()
                 },
                 error: jQueryCommonError,
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastrNoDuplicate(data.message, "Error", "error");
                     } else {
                         toastrNoDuplicate(data.message, "Success", "success");
                         $("#forwarderModal").modal("hide");
                         forwarderDT.ajax.reload();
-                        
+
                         hideLoader()
                     }
                 }

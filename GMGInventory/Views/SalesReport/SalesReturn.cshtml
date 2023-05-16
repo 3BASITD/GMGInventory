@@ -172,7 +172,8 @@
         // Load Select2 for Customer
         $("#filter-customer").select2({
             minimumInputLength: 1,
-            placeholder: '<empty>',
+            allowClear: true,
+            placeholder: 'All',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -213,6 +214,7 @@
 
         // Load Select2 for Item
         $("#filter-item").select2({
+            tags: true,
             minimumInputLength: 1,
             allowClear: true,
             placeholder: 'All',
@@ -220,7 +222,10 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
             },
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")",
@@ -247,7 +252,11 @@
         });
 
         $("#filter-item").on("select2:select", function () {
-            $("#filter-item-name").val($(this).select2("data")[0].name);
+            if ($(this).select2("data")[0].name) {
+                $("#filter-item-name").val($(this).select2("data")[0].name);
+            } else if ($("#filter-item").val()) {
+                $("#filter-item-name").val('All with keyword "' + $("#filter-item").val() + '"');
+            }
         });
 
         $("#filter-item").on("select2:unselecting", function (e) {
@@ -262,13 +271,21 @@
                 url: "@Url.Action("GetSalesReturnDT")",
                 type: "POST",
                 data: function (data) {
-                    var customerId = $("#filter-customer").val();
                     var itemId = $("#filter-item").val();
+                    if (itemId) {
+                        if (isNaN(itemId)) {
+                            data.Item = 0;
+                            data.ItemKeyword = itemId;
+                        } else {
+                            data.Item = itemId;
+                        }
+                    }
+
+                    var customerId = $("#filter-customer").val();
+                    if (customerId) data.Customer = customerId;
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-                    if (customerId) data.Customer = customerId;
-                    if (itemId) data.Item = itemId;
                 }
             },
             processing: true,
@@ -298,7 +315,7 @@
             footerCallback: function (row, data, start, end, display) {
                 var json = salesDT.ajax.json();
                 var api = this.api(), data;
-                
+
                 $(api.column(11).footer()).html(FormatStringInteger(json.totalQuantity));
                 $(api.column(12).footer()).html(FormatStringDecimal(json.totalAmount));
                 $(api.column(13).footer()).html(FormatStringDecimal(json.totalAmount2));

@@ -5,43 +5,49 @@
 }
 
 @section Breadcrumb {
-    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">Soacr</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">SOA / Counter Receipt</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Details" asp-route-id="@Model?.Id">SOACr Details</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                <button type="button" class="btn btn-primary btn-add">
-                    <span class="fas fa-plus"></span> Add
-                </button>
-            </div>
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-light float-right ml-2" asp-action="Details" asp-route-id="@Model?.Id">
+                <span class="fas fa-arrow-left"></span> Back to Details
+            </a>
+            <button type="button" class="btn btn-primary btn-add">
+                <span class="fas fa-plus"></span> Add
+            </button>
         </div>
-        <div class="card-body">
-            <table class="table table-head-fixed table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Contents.First().InvoiceType)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Contents.First().TotalAmount)
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <input class="chkclassinvoiceall" type="checkbox" style="min-width: 100px;" />
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Contents.First().InvoiceType)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Contents.First().TotalAmount)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
                 @foreach (var item in Model.Contents)
                 {
                     <tr>
                         <td>
-                            <input class="chkclassinvoice" type="checkbox" id="checkInvoice" name="CheckInvoice" data-id="@item.Id" />
+                            <input class="chkclassinvoice" type="checkbox" data-id="@item.Id" />
                         </td>
                         <td>@item.InvoiceDate</td>
                         <td>@item.InvoiceNumber</td>
@@ -60,9 +66,56 @@
     <script>
         var invoiceDT = $('.table').DataTable({
             columnDefs: [
-                { orderable: false, targets: -1 },
+                {
+                    orderable: false,
+                    width: "120px",
+                    targets: 0
+                },
+                {
+                    type: "date-g",
+                    targets: 1
+                }
+            ],
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, 'All'],
             ]
         });
+
+        function dtCheckboxes() {
+            $(".chkclassinvoiceall").on("change", function () {
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".chkclassinvoice").prop("checked", $(".chkclassinvoiceall").prop("checked"));
+                });
+            });
+
+
+            $(".chkclassinvoice").on("change", function () {
+                var rows_checked = 0;
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".chkclassinvoice").prop("checked")) {
+                        rows_checked++;
+                    }
+
+                    if (rows_checked == 0) {
+                        $(".chkclassinvoiceall").prop("checked", false);
+                        $(".chkclassinvoiceall").prop("indeterminate", false);
+                    } else if (rows_checked == invoiceDT.rows().count()) {
+                        $(".chkclassinvoiceall").prop("checked", true);
+                        $(".chkclassinvoiceall").prop("indeterminate", false);
+                    } else if (rows_checked == 0) {
+                        $(".chkclassinvoiceall").prop("checked", false);
+                        $(".chkclassinvoiceall").prop("indeterminate", false);
+                    } else {
+                        $(".chkclassinvoiceall").prop("checked", false);
+                        $(".chkclassinvoiceall").prop("indeterminate", true);
+                    }
+                });
+            });
+        }
+
+        dtCheckboxes();
+        invoiceDT.on("draw", dtCheckboxes);
 
         $(".btn-add").click(function (e) {
 

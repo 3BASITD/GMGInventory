@@ -4,20 +4,20 @@
     ViewData["Title"] = "SOACr Details";
 }
 @section Breadcrumb {
-    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">Soacr</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">SOA / Counter Receipt</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
 
-                <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
-                    <span class="fas fa-print"></span> Print
-                </button>
+            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                <span class="fas fa-print"></span> Print
+            </button>
             @if (Model?.Type == "Counter Receipt")
             {
                 @*<button type="button" class="btn btn-primary btn-sm float-right createInvoiceBtn ml-2" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
@@ -29,10 +29,9 @@
                 </a>
             }
 
-
-            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                <span class="fas fa-file-alt"></span> Add Payment
-            </button>
+            @*<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+            <span class="fas fa-file-alt"></span> Add Payment
+            </button>*@
         </div>
     </div>
     <div class="card-body">
@@ -71,7 +70,10 @@
         <table class="table table-head-fixed table-striped table-hover table-soa">
             <thead>
                 <tr>
-
+                    
+                    <th>
+                        @Html.DisplayNameFor(model => model.InvoiceDate)
+                    </th>
                     <th>
                         @Html.DisplayNameFor(model => model.InvoiceNumber)
                     </th>
@@ -102,6 +104,19 @@
 
                 </tr>
             </thead>
+            <tfoot>
+                <tr>
+                    <th colspan="2">Total</th>
+                    <th>0.00</th>
+                    <th>0.00</th>
+                    <th>0.00</th>
+                    <th>0.00</th>
+                    <th>0.00</th>
+                    <th>0.00</th>
+                    <th>0.00</th>
+                    <th></th>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
@@ -115,9 +130,9 @@
     <input type="hidden" id="reactivateSoaLineItemId" name="Id" />
 </form>
 
-<!-- Create New Payment Modal -->
-<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" style="max-width: 50%;" role="document">
+<!-- Update Payment Modal -->
+<div class="modal fade" id="paymentModal" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-fullscreen-md-down" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Payment</h5>
@@ -125,155 +140,175 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form autocomplete="off" id="createForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-customer-receipt" class="control-label mb-0 d-block">Customer Receipt No</label>
-                                <input type="text" name="CustomerReceipt" id="create-customer-receipt" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-customer-receipt" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-
+            <div class="modal-body">
+                <div class="row align-items-center form-group">
+                    <div class="col-12 col-lg-3">
+                        <label for="payment-customer-receipt" class="control-label mb-0">Customer Receipt No</label>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
-                                <input type="text" name="Remarks" id="create-remarks" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-remarks" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
+                    <div class="col-12 col-lg-5">
+                        <input type="text" name="CustomerReceipt" id="payment-customer-receipt" class="form-control form-control-sm" />
                     </div>
-                    @*   <div class="row">
-                    <div class="col-md-12">
-                    <div class="form-group">
-                    <label for="create-invoice" class="control-label mb-0 d-block">Debit</label>
-                    <input type="number" name="Invoice" id="create-invoice" class="form-control form-control-sm" />
-                    <span data-valmsg-for="create-invoice" data-valmsg-replace="true" class="text-danger"></span>
+                    <div class="col-12 col-lg-4">
+                        <span data-valmsg-for="payment-customer-receipt" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
-                    </div>
-                    </div>*@
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-over-payment" class="control-label mb-0 d-block">Over Payment</label>
-                                <input type="number" name="OverPayment" id="create-over-payment" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-over-payment" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
-                                <input type="number" name="TKT" id="create-tkt" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-tkt" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-tax" class="control-label mb-0 d-block">Tax</label>
-                                <input type="number" name="TAX" id="create-tax" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-tax" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
-                                <input type="number" name="CashAdvanced" id="create-cash-advanced" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-cash-advanced" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-discount" class="control-label mb-0 d-block">Discount</label>
-                                <input type="number" name="Discount" id="create-discount" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-discount" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-offset" class="control-label mb-0 d-block">Offset</label>
-                                <input type="number" name="Offset" id="create-offset" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-offset" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-cash-amount" class="control-label mb-0 d-block">Cash Amount</label>
-                                <input type="number" name="CashAmount" id="create-cash-amount" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-cash-amount" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-backload" class="control-label mb-0 d-block">Back Load</label>
-                                <input type="number" name="BackLoad" id="create-backload" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-backload" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4>Check</h4>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-bankname" class="control-label mb-0 d-block">Bank Name</label>
-                                <input type="text" name="BankName" id="create-bankname" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-bankname" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-checkdate" class="control-label mb-0 d-block">Check Date</label>
-                                <input type="date" name="CheckDate" id="create-checkdate" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-checkdate" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-checkamount" class="control-label mb-0 d-block">Check Amount</label>
-                                <input type="number" name="CheckAmount" id="create-checkamount" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-checkamount" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-bankbranch" class="control-label mb-0 d-block">Bank Branch</label>
-                                <input type="text" name="BankBranch" id="create-bankbranch" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-bankbranch" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-checknumber" class="control-label mb-0 d-block">Check Number</label>
-                                <input type="text" name="CheckNumber" id="create-checknumber" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-checknumber" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                    </div>
-
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-plus"></span> Add
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
+                <div class="row align-items-center form-group">
+                    <div class="col-12 col-lg-3">
+                        <label for="payment-remarks" class="control-label mb-0">Remarks</label>
+                    </div>
+                    <div class="col-12 col-lg-9">
+                        <input type="text" name="Remarks" id="payment-remarks" class="form-control form-control-sm" />
+                    </div>
                 </div>
-            </form>
+                <div class="row align-items-center form-group">
+                    <div class="col-4 col-lg-3">
+                        <label for="payment-over-payment" class="control-label mb-0">Over Payment</label>
+                    </div>
+                    <div class="col-8 col-lg-3">
+                        <input type="number" step="0.01" min="0" max="1999999.99" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-4 col-lg-3">
+                        <label for="payment-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
+                    </div>
+                    <div class="col-8 col-lg-3">
+                        <input type="number" step="0.01" min="0" max="1999999.99" name="TKT" id="payment-tkt" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="row align-items-center form-group">
+                    <div class="col-4 col-lg-3">
+                        <label for="payment-tax" class="control-label mb-0">Tax</label>
+                    </div>
+                    <div class="col-8 col-lg-3">
+                        <input type="number" step="0.01" min="0" max="1999999.99" name="TAX" id="payment-tax" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-4 col-lg-3">
+                        <label for="payment-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
+                    </div>
+                    <div class="col-8 col-lg-3">
+                        <input type="number" step="0.01" min="0" max="1999999.99" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="row align-items-center form-group">
+                    <div class="col-4 col-lg-3">
+                        <label for="payment-discount" class="control-label mb-0">Discount</label>
+                    </div>
+                    <div class="col-8 col-lg-3">
+                        <input type="number" step="0.01" min="0" max="1999999.99" name="Discount" id="payment-discount" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-4 col-lg-3">
+                        <label for="payment-offset" class="control-label mb-0 d-block">Offset</label>
+                    </div>
+                    <div class="col-8 col-lg-3">
+                        <input type="number" step="0.01" min="0" max="1999999.99" name="Offset" id="payment-offset" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="row align-items-center form-group">
+                    <div class="col-4 col-lg-3">
+                        <label for="payment-cash-amount" class="control-label mb-0">Cash Amount</label>
+                    </div>
+                    <div class="col-8 col-lg-3">
+                        <input type="number" step="0.01" min="0" max="1999999.99" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-4 col-lg-3">
+                        <label for="payment-backload" class="control-label mb-0 d-block">Back Load</label>
+                    </div>
+                    <div class="col-8 col-lg-3">
+                        <input type="number" step="0.01" min="0" max="1999999.99" name="BackLoad" id="payment-backload" class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card border-secondary border-1">
+                            <div class="card-header bg-secondary">
+                                <strong>Check</strong>
+                            </div>
+                            <div class="card-body pb-0">
+                                <form autocomplete="off" id="checkForm">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="check-bankname" class="control-label mb-0 d-block">Bank Name</label>
+                                                <input type="text" name="BankName" id="check-bankname" class="form-control form-control-sm" />
+                                                <span data-valmsg-for="check-bankname" data-valmsg-replace="true" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="check-checkdate" class="control-label mb-0 d-block">Check Date</label>
+                                                <input type="date" name="CheckDate" id="check-checkdate" class="form-control form-control-sm" />
+                                                <span data-valmsg-for="check-checkdate" data-valmsg-replace="true" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="check-checkamount" class="control-label mb-0 d-block">Check Amount</label>
+                                                <input type="number" step="0.01" min="0" max="1999999.99" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm" />
+                                                <span data-valmsg-for="check-checkamount" data-valmsg-replace="true" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="check-bankbranch" class="control-label mb-0 d-block">Bank Branch</label>
+                                                <input type="text" name="BankBranch" id="check-bankbranch" class="form-control form-control-sm" />
+                                                <span data-valmsg-for="check-bankbranch" data-valmsg-replace="true" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="check-checknumber" class="control-label mb-0 d-block">Check Number</label>
+                                                <input type="text" name="CheckNumber" id="check-checknumber" class="form-control form-control-sm" />
+                                                <span data-valmsg-for="check-checknumber" data-valmsg-replace="true" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <button type="button" class="btn btn-secondary btn-sm float-right btnClearCheck ml-2">
+                                                    <span class="fas fa-undo-alt"></span> Clear
+                                                </button>
+                                                <button type="submit" class="btn btn-primary btn-sm float-right">
+                                                    <span class="fas fa-arrow-down"></span> Add Check
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-head-fixed table-striped table-hover table-check">
+                                    <thead>
+                                        <tr>
+                                            <th>Bank Name</th>
+                                            <th>Bank Branch</th>
+                                            <th>Check Number</th>
+                                            <th>Check Amount</th>
+                                            <th>Check Date</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="3">Total</th>
+                                            <th>0.00</th>
+                                            <th colspan="2"></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-payment">
+                    <span class="fas fa-edit"></span> Update
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -405,30 +440,44 @@
                 return: true,
             },
             columns: [
+                { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
-                { data: "invoiceAmount", name: "InvoiceAmount" },
-                { data: "tbr", name: "TBR" },
-                { data: "credit", name: "Credit" },
-                { data: "debit", name: "Debit" },
-                { data: "paidAmount", name: "PaidAmount" },
-                { data: "freightCharge", name: "FreightCharge" },
-                { data: "balance", name: "Balance"/*, className: "text-end"*/ },
+                { data: "invoiceAmount", name: "InvoiceAmount", className: "text-end" },
+                { data: "tbr", name: "TBR", className: "text-end" },
+                { data: "credit", name: "Credit", className: "text-end" },
+                { data: "debit", name: "Debit", className: "text-end" },
+                { data: "paidAmount", name: "PaidAmount", className: "text-end" },
+                { data: "freightCharge", name: "FreightCharge", className: "text-end" },
+                { data: "balance", name: "Balance", className: "text-end" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                        actions += '<button class="btn btn-primary btn-xs paymentBtn" data-microtip-title="Edit Payment" data-microtip-position="top-left" role="tooltip"><i class="fas fa-money-bill"></i></button>';
                         actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions;
                     }
                 }
-
-            ]
+            ],
+            order: [[0, "desc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                columnDTTotalDecimal(api, 2);
+                columnDTTotalDecimal(api, 3);
+                columnDTTotalDecimal(api, 4);
+                columnDTTotalDecimal(api, 5);
+                columnDTTotalDecimal(api, 6);
+                columnDTTotalDecimal(api, 7);
+                columnDTTotalDecimal(api, 8);
+            }
         });
 
         itemTable.on("draw", function () {
             hideLoader();
+
+            //$('.table-soa thead th').removeClass("text-end");
 
             $(".printBtn").on("click", function () {
                 $.LoadingOverlay("show", {
@@ -493,8 +542,6 @@
             // Actions upon Display Edit Modal
             $(".editBtn").click(function (e) {
                 var data = itemTable.row($(this).parents('tr')).data();
-                console.log(data);
-                console.log(data.invoiceId);
                 $("#edit-id").val(data.id);
                 $("#edit-tbr").val(data.tbrd);
                 $("#edit-debit").val(data.debitD);
@@ -542,9 +589,9 @@
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            toastr.success(data.message, "Success");
+                            toastrNoDuplicate(data.message, "Success", "success");
                             $("#editModal").modal("hide");
                             itemTable.ajax.reload();
                         }
@@ -556,120 +603,219 @@
 
 
             // Actions upon Display Create Modal
-            $(".createBtn").click(function (e) {
+            $(".paymentBtn").click(function (e) {
                 var data = itemTable.row($(this).parents('tr')).data();
-                //$("#create-invoice").val(data.invoiceId);
-                $("#create-customer").val(@Model?.CustomerId);
-                $("#create-customer-receipt").val("");
-                $("#create-remarks").val("");
-                $("#create-over-payment").val("");
-                $("#create-tkt").val("");
-                $("#create-tax").val("");
-                $("#create-cash-advanced").val("");
-                $("#create-discount").val("");
-                $("#create-offset").val("");
-                $("#create-cash-amount").val("");
-                $("#create-backload").val("");
-                $("#create-bankname").val("");
-                $("#create-bankbranch").val("");
-                $("#create-checkdate").val("");
-                $("#create-checkamount").val("");
-                $("#create-checknumber").val("");
-            });
-
-            // Validation for Create Modal
-            var validateCreate = $("#createForm").validate({
-                errorClass: 'text-danger text-xs',
-                rules: {
-                    CustomerReceipt: { required: true, maxlength: 50 },
-                    Remarks: { required: true, maxlength: 100 },
-                    OverPayment: { range: [0, 1999999.99] },
-                    TKT: { range: [0, 1999999.99] },
-                    TAX: { range: [0, 1999999.99] },
-                    CashAdvanced: { range: [0, 1999999.99] },
-                    Discount: { range: [0, 1999999.99] },
-                    Offset: { range: [0, 1999999.99] },
-                    CashAmount: { range: [0, 1999999.99] },
-                    BackLoad: { range: [0, 1999999.99] },
-                    BankName: { required: true },
-                    BankBranch: { required: true },
-                    CheckDate: { required: true },
-                    CheckAmount: { required: true },
-                    CheckNumber: { required: true }
-                },
-                messages: {
-                    CustomerReceipt: { required: "Please enter Customer Receipt No.", maxlength: "Code must not exceed 50 characters." },
-                    Remarks: { required: "Please enter Remarks.", maxlength: "Remarks must not exceed 100 characters." },
-                    OverPayment: { range: "Over Payment must be between 0-1999999.99." },
-                    TKT: { range: "TKT must be between 0-1999999.99." },
-                    TAX: { range: "TAX must be between 0-1999999.99." },
-                    CashAdvanced: { range: "Cash Advanced must be between 0-1999999.99." },
-                    Discount: { range: "Discount must be between 0-1999999.99." },
-                    Offset: { range: "Offset must be between 0-1999999.99." },
-                    CashAmount: { range: "Cash Amount must be between 0-1999999.99." },
-                    BackLoad: { range: "Back Load must be between 0-1999999.99." },
-                    BankName: { required: "Please enter Bank Name." },
-                    BankBranch: { required: "Please enter Bank Branch." },
-                    CheckDate: { required: "Please enter Check Date." },
-                    CheckAmount: { required: "Please enter Check Amount." },
-                    CheckNumber: { required: "Please enter Check Number." }
-
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    DoCreate();
-                },
-                showErrors: validateShowErrors
-            });
-
-
-            // Send Create to Controller
-            function DoCreate() {
+                $("#payment-customer-receipt").data("invoice", data.invoiceId);
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("CreatePaymentJson")",
+                    url: "@Url.Action("GetPaymentDetailsJson")",
                     data: {
-                        SOANo: @Model?.Id,
                         CustomerId: @Model?.CustomerId,
-                        InvoiceId: $("#create-invoice").val(),
-                        CRNumber: $("#create-customer-receipt").val(),
-                        Remarks: $("#create-remarks").val(),
-                        OverPaymentD: $("#create-over-payment").val(),
-                        TKTD: $("#create-tkt").val(),
-                        TaxD: $("#create-tax").val(),
-                        CashAdvancedD: $("#create-cash-advanced").val(),
-                        DiscountD: $("#create-discount").val(),
-                        OffsetD: $("#create-offset").val(),
-                        CashAmountD: $("#create-cash-amount").val(),
-                        BackLoadD: $("#create-backload").val(),
-                        BankName: $("#create-bankname").val(),
-                        BankBranch: $("#create-bankbranch").val(),
-                        CheckAmountD: $("#create-checkamount").val(),
-                        CheckDateD: $("#create-checkdate").val(),
-                        CheckNo: $("#create-checknumber").val()
+                        SOACRId: @Model?.Id,
+                        InvoiceId: data.invoiceId
+                    },
+                    error: jQueryCommonError,
+                    success: function (data, status, xhr) {
+                        $("#payment-customer-receipt").val(data.customerReceiptNumber);
+                        $("#payment-customer-receipt").data("CustomerPaymentId", data.id);
+                        $("#payment-remarks").val(data.remarks);
+                        $("#payment-over-payment").val(data.overPayment.toFixed(2));
+                        $("#payment-tkt").val(data.tktSolicitation.toFixed(2));
+                        $("#payment-tax").val(data.tax.toFixed(2));
+                        $("#payment-cash-advanced").val(data.cashAdvance.toFixed(2));
+                        $("#payment-discount").val(data.discount.toFixed(2));
+                        $("#payment-offset").val(data.offset.toFixed(2));
+                        $("#payment-cash-amount").val(data.cashAmount.toFixed(2));
+                        $("#payment-backload").val(data.backLoad.toFixed(2));
+                    },
+                    complete: function (xhr, status) {
+                        checkTable.ajax.reload();
+                        ResetCheckPaymentForm();
+                        $("#paymentModal").modal("show");
+                    }
+                });
+            });
+
+            $("#payment-customer-receipt").on("change", function () {
+                if ($("#payment-customer-receipt").val() == "") {
+                    toastrNoDuplicate("Please enter customer receipt", "Required field &lt;Customer Receipt&gt;", "warning");
+                    $('span[data-valmsg-for="payment-customer-receipt"]').text("Please enter customer receipt");
+                } else {
+                    $('span[data-valmsg-for="payment-customer-receipt"]').text("");
+                }
+            })
+
+            $(".btn-payment").on("click", function () {
+                if ($("#payment-customer-receipt").val() == "") {
+                    toastrNoDuplicate("Please enter customer receipt", "Required field &lt;Customer Receipt&gt;", "warning");
+                    $('span[data-valmsg-for="payment-customer-receipt"]').text("Please enter customer receipt");
+                } else {
+                    $('span[data-valmsg-for="payment-customer-receipt"]').text("");
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("UpdatePaymentDetailsJson")",
+                        data: {
+                            Id: $("#payment-customer-receipt").data("CustomerPaymentId"),
+                            CustomerReceiptNumber: $("#payment-customer-receipt").val(),
+                            remarks: $("#payment-remarks").val(),
+                            overPayment: $("#payment-over-payment").val(),
+                            tktSolicitation: $("#payment-tkt").val(),
+                            tax: $("#payment-tax").val(),
+                            cashAdvance: $("#payment-cash-advanced").val(),
+                            discount: $("#payment-discount").val(),
+                            offset: $("#payment-offset").val(),
+                            cashAmount: $("#payment-cash-amount").val(),
+                            backLoad: $("#payment-backload").val()
+                        },
+                        error: jQueryCommonError,
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastrNoDuplicate(data.message, "Error", "error");
+                            } else {
+                                toastrNoDuplicate(data.message, "Success", "success");
+                                $("#paymentModal").modal("hide");
+                                itemTable.ajax.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        var checkTable = $('.table-check').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetPaymentChecksJson", "Soacr")",
+                type: "POST",
+                data: function (data) {
+                    data.CustomerPaymentId = $("#payment-customer-receipt").data("CustomerPaymentId");
+                },
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "bankName", name: "BankName" },
+                { data: "bankBranch", name: "BankBranch" },
+                { data: "checkNumber", name: "CheckNumber" },
+                { data: "checkAmount", name: "CheckAmount", className: "text-end" },
+                { data: "checkDate", name: "CheckDate" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<button class="btn btn-danger btn-xs btn-remove-check" data-microtip-title="Remove Check" data-microtip-position="top-left" role="tooltip"><i class="fas fa-trash"></i></button>';
+                        return actions;
+                    }
+                }
+            ],
+            order: [[4, "desc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                columnDTTotalDecimal(api, 3);
+            }
+        });
+
+        checkTable.on("draw", function () {
+            hideLoader();
+
+            $('.table-check thead th').removeClass("text-end");
+
+            $(".btn-remove-check").on("click", function () {
+                var data = checkTable.row($(this).parents('tr')).data();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("RemoveCheckJson")",
+                    data: {
+                        soaCheckId: data.id
                     },
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
+                            toastrNoDuplicate(data.message, "Error", "error");
                         } else {
-                            toastr.success(data.message, "Success");
-                            $("#createModal").modal("hide");
-                            itemTable.ajax.reload();
+                            toastrNoDuplicate(data.message, "Success", "success");
+                            $("#checkModal").modal("hide");
+                            checkTable.ajax.reload();
+                            hideLoader();
+                        }
+                    }
+                });
+            });
+        });
+
+        // Validation for Check Modal
+        var validateCheck = $("#checkForm").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                BankName: { required: true, maxlength: 100 },
+                CheckDate: { required: true },
+                CheckAmount: { required: true, range: [0.01, 1999999.99] },
+                BankBranch: { required: true, maxlength: 100 },
+                CheckNumber: { required: true, maxlength: 50 }
+            },
+            messages: {
+                BankName: { required: "Please enter Bank Name", maxlength: "Bank Name must not exceed 100 characters." },
+                CheckDate: { required: "Please enter Check Date" },
+                CheckAmount: { required: "Please enter Check Amount", range: "Check Amount must be between 0.01-1999999.99." },
+                BankBranch: { required: "Please enter Bank Branch", maxlength: "Bank Branch must not exceed 100 characters." },
+                CheckNumber: { required: "Please enter Check Number", maxlength: "Check Number must not exceed 50 characters." }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                DoCreateCheck();
+            },
+            showErrors: validateShowErrors
+        });
+
+
+        // Send Create Check to Controller
+        function DoCreateCheck() {
+            var customer_payment_id = $("#payment-customer-receipt").data("CustomerPaymentId");
+            if (customer_payment_id == null) {
+                toastrNoDuplicate("Please try again later", "Error", "error");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("AddCheckJson")",
+                    data: {
+                        CustomerPaymentId: customer_payment_id,
+                        BankName: $("#check-bankname").val(),
+                        CheckDateD: $("#check-checkdate").val(),
+                        CheckAmountD: $("#check-checkamount").val(),
+                        BankBranch: $("#check-bankbranch").val(),
+                        CheckNumber: $("#check-checknumber").val()
+                    },
+                    error: jQueryCommonError,
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastrNoDuplicate(data.message, "Error", "error");
+                        } else {
+                            toastrNoDuplicate(data.message, "Success", "success");
+                            ResetCheckPaymentForm();
+                            checkTable.ajax.reload();
                             hideLoader();
                         }
                     }
                 });
             }
+        }
 
+        $(".btnClearCheck").on("click", ResetCheckPaymentForm);
 
-
-
-
-        });
-
-
-
+        function ResetCheckPaymentForm() {
+            $("#check-bankname").val("");
+            $("#check-checkdate").val(DateForInput(new Date()));
+            $("#check-checkamount").val("0.00");
+            $("#check-bankbranch").val("");
+            $("#check-checknumber").val("");
+            validateCheck.resetForm();
+        }
 
         var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -740,9 +886,9 @@
                 error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
+                        toastrNoDuplicate(data.message, "Error", "error");
                     } else {
-                        toastr.success(data.message, "Success");
+                        toastrNoDuplicate(data.message, "Success", "success");
                         $("#createInvoiceModal").modal("hide");
                         itemTable.ajax.reload();
                         hideLoader();

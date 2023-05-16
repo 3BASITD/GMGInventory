@@ -36,7 +36,7 @@ namespace GMGInventory.Application.Repositories
                                  CRNumber = cp.CRNumber,
                                  SOANo = cp.SOACRId,
                                  CustomerName = cp.Customer.Name,
-                                 OverPaymentD = cp.OverPay,
+                                 OverPaymentD = cp.OverPayment,
                                  TaxD = cp.Tax,
                                  DiscountD = cp.Discount,
                                  TKTD = cp.TKTSolicitation,
@@ -64,7 +64,7 @@ namespace GMGInventory.Application.Repositories
                                        CustomerName = cp.Customer.Name,
                                        TotalInvoiceAmountD = cp.TotalInvoiceAmount,
                                        AmountPaidD = cp.TotalAmountPaid,
-                                       OverPaymentD = cp.OverPay,
+                                       OverPaymentD = cp.OverPayment,
                                        TransactionDateD = cp.DateCreated,
                                        CreatedBy = user.Nickname,
                                        Remarks = cp.Remarks

@@ -266,3 +266,15 @@ function columnDTTotalDecimal(api, column) {
 function formatDateEn(date) {
     return date.toLocaleDateString('en-us', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+
+jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+    "date-g-pre": function (a) {
+        return a == "" ? new Date() : new Date(a);
+    },
+    "date-g-asc": function (a, b) {
+        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    },
+    "date-g-desc": function (a, b) {
+        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    }
+});

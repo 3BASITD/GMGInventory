@@ -37,6 +37,7 @@ namespace GMGInventory.Application.Repositories
                     Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
+                .OrderBy(s => s.Text)
                 .ToListAsync();
         }
 

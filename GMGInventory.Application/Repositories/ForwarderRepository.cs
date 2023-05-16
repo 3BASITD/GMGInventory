@@ -36,16 +36,14 @@ namespace GMGInventory.Application.Repositories
                                     Text = s.Name,
                                     Selected = IncludeId != null && IncludeId == s.Id
                                 })
+                                .OrderBy(s => s.Text)
                                 .ToListAsync();
         }
 
 
-        public async Task<IList<ForwarderViewVM>> GetAllAsync()
+        public async Task<IList<ForwarderViewVM>> GetAllForwarderAsync()
         {
-
             var forwarders = from forward in context.Forwarders
-                         join cust in context.Customers
-                                    on forward.CustomerId equals cust.Id
                          join userc in userManager.Users on forward.UserCreated equals userc.Id
                          join userm in userManager.Users on forward.UserModified equals userm.Id into m
                          from um in m.DefaultIfEmpty()
@@ -53,8 +51,6 @@ namespace GMGInventory.Application.Repositories
                          select new ForwarderViewVM
                          {
                              Id = forward.Id,
-                             CustomerId = forward.CustomerId,
-                             CustomerName = cust.Name,
                              Name = forward.Name,
                              Address = forward.Address,
                              IsActive = forward.IsActive,
@@ -74,7 +70,7 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetAllAsync()).AsQueryable();
+            var data = (await GetAllForwarderAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -133,8 +129,8 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(ForwarderVM forwarderVM)
         {
-            return (await GetAllAsync()).Any(s => s.Name == forwarderVM.Name && s.Address == forwarderVM.Address &&
-            s.CustomerName == forwarderVM.CustomerName && s.PhoneNumber == forwarderVM.PhoneNumber && s.FaxNumber == forwarderVM.FaxNumber);
+            return (await GetAllForwarderAsync()).Any(s => s.Name == forwarderVM.Name && s.Address == forwarderVM.Address &&
+            s.PhoneNumber == forwarderVM.PhoneNumber && s.FaxNumber == forwarderVM.FaxNumber);
         }
 
 
@@ -142,9 +138,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ForwarderViewVM>> GetAllForwarderVMAsync()
         {
-            var forwarders = await context.Forwarders
-                .Include(s => s.Customer)
-                .ToListAsync();
+            var forwarders = await context.Forwarders.ToListAsync();
             var forwardersViewVM = mapper.Map<List<ForwarderViewVM>>(forwarders);
             foreach (ForwarderViewVM ivm in forwardersViewVM)
             {
@@ -157,7 +151,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<ForwarderViewVM?> GetForwarderViewVMAsync(int? id)
         {
             var forwarders = await context.Forwarders
-                .Include(s => s.Customer)
                 .Where(s => s.Id == id).FirstOrDefaultAsync();
             if (forwarders == null)
             {
@@ -172,7 +165,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<ForwarderVM?> GetForwarderVMAsync(int? id)
         {
             var forwarders = await context.Forwarders
-                .Include(s => s.Customer)
                 .Where(s => s.Id == id).FirstOrDefaultAsync();
             if (forwarders == null)
             {
@@ -227,10 +219,9 @@ namespace GMGInventory.Application.Repositories
             var forwarder = new Forwarder
             {
                 Name = forwarderVM.Name,
-                Address = forwarderVM.Address,
-                PhoneNumber = forwarderVM.PhoneNumber,
-                FaxNumber = forwarderVM.FaxNumber,
-                CustomerId = forwarderVM.CustomerId,
+                Address = forwarderVM.Address + "",
+                PhoneNumber = forwarderVM.PhoneNumber + "",
+                FaxNumber = forwarderVM.FaxNumber + "",
                 IsActive = true
             };
             await context.Forwarders.AddAsync(forwarder);
@@ -246,12 +237,11 @@ namespace GMGInventory.Application.Repositories
             }
 
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            forwarder.Id = forwarderVM.Id;
+            //forwarder.Id = forwarderVM.Id;
             forwarder.Name = forwarderVM.Name;
-            forwarder.Address = forwarderVM.Address;
-            forwarder.PhoneNumber = forwarderVM.PhoneNumber;
-            forwarder.FaxNumber = forwarderVM.FaxNumber;
-            forwarder.CustomerId = forwarderVM.CustomerId;
+            forwarder.Address = forwarderVM.Address + "";
+            forwarder.PhoneNumber = forwarderVM.PhoneNumber + "";
+            forwarder.FaxNumber = forwarderVM.FaxNumber + "";
             forwarder.IsActive = true;
 
             context.Forwarders.Update(forwarder);

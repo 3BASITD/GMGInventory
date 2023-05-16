@@ -30,6 +30,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Status")]
         public string Status { get; set; }
+
+        [Display(Name = "Reference Number")]
+        public string ReferenceNumber { get; set; }
         public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
         public DateTime DateCreatedD { get; set; }
         public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
@@ -50,9 +53,6 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Currency Rate")]
         public string CurrencyRate => string.Format(SystemFormat.StringDecimalComma, CurrencyRateD);
         public decimal CurrencyRateD { get; set; }
-
-        [Display(Name = "Reference Number")]
-        public string ReferenceNumber { get; set; }
     }
 
     public class PurchaseOrderItemVM

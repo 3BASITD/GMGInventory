@@ -25,7 +25,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Unit")]
         public string Unit { get; set; }
 
-        [Display(Name = "Retail Price")]
+        [Display(Name = "Gross Price")]
         public decimal RetailPrice { get; set; }
 
         [Display(Name = "Net Price")]
@@ -55,7 +55,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Name")]
         public string Name { get; set; }
 
-        [Display(Name = "Retail Price")]
+        [Display(Name = "Gross Price")]
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
 

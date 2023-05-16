@@ -6,6 +6,7 @@ namespace GMGInventory.Application.Contracts
     public interface ICustomerRepository : IGenericRepository<Customer>
     {
         Task<Select2Model<JsonAddressOptionsModel>> GetOptions(string search, int page);
+        Task<Select2Model<JsonAddressOptionsModel>> GetOptionsWithOrder(string search, int page);
 
         Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId);
 
@@ -22,7 +23,7 @@ namespace GMGInventory.Application.Contracts
         Task AddAsync(CustomerVM custVM);
 
         Task AddShippingAsync(CustomerVM shippingVM);
-        Task AddForwarderAsync(CustomerVM forwarderVM);
+        //Task AddForwarderAsync(CustomerVM forwarderVM);
         Task UpdateAsync(CustomerVM custVM);
 
         //Task UpdateAsync(int id, CustomerVM customerVM);
@@ -32,7 +33,7 @@ namespace GMGInventory.Application.Contracts
         CustomerVM? GetCustomerDtlVM(int? id);
         Task<int?> GetIdAsync(string? Name);
         Task<ForDataTables<CustomerVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id);
-        Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id);
+        //Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerPaymentDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerReceivableDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerDetailsDTAsync(DataTablesRequestForm form, int id);

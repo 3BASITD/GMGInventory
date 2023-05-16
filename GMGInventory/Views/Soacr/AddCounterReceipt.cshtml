@@ -1,69 +1,113 @@
-﻿@model SoaDetailsPVM
+﻿@model SoacrInvoiceVM
 
 @{
-    ViewData["Title"] = "Add Counter Receipt";
+    ViewData["Title"] = "Generate Counter Receipt";
 }
 
 @section Breadcrumb {
-    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">Soacr</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">SOA / Counter Receipt</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
 
-                <button type="button" class="btn btn-primary btn-sm float-right btn-add ml-2">
-                    <span class="fas fa-plus"></span> Add
-                </button>
-                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-                    <span class="fas fa-file-alt"></span> Filter
-                </button>
-                @* @await Html.PartialAsync("CustomerFilter", ViewData["CustomerFilter"])*@
+            <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+            @*<button type="button" class="btn btn-primary btn-sm float-right btn-add ml-2">
+                <span class="fas fa-plus"></span> Add
+            </button>
+            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <span class="fas fa-file-alt"></span> Filter
+            </button>*@
+            @* @await Html.PartialAsync("CustomerFilter", ViewData["CustomerFilter"])*@
 
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="filter-customer" class="form-label mb-0">Customer Code</label>
+                    <select id="filter-customer" style="width:100%">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="filter-customer-name" class="form-label mb-0">Customer Name</label>
+                    <input type="text" id="filter-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                </div>
+            </div>
+        </div>@*
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Select Customer</button>
+                </div>
+            </div>
+        </div>*@
+        <div class="row">
+            <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Invoice(s)</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right btn-add ml-2">
+                                    <span class="fas fa-plus"></span> Generate
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-invoice">
+                                <thead>
+                                    <tr>
+                                    <th>
+                                        <input class="chkclassinvoiceall" type="checkbox" style="width: 100px;" />
+                                    </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.InvoiceDate)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.InvoiceNumber)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.InvoiceType)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.TotalAmount)
+                                        </th>
+                                    </tr>
+                                </thead>
+                                @*<tbody>
+                                    @foreach (var item in Model.Contents)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input class="chkclassinvoice" type="checkbox" data-id="@item.Id" />
+                                            </td>
+                                            <td>@item.InvoiceDate</td>
+                                            <td>@item.InvoiceNumber</td>
+                                            <td>@item.InvoiceType</td>
+                                            <td>@item.TotalAmount</td>
+                                        </tr>
+                                    }
+                                </tbody>*@
+                            </table>
+                        </div>
+                    </div>
             </div>
         </div>
-
-        <div class="card-body">
-
-            <table class="table table-head-fixed table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Contents.First().InvoiceType)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Contents.First().TotalAmount)
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach (var item in Model.Contents)
-                {
-                    <tr>
-                        <td>
-                            <input class="chkclassinvoice" type="checkbox" id="checkInvoice" name="CheckInvoice" data-id="@item.Id" />
-                        </td>
-                        <td>@item.InvoiceDate</td>
-                        <td>@item.InvoiceNumber</td>
-                        <td>@item.InvoiceType</td>
-                        <td>@item.TotalAmount</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
     </div>
 </div>
 
 <!-- Filter Modal -->
-<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+@*<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -98,24 +142,12 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
 
 @section Scripts {
     <script>
-
-        //var loadfilterloaded = false;
-        //function LoadFilterSelect2() {
-        //	if (loadfilterloaded) return;
-        //	loadfilterloaded = true;
-
-
-
         // Load Select2 for Customer
         $("#filter-customer").select2({
-            minimumInputLength: 1,
-            allowClear: true,
-            placeholder: '@(Model?.CustomerCode ?? "<empty>")',
-
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -143,9 +175,8 @@
                 },
                 cache: true
             },
-            dropdownParent: $("#filterModal")
         });
-        $("#filter-customer-name").val('@Model?.Customer');
+
         $("#filter-customer").on("select2:select", function () {
             $("#filter-customer-name").val($(this).select2("data")[0].name);
         });
@@ -153,80 +184,178 @@
         $("#filter-customer").on("select2:unselecting", function (e) {
             $("#filter-customer-name").val("");
         });
-        //}
 
-
-
-
-        // Load List on DataTable
-        var invoiceDT = $('.table').on('preXhr.dt', function (e, settings, data) {
+        var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
-            columnDefs: [
-                { orderable: false, targets: -1 },
-            ]
-
-        });
-
-        // Load functions upon DataTable load
-        invoiceDT.on("draw", function () {
-            hideLoader();
-
-            DatatablesSearchOnEnter('.table', invoiceDT);
-
-            //LoadFilterSelect2();
-
-        });
-
-
-        $(".btnFilter").on("click", function () {
-            var customerId = $("#filter-customer").val();
-
-
-            $("#filterModal").modal("hide");
-            //location.hash = $("#filter-customer").val();
-            //var hash = location.hash.replace(/^#/, '');
-
-            window.location = window.location.origin + '/Soacr/AddCounterReceipt/' + customerId;
-
-
-        });
-
-        $(".btn-add").click(function (e) {
-
-            var invoiceIds = [];
-
-            invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var invlist = $(this.node()).find(".chkclassinvoice");
-                if (invlist.prop("checked")) {
-                    invoiceIds.push(invlist.data("id"));
-                }
-
-            });
-
-            $.ajax({
+            ajax: {
+                url: "@Url.Action("GetCustomerInvoiceToAddDT")",
                 type: "POST",
-                url: "@Url.Action("CreateJsonCR")",
-                data: {
-                    invoiceIds: invoiceIds,
-                    CustomerId: @(Model?.CustomerId == null ? 0 : Model?.CustomerId)
-
-                        },
-                error: jQueryCommonError,
-                success: function (data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Choose a Customer", "error");
-                    } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
-                        hideLoader();
-                        console.log(data);
-                        window.location = '@Url.Action("Details")/' + data.newRow;
-                    }
+                data: function (data) {
+                    data.Id = $("#filter-customer").val();
                 }
-            });
-
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            searching: false,
+            paging: false,
+            //search: {
+            //    return: true,
+            //},
+            columns: [
+                {
+                    orderable: false,
+                    width: "120px",
+                data: function (data, type, dataToSet) {
+                    var actions = '';
+                        actions += '<input class="chkclassinvoice" type="checkbox" value="' + data.id + '" />';
+                    return actions;
+                }
+            },
+                { data: "invoiceDate", name: "InvoiceDate" },
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "invoiceType", name: "InvoiceType" },
+                { data: "totalAmount", name: "TotalAmount", className: "text-end" }
+            ],
+            //lengthMenu: [
+            //    [-1, 10, 25, 50],
+            //    ['All', 10, 25, 50],
+            //],
+            order: [[1, 'desc']]
         });
 
+        invoiceDT.on("init.dt", function () {
+            hideLoader();
+        });
+
+
+
+
+        //// Load List on DataTable
+        //var invoiceDT = $('.table').on('preXhr.dt', function (e, settings, data) {
+        //    showLoader();
+        //}).DataTable({
+        //    columnDefs: [
+        //        {
+        //            orderable: false,
+        //            width: "120px",
+        //            targets: 0
+        //        },
+        //        {
+        //            type: "date-g",
+        //            targets: 1
+        //        }
+        //    ],
+        //    lengthMenu: [
+        //        [10, 25, 50, -1],
+        //        [10, 25, 50, 'All'],
+        //    ]
+
+        //});
+        ///////////////////////////////////////////////////////////////////////////
+        function dtCheckboxes() {
+            $(".chkclassinvoiceall").on("change", function () {
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".chkclassinvoice").prop("checked", $(".chkclassinvoiceall").prop("checked"));
+                });
+            });
+
+
+            $(".chkclassinvoice").on("change", function () {
+                var rows_checked = 0;
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".chkclassinvoice").prop("checked")) {
+                        rows_checked++;
+                    }
+                });
+
+                if (rows_checked == 0) {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else if (rows_checked == invoiceDT.rows().count()) {
+                    $(".chkclassinvoiceall").prop("checked", true);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else if (rows_checked == 0) {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", true);
+                }
+            });
+        }
+
+        dtCheckboxes();
+        invoiceDT.on("draw", dtCheckboxes);
+
+        ///////////////////////////////////////////////////////////////////////////
+        // Load functions upon DataTable load
+        //invoiceDT.on("draw", function () {
+        //    hideLoader();
+
+        //    DatatablesSearchOnEnter('.table', invoiceDT);
+
+        //    //LoadFilterSelect2();
+
+        //});
+
+
+        //$(".btnFilter").on("click", function () {
+        $("#filter-customer").on("change", function() {
+
+            invoiceDT.ajax.reload();
+            //var customerId = $("#filter-customer").val();
+
+
+            //$("#filterModal").modal("hide");
+            ////location.hash = $("#filter-customer").val();
+            ////var hash = location.hash.replace(/^#/, '');
+
+            //window.location = window.location.origin + '/Soacr/AddCounterReceipt/' + customerId;
+        });
+
+        
+        $(".btn-add").click(function (e) {
+            if ($("#filter-customer").val() == "") {
+                toastrNoDuplicate("Please select a customer first", "Customer", "warning");
+            } else {
+                var invoiceIds = [];
+
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var invlist = $(this.node()).find(".chkclassinvoice");
+                    if (invlist.prop("checked")) {
+                        invoiceIds.push(invlist.val());
+                    }
+                });
+
+                if (invoiceIds.length == 0) {
+                    toastrNoDuplicate("Please select atleast 1 invoice", "No Invoice Selected", "error");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        //url: "@Url.Action("CreateJsonCR")",
+                        url: "@Url.Action("CreateCRJson")",
+                        data: {
+                            InvoiceIds: invoiceIds,
+                            CustomerId: $("#filter-customer").val()
+
+                            },
+                        error: jQueryCommonError,
+                        success: function (data, status, xhr) {
+                            //if (data.status == "Error") {
+                            //    toastrNoDuplicate(data.message, "Error", "error");
+                            //} else {
+                                toastrNoDuplicate(data.message, "Success", "success");
+                                hideLoader();
+                                window.location = '@Url.Action("Details")/' + data.newRow;
+                            //}
+                        }
+                    });
+                }
+            }
+        });
 
     </script>
 }

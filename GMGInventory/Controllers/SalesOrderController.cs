@@ -181,11 +181,11 @@ namespace GMGInventory.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Disapprove(int Id, string Reason)
+        public async Task<ActionResult> Disapprove(int Id, string? Reason)
         {
             if (ModelState.IsValid)
             {
-                if (await salesOrderRepository.DisapproveAsync(Id, Reason))
+                if (await salesOrderRepository.DisapproveAsync(Id, Reason + ""))
                 {
                     TempData["SuccessMessage"] = "Sales order disapproved successfully";
                 }

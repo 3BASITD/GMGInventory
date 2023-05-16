@@ -163,6 +163,7 @@
         // Load Select2 for Agent
         $("#filter-agent").select2({
             minimumInputLength: 1,
+            allowClear: true,
             placeholder: 'All',
             templateResult: function (repo) {
                 if (repo.loading) {
@@ -222,6 +223,7 @@
          // Load Select2 for Customer
         $("#filter-customer").select2({
             minimumInputLength: 1,
+            allowClear: true,
             placeholder: '<empty>',
             templateResult: function (repo) {
                 if (repo.loading) {

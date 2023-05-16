@@ -38,6 +38,11 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetOptions(search, page));
         }
 
+        public async Task<IActionResult> GetOptionsWithOrder(string search, int page)
+        {
+            return Json(await customerRepository.GetOptionsWithOrder(search, page));
+        }
+
         public async Task<IActionResult> GetOptions2(int? IncludeId)
         {
             return Json(await customerRepository.GetOptions2(IncludeId));
@@ -84,16 +89,16 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [HttpPost]
-        public async Task<JsonResult> CreateForwarderJson(CustomerVM forwarderVM)
-        {
-            ResponseModel responseModel = new ResponseModel();
-            await customerRepository.AddForwarderAsync(forwarderVM);
-            responseModel.Status = "Success";
-            responseModel.Message = "Forwarder successfully added";
+        //[HttpPost]
+        //public async Task<JsonResult> CreateForwarderJson(CustomerVM forwarderVM)
+        //{
+        //    ResponseModel responseModel = new ResponseModel();
+        //    await customerRepository.AddForwarderAsync(forwarderVM);
+        //    responseModel.Status = "Success";
+        //    responseModel.Message = "Forwarder successfully added";
 
-            return Json(responseModel);
-        }
+        //    return Json(responseModel);
+        //}
 
         [HttpPost]
         public async Task<JsonResult> EditJson(CustomerVM custVM)
@@ -155,12 +160,12 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetCustomerShippingDTAsync(form, id));
         }
 
-        [HttpPost]
-        public async Task<JsonResult> GetForwarderJson(int id)
-        {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await customerRepository.GetCustomerForwarderDTAsync(form, id));
-        }
+        //[HttpPost]
+        //public async Task<JsonResult> GetForwarderJson(int id)
+        //{
+        //    DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+        //    return Json(await customerRepository.GetCustomerForwarderDTAsync(form, id));
+        //}
 
         [HttpPost]
         public async Task<JsonResult> GetPaymentJson(int id)

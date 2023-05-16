@@ -4,12 +4,19 @@ namespace GMGInventory.Application.Contracts
 {
     public interface ISoacrRepository 
     {
+        #region for SOACR/Index
+        Task<ForDataTables<SOACRVM>> SOACRListDT(DataTablesRequestForm form);
+        //Task<SoaDetailsPVM> PrintCRDetails(int id);
+        Task<int> GenerateSOAAsync(GenerateSOAVM soaVM);
+		#endregion
 
-        Task<IList<SoacrVM>> GetAllAsync(SoaFilterVM filter);
-        Task<ForDataTables<SoacrVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, SoaFilterVM filter);
+		#region for SOACR/Invoice
+		Task<ForDataTables<SOACRInvoices>> GetInvoiceListDTAsync(DataTablesRequestForm form, ListFilterSalesModel filter);
+        Task<SOACRInvoicesPVM> PrintInvoice(ListFilterSalesModel filter);
+        #endregion
+
         SoacrVM? GetSoacrVM(int? id);
 
-        Task<int> AddAsync(SoacrVM soaVM);
 
         Task<bool> IsSOAIdExist(int id);
 
@@ -21,13 +28,22 @@ namespace GMGInventory.Application.Contracts
 
         Task AddCustomerPaymentAsync(PaymentVM paymentVM);
 
-        Task<bool> IsCustomerPaymentIdExist(int id);
+        Task<SoacrPaymentDetails> GetPaymentDetails(SoacrPaymentFilter filter);
+
+        Task<bool> UpdatePaymentDetails(SoacrPaymentDetails payment);
+
+        Task<ForDataTables<SoacrPaymentCheck>> GetPaymentChecksDTAsync(DataTablesRequestForm form, int customerPaymentId);
+
+        Task<bool> AddPaymentCheck(SoacrPaymentCheck check);
+
+        Task<bool> RemovePaymentCheck(int soaCheckId);
+
+        Task<bool> IsCheckNumberInUse(string checkNumber);
 
         Task<ForDataTables<SoacrVM>> GetSoaDetailsDTAsync(DataTablesRequestForm form, int id);
 
         InvoiceVM? GetInvoiceVM(int? id);
-        Task<IList<InvoiceVM>> GetContractInvoices(SoaFilterVM filter);
-        Task<ForDataTables<InvoiceVM>> GetContractReceiptDTAsync(DataTablesRequestForm form, SoaFilterVM filter);
+
 
         Task<IList<InvoiceVM>> GetContractReceiptDetailsAsync(int id);
 
@@ -37,10 +53,8 @@ namespace GMGInventory.Application.Contracts
         Task<IList<SoacrVM>> GetSOAInvoice(/*int id*/);
 
         Task<SoaDetailsPVM> PrintSoaDetails(int id);
-        Task<SoaDetailsPVM> PrintCRDetails(int id);
 
         Task<IList<SoacrVM>> GetSoaDetails(int id);
-        Task<SoaDetailsPVM> PrintInvoice(SoaFilterVM filter);
         Task<bool> IsSoacrTypeCR(int id);
 
         //test
@@ -57,15 +71,18 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<InvoiceVM>> GetContractReceiptCustomerDTAsync(DataTablesRequestForm form, int id, int soaId);
 
         Task AddInvoicesAsync(int soaId, int[] invoiceIds);
-        Task<int> AddCrAsync(SoacrVM soaVM, int[] invoiceIds);
+        //Task<int> AddCrAsync(SoacrVM soaVM, int[] invoiceIds);
+        Task<int> AddCRAsync(int CustomerId, int[] InvoiceIds);
 
 
         //test1
         Task<SoaDetailsPVM> GetContractInvoicesCustomer2(int id, int custId);
         Task<IList<SoacrVM>> GetSoaDetails2(int id, int custId);
 
-        Task<IList<SoacrVM>> GetContractInvoices3(int? id);
-        Task<SoaDetailsPVM> GetCounterReceiptInvoices(int? id);
+        //Task<IList<SoacrVM>> GetContractInvoices3(int? id);
+        //Task<SoaDetailsPVM> GetCounterReceiptInvoices(int? id);
+
+        Task<ForDataTables<SoacrInvoiceVM>> GetCustomerInvoiceToAddDT(DataTablesRequestForm form, int customerId);
 
 
 

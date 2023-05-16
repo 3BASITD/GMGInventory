@@ -41,17 +41,17 @@
                     <a href="@Url.Action("Create", "Pack")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
                         <span class="fas fa-box-open"></span> Start Packing
                     </a>
-                    
+
                     <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                         <span class="fas fa-print"></span> Print
                     </button>
                 }
                 if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null && (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin)) && Model?.ResubmitId == null)
                 {
-                        <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
-                            <span class="fas fa-edit"></span> Update to Resubmit
-                        </a>
-                    }
+                    <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
+                        <span class="fas fa-edit"></span> Update to Resubmit
+                    </a>
+                }
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -68,14 +68,15 @@
                         @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
                     </div>
                 </div>
-        @if (Model?.ResubmitId != null) {
-                <div class="col-12">
-                    <div class="alert alert-info text-sm" role="alert">
-                        <strong>Resubmitted:</strong>
+                @if (Model?.ResubmitId != null)
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-sm" role="alert">
+                            <strong>Resubmitted:</strong>
                             This has been resubmitted. You can view the details <a href="@Url.Action("Details", "SalesOrder", new {Id = Model?.ResubmitId})">here</a>.
+                        </div>
                     </div>
-                </div>
-        }
+                }
             </div>
         }
         <div class="row">
@@ -807,24 +808,24 @@
             } else if (parseInt($("#served-inventory").data("prime")) <= 0) {
                 toastrNoDuplicate($("#served-code").val() + " needs replenishment.", "Inventory Count", "warning");
             } else {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("UpdateServedSOItem")",
-                data: {
-                    salesOrderLineItemId: $("#served-code").data("id"),
-                    quantity: $("#served-toadd").val()
-                },
-                error: jQueryCommonError,
-                success: function (data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
-                    } else {
-                        $("#servedModal").modal("hide");
-                        itemDT.ajax.reload();
-                        toastrNoDuplicate(data.message, "Success", "success");
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateServedSOItem")",
+                    data: {
+                        salesOrderLineItemId: $("#served-code").data("id"),
+                        quantity: $("#served-toadd").val()
+                    },
+                    error: jQueryCommonError,
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastrNoDuplicate(data.message, "Error", "error");
+                        } else {
+                            $("#servedModal").modal("hide");
+                            itemDT.ajax.reload();
+                            toastrNoDuplicate(data.message, "Success", "success");
+                        }
                     }
-                }
-            });
+                });
             }
         });
 
@@ -918,9 +919,10 @@
                     }
                 }
             }).then((confirm) => {
-                if (confirm) {
+                if (confirm !== null) {
                     $("#disapprove-reason").val(confirm);
-                    $('#disapprove-form').submit();
+                    console.log("swal:confirm " + $("#disapprove-reason").val());
+                $('#disapprove-form').submit();
                 }
             });
         });

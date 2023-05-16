@@ -1317,7 +1317,7 @@ namespace GMGInventory.Application.Repositories
                            where filter.DateFrom <= (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated).Date
                            && (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated).Date <= filter.DateTo
                            && (filter.Customer == null || sreturn.SalesReturn.Customer.Id == filter.Customer)
-                           && (filter.Item == null || sreturn.Item.Id == filter.Item)
+                           && (filter.Item == null || sreturn.Item.Id == filter.Item || (filter.Item == 0 && sreturn.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                            select new SalesReturnRVM
                            {
                                Agent = sreturn.Invoice == null ? "" : sreturn.Invoice.SalesOrder.Agent.Code,

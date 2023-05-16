@@ -59,6 +59,7 @@ namespace GMGInventory.Application.Repositories
             var invoices = from invoice in context.Invoices
                            where (string.IsNullOrWhiteSpace(search)
                               || invoice.InvoiceNumber.ToLower().Contains(search.ToLower()))
+                           orderby invoice.InvoiceNumber ascending
                            select new JsonOptionsModel
                            {
                                Id = invoice.Id.ToString(),
@@ -79,6 +80,7 @@ namespace GMGInventory.Application.Repositories
                            where invoice.SalesOrder.Customer.Id == customer
                               && (string.IsNullOrWhiteSpace(search)
                               || invoice.ControlNumber.ToLower().Contains(search.ToLower()))
+                           orderby invoice.ControlNumber ascending
                            select new JsonOptionsModel
                            {
                                Id = invoice.Id.ToString(),
@@ -102,6 +104,7 @@ namespace GMGInventory.Application.Repositories
                                     Text = s.Name,
                                     Selected = IncludeId == s.Id
                                 })
+                                .OrderBy(s => s.Text)
                                 .ToListAsync();
         }
 
@@ -394,18 +397,26 @@ namespace GMGInventory.Application.Repositories
             var packVM = await context.Packs.Where(s => s.Id == form.PackId).FirstOrDefaultAsync();
             if (packVM != null)
             {
+                int fullInvoicedId = await context.Statuses
+                                            .Where(s => s.Name == "Fully Invoiced")
+                                            .Select(s => s.Id)
+                                            .FirstAsync();
+
+                packVM.QuantityInvoiced += form.Items.Sum(s => s.Quantity);
+                if(packVM.TotalQuantity <= packVM.QuantityInvoiced)
+                {
+                    packVM.StatusId = fullInvoicedId;
+                    await context.SaveChangesAsync(currentUserId);
+                }
+
                 var salesOrder = await context.SalesOrders.Where(s => s.Id == packVM.SalesOrderId).FirstAsync();
                 salesOrder.QuantityInvoiced += form.Items.Sum(s => s.Quantity);
                 await context.SaveChangesAsync(currentUserId);
 
-                int statusId = await context.Statuses
-                                            .Where(s => s.Name == "Invoice Submitted")
-                                            .Select(s => s.Id)
-                                            .FirstAsync();
-
-                if (salesOrder.QuantityPacked == salesOrder.QuantityInvoiced)
+                if (salesOrder.QuantityOrdered <= salesOrder.QuantityInvoiced)
                 {
-                    salesOrder.StatusId = statusId;
+
+                    salesOrder.StatusId = fullInvoicedId;
                     await context.SaveChangesAsync(currentUserId);
                 }
 
@@ -433,6 +444,11 @@ namespace GMGInventory.Application.Repositories
                                                .FirstAsync();
                 var lastInvoiceNumber = lastInvoice.InvoiceNumber.Replace(invoiceType.Code + "-", "");
                 var newInvoiceNumber = Int32.Parse(lastInvoiceNumber) + 1;
+
+                int statusId = await context.Statuses
+                                            .Where(s => s.Name == "Invoice Submitted")
+                                            .Select(s => s.Id)
+                                            .FirstAsync();
 
                 Invoice invoice = new()
                 {

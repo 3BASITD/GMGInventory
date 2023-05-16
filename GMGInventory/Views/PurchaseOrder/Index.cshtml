@@ -38,6 +38,9 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Status)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReferenceNumber)
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -69,6 +72,7 @@
                 { data: "destination", name: "Destination" },
                 { data: "totalAmount", name: "TotalAmount", className: "text-end" },
                 { data: "status", name: "Status" },
+                { data: "referenceNumber", name: "ReferenceNumber" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {

@@ -61,8 +61,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
-        public decimal? BalanceD { get; set; }
-    }
+		//public decimal? BalanceD { get; set; }
+		public decimal BalanceD => TotalAmountD - (TBRD ?? 0) - (CreditD ?? 0) + (DebitD ?? 0) - (PaidAmountD ?? 0m) + (FreightChargeD ?? 0);
+	}
 
     public class InvoiceDetailsVM
     {

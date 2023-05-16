@@ -165,6 +165,7 @@ namespace GMGInventory.Common.Models
         public string? InvoiceNumberFrom { get; set; }
         public string? InvoiceNumberTo { get; set; }
         public int? Item { get; set; }
+        public string? ItemKeyword { get; set; }
         public int? Region { get; set; }
     }
 

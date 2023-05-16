@@ -9,8 +9,9 @@ namespace GMGInventory.Application.Contracts
         Task<Select2Model<JsonItemOptionsModel>> GetInWarehouseOptions(string search, int warehouse, int page);
         Task<IList<JsonOptionsModel>> GetUnitOptions(int? IncludeId);
         Task<int?> GetUnitIdAsync(string? Code);
-        Task<IList<ItemListVM>> GetAllAsync(ItemFilterVM filter);
-        Task<ForDataTables<ItemListVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, ItemFilterVM filter);
+        Task<int?> GetUnitIdByNameAsync(string? Name);
+        Task<IList<ItemCommonVM>> GetAllAsync(ItemFilterVM filter);
+        Task<ForDataTables<ItemCommonVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, ItemFilterVM filter);
         ItemViewVM? GetItemViewVM(int? id);
         Task<IList<ItemFileVM>> GetAllFileAsync();
         Task<bool> UploadCombinationExistAsync(ItemFileVM itemVM);
@@ -23,6 +24,7 @@ namespace GMGInventory.Application.Contracts
         Task UpdateAsync(ItemCommonVM itemVM);
         Task DeleteAsync(int id);
         Task UpdateQuantityAsync(int id, int quantity, string remarks);
+        Task<bool> UpdateOrAddItemWarehouse(int itemId, int warehouseId, int quantity, string remarks);
         Task<ForDataTables<ItemDetailWarehouseVM>> GetItemWarehouseDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailPurchaseVM>> GetItemPurchaseDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailSalesVM>> GetItemSalesDTAsync(DataTablesRequestForm form, int id);

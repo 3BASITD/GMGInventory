@@ -80,7 +80,6 @@ namespace GMGInventory.Application.Repositories
                 || await context.Brands.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.Categories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.CreditTerms.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.CustomerPaymentDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.CustomerPayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.Customers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.Forwarders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)

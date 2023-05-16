@@ -6,7 +6,7 @@ namespace GMGInventory.Data
     {
         public Payment()
         {
-            this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
+            //this.PaymentDetails = new HashSet<PaymentDetail>();
         }
 
         [ForeignKey("CustomerId")]
@@ -30,7 +30,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(250)")]
         public string? Remarks { get; set; }
 
-        public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
-        public ICollection<PaymentDetail> PaymentDetails { get; set; }
+        //public ICollection<PaymentDetail> PaymentDetails { get; set; }
     }
 }

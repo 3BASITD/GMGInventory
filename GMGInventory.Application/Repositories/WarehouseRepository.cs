@@ -38,6 +38,7 @@ namespace GMGInventory.Application.Repositories
                                     Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
                                     Selected = IncludeId != null && IncludeId == s.Id
                                 })
+                                .OrderBy(s => s.Text)
                                 .ToListAsync();
         }
 
@@ -93,6 +94,12 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> IsIdExists(int id)
         {
             return await context.Warehouses.AnyAsync(s => s.Id == id);
+        }
+
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var warehouse = await context.Warehouses.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            return warehouse?.Id;
         }
 
         public async Task<bool> IsCodeExists(string code)

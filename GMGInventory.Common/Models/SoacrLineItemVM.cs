@@ -38,97 +38,130 @@ namespace GMGInventory.Common.Models
 
         //Payment
 
-        [Display(Name = "Collector Receipt #")]
-        public string CRNumber { get; set; }
+        //[Display(Name = "Collector Receipt #")]
+        //public string CRNumber { get; set; }
 
-        [Display(Name = "SOA No")]
-        public decimal SOANo { get; set; }
+        //[Display(Name = "SOA No")]
+        //public decimal SOANo { get; set; }
 
-        [Display(Name = "Customer Name")]
-        public string CustomerName { get; set; }
+        //[Display(Name = "Customer Name")]
+        //public string CustomerName { get; set; }
 
-        [Display(Name = "Total Invoice Amount")]
-        public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
-        public decimal TotalInvoiceAmountD { get; set; }
+        //[Display(Name = "Total Invoice Amount")]
+        //public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
+        //public decimal TotalInvoiceAmountD { get; set; }
 
-        [Display(Name = "Amount Paid")]
-        public string AmountPaid => string.Format(SystemFormat.StringDecimalComma, AmountPaidD);
-        public decimal AmountPaidD { get; set; }
+        //[Display(Name = "Amount Paid")]
+        //public string AmountPaid => string.Format(SystemFormat.StringDecimalComma, AmountPaidD);
+        //public decimal AmountPaidD { get; set; }
 
-        [Display(Name = "Over Payment")]
-        public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
-        public decimal OverPaymentD { get; set; }
+        //[Display(Name = "Over Payment")]
+        //public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
+        //public decimal OverPaymentD { get; set; }
 
-        [Display(Name = "Transaction Date")]
-        public string TransactionDate => TransactionDateD == null ? "-" : TransactionDateD.Value.ToString(SystemFormat.StringDate);
-        public DateTime? TransactionDateD { get; set; }
-
-
-        [Display(Name = "Created By")]
-        public string CreatedBy { get; set; }
-
-        [Display(Name = "Remarks")]
-        public string Remarks { get; set; }
+        //[Display(Name = "Transaction Date")]
+        //public string TransactionDate => TransactionDateD == null ? "-" : TransactionDateD.Value.ToString(SystemFormat.StringDate);
+        //public DateTime? TransactionDateD { get; set; }
 
 
-        [Display(Name = "Tax")]
-        public string Tax => string.Format(SystemFormat.StringDecimalComma, TaxD);
-        public decimal TaxD { get; set; }
+        //[Display(Name = "Created By")]
+        //public string CreatedBy { get; set; }
+
+        //[Display(Name = "Remarks")]
+        //public string Remarks { get; set; }
 
 
-        [Display(Name = "Discount")]
-        public string Discount => string.Format(SystemFormat.StringDecimalComma, DiscountD);
-        public decimal DiscountD { get; set; }
-
-        [Display(Name = "Cash Amount")]
-        public string CashAmount => string.Format(SystemFormat.StringDecimalComma, CashAmountD);
-        public decimal CashAmountD { get; set; }
-
-        [Display(Name = "TKT/ Solicitation")]
-        public string TKT => string.Format(SystemFormat.StringDecimalComma, TKTD);
-        public decimal TKTD { get; set; }
+        //[Display(Name = "Tax")]
+        //public string Tax => string.Format(SystemFormat.StringDecimalComma, TaxD);
+        //public decimal TaxD { get; set; }
 
 
-        [Display(Name = "Cash Advanced")]
-        public string CashAdvanced => string.Format(SystemFormat.StringDecimalComma, CashAdvancedD);
+        //[Display(Name = "Discount")]
+        //public string Discount => string.Format(SystemFormat.StringDecimalComma, DiscountD);
+        //public decimal DiscountD { get; set; }
 
-        public decimal CashAdvancedD { get; set; }
+        //[Display(Name = "Cash Amount")]
+        //public string CashAmount => string.Format(SystemFormat.StringDecimalComma, CashAmountD);
+        //public decimal CashAmountD { get; set; }
+
+        //[Display(Name = "TKT/ Solicitation")]
+        //public string TKT => string.Format(SystemFormat.StringDecimalComma, TKTD);
+        //public decimal TKTD { get; set; }
 
 
-        [Display(Name = "Offset")]
-        public string Offset => string.Format(SystemFormat.StringDecimalComma, OffsetD);
-        public decimal OffsetD { get; set; }
+        //[Display(Name = "Cash Advanced")]
+        //public string CashAdvanced => string.Format(SystemFormat.StringDecimalComma, CashAdvancedD);
 
-        [Display(Name = "Back Load")]
-        public string BackLoad => string.Format(SystemFormat.StringDecimalComma, BackLoadD);
-        public decimal BackLoadD { get; set; }
+        //public decimal CashAdvancedD { get; set; }
 
-        //Payment Details
+
+        //[Display(Name = "Offset")]
+        //public string Offset => string.Format(SystemFormat.StringDecimalComma, OffsetD);
+        //public decimal OffsetD { get; set; }
+
+        //[Display(Name = "Back Load")]
+        //public string BackLoad => string.Format(SystemFormat.StringDecimalComma, BackLoadD);
+        //public decimal BackLoadD { get; set; }
+
+        ////Payment Details
 
         [Display(Name = "Invoice Id")]
         public int InvoiceId { get; set; }
 
-        [Display(Name = "Bank Name")]
-        public string BankName { get; set; }
+        //[Display(Name = "Bank Name")]
+        //public string BankName { get; set; }
 
-        [Display(Name = "Bank Branch")]
-        public string BankBranch { get; set; }
+        //[Display(Name = "Bank Branch")]
+        //public string BankBranch { get; set; }
 
-        [Display(Name = "Check Number")]
-        public float CheckNo { get; set; }
+        //[Display(Name = "Check Number")]
+        //public float CheckNo { get; set; }
 
-        [Display(Name = "Check Amount")]
-        public string CheckAmount => string.Format(SystemFormat.StringDecimalComma, CheckAmountD);
-        public decimal CheckAmountD { get; set; }
+        //[Display(Name = "Check Amount")]
+        //public string CheckAmount => string.Format(SystemFormat.StringDecimalComma, CheckAmountD);
+        //public decimal CheckAmountD { get; set; }
 
 
-        [Display(Name = "Check Date")]
-        public string CheckDate => CheckDateD.ToString(SystemFormat.StringDate);
-        public DateTime CheckDateD { get; set; }
+        //[Display(Name = "Check Date")]
+        //public string CheckDate => CheckDateD.ToString(SystemFormat.StringDate);
+        //public DateTime CheckDateD { get; set; }
 
 
 
     }
 
+    public class SoacrPaymentFilter
+    {
+        public int? CustomerId { get; set; }
+        public int? SOACRId { get; set; }
+        public int? InvoiceId { get; set; }
+    }
 
+    public class SoacrPaymentDetails
+    {
+        public int Id { get; set; }
+        public string CustomerReceiptNumber { get; set; }
+        public string Remarks { get; set; }
+        public decimal OverPayment { get; set; }
+        public decimal TKTSolicitation { get; set; }
+        public decimal Tax { get; set; }
+        public decimal CashAdvance { get; set; }
+        public decimal Discount { get; set; }
+        public decimal Offset { get; set; }
+        public decimal CashAmount { get; set; }
+        public decimal BackLoad { get; set; }
+    }
+
+    public class SoacrPaymentCheck
+    {
+        public int? CustomerPaymentId { get; set; }
+        public int Id { get; set; }
+        public string BankName { get; set; }
+        public string CheckDate => CheckDateD.ToString(SystemFormat.StringDate);
+        public DateTime CheckDateD { get; set; }
+        public string CheckAmount => string.Format(SystemFormat.StringDecimalComma, CheckAmountD);
+        public decimal CheckAmountD { get; set; }
+        public string BankBranch { get; set; }
+        public string CheckNumber { get; set; }
+    }
 }

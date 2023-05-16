@@ -7,7 +7,7 @@ namespace GMGInventory.Data
         public Customer()
         {
             this.CustomerPayments = new HashSet<CustomerPayment>();
-            this.Forwarders = new HashSet<Forwarder>();
+            //this.Forwarders = new HashSet<Forwarder>();
             this.Payments = new HashSet<Payment>();
             this.SalesOrders = new HashSet<SalesOrder>();
             this.SalesReturns = new HashSet<SalesReturn>();
@@ -73,7 +73,7 @@ namespace GMGInventory.Data
         public decimal OutstandingBalance { get; set; }
 
         public ICollection<CustomerPayment> CustomerPayments { get; set; }
-        public ICollection<Forwarder> Forwarders { get; set; }
+        //public ICollection<Forwarder> Forwarders { get; set; }
         public ICollection<Payment> Payments { get; set; }
         public ICollection<SalesOrder> SalesOrders { get; set; }
         public ICollection<SalesReturn> SalesReturns { get; set; }

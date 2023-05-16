@@ -12,6 +12,7 @@ namespace GMGInventory.Application.Contracts
         Task<WarehouseFormVM> AddAsync(WarehouseFormVM itemVM);
         Task<IList<Warehouse>> GetAllActiveWarehouseAsync(int includeId);
         Task<bool> IsIdExists(int id);
+        Task<int?> GetIdAsync(string? Name);
         Task<bool> IsCodeExists(string code);
         Task DeleteAsync(int id);
         Task UpdateAsync(WarehouseFormVM itemVM);

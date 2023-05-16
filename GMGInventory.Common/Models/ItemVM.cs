@@ -50,30 +50,37 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Quantity on Hand")]
         public int Quantity { get; set; }
 
-        public int UnitId { get; set; }
-        public int CategoryId { get; set; }
-        public int ItemTypeId { get; set; }
-        public int BrandId { get; set; }
-        public decimal RetailPriceD { get; set; }
-        public decimal NetPriceD { get; set; }
-    }
 
-    public class ItemListVM : ItemCommonVM
-    {
-        [Display(Name = "Warehouse")]
-        public string Warehouse { get; set; }
+        [Display(Name = "Unit")]
+        public string Unit { get; set; }
+        public int UnitId { get; set; }
+
+        [Display(Name = "Category")]
+        public string Category { get; set; }
+        public int CategoryId { get; set; }
+
+        [Display(Name = "Item Type")]
+        public string ItemType { get; set; }
+        public int ItemTypeId { get; set; }
+
+        [Display(Name = "Brand")]
+        public string Brand { get; set; }
+        public int BrandId { get; set; }
+
 
         [Display(Name = "Gross Price")]
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
+        public decimal RetailPriceD { get; set; }
 
         [Display(Name = "Net Price")]
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
+        public decimal NetPriceD { get; set; }
 
-        [Display(Name = "Quantity on Hand")]
-        public int Quantity { get; set; }
+        [Display(Name = "Warehouse")]
+        public string Warehouse { get; set; }
+        public int WarehouseId { get; set; }
 
         public bool IsActive { get; set; }
-
     }
 
     public class ItemVM
@@ -163,10 +170,12 @@ namespace GMGInventory.Common.Models
 
     public class ItemFileVM
     {
+        public int Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public string PartNumber { get; set; }
         public string InterchangeNumber { get; set; }
+        public string Warehouse { get; set; }
         public string ModelNumber { get; set; }
         public string Category { get; set; }
         public string ItemType { get; set; }

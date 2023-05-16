@@ -31,6 +31,7 @@ namespace GMGInventory.Application.Repositories
                          where string.IsNullOrWhiteSpace(search)
                          && order.Status.Code != "Draft"
                             || (order.PONumber.ToLower().Contains(search.ToLower()))
+                         orderby order.PONumber ascending
                          select new JsonPurchaseOrderOptionsModel
                          {
                              Id = order.Id.ToString(),
@@ -107,6 +108,7 @@ namespace GMGInventory.Application.Repositories
                                PONumber = order.PONumber,
                                Status = order.Status.Code,
                                Supplier = order.Supplier.Code,
+                               ReferenceNumber = order.ReferenceNumber + "",
                                TotalAmountD = order.TotalPurchaseAmount == null ? 0 : order.TotalPurchaseAmount.Value
                            });
             return await orderVM.ToListAsync();
@@ -126,6 +128,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.OrderBy.ToLower().Contains(form.SearchValue)
                                     || x.OrderDate.ToLower().Contains(form.SearchValue)
                                     || x.PONumber.ToLower().Contains(form.SearchValue)
+                                    || x.ReferenceNumber.ToLower().Contains(form.SearchValue)
                                     || x.Status.ToLower().Contains(form.SearchValue)
                                     || x.Supplier.ToLower().Contains(form.SearchValue)
                                     || x.TotalAmount.ToLower().Contains(form.SearchValue));
@@ -143,6 +146,7 @@ namespace GMGInventory.Application.Repositories
                         case "OrderBy": data = data.OrderBy(s => s.OrderBy); break;
                         case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
                         case "PONumber": data = data.OrderBy(s => s.PONumber); break;
+                        case "ReferenceNumber": data = data.OrderBy(s => s.ReferenceNumber); break;
                         case "Status": data = data.OrderBy(s => s.Status); break;
                         case "Supplier": data = data.OrderBy(s => s.Supplier); break;
                         case "TotalAmount": data = data.OrderBy(s => s.TotalAmountD); break;
@@ -157,6 +161,7 @@ namespace GMGInventory.Application.Repositories
                         case "OrderBy": data = data.OrderByDescending(s => s.OrderBy); break;
                         case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
                         case "PONumber": data = data.OrderByDescending(s => s.PONumber); break;
+                        case "ReferenceNumber": data = data.OrderByDescending(s => s.ReferenceNumber); break;
                         case "Status": data = data.OrderByDescending(s => s.Status); break;
                         case "Supplier": data = data.OrderByDescending(s => s.Supplier); break;
                         case "TotalAmount": data = data.OrderByDescending(s => s.TotalAmountD); break;
@@ -360,6 +365,44 @@ namespace GMGInventory.Application.Repositories
             context.PurchaseOrderLineItems.RemoveRange(ritems);
 
             await context.SaveChangesAsync(currentUserId);
+
+            await ReplenishInventory(PurchaseOrderId);
+        }
+
+        private async Task ReplenishInventory(int purchaseOrderId)
+        {
+            int postedId = await context.Statuses.Where(s => s.Name == "Purchase Order Posted").Select(s => s.Id).FirstAsync();
+            var purchaseOrder = await context.PurchaseOrders.Where(s => s.Id == purchaseOrderId && s.StatusId == postedId).FirstOrDefaultAsync();
+            if (purchaseOrder != null)
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                foreach (var item in purchaseOrder.PurchaseOrderLineItems)
+                {
+                    var warehouseId = await context.Warehouses
+                                                   .Where(s => s.Code == "MAIN")
+                                                   .Select(s => s.Id)
+                                                   .FirstAsync();
+                    var inventory = await context.ItemInventories
+                                                 .Where(s => s.ItemId == item.ItemId && s.WarehouseId == warehouseId)
+                                                 .FirstOrDefaultAsync();
+                    if (inventory != null)
+                    {
+                        inventory.Quantity += item.Quantity;
+                        context.ItemInventories.Update(inventory);
+                    }
+                    else
+                    {
+                        inventory = new ItemInventory()
+                        {
+                            ItemId = item.ItemId,
+                            Quantity = item.Quantity,
+                            WarehouseId = warehouseId
+                        };
+                        await context.ItemInventories.AddAsync(inventory);
+                    }
+                    await context.SaveChangesAsync(currentUserId);
+                }
+            }
         }
 
         public async Task<bool> DeleteDraftAsync(int purchaseOrderId)

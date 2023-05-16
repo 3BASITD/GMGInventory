@@ -29,23 +29,24 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
         {
-            var customers = await context.Agents
-                                         .Where(s => string.IsNullOrWhiteSpace(search)
-                                                 || (s.Code.ToLower().Contains(search.ToLower()))
-                                                 || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).ToLower().Contains(search.ToLower())))
-                                         .Select(s => new JsonNameOptionsModel
-                                         {
-                                             Id = s.Id.ToString(),
-                                             Text = s.Code,
-                                             Name = s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName,
-                                         })
-                                         .ToListAsync();
-            var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
+            var agents = await context.Agents
+                                      .Where(s => string.IsNullOrWhiteSpace(search)
+                                               || (s.Code.ToLower().Contains(search.ToLower()))
+                                               || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).ToLower().Contains(search.ToLower())))
+                                      .Select(s => new JsonNameOptionsModel
+                                      {
+                                          Id = s.Id.ToString(),
+                                          Text = s.Code,
+                                          Name = s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName,
+                                      })
+                                      .OrderBy(s => s.Text)
+                                      .ToListAsync();
+            var agentsFilterd = agents.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonNameOptionsModel>
             {
                 //incomplete_results = false,
-                items = customersFiltered,
-                total_count = customers.Count
+                items = agentsFilterd,
+                total_count = agents.Count
             };
         }
 
@@ -59,7 +60,39 @@ namespace GMGInventory.Application.Repositories
                     Text = s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
+                .OrderBy(s => s.Text)
                 .ToListAsync();
+        }
+
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptionsWithOrder(string search, int page, int? CustomerId, DateTime? DateFrom, DateTime? DateTo)
+        {
+            var dtFrom = DateFrom ?? DateTime.MinValue;
+            var dtTo = DateTo ?? DateTime.MaxValue;
+            var agentsInInvoices = from inv in context.Invoices
+                                   where (CustomerId == null || inv.SalesOrder.CustomerId == CustomerId)
+                                   && dtFrom.Date <= (inv.DateModified ?? inv.DateCreated).Date
+                                   && (inv.DateModified ?? inv.DateCreated).Date <= dtTo.Date
+                                   select inv.SalesOrder.AgentId;
+            var agents = await context.Agents
+                                      .Where(s => (string.IsNullOrWhiteSpace(search)
+                                               || (s.Code.ToLower().Contains(search.ToLower()))
+                                               || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).ToLower().Contains(search.ToLower())))
+                                               && agentsInInvoices.Contains(s.Id))
+                                      .Select(s => new JsonNameOptionsModel
+                                      {
+                                          Id = s.Id.ToString(),
+                                          Text = s.Code,
+                                          Name = s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName,
+                                      })
+                                      .OrderBy(s => s.Text)
+                                      .ToListAsync();
+            var agentsFilterd = agents.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = agentsFilterd,
+                total_count = agents.Count
+            };
         }
 
         public async Task<int?> GetIdAsync(string? Name)
@@ -78,8 +111,8 @@ namespace GMGInventory.Application.Repositories
                                     on areas.RegionId equals regions.Id
                          join userc in userManager.Users on agent.UserCreated equals userc.Id
                          join userm in userManager.Users on agent.UserModified equals userm.Id into m
-                         from um in m.DefaultIfEmpty() 
-                         where ((filter.RegionId == null || filter.RegionId == regions.Id))   
+                         from um in m.DefaultIfEmpty()
+                         where ((filter.RegionId == null || filter.RegionId == regions.Id))
 
                          select new AgentViewVM
                          {
@@ -178,7 +211,7 @@ namespace GMGInventory.Application.Repositories
                          join regions in context.Regions
                                     on areas.RegionId equals regions.Id
                          join userc in userManager.Users on agent.UserCreated equals userc.Id
-                         let userm = userManager.Users.Where(s=>s.Id == agent.UserModified).First()
+                         let userm = userManager.Users.Where(s => s.Id == agent.UserModified).First()
 
                          select new AgentViewVM
                          {
@@ -457,7 +490,7 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-        
+
 
 
     }

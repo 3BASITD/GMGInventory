@@ -171,8 +171,8 @@ namespace GMGInventory.Controllers
             ResponseModel responseModel = new ResponseModel();
             if (await itemRepository.UploadCombinationExistAsync(itemVM))
             {
-                responseModel.Status = "Error";
-                responseModel.Message = "Already exist";
+                responseModel.Status = "Warning";
+                responseModel.Message = "Nothing to change";
             }
             else
             {
@@ -200,7 +200,7 @@ namespace GMGInventory.Controllers
                         }
                         else
                         {
-                            int? UnitId = await itemRepository.GetUnitIdAsync(itemVM.Unit);
+                            int? UnitId = await itemRepository.GetUnitIdByNameAsync(itemVM.Unit);
                             if (UnitId == null)
                             {
                                 responseModel.Status = "Error";
@@ -208,47 +208,60 @@ namespace GMGInventory.Controllers
                             }
                             else
                             {
-                                if (await itemRepository.IsCodeExistAsync(itemVM.Code))
+                                int? warehouseId = await warehouseRepository.GetIdAsync(itemVM.Warehouse);
+                                if (warehouseId == null)
                                 {
-                                    int itemId = (int)await itemRepository.GetIdAsync(itemVM.Code);
-
-                                    await itemRepository.UpdateAsync(new ItemCommonVM
-                                    {
-                                        BrandId = BrandId.Value,
-                                        CategoryId = CategoryId.Value,
-                                        Id = itemId,
-                                        InterchangeNumber = itemVM.InterchangeNumber,
-                                        ItemTypeId = ItemTypeId.Value,
-                                        ModelNumber = itemVM.ModelNumber,
-                                        Name = itemVM.Name,
-                                        PartNumber = itemVM.PartNumber,
-                                        Size = itemVM.Size,
-                                        UnitId = UnitId.Value,
-                                        Quantity = itemVM.Quantity
-                                    });
-                                    responseModel.Status = "Success";
-                                    responseModel.Message = "Item updated";
+                                    responseModel.Status = "Error";
+                                    responseModel.Message = "Unknown Warehouse";
                                 }
                                 else
                                 {
-                                    await itemRepository.AddAsync(new ItemCommonVM
+                                    if (await itemRepository.IsCodeExistAsync(itemVM.Code))
                                     {
-                                        BrandId = BrandId.Value,
-                                        CategoryId = CategoryId.Value,
-                                        Code = itemVM.Code,
-                                        InterchangeNumber = itemVM.InterchangeNumber,
-                                        ItemTypeId = ItemTypeId.Value,
-                                        ModelNumber = itemVM.ModelNumber,
-                                        Name = itemVM.Name,
-                                        NetPriceD = 0,
-                                        PartNumber = itemVM.PartNumber,
-                                        RetailPriceD = 0,
-                                        Size = itemVM.Size,
-                                        UnitId = UnitId.Value,
-                                        Quantity = itemVM.Quantity
-                                    });
-                                    responseModel.Status = "Success";
-                                    responseModel.Message = "Item added";
+                                        int itemId = (int)await itemRepository.GetIdAsync(itemVM.Code);
+
+                                        await itemRepository.UpdateAsync(new ItemCommonVM
+                                        {
+                                            BrandId = BrandId.Value,
+                                            CategoryId = CategoryId.Value,
+                                            Id = itemId,
+                                            InterchangeNumber = itemVM.InterchangeNumber,
+                                            ItemTypeId = ItemTypeId.Value,
+                                            ModelNumber = itemVM.ModelNumber,
+                                            Name = itemVM.Name,
+                                            PartNumber = itemVM.PartNumber,
+                                            Size = itemVM.Size,
+                                            UnitId = UnitId.Value,
+                                            WarehouseId = warehouseId.Value,
+                                            Quantity = itemVM.Quantity
+                                        });
+
+                                        await itemRepository.UpdateOrAddItemWarehouse(itemId, warehouseId.Value, itemVM.Quantity, "Updated through file upload");
+
+                                        responseModel.Status = "Success";
+                                        responseModel.Message = "Item updated";
+                                    }
+                                    else
+                                    {
+                                        await itemRepository.AddAsync(new ItemCommonVM
+                                        {
+                                            BrandId = BrandId.Value,
+                                            CategoryId = CategoryId.Value,
+                                            Code = itemVM.Code,
+                                            InterchangeNumber = itemVM.InterchangeNumber,
+                                            ItemTypeId = ItemTypeId.Value,
+                                            ModelNumber = itemVM.ModelNumber,
+                                            Name = itemVM.Name,
+                                            NetPriceD = 0,
+                                            PartNumber = itemVM.PartNumber,
+                                            RetailPriceD = 0,
+                                            Size = itemVM.Size,
+                                            UnitId = UnitId.Value,
+                                            Quantity = itemVM.Quantity
+                                        });
+                                        responseModel.Status = "Success";
+                                        responseModel.Message = "Item added";
+                                    }
                                 }
                             }
                         }
@@ -258,14 +271,15 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        public async Task<IActionResult> DownloadFile()
+        public async Task<IActionResult> DownloadFile(ItemFilterVM filter)
         {
             DataTable dt = new DataTable("Items");
-            dt.Columns.AddRange(new DataColumn[11] {
+            dt.Columns.AddRange(new DataColumn[12] {
                 new DataColumn("Code"),
                 new DataColumn("Name"),
                 new DataColumn("Part Number"),
                 new DataColumn("Interchange Number"),
+                new DataColumn("Warehouse"),
                 new DataColumn("Model Number"),
                 new DataColumn("Category"),
                 new DataColumn("Item Type"),
@@ -274,13 +288,16 @@ namespace GMGInventory.Controllers
                 new DataColumn("Unit"),
                 new DataColumn("Quantity on Hand")
             });
-            var items = await itemRepository.GetAllFileAsync();
+            //var items = await itemRepository.GetAllFileAsync();
+            var items = (await itemRepository.GetAllAsync(filter)).Where(s=>s.IsActive == true);
+
             foreach (var item in items)
             {
                 dt.Rows.Add(item.Code,
                             item.Name,
                             item.PartNumber,
                             item.InterchangeNumber,
+                            item.Warehouse,
                             item.ModelNumber,
                             item.Category,
                             item.ItemType,

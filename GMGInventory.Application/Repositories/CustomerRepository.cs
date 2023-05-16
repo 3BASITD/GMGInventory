@@ -25,9 +25,9 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonAddressOptionsModel>> GetOptions(string search, int page)
         {
             var customers = await context.Customers
-                                         .Include(s => s.CreditTerm)
                                          .Where(s => string.IsNullOrWhiteSpace(search)
-                                                 || (s.Code.ToLower().Contains(search.ToLower())))
+                                                 || (s.Code.ToLower().Contains(search.ToLower()))
+                                                 || (s.Name.ToLower().Contains(search.ToLower())))
                                          .Select(s => new JsonAddressOptionsModel
                                          {
                                              Id = s.Id.ToString(),
@@ -38,7 +38,41 @@ namespace GMGInventory.Application.Repositories
                                              Agent = s.Agent.FirstName +' '+ s.Agent.MiddleName +' '+ s.Agent.LastName,
                                              OutstandingBalanceD = s.OutstandingBalance
                                          })
+                                         .OrderBy(s => s.Text)
                                          .ToListAsync();
+            var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonAddressOptionsModel>
+            {
+                //incomplete_results = false,
+                items = customersFiltered,
+                total_count = customers.Count
+            };
+        }
+
+        public async Task<Select2Model<JsonAddressOptionsModel>> GetOptionsWithOrder(string search, int page)
+        {
+            var customers = await (from c in context.Customers
+                                   where (string.IsNullOrWhiteSpace(search)
+                                   || c.Code.ToLower().Contains(search.ToLower())
+                                   || c.Name.ToLower().Contains(search.ToLower()))
+                                   && context.SalesOrders
+                                             .Any(s => s.Status.Name != "Sales Order Submitted"
+                                                    && s.Status.Name != "Sales Order Disapproved"
+                                                    && s.CustomerId == c.Id)
+                                   select new JsonAddressOptionsModel
+                                   {
+                                       Id = c.Id.ToString(),
+                                       Text = c.Code,
+                                       Name = c.Name,
+                                       Address = c.Address,
+                                       CreditTerm = c.CreditTerm.Name,
+                                       Agent = c.Agent.FirstName + ' ' + c.Agent.MiddleName + ' ' + c.Agent.LastName,
+                                       OutstandingBalanceD = c.OutstandingBalance
+                                   })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+
+
             var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonAddressOptionsModel>
             {
@@ -58,6 +92,7 @@ namespace GMGInventory.Application.Repositories
                     Text = s.Name,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
+                .OrderBy(s => s.Text)
                 .ToListAsync();
         }
 
@@ -329,20 +364,20 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task AddForwarderAsync(CustomerVM forwarderVM)
-        {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var forwarders = new Forwarder
-            {
-                CustomerId = forwarderVM.Id,
-                Name = forwarderVM.ForwarderName,
-                Address = forwarderVM.ForwarderAddress,
-                PhoneNumber = forwarderVM.ForwarderPhoneNo,
-                FaxNumber = forwarderVM.ForwarderFaxNo
-            };
-            await context.Forwarders.AddAsync(forwarders);
-            await context.SaveChangesAsync(currentUserId);
-        }
+        //public async Task AddForwarderAsync(CustomerVM forwarderVM)
+        //{
+        //    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+        //    var forwarders = new Forwarder
+        //    {
+        //        CustomerId = forwarderVM.Id,
+        //        Name = forwarderVM.ForwarderName,
+        //        Address = forwarderVM.ForwarderAddress,
+        //        PhoneNumber = forwarderVM.ForwarderPhoneNo,
+        //        FaxNumber = forwarderVM.ForwarderFaxNo
+        //    };
+        //    await context.Forwarders.AddAsync(forwarders);
+        //    await context.SaveChangesAsync(currentUserId);
+        //}
 
         private async Task<IList<CustomerVM>> GetCustomerDetailsAsync(int id)
         {
@@ -498,75 +533,75 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        private async Task<IList<CustomerVM>> GetCustomerForwarderAsync(int id)
-        {
-            var customerVM = from customer in context.Customers
-                             join frwdr in context.Forwarders
-                                            on customer.Id equals frwdr.CustomerId
-                             where frwdr.CustomerId == id
-                             select new CustomerVM
-                             {
-                                 ForwarderName = frwdr.Name,
-                                 ForwarderAddress = frwdr.Address,
-                                 ForwarderFaxNo = frwdr.FaxNumber,
-                                 ForwarderPhoneNo = frwdr.PhoneNumber
-                             };
-            return await customerVM.ToListAsync();
-        }
+        //private async Task<IList<CustomerVM>> GetCustomerForwarderAsync(int id)
+        //{
+        //    var customerVM = from customer in context.Customers
+        //                     join frwdr in context.Forwarders
+        //                                    on customer.Id equals frwdr.CustomerId
+        //                     where frwdr.CustomerId == id
+        //                     select new CustomerVM
+        //                     {
+        //                         ForwarderName = frwdr.Name,
+        //                         ForwarderAddress = frwdr.Address,
+        //                         ForwarderFaxNo = frwdr.FaxNumber,
+        //                         ForwarderPhoneNo = frwdr.PhoneNumber
+        //                     };
+        //    return await customerVM.ToListAsync();
+        //}
 
-        public async Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id)
-        {
-            int totalRecord = 0;
-            int filterRecord = 0;
-            var data = (await GetCustomerForwarderAsync(id)).AsQueryable();
-            //get total count of data in table
-            totalRecord = data.Count();
-            // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
-            {
-                data = data.Where(x => x.ForwarderName.ToString().Contains(form.SearchValue)
-                                    || x.ForwarderAddress.ToString().Contains(form.SearchValue)
-                                    || x.ForwarderFaxNo.ToString().Contains(form.SearchValue)
-                                    || x.ForwarderPhoneNo.ToString().Contains(form.SearchValue));
-            }
-            // get total count of records after search
-            filterRecord = data.Count();
-            //sort data
-            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
-            {
-                if (form.SortColumnDirection == "asc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "ForwarderName": data = data.OrderBy(s => s.ForwarderName); break;
-                        case "ForwarderAddress": data = data.OrderBy(s => s.ForwarderAddress); break;
-                        case "ForwarderFaxNo": data = data.OrderBy(s => s.ForwarderFaxNo); break;
-                        case "ForwarderPhoneNo": data = data.OrderBy(s => s.ForwarderPhoneNo); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "ForwarderName": data = data.OrderByDescending(s => s.ForwarderName); break;
-                        case "ForwarderAddress": data = data.OrderByDescending(s => s.ForwarderAddress); break;
-                        case "ForwarderFaxNo": data = data.OrderByDescending(s => s.ForwarderFaxNo); break;
-                        case "ForwarderPhoneNo": data = data.OrderByDescending(s => s.ForwarderPhoneNo); break;
-                        default: break;
-                    }
-                }
-            }
-            //pagination
-            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
-            return new ForDataTables<CustomerVM>
-            {
-                Draw = form.Draw,
-                RecordsTotal = totalRecord,
-                RecordsFiltered = filterRecord,
-                Data = pageList
-            };
-        }
+        //public async Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id)
+        //{
+        //    int totalRecord = 0;
+        //    int filterRecord = 0;
+        //    var data = (await GetCustomerForwarderAsync(id)).AsQueryable();
+        //    //get total count of data in table
+        //    totalRecord = data.Count();
+        //    // search data when search value found
+        //    if (!string.IsNullOrWhiteSpace(form.SearchValue))
+        //    {
+        //        data = data.Where(x => x.ForwarderName.ToString().Contains(form.SearchValue)
+        //                            || x.ForwarderAddress.ToString().Contains(form.SearchValue)
+        //                            || x.ForwarderFaxNo.ToString().Contains(form.SearchValue)
+        //                            || x.ForwarderPhoneNo.ToString().Contains(form.SearchValue));
+        //    }
+        //    // get total count of records after search
+        //    filterRecord = data.Count();
+        //    //sort data
+        //    if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+        //    {
+        //        if (form.SortColumnDirection == "asc")
+        //        {
+        //            switch (form.SortColumn)
+        //            {
+        //                case "ForwarderName": data = data.OrderBy(s => s.ForwarderName); break;
+        //                case "ForwarderAddress": data = data.OrderBy(s => s.ForwarderAddress); break;
+        //                case "ForwarderFaxNo": data = data.OrderBy(s => s.ForwarderFaxNo); break;
+        //                case "ForwarderPhoneNo": data = data.OrderBy(s => s.ForwarderPhoneNo); break;
+        //                default: break;
+        //            }
+        //        }
+        //        else if (form.SortColumnDirection == "desc")
+        //        {
+        //            switch (form.SortColumn)
+        //            {
+        //                case "ForwarderName": data = data.OrderByDescending(s => s.ForwarderName); break;
+        //                case "ForwarderAddress": data = data.OrderByDescending(s => s.ForwarderAddress); break;
+        //                case "ForwarderFaxNo": data = data.OrderByDescending(s => s.ForwarderFaxNo); break;
+        //                case "ForwarderPhoneNo": data = data.OrderByDescending(s => s.ForwarderPhoneNo); break;
+        //                default: break;
+        //            }
+        //        }
+        //    }
+        //    //pagination
+        //    var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+        //    return new ForDataTables<CustomerVM>
+        //    {
+        //        Draw = form.Draw,
+        //        RecordsTotal = totalRecord,
+        //        RecordsFiltered = filterRecord,
+        //        Data = pageList
+        //    };
+        //}
 
         private async Task<IList<CustomerVM>> GetCustomerPaymentAsync(int id)
         {

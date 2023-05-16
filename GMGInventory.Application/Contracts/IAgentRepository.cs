@@ -7,6 +7,7 @@ namespace GMGInventory.Application.Contracts
     {
         Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page);
         Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<Select2Model<JsonNameOptionsModel>> GetOptionsWithOrder(string search, int page, int? CustomerId, DateTime? DateFrom, DateTime? DateTo);
         Task<int?> GetIdAsync(string? Name);
         Task<IList<AgentViewVM>> GetListAsync();
         Task<ForDataTables <AgentViewVM>> GetListDTAsync(DataTablesRequestForm form);

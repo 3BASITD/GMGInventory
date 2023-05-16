@@ -43,6 +43,7 @@ namespace GMGInventory.Application.Repositories
                     Text = s.Name,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
+                .OrderBy(s => s.Text)
                 .ToListAsync();
         }
 

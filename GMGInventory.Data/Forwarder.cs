@@ -22,9 +22,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string FaxNumber { get; set; }
 
-        [ForeignKey("CustomerId")]
-        public int CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        //[ForeignKey("CustomerId")]
+        //public int CustomerId { get; set; }
+        //public Customer Customer { get; set; }
 
         public bool IsActive { get; set; }
 

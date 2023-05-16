@@ -270,6 +270,7 @@ namespace GMGInventory.Application.Repositories
                     Text = s.Name,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
+                .OrderBy(s => s.Text)
                 .ToListAsync();
         }
 
@@ -277,17 +278,19 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonAddressOptionsModel>> GetOptions2(string search, int page)
         {
             var areas = await context.Areas
-                                         .Include(s => s.Region)
-                                         .Where(s => string.IsNullOrWhiteSpace(search)
-                                                 || (s.Code.ToLower().Contains(search.ToLower())))
-                                         .Select(s => new JsonAddressOptionsModel
-                                         {
-                                             Id = s.Id.ToString(),
-                                             Text = s.Code,
-                                             Name = s.Name,
-                                             Region  = s.Region.Name,
-                                         })
-                                         .ToListAsync();
+                                     .Include(s => s.Region)
+                                     .Where(s => string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower())))
+                                     .Select(s => new JsonAddressOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Code,
+                                         Name = s.Name,
+                                         Region  = s.Region.Name,
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
             var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonAddressOptionsModel>
             {

@@ -35,6 +35,11 @@ namespace GMGInventory.Controllers
             return Json(await agentRepository.GetOptions(IncludeId));
         }
 
+        public async Task<IActionResult> GetOptionsWithOrder(string search, int page, int? CustomerId, DateTime? DateFrom, DateTime? DateTo)
+        {
+            return Json(await agentRepository.GetOptionsWithOrder(search, page, CustomerId, DateFrom, DateTo));
+        }
+
         public async Task<ActionResult> Index()
         {
             AgentFilterVM agentFilterVM = new AgentFilterVM();

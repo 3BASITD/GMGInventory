@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Authentication;
@@ -32,6 +33,7 @@ namespace GMGInventory.Application.Repositories
                          where order.Status.Code != "Draft"
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.PONumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         orderby order.PONumber ascending
                          select new JsonPurchaseOrderOptionsModel
                          {
                              Id = order.Id.ToString(),
@@ -58,6 +60,7 @@ namespace GMGInventory.Application.Repositories
                          && order.QuantityOrdered != order.QuantityPacked
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         orderby order.SalesOrderNumber ascending
                          select new JsonOptionsModel
                          {
                              Id = order.Id.ToString(),
@@ -80,11 +83,17 @@ namespace GMGInventory.Application.Repositories
                                     Text = s.Name,
                                     Selected = IncludeId == s.Id
                                 })
+                                .OrderBy(s => s.Text)
                                 .ToListAsync();
         }
 
         public async Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
+            var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
+            var currentUserId = currentUser.Id;
+            var currentUserRoles = await userManager.GetRolesAsync(currentUser);
+            var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
+
             var orderVM = (from order in context.SalesOrders
                                                 .Include(s => s.Agent)
                                                 .Include(s => s.Customer).ThenInclude(s => s.CreditTerm)
@@ -95,6 +104,7 @@ namespace GMGInventory.Application.Repositories
                            from approve in userManager.Users.Where(s => s.Id == order.ApprovedBy).DefaultIfEmpty()
                            from disapprove in userManager.Users.Where(s => s.Id == order.DisapprovedBy).DefaultIfEmpty()
                            where order.Id == Id
+                           && (currentUserId == order.UserCreated || isAdminOrManager)
                            select new SalesOrderDetailsVM
                            {
                                AgentCode = order.Agent.Code,
@@ -127,7 +137,8 @@ namespace GMGInventory.Application.Repositories
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code
                            });
-            return await orderVM.FirstOrDefaultAsync();
+
+                return await orderVM.FirstOrDefaultAsync();
         }
 
         public async Task<SalesOrderPrintVM?> PrintDetailsAsync(int? Id)
@@ -149,12 +160,18 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<SalesOrderVM>> GetListAsync()
         {
+            var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
+            var currentUserId = currentUser.Id;
+            var currentUserRoles = await userManager.GetRolesAsync(currentUser);
+            var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
+
             var orderVM = (from order in context.SalesOrders
                                                 .Include(s => s.Customer)
                                                 .Include(s => s.Status)
                            join user in userManager.Users on order.UserCreated equals user.Id
                            let auser = userManager.Users.Where(s => s.Id == order.ApprovedBy).Select(s => s.Nickname).First()
                            let duser = userManager.Users.Where(s => s.Id == order.DisapprovedBy).Select(s => s.Nickname).First()
+                           where order.UserCreated == currentUserId || isAdminOrManager
                            select new SalesOrderVM
                            {
                                Customer = order.Customer.Name,
@@ -547,6 +564,7 @@ namespace GMGInventory.Application.Repositories
                     }
                     else
                     {
+                        var oldInventoryQuantity = itemInventory.Quantity;
                         if (itemInventory.Quantity >= salesOrderLineItem.Quantity)
                         {
                             salesOrderLineItem.ServedQuantity = salesOrderLineItem.Quantity;
@@ -563,6 +581,17 @@ namespace GMGInventory.Application.Repositories
                             itemInventory.Quantity = 0;
                         }
                         context.ItemInventories.Update(itemInventory);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        var countHistory = new PhysicalCountHistory
+                        {
+                            ItemId = salesOrderLineItem.ItemId,
+                            QuantityFrom = oldInventoryQuantity,
+                            QuantityTo = itemInventory.Quantity,
+                            Remarks = "SO Served",
+                            WarehouseId = itemInventory.WarehouseId
+                        };
+                        context.PhysicalCountHistories.Add(countHistory);
                         await context.SaveChangesAsync(currentUserId);
                     }
                     context.SalesOrderLineItems.Update(salesOrderLineItem);

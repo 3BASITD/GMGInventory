@@ -29,6 +29,7 @@ namespace GMGInventory.Application.Repositories
                          && order.SalesOrder.QuantityOrdered != order.SalesOrder.QuantityInvoiced
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.Id.ToString().Contains(search.ToLower().Trim())))
+                         orderby order.Id ascending
                          select new JsonOptionsModel
                          {
                              Id = order.Id.ToString(),
@@ -267,6 +268,13 @@ namespace GMGInventory.Application.Repositories
             if (orderVM != null)
             {
                 orderVM.QuantityPacked = form.Items.Sum(s => s.Quantity);
+                if(orderVM.QuantityOrdered <= orderVM.QuantityPacked)
+                {
+                    orderVM.StatusId = await context.Statuses
+                                                    .Where(s => s.Name == "Fully Packed")
+                                                    .Select(s => s.Id)
+                                                    .FirstAsync();
+                }
                 await context.SaveChangesAsync(currentUserId);
 
                 int statusId = await context.Statuses

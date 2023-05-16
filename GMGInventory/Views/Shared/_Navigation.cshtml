@@ -350,7 +350,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "BrandSales" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="BrandSales">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Brand Sales</p>
+                                    <p>Brand Sales Report</p>
                                 </a>
                             </li>
                         }
@@ -361,7 +361,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "BestSellingItem" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="BestSellingItem">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Best Selling Item</p>
+                                    <p>Best Selling Items</p>
                                 </a>
                             </li>
                         }
@@ -372,7 +372,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "BestSellingItemInvoice" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="BestSellingItemInvoice">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Best Selling Item (Invoice)</p>
+                                    <p>Best Selling Items (Invoice)</p>
                                 </a>
                             </li>
                         }*@
@@ -380,7 +380,7 @@
                             <a class="nav-link @(currentController=="SalesReport" && currentAction == "Commission" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="Commission">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Commission</p>
+                                <p>Commission Report</p>
                             </a>
                         </li>
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
@@ -390,7 +390,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSalesRanking" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesRanking">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Customer Sales Ranking</p>
+                                    <p>Customer Sales Ranking Report</p>
                                 </a>
                             </li>
                         }
@@ -401,7 +401,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSalesAnalysis" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesAnalysis">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Customer Sales Analysis</p>
+                                    <p>Customer Sales Analysis Report</p>
                                 </a>
                             </li>
                         }*@
@@ -412,7 +412,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSales" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="CustomerSales">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Customer Sales</p>
+                                    <p>Customer Sales Report</p>
                                 </a>
                             </li>
                         }
@@ -420,7 +420,7 @@
                             <a class="nav-link @(currentController=="SalesReport" && currentAction == "DailySales" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="DailySales">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Daily Sales</p>
+                                <p>Daily Sales Report</p>
                             </a>
                         </li>
                         @*@if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
@@ -430,7 +430,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "DailySalesMargin" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="DailySalesMargin">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Daily Sales Margin</p>
+                                    <p>Daily Sales Margin Report</p>
                                 </a>
                             </li>
                         }*@
@@ -438,7 +438,7 @@
                             <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesInvoice" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="SalesInvoice">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Sales Invoice</p>
+                                <p>Sales Invoice Listing Report</p>
                             </a>
                         </li>
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
@@ -448,7 +448,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesAgentArea" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="SalesAgentArea">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Sales by Agent-Area</p>
+                                    <p>Sales by Agent/Area</p>
                                 </a>
                             </li>
                         }
@@ -459,7 +459,7 @@
                                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesMarginItem" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="SalesMarginItem">
                                     <i class="nav-icon fas fa-file"></i>
-                                    <p>Sales Margin Item</p>
+                                    <p>Sales Margin by Item</p>
                                 </a>
                             </li>
                         }*@
@@ -478,7 +478,7 @@
                             <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesReturn" ? "active" : "")"
                        asp-area="" asp-controller="SalesReport" asp-action="SalesReturn">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Sales Return Listing</p>
+                                <p>Sales Return Listing Report</p>
                             </a>
                         </li>
                         @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
@@ -515,7 +515,7 @@
                             <a class="nav-link @(currentController=="InventoryReport" && currentAction == "BelowMaintainingItem" ? "active" : "")"
                        asp-area="" asp-controller="InventoryReport" asp-action="BelowMaintainingItem">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Below Maintaining Item</p>
+                                <p>Below Maintaining Items</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -529,7 +529,7 @@
                             <a class="nav-link @(currentController=="InventoryReport" && currentAction == "ReceivingListingSupplier" ? "active" : "")"
                        asp-area="" asp-controller="InventoryReport" asp-action="ReceivingListingSupplier">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Receiving Listing Supplier</p>
+                                <p>Receiving Listing by Supplier</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -550,7 +550,7 @@
                             <a class="nav-link @(currentController=="InventoryReport" && currentAction == "StockStatus" ? "active" : "")"
                        asp-area="" asp-controller="InventoryReport" asp-action="StockStatus">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Stock Status</p>
+                                <p>Stock Status Report</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -579,14 +579,14 @@
                             <a class="nav-link @(currentController=="AccountingReport" && currentAction == "CreditMemo" ? "active" : "")"
                        asp-area="" asp-controller="AccountingReport" asp-action="CreditMemo">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Credit Memo Listing</p>
+                                <p>Credit Memo Listing Report</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(currentController=="AccountingReport" && currentAction == "DebitMemo" ? "active" : "")"
                        asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">
                                 <i class="nav-icon fas fa-file"></i>
-                                <p>Debit Memo Listing</p>
+                                <p>Debit Memo Listing Report</p>
                             </a>
                         </li>
                     </ul>

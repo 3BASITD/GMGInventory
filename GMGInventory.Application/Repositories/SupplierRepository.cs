@@ -57,6 +57,7 @@ namespace GMGInventory.Application.Repositories
                                     Address1 = s.AddressLine1,
                                     Address2 = s.AddressLine2
                                 })
+                                .OrderBy(s => s.Text)
                                 .ToListAsync();
         }
 
