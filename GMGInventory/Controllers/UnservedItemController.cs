@@ -25,10 +25,10 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<JsonResult> GetListJson(UnservedItemFilter filter)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await unservedItemRepository.GetListDataTablesAsync(form));
+            return Json(await unservedItemRepository.GetListDataTablesAsync(form, filter));
         }
     }
 }

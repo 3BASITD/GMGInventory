@@ -35,20 +35,19 @@
             {
                 if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null && (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin)))
                 {
-                    @*<button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
-            <span class="fas fa-box-open"></span> Start Packing
-            </button>*@
-                    <a href="@Url.Action("Create", "Pack")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
+                    if(Model.Status == "Approved")
+                    {
+                    <a href="@Url.Action("Create", "Pack")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
                         <span class="fas fa-box-open"></span> Start Packing
                     </a>
-
+                    }
                     <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                         <span class="fas fa-print"></span> Print
                     </button>
                 }
                 if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null && (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin)) && Model?.ResubmitId == null)
                 {
-                    <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2 btn-details-pack">
+                    <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
                         <span class="fas fa-edit"></span> Update to Resubmit
                     </a>
                 }
@@ -272,7 +271,7 @@
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th>Total</th>
+                                    <th class="text-end">Total</th>
                                     <th class="total-quantity">0</th>
                                     <th colspan="7"></th>
                                     <th class="total-gross-price">0.00</th>

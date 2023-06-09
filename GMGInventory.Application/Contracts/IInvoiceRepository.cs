@@ -14,7 +14,9 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<InvoiceVM>> GetListDTAsync(DataTablesRequestForm form, ListFilterCommonModel filter);
         Task<IList<InvoiceItemVM>> GetItemsAsync(int invoiceId);
         Task<ForDataTables<InvoiceItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int invoiceId);
+        Task<bool> IsBIRInvoiceNumberInUser(int? invoiceId, string BIRInvoiceNumber);
+        Task<bool> IsInvoiceInUse(int? invoiceId);
         Task<int> SaveAsync(InvoiceFormVM form);
-        Task<int> UpdateAsync(InvoiceFormUpdateVM form);
+        Task<int> UpdateAsync(InvoiceFormVM form);
     }
 }

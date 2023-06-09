@@ -44,8 +44,11 @@ namespace GMGInventory.Application.Repositories
                                              .Take(1)
                                              .DefaultIfEmpty()
                         let inventory = context.ItemInventories
-                                               .Where(s => s.ItemId == item.Id && s.Warehouse.Code == "MAIN")
+                                               .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
                                                .Sum(s => s.Quantity)
+                        let soli = context.SalesOrderLineItems
+                                          .Where(s=>s.ItemId == item.Id)
+                                          .Sum(s => s.ServedQuantity - s.PackedQuantity)
                         where item.IsActive == true
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
@@ -54,7 +57,7 @@ namespace GMGInventory.Application.Repositories
                         select new JsonItemOptionsModel
                         {
                             Id = item.Id.ToString(),
-                            InventoryCount = inventory,
+                            InventoryCount = inventory + soli,
                             Text = item.Code,
                             Name = item.Name,
                             NetPriceD = price.NetSellingPrice,
@@ -71,6 +74,46 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetModelNumberOptions(string search, int page)
+        {
+            var items = from item in context.Items
+                        where item.IsActive == true
+                           && (string.IsNullOrWhiteSpace(search)
+                           || (item.ModelNumber != null && item.ModelNumber.ToLower().Contains(search.ToLower())))
+                        orderby item.ModelNumber ascending
+                        select new JsonOptionsModel
+                        {
+                            Id = item.ModelNumber + "!",
+                            Text = item.ModelNumber + ""
+                        };
+            var itemsFiltered = await items.Distinct().Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = itemsFiltered,
+                total_count = items.Count()
+            };
+        }
+
+        public async Task<Select2Model<JsonOptionsModel>> GetSizeOptions(string search, int page)
+        {
+            var items = from item in context.Items
+                        where item.IsActive == true
+                           && (string.IsNullOrWhiteSpace(search)
+                           || item.Size.ToLower().Contains(search.ToLower()))
+                        orderby item.Size ascending
+                        select new JsonOptionsModel
+                        {
+                            Id = item.Size + "!",
+                            Text = item.Size
+                        };
+            var itemsFiltered = await items.Distinct().Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = itemsFiltered,
+                total_count = items.Count()
+            };
+        }
+
         public async Task<int?> GetIdAsync(string? Code)
         {
             var item = await context.Items.Where(s => s.Code == Code).FirstOrDefaultAsync();
@@ -79,21 +122,42 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetInWarehouseOptions(string search, int warehouse, int page)
         {
-            var items = await context.ItemInventories.Include(s => s.Item).ThenInclude(s => s.Unit)
-                                .Where(s => s.WarehouseId == warehouse
-                                         && (string.IsNullOrWhiteSpace(search)
-                                         || (s.Item.Code.ToLower().Contains(search.ToLower()))
-                                         || (s.Item.Name.ToLower().Contains(search.ToLower()))))
-                                .Select(s => new JsonItemOptionsModel
-                                {
-                                    Id = s.Item.Id.ToString(),
-                                    Text = s.Item.Code,
-                                    Name = s.Item.Name,
-                                    Quantity = s.Quantity,
-                                    Unit = s.Item.Unit.Code
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
+            //var items = await context.ItemInventories.Include(s => s.Item).ThenInclude(s => s.Unit)
+            //                    .Where(s => s.WarehouseId == warehouse
+            //                             && (string.IsNullOrWhiteSpace(search)
+            //                             || (s.Item.Code.ToLower().Contains(search.ToLower()))
+            //                             || (s.Item.Name.ToLower().Contains(search.ToLower()))))
+            //                    .Select(s => new JsonItemOptionsModel
+            //                    {
+            //                        Id = s.Item.Id.ToString(),
+            //                        Text = s.Item.Code,
+            //                        Name = s.Item.Name,
+            //                        Quantity = s.Quantity,
+            //                        Unit = s.Item.Unit.Code
+            //                    })
+            //                    .OrderBy(s => s.Text)
+            //                    .ToListAsync();
+
+            var whouse = context.Warehouses.Where(s => s.Id == warehouse).FirstOrDefault();
+            var items = await (from item in context.ItemInventories
+                               let served = context.SalesOrderLineItems
+                                                   .Where(s => s.ItemId == item.Id && whouse != null && whouse.Code.ToLower().Contains("main"))
+                                                   .Sum(s => s.ServedQuantity - s.PackedQuantity)
+                               where item.WarehouseId == warehouse
+                               && item.Item.IsActive == true
+                               && (search == null
+                               || item.Item.Code.ToLower().Contains(search.ToLower())
+                               || item.Item.Name.ToLower().Contains(search.ToLower()))
+                               && (item.Quantity + served) > 0
+                               select new JsonItemOptionsModel
+                               {
+                                   Id = item.ItemId.ToString(),
+                                   Text = item.Item.Code,
+                                   Name = item.Item.Name,
+                                   Quantity = item.Quantity + served,
+                                   Unit = item.Item.Unit.Code
+                               }).ToListAsync();
+
             var itemsFiltered = items.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonItemOptionsModel>
             {
@@ -159,7 +223,7 @@ namespace GMGInventory.Application.Repositories
                               Name = item.Name,
                               NetPriceD = price == null ? 0 : price.NetSellingPrice,
                               PartNumber = item.PartNumber + "",
-                              Quantity = inventory.Quantity,
+                              QuantityD = inventory.Quantity,
                               RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                               Size = item.Size,
                               Unit = item.Unit.Name,
@@ -186,7 +250,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.Name.ToLower().Contains(form.SearchValue)
                                     || x.NetPrice.ToString().Contains(form.SearchValue)
                                     || x.PartNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.QuantityD.ToString().Contains(form.SearchValue)
                                     || x.RetailPrice.ToString().Contains(form.SearchValue)
                                     || x.Warehouse.ToLower().Contains(form.SearchValue));
             }
@@ -204,7 +268,7 @@ namespace GMGInventory.Application.Repositories
                         case "Name": data = data.OrderBy(s => s.Name); break;
                         case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
                         case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
                         case "RetailPrice": data = data.OrderBy(s => s.RetailPriceD); break;
                         case "Warehouse": data = data.OrderBy(s => s.Warehouse); break;
                         default: break;
@@ -219,7 +283,7 @@ namespace GMGInventory.Application.Repositories
                         case "Name": data = data.OrderByDescending(s => s.Name); break;
                         case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
                         case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
                         case "RetailPrice": data = data.OrderByDescending(s => s.RetailPriceD); break;
                         case "Warehouse": data = data.OrderByDescending(s => s.Warehouse); break;
                         default: break;
@@ -256,7 +320,7 @@ namespace GMGInventory.Application.Repositories
                               Name = item.Name,
                               NetPriceD = price == null ? 0 : price.NetSellingPrice,
                               PartNumber = item.PartNumber + "",
-                              Quantity = inventory.Quantity,
+                              QuantityD = inventory.Quantity,
                               RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                               Size = item.Size,
                               UnitCode = item.Unit.Name,
@@ -273,7 +337,7 @@ namespace GMGInventory.Application.Repositories
                               //.Include(s => s.Brand)
                               //.Include(s => s.Unit)
                           let inventory = context.ItemInventories
-                                                 .Where(s => s.ItemId == item.Id && s.Warehouse.Code == "MAIN")
+                                                 .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
                                                  .Sum(s => s.Quantity)
                           select new ItemFileVM
                           {
@@ -391,7 +455,7 @@ namespace GMGInventory.Application.Repositories
             var itemInventories = new ItemInventory
             {
                 ItemId = item.Id,
-                Quantity = itemVM.Quantity,
+                Quantity = itemVM.QuantityD,
                 WarehouseId = defaultWarehouse
             };
             await context.ItemInventories.AddAsync(itemInventories);
@@ -492,17 +556,16 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<ItemDetailWarehouseVM>> GetItemWarehouseAsync(int id)
         {
-            var warehousesVM = from warehouse in context.Warehouses
-                               join inventory in context.ItemInventories on warehouse.Id equals inventory.WarehouseId
-                               where inventory.ItemId == id
-                               select new ItemDetailWarehouseVM
-                               {
-                                   Code = warehouse.Code,
-                                   Id = inventory.Id,
-                                   Name = warehouse.Name,
-                                   Quantity = inventory.Quantity,
-                               };
-            return await warehousesVM.ToListAsync();
+            var inventoryVM = from inv in context.ItemInventories
+                              where inv.ItemId == id
+                              select new ItemDetailWarehouseVM
+                              {
+                                  Code = inv.Warehouse.Code,
+                                  Id = inv.Id,
+                                  Name = inv.Warehouse.Name,
+                                  QuantityD = inv.Quantity,
+                              };
+            return await inventoryVM.ToListAsync();
         }
 
         public async Task<ForDataTables<ItemDetailWarehouseVM>> GetItemWarehouseDTAsync(DataTablesRequestForm form, int id)
@@ -517,7 +580,7 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.Code.ToString().Contains(form.SearchValue)
                                     || x.Name.ToString().Contains(form.SearchValue)
-                                    || x.Quantity.ToString().Contains(form.SearchValue));
+                                    || x.QuantityD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -530,7 +593,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Code": data = data.OrderBy(s => s.Code); break;
                         case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
                         default: break;
                     }
                 }
@@ -540,7 +603,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Code": data = data.OrderByDescending(s => s.Code); break;
                         case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
                         default: break;
                     }
                 }
@@ -571,7 +634,7 @@ namespace GMGInventory.Application.Repositories
                                   ConversionFactorD = purchase.CurrencyRate,
                                   Currency = purchase.Currency.Code,
                                   PurchaseNumber = purchase.PONumber,
-                                  Quantity = purchaseItem.Quantity,
+                                  QuantityD = purchaseItem.Quantity,
                                   ReplenishBy = user.Nickname,
                                   ReplenishDateD = purchase.DateCreated,
                                   Status = purchase.Status.Code,
@@ -597,7 +660,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.ConvertedUnitPriceD.ToString().Contains(form.SearchValue)
                                     || x.Currency.ToString().Contains(form.SearchValue)
                                     || x.PurchaseNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.QuantityD.ToString().Contains(form.SearchValue)
                                     || x.ReplenishBy.ToLower().Contains(form.SearchValue)
                                     || x.ReplenishDate.ToLower().Contains(form.SearchValue)
                                     || x.Status.ToLower().Contains(form.SearchValue)
@@ -619,9 +682,9 @@ namespace GMGInventory.Application.Repositories
                         case "ConvertedUnitPrice": data = data.OrderBy(s => s.ConvertedUnitPriceD); break;
                         case "Currency": data = data.OrderBy(s => s.Currency); break;
                         case "PurchaseNumber": data = data.OrderBy(s => s.PurchaseNumber); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
                         case "ReplenishBy": data = data.OrderBy(s => s.ReplenishBy); break;
-                        case "ReplenishDate": data = data.OrderBy(s => s.ReplenishDate); break;
+                        case "ReplenishDate": data = data.OrderBy(s => s.ReplenishDateD); break;
                         case "Status": data = data.OrderBy(s => s.Status); break;
                         case "Supplier": data = data.OrderBy(s => s.Supplier); break;
                         case "UnitCost": data = data.OrderBy(s => s.UnitCostD); break;
@@ -638,9 +701,9 @@ namespace GMGInventory.Application.Repositories
                         case "ConvertedUnitPrice": data = data.OrderByDescending(s => s.ConvertedUnitPriceD); break;
                         case "Currency": data = data.OrderByDescending(s => s.Currency); break;
                         case "PurchaseNumber": data = data.OrderByDescending(s => s.PurchaseNumber); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
                         case "ReplenishBy": data = data.OrderByDescending(s => s.ReplenishBy); break;
-                        case "ReplenishDate": data = data.OrderByDescending(s => s.ReplenishDate); break;
+                        case "ReplenishDate": data = data.OrderByDescending(s => s.ReplenishDateD); break;
                         case "Status": data = data.OrderByDescending(s => s.Status); break;
                         case "Supplier": data = data.OrderByDescending(s => s.Supplier); break;
                         case "UnitCost": data = data.OrderByDescending(s => s.UnitCostD); break;
@@ -663,25 +726,23 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<ItemDetailSalesVM>> GetItemSalesAsync(int id)
         {
-            var salesVM = from sales in context.SalesOrders
-                                               .Include(s => s.Agent)
-                                               .Include(s => s.Customer)
-                          join salesItem in context.SalesOrderLineItems
-                                                   .Include(s => s.Item) on sales.Id equals salesItem.SalesOrderId
-                          join user in userManager.Users on sales.UserCreated equals user.Id
-                          where salesItem.Item.Id == id
+
+            var salesVM = from sitem in context.SalesOrderLineItems
+                          join user in userManager.Users on sitem.SalesOrder.UserCreated equals user.Id
+                          where sitem.Item.Id == id
                           select new ItemDetailSalesVM
                           {
-                              Agent = sales.Agent.Code,
-                              Customer = sales.Agent.Code,
-                              Discount1D = salesItem.Discount1,
-                              Discount2D = salesItem.Discount2,
+                              Agent = sitem.SalesOrder.Agent.Code,
+                              Customer = sitem.SalesOrder.Customer.Name,
+                              Discount1D = sitem.Discount1,
+                              Discount2D = sitem.Discount2,
                               OrderBy = user.Nickname,
-                              OrderDateD = sales.DateCreated,
-                              PackedQuantity = salesItem.PackedQuantity,
-                              Quantity = salesItem.Quantity,
-                              SalesNumber = sales.SalesOrderNumber,
-                              UnitPriceD = salesItem.SellingPrice
+                              OrderDateD = sitem.SalesOrder.DateCreated,
+                              PackedQuantityD = sitem.PackedQuantity,
+                              QuantityD = sitem.Quantity,
+                              SalesNumber = sitem.SalesOrder.SalesOrderNumber,
+                              UnitPriceD = sitem.SellingPrice,
+                              UnservedQuantityD = sitem.UnservedQuantity
                           };
             return await salesVM.ToListAsync();
         }
@@ -702,10 +763,10 @@ namespace GMGInventory.Application.Repositories
                                     || x.Discount2D.ToString().Contains(form.SearchValue)
                                     || x.OrderBy.ToLower().Contains(form.SearchValue)
                                     || x.OrderDate.ToLower().Contains(form.SearchValue)
-                                    || x.PackedQuantity.ToString().Contains(form.SearchValue)
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.PackedQuantityD.ToString().Contains(form.SearchValue)
+                                    || x.QuantityD.ToString().Contains(form.SearchValue)
                                     || x.UnitPriceD.ToString().Contains(form.SearchValue)
-                                    || x.UnservedQuantity.ToString().Contains(form.SearchValue));
+                                    || x.UnservedQuantityD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -721,11 +782,11 @@ namespace GMGInventory.Application.Repositories
                         case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
                         case "OrderBy": data = data.OrderBy(s => s.OrderBy); break;
-                        case "OrderDate": data = data.OrderBy(s => s.OrderDate); break;
-                        case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantity); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
+                        case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantityD); break;
+                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
                         case "UnitPrice": data = data.OrderBy(s => s.UnitPriceD); break;
-                        case "UnservedQuantity": data = data.OrderBy(s => s.UnservedQuantity); break;
+                        case "UnservedQuantity": data = data.OrderBy(s => s.UnservedQuantityD); break;
                         default: break;
                     }
                 }
@@ -738,11 +799,11 @@ namespace GMGInventory.Application.Repositories
                         case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
                         case "OrderBy": data = data.OrderByDescending(s => s.OrderBy); break;
-                        case "OrderDate": data = data.OrderByDescending(s => s.OrderDate); break;
-                        case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantity); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
+                        case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantityD); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
                         case "UnitPrice": data = data.OrderByDescending(s => s.UnitPriceD); break;
-                        case "UnservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantity); break;
+                        case "UnservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantityD); break;
                         default: break;
                     }
                 }
@@ -768,8 +829,8 @@ namespace GMGInventory.Application.Repositories
                             {
                                 AdjustmentBy = user.Nickname,
                                 AdjustmentDateD = count.DateCreated,
-                                QuantityFrom = count.QuantityFrom,
-                                QuantityTo = count.QuantityTo,
+                                QuantityFromD = count.QuantityFrom,
+                                QuantityToD = count.QuantityTo,
                                 Remarks = count.Remarks + "",
                                 Warehouse = count.Warehouse.Code
                             };
@@ -788,9 +849,9 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.AdjustmentBy.ToLower().Contains(form.SearchValue)
                                     || x.AdjustmentDate.ToLower().Contains(form.SearchValue)
-                                    || x.QuantityAdjusted.ToString().Contains(form.SearchValue)
-                                    || x.QuantityFrom.ToString().Contains(form.SearchValue)
-                                    || x.QuantityTo.ToString().Contains(form.SearchValue)
+                                    || x.QuantityAdjustedD.ToString().Contains(form.SearchValue)
+                                    || x.QuantityFromD.ToString().Contains(form.SearchValue)
+                                    || x.QuantityToD.ToString().Contains(form.SearchValue)
                                     || x.Remarks.ToLower().Contains(form.SearchValue)
                                     || x.Warehouse.ToLower().Contains(form.SearchValue));
             }
@@ -804,10 +865,10 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "AdjustmentBy": data = data.OrderBy(s => s.AdjustmentBy); break;
-                        case "AdjustmentDate": data = data.OrderBy(s => s.AdjustmentDate); break;
-                        case "QuantityAdjusted": data = data.OrderBy(s => s.QuantityAdjusted); break;
-                        case "QuantityFrom": data = data.OrderBy(s => s.QuantityFrom); break;
-                        case "QuantityTo": data = data.OrderBy(s => s.QuantityTo); break;
+                        case "AdjustmentDate": data = data.OrderBy(s => s.AdjustmentDateD); break;
+                        case "QuantityAdjusted": data = data.OrderBy(s => s.QuantityAdjustedD); break;
+                        case "QuantityFrom": data = data.OrderBy(s => s.QuantityFromD); break;
+                        case "QuantityTo": data = data.OrderBy(s => s.QuantityToD); break;
                         case "Remarks": data = data.OrderBy(s => s.Remarks); break;
                         case "Warehouse": data = data.OrderBy(s => s.Warehouse); break;
                         default: break;
@@ -818,10 +879,10 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "AdjustmentBy": data = data.OrderByDescending(s => s.AdjustmentBy); break;
-                        case "AdjustmentDate": data = data.OrderByDescending(s => s.AdjustmentDate); break;
-                        case "QuantityAdjusted": data = data.OrderByDescending(s => s.QuantityAdjusted); break;
-                        case "QuantityFrom": data = data.OrderByDescending(s => s.QuantityFrom); break;
-                        case "QuantityTo": data = data.OrderByDescending(s => s.QuantityTo); break;
+                        case "AdjustmentDate": data = data.OrderByDescending(s => s.AdjustmentDateD); break;
+                        case "QuantityAdjusted": data = data.OrderByDescending(s => s.QuantityAdjustedD); break;
+                        case "QuantityFrom": data = data.OrderByDescending(s => s.QuantityFromD); break;
+                        case "QuantityTo": data = data.OrderByDescending(s => s.QuantityToD); break;
                         case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
                         case "Warehouse": data = data.OrderByDescending(s => s.Warehouse); break;
                         default: break;
@@ -910,23 +971,20 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<ItemDetailTransferVM>> GetItemTransferAsync(int id)
         {
-            var transfersVM = from transfer in context.TransferItems
-                                                      .Include(s => s.Destination)
-                                                      .Include(s => s.Source)
-                              join transferItem in context.TransferItemDetails on transfer.Id equals transferItem.TransferItemId
-                              join user in userManager.Users on transfer.UserCreated equals user.Id
-                              where transferItem.ItemId == id
-                              select new ItemDetailTransferVM
-                              {
-                                  Destination = transfer.Destination.Code,
-                                  Quantity = transferItem.Quantity,
-                                  Remarks = transfer.Remarks,
-                                  Source = transfer.Source.Code,
-                                  TransferBy = user.Nickname,
-                                  TransferDateD = transfer.DateCreated,
-                                  TransferNumber = transfer.Id
-                              };
-            return await transfersVM.ToListAsync();
+            var transferVM = from titem in context.TransferItemDetails
+                             join user in userManager.Users on titem.UserCreated equals user.Id
+                             where titem.Item.Id == id
+                             select new ItemDetailTransferVM
+                             {
+                                 Destination = titem.TransferItem.Destination.Code,
+                                 QuantityD = titem.Quantity,
+                                 Remarks = titem.TransferItem.Remarks,
+                                 Source = titem.TransferItem.Source.Code,
+                                 TransferBy = user.Nickname,
+                                 TransferDateD = titem.TransferItem.DateCreated,
+                                 TransferNumber = titem.TransferItem.Id
+                             };
+            return await transferVM.ToListAsync();
         }
 
         public async Task<ForDataTables<ItemDetailTransferVM>> GetItemTransferDTAsync(DataTablesRequestForm form, int id)
@@ -940,7 +998,7 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.Destination.ToLower().Contains(form.SearchValue)
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.QuantityD.ToString().Contains(form.SearchValue)
                                     || x.Remarks.ToLower().Contains(form.SearchValue)
                                     || x.Source.ToLower().Contains(form.SearchValue)
                                     || x.TransferBy.ToLower().Contains(form.SearchValue)
@@ -957,7 +1015,7 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "Destination": data = data.OrderBy(s => s.Destination); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
                         case "Remarks": data = data.OrderBy(s => s.Remarks); break;
                         case "Source": data = data.OrderBy(s => s.Source); break;
                         case "TransferBy": data = data.OrderBy(s => s.TransferBy); break;
@@ -971,7 +1029,7 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "Destination": data = data.OrderByDescending(s => s.Destination); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
                         case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
                         case "Source": data = data.OrderByDescending(s => s.Source); break;
                         case "TransferBy": data = data.OrderByDescending(s => s.TransferBy); break;
@@ -994,22 +1052,20 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<ItemDetailReturnVM>> GetItemReturnAsync(int id)
         {
-            var returnsVM = from rturn in context.SalesReturns
-                                                 .Include(s => s.Customer)
-                            join rturnItem in context.SalesReturnLineItems
-                                                     .Include(s => s.Item) on rturn.Id equals rturnItem.SalesReturnId
-                            join user in userManager.Users on rturn.UserCreated equals user.Id
-                            where rturnItem.Item.Id == id
+            var returnsVM = from ritem in context.SalesReturnLineItems
+                            join user in userManager.Users on ritem.SalesReturn.UserCreated equals user.Id
+                            where ritem.Item.Id == id
                             select new ItemDetailReturnVM
                             {
-                                Customer = rturn.Customer.Code,
-                                ItemCode = rturnItem.Item.Code,
-                                ItemName = rturnItem.Item.Name,
-                                Quantity = rturnItem.Quantity,
+                                Customer = ritem.SalesReturn.Customer.Code,
+                                ItemCode = ritem.Item.Code,
+                                ItemName = ritem.Item.Name,
+                                QuantityD = ritem.Quantity,
                                 ReturnBy = user.Nickname,
-                                ReturnDateD = rturn.DateCreated,
-                                ReturnNumber = rturn.SalesReturnNumber
+                                ReturnDateD = ritem.SalesReturn.DateCreated,
+                                ReturnNumber = ritem.SalesReturn.SalesReturnNumber
                             };
+
             return await returnsVM.ToListAsync();
         }
 
@@ -1026,7 +1082,7 @@ namespace GMGInventory.Application.Repositories
                 data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue)
                                     || x.ItemCode.ToLower().Contains(form.SearchValue)
                                     || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.QuantityD.ToString().Contains(form.SearchValue)
                                     || x.ReturnBy.ToLower().Contains(form.SearchValue)
                                     || x.ReturnDate.ToLower().Contains(form.SearchValue)
                                     || x.ReturnNumber.ToLower().Contains(form.SearchValue));
@@ -1043,7 +1099,7 @@ namespace GMGInventory.Application.Repositories
                         case "Customer": data = data.OrderBy(s => s.Customer); break;
                         case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
                         case "ReturnBy": data = data.OrderBy(s => s.ReturnBy); break;
                         case "ReturnDate": data = data.OrderBy(s => s.ReturnDateD); break;
                         case "ReturnNumber": data = data.OrderBy(s => s.ReturnNumber); break;
@@ -1057,7 +1113,7 @@ namespace GMGInventory.Application.Repositories
                         case "Customer": data = data.OrderByDescending(s => s.Customer); break;
                         case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
                         case "ReturnBy": data = data.OrderByDescending(s => s.ReturnBy); break;
                         case "ReturnDate": data = data.OrderByDescending(s => s.ReturnDateD); break;
                         case "ReturnNumber": data = data.OrderBy(s => s.ReturnNumber); break;

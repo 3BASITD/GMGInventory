@@ -19,7 +19,7 @@ namespace GMGInventory.Application.Contracts
         Task UpdateAsync(SupplierVM supplierVM);
         Task<bool> IsCodeExist(string code);
         Task<bool> UploadCombinationExistAsync(SupplierVM supplierVM);
-        Task<IList<SupplierViewVM>> GetAllAsync();
+        Task<IList<SupplierViewVM>> GetAllSupplierAsync();
         Task<ForDataTables<SupplierViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
 
     }

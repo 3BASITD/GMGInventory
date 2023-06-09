@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover">
+        <table class="table table-head-fixed table-striped table-hover table-price">
             <thead>
                 <tr>
                     <th>
@@ -57,7 +57,7 @@
 </div>
 
 <div class="modal fade" id="filterPriceModal" role="dialog" aria-labelledby="filterPriceModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Filter Table</h5>
@@ -67,22 +67,52 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-brand" class="form-label mb-0">Brand</label>
                             <select id="filter-brand" style="width:100%">
                                 <option></option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="filter-category" class="form-label mb-0">Category</label>
-                            <select id="filter-category" style="width:100%">
-                                <option></option>
-                            </select>
-                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-type" class="form-label mb-0">Item Type</label>
                             <select id="filter-type" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item-code" class="form-label mb-0">Item Code</label>
+                            <select id="filter-item-code" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item-name" class="form-label mb-0">Item Name</label>
+                            <input type="text" id="filter-item-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-model" class="form-label mb-0">Model Number</label>
+                            <select id="filter-model" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-size" class="form-label mb-0">Size</label>
+                            <select id="filter-size" style="width:100%">
                                 <option></option>
                             </select>
                         </div>
@@ -98,23 +128,59 @@
 
 @section Scripts {
     <script>
-        var dataTable = $('.table').on('preXhr.dt', function (e, settings, data) {
+        var priceDT = $('.table-price').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
                 data: function (data) {
-                    var categoryId = $("#filter-category").val();
-                    var itemTypeId = $("#filter-type").val();
                     var brandId = $("#filter-brand").val();
+                    if (brandId) {
+                        if (isNaN(brandId)) {
+                            data.BrandId = 0;
+                            data.BrandKeyword = brandId;
+                        } else {
+                            data.BrandId = brandId;
+                        }
+                    }
 
-                    if (categoryId) data.CategoryId = categoryId;
-                    if (itemTypeId) data.ItemTypeId = itemTypeId;
-                    if (brandId) data.BrandId = brandId;
+                    var itemTypeId = $("#filter-type").val();
+                    if (itemTypeId) {
+                        if (isNaN(itemTypeId)) {
+                            data.ItemTypeId = 0;
+                            data.ItemTypeKeyword = itemTypeId;
+                        } else {
+                            data.ItemTypeId = itemTypeId;
+                        }
+                    }
+
+                    var itemId = $("#filter-item-code").val();
+                    if (itemId) {
+                        if (isNaN(itemId)) {
+                            data.ItemId = 0;
+                            data.ItemKeyword = itemId;
+                        } else {
+                            data.ItemId = itemId;
+                        }
+                    }
+
+                    if ($("#filter-model").hasClass("select2-hidden-accessible")) {
+                        var model = $("#filter-model").select2("data")[0].text;
+                        if (model) {
+                            data.ModelNumber = model;
+                        }
+                    }
+
+                    if ($("#filter-size").hasClass("select2-hidden-accessible")) {
+                        var size = $("#filter-size").select2("data")[0].text;
+                        if (size) {
+                            data.Size = size;
+                        }
+                    }
                 },
             },
-            //processing: true,
+            processing: true,
             serverSide: true,
             filter: true,
             responsive: true,
@@ -145,23 +211,30 @@
             order: [[3, "asc"]]
         });
 
-        dataTable.on("draw", function () {
+        priceDT.on("draw", function () {
             hideLoader();
         });
 
         function ApplyFilter() {
-            $(".table").DataTable().ajax.reload();
+            priceDT.ajax.reload();
             $("#filterPriceModal").modal("hide");
         }
 
-        // Load Select2 for Category
+        // Load Select2 for Brand
         $.ajax({
             type: "POST",
-            url: "@Url.Action("GetOptions", "Category")",
+            url: "@Url.Action("GetOptions", "Brand")",
             success: function (data, status, xhr) {
-                $("#filter-category").select2({
+                $("#filter-brand").select2({
+                    tags: true,
                     data: data,
                     allowClear: true,
+                    templateResult: function (repo) {
+                        if (repo.element) {
+                            return repo.text;
+                        }
+                        return $("<span>" + repo.text + "</span> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                    },
                     placeholder: {
                         id: "",
                         text: "All"
@@ -177,8 +250,15 @@
             url: "@Url.Action("GetOptions", "ItemType")",
             success: function (data, status, xhr) {
                 $("#filter-type").select2({
+                    tags: true,
                     data: data,
                     allowClear: true,
+                    templateResult: function (repo) {
+                        if (repo.element) {
+                            return repo.text;
+                        }
+                        return $("<span>" + repo.text + "</span> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                    },
                     placeholder: {
                         id: "",
                         text: "All"
@@ -188,28 +268,131 @@
             }
         });
 
-        // Load Select2 for Brand
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Brand")",
-            success: function (data, status, xhr) {
-                $("#filter-brand").select2({
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterPriceModal')
-                });
+        // Load Select2 for Item
+        $("#filter-item-code").select2({
+            tags: true,
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "All"
+            },
+            templateResult: function (repo) {
+                if (repo.element) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - " + repo.name + "</em>");
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Item")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterPriceModal")
+        });
+
+        $("#filter-item-code").on("select2:select", function () {
+            if ($(this).select2("data")[0].name) {
+                $("#filter-item-name").val($(this).select2("data")[0].name);
+            } else if ($(this).val()) {
+                $("#filter-item-name").val($("#filter-item").val());
             }
+        });
+
+        $("#filter-item-code").on("select2:unselecting", function (e) {
+            $("#filter-item-name").val("");
+        });
+
+        // Load Select2 for Model Number
+        $("#filter-model").select2({
+            tags: true,
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "All"
+            },
+            ajax: {
+                url: "@Url.Action("GetModelNumberOptions", "Item")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterPriceModal")
+        });
+
+        // Load Select2 for Size
+        $("#filter-size").select2({
+            tags: true,
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "All"
+            },
+            ajax: {
+                url: "@Url.Action("GetSizeOptions", "Item")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterPriceModal")
         });
 
         $(".printBtn").on("click", function () {
-            if (dataTable.page.info().recordsTotal > 1000) {
+            if (priceDT.page.info().recordsTotal > 1000) {
                 swal({
                     title: "A lot of records to print",
-                    text: "You are trying to print " + dataTable.page.info().recordsTotal + " record(s). Genererating a page to print for this much will take a while. Would you like to continue?",
+                    text: "You are trying to print " + priceDT.page.info().recordsTotal + " record(s). Genererating a page to print for this much will take a while. Would you like to continue?",
                     icon: "info",
                     buttons: {
                         cancel: "No",
@@ -235,9 +418,47 @@
                 fontawesome: "fas fa-print"
             });
             var urlQuery = [];
-            if ($("#filter-category").val()) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
-            if ($("#filter-type").val()) { urlQuery.push("ItemTypeId=" + $("#filter-type").val()); }
-            if ($("#filter-brand").val()) { urlQuery.push("BrandId=" + $("#filter-brand").val()); }
+
+            var brandId = $("#filter-brand").val();
+            if (brandId) {
+                if (isNaN(brandId)) {
+                    urlQuery.push("BrandId=0");
+                    urlQuery.push("BrandKeyword=" + brandId);
+                } else {
+                    urlQuery.push("BrandId=" + brandId);
+                }
+            }
+
+            var itemTypeId = $("#filter-type").val();
+            if (itemTypeId) {
+                if (isNaN(itemTypeId)) {
+                    urlQuery.push("ItemTypeId=0");
+                    urlQuery.push("ItemTypeKeyword=" + itemTypeId);
+                } else {
+                    urlQuery.push("ItemTypeId=" + itemTypeId);
+                }
+            }
+
+            var itemId = $("#filter-item-code").val();
+            if (itemId) {
+                if (isNaN(itemId)) {
+                    urlQuery.push("ItemId=0");
+                    urlQuery.push("ItemCategory=" + itemId);
+                } else {
+                    urlQuery.push("ItemId=" + itemId);
+                }
+            }
+
+            var model = $("#filter-model").select2("data")[0].text;
+            if (model) {
+                urlQuery.push("ModelNumber=" + model);
+            }
+
+            var size = $("#filter-size").select2("data")[0].text;
+            if (size) {
+                urlQuery.push("Size=" + size);
+            }
+
             setTimeout(function () {
                 let win = window.open('@Url.Action("Print")?' + urlQuery.join("&"), '');
                 var wintimer = setInterval(function () {

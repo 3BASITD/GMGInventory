@@ -99,9 +99,7 @@
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th>Total</th>
+                                    <th colspan="3" class="text-end">Total</th>
                                     <th class="total-quantity">0</th>
                                     <th></th>
                                     <th></th>
@@ -247,7 +245,7 @@
             $("#for-print").printThis({
                 importCSS: false,
                 loadCSS: "/css/print.css",
-                pageTitle: "GMG Inventory",
+                pageTitle: "BAS/GMG Inventory",
                 beforePrint: function () {
                     $.LoadingOverlay("show", {
                         image: "",

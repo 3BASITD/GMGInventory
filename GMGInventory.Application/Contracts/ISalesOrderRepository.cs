@@ -9,9 +9,8 @@ namespace GMGInventory.Application.Contracts
         Task<IList<JsonOptionsModel>> GetPriceTypeOptions(int? IncludeId);
         Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id);
         Task<SalesOrderPrintVM?> PrintDetailsAsync(int? Id);
-        Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form);
-        Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId);
-        Task<IList<SalesOrderItemVM>> GetItemsForPackAsync(int salesOrderId);
+        Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form, SalesOrderFilterVM filter);
+        Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId, bool forPack = false);
         Task<ForDataTables<SalesOrderItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int salesOrderId);
         Task<int> SaveAsync(SalesOrderFormVM form);
         Task SaveItemsAsync(IList<SalesOrderFormItemVM> Items, int salesOrderId);

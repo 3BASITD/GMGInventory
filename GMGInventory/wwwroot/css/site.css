@@ -156,6 +156,13 @@ table tr td > input {
     min-width: 100px;
 }
 
+table tr th > input[type=checkbox],
+table tr td > input[type=checkbox],
+table tr th > input[type=radio],
+table tr td > input[type=radio]{
+    min-width: 20px;
+}
+
 .form-check-input {
     position: static !important;
     margin-left: 0 !important;
@@ -193,4 +200,8 @@ pre {
 .clickable {
     cursor: pointer;
     display: inline-block;
+}
+
+p.text-sm {
+    margin-bottom: 0.5rem;
 }

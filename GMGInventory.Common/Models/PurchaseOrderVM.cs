@@ -83,9 +83,13 @@ namespace GMGInventory.Common.Models
         public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
+        [Display(Name = "Discount 3")]
+        public string Discount3 => string.Format(SystemFormat.StringDecimalComma, Discount3D);
+        public decimal Discount3D { get; set; }
+
         [Display(Name = "Gross Price")]
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
-        public decimal NetPriceD => Quantity * (((100m - Discount1D - Discount2D) * UnitPriceD) / 100m);
+        public decimal NetPriceD => Quantity * (((100m - Discount1D - Discount2D - Discount3D) * UnitPriceD) / 100m);
     }
 
     public class PurchaseOrderFormVM
@@ -107,5 +111,6 @@ namespace GMGInventory.Common.Models
         public decimal UnitPrice { get; set; }
         public decimal Discount1 { get; set; }
         public decimal Discount2 { get; set; }
+        public decimal Discount3 { get; set; }
     }
 }

@@ -317,9 +317,24 @@ namespace GMGInventory.Controllers
             return View();
         }
 
+        public IActionResult CustomerSalesCompare()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> PrintCustomerSales(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintCustomerSales(filter));
+        }
+
+        public async Task<IActionResult> PrintCustomerSalesCompare(ListFilterSalesModel filter1, ListFilterSalesModel filter2)
+        {
+            var sales = new CustomerSalesComparePVM
+            {
+                CustomerSales1 = await reportSalesRepository.PrintCustomerSales(filter1),
+                CustomerSales2 = await reportSalesRepository.PrintCustomerSales(filter2)
+            };
+            return View(sales);
         }
 
         [HttpPost]
@@ -360,6 +375,50 @@ namespace GMGInventory.Controllers
                     return File(stream.ToArray(),
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         DateTime.Now.ToString("yyyyMMdd") + " Sales Report by Customer.xlsx");
+                }
+            }
+        }
+
+        public async Task<IActionResult> DownloadCustomerSalesCompare(ListFilterSalesModel filter1, ListFilterSalesModel filter2)
+        {
+            DataTable dt1 = new DataTable("Sales Report #1");
+            dt1.Columns.AddRange(new DataColumn[3] {
+                new DataColumn("Customer"),
+                new DataColumn(chelper.DisplayName<CustomerSalesRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<CustomerSalesRVM>("Amount"))
+            });
+            var debits1 = await reportSalesRepository.GetCustomerSales(filter1);
+            foreach (var debit in debits1)
+            {
+                dt1.Rows.Add(debit.CustomerCode,
+                            debit.Brand,
+                            debit.Amount);
+            }
+
+            DataTable dt2 = new DataTable("Sales Report #2");
+            dt2.Columns.AddRange(new DataColumn[3] {
+                new DataColumn("Customer"),
+                new DataColumn(chelper.DisplayName<CustomerSalesRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<CustomerSalesRVM>("Amount"))
+            });
+            var debits2 = await reportSalesRepository.GetCustomerSales(filter2);
+            foreach (var debit in debits2)
+            {
+                dt2.Rows.Add(debit.CustomerCode,
+                            debit.Brand,
+                            debit.Amount);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt1);
+                wb.Worksheets.Add(dt2);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Sales Report by Customer (Compare).xlsx");
                 }
             }
         }

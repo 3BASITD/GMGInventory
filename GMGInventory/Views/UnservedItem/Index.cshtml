@@ -7,6 +7,11 @@
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
     </div>
     <div class="card-body">
         <table class="table table-head-fixed table-striped table-hover table-unserved">
@@ -37,6 +42,9 @@
                         @Html.DisplayNameFor(model => model.UnservedQuantity)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.QuantityOnHand)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Discount1)
                     </th>
                     <th>
@@ -54,14 +62,105 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-region" class="form-label mb-0">Region</label>
+                            <select id="filter-region" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Order Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Order Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        SetDateFilter();
+        function SetDateFilter() {
+            if ($("#filter-to").val() == "") {
+                if ($("#filter-from").val() == "") {
+                    $("#filter-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter-from").val());
+                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    $("#filter-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter-from").val() == "") {
+                var dt_to = new Date($("#filter-to").val());
+                dt_to.setFullYear(dt_to.getFullYear() - 1);
+                $("#filter-from").val(DateForInput(dt_to));
+            }
+        }
+
+        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+
+        // Load region data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#filter-region").select2({
+                    allowClear: true,
+                    placeholder: '<empty>',
+                    data: $.map(data, function (v, i) {
+                        return v.text == "Luzon" || v.text == "Visayas" || v.text == "Mindanao" ? v : null;
+                    }),
+                    minimumResultsForSearch: Infinity
+                });
+            }
+        });
+
+        $(".btnFilter").on("click", function () {
+            dataTable.ajax.reload();
+        });
+
         // Load List on DataTable
         var dataTable = $('.table-unserved').on('preXhr.dt', function(e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
+                data: function (data) {
+                    var regionId = $("#filter-region").val();
+                    if (regionId) data.Region = regionId;
+
+                    data.StartDate = $("#filter-from").val();
+                    data.EndDate = $("#filter-to").val();
+                },
                 type: "POST",
             },
             serverSide: true,
@@ -84,6 +183,7 @@
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "packedQuantity", name: "PackedQuantity", className: "text-end" },
                 { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end" },
+                { data: "quantityOnHand", name: "QuantityOnHand", className: "text-end" },
                 {
                     data: "discount1",//function(data, type, dataToSet) { return data.discount1.toFixed(2); },
                     name: "Discount1",

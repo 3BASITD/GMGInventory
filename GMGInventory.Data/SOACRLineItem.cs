@@ -18,8 +18,8 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal PaidAmount { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal TBRAmount { get; set; }
+        //[Column(TypeName = "decimal(18, 2)")]
+        //public decimal TBRAmount { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal CreditAmount { get; set; }
@@ -33,8 +33,8 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string? FreightWaybill { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal? Balance { get; set; }
+        //[Column(TypeName = "decimal(18, 2)")]
+        //public decimal? Balance { get; set; }
 
         public bool? IsPaid { get; set; }
     }

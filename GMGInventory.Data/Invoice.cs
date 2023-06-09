@@ -6,10 +6,11 @@ namespace GMGInventory.Data
     {
         public Invoice()
         {
+            this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
             this.CreditDebitMemos = new HashSet<CreditDebitMemo>();
             this.InvoiceLineItems = new HashSet<InvoiceLineItem>();
-            this.InvoicePayments = new HashSet<InvoicePayment>();
-            this.PaymentDetails = new HashSet<PaymentDetail>();
+            //this.InvoicePayments = new HashSet<InvoicePayment>();
+            //this.PaymentDetails = new HashSet<PaymentDetail>();
             this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
             this.SOACRLineItems = new HashSet<SOACRLineItem>();
         }
@@ -48,6 +49,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
 
+        public DateTime InvoiceDate { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? ApprovedBy { get; set; }
@@ -57,10 +59,11 @@ namespace GMGInventory.Data
         public string? DisapprovedBy { get; set; }
         public DateTime? DisapprovedDate { get; set; }
 
+        public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public ICollection<CreditDebitMemo> CreditDebitMemos { get; set; }
         public ICollection<InvoiceLineItem> InvoiceLineItems { get; set; }
-        public ICollection<InvoicePayment> InvoicePayments { get; set; }
-        public ICollection<PaymentDetail> PaymentDetails { get; set; }
+        //public ICollection<InvoicePayment> InvoicePayments { get; set; }
+        //public ICollection<PaymentDetail> PaymentDetails { get; set; }
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
         public ICollection<SOACRLineItem> SOACRLineItems { get; set; }
 

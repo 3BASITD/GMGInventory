@@ -14,6 +14,9 @@
             <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
                 <span class="fas fa-download"></span> Download
             </button>
+            <a class="btn btn-secondary btn-sm float-right ml-2" asp-action="CustomerSalesCompare">
+                <span class="fas fa-columns"></span> Compare
+            </a>
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -24,12 +27,8 @@
             <thead>
                 <tr>
                     <th>
-                        @*@Html.DisplayNameFor(model => model.CustomerCode)*@
                         Customer
                     </th>
-                    @*<th>
-                        @Html.DisplayNameFor(model => model.CustomerName)
-                    </th>*@
                     <th>
                         @Html.DisplayNameFor(model => model.Brand)
                     </th>
@@ -40,7 +39,7 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="2">Total</th>
+                    <th colspan="2" class="text-end">Total</th>
                     <th></th>
                 </tr>
             </tfoot>

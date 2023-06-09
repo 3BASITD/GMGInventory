@@ -5,7 +5,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IAreaRepository : IGenericRepository<Area>
     {
-        Task<IList<AreaViewVM>> GetAllAsync();
+        Task<IList<AreaViewVM>> GetAllAreaAsync();
         Task<ForDataTables<AreaViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
         Task<IList<AreaViewVM>> GetAllAreaVMAsync();
         Task<AreaViewVM?> GetAreaViewVMAsync(int? id);

@@ -28,6 +28,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount2 { get; set; }
 
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Discount3 { get; set; }
+
         public ICollection<PurchaseReturnLineItem> PurchaseReturnLineItems { get; set; }
     }
 }

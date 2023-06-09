@@ -34,7 +34,7 @@ namespace GMGInventory.Application.Repositories
         }
 
 
-        public async Task<IList<AreaViewVM>> GetAllAsync()
+        public async Task<IList<AreaViewVM>> GetAllAreaAsync()
         {
 
             var agents = from area in context.Areas
@@ -53,9 +53,7 @@ namespace GMGInventory.Application.Repositories
                              CommissionRateD = area.CommissionRate,
                              RegionName = region.Name,
                              IsActive = area.IsActive,
-                             DateCreated = area.DateCreated.ToString(SystemFormat.StringDateTime),
                              DateCreatedD = area.DateCreated,
-                             DateModified = area.DateModified == null ? "-" : area.DateModified.Value.ToString(SystemFormat.StringDateTime),
                              DateModifiedD = area.DateModified == null ? null : area.DateModified.Value,
                              UserCreated = userc.Nickname,
                              UserModified = um == null ? "-" : um.Nickname
@@ -67,7 +65,7 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetAllAsync()).AsQueryable();
+            var data = (await GetAllAreaAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -249,7 +247,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(AreaVM areaVM)
         {
-            return (await GetAllAsync()).Any(s => s.Code == areaVM.Code && s.Name == areaVM.Name &&
+            return (await GetAllAreaAsync()).Any(s => s.Code == areaVM.Code && s.Name == areaVM.Name &&
             s.CommissionRate == areaVM.CommissionRate && s.RegionName == areaVM.RegionName);
         }
 

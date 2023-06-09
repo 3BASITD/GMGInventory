@@ -1,0 +1,130 @@
+﻿@model CustomerSalesComparePVM
+
+@{
+    Layout = "";
+    var title = "Customer Sales (Compare)";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <table>
+        <tr>
+            <td valign="top">
+                <p>
+                    <strong>Brand</strong>
+                    <span>@Model.CustomerSales1.Brand</span>
+                    <br />
+                    <strong>Customer</strong>
+                    <span>@Model.CustomerSales1.Customer</span>
+                    <br />
+                    <strong>Date From</strong>
+                    <span>@Model.CustomerSales1.DateFrom</span>
+                    <br />
+                    <strong>Date To</strong>
+                    <span>@Model.CustomerSales1.DateTo</span>
+                </p>
+                <table class="table-items">
+                    <thead>
+                        <tr>
+                            <th>
+                                @*@Html.DisplayNameFor(model => model.Contents.First().CustomerCode)*@
+                                Customer
+                            </th>
+                            @*<th>
+                            @Html.DisplayNameFor(model => model.Contents.First().CustomerName)
+                            </th>*@
+                            <th>
+                                @Html.DisplayNameFor(model => model.CustomerSales1.Contents.First().Brand)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.CustomerSales1.Contents.First().Amount)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.CustomerSales1.Contents)
+                        {
+                            <tr>
+                                <td>@item.CustomerCode</td>
+                                @*<td>@item.CustomerName</td>*@
+                                <td><nobr>@item.Brand</nobr></td>
+                                <td class="right-text"><nobr>@item.Amount</nobr></td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2" class="right-text">Total</th>
+                            <th class="right-text"><nobr>@Model.CustomerSales1.TotalAmount</nobr></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </td>
+            <td valign="top">
+                <p>
+                    <strong>Brand</strong>
+                    <span>@Model.CustomerSales2.Brand</span>
+                    <br />
+                    <strong>Customer</strong>
+                    <span>@Model.CustomerSales2.Customer</span>
+                    <br />
+                    <strong>Date From</strong>
+                    <span>@Model.CustomerSales2.DateFrom</span>
+                    <br />
+                    <strong>Date To</strong>
+                    <span>@Model.CustomerSales2.DateTo</span>
+                </p>
+                <table class="table-items">
+                    <thead>
+                        <tr>
+                            <th>
+                                @*@Html.DisplayNameFor(model => model.Contents.First().CustomerCode)*@
+                                Customer
+                            </th>
+                            @*<th>
+                            @Html.DisplayNameFor(model => model.Contents.First().CustomerName)
+                            </th>*@
+                            <th>
+                                @Html.DisplayNameFor(model => model.CustomerSales2.Contents.First().Brand)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.CustomerSales2.Contents.First().Amount)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.CustomerSales2.Contents)
+                        {
+                            <tr>
+                                <td>@item.CustomerCode</td>
+                                @*<td>@item.CustomerName</td>*@
+                                <td><nobr>@item.Brand</nobr></td>
+                                <td class="right-text"><nobr>@item.Amount</nobr></td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2" class="right-text">Total</th>
+                            <th class="right-text"><nobr>@Model.CustomerSales2.TotalAmount</nobr></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
+</html>

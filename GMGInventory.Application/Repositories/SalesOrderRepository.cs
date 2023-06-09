@@ -138,7 +138,7 @@ namespace GMGInventory.Application.Repositories
                                Status = order.Status.Code
                            });
 
-                return await orderVM.FirstOrDefaultAsync();
+            return await orderVM.FirstOrDefaultAsync();
         }
 
         public async Task<SalesOrderPrintVM?> PrintDetailsAsync(int? Id)
@@ -158,7 +158,7 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
-        private async Task<IList<SalesOrderVM>> GetListAsync()
+        private async Task<IList<SalesOrderVM>> GetListAsync(SalesOrderFilterVM filter)
         {
             var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
             var currentUserId = currentUser.Id;
@@ -171,7 +171,12 @@ namespace GMGInventory.Application.Repositories
                            join user in userManager.Users on order.UserCreated equals user.Id
                            let auser = userManager.Users.Where(s => s.Id == order.ApprovedBy).Select(s => s.Nickname).First()
                            let duser = userManager.Users.Where(s => s.Id == order.DisapprovedBy).Select(s => s.Nickname).First()
-                           where order.UserCreated == currentUserId || isAdminOrManager
+                           where (order.UserCreated == currentUserId || isAdminOrManager)
+                           && (filter.AgentId == null || order.AgentId == filter.AgentId)
+                           && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
+                           && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
+                           && filter.DateFrom <= order.DateCreated.Date
+                           && order.DateCreated.Date <= filter.DateTo
                            select new SalesOrderVM
                            {
                                Customer = order.Customer.Name,
@@ -186,11 +191,11 @@ namespace GMGInventory.Application.Repositories
             return await orderVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form, SalesOrderFilterVM filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync()).AsQueryable();
+            var data = (await GetListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -243,71 +248,41 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId)
+        public async Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId, bool forPack = false)
         {
             var itemVM = from order in context.SalesOrderLineItems
                                               .Include(s => s.Item)
                                               .ThenInclude(s => s.Unit)
-                         from price in context.ItemPrices
-                                              .Where(s => s.ItemId == order.ItemId
-                                                       && s.DateCreated <= DateTime.Now)
-                                              .OrderByDescending(s => s.DateCreated)
-                                              .Take(1)
-                                              .DefaultIfEmpty()
+                         let price = context.ItemPrices
+                                            .Where(s => s.ItemId == order.ItemId
+                                                     && s.DateCreated <= order.SalesOrder.ApprovedDate)
+                                            .OrderByDescending(s => s.DateCreated)
+                                            .FirstOrDefault()
                          let inventory = context.ItemInventories
-                                                .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code == "MAIN")
+                                                .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
                                                 .Sum(s => s.Quantity)
+                         let served = context.SalesOrderLineItems.Where(s => s.ItemId == order.Item.Id).ToList()
                          where order.SalesOrderId == salesOrderId
+                         && ((order.Quantity != order.PackedQuantity && forPack == true) || forPack == false)
                          select new SalesOrderItemVM
                          {
                              Discount1D = order.Discount1,
                              Discount2D = order.Discount2,
                              Id = order.Id,
-                             InventoryCountD = inventory,
+                             InventoryCountD = inventory + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
                              InvoicedQuantityD = order.InvoicedQuantity,
                              ItemCode = order.Item.Code,
                              ItemId = order.Item.Id,
                              ItemName = order.Item.Name,
-                             NetPriceD = price.NetSellingPrice,
+                             NetPriceD = price == null ? 0 : price.NetSellingPrice,
                              QuantityD = order.Quantity,
                              PackedQuantityD = order.PackedQuantity,
-                             RetailPriceD = price.RetailSellingPrice,
+                             RemainingQuantityD = order.ServedQuantity - order.PackedQuantity,
+                             RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                              SellingPriceD = order.SellingPrice,
                              ServedQuantityD = order.ServedQuantity,
                              Unit = order.Item.Unit.Code,
                              UnservedQuantityD = order.UnservedQuantity
-                         };
-            return await itemVM.ToListAsync();
-        }
-
-        public async Task<IList<SalesOrderItemVM>> GetItemsForPackAsync(int salesOrderId)
-        {
-            var itemVM = from order in context.SalesOrderLineItems
-                         from price in context.ItemPrices
-                                              .Where(s => s.ItemId == order.ItemId
-                                                       && s.DateCreated <= DateTime.Now)
-                                              .OrderByDescending(s => s.DateCreated)
-                                              .Take(1)
-                                              .DefaultIfEmpty()
-                         let inventory = context.ItemInventories
-                                                .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code == "MAIN")
-                                                .Sum(s => s.Quantity)
-                         where order.SalesOrderId == salesOrderId
-                         && order.Quantity != order.PackedQuantity
-                         select new SalesOrderItemVM
-                         {
-                             Discount1D = order.Discount1,
-                             Discount2D = order.Discount2,
-                             Id = order.Id,
-                             InventoryCountD = inventory,
-                             ItemCode = order.Item.Code,
-                             ItemId = order.Item.Id,
-                             ItemName = order.Item.Name,
-                             NetPriceD = price.NetSellingPrice,
-                             PackedQuantityD = order.PackedQuantity,
-                             QuantityD = order.Quantity,
-                             RetailPriceD = price.RetailSellingPrice,
-                             SellingPriceD = order.SellingPrice
                          };
             return await itemVM.ToListAsync();
         }
@@ -411,9 +386,22 @@ namespace GMGInventory.Application.Repositories
             //    soNumber = string.Format("{0:SO00000000}", previousOrders);
             //}
 
-            var latestOrder = context.SalesOrders.OrderByDescending(s => s.SalesOrderNumber).Select(s => s.SalesOrderNumber).FirstOrDefault();
-            var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
-            string soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
+            var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
+            string soNumber = "";
+            if (previous == null)
+            {
+                var latestOrder = context.SalesOrders
+                                         .Where(s => s.SalesOrderNumber.StartsWith("SO"))
+                                         .OrderByDescending(s => s.SalesOrderNumber)
+                                         .Select(s => s.SalesOrderNumber)
+                                         .FirstOrDefault();
+                var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
+                soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
+            }
+            else
+            {
+                soNumber = previous.SalesOrderNumber;
+            }
 
             int statusId = context.Statuses.Where(s => s.Name == "Sales Order Submitted").Select(s => s.Id).First();
             if (orderVM == null)
@@ -437,11 +425,27 @@ namespace GMGInventory.Application.Repositories
                 await context.SalesOrders.AddAsync(orderVM);
                 await context.SaveChangesAsync(currentUserId);
 
-
-                var previous = await context.SalesOrders.Where(s=>s.Id == form.ResubmitId).FirstOrDefaultAsync();
-                if(previous != null)
+                if (previous != null)
                 {
-                    previous.ResubmittedSalesOrderId = orderVM.Id;
+                    //previous.ResubmittedSalesOrderId = orderVM.Id;
+                    //previous.SalesOrderNumber = "*" + previous.SalesOrderNumber;
+
+                    var soLineItems = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
+                    if (soLineItems != null)
+                    {
+                        context.SalesOrderLineItems.RemoveRange(soLineItems);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+
+
+                    var soDelivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
+                    if (soDelivery != null)
+                    {
+                        context.SalesOrderDeliveryMonitorings.RemoveRange(soDelivery);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+
+                    context.SalesOrders.Remove(previous);
                     await context.SaveChangesAsync(currentUserId);
                 }
 
@@ -546,7 +550,7 @@ namespace GMGInventory.Application.Repositories
                 foreach (var salesOrderLineItem in salesOrderLineItems)
                 {
                     var itemInventory = await context.ItemInventories
-                                                     .Where(s => s.ItemId == salesOrderLineItem.ItemId && s.Warehouse.Name == "MAIN")
+                                                     .Where(s => s.ItemId == salesOrderLineItem.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
                                                      .FirstOrDefaultAsync();
                     //if (itemInventory != null && itemInventory.Quantity >= salesOrderLineItem.Quantity)
                     //{
@@ -573,7 +577,7 @@ namespace GMGInventory.Application.Repositories
                         else if (itemInventory.Quantity < 0)
                         {
                             salesOrderLineItem.UnservedQuantity = salesOrderLineItem.Quantity;
-                        } 
+                        }
                         else
                         {
                             salesOrderLineItem.ServedQuantity = itemInventory.Quantity;
@@ -624,7 +628,7 @@ namespace GMGInventory.Application.Repositories
                 await context.SaveChangesAsync(currentUserId);
 
                 var delivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == salesOrderId).FirstOrDefaultAsync();
-                if(delivery != null)
+                if (delivery != null)
                 {
                     context.SalesOrderDeliveryMonitorings.Remove(delivery);
                     await context.SaveChangesAsync(currentUserId);
@@ -647,7 +651,7 @@ namespace GMGInventory.Application.Repositories
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 var inventory = await context.ItemInventories
-                                             .Where(s => s.ItemId == soItem.ItemId && s.Warehouse.Name == "MAIN")
+                                             .Where(s => s.ItemId == soItem.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
                                              .FirstOrDefaultAsync();
                 if (inventory == null)
                 {

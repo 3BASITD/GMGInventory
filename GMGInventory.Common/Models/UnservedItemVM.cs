@@ -11,7 +11,7 @@ namespace GMGInventory.Common.Models
         public string Item { get; set; }
 
         [Display(Name = "Order Date")]
-        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
+        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
         public DateTime OrderDateD { get; set; }
 
         [Display(Name = "Sales Order Number")]
@@ -36,6 +36,10 @@ namespace GMGInventory.Common.Models
         public string UnservedQuantity => string.Format(SystemFormat.StringIntegerComma, UnservedQuantityD);
         public int UnservedQuantityD { get; set; }
 
+        [Display(Name = "Quantity on Hand")]
+        public string QuantityOnHand => string.Format(SystemFormat.StringIntegerComma, QuantityOnHandD);
+        public int QuantityOnHandD { get; set; }
+
         [Display(Name = "Discount 1")]
         public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
         public decimal Discount1D { get; set; }
@@ -55,8 +59,6 @@ namespace GMGInventory.Common.Models
     {
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public int? CategoryId { get; set; }
-        public int? ItemTypeId { get; set; }
-        public int? BrandId { get; set; }
+        public int? Region { get; set; }
     }
 }

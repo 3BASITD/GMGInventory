@@ -11,7 +11,12 @@
     <div class="card card-default">
         <div class="card-header">
             <span class="card-title po-title">@ViewData["Title"]</span>
-            <div class="card-tools">
+        <div class="card-tools">
+            @if (Model.Status == "Posted") {
+                <a href="@Url.Action("Create", "SalesInvoice")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-file-invoice"></span> Start Invoice
+            </a>
+            }
                 <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                     <span class="fas fa-print"></span> Print
                 </button>
@@ -109,8 +114,7 @@
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th colspan="2"></th>
-                                        <th>Total</th>
+                                    <th colspan="3" class="text-end">Total</th>
                                         <th>0</th>
                                     </tr>
                                 </tfoot>
@@ -138,11 +142,13 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            paging: false,
+            searching: false,
             search: {
                 return: true,
             },
             columns: [
-                { data: "boxNumber", name: "BoxNumber" },
+                { data: "boxNumber", name: "BoxNumber", visible: false },
                 {
                     data: function (data, type, dataToSet) {
                         return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
@@ -156,6 +162,20 @@
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
                 columnDTTotalInteger(api, 3);
+            },
+            order: [[1, "asc"]],
+            orderFixed: [[0, 'asc']],
+            rowGroup: {
+                startRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="3"><strong>Box ' + group + '</strong></td>');
+                },
+                endRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="2" class="text-end">Total Quantity for <strong>Box ' + group + '</strong></td>')
+                        .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
+                },
+                dataSrc: "boxNumber"
             }
         });
 
@@ -165,71 +185,89 @@
             $(".table-item thead th").removeClass("text-end");
         });
 
+
+
         $(".btn-details-print").on("click", function () {
-            var html = '<h3>Pack Details</h3>';
-            html += '<table class="table-header w100">';
-            html += '<tr>';
-
-            html += '<th>@Html.DisplayNameFor(model => model.Id)</th><td>@Model?.Id</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.SONumber)</th><td>@Model?.SONumber</td>';
-            html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.CustomerCode)</th><td>@Model?.CustomerCode</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.SalesOrderDate)</th><td>@Model?.SalesOrderDate</td>';
-            html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.CustomerName)</th><td>@Model?.CustomerName</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.PackDate)</th><td>@Model?.PackDate</td>';
-            html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.Forwarder)</th><td>@Model?.Forwarder</td > ';
-            html += '<th>@Html.DisplayNameFor(model => model.PackBy)</th><td>@Model?.PackBy</td > ';
-            html += '</tr>';
-            html += '</table>';
-
-            html += '<table class="table-items">';
-            html += '<tr>';
-            html += '<thead>';
-            html += '<th>Box Number</th>';
-            html += '<th>Item Code</th>';
-            html += '<th>Item Name</th>';
-            html += '<th>Quantity</th>';
-            html += '</thead>';
-            html += '</tr>';
-            var totalQuantity = 0, totalNetPrice = 0;
-            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var row_data = this.data();
-                html += '<tr>';
-                html += '<td>' + row_data.boxNumber + '</td>';
-                html += '<td>' + row_data.itemCode + '</td>';
-                html += '<td>' + row_data.itemName + '</td>';
-                html += '<td class="right-text">' + row_data.quantity + '</td>';
-                html += '</tr>';
-
-                totalQuantity += parseInt(row_data.quantity);
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
             });
-            html += '<tr>';
-            html += '<tfoot>';
-            html += '<th colspan="3" class="right-text">Total</th>';
-            html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
-            html += '</tfoot>';
-            html += '</tr>';
-            html += '</table>';
-            $("#for-print").html(html);
-            $("#for-print").printThis({
-                importCSS: false,
-                loadCSS: "/css/print.css",
-                pageTitle: "GMG Inventory",
-                beforePrint: function () {
-                    $.LoadingOverlay("show", {
-                        image: "",
-                        fontawesome: "fas fa-print"
-                    });
-                },
-                afterPrint: function () {
-                    hideLoader();
-                }
-            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id, '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
         });
+
+        //$(".btn-details-print").on("click", function () {
+        //    var html = '<h3>Pack Details</h3>';
+        //    html += '<table class="table-header w100">';
+        //    html += '<tr>';
+
+        //    html += '<th>@Html.DisplayNameFor(model => model.Id)</th><td>@Model?.Id</td>';
+        //    html += '<th>@Html.DisplayNameFor(model => model.SONumber)</th><td>@Model?.SONumber</td>';
+        //    html += '</tr>';
+        //    html += '<tr>';
+        //    html += '<th>@Html.DisplayNameFor(model => model.CustomerCode)</th><td>@Model?.CustomerCode</td>';
+        //    html += '<th>@Html.DisplayNameFor(model => model.SalesOrderDate)</th><td>@Model?.SalesOrderDate</td>';
+        //    html += '</tr>';
+        //    html += '<tr>';
+        //    html += '<th>@Html.DisplayNameFor(model => model.CustomerName)</th><td>@Model?.CustomerName</td>';
+        //    html += '<th>@Html.DisplayNameFor(model => model.PackDate)</th><td>@Model?.PackDate</td>';
+        //    html += '</tr>';
+        //    html += '<tr>';
+        //    html += '<th>@Html.DisplayNameFor(model => model.Forwarder)</th><td>@Model?.Forwarder</td > ';
+        //    html += '<th>@Html.DisplayNameFor(model => model.PackBy)</th><td>@Model?.PackBy</td > ';
+        //    html += '</tr>';
+        //    html += '</table>';
+
+        //    html += '<table class="table-items">';
+        //    html += '<tr>';
+        //    html += '<thead>';
+        //    html += '<th>Box Number</th>';
+        //    html += '<th>Item Code</th>';
+        //    html += '<th>Item Name</th>';
+        //    html += '<th>Quantity</th>';
+        //    html += '</thead>';
+        //    html += '</tr>';
+        //    var totalQuantity = 0, totalNetPrice = 0;
+        //    itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+        //        var row_data = this.data();
+        //        html += '<tr>';
+        //        html += '<td>' + row_data.boxNumber + '</td>';
+        //        html += '<td>' + row_data.itemCode + '</td>';
+        //        html += '<td>' + row_data.itemName + '</td>';
+        //        html += '<td class="right-text">' + row_data.quantity + '</td>';
+        //        html += '</tr>';
+
+        //        totalQuantity += parseInt(row_data.quantity);
+        //    });
+        //    html += '<tr>';
+        //    html += '<tfoot>';
+        //    html += '<th colspan="3" class="right-text">Total</th>';
+        //    html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
+        //    html += '</tfoot>';
+        //    html += '</tr>';
+        //    html += '</table>';
+        //    $("#for-print").html(html);
+        //    $("#for-print").printThis({
+        //        importCSS: false,
+        //        loadCSS: "/css/print.css",
+                //        pageTitle: "BAS/GMG Inventory",
+        //        beforePrint: function () {
+        //            $.LoadingOverlay("show", {
+        //                image: "",
+        //                fontawesome: "fas fa-print"
+        //            });
+        //        },
+        //        afterPrint: function () {
+        //            hideLoader();
+        //        }
+        //    });
+        //});
     </script>
 }

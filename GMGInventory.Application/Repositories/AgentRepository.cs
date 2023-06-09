@@ -70,8 +70,8 @@ namespace GMGInventory.Application.Repositories
             var dtTo = DateTo ?? DateTime.MaxValue;
             var agentsInInvoices = from inv in context.Invoices
                                    where (CustomerId == null || inv.SalesOrder.CustomerId == CustomerId)
-                                   && dtFrom.Date <= (inv.DateModified ?? inv.DateCreated).Date
-                                   && (inv.DateModified ?? inv.DateCreated).Date <= dtTo.Date
+                                   && dtFrom.Date <= inv.InvoiceDate.Date
+                                   && inv.InvoiceDate.Date <= dtTo.Date
                                    select inv.SalesOrder.AgentId;
             var agents = await context.Agents
                                       .Where(s => (string.IsNullOrWhiteSpace(search)
@@ -124,10 +124,8 @@ namespace GMGInventory.Application.Repositories
                              AreaId = agent.Area.Id,
                              Code = agent.Code,
                              IsActive = agent.IsActive,
-                             DateCreated = agent.DateCreated.ToString(SystemFormat.StringDateTime),
                              DateCreatedD = agent.DateCreated,
-                             DateModified = agent.DateModified == null ? "-" : agent.DateModified.Value.ToString(SystemFormat.StringDateTime),
-                             DateModifiedD = agent.DateModified == null ? null : agent.DateModified.Value,
+                             DateModifiedD = agent.DateModified,
                              UserCreated = userc.Nickname,
                              UserModified = um == null ? "-" : um.Nickname
                          };
@@ -223,10 +221,8 @@ namespace GMGInventory.Application.Repositories
                              AreaId = agent.Area.Id,
                              Code = agent.Code,
                              IsActive = agent.IsActive,
-                             DateCreated = agent.DateCreated.ToString(SystemFormat.StringDateTime),
                              DateCreatedD = agent.DateCreated,
-                             DateModified = agent.DateModified == null ? "-" : agent.DateModified.Value.ToString(SystemFormat.StringDateTime),
-                             DateModifiedD = agent.DateModified == null ? null : agent.DateModified.Value,
+                             DateModifiedD = agent.DateModified,
 
                              UserCreated = userc.Nickname,
                              UserModified = userm == null ? "-" : userm.Nickname
@@ -313,8 +309,8 @@ namespace GMGInventory.Application.Repositories
                           {
                               CustomerName = cust.Name,
                               CustomerAddress = cust.Address,
-                              CustomerEmail = cust.Email,
-                              CustomerContactNo = cust.ContactNumber
+                              CustomerEmail = cust.Email + "",
+                              CustomerContactNo = cust.ContactNumber + ""
                           };
             return await agentVM.ToListAsync();
         }

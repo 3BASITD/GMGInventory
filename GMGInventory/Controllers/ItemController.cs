@@ -33,6 +33,16 @@ namespace GMGInventory.Controllers
             return Json(await itemRepository.GetOptions(search, page));
         }
 
+        public async Task<IActionResult> GetModelNumberOptions(string search, int page)
+        {
+            return Json(await itemRepository.GetModelNumberOptions(search, page));
+        }
+
+        public async Task<IActionResult> GetSizeOptions(string search, int page)
+        {
+            return Json(await itemRepository.GetSizeOptions(search, page));
+        }
+
         public async Task<IActionResult> GetInWarehouseOptions(string search, int warehouse, int page)
         {
             return Json(await itemRepository.GetInWarehouseOptions(search, warehouse, page));
@@ -233,7 +243,7 @@ namespace GMGInventory.Controllers
                                             Size = itemVM.Size,
                                             UnitId = UnitId.Value,
                                             WarehouseId = warehouseId.Value,
-                                            Quantity = itemVM.Quantity
+                                            QuantityD = itemVM.Quantity
                                         });
 
                                         await itemRepository.UpdateOrAddItemWarehouse(itemId, warehouseId.Value, itemVM.Quantity, "Updated through file upload");
@@ -257,7 +267,7 @@ namespace GMGInventory.Controllers
                                             RetailPriceD = 0,
                                             Size = itemVM.Size,
                                             UnitId = UnitId.Value,
-                                            Quantity = itemVM.Quantity
+                                            QuantityD = itemVM.Quantity
                                         });
                                         responseModel.Status = "Success";
                                         responseModel.Message = "Item added";

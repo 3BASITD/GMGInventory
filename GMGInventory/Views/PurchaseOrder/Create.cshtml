@@ -92,19 +92,15 @@
                                         <th>Unit Price</th>
                                         <th>Discount 1</th>
                                         <th>Discount 2</th>
+                                        <th>Discount 3</th>
                                         <th>Net Price</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th></th>
-                                        <th></th>
-                                        <th>Total</th>
+                                        <th colspan="3" class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
+                                        <th colspan="5"></th>
                                         <th class="total-net-price">0.00</th>
                                     </tr>
                                 </tfoot>
@@ -194,6 +190,18 @@
                                 <span data-valmsg-for="add-discount2" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-discount3" class="form-label mb-0">Discount 3</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="add-discount3" name="Discount3" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="add-discount3" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-net-price" class="form-label mb-0">Net Price</label>
@@ -308,13 +316,14 @@
             $("#add-unit").val("");
         });
 
-        $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2").on("input", function () {
+        $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2, #add-discount3").on("input", function () {
             var quantity = parseFloat($("#add-quantity").val());
             var unit_price = parseFloat($("#add-unit-price").val());
             var discount1 = parseFloat($("#add-discount1").val());
             var discount2 = parseFloat($("#add-discount2").val());
+            var discount3 = parseFloat($("#add-discount3").val());
 
-            $("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+            $("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
         });
 
         function clearItemForm() {
@@ -325,6 +334,7 @@
             $("#add-unit-price").val("0");
             $("#add-discount1").val("0");
             $("#add-discount2").val("0");
+            $("#add-discount3").val("0");
             $("#add-net-price").val("0");
         }
 
@@ -370,6 +380,7 @@
                     unitPrice: Round2Decimal($("#add-unit-price").val() || 0),
                     discount1: Round2Decimal($("#add-discount1").val() || 0),
                     discount2: Round2Decimal($("#add-discount2").val() || 0),
+                    discount3: Round2Decimal($("#add-discount3").val() || 0),
                     netPrice: Round2Decimal($("#add-net-price").val() || 0),
                 }).draw();
                 clearItemForm();
@@ -399,7 +410,8 @@
                     data: function (data, type, dataToSet) {
                         return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                     },
-                    name: "Quantity"
+                    name: "Quantity",
+                    className: "text-end"
                 },
                 { data: "unit", name: "Name", className: "form-cell" },
                 {
@@ -420,7 +432,17 @@
                     },
                     name: "Discount2"
                 },
-                { data: "netPrice", name: "NetPrice", className: "form-cell text-end netprice" }
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + data.discount3 + '" class="form-control form-control-sm discount3" /><span class="input-group-text">%</span></div>';
+                    },
+                    name: "Discount3"
+                },
+                {
+                    data: "netPrice",
+                    name: "NetPrice",
+                    className: "form-cell text-end netprice"
+                }
             ]
         });
 
@@ -429,43 +451,39 @@
                 itemDT.row($(this).parents('tr')).remove().draw();
             });
             $(".table-item th").removeClass("form-cell");
-            $(".table-item th").removeClass("text-end");
+            //$(".table-item th").removeClass("text-end");
 
-            $(".quantity, .unitprice, .discount1, .discount2").on("input", function () {
+            $(".quantity, .unitprice, .discount1, .discount2, .discount3").on("input", function () {
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
                 var unit_price = parseFloat($(this).parents("tr").find(".unitprice").val());
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
+                var discount3 = parseFloat($(this).parents("tr").find(".discount3").val());
 
-                var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+                var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
                 $(this).parents("tr").find(".netprice").html(net_price);
                 ComputeTotalQuantity();
                 ComputeTotalNetPrice();
             });
+
+            ComputeTotalQuantity();
+            ComputeTotalNetPrice();
         });
 
         function ComputeTotalQuantity() {
-            quantities = $(".table-item").find(".quantity");
             total_quantity = 0;
-            console.log("Quantity:");
-            console.log(quantities);
-            $.each(quantities, function () {
-                console.log($(this).val());
-                total_quantity += parseInt($(this).val());
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_quantity += parseInt($(this.node()).find(".quantity").val());
             });
             $(".total-quantity").html(FormatStringInteger(total_quantity));
         }
 
         function ComputeTotalNetPrice() {
-            net_prices = $(".table-item").find(".netprice");
-            total_net_price = 0;
-            console.log("NetPrice:");
-            console.log(net_prices);
-            $.each(net_prices, function () {
-                console.log($(this).html());
-                total_net_price += parseFloat($(this).html());
+            total_net_prices = 0;
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_net_prices += parseFloat($(this.node()).find(".netprice").html().replace(",", ""));
             });
-            $(".total-net-price").html(FormatStringDecimal(total_net_price));
+            $(".total-net-price").html(FormatStringDecimal(total_net_prices));
         }
 
         itemDT.clear().draw();
@@ -478,12 +496,14 @@
                 var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
+                var row_discount3 = parseFloat($(this.node()).find(".discount3").val());
                 item_to_replenish.push({
                     item: row_data.id,
                     quantity: row_quantity,
                     unitPrice: row_unitprice,
                     discount1: row_discount1,
-                    discount2: row_discount2
+                    discount2: row_discount2,
+                    discount3: row_discount3
                 });
             });
             return item_to_replenish;

@@ -207,7 +207,7 @@ namespace GMGInventory.Controllers
                 new DataColumn("Is Active")
 
             });
-            var supplier = (await supplierRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
+            var supplier = (await supplierRepository.GetAllSupplierAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var suppliers in supplier)
             {
                 dt.Rows.Add(suppliers.Code, suppliers.Name, suppliers.ContactPerson, suppliers.ContactNumber, suppliers.EmailAddress,

@@ -1,10 +1,12 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Humanizer.On;
 
 namespace GMGInventory.Controllers
 {
@@ -35,19 +37,27 @@ namespace GMGInventory.Controllers
             return Json(await soaRepository.SOACRListDT(form));
         }
 
-        //public async Task<IActionResult> PrintCRDetails(int id)
-        //{
-        //    return View(await soaRepository.PrintCRDetails(id));
-        //}
+        public IActionResult GenerateCR()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<JsonResult> GenerateSOAJson(GenerateSOAVM soaVM)
         {
             ResponseModel<int> responseModel = new ResponseModel<int>();
             var soaId = await soaRepository.GenerateSOAAsync(soaVM);
-            responseModel.Status = "Success";
-            responseModel.Message = "SOA successfully added";
-            responseModel.NewRow = soaId;
+            if (soaId == 0)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "No available invoice within selected combination";
+            }
+            else
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "SOA successfully added";
+                responseModel.NewRow = soaId;
+            }
             return Json(responseModel);
         }
         #endregion
@@ -71,133 +81,58 @@ namespace GMGInventory.Controllers
         }
         #endregion
 
-        public async Task<IActionResult> AddInvoice(int id, int custId)
-        {
-            var soaInv = await soaRepository.GetContractInvoicesCustomer2(id, custId);
-            if (soaInv == null)
-            {
-                return NotFound();
-            }
-            return View(soaInv);
-
-
-        }
-
-        public IActionResult AddCounterReceipt()
-        {
-            return View();
-        }
-
+        #region for SOACR/Generate CR
         public async Task<IActionResult> GetCustomerInvoiceToAddDT(int id)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await soaRepository.GetCustomerInvoiceToAddDT(form, id));
         }
 
-
-
-        //[HttpPost]
-        //public async Task<JsonResult> CreatePaymentJson(PaymentVM paymentVM)
-        //{
-        //    ResponseModel responseModel = new ResponseModel();
-        //    await soaRepository.AddCustomerPaymentAsync(paymentVM);
-        //    responseModel.Status = "Success";
-        //    responseModel.Message = "Payment successfully added";
-        //    return Json(responseModel);
-        //}
-
         [HttpPost]
-        public async Task<JsonResult> GetPaymentDetailsJson(SoacrPaymentFilter filter)
-        {
-            return Json(await soaRepository.GetPaymentDetails(filter));
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> UpdatePaymentDetailsJson(SoacrPaymentDetails payment)
+        public async Task<JsonResult> GenerateCRJson(int CustomerId, int[] InvoiceIds)
         {
             ResponseModel<int> responseModel = new ResponseModel<int>();
-            if (await soaRepository.UpdatePaymentDetails(payment))
-            {
-                responseModel.Status = "Success";
-                responseModel.Message = "Payment updated successfully";
-            }
-            else
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Updating payment failed";
-            }
+            responseModel.Status = "Success";
+            responseModel.Message = "Counter Receipt Successfully added";
+            responseModel.NewRow = await soaRepository.GenerateCRAsync(CustomerId, InvoiceIds);
+
+            TempData["SuccessMessage"] = responseModel.Message;
+
             return Json(responseModel);
+        }
+        #endregion
+
+        #region for SOACR/Details
+        public async Task<ActionResult> Details(int id)
+        {
+            var soa = await soaRepository.GetSOACRDetails(id);
+            if (soa == null)
+            {
+                return NotFound();
+            }
+            return View(soa);
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetPaymentChecksJson(int customerPaymentId)
+        public async Task<JsonResult> GetSOACRItemsJson(int id)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await soaRepository.GetPaymentChecksDTAsync(form, customerPaymentId));
+            return Json(await soaRepository.GetSOACRItemsDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> AddCheckJson(SoacrPaymentCheck check)
-        {
-            ResponseModel<int> responseModel = new ResponseModel<int>();
-            if (check.CheckAmountD == 0)
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Check Amount cannot be 0";
-            }
-            else if (await soaRepository.IsCheckNumberInUse(check.CheckNumber))
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Check Number already in use";
-            }
-            else if (await soaRepository.AddPaymentCheck(check))
-            {
-                responseModel.Status = "Success";
-                responseModel.Message = "Add Check successfully";
-            }
-            else
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Add Check failed";
-            }
-            return Json(responseModel);
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> RemoveCheckJson(int? soaCheckId)
-        {
-            ResponseModel<int> responseModel = new ResponseModel<int>();
-            if (soaCheckId == null)
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Please try again later";
-            }
-            else if (await soaRepository.RemovePaymentCheck(soaCheckId.Value))
-            {
-                responseModel.Status = "Success";
-                responseModel.Message = "Remove Check successfully";
-            }
-            else
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Remove Check failed";
-            }
-            return Json(responseModel);
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> EditInvoiceJson(SoacrLineItemVM soaVM)
+        public async Task<JsonResult> EditInvoiceJson(SOACRItemsForm soaVM)
         {
             ResponseModel responseModel = new ResponseModel();
             try
             {
-                await soaRepository.UpdateAsync(soaVM);
+                await soaRepository.UpdateSOACRInvoiceAsync(soaVM);
                 responseModel.Status = "Success";
                 responseModel.Message = "Invoice successfully updated";
             }
             catch (Exception ex)
             {
-                if (!await soaRepository.IsSOALineItemIdExist(soaVM.Id))
+                if (!await soaRepository.IsSOACRLineItemIdExist(soaVM.Id))
                 {
                     responseModel.Status = "Error";
                     responseModel.Message = "Invoice cannot be found";
@@ -212,103 +147,87 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetList2Json(SoaFilterVM filter)
+        public async Task<IActionResult> DeleteInvoiceJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await soaRepository.GetAllForDataTables2Async(form, filter));
-        }
-
-        public ActionResult Details(int id)
-        {
-            var soa = soaRepository.GetSoacrVM(id);
-            if (soa == null)
-            {
-                return NotFound();
-            }
-            return View(soa);
-        }
-
-        public ActionResult ContractReceiptDetails(int id)
-        {
-            var soa = soaRepository.GetInvoiceVM(id);
-            if (soa == null)
-            {
-                return NotFound();
-            }
-            return View(soa);
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> GetSoaDetailsJson(int id)
-        {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await soaRepository.GetSoaDetailsDTAsync(form, id));
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> GetSOAInvoice(int id)
-        {
-            //return Json(await soaRepository.GetSOAInvoice(/*id*/));
-            return Json(await soaRepository.GetSoaDetailsAsync(id));
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, int soacrId)
-        {
+            ResponseModel responseModel = new ResponseModel();
             if (await soacrLineItemRepository.IsSoaLineItemIdExistAsync(id) == false)
             {
-                return NotFound();
+                responseModel.Status = "Error";
+                responseModel.Message = "Invoice cannot be found";
             }
             else
             {
                 await soacrLineItemRepository.DeleteAsync(id);
-                TempData["SuccessMessage"] = "Invoice successfully deleted";
+                responseModel.Status = "Success";
+                responseModel.Message = "Invoice successfully deleted";
             }
-            return RedirectToAction(nameof(Details), new { id = soacrId });
+            return Json(responseModel);
         }
 
-        public async Task<IActionResult> PrintSoaDetails(int id)
+        [HttpPost]
+        public async Task<IActionResult> CheckCheckNumberJson(string CheckNumber)
         {
-            return View(await soaRepository.PrintSoaDetails(id));
-        }
-
-        public ActionResult EditInvoice(int id)
-        {
-            var inv = soaRepository.GetSoaInvoiceDtlVM(id);
-            if (inv == null)
+            ResponseModel responseModel = new ResponseModel();
+            if (await soaRepository.IsCheckNumberInUse(CheckNumber))
             {
-                return NotFound();
+                responseModel.Status = "Error";
+                responseModel.Message = "Check Number already in use";
             }
-            return Json(inv);
-        }
-
-        public ActionResult ContractReceipt()
-        {
-            return View();
-        }
-
-
-        [HttpPost]
-        public async Task<JsonResult> GetContractReceipt2Json(SoaFilterVM filter)
-        {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await soaRepository.GetContractReceipt2DTAsync(form, filter));
+            else
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "Check Number available";
+            }
+            return Json(responseModel);
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetCustomerInvoicesJson(int id, int soaId)
+        public async Task<IActionResult> CollectorReceiptNumberJson(string CollectorReceiptNumber)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await soaRepository.GetContractReceiptCustomerDTAsync(form, id, soaId));
+            ResponseModel responseModel = new ResponseModel();
+            if (await soaRepository.IsCollectorReceiptNumberInUse(CollectorReceiptNumber))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Collector Receipt Number already in use";
+            }
+            else
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "Collector Receipt Number available";
+            }
+            return Json(responseModel);
         }
 
-
         [HttpPost]
-        public async Task<JsonResult> GetContractReceiptDetailsJson(int id)
+        public async Task<JsonResult> AddPaymentDetailsJson(SOACRPaymentDetails payment)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await soaRepository.GetContractReceiptDetailsDTAsync(form, id));
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            if (await soaRepository.IsCollectorReceiptNumberInUse(payment.CollectorReceiptNumber))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Collector Receipt Number already in use";
+            }
+            else if(await soaRepository.AddPaymentDetails(payment))
+            {
+                responseModel.Status = "Success";
+                responseModel.Message = "Payment added successfully";
+            }
+            else
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Adding payment failed";
+            }
+            return Json(responseModel);
+        }
+
+        public async Task<IActionResult> PrintCRDetails(int id)
+        {
+            return View(await soaRepository.PrintCRDetails(id));
+        }
+
+        public async Task<IActionResult> PrintSOADetails(int id)
+        {
+            return View(await soaRepository.PrintSOADetails(id));
         }
 
         [HttpPost]
@@ -320,8 +239,189 @@ namespace GMGInventory.Controllers
 
             await soaRepository.AddInvoicesAsync(soaId, invoiceIds);
             return Json(responseModel);
-
         }
+
+        [HttpPost]
+        public async Task<JsonResult> GetInvoiceTBR(string search, int page, int CustomerId)
+        {
+            return Json(await soaRepository.GetInvoicesTBRAsync(search, page, CustomerId));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> AddInvoiceTBR(int soaLineItemId, int salesReturnId, decimal amount)
+        {
+                await soaRepository.AddInvoiceTBRAsync(soaLineItemId, salesReturnId, amount);
+            ResponseModel responseModel = new ResponseModel();
+            responseModel.Status = "Success";
+            responseModel.Message = "TBR Successfully Added";
+
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetInvoiceTBRHistory(int soaLineItemId)
+        {
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            return Json(await soaRepository.GetInvoiceTBRHistoryDTAsync(form, soaLineItemId));
+        }
+        #endregion
+
+
+
+
+
+
+
+
+        //public async Task<IActionResult> AddInvoice(int id, int custId)
+        //{
+        //    var soaInv = await soaRepository.GetContractInvoicesCustomer2(id, custId);
+        //    if (soaInv == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(soaInv);
+
+
+        //}
+
+
+
+
+
+        //[HttpPost]
+        //public async Task<JsonResult> CreatePaymentJson(PaymentVM paymentVM)
+        //{
+        //    ResponseModel responseModel = new ResponseModel();
+        //    await soaRepository.AddCustomerPaymentAsync(paymentVM);
+        //    responseModel.Status = "Success";
+        //    responseModel.Message = "Payment successfully added";
+        //    return Json(responseModel);
+        //}
+
+        //[HttpPost]
+        //public async Task<JsonResult> GetPaymentDetailsJson(SoacrPaymentFilter filter)
+        //{
+        //    return Json(await soaRepository.GetPaymentDetails(filter));
+        //}
+
+        //[HttpPost]
+        //public async Task<JsonResult> GetPaymentChecksJson(int customerPaymentId)
+        //{
+        //    DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+        //    return Json(await soaRepository.GetPaymentChecksDTAsync(form, customerPaymentId));
+        //}
+
+        //[HttpPost]
+        //public async Task<JsonResult> AddCheckJson(SoacrPaymentCheck check)
+        //{
+        //    ResponseModel<int> responseModel = new ResponseModel<int>();
+        //    if (check.CheckAmountD == 0)
+        //    {
+        //        responseModel.Status = "Error";
+        //        responseModel.Message = "Check Amount cannot be 0";
+        //    }
+        //    else if (await soaRepository.IsCheckNumberInUse(check.CheckNumber))
+        //    {
+        //        responseModel.Status = "Error";
+        //        responseModel.Message = "Check Number already in use";
+        //    }
+        //    else if (await soaRepository.AddPaymentCheck(check))
+        //    {
+        //        responseModel.Status = "Success";
+        //        responseModel.Message = "Add Check successfully";
+        //    }
+        //    else
+        //    {
+        //        responseModel.Status = "Error";
+        //        responseModel.Message = "Add Check failed";
+        //    }
+        //    return Json(responseModel);
+        //}
+
+        //[HttpPost]
+        //public async Task<JsonResult> RemoveCheckJson(int? soaCheckId)
+        //{
+        //    ResponseModel<int> responseModel = new ResponseModel<int>();
+        //    if (soaCheckId == null)
+        //    {
+        //        responseModel.Status = "Error";
+        //        responseModel.Message = "Please try again later";
+        //    }
+        //    else if (await soaRepository.RemovePaymentCheck(soaCheckId.Value))
+        //    {
+        //        responseModel.Status = "Success";
+        //        responseModel.Message = "Remove Check successfully";
+        //    }
+        //    else
+        //    {
+        //        responseModel.Status = "Error";
+        //        responseModel.Message = "Remove Check failed";
+        //    }
+        //    return Json(responseModel);
+        //}
+
+        //[HttpPost]
+        //public async Task<JsonResult> GetList2Json(SoaFilterVM filter)
+        //{
+        //    DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+        //    return Json(await soaRepository.GetAllForDataTables2Async(form, filter));
+        //}
+
+        //public ActionResult ContractReceiptDetails(int id)
+        //{
+        //    var soa = soaRepository.GetInvoiceVM(id);
+        //    if (soa == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(soa);
+        //}
+
+        //[HttpPost]
+        //public async Task<JsonResult> GetSOAInvoice(int id)
+        //{
+        //    //return Json(await soaRepository.GetSoaDetailsAsync(id));
+        //    return Json(null);
+        //}
+
+        ////public ActionResult EditInvoice(int id)
+        ////{
+        ////    var inv = soaRepository.GetSoaInvoiceDtlVM(id);
+        ////    if (inv == null)
+        ////    {
+        ////        return NotFound();
+        ////    }
+        ////    return Json(inv);
+        ////}
+
+        //public ActionResult ContractReceipt()
+        //{
+        //    return View();
+        //}
+
+
+        //[HttpPost]
+        //public async Task<JsonResult> GetContractReceipt2Json(SoaFilterVM filter)
+        //{
+        //    DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+        //    return Json(await soaRepository.GetContractReceipt2DTAsync(form, filter));
+        //}
+
+        //[HttpPost]
+        //public async Task<JsonResult> GetCustomerInvoicesJson(int id, int soaId)
+        //{
+        //    DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+        //    return Json(await soaRepository.GetContractReceiptCustomerDTAsync(form, id, soaId));
+        //}
+
+
+        //[HttpPost]
+        //public async Task<JsonResult> GetContractReceiptDetailsJson(int id)
+        //{
+        //    DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+        //    return Json(await soaRepository.GetContractReceiptDetailsDTAsync(form, id));
+        //}
 
 
         //[HttpPost]
@@ -343,16 +443,5 @@ namespace GMGInventory.Controllers
         //    }
         //    return Json(responseModel);
         //}
-
-        [HttpPost]
-        public async Task<JsonResult> CreateCRJson(int CustomerId, int[] InvoiceIds)
-        {
-            ResponseModel<int> responseModel = new ResponseModel<int>();
-            responseModel.Status = "Success";
-            responseModel.Message = "Counter Receipt Successfully added";
-            responseModel.NewRow = await soaRepository.AddCRAsync(CustomerId, InvoiceIds);
-
-            return Json(responseModel);
-        }
     }
 }

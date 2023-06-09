@@ -191,6 +191,7 @@ namespace GMGInventory.Application.Repositories
                          {
                              Discount1D = order.Discount1,
                              Discount2D = order.Discount2,
+                             Discount3D = order.Discount3,
                              Id = order.ItemId,
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
@@ -213,6 +214,7 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.Discount1.ToLower().Contains(form.SearchValue)
                                     || x.Discount2.ToLower().Contains(form.SearchValue)
+                                    || x.Discount3.ToLower().Contains(form.SearchValue)
                                     || x.ItemCode.ToLower().Contains(form.SearchValue)
                                     || x.ItemName.ToLower().Contains(form.SearchValue)
                                     || x.Quantity.ToString().Contains(form.SearchValue)
@@ -231,6 +233,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
+                        case "Discount3": data = data.OrderBy(s => s.Discount3D); break;
                         case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderBy(s => s.ItemName); break;
                         case "Quantity": data = data.OrderBy(s => s.Quantity); break;
@@ -246,6 +249,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
+                        case "Discount3": data = data.OrderByDescending(s => s.Discount3D); break;
                         case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
                         case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
@@ -279,7 +283,7 @@ namespace GMGInventory.Application.Repositories
                 poNumber = string.Format("{0:PO00000000}", previousOrders);
             }
 
-            decimal totalPurchaseAmount = form.Items.Sum(s => (decimal)s.Quantity * ((s.UnitPrice * (100 - s.Discount1 - s.Discount2)) / 100m));
+            decimal totalPurchaseAmount = form.Items.Sum(s => (decimal)s.Quantity * ((s.UnitPrice * (100 - s.Discount1 - s.Discount2 - s.Discount3)) / 100m));
             if (orderVM == null)
             {
                 orderVM = new PurchaseOrder
@@ -335,6 +339,7 @@ namespace GMGInventory.Application.Repositories
                                {
                                    Discount1 = s.Discount1,
                                    Discount2 = s.Discount2,
+                                   Discount3 = s.Discount3,
                                    ItemId = s.Item,
                                    PurchaseOrderId = PurchaseOrderId,
                                    Quantity = s.Quantity,
@@ -351,6 +356,7 @@ namespace GMGInventory.Application.Repositories
                 var dbitem = await citemsVM.Where(s => s.ItemId == di.Item).FirstAsync();
                 dbitem.Discount1 = di.Discount1;
                 dbitem.Discount2 = di.Discount2;
+                dbitem.Discount3 = di.Discount3;
                 dbitem.Quantity = di.Quantity;
                 dbitem.UnitPrice = di.UnitPrice;
 
@@ -378,12 +384,12 @@ namespace GMGInventory.Application.Repositories
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 foreach (var item in purchaseOrder.PurchaseOrderLineItems)
                 {
-                    var warehouseId = await context.Warehouses
-                                                   .Where(s => s.Code == "MAIN")
-                                                   .Select(s => s.Id)
-                                                   .FirstAsync();
+                    //var warehouseId = await context.Warehouses
+                    //                               .Where(s => s.Code == "MAIN")
+                    //                               .Select(s => s.Id)
+                    //                               .FirstAsync();
                     var inventory = await context.ItemInventories
-                                                 .Where(s => s.ItemId == item.ItemId && s.WarehouseId == warehouseId)
+                                                 .Where(s => s.ItemId == item.ItemId && s.WarehouseId == purchaseOrder.DestinationId)
                                                  .FirstOrDefaultAsync();
                     if (inventory != null)
                     {
@@ -396,7 +402,7 @@ namespace GMGInventory.Application.Repositories
                         {
                             ItemId = item.ItemId,
                             Quantity = item.Quantity,
-                            WarehouseId = warehouseId
+                            WarehouseId = purchaseOrder.DestinationId
                         };
                         await context.ItemInventories.AddAsync(inventory);
                     }

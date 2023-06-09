@@ -137,7 +137,7 @@
                 { data: "packNumber", name: "PackNumber" },
                 { data: "customer", name: "Customer" },
                 { data: "soNumber", name: "SONumber" },
-                { data: "totalAmount", name: "TotalAmount" },
+                { data: "totalAmount", name: "TotalAmount", class: "text-end" },
                 { data: "status", name: "Status" },
                 {
                     orderable: false,
@@ -156,6 +156,7 @@
 
         // Load functions upon DataTable load
         invoiceDT.on("draw", function () {
+            $(".table-invoice th").removeClass("text-end");
             hideLoader();
         });
     </script>

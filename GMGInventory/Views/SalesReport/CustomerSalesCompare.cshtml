@@ -1,0 +1,490 @@
+﻿@model IEnumerable<CustomerSalesRVM>
+
+@{
+    ViewData["Title"] = "Customer Sales (Compare)";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="SalesReport" asp-action="CusomerSales">Customer Sales</a></li>
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                <span class="fas fa-print"></span> Print
+            </button>
+            <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
+                <span class="fas fa-download"></span> Download
+            </button>
+            <a class="btn btn-secondary btn-sm float-right ml-2" asp-action="CustomerSales">
+                <span class="fas fa-not-equal"></span> Cancel Compare
+            </a>
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <span class="card-title">Customer Sales #1</span>
+                        </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-sales1">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Customer
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Brand)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Amount)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-end">Total</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <span class="card-title">Customer Sales #2</span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-sales2">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Customer
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Brand)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Amount)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-end">Total</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Report</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-header">
+                <h6 class="modal-title">Customer Sales #1</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter1-customer" class="form-label mb-0">Customer Code</label>
+                            <select id="filter1-customer" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter1-customer-name" class="form-label mb-0">Customer Name</label>
+                            <input type="text" id="filter1-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter1-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter1-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter1-from" class="form-label mb-0">Date From</label>
+                            <input type="date" id="filter1-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter1-to" class="control-label mb-0">Date To</label>
+                            <input type="date" id="filter1-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-header">
+                <h6 class="modal-title">Customer Sales #2</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter2-customer" class="form-label mb-0">Customer Code</label>
+                            <select id="filter2-customer" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter2-customer-name" class="form-label mb-0">Customer Name</label>
+                            <input type="text" id="filter2-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter2-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter2-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter2-from" class="form-label mb-0">Date From</label>
+                            <input type="date" id="filter2-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter2-to" class="control-label mb-0">Date To</label>
+                            <input type="date" id="filter2-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        SetDateFilter1();
+        SetDateFilter2();
+        function SetDateFilter1() {
+            if ($("#filter1-to").val() == "") {
+                if ($("#filter1-from").val() == "") {
+                    $("#filter1-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter1-from").val());
+                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    dt_from.setMonth(dt_from.getMonth() + 1);
+                    $("#filter1-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter1-from").val() == "") {
+                var dt_to = new Date($("#filter1-to").val());
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
+                dt_to.setMonth(dt_to.getMonth() - 1);
+                $("#filter1-from").val(DateForInput(dt_to));
+            }
+        }
+
+        function SetDateFilter2() {
+            if ($("#filter2-to").val() == "") {
+                if ($("#filter2-from").val() == "") {
+                    $("#filter2-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter2-from").val());
+                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    dt_from.setMonth(dt_from.getMonth() + 1);
+                    $("#filter2-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter2-from").val() == "") {
+                var dt_to = new Date($("#filter2-to").val());
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
+                dt_to.setMonth(dt_to.getMonth() - 1);
+                $("#filter2-from").val(DateForInput(dt_to));
+            }
+        }
+
+        $("#filter1-to, #filter1-from").on("focusout", SetDateFilter1);
+        $("#filter2-to, #filter2-from").on("focusout", SetDateFilter2);
+
+        // Load Select2 for Customer Filter 1
+        $("#filter1-customer").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: 'All',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Customer")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $("#filter1-customer").on("select2:select", function () {
+            $("#filter1-customer-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter1-customer").on("select2:unselecting", function (e) {
+            $("#filter1-customer-name").val("");
+        });
+
+        // Load Select2 for Customer Filter 2
+        $("#filter2-customer").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: 'All',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Customer")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $("#filter2-customer").on("select2:select", function () {
+            $("#filter2-customer-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter2-customer").on("select2:unselecting", function (e) {
+            $("#filter2-customer-name").val("");
+        });
+
+        // Load Select2 for Brand Filter 1
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Brand")",
+            success: function (data, status, xhr) {
+                $("#filter1-brand").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+                $("#filter2-brand").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+            }
+        });
+
+        // Load List 1 on DataTable
+        var salesDT1 = $('.table-sales1').on('preXhr.dt', function (e, settings, data) {
+            ShowTabLoader("sales1");
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetCustomerSalesDT")",
+                type: "POST",
+                data: function (data) {
+                    var brandId = $("#filter1-brand").val();
+                    var customerId = $("#filter1-customer").val();
+
+                    data.DateFrom = $("#filter1-from").val();
+                    data.DateTo = $("#filter1-to").val();
+                    if (brandId) data.Brand = brandId;
+                    if (customerId) data.Customer = customerId;
+                }
+            },
+            processing: true,
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "customerCode", name: "CustomerCode" },
+                { data: "brand", name: "Brand" },
+                { data: "amount", name: "Amount", className: "text-end" }
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var json = salesDT1.ajax.json();
+                var api = this.api(), data;
+
+                $(api.column(2).footer()).html(FormatStringDecimal(json.totalAmount));
+            }
+        });
+
+        // Load functions upon DataTable load
+        salesDT1.on("draw", function () {
+            HideTabLoader("sales1");
+
+            //$(".table-sales1 thead th").removeClass("text-end");
+        });
+
+        // Load List 2 on DataTable
+        var salesDT2 = $('.table-sales2').on('preXhr.dt', function (e, settings, data) {
+            ShowTabLoader("sales2");
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetCustomerSalesDT")",
+                type: "POST",
+                data: function (data) {
+                    var brandId = $("#filter2-brand").val();
+                    var customerId = $("#filter2-customer").val();
+
+                    data.DateFrom = $("#filter2-from").val();
+                    data.DateTo = $("#filter2-to").val();
+                    if (brandId) data.Brand = brandId;
+                    if (customerId) data.Customer = customerId;
+                }
+            },
+            processing: true,
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "customerCode", name: "CustomerCode" },
+                { data: "brand", name: "Brand" },
+                { data: "amount", name: "Amount", className: "text-end" }
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var json = salesDT2.ajax.json();
+                var api = this.api(), data;
+
+                $(api.column(2).footer()).html(FormatStringDecimal(json.totalAmount));
+            }
+        });
+
+        // Load functions upon DataTable load
+        salesDT2.on("draw", function () {
+            HideTabLoader("sales2");
+
+            //$(".table-sales1 thead th").removeClass("text-end");
+        });
+
+        $(".btnFilter").on("click", function () {
+            salesDT1.ajax.reload();
+            salesDT2.ajax.reload();
+            $("#filterModal").modal("hide");
+        });
+
+        function urlQuery() {
+            var urlQuery = [];
+            urlQuery.push("filter1.DateFrom=" + $("#filter1-from").val());
+            urlQuery.push("filter2.DateFrom=" + $("#filter2-from").val());
+            urlQuery.push("filter1.DateTo=" + $("#filter1-to").val());
+            urlQuery.push("filter2.DateTo=" + $("#filter2-to").val());
+            if ($("#filter1-brand").val()) { urlQuery.push("filter1.Brand=" + $("#filter1-brand").val()); }
+            if ($("#filter2-brand").val()) { urlQuery.push("filter2.Brand=" + $("#filter2-brand").val()); }
+            if ($("#filter1-customer").val()) { urlQuery.push("filter1.Customer=" + $("#filter1-customer").val()); }
+            if ($("#filter2-customer").val()) { urlQuery.push("filter2.Customer=" + $("#filter2-customer").val()); }
+            return urlQuery;
+        }
+
+        $(".downloadBtn").click(function (e) {
+            window.location = "@Url.Action("DownloadCustomerSalesCompare")?" + urlQuery().join("&");
+        });
+
+        $(".printBtn").on("click", function () {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
+            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintCustomerSalesCompare")?' + urlQuery().join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
+        });
+    </script>
+    }

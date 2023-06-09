@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GMGInventory.Common.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
@@ -19,16 +20,14 @@ namespace GMGInventory.Common.Models
         public string UserCreated { get; set; }
 
         [Display(Name = "Date Created")]
-        public string DateCreated { get; set; }
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
         public DateTime DateCreatedD { get; set; }
 
         [Display(Name = "User Modified")]
         public string UserModified { get; set; }
 
         [Display(Name = "Date Modifed")]
-        public string DateModified { get; set; }
+        public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
-
-
     }
 }

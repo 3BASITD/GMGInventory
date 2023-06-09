@@ -1,4 +1,4 @@
-﻿@model SoaDetailsPVM
+﻿@model SOACRDetailsPVM
 
 @{
     Layout = "";
@@ -17,22 +17,24 @@
 <body>
     <h3>@title</h3>
     <p>
-        <strong>Customer Code: </strong>
+        <strong>CR Number:</strong>
+        <span>@Model.SOACRNumber</span>
+        <br />
+        <strong>Customer Code:</strong>
         <span>@Model.CustomerCode</span>
         <br />
-        <strong>Customer Name: </strong>
-        <span>@Model.Customer</span>
-        <br />
+        <strong>Customer Name:</strong>
+        <span>@Model.CustomerName</span>
+        @*<br />
         <strong>Counter Receipt Date: </strong>
         <span>@Model.CRDate</span>
         <br />
         <strong>Date to be Collected: </strong>
-        <span> </span>
+        <span> </span>*@
     </p>
     <table class="table-items">
         <thead>
             <tr>
-
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
                 </th>
@@ -43,13 +45,25 @@
                     @Html.DisplayNameFor(model => model.Contents.First().InvoiceType)
                 </th>
                 <th>
-                    Open Amount
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceAmount)
+                </th>
+                @*<th>
+                    @Html.DisplayNameFor(model => model.Contents.First().TBR)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().FreightCost)
+                    @Html.DisplayNameFor(model => model.Contents.First().Credit)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().TotalAmount)
+                    @Html.DisplayNameFor(model => model.Contents.First().Debit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().PaidAmount)
+                </th>*@
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().FreightCharge)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Balance)
                 </th>
             </tr>
         </thead>
@@ -57,25 +71,46 @@
             @foreach (var item in Model.Contents)
             {
                 <tr>
-                    <td>@item.InvoiceDate</td>
+                    <td>@item.InvoiceDate2</td>
                     <td>@item.InvoiceNumber</td>
                     <td>@item.InvoiceType</td>
-                    <td>@item.InvoiceAmountDeducted</td>
-                    <td>@item.FreightCharge</td>
-                    <td>@item.InvoiceAmountDeducted</td>
+                    <td class="right-text">@item.InvoiceAmount</td>
+                    @*<td class="right-text">@item.TBR</td>
+                    <td class="right-text">@item.Credit</td>
+                    <td class="right-text">@item.Debit</td>
+                    <td class="right-text">@item.PaidAmount</td>*@
+                    <td class="right-text">@item.FreightCharge</td>
+                    <td class="right-text">@item.Balance</td>
                 </tr>
             }
-        </tbody>
-        <tfoot>
             <tr>
                 <th colspan="3" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalInvoiceAmount</nobr></th>
-                <th class="right-text"></th>
-                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+                @*<th class="right-text"><nobr>@Model.TotalTBR</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalCredit</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalDebit</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalPaidAmount</nobr></th>*@
+                <th class="right-text"><nobr>@Model.TotalFreightCost</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalBalance</nobr></th>
             </tr>
+            <tr>
+                <td colspan="10" class="signatory">
+                    <div>
+                        <span>
+                            Authorized Signature
+                        </span>
+                        <span>
+                            Received By
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
         </tfoot>
     </table>
 </body>
+
 <script type="text/javascript">
     window.print();
     window.onafterprint = window.close;

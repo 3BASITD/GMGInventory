@@ -38,8 +38,8 @@ namespace GMGInventory.Application.Repositories
                              ItemType = brand.ItemType.Name,
                              ItemTypeId = brand.ItemType.Id,
                              Code = brand.Code,
-                             DateCreated = brand.DateCreated.ToString("yyyy/dd/MM hh:mm:ss tt"),
-                             DateModified = brand.DateModified == null ? "-" : brand.DateModified.Value.ToString("yyyy/dd/MM hh:mm:ss tt"),
+                             DateCreatedD = brand.DateCreated,
+                             DateModifiedD = brand.DateModified,
                              IsActive = brand.IsActive,
                              Name = brand.Name,
                              UserCreated = userc.Nickname,
@@ -79,9 +79,9 @@ namespace GMGInventory.Application.Repositories
                         case "Name": data = data.OrderBy(s => s.Name); break;
                         case "ItemType": data = data.OrderBy(s => s.ItemType); break;
                         case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderBy(s => s.DateModified); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
                         case "UserModified": data = data.OrderBy(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderBy(s => s.DateModified); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
                         default: break;
                     }
                 }

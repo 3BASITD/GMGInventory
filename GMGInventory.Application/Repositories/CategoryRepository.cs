@@ -49,7 +49,7 @@ namespace GMGInventory.Application.Repositories
 
 
         
-        public async Task<IList<CategoryVM>> GetAllAsync()
+        public async Task<IList<CategoryVM>> GetAllCategoryAsync()
         {
 
             var categories = from category in context.Categories
@@ -61,12 +61,10 @@ namespace GMGInventory.Application.Repositories
                          select new CategoryVM
                          {
                              Id = category.Id,
-                             Name = category.Name,
-                             Code = category.Code,
+                             CategoryName = category.Name,
+                             CategoryCode = category.Code,
                              IsActive = category.IsActive,
-                             DateCreated = category.DateCreated.ToString(SystemFormat.StringDateTime),
                              DateCreatedD = category.DateCreated,
-                             DateModified = category.DateModified == null ? "-" : category.DateModified.Value.ToString(SystemFormat.StringDateTime),
                              DateModifiedD = category.DateModified == null ? null : category.DateModified.Value,
                              UserCreated = userc.Nickname,
                              UserModified = um == null ? "-" : um.Nickname
@@ -78,14 +76,14 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetAllAsync()).AsQueryable();
+            var data = (await GetAllCategoryAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
-                                    || x.Name.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.CategoryCode.ToLower().Contains(form.SearchValue)
+                                    || x.CategoryName.ToLower().Contains(form.SearchValue)
                                     || x.UserCreated.ToLower().Contains(form.SearchValue)
                                     || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
                                     || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
@@ -100,8 +98,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Code": data = data.OrderBy(s => s.Code); break;
-                        case "Name": data = data.OrderBy(s => s.Name); break;
+                        case "CategoryCode": data = data.OrderBy(s => s.CategoryCode); break;
+                        case "CategoryName": data = data.OrderBy(s => s.CategoryName); break;
                         case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
                         case "UserModified": data = data.OrderBy(s => s.UserModified); break;
@@ -113,8 +111,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Code": data = data.OrderByDescending(s => s.Code); break;
-                        case "Name": data = data.OrderByDescending(s => s.Name); break;
+                        case "CategoryCode": data = data.OrderByDescending(s => s.CategoryCode); break;
+                        case "CategoryName": data = data.OrderByDescending(s => s.CategoryName); break;
                         case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
                         case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
@@ -192,8 +190,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var category = new Category
             {
-                Code = categoryVM.Code,
-                Name = categoryVM.Name,
+                Code = categoryVM.CategoryCode,
+                Name = categoryVM.CategoryName,
                 IsActive = true
 
             };
@@ -211,8 +209,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             category.Id = categoryVM.Id;
 
-            category.Code = categoryVM.Code;
-            category.Name = categoryVM.Name;
+            category.Code = categoryVM.CategoryCode;
+            category.Name = categoryVM.CategoryName;
             category.IsActive = true;
             context.Categories.Update(category);
             await context.SaveChangesAsync(currentUserId);
@@ -221,7 +219,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(CategoryVM categoryVM)
         {
-            return (await GetAllGenericVMAsync()).Any(s => s.Code == categoryVM.Code && s.Name == categoryVM.Name);
+            return (await GetAllGenericVMAsync()).Any(s => s.Code == categoryVM.CategoryCode && s.Name == categoryVM.CategoryName);
         }
 
 

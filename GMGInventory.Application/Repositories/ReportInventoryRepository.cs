@@ -29,6 +29,9 @@ namespace GMGInventory.Application.Repositories
                         let inventory = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.Code == "MAIN")
                                                .Sum(s => s.Quantity)
+                        let served = context.SalesOrderLineItems
+                                            .Where(s => s.ItemId == item.Id)
+                                            .ToList()
                         where item.IsActive == true
                            && (filter.Brand == null || item.BrandId == filter.Brand)
                            && (filter.Item == null || item.Id == filter.Item)
@@ -37,9 +40,9 @@ namespace GMGInventory.Application.Repositories
                             Brand = item.Brand.Name,
                             ItemCode = item.Code,
                             ItemName = item.Name,
-                            MaintainingQuantityD = -1, // may minimum quantity dapat si item
+                            MaintainingQuantityD = inventory,
                             PartNumber = item.PartNumber + "",
-                            QuantityOnHandD = inventory,
+                            QuantityOnHandD = inventory + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
                             Unit = item.Unit.Name
                         };
             return await items.ToListAsync();
@@ -519,12 +522,12 @@ namespace GMGInventory.Application.Repositories
             var cards1 = from card in context.InvoiceLineItems
                                             .Include(s => s.Item)
                                             .Include(s => s.Invoice).ThenInclude(s => s.SalesOrder).ThenInclude(s => s.Customer)
-                         where filter.DateFrom <= (card.Invoice.DateModified ?? card.Invoice.DateCreated).Date
-                           && (card.Invoice.DateModified ?? card.Invoice.DateCreated).Date <= filter.DateTo &&
+                         where filter.DateFrom <= card.Invoice.InvoiceDate.Date
+                           && card.Invoice.InvoiceDate.Date <= filter.DateTo &&
                          (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
-                             DateD = card.Invoice.DateModified ?? card.Invoice.DateCreated,
+                             DateD = card.Invoice.InvoiceDate,
                              DetailsRemarks = "Sold to - " + card.Invoice.SalesOrder.Customer.Name,
                              InD = 0,
                              Item = card.Item.Name,
@@ -719,6 +722,9 @@ namespace GMGInventory.Application.Repositories
                          let quantity = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id)
                                                .Sum(s => s.Quantity)
+                         let served = context.SalesOrderLineItems
+                                             .Where(s => s.ItemId == item.Id)
+                                             .ToList()
                          let unitcost = context.PurchaseOrderLineItems
                                                .Include(s => s.PurchaseOrder)
                                                .Where(s => s.ItemId == item.Id)
@@ -733,7 +739,7 @@ namespace GMGInventory.Application.Repositories
                              ItemName = item.Name,
                              ItemType = item.ItemType.Name,
                              PartNumber = item.PartNumber + "",
-                             QuantityOnHandD = quantity,
+                             QuantityOnHandD = quantity + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
                              Unit = item.Unit.Name,
                              UnitCostD = 0
                          };

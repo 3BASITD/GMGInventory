@@ -55,7 +55,7 @@ namespace GMGInventory.Application.Repositories
                                             ? userm.Nickname
                                             : (userm.FirstName + " " + userm.LastName),
                                  ModifiedDateD = sdm.DateModified,
-                                 PONumber = so.PurchaseOrder == null ? "-" : so.PurchaseOrder.PONumber,
+                                 PONumber = so.PurchaseOrder == null ? "-" : so.PurchaseOrder!.PONumber,
                                  Remarks = sdm == null || sdm.Remarks.Trim() == "" ? "-" : sdm.Remarks,
                                  SalesOrderDateD = so.DateCreated,
                                  SalesOrderId = so.Id,

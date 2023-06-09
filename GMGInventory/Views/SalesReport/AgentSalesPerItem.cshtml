@@ -51,7 +51,7 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="5">Total</th>
+                    <th colspan="5" class="text-end">Total</th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -254,6 +254,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "agent", name: "Agent" },
                 { data: "brand", name: "Brand" },
@@ -277,8 +280,6 @@
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-sales', salesDT);
 
             $(".table-sales thead th").removeClass("text-end");
         });

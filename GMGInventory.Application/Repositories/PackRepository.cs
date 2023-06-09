@@ -59,9 +59,20 @@ namespace GMGInventory.Application.Repositories
                                PackBy = user.Nickname,
                                PackDateD = order.DateCreated,
                                SalesOrderDateD = order.SalesOrder.DateCreated,
-                               SONumber = order.SalesOrder.SalesOrderNumber
+                               SONumber = order.SalesOrder.SalesOrderNumber,
+                               Status = order.Status.Code
                            });
             return await orderVM.FirstOrDefaultAsync();
+        }
+
+
+        public async Task<PackDetailsPVM> PrintDetailsAsync(int? Id)
+        {
+            return new PackDetailsPVM
+            {
+                Contents = await GetItemsAsync(Id ?? 0),
+                Details = await GetDetailsAsync(Id) ?? new PackDetailsVM()
+            };
         }
 
         public async Task<PackDetailsVM?> GetDetailsBySOAsync(int? Id)
@@ -190,19 +201,21 @@ namespace GMGInventory.Application.Repositories
         {
             var itemVM = from pack in context.PackLineItems
                          join order in context.SalesOrderLineItems on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
+                         let price = context.ItemPrices.Where(s => s.ItemId == pack.Item.Id && s.DateCreated <= pack.DateCreated).OrderByDescending(s => s.DateCreated).First()
                          where pack.PackId == packId
                          && pack.Item.Id == order.Item.Id
+                         && order.InvoicedQuantity < order.PackedQuantity
+                         group new { pack, order, price } by new { pack.ItemId, order.Discount1, order.Discount2, order.SellingPrice } into grp
                          select new PackItemVM
                          {
-                             BoxNumber = pack.BoxNumber,
-                             Discount1D = order.Discount1,
-                             Discount2D = order.Discount2,
-                             Id = pack.Id,
-                             ItemCode = pack.Item.Code,
-                             ItemId = order.ItemId,
-                             ItemName = pack.Item.Name,
-                             Quantity = pack.Quantity,
-                             SellingPriceD = order.SellingPrice
+                             Discount1D = grp.First().order.Discount1,
+                             Discount2D = grp.First().order.Discount2,
+                             ItemCode = grp.First().pack.Item.Code,
+                             ItemId = grp.First().order.ItemId,
+                             ItemName = grp.First().pack.Item.Name,
+                             Quantity = grp.Sum(s => s.pack.Quantity),
+                             SellingPriceD = grp.First().order.SellingPrice,
+                             SellingPriceType = grp.First().price.RetailSellingPrice > grp.First().price.NetSellingPrice ? "Gross" : "Net"
                          };
             return await itemVM.ToListAsync();
         }
@@ -268,7 +281,7 @@ namespace GMGInventory.Application.Repositories
             if (orderVM != null)
             {
                 orderVM.QuantityPacked = form.Items.Sum(s => s.Quantity);
-                if(orderVM.QuantityOrdered <= orderVM.QuantityPacked)
+                if (orderVM.QuantityOrdered <= orderVM.QuantityPacked)
                 {
                     orderVM.StatusId = await context.Statuses
                                                     .Where(s => s.Name == "Fully Packed")

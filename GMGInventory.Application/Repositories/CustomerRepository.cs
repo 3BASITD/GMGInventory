@@ -142,7 +142,7 @@ namespace GMGInventory.Application.Repositories
             return customerVM;
         }
 
-        public async Task<IList<CustomerVM>> GetAllAsync()
+        public async Task<IList<CustomerVM>> GetAllCustomerAsync()
         {
             var customers =  from cust in context.Customers
                                     .Include(s => s.Area)
@@ -186,7 +186,7 @@ namespace GMGInventory.Application.Repositories
             int totalRecord = 0;
             int filterRecord = 0;
             //var data = context.AuditLogs.Include(s=>s.User).AsQueryable();
-            var data = (await GetAllAsync()).AsQueryable();
+            var data = (await GetAllCustomerAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -693,23 +693,33 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<CustomerVM>> GetCustomerReceivableAsync(int id)
         {
-            var customerVM = from inv in context.Invoices
-                             join soali in context.SOACRLineItems
-                                        on inv.Id equals soali.InvoiceId
-                             join soacr in context.SOACRs
-                                        on soali.SOACRId equals soacr.Id into soacrs
-                             from soacrsGroup in soacrs.DefaultIfEmpty()
-                             join c in context.CustomerPayments
-                                        on soacrsGroup.Id equals c.SOACRId
+            //var customerVM = from inv in context.Invoices
+            //                 join soali in context.SOACRLineItems
+            //                            on inv.Id equals soali.InvoiceId
+            //                 join soacr in context.SOACRs
+            //                            on soali.SOACRId equals soacr.Id into soacrs
+            //                 from soacrsGroup in soacrs.DefaultIfEmpty()
+            //                 join c in context.CustomerPayments
+            //                            on soacrsGroup.Id equals c.SOACRId
 
-                             where c.CustomerId == id
-                             select new CustomerVM
-                             {
-                                 InvoiceNo = inv.InvoiceNumber,
-                                 InvoicedDateD = inv.DateModified ?? inv.DateCreated,
-                                 InvoicedAmountD = inv.Amount
-                             };
-            return await customerVM.ToListAsync();
+            //                 where c.CustomerId == id
+            //                 select new CustomerVM
+            //                 {
+            //                     InvoiceNo = inv.InvoiceNumber,
+            //                     InvoicedDateD = inv.DateModified ?? inv.DateCreated,
+            //                     InvoicedAmountD = inv.Amount
+            //                 };
+            //return await customerVM.ToListAsync();
+
+            var receivables = from inv in context.Invoices
+                              where inv.SalesOrder.Customer.Id == id
+                              select new CustomerVM
+                              {
+                                  InvoiceNo = inv.InvoiceNumber,
+                                  InvoicedDateD = inv.InvoiceDate,
+                                  InvoicedAmountD = inv.Amount
+                              };
+            return await receivables.ToListAsync();
         }
 
         public async Task<ForDataTables<CustomerVM>> GetCustomerReceivableDTAsync(DataTablesRequestForm form, int id)
@@ -767,7 +777,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(CustomerVM customerVM)
         {
-            return (await GetAllAsync()).Any(s => s.Code == customerVM.Code && s.Name == customerVM.Name &&
+            return (await GetAllCustomerAsync()).Any(s => s.Code == customerVM.Code && s.Name == customerVM.Name &&
             s.CommissionRate == customerVM.CommissionRate && s.RegionName == customerVM.RegionName &&
             s.AreaName == customerVM.AreaName && s.CustomerTypeName == customerVM.CustomerTypeName &&
             s.ContactPerson == customerVM.ContactPerson && s.ContactNumber == customerVM.ContactNumber &&

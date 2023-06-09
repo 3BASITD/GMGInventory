@@ -18,11 +18,17 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<IList<UnservedItemVM>> GetListAsync()
+        public async Task<IList<UnservedItemVM>> GetListAsync(UnservedItemFilter filter)
         {
+            var regionSelected = await context.Regions.Where(s => s.Id == filter.Region).Select(s => s.Name).FirstOrDefaultAsync();
             var salesOrder = from l in context.SalesOrderLineItems
                              join u in userManager.Users on l.SalesOrder.UserCreated equals u.Id
+                             let i = context.ItemInventories.Where(s => s.ItemId == l.ItemId).Sum(s => s.Quantity)
                              where l.UnservedQuantity > 0
+                             && (filter.Region == null || l.SalesOrder.Customer.Area.Region.Id == filter.Region
+                             || (filter.Region != null && regionSelected == "Luzon" && l.SalesOrder.Customer.Area.Region.Name == "Metro Manila"))
+                             && filter.StartDate <= l.SalesOrder.DateCreated.Date
+                             && l.SalesOrder.DateCreated.Date <= filter.EndDate
                              select new UnservedItemVM
                              {
                                  Agent = l.SalesOrder.Agent.Code,
@@ -35,6 +41,7 @@ namespace GMGInventory.Application.Repositories
                                  OrderDateD = l.SalesOrder.DateCreated,
                                  PackedQuantityD = l.PackedQuantity,
                                  QuantityD = l.Quantity,
+                                 QuantityOnHandD = i,
                                  SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
                                  UnitPriceD = l.SellingPrice,
                                  UnservedQuantityD = l.UnservedQuantity
@@ -42,11 +49,11 @@ namespace GMGInventory.Application.Repositories
             return await salesOrder.ToListAsync();
         }
 
-        public async Task<ForDataTables<UnservedItemVM>> GetListDataTablesAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<UnservedItemVM>> GetListDataTablesAsync(DataTablesRequestForm form, UnservedItemFilter filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync()).AsQueryable();
+            var data = (await GetListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -61,6 +68,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.OrderDate.ToLower().Contains(form.SearchValue)
                                     || x.PackedQuantityD.ToString().Contains(form.SearchValue)
                                     || x.QuantityD.ToString().Contains(form.SearchValue)
+                                    || x.QuantityOnHandD.ToString().Contains(form.SearchValue)
                                     || x.SalesOrderNumber.ToLower().Contains(form.SearchValue)
                                     || x.UnitPriceD.ToString().Contains(form.SearchValue)
                                     || x.UnservedQuantityD.ToString().Contains(form.SearchValue));
@@ -83,6 +91,7 @@ namespace GMGInventory.Application.Repositories
                         case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
                         case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantityD); break;
                         case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
+                        case "QuantityOnHand": data = data.OrderBy(s => s.QuantityOnHandD); break;
                         case "SalesOrderNumber": data = data.OrderBy(s => s.SalesOrderNumber); break;
                         case "UnitPrice": data = data.OrderBy(s => s.UnitPriceD); break;
                         case "UnservedQuantity": data = data.OrderBy(s => s.UnservedQuantityD); break;
@@ -102,6 +111,7 @@ namespace GMGInventory.Application.Repositories
                         case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
                         case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantityD); break;
                         case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
+                        case "QuantityOnHand": data = data.OrderByDescending(s => s.QuantityOnHandD); break;
                         case "SalesOrderNumber": data = data.OrderByDescending(s => s.SalesOrderNumber); break;
                         case "UnitPrice": data = data.OrderByDescending(s => s.UnitPriceD); break;
                         case "UnservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantityD); break;

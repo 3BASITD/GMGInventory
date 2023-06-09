@@ -9,19 +9,27 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Category")]
         public int? CategoryId { get; set; }
         public SelectList? Categories { get; set; }
+        public string? CategoryKeyword { get; set; }
 
         [Display(Name = "Item Type")]
         public int? ItemTypeId { get; set; }
         public SelectList? ItemTypes { get; set; }
+        public string? ItemTypeKeyword { get; set; }
 
         [Display(Name = "Brand")]
         public int? BrandId { get; set; }
         public SelectList? Brands { get; set; }
+        public string? BrandKeyword { get; set; }
 
         [Display(Name = "Warehouse")]
         public int? WarehouseId { get; set; }
         public SelectList? Warehouses { get; set; }
 
+        public int? ItemId { get; set; }
+        public string? ItemKeyword { get; set; }
+
+        public string? ModelNumber { get; set; }
+        public string? Size { get; set; }
         public bool ActiveOnly { get; set; } = false;
     }
 
@@ -48,7 +56,8 @@ namespace GMGInventory.Common.Models
         public string Size { get; set; }
 
         [Display(Name = "Quantity on Hand")]
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
 
 
         [Display(Name = "Unit")]
@@ -162,7 +171,8 @@ namespace GMGInventory.Common.Models
         public decimal NetPriceD { get; set; }
 
         [Display(Name = "Quantity on Hand")]
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
 
         [Display(Name = "Warehouse")]
         public string Warehouse { get; set; }
@@ -191,7 +201,8 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
     }
 
     public class ItemDetailPurchaseVM
@@ -199,7 +210,8 @@ namespace GMGInventory.Common.Models
         public string PurchaseNumber { get; set; }
         public string Warehouse { get; set; }
         public string Supplier { get; set; }
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
         public string UnitCost => string.Format(SystemFormat.StringDecimalComma, UnitCostD);
         public decimal UnitCostD { get; set; }
         public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
@@ -219,14 +231,17 @@ namespace GMGInventory.Common.Models
     {
         public string SalesNumber { get; set; }
         public string Customer { get; set; }
-        public string UnitPrice => string.Format("{0:##0.00}", UnitPriceD);
+        public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
         public decimal UnitPriceD { get; set; }
-        public int Quantity { get; set; }
-        public int PackedQuantity { get; set; }
-        public int UnservedQuantity => Quantity - PackedQuantity;
-        public string Discount1 => string.Format("{0:##0.00}", Discount1D);
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
+        public string PackedQuantity => string.Format(SystemFormat.StringIntegerComma, PackedQuantityD);
+        public int PackedQuantityD { get; set; }
+        public string UnservedQuantity => string.Format(SystemFormat.StringIntegerComma, UnservedQuantityD);
+        public int UnservedQuantityD { get; set; }
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
         public decimal Discount1D { get; set; }
-        public string Discount2 => string.Format("{0:##0.00}", Discount2D);
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
         public string Agent { get; set; }
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
@@ -237,9 +252,12 @@ namespace GMGInventory.Common.Models
     public class ItemDetailCountVM
     {
         public string Warehouse { get; set; }
-        public int QuantityFrom { get; set; }
-        public int QuantityTo { get; set; }
-        public int QuantityAdjusted => QuantityTo - QuantityFrom;
+        public string QuantityFrom => string.Format(SystemFormat.StringIntegerComma, QuantityFromD);
+        public int QuantityFromD { get; set; }
+        public string QuantityTo => string.Format(SystemFormat.StringIntegerComma, QuantityToD);
+        public int QuantityToD { get; set; }
+        public string QuantityAdjusted => string.Format(SystemFormat.StringIntegerComma, QuantityAdjustedD);
+        public int QuantityAdjustedD => QuantityToD - QuantityFromD;
         public string AdjustmentDate => AdjustmentDateD.ToString(SystemFormat.StringDateTime);
         public DateTime AdjustmentDateD { get; set; }
         public string AdjustmentBy { get; set; }
@@ -248,9 +266,9 @@ namespace GMGInventory.Common.Models
 
     public class ItemDetailPriceVM
     {
-        public string RetailPrice => string.Format("{0:##0.00}", RetailPriceD);
+        public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
-        public string NetPrice => string.Format("{0:##0.00}", NetPriceD);
+        public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
         public decimal NetPriceD { get; set; }
         public string UpdateDate => UpdateDateD.ToString(SystemFormat.StringDateTime);
         public DateTime UpdateDateD { get; set; }
@@ -262,7 +280,8 @@ namespace GMGInventory.Common.Models
         public int TransferNumber { get; set; }
         public string Source { get; set; }
         public string Destination { get; set; }
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
         public string TransferDate => TransferDateD.ToString(SystemFormat.StringDateTime);
         public DateTime TransferDateD { get; set; }
         public string TransferBy { get; set; }
@@ -274,7 +293,8 @@ namespace GMGInventory.Common.Models
         public string ReturnNumber { get; set; }
         public string ItemCode { get; set; }
         public string ItemName { get; set; }
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
         public string Customer { get; set; }
         public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDateTime);
         public DateTime ReturnDateD { get; set; }

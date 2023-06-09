@@ -45,7 +45,7 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="5">Total</th>
+                    <th colspan="5" class="text-end">Total</th>
                     <th></th>
                 </tr>
             </tfoot>
@@ -190,6 +190,9 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            search: {
+                return: true,
+            },
             columns: [
                 { data: "item", name: "Item" },
                 { data: "transactionType", name: "TransactionType" },
@@ -211,8 +214,6 @@
         // Load functions upon DataTable load
         stockDT.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-stock', stockDT);
 
             $(".table-stock thead th").removeClass("text-end");
         });

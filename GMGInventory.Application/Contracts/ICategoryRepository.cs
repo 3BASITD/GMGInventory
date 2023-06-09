@@ -17,7 +17,7 @@ namespace GMGInventory.Application.Contracts
         Task UpdateAsync(CategoryVM categoryVM);
         Task<bool> UploadCombinationExistAsync(CategoryVM categoryVM);
         Task<bool> IsCodeExist(string code);
-        Task<IList<CategoryVM>> GetAllAsync();
+        Task<IList<CategoryVM>> GetAllCategoryAsync();
         Task<ForDataTables<CategoryVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
     }
 }

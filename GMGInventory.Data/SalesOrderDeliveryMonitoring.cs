@@ -6,7 +6,7 @@ namespace GMGInventory.Data
     {
         public SalesOrderDeliveryMonitoring()
         {
-            this.SalesReturnAppliedAmounts = new HashSet<SalesReturnAppliedAmount>();
+            //this.SalesReturnAppliedAmounts = new HashSet<SalesReturnAppliedAmount>();
         }
 
         [ForeignKey("SalesOrderId")]
@@ -27,6 +27,6 @@ namespace GMGInventory.Data
 
         public DateTime? DateDeliver { get; set; }
 
-        public ICollection<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
+        //public ICollection<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
     }
 }

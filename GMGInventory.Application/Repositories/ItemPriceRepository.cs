@@ -28,6 +28,7 @@ namespace GMGInventory.Application.Repositories
                           from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated >= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
                           join inventory in context.ItemInventories on item.Id equals inventory.Id
                           group inventory by new { item, price } into i
+                          let served = context.SalesOrderLineItems.Where(s => s.ItemId == i.Key.item.Id).ToList()
                           where i.Key.item.Id == id
                           select new ItemPriceVM
                           {
@@ -40,7 +41,7 @@ namespace GMGInventory.Application.Repositories
                               Name = i.Key.item.Name,
                               NetPrice = i.Key.price.NetSellingPrice,
                               PartNumber = string.IsNullOrWhiteSpace(i.Key.item.PartNumber) ? "-" : i.Key.item.PartNumber,
-                              Quantity = i.Sum(s => s.Quantity),
+                              Quantity = i.Sum(s => s.Quantity) + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
                               RetailPrice = i.Key.price.RetailSellingPrice,
                               Size = i.Key.item.Size,
                               Unit = i.Key.item.Unit.Code
@@ -56,13 +57,16 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<ItemPriceVM>> GetAllItemPriceAsync(ItemFilterVM filter)
         {
             var pricesVM = (from item in context.Items
-                            from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated <= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
-                            let quantity = (from inventory in context.ItemInventories where inventory.ItemId == item.Id select inventory.Quantity).ToList()
+                            from price in context.ItemPrices.Where(s => s.ItemId == item.Id).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
                             join user in userManager.Users on price.UserCreated equals user.Id
-                            where ((!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
-                                && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
-                                && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
-                                && (filter.BrandId == null || filter.BrandId == item.BrandId))
+                            let quantity = context.ItemInventories.Where(s => s.ItemId == item.Id).Sum(s => s.Quantity)
+                            let served = context.SalesOrderLineItems.Where(s => s.ItemId == item.Id).ToList()
+                            where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+                                && (filter.BrandId == null || filter.BrandId == item.BrandId || (filter.BrandId == 0 && item.Brand.Code.ToLower().Contains((filter.BrandKeyword + "").ToLower())))
+                                && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId || (filter.ItemTypeId == 0 && item.ItemType.Code.ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
+                                && (filter.ItemId == null || filter.ItemId == item.Id || (filter.ItemId == 0 && (item.Code + "|" + item.Name).ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                                && (filter.ModelNumber == null || (item.ModelNumber + "").ToLower().Contains(filter.ModelNumber.ToLower()))
+                                && (filter.Size == null || item.Size.ToLower().Contains(filter.Size.ToLower()))
                             select new ItemPriceVM
                             {
                                 Brand = item.Brand.Code,
@@ -70,11 +74,11 @@ namespace GMGInventory.Application.Repositories
                                 Code = item.Code,
                                 Id = item.Id,
                                 ItemType = item.ItemType.Code,
-                                ModelNumber = string.IsNullOrWhiteSpace(item.ModelNumber) ? "-" : item.ModelNumber,
+                                ModelNumber = string.IsNullOrWhiteSpace(item.ModelNumber) ? "-" : item.ModelNumber + "",
                                 Name = item.Name,
                                 NetPrice = price == null ? 0 : price.NetSellingPrice,
-                                PartNumber = string.IsNullOrWhiteSpace(item.PartNumber) ? "-" : item.PartNumber,
-                                Quantity = quantity.Count() == 0 ? 0 : quantity.Sum(s => s),
+                                PartNumber = string.IsNullOrWhiteSpace(item.PartNumber) ? "-" : item.PartNumber + "",
+                                Quantity = quantity + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
                                 RetailPrice = price == null ? 0 : price.RetailSellingPrice,
                                 Size = item.Size,
                                 Unit = item.Unit.Code
@@ -283,7 +287,7 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var itemPrice = new ItemPrice
             {
-                ItemId = id.Value,
+                ItemId = id == null ? 0 : id.Value,
                 RetailSellingPrice = retailPrice,
                 NetSellingPrice = netPrice
             };

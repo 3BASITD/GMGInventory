@@ -105,9 +105,9 @@ namespace GMGInventory.Application.Repositories
                         case "CRNumber": data = data.OrderBy(s => s.CRNumber); break;
                         case "SOANo": data = data.OrderBy(s => s.SOANo); break;
                         case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
-                        case "TotalInvoiceAmount": data = data.OrderBy(s => s.TotalInvoiceAmount); break;
-                        case "AmountPaid": data = data.OrderBy(s => s.AmountPaid); break;
-                        case "OverPayment": data = data.OrderBy(s => s.OverPayment); break;
+                        case "TotalInvoiceAmount": data = data.OrderBy(s => s.TotalInvoiceAmountD); break;
+                        case "AmountPaid": data = data.OrderBy(s => s.AmountPaidD); break;
+                        case "OverPayment": data = data.OrderBy(s => s.OverPaymentD); break;
                         case "TransactionDate": data = data.OrderBy(s => s.TransactionDateD); break;
                         case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderBy(s => s.Remarks); break;
@@ -122,9 +122,9 @@ namespace GMGInventory.Application.Repositories
                         case "CRNumber": data = data.OrderByDescending(s => s.CRNumber); break;
                         case "SOANo": data = data.OrderByDescending(s => s.SOANo); break;
                         case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
-                        case "TotalInvoiceAmount": data = data.OrderByDescending(s => s.TotalInvoiceAmount); break;
-                        case "AmountPaid": data = data.OrderByDescending(s => s.AmountPaid); break;
-                        case "OverPayment": data = data.OrderByDescending(s => s.OverPayment); break;
+                        case "TotalInvoiceAmount": data = data.OrderByDescending(s => s.TotalInvoiceAmountD); break;
+                        case "AmountPaid": data = data.OrderByDescending(s => s.AmountPaidD); break;
+                        case "OverPayment": data = data.OrderByDescending(s => s.OverPaymentD); break;
                         case "TransactionDate": data = data.OrderByDescending(s => s.TransactionDateD); break;
                         case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
@@ -146,19 +146,31 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<PaymentVM>> GetPaymentChecksAsync(int id)
         {
-            var customerVM = from cp in context.CustomerPayments
-                             join sc in context.SOACRChecks
-                                     on cp.Id equals sc.CustomerPaymentId
-                             where cp.Id == id
-                             select new PaymentVM
-                             {
-                                 CheckNo = sc.CheckNumber,
-                                 CheckAmountD = sc.CheckAmount,
-                                 CheckDateD = sc.CheckDate,
-                                 BankName = sc.BankName,
-                                 BankBranch = sc.BankBranch
-                             };
-            return await customerVM.ToListAsync();
+            //var customerVM = from cp in context.CustomerPayments
+            //                 join sc in context.SOACRChecks
+            //                         on cp.Id equals sc.CustomerPaymentId
+            //                 where cp.Id == id
+            //                 select new PaymentVM
+            //                 {
+            //                     CheckNo = sc.CheckNumber,
+            //                     CheckAmountD = sc.CheckAmount,
+            //                     CheckDateD = sc.CheckDate,
+            //                     BankName = sc.BankName,
+            //                     BankBranch = sc.BankBranch
+            //                 };
+            //return await customerVM.ToListAsync();
+
+            var checkVM = from check in context.SOACRChecks
+                          where check.CustomerPaymentId == id
+                          select new PaymentVM
+                          {
+                              CheckNo = check.CheckNumber,
+                              CheckAmountD = check.CheckAmount,
+                              CheckDateD = check.CheckDate,
+                              BankName = check.BankName,
+                              BankBranch = check.BankBranch
+                          };
+            return await checkVM.ToListAsync();
         }
 
         public async Task<ForDataTables<PaymentVM>> GetPaymentChecksDTAsync(DataTablesRequestForm form, int id)
@@ -220,27 +232,41 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<PaymentVM>> GetPaymentInvoicesAsync(int id)
         {
-            var customerVM = from inv in context.Invoices
-                             join soali in context.SOACRLineItems
-                                        on inv.Id equals soali.InvoiceId
-                             join soacr in context.SOACRs
-                                        on soali.SOACRId equals soacr.Id into soacrs
-                             from soacrsGroup in soacrs.DefaultIfEmpty()
-                             join c in context.CustomerPayments
-                                        on soacrsGroup.Id equals c.SOACRId
+            //var customerVM = from inv in context.Invoices
+            //                 join soali in context.SOACRLineItems
+            //                            on inv.Id equals soali.InvoiceId
+            //                 join soacr in context.SOACRs
+            //                            on soali.SOACRId equals soacr.Id into soacrs
+            //                 from soacrsGroup in soacrs.DefaultIfEmpty()
+            //                 join c in context.CustomerPayments
+            //                            on soacrsGroup.Id equals c.SOACRId
 
-                             where c.Id == id
-                             select new PaymentVM
-                             {
-                                 InvoiceNumber = inv.InvoiceNumber,
-                                 InvoiceDateD = inv.DateModified ?? inv.DateCreated,
-                                 InvoiceType = inv.InvoiceType.Name,
-                                 InvoiceAmountD = inv.Amount,
-                                 BalanceAmountD = inv.PaidAmount,
-                                 PackNo = inv.Pack.QuantityInvoiced,
-                                 SalesOrderNo = inv.SalesOrder.SalesOrderNumber
-                             };
-            return await customerVM.ToListAsync();
+            //                 where c.Id == id
+            //                 select new PaymentVM
+            //                 {
+            //                     InvoiceNumber = inv.InvoiceNumber,
+            //                     InvoiceDateD = inv.DateModified ?? inv.DateCreated,
+            //                     InvoiceType = inv.InvoiceType.Name,
+            //                     InvoiceAmountD = inv.Amount,
+            //                     BalanceAmountD = inv.PaidAmount,
+            //                     PackNo = inv.Pack.QuantityInvoiced,
+            //                     SalesOrderNo = inv.SalesOrder.SalesOrderNumber
+            //                 };
+            //return await customerVM.ToListAsync();
+
+            var payment = from pay in context.CustomerPaymentDetails
+                          where pay.CustomerPayment.Id == id
+                          select new PaymentVM
+                          {
+                              InvoiceNumber = pay.Invoice.InvoiceNumber,
+                              InvoiceDateD = pay.Invoice.InvoiceDate,
+                              InvoiceType = pay.Invoice.InvoiceType.Name,
+                              InvoiceAmountD = pay.Invoice.Amount,
+                              BalanceAmountD = pay.Invoice.Amount - pay.Invoice.PaidAmount,
+                              PackNo = pay.Invoice.Pack.Id,
+                              SalesOrderNo = pay.Invoice.SalesOrder.SalesOrderNumber
+                          };
+            return await payment.ToListAsync();
         }
 
         public async Task<ForDataTables<PaymentVM>> GetPaymentInvoicesDTAsync(DataTablesRequestForm form, int id)

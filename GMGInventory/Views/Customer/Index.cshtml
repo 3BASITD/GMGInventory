@@ -521,6 +521,7 @@
                 url: "@Url.Action("GetListJson", "Customer")",
                 type: "POST",
             },
+            processing: true,
             serverSide: true,
             filter: true,
             responsive: true,
@@ -672,8 +673,6 @@
         // load functions upon datatable load
         dataTable.on("draw", function () {
             hideLoader();
-
-            DatatablesSearchOnEnter('.table-Customer', dataTable);
 
             $('.deleteBtn').click(function (e) {
                 swal({

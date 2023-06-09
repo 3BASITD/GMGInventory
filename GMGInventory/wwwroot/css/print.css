@@ -54,7 +54,25 @@ p {
     margin-bottom: 5px;
 }
 
-    p strong {
-        display: inline-block;
-        min-width: 75px;
-    }
+p strong {
+    display: inline-block;
+    min-width: 75px;
+}
+
+.signatory {
+    border: none !important;
+}
+
+.signatory div {
+    display: flex;
+    flex-flow: column wrap;
+    height: 85px;
+}
+
+.signatory span {
+    border-bottom: solid 2px black !important;
+    padding: 10px 5px 30px 0;
+    font-weight: bold;
+    display: block;
+    width: 25%;
+}

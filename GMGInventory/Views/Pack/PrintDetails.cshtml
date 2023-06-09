@@ -1,0 +1,107 @@
+﻿@model PackDetailsPVM
+
+@{
+    Layout = "";
+    var title = "Pack Listing";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <table class="table-header">
+        <tr>
+            <th>Pack Number</th>
+            <td>@Model.Details.Id</td>
+            <th>Sales Order Number</th>
+            <td>@Model.Details.SONumber</td>
+        </tr>
+        <tr>
+            <th>Customer Code</th>
+            <td>@Model.Details.CustomerCode</td>
+            <th>Sales Order Date</th>
+            <td>@Model.Details.SalesOrderDate</td>
+        </tr>
+        <tr>
+            <th>Customer Name</th>
+            <td>@Model.Details.CustomerName</td>
+            <th>Pack Date</th>
+            <td>@Model.Details.PackDate</td>
+        </tr>
+        <tr>
+            <th>Forwarder</th>
+            <td>@Model.Details.Forwarder</td>
+            <th>Packed By</th>
+            <td>@Model.Details.PackBy</td>
+        </tr>
+    </table>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Quantity)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var group = "";
+                var totalquantity = 0;
+                var allquantity = 0;
+                foreach (var item in Model.Contents)
+                {
+                    if((item.BoxNumber + "") != group)
+                    {
+                        if(group != "")
+                        {
+                            <tr>
+                                <td colspan="2" class="right-text">Total Quantity for <strong>Box @group</strong></td>
+                                <td class="right-text"><nobr>@totalquantity</nobr></td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="3"><strong>Box @item.BoxNumber</strong></td>
+                        </tr>
+                        group = item.BoxNumber + "";
+                        totalquantity = 0;
+                    }
+                    totalquantity += item.Quantity;
+                    allquantity += item.Quantity;
+                    <tr>
+                        <td>@item.ItemCode</td>
+                        <td>@item.ItemName</td>
+                        <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="2" class="right-text">Total Quantity for <strong>Box @group</strong></td>
+                    <td class="right-text"><nobr>@totalquantity</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2" class="right-text">Total</th>
+                <th class="right-text"><nobr>@allquantity</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
+</html>

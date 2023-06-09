@@ -2,6 +2,7 @@
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -86,37 +87,63 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> SaveJson(InvoiceFormVM form)
         {
             ResponseModel<int> responseModel = new ResponseModel<int>();
-            var orderId = await invoiceRepository.SaveAsync(form);
-            if (orderId == -1)
+            if (await invoiceRepository.IsBIRInvoiceNumberInUser(form.Id, form.BIRInvoiceNumber))
             {
                 responseModel.Status = "Error";
-                responseModel.Message = "Sales Order missing. Failed to submit.";
+                responseModel.Message = "BIR Invoice Number already in use";
             }
             else
             {
-                responseModel.Status = "Success";
-                responseModel.Message = "Pack successfully submitted";
+                var orderId = await invoiceRepository.SaveAsync(form);
+                if (orderId == -1)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Pack missing. Failed to submit.";
+                    TempData["ErrorMessage"] = "Pack missing. Failed to submit.";
+                }
+                else
+                {
+                    var submitMessage = "Pack successfully " + (form.SavingAs == "post" ? "posted" : "saved");
+                    responseModel.Status = "Success";
+                    responseModel.Message = submitMessage;
+                    TempData["SuccessMessage"] = submitMessage;
+                }
+                responseModel.NewRow = orderId;
             }
-            responseModel.NewRow = orderId;
             return Json(responseModel);
         }
 
         [HttpPost]
-        public async Task<JsonResult> UpdateJson(InvoiceFormUpdateVM form)
+        public async Task<JsonResult> UpdateJson(InvoiceFormVM form)
         {
             ResponseModel<int> responseModel = new ResponseModel<int>();
-            var orderId = await invoiceRepository.UpdateAsync(form);
-            if (orderId == -1)
+            if (await invoiceRepository.IsBIRInvoiceNumberInUser(form.Id, form.BIRInvoiceNumber))
             {
                 responseModel.Status = "Error";
-                responseModel.Message = "Sales Invoice missing. Failed to submit.";
+                responseModel.Message = "BIR Invoice Number already in use";
+            }
+            else if (form.SavingAs == "delete" && await invoiceRepository.IsInvoiceInUse(form.Id))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Cannot proceed to cancel. Invoice already in use";
             }
             else
             {
-                responseModel.Status = "Success";
-                responseModel.Message = "Sales Invoice successfully saved.";
+                var responseId = await invoiceRepository.UpdateAsync(form);
+                if (responseId == -1)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Sales Invoice missing. Failed to submit.";
+                }
+                else
+                {
+                    var submitMessage = "Sales Invoice successfully " + (form.SavingAs == "post" ? "posted" : form.SavingAs == "delete" ? "cancelled" : "saved");
+                    responseModel.Status = "Success";
+                    responseModel.Message = submitMessage;
+                    TempData["SuccessMessage"] = submitMessage;
+                }
+                responseModel.NewRow = responseId;
             }
-            responseModel.NewRow = orderId;
             return Json(responseModel);
         }
     }

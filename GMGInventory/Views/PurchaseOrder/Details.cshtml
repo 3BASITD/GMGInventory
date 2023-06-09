@@ -10,17 +10,21 @@
 
     <div class="card card-default">
         <div class="card-header">
-            <span class="card-title po-title">@ViewData["Title"]</span>
+        <span class="card-title po-title">@ViewData["Title"]</span>
             <div class="card-tools">
+            @if (Model.Status == "Draft")
+            {
                 <button type="button" onclick="SaveReplenish('Replenish')" class="btn btn-primary btn-sm float-right ml-2 btn-details-replenish">
                     <span class="fas fa-sync"></span> Replenish Item
                 </button>
                 <button type="button" onclick="SaveReplenish('Draft')" class="btn btn-secondary btn-sm float-right ml-2 btn-details-draft">
                     <span class="fab fa-firstdraft"></span> Save as Draft
                 </button>
-                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-print">
+            } else {
+            <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-print">
                     <span class="fas fa-print"></span> Print
                 </button>
+            }
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
                     <span class="fas fa-arrow-left"></span> Back to List
                 </a>
@@ -121,9 +125,12 @@
                     <div class="card-header bg-light">
                         <span class="card-title">Replenish Item(s)</span>
                         <div class="card-tools">
+            @if (Model?.Status == "Draft")
+            {
                             <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
                                 <span class="fas fa-plus"></span> Add Replenish Item
                             </button>
+            }
                         </div>
                     </div>
                     <div class="card-body">
@@ -138,19 +145,15 @@
                                     <th>Unit Price</th>
                                     <th>Discount 1</th>
                                     <th>Discount 2</th>
+                                    <th>Discount 3</th>
                                     <th>Net Price</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th>Total</th>
+                                    <th colspan="3" class="text-end">Total</th>
                                     <th class="total-quantity">0</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
+                                    <th colspan="5"></th>
                                     <th class="total-net-price">0.00</th>
                                 </tr>
                             </tfoot>
@@ -242,6 +245,18 @@
                         </div>
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
+                                <label for="add-discount3" class="form-label mb-0">Discount 3</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" min="0" max="100" id="add-discount3" name="Discount3" class="form-control form-control-sm" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <span data-valmsg-for="add-discount3" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
                                 <label for="add-net-price" class="form-label mb-0">Net Price</label>
                                 <input type="number" id="add-net-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
                                 <span data-valmsg-for="add-net-price" data-valmsg-replace="true" class="text-danger"></span>
@@ -310,13 +325,14 @@
             $("#add-unit").val("");
         });
 
-        $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2").on("input", function () {
+        $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2, #add-discount3").on("input", function () {
             var quantity = parseFloat($("#add-quantity").val());
             var unit_price = parseFloat($("#add-unit-price").val());
             var discount1 = parseFloat($("#add-discount1").val());
             var discount2 = parseFloat($("#add-discount2").val());
+            var discount3 = parseFloat($("#add-discount3").val());
 
-            $("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+            $("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
         });
 
         function clearItemForm() {
@@ -327,6 +343,7 @@
             $("#add-unit-price").val("0");
             $("#add-discount1").val("0");
             $("#add-discount2").val("0");
+            $("#add-discount3").val("0");
             $("#add-net-price").val("0");
         }
 
@@ -375,6 +392,8 @@
                     discount1D: $("#add-discount1").val() || 0,
                     discount2: Round2Decimal($("#add-discount2").val() || 0),
                     discount2D: $("#add-discount2").val() || 0,
+                    discount3: Round2Decimal($("#add-discount3").val() || 0),
+                    discount3D: $("#add-discount3").val() || 0,
                     netPrice: Round2Decimal($("#add-net-price").val() || 0),
                     netPriceD: $("#add-net-price").val() || 0
                 }).draw();
@@ -406,7 +425,8 @@
                         var actions = '';
                         actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         return actions;
-                    }
+                    },
+                    visible: $("#po-status").val() == "Draft"
                 },
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemName", name: "ItemName" },
@@ -455,41 +475,27 @@
                     name: "Discount2",
                     className: "text-end"
                 },
+                {
+                    data: function (data, type, dataToSet) {
+                        if ($("#po-status").val() == "Draft") {
+                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3D) + '" class="form-control form-control-sm discount3" /><span class="input-group-text">%</span></div>';
+                        } else {
+                            return data.discount3
+                        }
+                    },
+                    name: "Discount3",
+                    className: "text-end"
+                },
                 { data: "netPrice", name: "NetPrice", className: "form-cell text-end netprice" }
             ],
-            order: [[0, "asc"]],
+            order: [[1, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 3);
-                columnDTTotalDecimal(api, 8)
+                columnDTTotalDecimal(api, 9);
             }
         });
-
-        LoadDraft();
-        function LoadDraft() {
-            if ($("#po-status").val() == "Draft") {
-                $(".btn-details-replenish").show();
-                $(".btn-details-draft").show();
-                $(".btn-details-print").hide();
-
-                $(".createBtn").show();
-
-                itemDT.column(0).visible(true);
-            } else {
-                $(".btn-details-replenish").hide();
-                $(".btn-details-draft").hide();
-                $(".btn-details-print").show();
-
-                $(".createBtn").hide();
-
-                itemDT.column(0).visible(false);
-
-                $(".po-title").text($(".po-title").text().replace(" (Draft)", ""));
-                $(".breadcrumb-item.active").text($(".breadcrumb-item.active").text().replace(" (Draft)", ""));
-            }
-            itemDT.ajax.reload();
-        }
 
         itemDT.on("draw", function () {
             hideLoader();
@@ -505,13 +511,14 @@
                 ComputeTotalQuantity();
             }
 
-            $(".quantity, .unitprice, .discount1, .discount2").on("input", function () {
+            $(".quantity, .unitprice, .discount1, .discount2, .discount3").on("input", function () {
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
                 var unit_price = parseFloat($(this).parents("tr").find(".unitprice").val());
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
+                var discount3 = parseFloat($(this).parents("tr").find(".discount3").val());
 
-                var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+                var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
                 $(this).parents("tr").find(".netprice").html(net_price);
                 ComputeTotalQuantity();
                 ComputeTotalNetPrice();
@@ -521,10 +528,7 @@
         function ComputeTotalQuantity() {
             quantities = $(".table-item").find(".quantity");
             total_quantity = 0;
-            console.log("Quantity:");
-            console.log(quantities);
             $.each(quantities, function () {
-                console.log($(this).val());
                 total_quantity += parseInt($(this).val());
             });
             $(".total-quantity").html(FormatStringInteger(total_quantity));
@@ -533,10 +537,7 @@
         function ComputeTotalNetPrice() {
             net_prices = $(".table-item").find(".netprice");
             total_net_price = 0;
-            console.log("NetPrice:");
-            console.log(net_prices);
             $.each(net_prices, function () {
-                console.log($(this).html());
                 total_net_price += parseFloat($(this).html());
             });
             $(".total-net-price").html(FormatStringDecimal(total_net_price));
@@ -550,12 +551,14 @@
                 var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
+                var row_discount3 = parseFloat($(this.node()).find(".discount3").val());
                 item_to_replenish.push({
                     item: row_data.id,
                     quantity: row_quantity,
                     unitPrice: row_unitprice,
                     discount1: row_discount1,
-                    discount2: row_discount2
+                    discount2: row_discount2,
+                    discount3: row_discount3
                 });
             });
             return item_to_replenish;
@@ -583,7 +586,7 @@
                         } else {
                             toastrNoDuplicate(data.message, "Success", "success");
                             $("#po-status").val(submitter);
-                            LoadDraft();
+                            itemDT.ajax.reload();
                         }
                     }
                 });
@@ -623,6 +626,7 @@
             html += '<th>Unit Price</th>';
             html += '<th>Discount 1</th>';
             html += '<th>Discount 2</th>';
+            html += '<th>Discount 3</th>';
             html += '<th>Net Price</th>';
             html += '</thead>';
             html += '</tr>';
@@ -637,6 +641,7 @@
                 html += '<td class="right-text">' + row_data.unitPrice + '</td>';
                 html += '<td class="right-text">' + row_data.discount1 + '</td>';
                 html += '<td class="right-text">' + row_data.discount2 + '</td>';
+                html += '<td class="right-text">' + row_data.discount3 + '</td>';
                 html += '<td class="right-text">' + row_data.netPrice + '</td>';
                 html += '</tr>';
 
@@ -647,7 +652,7 @@
             html += '<tfoot>';
             html += '<th colspan="2" class="right-text">Total</th>';
             html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
-            html += '<th colspan="4"></th>';
+            html += '<th colspan="5"></th>';
             html += '<th class="right-text">' + FormatStringDecimal(totalNetPrice) + '</th>';
             html += '</tfoot>';
             html += '</tr>';
@@ -656,7 +661,7 @@
             $("#for-print").printThis({
                 importCSS: false,
                 loadCSS: "/css/print.css",
-                pageTitle: "GMG Inventory",
+                pageTitle: "BAS/GMG Inventory",
                 beforePrint: function () {
                     $.LoadingOverlay("show", {
                         image: "",

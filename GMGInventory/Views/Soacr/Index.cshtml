@@ -12,7 +12,7 @@
             <button type="button" class="btn btn-primary btn-sm float-right btn-generate-soa ml-2" data-bs-toggle="modal" data-bs-target="#generateSOA">
                 <span class="fas fa-plus"></span> Generate SOA
             </button>
-            <a class="btn btn-primary btn-sm float-right ml-2" asp-action="AddCounterReceipt">
+            <a class="btn btn-primary btn-sm float-right ml-2" asp-action="GenerateCR">
                 <span class="fas fa-plus"></span> Generate Counter Receipt
             </a>
             <a class="btn btn-primary btn-sm float-right" asp-action="Invoice">
@@ -358,11 +358,15 @@
                 },
                 error: jQueryCommonError,
                 success: function (data, status, xhr) {
-                    toastrNoDuplicate(data.message, "Success", "success");
-                    $("#generateSOA").modal("hide");
-                    soacrDT.ajax.reload();
-                    hideLoader();
-                    //window.location = '@Url.Action("Details")/' + data.newRow;
+                    if (data.status == "Error") {
+                        toastrNoDuplicate(data.message, "Error", "error");
+                    } else {
+                        toastrNoDuplicate(data.message, "Success", "success");
+                        $("#generateSOA").modal("hide");
+                        soacrDT.ajax.reload();
+                        hideLoader();
+                        //window.location = '@Url.Action("Details")/' + data.newRow;
+                    }
                 }
             });
         }

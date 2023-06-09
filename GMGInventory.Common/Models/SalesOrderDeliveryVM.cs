@@ -1,5 +1,6 @@
 ﻿using GMGInventory.Common.Constants;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GMGInventory.Common.Models
 {

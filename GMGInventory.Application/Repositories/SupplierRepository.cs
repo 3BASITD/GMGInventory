@@ -36,7 +36,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(SupplierVM supplierVM)
         {
-            return (await GetAllAsync()).Any(s => s.Code == supplierVM.Code && s.Name == supplierVM.Name &&
+            return (await GetAllSupplierAsync()).Any(s => s.Code == supplierVM.Code && s.Name == supplierVM.Name &&
             s.ContactPerson == supplierVM.ContactPerson && s.ContactNumber == supplierVM.ContactNumber &&
             s.EmailAddress == supplierVM.EmailAddress && s.AddressLine1 == supplierVM.AddressLine1 &&
             s.AddressLine2 == supplierVM.AddressLine2 && s.Barangay == supplierVM.Barangay &&
@@ -61,7 +61,7 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<SupplierViewVM>> GetAllAsync()
+        public async Task<IList<SupplierViewVM>> GetAllSupplierAsync()
         {
 
             var suppliers = from supplier in context.Suppliers
@@ -93,10 +93,8 @@ namespace GMGInventory.Application.Repositories
                              IsActive = supplier.IsActive,
                              ZipCode = supplier.ZipCode,
                              IsForeign = supplier.IsForeign,
-                             DateCreated = supplier.DateCreated.ToString(SystemFormat.StringDateTime),
                              DateCreatedD = supplier.DateCreated,
-                             DateModified = supplier.DateModified == null ? "-" : supplier.DateModified.Value.ToString(SystemFormat.StringDateTime),
-                             DateModifiedD = supplier.DateModified == null ? null : supplier.DateModified.Value,
+                             DateModifiedD = supplier.DateModified,
                              UserCreated = userc.Nickname,
                              UserModified = um == null ? "-" : um.Nickname
                          };
@@ -107,7 +105,7 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetAllAsync()).AsQueryable();
+            var data = (await GetAllSupplierAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -260,14 +258,14 @@ namespace GMGInventory.Application.Repositories
             {
                 Code = supplierVM.Code,
                 Name = supplierVM.Name,
-                ContactPerson = supplierVM.ContactPerson,
-                ContactNumber = supplierVM.ContactNumber,
-                EmailAddress = supplierVM.EmailAddress,
+                ContactPerson = supplierVM.ContactPerson + "",
+                ContactNumber = supplierVM.ContactNumber + "",
+                EmailAddress = supplierVM.EmailAddress + "",
                 AddressLine1 = supplierVM.AddressLine1,
                 AddressLine2 = supplierVM.AddressLine2,
-                Barangay = supplierVM.Barangay,
+                Barangay = supplierVM.Barangay + "",
                 City = supplierVM.City,
-                ZipCode = supplierVM.ZipCode,
+                ZipCode = supplierVM.ZipCode + "",
                 AreaId = supplierVM.AreaId,
                 CurrencyId = supplierVM.CurrencyId,
                 IsForeign = supplierVM.IsForeign,
@@ -292,14 +290,14 @@ namespace GMGInventory.Application.Repositories
             supplier.Id = supplierVM.Id;
             supplier.Code = supplierVM.Code;
             supplier.Name = supplierVM.Name;
-            supplier.ContactPerson = supplierVM.ContactPerson;
-            supplier.ContactNumber = supplierVM.ContactNumber;
-            supplier.EmailAddress = supplierVM.EmailAddress;
+            supplier.ContactPerson = supplierVM.ContactPerson + "";
+            supplier.ContactNumber = supplierVM.ContactNumber + "";
+            supplier.EmailAddress = supplierVM.EmailAddress + "";
             supplier.AddressLine1 = supplierVM.AddressLine1;
             supplier.AddressLine2 = supplierVM.AddressLine2;
-            supplier.Barangay = supplierVM.Barangay;
+            supplier.Barangay = supplierVM.Barangay + "";
             supplier.City = supplierVM.City;
-            supplier.ZipCode = supplierVM.ZipCode;
+            supplier.ZipCode = supplierVM.ZipCode + "";
             supplier.AreaId = supplierVM.AreaId;
             supplier.CurrencyId = supplierVM.CurrencyId;
             supplier.IsForeign = supplierVM.IsForeign;

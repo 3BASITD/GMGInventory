@@ -41,7 +41,7 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> CreateJson(CategoryVM categoryVM)
         {
             ResponseModel responseModel = new ResponseModel();
-            if (await categoryRepository.IsCategoryCodeExist(categoryVM.Code))
+            if (await categoryRepository.IsCategoryCodeExist(categoryVM.CategoryCode))
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Category code already in use";
@@ -174,7 +174,7 @@ namespace GMGInventory.Controllers
                 responseModel.Status = "Error";
                 responseModel.Message = "Already exist";
             }
-            else if (await categoryRepository.IsCodeExist(categoryVM.Code))
+            else if (await categoryRepository.IsCodeExist(categoryVM.CategoryCode))
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Code already in use";

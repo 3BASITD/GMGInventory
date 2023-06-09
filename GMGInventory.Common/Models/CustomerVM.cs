@@ -133,7 +133,7 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Invoiced Date")]
-        public string InvoicedDate => InvoicedDateD == null ? "-" : InvoicedDateD.ToString(SystemFormat.StringDate);
+        public string InvoicedDate => InvoicedDateD.ToString(SystemFormat.StringDate);
         public DateTime InvoicedDateD { get; set; }
 
 
@@ -167,7 +167,7 @@ namespace GMGInventory.Common.Models
         public decimal? OverPaymentD { get; set; }
 
         [Display(Name = "Transaction Date")]
-        public string TransactionDate => TransactionDateD == null ? "-" : TransactionDateD.ToString(SystemFormat.StringDate);
+        public string TransactionDate => TransactionDateD.ToString(SystemFormat.StringDate);
         public DateTime TransactionDateD { get; set; }
 
         [Display(Name = "Created By")]
@@ -266,7 +266,7 @@ namespace GMGInventory.Common.Models
         public string ForwarderFaxNo { get; set; }
 
         [Display(Name = "Invoiced Date")]
-        public string InvoicedDate => InvoicedDateD == null ? "-" : InvoicedDateD.ToString(SystemFormat.StringDate);
+        public string InvoicedDate => InvoicedDateD.ToString(SystemFormat.StringDate);
         public DateTime InvoicedDateD { get; set; }
 
 
@@ -298,7 +298,7 @@ namespace GMGInventory.Common.Models
         public decimal? OverPaymentD { get; set; }
 
         [Display(Name = "Transaction Date")]
-        public string TransactionDate => TransactionDateD == null ? "-" : TransactionDateD.ToString(SystemFormat.StringDate);
+        public string TransactionDate => TransactionDateD.ToString(SystemFormat.StringDate);
         public DateTime TransactionDateD { get; set; }
 
         [Display(Name = "Created By")]

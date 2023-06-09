@@ -56,10 +56,8 @@ namespace GMGInventory.Application.Repositories
                              IsActive = forward.IsActive,
                              PhoneNumber = forward.PhoneNumber,
                              FaxNumber = forward.FaxNumber,
-                             DateCreated = forward.DateCreated.ToString(SystemFormat.StringDateTime),
                              DateCreatedD = forward.DateCreated,
-                             DateModified = forward.DateModified == null ? "-" : forward.DateModified.Value.ToString(SystemFormat.StringDateTime),
-                             DateModifiedD = forward.DateModified == null ? null : forward.DateModified.Value,
+                             DateModifiedD = forward.DateModified,
                              UserCreated = userc.Nickname,
                              UserModified = um == null ? "-" : um.Nickname
                          };

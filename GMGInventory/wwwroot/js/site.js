@@ -73,7 +73,7 @@
     }, 'Should not be equal');
 
     $.validator.addMethod('isNotZero', function (value, element, param) {
-        return this.optional(element) || parseInt(value) !== 0;
+        return this.optional(element) || parseInt(value) !== 0 || parseFloat(value) !== 0;
     }, 'Should not be 0');
 });
 
@@ -133,15 +133,6 @@ function showLoader() {
 
 function hideLoader() {
     $.LoadingOverlay("hide");
-}
-
-function DatatablesSearchOnEnter(table, table_elem) {
-    $(table + ' .dataTables_filter input').unbind();
-    $(table + ' .dataTables_filter input').keyup(function (e) {
-        if (e.keyCode == 13) {
-            table_elem.search($(this).val()).draw();
-        }
-    });
 }
 
 // Use for tabs with datatables content

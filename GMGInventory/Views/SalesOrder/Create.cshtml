@@ -1,18 +1,25 @@
 ﻿@{
-    ViewData["Title"] = "New Sales Order";
+    if (TempData["SalesOrderId"] != null)
+    {
+        ViewData["Title"] = "Resubmit Sales Order";
+    }
+    else
+    {
+        ViewData["Title"] = "New Sales Order";
+    }
 }
 
 @section Breadcrumb {
     <li class="breadcrumb-item"><a asp-controller="SalesOrder" asp-action="Index">Sales Orders</a></li>
 }
 
-    <div class="card card-default">
-        <form id="form-order">
-            <div class="card-header">
-                <span class="card-title">@ViewData["Title"]</span>
-                <div class="card-tools">
-                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-save"></span> @(TempData["SalesOrderId"] != null ? "Resubmit" : "Submit")
+<div class="card card-default">
+    <form id="form-order">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-save"></span> @(TempData["SalesOrderId"] != null ? "Resubmit" : "Submit")
                 </button>
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
                     <span class="fas fa-arrow-left"></span> Back to List
@@ -117,7 +124,7 @@
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th>Total</th>
+                                        <th class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
                                         <th colspan="7"></th>
                                         <th class="total-gross-price">0.00</th>
@@ -656,7 +663,7 @@
                 itemDT.row($(this).parents('tr')).remove().draw();
             });
             $(".table-item thead th").removeClass("form-cell");
-            $(".table-item thead th").removeClass("text-end");
+            //$(".table-item thead th").removeClass("text-end");
 
             $(".quantity, .sellingprice, .discount1, .discount2").on("input", function () {
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());

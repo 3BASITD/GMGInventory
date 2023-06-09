@@ -8,132 +8,156 @@
     <li class="breadcrumb-item"><a asp-controller="Pack" asp-action="Index">Pack Listing</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack()">
-                    <span class="fas fa-paper-plane"></span> Submit
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack()">
+                <span class="fas fa-paper-plane"></span> Post
+            </button>
+            <a class="btn btn-light btn-sm float-right" asp-action="Index" asp-controller="SalesOrder">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <div class="form-group">
+                    <label for="pack-so-number" class="form-label mb-0">Sales Order Number</label>
+                    <select id="pack-so-number" class="s2-bold s2ph-bold s2ph-dark" name="SONumber" style="width: 100%"></select>
+                    <span data-valmsg-for="pack-so-number" data-valmsg-replace="true" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerCode)</span>
+                    <b class="d-block">@Model?.CustomerCode</b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerName)</span>
+                    <b class="d-block">@Model?.CustomerName</b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">@Html.DisplayNameFor(model => model.SalesOrderDate)</span>
+                    <b class="d-block">@Model?.SalesOrderDate</b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">@Html.DisplayNameFor(model => model.Forwarder)</span>
+                    <b class="d-block">@Model?.Forwarder</b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Packed Item(s)</span>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                <span class="fas fa-plus"></span> Add Packed Item
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-item">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Box Number</th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-end">Total</th>
+                                    <th class="total-quantity">0</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Packed Item Modal -->
+<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Packed Item</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
-                <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-12 col-md-4 col-sm-6">
-                    <div class="form-group">
-                        <label for="pack-so-number" class="form-label mb-0">Sales Order Number</label>
-                        <select id="pack-so-number" class="s2-bold s2ph-bold s2ph-dark" name="SONumber" style="width: 100%"></select>
-                        <span data-valmsg-for="pack-so-number" data-valmsg-replace="true" class="text-danger"></span>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Box Number</label>
+                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" />
+                        <span data-valmsg-for="add-box" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="form-check form-switch pl-0">
+                            <input class="form-check-input mr-1" type="checkbox" id="add-partial">
+                            <label class="form-check-label" for="add-partial">Partial Quantity</label>
+                        </div>
+                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-quantity" />
+                        <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table table-head-fixed table-striped table-hover table-order">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input class="chkclassorderall" type="checkbox" />
+                                    </th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Selling Price</th>
+                                    <th>Discount 1</th>
+                                    <th>Discount 2</th>
+                                    <th>Ordered Quantity</th>
+                                    <th>Inventory Quantity</th>
+                                    <th>Gross Price</th>
+                                    <th>Packed Quantity</th>
+                                    <th>Remaining Quantity</th>
+                                    <th>Extended Price</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerCode)</span>
-                        <b class="d-block">@Model?.CustomerCode</b>
-                    </p>
-                </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">@Html.DisplayNameFor(model => model.CustomerName)</span>
-                        <b class="d-block">@Model?.CustomerName</b>
-                    </p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">@Html.DisplayNameFor(model => model.SalesOrderDate)</span>
-                        <b class="d-block">@Model?.SalesOrderDate</b>
-                    </p>
-                </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">@Html.DisplayNameFor(model => model.Forwarder)</span>
-                        <b class="d-block">@Model?.Forwarder</b>
-                    </p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header bg-light">
-                            <span class="card-title">Packed Item(s)</span>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                    <span class="fas fa-plus"></span> Add Packed Item
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-head-fixed table-striped table-hover table-item">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Box Number</th>
-                                        <th>Item Code</th>
-                                        <th>Item Name</th>
-                                        <th>Quantity</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="4">Total</th>
-                                        <th class="total-quantity">0</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-add-item">
+                    <span class="fas fa-plus"></span> Add
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Save Packed Item Modal -->
-    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Packed Item</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-head-fixed table-striped table-hover table-order">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Selling Price</th>
-                                <th>Discount 1</th>
-                                <th>Discount 2</th>
-                                <th>Ordered Quantity</th>
-                                <th>Inventory Quantity</th>
-                                <th>Gross Price</th>
-                                <th>Packed Quantity</th>
-                                <th>Remaining Quantity</th>
-                                <th>Extended Price</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @section Scripts {
+@section Scripts {
     <script>
         $("#pack-so-number").select2({
             minimumInputLength: 1,
@@ -174,9 +198,13 @@
                 },
                 type: "POST",
             },
+            serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
+            searching: false,
+            paging: false,
+            info: false,
             search: {
                 return: true,
             },
@@ -185,7 +213,12 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        //actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        if ($("#add-partial").prop("checked")) {
+                            actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
+                        } else {
+                            actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
+                        }
                         return actions;
                     }
                 },
@@ -205,18 +238,81 @@
                 { data: "packedQuantity", name: "PackedQuantity", className: "text-end" },
                 { data: "remainingQuantity", name: "RemainingQuantity", className: "text-end" },
                 { data: "grossPrice", name: "GrossPrice", className: "text-end" }
-            ]
+            ],
+            order: [[1, "asc"]]
         });
 
         orderDT.on("draw", function () {
             $(".table-order thead th").removeClass("text-end");
 
-            $(".btn-add-item").on("click", function () {
-                var rowdata = orderDT.row($(this).parents('tr')).data();
-                itemDT.row.add(rowdata).draw();
-                orderDT.row($(this).parents('tr')).remove().draw();
-                toastrNoDuplicate("Added " + rowdata.itemCode + " on Packed Item(s)", "Success", "success");
-            });
+            dtCheckboxes();
+        });
+
+        $(".btn-add-item").on("click", function () {
+            if ($("#add-box").val() == 0) {
+                toastrNoDuplicate("Please enter box number", "Required field &lt;Box Number&gt;", "warning");
+                $("#add-box").addClass("text-danger");
+                $('span[data-valmsg-for="add-box"]').text("Please enter box number");
+            } else if ($("#add-quantity").val() == 0 && $("#add-partial").prop("checked")) {
+                toastrNoDuplicate("Please enter quantity", "Required field &lt;Quantity&gt;", "warning");
+                $("#add-quantity").addClass("text-danger");
+                $('span[data-valmsg-for="add-quantity"]').text("Please enter collector receipt");
+            } else {
+                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var row_data = this.data();
+                    var itemchk = $(this.node()).find(".chkclassorder");
+                    if (itemchk.prop("checked") && parseInt(row_data.remainingQuantity) > 0) {
+                        if (parseInt(row_data.remainingQuantity) < parseInt($("#add-quantity").val())) {
+                            $("#add-quantity").val(parseInt(row_data.remainingQuantity));
+                        }
+                        var quantityToPack = 0;
+                        if ($("#add-partial").prop("checked")) {
+                            quantityToPack = parseInt($("#add-quantity").val());
+                            row_data.remainingQuantity = parseInt(row_data.remainingQuantity) - parseInt($("#add-quantity").val());
+                            row_data.packedQuantity = parseInt(row_data.packedQuantity) + parseInt($("#add-quantity").val());
+                        } else {
+                            quantityToPack = parseInt(row_data.remainingQuantity);
+                            row_data.packedQuantity = parseInt(row_data.remainingQuantity) + parseInt(row_data.packedQuantity);
+                            row_data.remainingQuantity = 0;
+                        }
+                        var toItem = {
+                            id: row_data.id,
+                            boxNumber: $("#add-box").val(),
+                            itemId: row_data.itemId,
+                            itemCode: row_data.itemCode,
+                            itemName: row_data.itemName,
+                            quantityToPack: quantityToPack
+                        };
+                        itemDT.row.add(toItem).draw();
+
+                        this.data(row_data);
+                    }
+                });
+                $(".chkclassorderall").prop("checked", false);
+                $(".chkclassorderall").prop("indeterminate", false);
+            }
+        });
+
+        $("#add-box").on("change", function () {
+            if ($("#add-box").val() == 0) {
+                toastrNoDuplicate("Please enter box number", "Required field &lt;Box Number&gt;", "warning");
+                $("#add-box").addClass("text-danger");
+                $('span[data-valmsg-for="add-box"]').text("Please enter box number");
+            } else {
+                $("#add-box").removeClass("text-danger");
+                $('span[data-valmsg-for="add-box"]').text("");
+            }
+        });
+
+        $("#add-quantity").on("change", function () {
+            if ($("#add-quantity").val() == 0 && $("#add-partial").prop("checked")) {
+                toastrNoDuplicate("Please enter quantity", "Required field &lt;Quantity&gt;", "warning");
+                $("#add-quantity").addClass("text-danger");
+                $('span[data-valmsg-for="add-quantity"]').text("Please enter collector receipt");
+            } else {
+                $("#add-quantity").removeClass("text-danger");
+                $('span[data-valmsg-for="add-quantity"]').text("");
+            }
         });
 
         var itemDT = $('.table-item').DataTable({
@@ -224,6 +320,8 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            searching: false,
+            paging: false,
             columns: [
                 {
                     orderable: false,
@@ -233,34 +331,46 @@
                         return actions;
                     }
                 },
-                {
-                    data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="' + data.quantity + '" value="1" class="form-control form-control-sm box-number" style="width: 100%;" />';
-                    },
-                    name: "BoxNumber",
-                    className: "form-cell text-end"
-                },
-                { data: "itemCode", name: "ItemCode", className: "form-cell" },
-                { data: "itemName", name: "ItemName", className: "form-cell" },
-                {
-                    data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" value="' + Math.max(0, data.quantity - data.packedQuantity) + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
-                    },
-                    //name: "PackedQuantity",
-                    className: "form-cell text-end"
-                }
+                { data: "boxNumber", name: "BoxNumber", visible: false },
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "quantityToPack", name: "QuantityToPack", className: "text-end" }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 4);
+            },
+            order: [[2, "asc"]],
+            orderFixed: [[1, 'asc']],
+            rowGroup: {
+                startRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="4"><strong>Box ' + group + '</strong></td>');
+                },
+                endRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="3" class="text-end">Total Quantity for <strong>Box ' + group + '</strong></td>')
+                        .append('<td class="text-end">' + rows.data().pluck("quantityToPack").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
+                },
+                dataSrc: "boxNumber"
             }
         });
 
         itemDT.on("draw", function () {
             $(".btn-remove-item").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
-                orderDT.row.add(rowdata).draw();
+                
+                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var row_data = this.data();
+                    if (row_data.id == rowdata.id) {
+                        row_data.remainingQuantity = parseInt(row_data.remainingQuantity) + parseInt(rowdata.quantityToPack);
+                        row_data.packedQuantity = parseInt(row_data.packedQuantity) - parseInt(rowdata.quantityToPack);
+                        this.data(row_data);
+                    }
+                });
+
+                dtCheckboxes();
                 itemDT.row($(this).parents('tr')).remove().draw();
                 toastrNoDuplicate("Removed " + rowdata.itemCode + " on Packed Item(s)", "Warning", "warning");
             });
@@ -269,16 +379,60 @@
             $(".table-item thead th").removeClass("text-end");
 
             $(".quantity").on("input", function () {
+                CheckQuantityServed();
                 ComputeTotalQuantity();
             });
         });
 
-        function ComputeTotalQuantity() {
-            total_quantity = 0;
-            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                total_quantity += parseInt($(this.node()).find(".quantity").val());
+        $("#add-quantity").hide();
+        $("#add-partial").on("change", function () {
+            if ($(this).prop("checked")) {
+                $("#add-quantity").val(1);
+                $("#add-quantity").show();
+                $("#add-quantity").focus();
+                $(".chkclassorder").attr("type", "radio");
+                $(".chkclassorderall").hide();
+            } else {
+                $("#add-quantity").val("");
+                $("#add-quantity").hide();
+                $(".chkclassorder").attr("type", "checkbox");
+                $(".chkclassorderall").show();
+            }
+            $(".chkclassorder").prop("checked", false);
+            $(".chkclassorderall").prop("checked", false);
+            $(".chkclassorderall").prop("indeterminate", false);
+        });
+
+        dtCheckboxes();
+        function dtCheckboxes() {
+            $(".chkclassorderall").off("change").on("change", function () {
+                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".chkclassorder").prop("checked", $(".chkclassorderall").prop("checked"));
+                });
             });
-            $(".total-quantity").html(FormatStringInteger(total_quantity));
+
+            $(".chkclassorder").off("change").on("change", function () {
+                var rows_checked = 0;
+                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".chkclassorder").prop("checked")) {
+                        rows_checked++;
+                    }
+                });
+
+                if (rows_checked == 0) {
+                    $(".chkclassorderall").prop("checked", false);
+                    $(".chkclassorderall").prop("indeterminate", false);
+                } else if (rows_checked == orderDT.rows().count()) {
+                    $(".chkclassorderall").prop("checked", true);
+                    $(".chkclassorderall").prop("indeterminate", false);
+                } else if (rows_checked == 0) {
+                    $(".chkclassorderall").prop("checked", false);
+                    $(".chkclassorderall").prop("indeterminate", false);
+                } else {
+                    $(".chkclassorderall").prop("checked", false);
+                    $(".chkclassorderall").prop("indeterminate", true);
+                }
+            });
         }
 
         itemDT.clear().draw();
@@ -287,12 +441,10 @@
             var item_to_pack = [];
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
-                var row_box_number = parseInt($(this.node()).find(".box-number").val());
-                var row_quantity = parseInt($(this.node()).find(".quantity").val());
                 item_to_pack.push({
-                    boxNumber: row_box_number,
+                    boxNumber: row_data.boxNumber,
                     item: row_data.itemId,
-                    quantity: row_quantity,
+                    quantity: row_data.quantityToPack,
                 });
             });
             return item_to_pack;
@@ -302,6 +454,8 @@
             var itemsToPack = GetItemsToPack();
             if (itemsToPack.length == 0) {
                 toastrNoDuplicate("No item to pack. Add an item to the list to continue", "Warning", "warning");
+                //} else if (itemsToPack.filter(s => parseInt(s.quantity) > parseInt(s.served_quantity)).length > 0) {
+                //    toastrNoDuplicate("Some items have exceeded the served quantity. Please update the served quantity on sales order", "Warning", "warning");
             } else if (itemsToPack.filter(s => parseInt(s.quantity) === 0).length > 0) {
                 toastrNoDuplicate("Some items have 0 quantity. Can't pack an item with 0 quantity", "Warning", "warning");
             } else {

@@ -44,12 +44,15 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Forwarder")]
         public string Forwarder { get; set; }
 
+        [Display(Name = "Status")]
+        public string Status { get; set; }
+
         [Display(Name = "Sales Order Date")]
-        public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDateTime);
+        public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDate);
         public DateTime SalesOrderDateD { get; set; }
 
         [Display(Name = "Packed Date")]
-        public string PackDate => PackDateD.ToString(SystemFormat.StringDateTime);
+        public string PackDate => PackDateD.ToString(SystemFormat.StringDate);
         public DateTime PackDateD { get; set; }
 
         [Display(Name = "Packed By")]
@@ -77,6 +80,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Selling Price")]
         public string SellingPrice => string.Format(SystemFormat.StringDecimalComma, SellingPriceD);
         public decimal SellingPriceD { get; set; }
+
+        public string SellingPriceType { get; set; }
 
         [Display(Name = "Gross Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
@@ -107,5 +112,11 @@ namespace GMGInventory.Common.Models
         public int Item { get; set; }
         public int Quantity { get; set; }
         public int BoxNumber { get; set; }
+    }
+
+    public class PackDetailsPVM
+    {
+            public IList<PackItemVM> Contents { get; set; }
+        public PackDetailsVM Details { get; set; }
     }
 }

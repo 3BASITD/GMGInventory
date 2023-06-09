@@ -226,7 +226,7 @@ namespace GMGInventory.Controllers
 
 
             });
-            var customer = (await customerRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
+            var customer = (await customerRepository.GetAllCustomerAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var customers in customer)
             {
                 dt.Rows.Add(customers.Code, customers.Name, customers.CommissionRateD,

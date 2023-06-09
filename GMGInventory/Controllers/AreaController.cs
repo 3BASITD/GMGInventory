@@ -143,7 +143,7 @@ namespace GMGInventory.Controllers
                 new DataColumn("Region")
 
             });
-            var area = (await areaRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
+            var area = (await areaRepository.GetAllAreaAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var areas in area)
             {
                 dt.Rows.Add(areas.Code, areas.Name, areas.CommissionRate, areas.RegionName);

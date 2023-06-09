@@ -1,7 +1,7 @@
-﻿@model SoacrVM
+﻿@model SOACRDetailsVM
 
 @{
-    ViewData["Title"] = "SOACr Details";
+    ViewData["Title"] = "SOA/CR Details";
 }
 @section Breadcrumb {
     <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">SOA / Counter Receipt</a></li>
@@ -14,29 +14,14 @@
             <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
-
             <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
                 <span class="fas fa-print"></span> Print
             </button>
-            @if (Model?.Type == "Counter Receipt")
-            {
-                @*<button type="button" class="btn btn-primary btn-sm float-right createInvoiceBtn ml-2" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
-            <span class="fas fa-file-alt"></span> Add Invoice
-            </button>*@
-
-                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="AddInvoice" asp-route-id="@Model.Id" asp-route-custId="@Model.CustomerId">
-                    <span class="fas fa-plus"></span> Add Invoice
-                </a>
-            }
-
-            @*<button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-            <span class="fas fa-file-alt"></span> Add Payment
-            </button>*@
         </div>
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Id)
@@ -45,15 +30,18 @@
                         @Model?.Id
                     </b>
                 </p>
+            </div>
+            <div class="col-12 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CustomerName)
+                        @Html.DisplayNameFor(model => model.Customer)
                     </span>
                     <b class="d-block">
-                        @Model?.CustomerName
+                        @Model?.Customer
                     </b>
                 </p>
-
+            </div>
+            <div class="col-12 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Type)
@@ -62,73 +50,269 @@
                         @Model?.Type
                     </b>
                 </p>
+            </div>
+        </div>
+        @if (Model?.Type == "Statement of Account")
+        {
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateFrom)
+                        </span>
+                        <b class="d-block">
+                            @Model?.DateFrom
+                        </b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateTo)
+                        </span>
+                        <b class="d-block">
+                            @Model?.DateTo
+                        </b>
+                    </p>
+                </div>
+            </div>
+        }
+        <div class="card card-default">
+            <div class="card-header">
+                <span class="card-title">Invoice(s)</span>
+                <div class="card-tools">
+                    @if (Model?.Type == "Counter Receipt")
+                    {
+                        <a class="btn btn-primary btn-sm float-right ml-2 btn-add-invoice">
+                            <span class="fas fa-plus"></span> Add Invoice
+                        </a>
+                    }
+                    <button type="button" class="btn btn-primary btn-sm float-right paymentBtn ml-2">
+                        <span class="fas fa-money-bill"></span> Add Payment
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-head-fixed table-striped table-hover table-soa">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input class="chkclassinvoiceall" type="checkbox" />
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().InvoiceDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().InvoiceNumber)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().InvoiceAmount)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().TBR)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().Credit)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().Debit)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().PaidAmount)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().FreightCharge)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Items.First().Balance)
+                            </th>
+                            <th>
+                            </th>
 
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-end">Total</th>
+                            <th>0.00</th>
+                            <th>0.00</th>
+                            <th>0.00</th>
+                            <th>0.00</th>
+                            <th>0.00</th>
+                            <th>0.00</th>
+                            <th>0.00</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
     </div>
-    <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover table-soa">
-            <thead>
-                <tr>
-                    
-                    <th>
-                        @Html.DisplayNameFor(model => model.InvoiceDate)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.InvoiceNumber)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.InvoiceAmount)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.TBR)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Credit)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Debit)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PaidAmount)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.FreightCharge)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Balance)
-                    </th>
-                    <th>
+</div>
 
-                    </th>
-
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <th colspan="2">Total</th>
-                    <th>0.00</th>
-                    <th>0.00</th>
-                    <th>0.00</th>
-                    <th>0.00</th>
-                    <th>0.00</th>
-                    <th>0.00</th>
-                    <th>0.00</th>
-                    <th></th>
-                </tr>
-            </tfoot>
-        </table>
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Invoice</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="editForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
+                                <input type="number" step="0.01" min="0" max="1999999.99" name="Debit" id="edit-debit" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
+                                <input type="number" step="0.01" min="0" max="1999999.99" name="Credit" id="edit-credit" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
+                                <input type="number" step="0.01" min="0" max="1999999.99" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-freight-waybill" class="control-label mb-0 d-block">Freight's Waybill</label>
+                                <input type="text" name="FreightWaybill" id="edit-freight-waybill" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-freight-waybill" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<form id="deleteSoaLineItemForm" asp-action="Delete">
-    <input type="hidden" id="deleteSoaLineItemId" name="Id" />
-    <input type="hidden" id="deleteSoaCrId" name="soacrId" value="@Model?.Id" />
-</form>
+<!-- TBR Modal -->
+<div class="modal fade" id="tbrModal" role="dialog" aria-labelledby="tbrModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">TBR</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="tbrForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="tbr-for" class="control-label mb-0 d-block">TBR For</label>
+                                <input type="text" id="tbr-for" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="tbr-invoice" class="control-label mb-0 d-block">Invoice Number</label>
+                                <select id="tbr-invoice" name="InvoiceNumber" style="width: 100%"></select>
+                                <span data-valmsg-for="tbr-invoice" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="tbr-amount" class="control-label mb-0 d-block">Amount</label>
+                                <input type="number" step="0.01" min="0" max="1999999.99" name="Amount" id="tbr-amount" class="form-control form-control-sm" />
+                                <input type="hidden" id="tbr-amount-max" class="form-control form-control-sm" />
+                                <span data-valmsg-for="tbr-amount" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info mr-auto btnTBRHistory">
+                        <span class="fas fa-history"></span>
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-save"></span> Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-<form id="reactivateSoaLineItemForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateSoaLineItemId" name="Id" />
-</form>
+<!-- TBR History Modal -->
+<div class="modal fade" id="tbrHistoryModal" role="dialog" aria-labelledby="tbrHistoryModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">TBR History</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="tbr-history-for" class="control-label mb-0 d-block">TBR For</label>
+                            <input type="text" id="tbr-history-for" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <table class="table table-head-fixed table-striped table-hover table-tbr-history">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Invoice Number
+                                    </th>
+                                    <th>
+                                        Amount
+                                    </th>
+                                    <th>
+                                        Added By
+                                    </th>
+                                    <th>
+                                        Date Added
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-end">Total</th>
+                                    <th>0.00</th>
+                                    <th colspan="2"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Update Payment Modal -->
 <div class="modal fade" id="paymentModal" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -143,13 +327,13 @@
             <div class="modal-body">
                 <div class="row align-items-center form-group">
                     <div class="col-12 col-lg-3">
-                        <label for="payment-customer-receipt" class="control-label mb-0">Customer Receipt No</label>
+                        <label for="payment-collector-receipt" class="control-label mb-0">Collector Receipt No</label>
                     </div>
                     <div class="col-12 col-lg-5">
-                        <input type="text" name="CustomerReceipt" id="payment-customer-receipt" class="form-control form-control-sm" />
+                        <input type="text" name="CollectorReceipt" id="payment-collector-receipt" class="form-control form-control-sm" autocomplete="off" />
                     </div>
                     <div class="col-12 col-lg-4">
-                        <span data-valmsg-for="payment-customer-receipt" data-valmsg-replace="true" class="text-danger"></span>
+                        <span data-valmsg-for="payment-collector-receipt" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row align-items-center form-group">
@@ -157,7 +341,7 @@
                         <label for="payment-remarks" class="control-label mb-0">Remarks</label>
                     </div>
                     <div class="col-12 col-lg-9">
-                        <input type="text" name="Remarks" id="payment-remarks" class="form-control form-control-sm" />
+                        <input type="text" name="Remarks" id="payment-remarks" class="form-control form-control-sm" autocomplete="off" />
                     </div>
                 </div>
                 <div class="row align-items-center form-group">
@@ -260,7 +444,7 @@
                                             <div class="form-group">
                                                 <label for="check-checknumber" class="control-label mb-0 d-block">Check Number</label>
                                                 <input type="text" name="CheckNumber" id="check-checknumber" class="form-control form-control-sm" />
-                                                <span data-valmsg-for="check-checknumber" data-valmsg-replace="true" class="text-danger"></span>
+                                                <span data-valmsg-for="check-checknumber" data-valmsg-replace="true" class="text-danger text-xs"></span>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -290,7 +474,7 @@
                                     </thead>
                                     <tfoot>
                                         <tr>
-                                            <th colspan="3">Total</th>
+                                            <th colspan="3" class="text-end">Total</th>
                                             <th>0.00</th>
                                             <th colspan="2"></th>
                                         </tr>
@@ -313,64 +497,9 @@
     </div>
 </div>
 
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Invoice</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form autocomplete="off" id="editForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="edit-tbr" class="control-label mb-0 d-block">TBR</label>
-                                <input type="number" name="TBR" id="edit-tbr" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-tbr" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
-                                <input type="number" name="Debit" id="edit-debit" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
-                                <input type="number" name="Credit" id="edit-credit" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
-                                <input type="number" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <input type="hidden" id="edit-id" />
-                            <input type="hidden" id="edit-invoice" />
-
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-edit"></span> Update
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <!-- Add Invoice Modal   -->
-
-<div class="modal fade" id="createInvoiceModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="addInvoiceModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Invoice</h5>
@@ -378,68 +507,63 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form autocomplete="off" id="createInvoiceForm">
+            <div class="modal-body">
+                <table class="table table-head-fixed table-striped table-hover table-invoice">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input class="chkclassaddinvoiceall" type="checkbox" />
+                            </th>
+                            <th>Invoice Date</th>
+                            <th>Invoice Number</th>
+                            <th>Invoice Type</th>
+                            <th>Total Amount</th>
+                        </tr>
+                    </thead>
+                </table>
 
-                <div class="modal-body">
-
-                    <table class="table table-head-fixed table-striped table-hover table-invoice">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.InvoiceDate)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.InvoiceNumber)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.InvoiceType)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.TotalAmount)
-                                </th>
-                            </tr>
-                        </thead>
-                    </table>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btn-add">
-                        <span class="fas fa-plus"></span> Add
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-add-selected-invoice">
+                    <span class="fas fa-plus"></span> Add
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-
-
-
 @section Scripts {
     <script>
-        var itemTable = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
+        var soaDT = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
-                url: "@Url.Action("GetSoaDetailsJson", "Soacr")",
+                url: "@Url.Action("GetSOACRItemsJson", "Soacr")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
-                    data.custId = @Model?.CustomerId;
                 },
             },
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
-            search: {
-                return: true,
-            },
+            searching: false,
+            paging: false,
             columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        if (data.isPaid == false) {
+                            actions += '<input class="chkclassinvoice" type="checkbox" value="' + data.invoiceId + '" />';
+                        }
+                        return actions;
+                    }
+                },
                 { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
                 { data: "invoiceAmount", name: "InvoiceAmount", className: "text-end" },
@@ -453,71 +577,47 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                        actions += '<button class="btn btn-primary btn-xs paymentBtn" data-microtip-title="Edit Payment" data-microtip-position="top-left" role="tooltip"><i class="fas fa-money-bill"></i></button>';
-                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
-                        actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        if (data.isPaid == false) {
+                            actions += '<button class="btn btn-info btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs tbrBtn" data-bs-toggle="modal" data-bs-target="#tbrModal" data-microtip-title="TBR" data-microtip-position="top-left" role="tooltip"><i class="fas fa-exchange-alt"></i></button>';
+                            if ($(".SoacrType").text().trim() == "Counter Receipt"/* && data.invoiceAmount == data.balance*/) {
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            }
+                            actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        }
                         return actions;
                     }
                 }
             ],
-            order: [[0, "desc"]],
+            order: [[1, "desc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
-                columnDTTotalDecimal(api, 2);
                 columnDTTotalDecimal(api, 3);
                 columnDTTotalDecimal(api, 4);
                 columnDTTotalDecimal(api, 5);
                 columnDTTotalDecimal(api, 6);
                 columnDTTotalDecimal(api, 7);
                 columnDTTotalDecimal(api, 8);
+                columnDTTotalDecimal(api, 9);
             }
         });
 
-        itemTable.on("draw", function () {
+        soaDT.on("draw", function () {
             hideLoader();
 
             //$('.table-soa thead th').removeClass("text-end");
 
-            $(".printBtn").on("click", function () {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesome: "fas fa-print"
-                });
-                var urlQuery = [];
-                //urlQuery.push("DateFrom=" + $("#filter-from").val());
-                //urlQuery.push("DateTo=" + $("#filter-to").val());
-                //if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
-                //if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
-                if ($(".SoacrType").text().trim() == "Statement of Account") {
-                    setTimeout(function () {
-                        //let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
+            $(".chkclassinvoiceall").prop("checked", false);
+            $(".chkclassinvoiceall").prop("indeterminate", false);
 
-                        let win = window.open('@Url.Action("PrintSoaDetails")/@Model?.Id', '');
-                        var wintimer = setInterval(function () {
-                            if (win.closed) {
-                                clearInterval(wintimer);
-                                hideLoader();
-                            }
-                        }, 100);
-                    }, 500);
-
-                }
-                else if ($(".SoacrType").text().trim() == "Counter Receipt") {
-                    setTimeout(function () {
-                        //let win = window.open('@Url.Action("PrintCRDetails")?' + urlQuery.join("&"), '');
-
-                        let win = window.open('@Url.Action("PrintCRDetails")/@Model?.Id', '');
-                        var wintimer = setInterval(function () {
-                            if (win.closed) {
-                                clearInterval(wintimer);
-                                hideLoader();
-                            }
-                        }, 100);
-                    }, 500);
-
-                }
-
+            // Actions upon Display Edit Modal
+            $(".editBtn").click(function (e) {
+                var data = soaDT.row($(this).parents('tr')).data();
+                $("#edit-debit").data("id", data.id);
+                $("#edit-debit").val(data.debitD.toFixed(2));
+                $("#edit-credit").val(data.creditD.toFixed(2));
+                $("#edit-freight-cost").val(data.freightChargeD.toFixed(2));
+                $("#edit-frieght-waybill").val(data.frieghtWaybill);
             });
 
             $('.deleteBtn').click(function (e) {
@@ -529,62 +629,198 @@
                     dangerMode: true
                 }).then((confirm) => {
                     if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#deleteSoaLineItemId').val(id);
-                        $('#deleteSoaLineItemForm').submit();
+                        var btn_clicked = $(this);
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("DeleteInvoiceJson")",
+                            data: {
+                                Id: btn_clicked.data("id")
+                            },
+                            error: jQueryCommonError,
+                            success: function (data, status, xhr) {
+                                if (data.status == "Error") {
+                                    toastrNoDuplicate(data.message, "Error", "error");
+                                } else {
+                                    toastrNoDuplicate(data.message, "Success", "success");
+                                    soaDT.row(btn_clicked.parents('tr')).remove().draw();
+                                }
+                            }
+                        });
                     }
                 });
             });
 
-
-
-            // Actions upon Display Edit Modal
-            $(".editBtn").click(function (e) {
-                var data = itemTable.row($(this).parents('tr')).data();
-                $("#edit-id").val(data.id);
-                $("#edit-tbr").val(data.tbrd);
-                $("#edit-debit").val(data.debitD);
-                $("#edit-credit").val(data.creditD);
-                $("#edit-freight-cost").val(data.freightChargeD);
-                $("#edit-invoice").val(data.invoiceId);
-
+            $(".chkclassinvoiceall").on("change", function () {
+                soaDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".chkclassinvoice").prop("checked", $(".chkclassinvoiceall").prop("checked"));
+                });
             });
 
-            // Validation for Edit Modal
-            var validateEdit = $("#editForm").validate({
-                errorClass: 'text-danger text-xs',
-                rules: {
-                    TBR: { range: [0, 1999999.99] },
-                    Debit: { range: [0, 1999999.99] },
-                    Credit: { range: [0, 1999999.99] },
-                    FreightCost: { range: [0, 1999999.99] }
-                },
-                messages: {
-                    TBR: { range: "Credit Limit must be between 0-1999999.99." },
-                    Debit: { range: "Credit Limit must be between 0-1999999.99." },
-                    Credit: { range: "Credit Limit must be between 0-1999999.99." },
-                    FreightCost: { range: "Credit Limit must be between 0-1999999.99." }
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    DoEdit();
-                },
-                showErrors: validateShowErrors
+            $(".chkclassinvoice").on("change", function () {
+                var rows_checked = 0;
+                soaDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".chkclassinvoice").prop("checked")) {
+                        rows_checked++;
+                    }
+                });
+
+                if (rows_checked == 0) {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else if (rows_checked == soaDT.rows().count()) {
+                    $(".chkclassinvoiceall").prop("checked", true);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else if (rows_checked == 0) {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", true);
+                }
             });
 
-            // Send Edit to Controller
-            function DoEdit() {
+            $(".tbrBtn").on("click", function () {
+                var data = soaDT.row($(this).parents('tr')).data();
+                $("#tbr-for").val(data.invoiceNumber);
+                $("#tbr-for").data("id", data.id);
+                $("#tbr-invoice").val("").trigger("change");
+                $("#tbr-amount").val("0.00");
+                $("#tbr-history-for").val(data.invoiceNumber);
+                $("#tbr-history-for").data("id", data.id);
+            });
+        });
+
+        // Validation for Edit Modal
+        var validateEdit = $("#editForm").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                Debit: { range: [0, 1999999.99] },
+                Credit: { range: [0, 1999999.99] },
+                FreightCost: { range: [0, 1999999.99] },
+                FreightWaybill: {
+                    required: function (element) {
+                        return $("#edit-freight-cost").val() != "" && parseInt($("#edit-freight-cost").val()) != 0;
+                    }
+                }
+            },
+            messages: {
+                Debit: { range: "Debit Limit must be between 0-1999999.99." },
+                Credit: { range: "Credit Limit must be between 0-1999999.99." },
+                FreightCost: { range: "Freight Cost must be between 0-1999999.99." },
+                FreightWaybill: { required: "Freight's Waybill is required" }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                DoEdit();
+            },
+            showErrors: validateShowErrors
+        });
+
+        // Send Edit to Controller
+        function DoEdit() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("EditInvoiceJson")",
+                data: {
+                    Id: $("#edit-debit").data("id"),
+                    Debit: $("#edit-debit").val(),
+                    Credit: $("#edit-credit").val(),
+                    FreightCharge: $("#edit-freight-cost").val(),
+                    FreightWaybill: $("#edit-frieght-waybill").val(),
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastrNoDuplicate(data.message, "Error", "error");
+                    } else {
+                        toastrNoDuplicate(data.message, "Success", "success");
+                        $("#editModal").modal("hide");
+                        soaDT.ajax.reload();
+                    }
+                },
+                complete: function (xhr, status) {
+                }
+            });
+        }
+
+        // Actions upon Display Payment Modal
+        $(".paymentBtn").click(function (e) {
+            if (GetInvoiceSelected().length == 0) {
+                toastrNoDuplicate("Please select atleast 1 invoice", "No Invoice Selected", "error");
+            } else {
+                $("#payment-collector-receipt").val("");
+                $("#payment-remarks").val("");
+                $("#payment-over-payment").val("0.00");
+                $("#payment-tkt").val("0.00");
+                $("#payment-tax").val("0.00");
+                $("#payment-cash-advanced").val("0.00");
+                $("#payment-discount").val("0.00");
+                $("#payment-offset").val("0.00");
+                $("#payment-cash-amount").val("0.00");
+                $("#payment-backload").val("0.00");
+                ResetCheckPaymentForm();
+                checkTable.clear().draw();
+                $("#paymentModal").modal("show");
+            }
+        });
+
+        $("#payment-collector-receipt").on("change", function () {
+            if ($("#payment-collector-receipt").val() == "") {
+                toastrNoDuplicate("Please enter collector receipt", "Required field &lt;Collector Receipt&gt;", "warning");
+                $("#payment-collector-receipt").addClass("text-danger");
+                $('span[data-valmsg-for="payment-collector-receipt"]').text("Please enter collector receipt");
+            } else {
+                //$.ajax({
+                //    type: "POST",
+                //    url: "@Url.Action("AddPaymentDetailsJson")",
+                //    data: {
+                //        CollectorReceiptNumber: $("#payment-collector-receipt").val()
+                //    },
+                //    error: jQueryCommonError,
+                //    success: function (data, status, xhr) {
+                //        if (data.status == "Error") {
+                //            toastrNoDuplicate(data.message, "Error", "error");
+                //            $("#payment-collector-receipt").addClass("text-danger");
+                //            $('span[data-valmsg-for="payment-collector-receipt"]').text(data.message);
+                //        } else {
+                $("#payment-collector-receipt").removeClass("text-danger");
+                $('span[data-valmsg-for="payment-collector-receipt"]').text("");
+                //        }
+                //    }
+                //});
+            }
+        });
+
+        $(".btn-payment").on("click", function () {
+            var checkData = GetChecks();
+            if ($("#payment-collector-receipt").val() == "") {
+                toastrNoDuplicate("Please enter collector receipt", "Required field &lt;Collection Receipt&gt;", "warning");
+                $('span[data-valmsg-for="payment-collector-receipt"]').text("Please enter collector receipt");
+            } else if ($("#payment-over-payment").val() == 0 && $("#payment-tkt").val() == 0
+                && $("#payment-tax").val() == 0 && $("#payment-cash-advanced").val() == 0
+                && $("#payment-discount").val() == 0 && $("#payment-offset").val() == 0
+                && $("#payment-cash-amount").val() == 0 && $("#payment-backload").val() == 0
+                && checkData.length == 0) {
+                toastrNoDuplicate("Please enter atleast 1 amount/check", "No amount available", "warning");
+            } else {
+                $('span[data-valmsg-for="payment-collector-receipt"]').text("");
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("EditInvoiceJson")",
+                    url: "@Url.Action("AddPaymentDetailsJson")",
                     data: {
-                        Id: $("#edit-id").val(),
-                        InvoiceId: $("#edit-invoice").val(),
-                        TBRD: $("#edit-tbr").val(),
-                        DebitD: $("#edit-debit").val(),
-                        CreditD: $("#edit-credit").val(),
-                        FreightChargeD: $("#edit-freight-cost").val()
+                        SOACRId: @Model?.Id,
+                        CollectorReceiptNumber: $("#payment-collector-receipt").val(),
+                        Remarks: $("#payment-remarks").val(),
+                        OverPayment: $("#payment-over-payment").val(),
+                        TKTSolicitation: $("#payment-tkt").val(),
+                        Tax: $("#payment-tax").val(),
+                        CashAdvance: $("#payment-cash-advanced").val(),
+                        Discount: $("#payment-discount").val(),
+                        Offset: $("#payment-offset").val(),
+                        CashAmount: $("#payment-cash-amount").val(),
+                        BackLoad: $("#payment-backload").val(),
+                        Checks: checkData,
+                        InvoiceIds: GetInvoiceSelected()
                     },
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {
@@ -592,119 +828,186 @@
                             toastrNoDuplicate(data.message, "Error", "error");
                         } else {
                             toastrNoDuplicate(data.message, "Success", "success");
-                            $("#editModal").modal("hide");
-                            itemTable.ajax.reload();
+                            $("#paymentModal").modal("hide");
+                            soaDT.ajax.reload();
                         }
-                    },
-                    complete: function (xhr, status) {
                     }
                 });
             }
-
-
-            // Actions upon Display Create Modal
-            $(".paymentBtn").click(function (e) {
-                var data = itemTable.row($(this).parents('tr')).data();
-                $("#payment-customer-receipt").data("invoice", data.invoiceId);
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetPaymentDetailsJson")",
-                    data: {
-                        CustomerId: @Model?.CustomerId,
-                        SOACRId: @Model?.Id,
-                        InvoiceId: data.invoiceId
-                    },
-                    error: jQueryCommonError,
-                    success: function (data, status, xhr) {
-                        $("#payment-customer-receipt").val(data.customerReceiptNumber);
-                        $("#payment-customer-receipt").data("CustomerPaymentId", data.id);
-                        $("#payment-remarks").val(data.remarks);
-                        $("#payment-over-payment").val(data.overPayment.toFixed(2));
-                        $("#payment-tkt").val(data.tktSolicitation.toFixed(2));
-                        $("#payment-tax").val(data.tax.toFixed(2));
-                        $("#payment-cash-advanced").val(data.cashAdvance.toFixed(2));
-                        $("#payment-discount").val(data.discount.toFixed(2));
-                        $("#payment-offset").val(data.offset.toFixed(2));
-                        $("#payment-cash-amount").val(data.cashAmount.toFixed(2));
-                        $("#payment-backload").val(data.backLoad.toFixed(2));
-                    },
-                    complete: function (xhr, status) {
-                        checkTable.ajax.reload();
-                        ResetCheckPaymentForm();
-                        $("#paymentModal").modal("show");
-                    }
-                });
-            });
-
-            $("#payment-customer-receipt").on("change", function () {
-                if ($("#payment-customer-receipt").val() == "") {
-                    toastrNoDuplicate("Please enter customer receipt", "Required field &lt;Customer Receipt&gt;", "warning");
-                    $('span[data-valmsg-for="payment-customer-receipt"]').text("Please enter customer receipt");
-                } else {
-                    $('span[data-valmsg-for="payment-customer-receipt"]').text("");
-                }
-            })
-
-            $(".btn-payment").on("click", function () {
-                if ($("#payment-customer-receipt").val() == "") {
-                    toastrNoDuplicate("Please enter customer receipt", "Required field &lt;Customer Receipt&gt;", "warning");
-                    $('span[data-valmsg-for="payment-customer-receipt"]').text("Please enter customer receipt");
-                } else {
-                    $('span[data-valmsg-for="payment-customer-receipt"]').text("");
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("UpdatePaymentDetailsJson")",
-                        data: {
-                            Id: $("#payment-customer-receipt").data("CustomerPaymentId"),
-                            CustomerReceiptNumber: $("#payment-customer-receipt").val(),
-                            remarks: $("#payment-remarks").val(),
-                            overPayment: $("#payment-over-payment").val(),
-                            tktSolicitation: $("#payment-tkt").val(),
-                            tax: $("#payment-tax").val(),
-                            cashAdvance: $("#payment-cash-advanced").val(),
-                            discount: $("#payment-discount").val(),
-                            offset: $("#payment-offset").val(),
-                            cashAmount: $("#payment-cash-amount").val(),
-                            backLoad: $("#payment-backload").val()
-                        },
-                        error: jQueryCommonError,
-                        success: function (data, status, xhr) {
-                            if (data.status == "Error") {
-                                toastrNoDuplicate(data.message, "Error", "error");
-                            } else {
-                                toastrNoDuplicate(data.message, "Success", "success");
-                                $("#paymentModal").modal("hide");
-                                itemTable.ajax.reload();
-                            }
-                        }
-                    });
-                }
-            });
         });
 
-        var checkTable = $('.table-check').on('preXhr.dt', function (e, settings, data) {
+        $("#tbr-invoice").select2({
+            ajax: {
+                url: "@Url.Action("GetInvoiceTBR")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        CustomerId: @Model?.CustomerId
+                                                            };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#tbrModal")
+        });
+
+        $("#tbr-invoice").on("select2:select", function () {
+            $("#tbr-amount").val($(this).select2("data")[0].invoiceAmount.toFixed(2));
+            $("#tbr-amount-max").val($(this).select2("data")[0].invoiceAmount.toFixed(2));
+        });
+
+        $("#tbr-invoice").on("select2:unselecting", function (e) {
+            $("#tbr-amount").val("0.00");
+            $("#tbr-amount-max").val("0.00");
+        });
+
+        // Validation for TBR Modal
+        var validateTBR = $("#tbrForm").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                InvoiceNumber: { required: true },
+                Amount: {
+                    required: true, isNotZero: true, lessThanOrEqual: "#tbr-amount-max"
+                }
+            },
+            messages: {
+                InvoiceNumber: { required: "Please select an Invoice Number" },
+                Amount: { required: "Amount is required", isNotZero: "Amount cannot be 0", lessThanOrEqual: "Cannot exceed " + FormatStringDecimal($("#tbr-amount").val()) }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                DoTBR();
+            },
+            showErrors: validateShowErrors
+        });
+
+        // Send TBR to Controller
+        function DoTBR() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("AddInvoiceTBR")",
+                data: {
+                    soaLineItemId: $("#tbr-for").data("id"),
+                    salesReturnId: $("#tbr-invoice").val(),
+                    amount: $("#tbr-amount").val()
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    toastrNoDuplicate(data.message, "Success", "success");
+                    $("#tbrModal").modal("hide");
+                    soaDT.ajax.reload();
+                },
+                complete: function (xhr, status) {
+                }
+            });
+        }
+
+        $(".btnTBRHistory").on("click", function () {
+            tbrHistoryDT.ajax.reload();
+            $("#tbrModal").modal("hide");
+            $("#tbrHistoryModal").modal("show");
+        });
+
+        $("#tbrHistoryModal").on("hide.bs.modal", function () {
+            $("#tbr-invoice").val("").trigger("change");
+            $("#tbr-amount").val("0.00");
+            $("#tbrModal").modal("show");
+        });
+
+        var tbrHistoryDT = $('.table-tbr-history').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
-                url: "@Url.Action("GetPaymentChecksJson", "Soacr")",
-                type: "POST",
+                url: "@Url.Action("GetInvoiceTBRHistory")",
                 data: function (data) {
-                    data.CustomerPaymentId = $("#payment-customer-receipt").data("CustomerPaymentId");
+                    data.soaLineItemId = $("#tbr-history-for").data("id");
                 },
+                type: "POST",
             },
             serverSide: true,
             filter: true,
             responsive: true,
             autoWidth: false,
-            search: {
-                return: true,
-            },
+            searching: false,
+            paging: false,
             columns: [
-                { data: "bankName", name: "BankName" },
-                { data: "bankBranch", name: "BankBranch" },
-                { data: "checkNumber", name: "CheckNumber" },
-                { data: "checkAmount", name: "CheckAmount", className: "text-end" },
-                { data: "checkDate", name: "CheckDate" },
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "amount", name: "Amount", className: "text-end" },
+                { data: "userCreated", name: "UserCreated" },
+                { data: "dateCreated", name: "DateCreated" }
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                columnDTTotalDecimal(api, 1);
+            },
+            order: [[3, "desc"]]
+        });
+
+        // Load functions upon DataTable load
+        tbrHistoryDT.on("draw", function () {
+            hideLoader();
+        });
+
+        $(".printBtn").on("click", function () {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
+            });
+            setTimeout(function () {
+                var printLink = "";
+                if ($(".SoacrType").text().trim() == "Statement of Account") {
+                    printLink = '@Url.Action("PrintSOADetails")/@Model?.Id';
+                }
+                else if ($(".SoacrType").text().trim() == "Counter Receipt") {
+                    printLink = '@Url.Action("PrintCRDetails")/@Model?.Id';
+                }
+                let win = window.open(printLink, '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
+        });
+
+        function GetInvoiceSelected() {
+            var invoice_selected = [];
+            soaDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var invlist = $(this.node()).find(".chkclassinvoice");
+                if (invlist.prop("checked")) {
+                    invoice_selected.push(invlist.val());
+                }
+            });
+            return invoice_selected;
+        }
+
+        var checkTable = $('.table-check').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            data: [],
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            searching: false,
+            paging: false,
+            columns: [
+                { data: "BankName", name: "BankName" },
+                { data: "BankBranch", name: "BankBranch" },
+                { data: "CheckNumber", name: "CheckNumber" },
+                { data: "CheckAmount", name: "CheckAmount", className: "text-end" },
+                { data: "CheckDate", name: "CheckDate" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -724,28 +1027,8 @@
         checkTable.on("draw", function () {
             hideLoader();
 
-            $('.table-check thead th').removeClass("text-end");
-
             $(".btn-remove-check").on("click", function () {
-                var data = checkTable.row($(this).parents('tr')).data();
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("RemoveCheckJson")",
-                    data: {
-                        soaCheckId: data.id
-                    },
-                    error: jQueryCommonError,
-                    success: function (data, status, xhr) {
-                        if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
-                        } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
-                            $("#checkModal").modal("hide");
-                            checkTable.ajax.reload();
-                            hideLoader();
-                        }
-                    }
-                });
+                checkTable.row($(this).parents('tr')).remove().draw();
             });
         });
 
@@ -768,42 +1051,50 @@
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
-                DoCreateCheck();
+                DoAddCheck();
             },
             showErrors: validateShowErrors
         });
 
-
-        // Send Create Check to Controller
-        function DoCreateCheck() {
-            var customer_payment_id = $("#payment-customer-receipt").data("CustomerPaymentId");
-            if (customer_payment_id == null) {
-                toastrNoDuplicate("Please try again later", "Error", "error");
-            } else {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("AddCheckJson")",
-                    data: {
-                        CustomerPaymentId: customer_payment_id,
-                        BankName: $("#check-bankname").val(),
-                        CheckDateD: $("#check-checkdate").val(),
-                        CheckAmountD: $("#check-checkamount").val(),
-                        BankBranch: $("#check-bankbranch").val(),
-                        CheckNumber: $("#check-checknumber").val()
-                    },
-                    error: jQueryCommonError,
-                    success: function (data, status, xhr) {
-                        if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+        // Send Add Check to Controller
+        function DoAddCheck() {
+            $('span[data-valmsg-for="check-checknumber"]').text("");
+            $("#check-checknumber").removeClass("text-danger text-xs");
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CheckCheckNumberJson")",
+                data: {
+                    CheckNumber: $("#check-checknumber").val()
+                },
+                error: jQueryCommonError,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastrNoDuplicate("Check Number already in use in other payment", "Required field &lt;Check Number&gt;", "warning");
+                        $('span[data-valmsg-for="check-checknumber"]').text("Check Number already in use in other payment");
+                        $("#check-checknumber").addClass("text-danger text-xs");
+                    } else {
+                        var checkDuplicateNumber = false;
+                        checkTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            if (this.data().CheckNumber == $("#check-checknumber").val()) { checkDuplicateNumber = true; }
+                            $("#check-checknumber").addClass("text-danger text-xs");
+                        });
+                        if (checkDuplicateNumber) {
+                            toastrNoDuplicate("Duplicate Check Number", "Required field &lt;Check Number&gt;", "warning");
+                            $('span[data-valmsg-for="check-checknumber"]').text("Duplicate Check Number");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            var invoiceForm = {
+                                BankName: $("#check-bankname").val(),
+                                CheckDate: $("#check-checkdate").val(),
+                                CheckAmount: $("#check-checkamount").val(),
+                                BankBranch: $("#check-bankbranch").val(),
+                                CheckNumber: $("#check-checknumber").val()
+                            };
+                            checkTable.row.add(invoiceForm).draw();
                             ResetCheckPaymentForm();
-                            checkTable.ajax.reload();
-                            hideLoader();
                         }
                     }
-                });
-            }
+                }
+            });
         }
 
         $(".btnClearCheck").on("click", ResetCheckPaymentForm);
@@ -814,18 +1105,42 @@
             $("#check-checkamount").val("0.00");
             $("#check-bankbranch").val("");
             $("#check-checknumber").val("");
+            $('span[data-valmsg-for="check-checknumber"]').text("");
+            $("#check-checknumber").removeClass("text-danger text-xs");
             validateCheck.resetForm();
         }
+
+        function GetChecks() {
+            var checks = [];
+            checkTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                var row_quantity = parseInt($(this.node()).find(".quantity").val());
+                var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
+                var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
+                var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
+                checks.push({
+                    BankName: row_data.BankName,
+                    CheckDate: row_data.CheckDate,
+                    CheckAmount: row_data.CheckAmount,
+                    BankBranch: row_data.BankBranch,
+                    CheckNumber: row_data.CheckNumber
+                });
+            });
+            return checks;
+        }
+
+        $(".btn-add-invoice").on("click", function () {
+            invoiceDT.ajax.reload();
+            $("#addInvoiceModal").modal("show");
+        });
 
         var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
-                url: "@Url.Action("GetCustomerInvoicesJson")",
+                url: "@Url.Action("GetCustomerInvoiceToAddDT")",
                 data: function (data) {
                     data.Id = @Model?.CustomerId;
-                    data.soaId = @Model?.Id;
-
                 },
                 type: "POST",
             },
@@ -833,22 +1148,21 @@
             filter: true,
             responsive: true,
             autoWidth: false,
-            search: {
-                return: true,
-            },
+            searching: false,
+            paging: false,
             columns: [
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        var input = '<input class="chkclassinvoice" type="checkbox" id="checkInvoice"  name="CheckInvoice" data-id = "' + data.id + '">';
-
-                        return input;
+                        var actions = '';
+                        actions += '<input class="chkclassaddinvoice" type="checkbox" value="' + data.id + '" />';
+                        return actions;
                     }
                 },
                 { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
                 { data: "invoiceType", name: "InvoiceType" },
-                { data: "totalAmount", name: "TotalAmount" }
+                { data: "totalAmount", name: "TotalAmount", className: "text-end" }
             ],
             order: [[1, "desc"]]
         });
@@ -856,23 +1170,44 @@
         // Load functions upon DataTable load
         invoiceDT.on("draw", function () {
             hideLoader();
-        });
 
-        $(".createInvoiceBtn").click(function (e) {
-            invoiceDT.ajax.reload();
-        });
+            $(".chkclassaddinvoiceall").on("change", function () {
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".chkclassaddinvoice").prop("checked", $(".chkclassaddinvoiceall").prop("checked"));
+                });
+            });
 
+            $(".chkclassaddinvoice").on("change", function () {
+                var rows_checked = 0;
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".chkclassaddinvoice").prop("checked")) {
+                        rows_checked++;
+                    }
+                });
 
-        $(".btn-add").click(function (e) {
-
-            var invoiceIds = [];
-
-            invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var invlist = $(this.node()).find(".chkclassinvoice");
-                if (invlist.prop("checked")) {
-                    invoiceIds.push(invlist.data("id"));
+                if (rows_checked == 0) {
+                    $(".chkclassaddinvoiceall").prop("checked", false);
+                    $(".chkclassaddinvoiceall").prop("indeterminate", false);
+                } else if (rows_checked == invoiceDT.rows().count()) {
+                    $(".chkclassaddinvoiceall").prop("checked", true);
+                    $(".chkclassaddinvoiceall").prop("indeterminate", false);
+                } else if (rows_checked == 0) {
+                    $(".chkclassaddinvoiceall").prop("checked", false);
+                    $(".chkclassaddinvoiceall").prop("indeterminate", false);
+                } else {
+                    $(".chkclassaddinvoiceall").prop("checked", false);
+                    $(".chkclassaddinvoiceall").prop("indeterminate", true);
                 }
+            });
+        });
 
+        $(".btn-add-selected-invoice").on("click", function () {
+            var invoiceIds = [];
+            invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var invlist = $(this.node()).find(".chkclassaddinvoice");
+                if (invlist.prop("checked")) {
+                    invoiceIds.push(invlist.val());
+                }
             });
 
             $.ajax({
@@ -881,7 +1216,6 @@
                 data: {
                     soaId: @Model?.Id,
                     invoiceIds: invoiceIds
-
                 },
                 error: jQueryCommonError,
                 success: function (data, status, xhr) {
@@ -889,14 +1223,12 @@
                         toastrNoDuplicate(data.message, "Error", "error");
                     } else {
                         toastrNoDuplicate(data.message, "Success", "success");
-                        $("#createInvoiceModal").modal("hide");
-                        itemTable.ajax.reload();
+                        $("#addInvoiceModal").modal("hide");
+                        soaDT.ajax.reload();
                         hideLoader();
-                        //window.location = '@Url.Action("ContractReceiptDetails")/' + Id;
                     }
                 }
             });
-
         });
 
     </script>

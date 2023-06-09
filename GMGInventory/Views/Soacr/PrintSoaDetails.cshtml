@@ -1,4 +1,4 @@
-﻿@model SoaDetailsPVM
+﻿@model SOACRDetailsPVM
 
 @{
     Layout = "";
@@ -17,20 +17,20 @@
 <body>
     <h3>@title</h3>
     <p>
+        <strong>SOA Number:</strong>
+        <span>@Model.SOACRNumber</span>
+        <br />
+        <strong>Customer:</strong>
+        <span>@Model.CustomerName</span>
+        <br />
+        <strong>Agent:</strong>
+        <span>@Model.Agent</span>
+        <br />
         <strong>Date From:</strong>
         <span>@Model.DateFrom</span>
         <br />
         <strong>Data To:</strong>
         <span>@Model.DateTo</span>
-        <br />
-        <strong>SOA No:</strong>
-        <span>@Model.SoaNo</span>
-        <br />
-        <strong>Agent:</strong>
-        <span>@Model.Agent</span>
-        <br />
-        <strong>Customer:</strong>
-        <span>@Model.Customer</span>
         <br />
         <strong>Terms:</strong>
         <span>@Model.CreditTerm</span>
@@ -38,7 +38,6 @@
     <table class="table-items">
         <thead>
             <tr>
-
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
                 </th>
@@ -49,16 +48,16 @@
                     @Html.DisplayNameFor(model => model.Contents.First().InvoiceType)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().TransAmount)
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceAmount)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().WaybillNo)
+                    @Html.DisplayNameFor(model => model.Contents.First().FreightCharge)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().FreightCost)
+                    @Html.DisplayNameFor(model => model.Contents.First().FreightWaybill)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().TotalAmount)
+                    @Html.DisplayNameFor(model => model.Contents.First().Balance)
                 </th>
             </tr>
         </thead>
@@ -66,24 +65,36 @@
             @foreach (var item in Model.Contents)
             {
                 <tr>
-                    <td>@item.InvoiceDate</td>
+                    <td>@item.InvoiceDate2</td>
                     <td>@item.InvoiceNumber</td>
                     <td>@item.InvoiceType</td>
-                    <td>@item.InvoiceAmountDeducted</td>
-                    <td>@item.WaybillNo</td>
-                    <td>@item.FreightCharge</td>
-                    <td>@item.InvoiceAmountDeducted</td>
+                    <td class="right-text">@item.InvoiceAmount</td>
+                    <td class="right-text">@item.FreightCharge</td>
+                    <td class="right-text">@item.FreightWaybill</td>
+                    <td class="right-text">@item.Balance</td>
                 </tr>
             }
-        </tbody>
-        <tfoot>
             <tr>
                 <th colspan="3" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalInvoiceAmount</nobr></th>
-                <th class="right-text"></th>
-                <th class="right-text"></th>
-                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalFreightCost</nobr></th>
+                <th></th>
+                <th class="right-text"><nobr>@Model.TotalBalance</nobr></th>
             </tr>
+            <tr>
+                <td colspan="7" class="signatory">
+                    <div>
+                        <span>
+                            Authorized Signature
+                        </span>
+                        <span>
+                            Received By
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
         </tfoot>
     </table>
 </body>

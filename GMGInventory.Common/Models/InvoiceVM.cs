@@ -61,9 +61,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
-		//public decimal? BalanceD { get; set; }
-		public decimal BalanceD => TotalAmountD - (TBRD ?? 0) - (CreditD ?? 0) + (DebitD ?? 0) - (PaidAmountD ?? 0m) + (FreightChargeD ?? 0);
-	}
+        //public decimal? BalanceD { get; set; }
+        public decimal BalanceD => TotalAmountD - (TBRD ?? 0) - (CreditD ?? 0) + (DebitD ?? 0) - (PaidAmountD ?? 0m) + (FreightChargeD ?? 0);
+    }
 
     public class InvoiceDetailsVM
     {
@@ -106,8 +106,13 @@ namespace GMGInventory.Common.Models
         public string Status { get; set; }
 
         [Display(Name = "Invoice Date")]
-        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDateTime);
+        public string InvoiceDate1 => InvoiceDateD.ToString(SystemFormat.StringDate);
+        public string InvoiceDate3 => InvoiceDateD.ToString(SystemFormat.StringDate3);
         public DateTime InvoiceDateD { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDate);
+        public DateTime DateCreatedD { get; set; }
 
         [Display(Name = "Invoice By")]
         public string InvoiceBy { get; set; }
@@ -166,6 +171,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Quantity")]
         public int Quantity { get; set; }
+        public int QuantityOfPack { get; set; }
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }
@@ -173,6 +179,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Net Price")]
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
         public decimal NetPriceD { get; set; }
+        public string SellingPriceType { get; set; }
 
         [Display(Name = "Discount 1")]
         public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
@@ -189,27 +196,29 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Gross Price (No Discount)")]
         public string GrossPriceNoDiscount => string.Format(SystemFormat.StringDecimalComma, GrossPriceNoDiscountD);
         public decimal GrossPriceNoDiscountD => Quantity * NetPriceD;
-
-        [Display(Name = "Reference Number")]
-        public string ReferenceNumber { get; set; }
     }
 
-    public class InvoiceFormUpdateVM
-    {
-        public int Id { get; set; }
-        public string BIRInvoiceNumber { get; set; }
-        public int InvoiceType { get; set; }
-        public string Remarks { get; set; }
+    //public class InvoiceFormUpdateVM
+    //{
+    //    public int Id { get; set; }
+    //    public string BIRInvoiceNumber { get; set; }
+    //    public int InvoiceType { get; set; }
+    //    public DateTime InvoiceDate { get; set; }
+    //    public string Remarks { get; set; }
+    //    public string SavingAs { get; set; }
+    //    public IList<InvoiceFormItemVM> Items { get; set; }
 
-    }
+    //}
 
     public class InvoiceFormVM
     {
         public int? Id { get; set; }
         public int PackId { get; set; }
         public string BIRInvoiceNumber { get; set; }
+        public DateTime InvoiceDate { get; set; }
         public int InvoiceType { get; set; }
         public string Remarks { get; set; }
+        public string SavingAs { get; set; }
         public IList<InvoiceFormItemVM> Items { get; set; }
     }
 

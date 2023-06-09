@@ -32,6 +32,13 @@ namespace GMGInventory.Common.Models
         public DateTime? ApprovedDisapprovedDateD { get; set; }
     }
 
+    public class SalesOrderFilterVM : ListFilterCommonModel
+    {
+        public int? AgentId { get; set; }
+        public int? CustomerId { get; set; }
+        public int? RegionId { get; set; }
+    }
+
     public class SalesOrderDetailsVM
     {
         public int Id { get; set; }
@@ -201,7 +208,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Remaining Quantity")]
         public string RemainingQuantity => string.Format(SystemFormat.StringIntegerComma, RemainingQuantityD);
-        public int RemainingQuantityD => QuantityD - PackedQuantityD;
+        //public int RemainingQuantityD => ServedQuantityD - PackedQuantityD;
+        public int RemainingQuantityD { get;set; }
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }

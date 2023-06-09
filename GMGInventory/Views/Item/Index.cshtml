@@ -460,7 +460,8 @@
             ]
         });
 
-        itemDT.on("init.dt", function () {
+        //itemDT.on("init.dt", function () {
+        itemDT.on("draw", function () {
             hideLoader();
 
             LoadSelect2();

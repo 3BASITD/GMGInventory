@@ -147,12 +147,13 @@ namespace GMGInventory.Data
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerPayment> CustomerPayments { get; set; }
+        public DbSet<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public DbSet<CustomerType> CustomerTypes { get; set; }
         public DbSet<Forwarder> Forwarders { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceLineItem> InvoiceLineItems { get; set; }
-        public DbSet<InvoicePayment> InvoicePayments { get; set; }
-        public DbSet<InvoiceSequence> InvoiceSequences { get; set; }
+        //public DbSet<InvoicePayment> InvoicePayments { get; set; }
+        //public DbSet<InvoiceSequence> InvoiceSequences { get; set; }
         public DbSet<InvoiceType> InvoiceTypes { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemInventory> ItemInventories { get; set; }
@@ -162,8 +163,9 @@ namespace GMGInventory.Data
         public DbSet<PackLineItem> PackLineItems { get; set; }
         public DbSet<PackReturn> PackReturns { get; set; }
         public DbSet<PackReturnLineItem> PackReturnLineItems { get; set; }
-        public DbSet<Payment> Payments { get; set; }
-        public DbSet<PaymentDetail> PaymentDetails { get; set; }
+        public DbSet<PackType> PackTypes { get; set; }
+        //public DbSet<Payment> Payments { get; set; }
+        //public DbSet<PaymentDetail> PaymentDetails { get; set; }
         public DbSet<PhysicalCountHistory> PhysicalCountHistories { get; set; }
         public DbSet<PriceType> PriceTypes { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
@@ -175,13 +177,14 @@ namespace GMGInventory.Data
         public DbSet<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
         public DbSet<SalesOrderLineItem> SalesOrderLineItems { get; set; }
         public DbSet<SalesReturn> SalesReturns { get; set; }
-        public DbSet<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
+        //public DbSet<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
         public DbSet<SalesReturnLineItem> SalesReturnLineItems { get; set; }
-        public DbSet<SalesReturnTotalReturnAmount> SalesReturnTotalReturnAmounts { get; set; }
+        //public DbSet<SalesReturnTotalReturnAmount> SalesReturnTotalReturnAmounts { get; set; }
         public DbSet<ShippingAddress> ShippingAddresses { get; set; }
         public DbSet<SOACR> SOACRs { get; set; }
         public DbSet<SOACRCheck> SOACRChecks { get; set; }
         public DbSet<SOACRLineItem> SOACRLineItems { get; set; }
+        public DbSet<SOACRLineItemTBR> SOACRLineItemTBRs { get; set; }
         public DbSet<SOACRType> SOACRTypes { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<StockCard> StockCards { get; set; }

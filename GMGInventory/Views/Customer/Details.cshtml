@@ -302,6 +302,12 @@
                                     <th>Amount</th>
                                 </tr>
                             </thead>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-end">Total</th>
+                                    <th class="text-end">0.00</th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -327,6 +333,15 @@
                                     <th>Remarks</th>
                                 </tr>
                             </thead>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-end">Total</th>
+                                    <th class="text-end">0.00</th>
+                                    <th class="text-end">0.00</th>
+                                    <th class="text-end">0.00</th>
+                                    <th colspan="3"></th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -662,15 +677,13 @@
 
 @section Scripts {
     <script>
-
-
-        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-            var selectedTab = e.currentTarget.dataset.bsTarget;
-            if (selectedTab == "#nav-shipping") shippingDT.ajax.reload();
-            if (selectedTab == "#nav-forwarder") forwarderDT.ajax.reload();
-            if (selectedTab == "#nav-receivables") receivablesDT.ajax.reload();
-            if (selectedTab == "#nav-payments") paymentsDT.ajax.reload();
-        });
+        //$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        //    var selectedTab = e.currentTarget.dataset.bsTarget;
+        //    if (selectedTab == "#nav-shipping") shippingDT.ajax.reload();
+        //    if (selectedTab == "#nav-forwarder") forwarderDT.ajax.reload();
+        //    if (selectedTab == "#nav-receivables") receivablesDT.ajax.reload();
+        //    if (selectedTab == "#nav-payments") paymentsDT.ajax.reload();
+        //});
 
         var loaderDisplayed = [];
 
@@ -784,7 +797,6 @@
                     data.Id = @Model?.Id;
                 }
             },
-            //searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
@@ -801,13 +813,6 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            $('.table-shipping .dataTables_filter input').unbind();
-            $('.table-shipping .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    shippingDT.search($(this).val()).draw();
-                }
-            });
-
             HideLoader("shipping");
 
         });
@@ -824,7 +829,6 @@
                     data.Id = @Model?.Id;
                 }
             },
-            //searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
@@ -841,13 +845,6 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            $('.table-forwarder .dataTables_filter input').unbind();
-            $('.table-forwarder .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    forwarderDT.search($(this).val()).draw();
-                }
-            });
-
             HideLoader("forwarder");
 
         });
@@ -863,7 +860,6 @@
                     data.Id = @Model?.Id;
                 }
             },
-            //searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
@@ -874,23 +870,22 @@
             columns: [
                 { data: "crNo", name: "CRNo" },
                 { data: "soaNo", name: "SOANo" },
-                { data: "totalInvoiceAmount", name: "TotalInvoiceAmount" },
-                { data: "amountPaid", name: "AmountPaid" },
-                { data: "overPayment", name: "OverPayment" },
+                { data: "totalInvoiceAmount", name: "TotalInvoiceAmount", className: "text-end" },
+                { data: "amountPaid", name: "AmountPaid", className: "text-end" },
+                { data: "overPayment", name: "OverPayment", className: "text-end" },
                 { data: "transactionDate", name: "TransactionDate" },
                 { data: "createdBy", name: "CreatedBy" },
                 { data: "remarks", name: "Remarks" },
 
             ],
-            order: [[0, "asc"]]
+            order: [[0, "asc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                columnDTTotalDecimal(api, 2);
+                columnDTTotalDecimal(api, 3);
+                columnDTTotalDecimal(api, 4);
+            }
         }).on("draw.dt", function () {
-            $('.table-payments .dataTables_filter input').unbind();
-            $('.table-payments .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    paymentsDT.search($(this).val()).draw();
-                }
-            });
-
             HideLoader("payments");
 
         });
@@ -907,7 +902,6 @@
                     data.Id = @Model?.Id;
                 }
             },
-            //searchDelay: 1000,
             serverSide: true,
             filter: true,
             responsive: true,
@@ -918,18 +912,15 @@
             columns: [
                 { data: "invoicedDate", name: "InvoicedDate" },
                 { data: "invoiceNo", name: "InvoiceNo" },
-                { data: "invoicedAmount", name: "InvoicedAmount" }
+                { data: "invoicedAmount", name: "InvoicedAmount", className: "text-end" }
 
             ],
-            order: [[0, "asc"]]
+            order: [[0, "desc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                columnDTTotalDecimal(api, 2);
+            }
         }).on("draw.dt", function () {
-            $('.table-receivables .dataTables_filter input').unbind();
-            $('.table-receivables .dataTables_filter input').keyup(function (e) {
-                if (e.keyCode == 13) {
-                    receivablesDT.search($(this).val()).draw();
-                }
-            });
-
             HideLoader("receivables");
 
         });

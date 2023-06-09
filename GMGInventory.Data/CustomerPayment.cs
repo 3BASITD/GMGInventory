@@ -6,6 +6,7 @@ namespace GMGInventory.Data
     {
         public CustomerPayment()
         {
+            this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
             this.SOACRChecks = new HashSet<SOACRCheck>();
         }
 
@@ -19,7 +20,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal OverPayment { get; set; }
 
-        [Column(TypeName = "nvarchar(18, 2)")]
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal Tax { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
@@ -56,10 +57,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalInvoiceAmount { get; set; }
 
-        [ForeignKey("InvoiceId")]
-        public int? InvoiceId { get; set; }
-        public Invoice Invoice { get; set; }
-
+        public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public ICollection<SOACRCheck> SOACRChecks { get; set; }
     }
 }

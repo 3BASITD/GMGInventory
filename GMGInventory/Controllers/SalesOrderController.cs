@@ -44,10 +44,10 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListDTJson()
+        public async Task<JsonResult> GetListDTJson(SalesOrderFilterVM filter)
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await salesOrderRepository.GetListDTAsync(form));
+            return Json(await salesOrderRepository.GetListDTAsync(form, filter));
         }
 
         public async Task<ActionResult> Details(int? Id)
@@ -94,7 +94,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<JsonResult> GetItemsForPackJson(int salesOrderId)
         {
-            return Json(await salesOrderRepository.GetItemsForPackAsync(salesOrderId));
+            return Json(await salesOrderRepository.GetItemsAsync(salesOrderId, true));
         }
 
         [HttpPost]

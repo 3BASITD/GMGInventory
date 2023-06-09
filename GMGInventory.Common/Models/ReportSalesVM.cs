@@ -262,6 +262,12 @@ namespace GMGInventory.Common.Models
         public decimal TotalAmountD { get; set; }
     }
 
+    public class CustomerSalesComparePVM
+    {
+        public CustomerSalesPVM CustomerSales1 { get; set; }
+        public CustomerSalesPVM CustomerSales2 { get; set; }
+    }
+
     public class DailySalesRVM
     {
         [Display(Name = "Invoice Date")]

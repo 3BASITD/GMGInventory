@@ -13,10 +13,13 @@
         <div class="card-header">
             <span class="card-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
-                    <span class="fas fa-paper-plane"></span> Submit
+                <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
+                    <span class="fas fa-save"></span> Save as Draft
                 </button>
-                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
+                    <span class="fas fa-paper-plane"></span> Post
+                </button>
+                <a class="btn btn-light btn-sm float-right" asp-action="Index" asp-controller="Pack">
                     <span class="fas fa-arrow-left"></span> Back to List
                 </a>
             </div>
@@ -28,6 +31,13 @@
                         <label for="invoice-pack-number" class="form-label fw-normal mb-0">Pack Number</label>
                         <select id="invoice-pack-number" class="s2-bold s2ph-bold s2ph-dark" name="PackNumber" style="width: 100%"></select>
                         <span data-valmsg-for="invoice-pack-number" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                <label for="invoice-date" class="form-label fw-normal mb-0">Invoice Date</label>
+                        <input type="date" id="invoice-date" class="form-control form-control-sm" name="InvoiceDate" value="" />
+                        <span data-valmsg-for="invoice-date" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
             </div>
@@ -116,7 +126,7 @@
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th>Total</th>
+                                        <th class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
                                         <th colspan="5"></th>
                                         <th class="total-extended">0.00</th>
@@ -212,20 +222,20 @@
             }
         });
 
-        function clearItemForm() {
-            $("#add-code").val("").trigger("change");
-            $("#add-name").val("");
-            $("#add-net-price").val("0.00");
-            $("#add-retail-price").val("0.00");
-            $("#add-quantity").val("0");
-            $("#add-unit").val("");
-            $("#add-selling-price").val("0.00");
-            $("#add-discount1").val("0.00");
-            $("#add-discount2").val("0.00");
-            $("#add-gross-price").val("0.00");
-        }
+        //function clearItemForm() {
+        //    $("#add-code").val("").trigger("change");
+        //    $("#add-name").val("");
+        //    $("#add-net-price").val("0.00");
+        //    $("#add-retail-price").val("0.00");
+        //    $("#add-quantity").val("0");
+        //    $("#add-unit").val("");
+        //    $("#add-selling-price").val("0.00");
+        //    $("#add-discount1").val("0.00");
+        //    $("#add-discount2").val("0.00");
+        //    $("#add-gross-price").val("0.00");
+        //}
 
-        $(".createBtn").on("click", clearItemForm);
+        //$(".createBtn").on("click", clearItemForm);
 
         var packDT = $('.table-pack').DataTable({
             ajax: {
@@ -264,17 +274,33 @@
                 { data: "discount1", name: "Discount1", className: "text-end" },
                 { data: "discount2", name: "Discount2", className: "text-end" },
                 { data: "extendedPrice", name: "ExtendedPrice", className: "text-end" }
-            ]
+            ],
+            order: [[1, "asc"]]
         });
 
         packDT.on("draw", function () {
             $(".table-item thead th").removeClass("text-end");
 
-            $(".btn-add-item").on("click", function () {
+            $(".btn-add-item").off("click").on("click", function () {
                 var rowdata = packDT.row($(this).parents('tr')).data();
-                itemDT.row.add(rowdata).draw();
-                packDT.row($(this).parents('tr')).remove().draw();
-                toastrNoDuplicate("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success", "success");
+                if (itemDT.rows().data().length == 0 && packDT.rows().data().length > 1) {
+                    toastrNoDuplicate("You added an item with " + rowdata.sellingPriceType + " Selling Price, " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info", "info");
+                }
+
+                if (itemDT.rows().data().length != 0) {
+                    var firstItem = itemDT.row(0).data();
+                    if (firstItem.sellingPriceType != rowdata.sellingPriceType || firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
+                        toastrNoDuplicate("You can only add an item with the same data of the first added item. " + firstItem.sellingPriceType + " Selling Price, " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error", "error");
+                    } else {
+                        itemDT.row.add(rowdata).draw();
+                        packDT.row($(this).parents('tr')).remove().draw();
+                        toastrNoDuplicate("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success", "success");
+                    }
+                } else {
+                    itemDT.row.add(rowdata).draw();
+                    packDT.row($(this).parents('tr')).remove().draw();
+                    toastrNoDuplicate("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success", "success");
+                }
             });
         });
 
@@ -318,7 +344,8 @@
 
                 columnDTTotalInteger(api, 1);
                 columnDTTotalDecimal(api, 7);
-            }
+            },
+            order: [[2, "asc"]]
         });
 
         itemDT.on("draw", function () {
@@ -379,25 +406,31 @@
             return item_to_invoice;
         }
 
+        $("#form-invoice button[type='submit']").on("click", function () {
+            $("#invoice-date").data("saving-as", $(this).val());
+        });
+
         // Validation for Create
         var validateCreate = $("#form-invoice").validate({
             errorClass: 'text-danger text-xs',
             rules: {
                 ControlNumber: { required: true, maxlength: 50 },
+                InvoiceDate: { required: true },
                 AgentCode: { maxlength: 250 }
             },
             messages: {
                 ControlNumber: { required: "Please enter BIR Invoice Number", maxlength: "BIR Invoice Number must not exceed 50 characters." },
+                InvoiceDate: { required: "Please enter Invoice Date." },
                 Remarks: { maxlength: "BIR Invoice Number must not exceed 250 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
-                SaveInvoice();
+                SaveInvoice($("#invoice-date").data("saving-as"));
             },
             showErrors: validateShowErrors
         });
 
-        function SaveInvoice() {
+        function SaveInvoice(saving_as) {
             var itemsToInvoice = GetItemsToInvoice();
             if (itemsToInvoice.length == 0) {
                 toastrNoDuplicate("No item to invoice. Add an item to the list to continue", "Warning", "warning");
@@ -411,8 +444,10 @@
                         PackId: @Model?.PackNumber,
                         BIRInvoiceNumber: $("#invoice-control-number").val(),
                         InvoiceType: $("#invoice-invoice-type").val(),
+                        InvoiceDate: $("#invoice-date").val(),
                         Remarks: $("#invoice-remarks").val(),
-                        Items: itemsToInvoice
+                        Items: itemsToInvoice,
+                        SavingAs: saving_as
                     },
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {

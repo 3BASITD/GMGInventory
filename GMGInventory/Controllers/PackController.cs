@@ -46,6 +46,11 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
+        public async Task<IActionResult> PrintDetails(int Id)
+        {
+            return View(await packRepository.PrintDetailsAsync(Id));
+        }
+
         [HttpPost]
         public async Task<JsonResult> GetItemsJson(int packId)
         {

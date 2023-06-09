@@ -4,17 +4,15 @@ namespace GMGInventory.Common.Models
 {
     public class CategoryVM: GenericAuditVM
     {
-        public int Id { get; set; }
-
         [Required]
         [StringLength(10)]
         [Display(Name = "Code")]
-        public string Code { get; set; }
+        public string CategoryCode { get; set; }
 
         [Required]
         [StringLength(100)]
         [MinLength(5)]
         [Display(Name = "Name")]
-        public string Name { get; set; }
+        public string CategoryName { get; set; }
     }
 }

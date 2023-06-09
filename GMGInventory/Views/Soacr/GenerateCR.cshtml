@@ -1,0 +1,243 @@
+﻿@model SoacrInvoiceVM
+
+@{
+    ViewData["Title"] = "Generate Counter Receipt";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">SOA / Counter Receipt</a></li>
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="filter-customer" class="form-label mb-0">Customer Code</label>
+                    <select id="filter-customer" style="width:100%">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <label for="filter-customer-name" class="form-label mb-0">Customer Name</label>
+                    <input type="text" id="filter-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                </div>
+            </div>
+        </div>@*
+        <div class="row">
+        <div class="col-12 col-sm-6 col-md-4">
+        <div class="form-group">
+        <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Select Customer</button>
+        </div>
+        </div>
+        </div>*@
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Invoice(s)</span>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-primary btn-sm float-right btn-add ml-2">
+                                <span class="fas fa-plus"></span> Generate
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-invoice">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input class="chkclassinvoiceall" type="checkbox" />
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.InvoiceDate)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.InvoiceNumber)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.InvoiceType)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.TotalAmount)
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load Select2 for Customer
+        $("#filter-customer").select2({
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Customer")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+        });
+
+        $("#filter-customer").on("select2:select", function () {
+            $("#filter-customer-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-customer").on("select2:unselecting", function (e) {
+            $("#filter-customer-name").val("");
+        });
+
+        var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetCustomerInvoiceToAddDT")",
+                type: "POST",
+                data: function (data) {
+                    data.Id = $("#filter-customer").val();
+                }
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            searching: false,
+            paging: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '';
+                        actions += '<input class="chkclassinvoice" type="checkbox" value="' + data.id + '" />';
+                        return actions;
+                    }
+                },
+                { data: "invoiceDate", name: "InvoiceDate" },
+                { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "invoiceType", name: "InvoiceType" },
+                { data: "totalAmount", name: "TotalAmount", className: "text-end" }
+            ],
+            //lengthMenu: [
+            //    [-1, 10, 25, 50],
+            //    ['All', 10, 25, 50],
+            //],
+            order: [[1, 'desc']]
+        });
+        
+        invoiceDT.on("draw", function () {
+            hideLoader();
+            dtCheckboxes();
+        });
+
+        dtCheckboxes();
+        function dtCheckboxes() {
+            $(".chkclassinvoiceall").on("change", function () {
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".chkclassinvoice").prop("checked", $(".chkclassinvoiceall").prop("checked"));
+                });
+            });
+
+            $(".chkclassinvoice").on("change", function () {
+                var rows_checked = 0;
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".chkclassinvoice").prop("checked")) {
+                        rows_checked++;
+                    }
+                });
+
+                if (rows_checked == 0) {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else if (rows_checked == invoiceDT.rows().count()) {
+                    $(".chkclassinvoiceall").prop("checked", true);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else if (rows_checked == 0) {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", false);
+                } else {
+                    $(".chkclassinvoiceall").prop("checked", false);
+                    $(".chkclassinvoiceall").prop("indeterminate", true);
+                }
+            });
+        }
+
+        $("#filter-customer").on("change", function () {
+            invoiceDT.ajax.reload();
+        });
+
+        $(".btn-add").click(function (e) {
+            if ($("#filter-customer").val() == "") {
+                toastrNoDuplicate("Please select a customer first", "Customer", "warning");
+            } else {
+                var invoiceIds = [];
+
+                invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var invlist = $(this.node()).find(".chkclassinvoice");
+                    if (invlist.prop("checked")) {
+                        invoiceIds.push(invlist.val());
+                    }
+                });
+
+                if (invoiceIds.length == 0) {
+                    toastrNoDuplicate("Please select atleast 1 invoice", "No Invoice Selected", "error");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        //url: "@Url.Action("CreateJsonCR")",
+                        url: "@Url.Action("GenerateCRJson")",
+                        data: {
+                            InvoiceIds: invoiceIds,
+                            CustomerId: $("#filter-customer").val()
+
+                        },
+                        error: jQueryCommonError,
+                        success: function (data, status, xhr) {
+                            toastrNoDuplicate(data.message, "Success", "success");
+                            hideLoader();
+                            window.location = '@Url.Action("Details")/' + data.newRow;
+                        }
+                    });
+                }
+            }
+        });
+
+    </script>
+}
+
