@@ -8,9 +8,12 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
-                <span class="fas fa-plus"></span> New Sales Order
+            @if (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin))
+            {
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
+                    <span class="fas fa-plus"></span> New Sales Order
             </a>
+            }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -112,6 +115,20 @@
                         <div class="form-group">
                             <label for="filter-to" class="control-label mb-0">Order Date To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-status" class="control-label mb-0">Status</label>
+                            <select id="filter-status" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="Submitted">My Submission</option>
+                                <option value="ApprovedDisapproved">Approved / Disapproved</option>
+                                <option value="Approval">For Approval</option>
+                                <option value="Approved">Approved by Me</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -290,6 +307,7 @@
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
+                    data.StatusCode = $("#filter-status").val();
                 },
                 type: "POST",
             },

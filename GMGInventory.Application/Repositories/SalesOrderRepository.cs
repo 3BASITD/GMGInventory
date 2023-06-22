@@ -2,6 +2,7 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Humanizer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -165,18 +166,25 @@ namespace GMGInventory.Application.Repositories
             var currentUserRoles = await userManager.GetRolesAsync(currentUser);
             var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
 
+            var users = userManager.Users;
+
             var orderVM = (from order in context.SalesOrders
                                                 .Include(s => s.Customer)
                                                 .Include(s => s.Status)
-                           join user in userManager.Users on order.UserCreated equals user.Id
-                           let auser = userManager.Users.Where(s => s.Id == order.ApprovedBy).Select(s => s.Nickname).First()
-                           let duser = userManager.Users.Where(s => s.Id == order.DisapprovedBy).Select(s => s.Nickname).First()
+                           join user in users on order.UserCreated equals user.Id
+                           let auser = users.Where(s => s.Id == order.ApprovedBy).Select(s => s.Nickname).First()
+                           let duser = users.Where(s => s.Id == order.DisapprovedBy).Select(s => s.Nickname).First()
                            where (order.UserCreated == currentUserId || isAdminOrManager)
                            && (filter.AgentId == null || order.AgentId == filter.AgentId)
                            && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
                            && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
                            && filter.DateFrom <= order.DateCreated.Date
                            && order.DateCreated.Date <= filter.DateTo
+                           && (filter.StatusCode == null
+                           || (filter.StatusCode == "Submitted" && order.UserCreated == currentUserId)
+                           || (filter.StatusCode == "ApprovedDisapproved" && (order.Status.Name == "Sales Order Approved" || order.Status.Name == "Sales Order Disapproved"))
+                           || (filter.StatusCode == "Approval" && order.Status.Name == "Sales Order Submitted")
+                           || (filter.StatusCode == "Approved" && order.ApprovedBy == currentUserId))
                            select new SalesOrderVM
                            {
                                Customer = order.Customer.Name,
@@ -261,15 +269,15 @@ namespace GMGInventory.Application.Repositories
                          let inventory = context.ItemInventories
                                                 .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
                                                 .Sum(s => s.Quantity)
-                         let served = context.SalesOrderLineItems.Where(s => s.ItemId == order.Item.Id).ToList()
                          where order.SalesOrderId == salesOrderId
-                         && ((order.Quantity != order.PackedQuantity && forPack == true) || forPack == false)
+                         //&& ((order.Quantity != order.PackedQuantity && forPack == true) || forPack == false)
+                         && ((order.Quantity != order.InvoicedQuantity && forPack == true) || forPack == false)
                          select new SalesOrderItemVM
                          {
                              Discount1D = order.Discount1,
                              Discount2D = order.Discount2,
                              Id = order.Id,
-                             InventoryCountD = inventory + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
+                             InventoryCountD = inventory,
                              InvoicedQuantityD = order.InvoicedQuantity,
                              ItemCode = order.Item.Code,
                              ItemId = order.Item.Id,

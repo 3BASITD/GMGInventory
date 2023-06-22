@@ -10,8 +10,7 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
-    //[Authorize]
+    [Authorize]
     public class ForwarderController : Controller
     {
         private readonly IForwarderRepository forwarderRepository;
@@ -29,17 +28,31 @@ namespace GMGInventory.Controllers
             return Json(await forwarderRepository.GetOptions(IncludeId));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public ActionResult Index()
         {
             return View();
         }
 
+
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetListJson()
         {
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await forwarderRepository.GetAllForDataTablesAsync(form));
         }
+
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Details(int? id)
         {
             var forwarderVM = await forwarderRepository.GetForwarderViewVMAsync(id);
@@ -50,6 +63,10 @@ namespace GMGInventory.Controllers
             return View(forwarderVM);
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> CreateJson(ForwarderVM forwarderVM)
         {
@@ -68,6 +85,10 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> EditJson(ForwarderVM forwarderVM)
         {
@@ -94,7 +115,10 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -116,7 +140,10 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
@@ -130,7 +157,10 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Forwarder");
@@ -157,9 +187,12 @@ namespace GMGInventory.Controllers
                     DateTime.Now.ToString("yyyyMMdd") + " Forwarders.xlsx");
                 }
             }
-
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> UploadJson(ForwarderVM forwarderVM)
         {

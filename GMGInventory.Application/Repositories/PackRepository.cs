@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,16 +11,29 @@ namespace GMGInventory.Application.Repositories
     public class PackRepository : IPackRepository
     {
         private readonly ApplicationDbContext context;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly string currentUserId;
 
         public PackRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
              , UserManager<User> userManager)
         {
             this.context = context;
-            this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+        }
+
+        public async Task<IList<JsonOptionsModel>> GetPackTypeOptions(int? IncludeId)
+        {
+            return await context.PackTypes
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .OrderBy(s => s.Text)
+                .ToListAsync();
         }
 
         public async Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page)
@@ -59,6 +73,7 @@ namespace GMGInventory.Application.Repositories
                                PackBy = user.Nickname,
                                PackDateD = order.DateCreated,
                                SalesOrderDateD = order.SalesOrder.DateCreated,
+                               SalesOrderId = order.SalesOrder.Id,
                                SONumber = order.SalesOrder.SalesOrderNumber,
                                Status = order.Status.Code
                            });
@@ -96,15 +111,17 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<PackVM>> GetListAsync(ListFilterCommonModel filter)
         {
             var packs = from pck in context.Packs
-                                           .Include(s => s.Status)
-                                           .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
-                                           .Where(s => (filter.Status == null || s.StatusId == filter.Status)
-                                                     && filter.DateFrom <= s.DateCreated.Date
-                                                     && s.DateCreated.Date <= filter.DateTo)
                         join usr in userManager.Users on pck.UserCreated equals usr.Id
+                        where filter.DateFrom <= pck.DateCreated.Date
+                        && pck.DateCreated.Date <= filter.DateTo
+                        && (filter.StatusCode == null
+                        || (filter.StatusCode == "Draft" && pck.Status.Name == "Packing Draft" && pck.UserCreated == currentUserId)
+                        || (filter.StatusCode == "Invoicing" && pck.Status.Name == "Packing Submitted")
+                        || (filter.StatusCode == "Invoiced" && pck.Status.Name == "Invoice Submitted"))
                         select new PackVM
                         {
-                            Customer = pck.SalesOrder.Customer.Code,
+                            CurrentUsersDraft = pck.Status.Name == "Packing Draft" && pck.UserCreated == currentUserId,
+                            Customer = pck.SalesOrder.Customer.Name,
                             Id = pck.Id,
                             PackedBy = usr.Nickname,
                             PackedDateD = pck.DateCreated,
@@ -182,17 +199,23 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<PackItemVM>> GetItemsAsync(int packId)
         {
-            var itemVM = from order in context.PackLineItems
+            var itemVM = from pack in context.PackLineItems
                                               .Include(s => s.Item)
-                         where order.PackId == packId
+                         join order in context.SalesOrderLineItems on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
+                         where pack.PackId == packId
+                         && pack.Item.Id == order.Item.Id
+                         orderby pack.BoxNumber ascending, pack.PackTypeId ascending
                          select new PackItemVM
                          {
-                             BoxNumber = order.BoxNumber,
-                             Id = order.Id,
-                             ItemId = order.Item.Id,
-                             ItemCode = order.Item.Code,
-                             ItemName = order.Item.Name,
-                             Quantity = order.Quantity
+                             BoxNumber = pack.BoxNumber,
+                             Id = pack.Id,
+                             ItemId = pack.Item.Id,
+                             ItemCode = pack.Item.Code,
+                             ItemName = pack.Item.Name,
+                             PackType = pack.PackType.Id,
+                             PackTypeName = pack.PackType.Code,
+                             Quantity = pack.Quantity,
+                             SalesOrderLineItemId = order.Id
                          };
             return await itemVM.ToListAsync();
         }
@@ -233,6 +256,7 @@ namespace GMGInventory.Application.Repositories
                 data = data.Where(x => x.BoxNumber.ToString().Contains(form.SearchValue)
                                     || x.ItemCode.ToLower().Contains(form.SearchValue)
                                     || x.ItemName.ToLower().Contains(form.SearchValue)
+                                    || x.PackTypeName.ToLower().Contains(form.SearchValue)
                                     || x.Quantity.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -247,6 +271,8 @@ namespace GMGInventory.Application.Repositories
                         case "BoxNumber": data = data.OrderBy(s => s.BoxNumber); break;
                         case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderBy(s => s.ItemName); break;
+                        case "PackType": data = data.OrderBy(s => s.PackTypeName); break;
+                        case "PackTypeName": data = data.OrderBy(s => s.PackTypeName); break;
                         case "Quantity": data = data.OrderBy(s => s.Quantity); break;
                         default: break;
                     }
@@ -258,6 +284,8 @@ namespace GMGInventory.Application.Repositories
                         case "BoxNumber": data = data.OrderByDescending(s => s.BoxNumber); break;
                         case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
+                        case "PackType": data = data.OrderByDescending(s => s.PackTypeName); break;
+                        case "PackTypeName": data = data.OrderByDescending(s => s.PackTypeName); break;
                         case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
                         default: break;
                     }
@@ -276,12 +304,12 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int> SaveAsync(PackFormVM form)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var orderVM = await context.SalesOrders.Where(s => s.Id == form.SONumber).FirstOrDefaultAsync();
+            var orderVM = await context.SalesOrders.Where(s => s.Id == form.SalesOrderId).FirstOrDefaultAsync();
             if (orderVM != null)
             {
-                orderVM.QuantityPacked = form.Items.Sum(s => s.Quantity);
-                if (orderVM.QuantityOrdered <= orderVM.QuantityPacked)
+                orderVM.QuantityPacked = await context.PackLineItems.Where(s => s.Pack.SalesOrderId == form.SalesOrderId).SumAsync(s => (int?)s.Quantity) ?? 0;
+                orderVM.QuantityPacked += form.Items.Sum(s => s.Quantity);
+                if (orderVM.QuantityOrdered <= orderVM.QuantityPacked && form.SavingAs == "post")
                 {
                     orderVM.StatusId = await context.Statuses
                                                     .Where(s => s.Name == "Fully Packed")
@@ -290,14 +318,14 @@ namespace GMGInventory.Application.Repositories
                 }
                 await context.SaveChangesAsync(currentUserId);
 
-                int statusId = await context.Statuses
-                                            .Where(s => s.Name == "Packing Submitted")
-                                            .Select(s => s.Id)
-                                            .FirstAsync();
                 Pack pack = new()
                 {
                     SalesOrderId = orderVM.Id,
-                    StatusId = statusId,
+                    StatusId = await context.Statuses
+                                            .Where(s => (form.SavingAs == "post" && s.Name == "Packing Submitted")
+                                                     || (form.SavingAs == "save" && s.Name == "Packing Draft"))
+                                            .Select(s => s.Id)
+                                            .FirstAsync(),
                     TotalQuantity = form.Items.Sum(s => s.Quantity)
                 };
 
@@ -313,6 +341,7 @@ namespace GMGInventory.Application.Repositories
                     if (soItem != null)
                     {
                         soItem.PackedQuantity += item.Quantity;
+                        soItem.IsServed = soItem.Quantity <= soItem.PackedQuantity;
                     }
 
                     PackLineItem packItem = new()
@@ -320,6 +349,7 @@ namespace GMGInventory.Application.Repositories
                         BoxNumber = item.BoxNumber,
                         ItemId = item.Item,
                         PackId = pack.Id,
+                        PackTypeId = item.PackType,
                         Quantity = item.Quantity
                     };
                     await context.PackLineItems.AddAsync(packItem);
@@ -329,6 +359,93 @@ namespace GMGInventory.Application.Repositories
                 return pack.Id;
             }
             return -1;
+        }
+
+        public async Task<int> UpdateAsync(PackFormVM form)
+        {
+            var orderVM = await context.SalesOrders.Where(s => s.Id == form.SalesOrderId).FirstOrDefaultAsync();
+            var packVM = await context.Packs.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+            if (orderVM == null || packVM == null)
+            {
+                return -1;
+            }
+
+            //delete pack items and adjust references
+            var packItems = await context.PackLineItems.Where(s => s.PackId == form.Id).ToListAsync();
+            foreach (var item in packItems)
+            {
+                var soItem = await context.SalesOrderLineItems
+                                          .Where(s => s.SalesOrderId == orderVM.Id
+                                                   && s.ItemId == item.ItemId)
+                                          .FirstOrDefaultAsync();
+                if (soItem != null)
+                {
+                    soItem.PackedQuantity -= item.Quantity;
+                    soItem.IsServed = false;
+                }
+                await context.SaveChangesAsync(currentUserId);
+            }
+
+            context.PackLineItems.RemoveRange(packItems);
+            await context.SaveChangesAsync(currentUserId);
+            //end of delete pack items
+
+            orderVM.QuantityPacked = await context.PackLineItems.Where(s => s.Pack.SalesOrderId == form.SalesOrderId).SumAsync(s => (int?)s.Quantity) ?? 0;
+
+            if (form.SavingAs != "delete")
+            {
+                orderVM.QuantityPacked += form.Items.Sum(s => s.Quantity);
+                if (orderVM.QuantityOrdered <= orderVM.QuantityPacked && form.SavingAs == "post")
+                {
+                    orderVM.StatusId = await context.Statuses
+                                                    .Where(s => s.Name == "Fully Packed")
+                                                    .Select(s => s.Id)
+                                                    .FirstAsync();
+                }
+                await context.SaveChangesAsync(currentUserId);
+
+                packVM.StatusId = await context.Statuses
+                                               .Where(s => (form.SavingAs == "post" && s.Name == "Packing Submitted")
+                                                        || (form.SavingAs == "save" && s.Name == "Packing Draft"))
+                                               .Select(s => s.Id)
+                                               .FirstAsync();
+                packVM.TotalQuantity = form.Items.Sum(s => s.Quantity);
+
+                context.Packs.Update(packVM);
+                await context.SaveChangesAsync(currentUserId);
+
+                foreach (var item in form.Items)
+                {
+                    var soItem = await context.SalesOrderLineItems
+                                              .Where(s => s.SalesOrderId == orderVM.Id
+                                                       && s.ItemId == item.Item)
+                                              .FirstOrDefaultAsync();
+                    if (soItem != null)
+                    {
+                        soItem.PackedQuantity += item.Quantity;
+                        soItem.IsServed = soItem.Quantity <= soItem.PackedQuantity;
+                    }
+
+                    PackLineItem packItem = new()
+                    {
+                        BoxNumber = item.BoxNumber,
+                        ItemId = item.Item,
+                        PackId = packVM.Id,
+                        PackTypeId = item.PackType,
+                        Quantity = item.Quantity
+                    };
+                    await context.PackLineItems.AddAsync(packItem);
+                }
+
+                await context.SaveChangesAsync(currentUserId);
+                return packVM.Id;
+            }
+            else
+            {
+                context.Packs.Remove(packVM);
+                await context.SaveChangesAsync(currentUserId);
+                return -2;
+            }
         }
     }
 }

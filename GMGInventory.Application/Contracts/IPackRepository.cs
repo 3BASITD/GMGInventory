@@ -4,6 +4,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IPackRepository
     {
+        Task<IList<JsonOptionsModel>> GetPackTypeOptions(int? IncludeId);
         Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page);
         Task<PackDetailsVM?> GetDetailsAsync(int? Id); 
         Task<PackDetailsPVM> PrintDetailsAsync(int? Id);
@@ -13,5 +14,6 @@ namespace GMGInventory.Application.Contracts
         Task<IList<PackItemVM>> GetItemsWithPriceAsync(int packId);
         Task<ForDataTables<PackItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int packId);
         Task<int> SaveAsync(PackFormVM form);
+        Task<int> UpdateAsync(PackFormVM form);
     }
 }

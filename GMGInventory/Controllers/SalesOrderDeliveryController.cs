@@ -6,12 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + ","
-                     + Roles.InventoryManager + ","
-                     + Roles.InvoicingClerk + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
     public class SalesOrderDeliveryController : Controller
     {
         private readonly ISalesOrderDeliveryRepository salesOrderDeliveryRepository;
@@ -33,6 +28,11 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderDeliveryRepository.GetListDataTablesAsync(form, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> EditJson(SalesOrderDeliveryFormVM form)
         {

@@ -6,6 +6,7 @@ namespace GMGInventory.Application.Contracts
     public interface ICustomerRepository : IGenericRepository<Customer>
     {
         Task<Select2Model<JsonAddressOptionsModel>> GetOptions(string search, int page);
+        Task<Select2Model<JsonAddressOptionsModel>> GetByAgentOptions(string search, int page, int? agent);
         Task<Select2Model<JsonAddressOptionsModel>> GetOptionsWithOrder(string search, int page);
 
         Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId);

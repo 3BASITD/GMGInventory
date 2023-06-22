@@ -7,9 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InvoicingClerk + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
     public class PackController : Controller
     {
         private readonly IPackRepository packRepository;
@@ -19,16 +17,27 @@ namespace GMGInventory.Controllers
             this.packRepository = packRepository;
         }
 
+        public async Task<IActionResult> GetPackTypeOptions(int? IncludeId)
+        {
+            return Json(await packRepository.GetPackTypeOptions(IncludeId));
+        }
+
         public async Task<IActionResult> GetOptions(string search, int page)
         {
             return Json(await packRepository.GetOptions(search, page));
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public ActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> GetListJson(ListFilterCommonModel filter)
         {
@@ -36,6 +45,9 @@ namespace GMGInventory.Controllers
             return Json(await packRepository.GetListDTAsync(form, filter));
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Details(int? Id)
         {
             var order = await packRepository.GetDetailsAsync(Id);
@@ -46,6 +58,9 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<IActionResult> PrintDetails(int Id)
         {
             return View(await packRepository.PrintDetailsAsync(Id));
@@ -70,6 +85,8 @@ namespace GMGInventory.Controllers
             return Json(await packRepository.GetItemsDTAsync(form, packId));
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin)]
         public async Task<ActionResult> Create(int? Id)
         {
             var order = await packRepository.GetDetailsBySOAsync(Id);
@@ -81,21 +98,47 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> SaveJson(PackFormVM form)
         {
             ResponseModel<int> responseModel = new ResponseModel<int>();
             var orderId = await packRepository.SaveAsync(form);
-            if(orderId == -1)
+            if (orderId == -1)
             {
                 responseModel.Status = "Error";
-                responseModel.Message = "Sales Order missing. Failed to submit.";
-            } else
+                responseModel.Message = "Sales Order is missing. Failed to submit.";
+            }
+            else
             {
                 responseModel.Status = "Success";
-                responseModel.Message = "Pack successfully submitted";
+                responseModel.Message = "Pack successfully " + (form.SavingAs == "post" ? "posted" : "saved as draft");
             }
             responseModel.NewRow = orderId;
+            return Json(responseModel);
+        }
+
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin)]
+        [HttpPost]
+        public async Task<JsonResult> UpdateJson(PackFormVM form)
+        {
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+            var packId = await packRepository.UpdateAsync(form);
+            if (packId == -1)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Pack is missing. Failed to submit.";
+            }
+            else
+            {
+                responseModel.Status = "Success";
+                var msg = "Pack successfully " + (form.SavingAs == "post" ? "posted" : form.SavingAs == "save" ? "saved as draft" : "deleted");
+                responseModel.Message = msg;
+                TempData["SuccessMessage"] = msg;
+            }
+            responseModel.NewRow = packId;
             return Json(responseModel);
         }
     }

@@ -233,7 +233,7 @@
             </li>
         }
 
-        @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
+        @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
         || User.IsInRole(Roles.SystemAdmin))
         {
             var navAdministrationActive = (new List<string> { "Agent", "Area", "Brand", "Category", "Forwarder", "ItemType", "User", "Supplier", "AuditLog" }).Contains(currentController ?? "");
@@ -247,27 +247,38 @@
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                        <a class="nav-link @(currentController == "Agent" ? "active" : "")"
+                    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Agent" ? "active" : "")"
                        asp-area="" asp-controller="Agent" asp-action="Index">
                             <i class="nav-icon fas fa-user-secret"></i>
                             <p>Agents</p>
                         </a>
-                    </li>
+                        </li>
+                    }
+                    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                    {
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Area" ? "active" : "")"
                        asp-area="" asp-controller="Area" asp-action="Index">
                             <i class="nav-icon fas fa-map-marker-alt"></i>
                             <p>Areas</p>
                         </a>
-                    </li>
+                        </li>
+                    }
+                    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                    {
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Brand" ? "active" : "")"
                        asp-area="" asp-controller="Brand" asp-action="Index">
                             <i class="nav-icon fas fa-trademark"></i>
                             <p>Brands</p>
                         </a>
-                    </li>
+                        </li>
+                    }
+                    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                    {
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Category" ? "active" : "")"
                        asp-area="" asp-controller="Category" asp-action="Index">
@@ -275,6 +286,7 @@
                             <p>Categories</p>
                         </a>
                     </li>
+                    }
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Forwarder" ? "active" : "")"
                        asp-area="" asp-controller="Forwarder" asp-action="Index">
@@ -282,13 +294,18 @@
                             <p>Forwarder</p>
                         </a>
                     </li>
+                    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                    {
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "ItemType" ? "active" : "")"
                        asp-area="" asp-controller="ItemType" asp-action="Index">
                             <i class="nav-icon fas fa-keyboard"></i>
                             <p>Item Types</p>
                         </a>
-                    </li>
+                        </li>
+                    }
+                    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                    {
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "User" ? "active" : "")"
                        asp-area="" asp-controller="User" asp-action="Index">
@@ -296,20 +313,27 @@
                             <p>Users</p>
                         </a>
                     </li>
+                    }
+                    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                    {
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Supplier" ? "active" : "")"
                        asp-area="" asp-controller="Supplier" asp-action="Index">
                             <i class="nav-icon fas fa-handshake"></i>
                             <p>Suppliers</p>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(currentController == "AuditLog" ? "active" : "")"
+                        </li>
+                    }
+                    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "AuditLog" ? "active" : "")"
                        asp-area="" asp-controller="AuditLog" asp-action="Index">
-                            <i class="nav-icon fas fa-clipboard-list"></i>
-                            <p>Audit Logs</p>
-                        </a>
-                    </li>
+                                <i class="nav-icon fas fa-clipboard-list"></i>
+                                <p>Audit Logs</p>
+                            </a>
+                        </li>
+                    }
                 </ul>
             </li>
         }

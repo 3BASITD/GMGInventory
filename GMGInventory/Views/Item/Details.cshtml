@@ -8,15 +8,15 @@
     <li class="breadcrumb-item"><a asp-controller="Item" asp-action="Index">Items</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
             @*    @if (Model?.IsActive == true)
             {
-                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
-                    <span class="fas fa-edit"></span> Edit Item
-                </a>
+            <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+            <span class="fas fa-edit"></span> Edit Item
+            </a>
             }*@
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -30,13 +30,13 @@
                     <label for="item-code" class="text-muted fw-normal mb-0">
                         @Html.DisplayNameFor(model => model.Code)
                     </label>
-                        <select id="item-code" class="s2-bold s2ph-bold s2ph-dark" style="width: 100%;">
+                    <select id="item-code" class="s2-bold s2ph-bold s2ph-dark" style="width: 100%;">
                     </select>
                     @*<span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Code)
+                    @Html.DisplayNameFor(model => model.Code)
                     </span>
                     <b class="d-block">
-                        @Model?.Code
+                    @Model?.Code
                     </b>*@
                 </p>
                 <p class="text-sm">
@@ -127,7 +127,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.NetPrice)
                     </span>
-                        <b class="d-block form-gayahin">
+                    <b class="d-block form-gayahin">
                         @Model?.NetPrice
                     </b>
                 </p>
@@ -397,10 +397,10 @@
         });
 
         $("#item-code").on("select2:select", function () {
-            window.location = window.location.href.replace("@Model?.Id",$("#item-code").val());
+            window.location = window.location.href.replace("@Model?.Id", $("#item-code").val());
         });
 
-        $('.nav-item a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+        $('.nav-item a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             var selectedTab = e.currentTarget.dataset.bsTarget;
             if (selectedTab == "#nav-warehouse") warehouseDT.ajax.reload();
             if (selectedTab == "#nav-purchase") purchaseDT.ajax.reload();
@@ -412,13 +412,13 @@
         });
 
         // Warehouse Details
-        var warehouseDT = $('.table-warehouse').on('preXhr.dt', function(e, settings, data) {
+        var warehouseDT = $('.table-warehouse').on('preXhr.dt', function (e, settings, data) {
             ShowTabLoader("warehouse");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehousesJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -435,9 +435,11 @@
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 {
                     orderable: false,
-                    data: function(data, type, dataToSet) {
+                    data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="top-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                        if (userIsInRole("Inventory Manager") || userIsInRole("System Admin") || userIsInRole("Sales Director") || userIsInRole("Telemarketer")) {
+                            actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="top-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                        }
                         return actions;
                     }
                 }
@@ -448,7 +450,7 @@
             HideTabLoader("warehouse");
 
             // Actions upon Display Edit Quantity Modal
-            $(".quantityBtn").click(function(e) {
+            $(".quantityBtn").click(function (e) {
                 var data = warehouseDT.row($(this).parents('tr')).data();
                 validateEdit.hideThese(validateEdit.errors());
                 $("#quantity-warehouse").val(data.name);
@@ -474,7 +476,7 @@
                     notEqualTo: "Equal quantity. No change will be done."
                 }
             },
-            submitHandler: function(form) {
+            submitHandler: function (form) {
                 DoQuantity();
                 return false;
             },
@@ -492,7 +494,7 @@
                     Remarks: $("#quantity-remarks").val()
                 },
                 error: jQueryCommonError,
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastrNoDuplicate(data.message, "Error", "error");
                     } else {
@@ -505,13 +507,13 @@
         }
 
         // Purchase Order Details
-        var purchaseDT = $('.table-purchase').on('preXhr.dt', function(e, settings, data) {
+        var purchaseDT = $('.table-purchase').on('preXhr.dt', function (e, settings, data) {
             ShowTabLoader("purchase");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPurchasesJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -537,19 +539,19 @@
                 { data: "status", name: "Status" }
             ],
             order: [[9, "desc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             HideTabLoader("purchase");
         });
 
 
         // Sales Order Details
-        var salesDT = $('.table-sales').on('preXhr.dt', function(e, settings, data) {
+        var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
             ShowTabLoader("sales");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetSalesJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -574,19 +576,19 @@
                 { data: "orderBy", name: "OrderBy" }
             ],
             order: [[9, "desc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             HideTabLoader("sales");
         });
 
 
         // Physical Count Adjustment
-        var countDT = $('.table-count').on('preXhr.dt', function(e, settings, data) {
+        var countDT = $('.table-count').on('preXhr.dt', function (e, settings, data) {
             ShowTabLoader("count");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCountsJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -607,19 +609,19 @@
                 { data: "remarks", name: "Remarks" }
             ],
             order: [[4, "desc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             HideTabLoader("count");
         });
 
 
         // Price History
-        var priceDT = $('.table-price').on('preXhr.dt', function(e, settings, data) {
+        var priceDT = $('.table-price').on('preXhr.dt', function (e, settings, data) {
             ShowTabLoader("price");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPricesJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -637,19 +639,19 @@
                 { data: "updateBy", name: "UpdateBy" }
             ],
             order: [[3, "desc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             HideTabLoader("price");
         });
 
 
         // Warehouse Transfer History
-        var transferDT = $('.table-transfer').on('preXhr.dt', function(e, settings, data) {
+        var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
             ShowTabLoader("transfer");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetTransfersJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -670,19 +672,19 @@
                 { data: "remarks", name: "Remarks" }
             ],
             order: [[4, "desc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             HideTabLoader("transfer");
         });
 
 
         // Sales Return Details
-        var returnDT = $('.table-return').on('preXhr.dt', function(e, settings, data) {
+        var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
             ShowTabLoader("return");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetReturnsJson")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.Id = @Model?.Id;
                 }
             },
@@ -703,7 +705,7 @@
                 { data: "returnBy", name: "ReturnBy" }
             ],
             order: [[5, "desc"]]
-        }).on("draw.dt", function() {
+        }).on("draw.dt", function () {
             HideTabLoader("return");
         });
     </script>

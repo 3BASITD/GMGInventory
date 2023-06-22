@@ -515,13 +515,13 @@
             rules: {
                 ReplenishDate: { required: true },
                 CurrencyRate: { required: true, isNotZero: true },
-                ReferenceNumber: { maxlength: 50 }
+                ReferenceNumber: { maxlength: 100 }
 
             },
             messages: {
                 ReplenishDate: { required: "Please enter date of replenish." },
                 Quantity: { required: "Please enter a currency rate", isNotZero: "Currency rate cannot be 0" },
-                ReferenceNumber: { maxlength: "Reference number must not exceed 50 characters." }
+                ReferenceNumber: { maxlength: "Reference number must not exceed 100 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();

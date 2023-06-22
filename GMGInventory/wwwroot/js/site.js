@@ -61,21 +61,40 @@
         ajax_run_time -= ajax_run_mm * 1000 * 60;
         var ajax_run_ss = Math.floor(ajax_run_time / 1000);
         ajax_run_time -= ajax_run_ss * 1000;
-        console.log("Ajax Load Time > " + String(ajax_run_hh).padStart(2, "0") + ":" + String(ajax_run_mm).padStart(2, "0") + ":" + String(ajax_run_ss).padStart(2, "0") + ":" + String(ajax_run_time).padStart(3, "0"));
+
+        var today = new Date();
+        var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
+        log += " Ajax Load Time "
+        var logTime = String(ajax_run_hh).padStart(2, "0");
+        logTime += ":" + String(ajax_run_mm).padStart(2, "0");
+        logTime += ":" + String(ajax_run_ss).padStart(2, "0");
+        logTime += "." + String(ajax_run_time).padStart(3, "0");
+        console.log('%c %s%c %s ', 'background-color:lightblue;font-weight:bold;', log, 'background-color:transparent;', logTime);
     });
 
     $.validator.addMethod('lessThanOrEqual', function (value, element, param) {
-        return this.optional(element) || parseInt(value) <= parseInt($(param).val());
+        var val1 = value.includes(",") ? removeCommaOfNumber(value) : parseFloat(value);
+        var val2 = $(param).val().includes(",") ? removeCommaOfNumber($(param).val()) : parseFloat($(param).val());
+        return this.optional(element) || val1 <= val2;
     }, 'Should not be greater than');
 
     $.validator.addMethod('notEqualTo', function (value, element, param) {
-        return this.optional(element) || parseInt(value) !== parseInt($(param).val());
+        return this.optional(element) || parseFloat(value) !== parseFloat($(param).val());
     }, 'Should not be equal');
 
     $.validator.addMethod('isNotZero', function (value, element, param) {
         return this.optional(element) || parseInt(value) !== 0 || parseFloat(value) !== 0;
     }, 'Should not be 0');
+
+    $.validator.addMethod('rangeForMasked', function (value, element, param) {
+        var val = removeCommaOfNumber(value);
+        return this.optional(element) || (param[0] <= val && val <= param[1]);
+    }, "Please enter a value between {0} and {1}.");
 });
+
+function removeCommaOfNumber(value) {
+    return parseFloat(value.replace(/[\$,]/g, '') * 1);
+}
 
 function toastrNoDuplicate(message, title, type) {
     var hasDuplicate = false;

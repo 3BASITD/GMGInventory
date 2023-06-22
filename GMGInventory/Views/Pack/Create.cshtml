@@ -12,7 +12,10 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack()">
+            <button type="button" class="btn btn-secondary btn-sm float-right ml-2" onclick="SavePack('save')">
+                <span class="fas fa-save"></span> Save as Draft
+            </button>
+            <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack('post')">
                 <span class="fas fa-paper-plane"></span> Post
             </button>
             <a class="btn btn-light btn-sm float-right" asp-action="Index" asp-controller="SalesOrder">
@@ -74,7 +77,8 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Box Number</th>
+                                    <th>Package Number</th>
+                                    <th>Package Type</th>
                                     <th>Item Code</th>
                                     <th>Item Name</th>
                                     <th>Quantity</th>
@@ -82,7 +86,7 @@
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="4" class="text-end">Total</th>
+                                    <th colspan="5" class="text-end">Total</th>
                                     <th class="total-quantity">0</th>
                                 </tr>
                             </tfoot>
@@ -107,9 +111,15 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-12 col-sm-4">
-                        <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Box Number</label>
+                        <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Package Number</label>
                         <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" />
                         <span data-valmsg-for="add-box" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <label for="add-type" col-form-label pt-0" style="margin-bottom: 5px;">Package Type</label>
+                        <select id="add-type" style="width: 100%;">
+                        </select>
+                        <span data-valmsg-for="add-type" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                     <div class="col-12 col-sm-4">
                         <div class="form-check form-switch pl-0">
@@ -189,6 +199,18 @@
             window.location = "@Url.Action("Create", "Pack", new { id = "" })/" + $("#pack-so-number").val();
         });
 
+        // Load Select2 Pack Type
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetPackTypeOptions")",
+            success: function (data, status, xhr) {
+                $("#add-type").select2({
+                    data: data,
+                    dropdownParent: $("#addModal")
+                });
+            }
+        });
+
         var orderDT = $('.table-order').DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsForPackJson", "SalesOrder")",
@@ -213,11 +235,13 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        //actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
-                        if ($("#add-partial").prop("checked")) {
-                            actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
-                        } else {
-                            actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
+                        if (data.remainingQuantity > 0) {
+                            //actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                            if ($("#add-partial").prop("checked")) {
+                                actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
+                            } else {
+                                actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
+                            }
                         }
                         return actions;
                     }
@@ -239,20 +263,35 @@
                 { data: "remainingQuantity", name: "RemainingQuantity", className: "text-end" },
                 { data: "grossPrice", name: "GrossPrice", className: "text-end" }
             ],
-            order: [[1, "asc"]]
+            order: [[1, "asc"]],
+            createdRow: function (row, data, dataIndex) {
+                if (data.remainingQuantity == 0) {
+                    $(row).addClass("text-muted");
+                }
+            }
         });
 
         orderDT.on("draw", function () {
             $(".table-order thead th").removeClass("text-end");
-
             dtCheckboxes();
         });
 
+        //$(".createBtn").on("click", function () {
+        //    orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+        //        var row_data = this.data();
+        //        if (row_data.remainingQuantity == 0) {
+        //            $(this.node()).addClass("text-muted");
+        //        } else {
+        //            $(this.node()).removeClass("text-muted");
+        //        }
+        //    });
+        //});
+
         $(".btn-add-item").on("click", function () {
             if ($("#add-box").val() == 0) {
-                toastrNoDuplicate("Please enter box number", "Required field &lt;Box Number&gt;", "warning");
+                toastrNoDuplicate("Please enter package number", "Required field &lt;Package Number&gt;", "warning");
                 $("#add-box").addClass("text-danger");
-                $('span[data-valmsg-for="add-box"]').text("Please enter box number");
+                $('span[data-valmsg-for="add-box"]').text("Please enter package number");
             } else if ($("#add-quantity").val() == 0 && $("#add-partial").prop("checked")) {
                 toastrNoDuplicate("Please enter quantity", "Required field &lt;Quantity&gt;", "warning");
                 $("#add-quantity").addClass("text-danger");
@@ -261,31 +300,42 @@
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
                     var itemchk = $(this.node()).find(".chkclassorder");
-                    if (itemchk.prop("checked") && parseInt(row_data.remainingQuantity) > 0) {
-                        if (parseInt(row_data.remainingQuantity) < parseInt($("#add-quantity").val())) {
-                            $("#add-quantity").val(parseInt(row_data.remainingQuantity));
-                        }
-                        var quantityToPack = 0;
-                        if ($("#add-partial").prop("checked")) {
-                            quantityToPack = parseInt($("#add-quantity").val());
-                            row_data.remainingQuantity = parseInt(row_data.remainingQuantity) - parseInt($("#add-quantity").val());
-                            row_data.packedQuantity = parseInt(row_data.packedQuantity) + parseInt($("#add-quantity").val());
-                        } else {
-                            quantityToPack = parseInt(row_data.remainingQuantity);
-                            row_data.packedQuantity = parseInt(row_data.remainingQuantity) + parseInt(row_data.packedQuantity);
-                            row_data.remainingQuantity = 0;
-                        }
-                        var toItem = {
-                            id: row_data.id,
-                            boxNumber: $("#add-box").val(),
-                            itemId: row_data.itemId,
-                            itemCode: row_data.itemCode,
-                            itemName: row_data.itemName,
-                            quantityToPack: quantityToPack
-                        };
-                        itemDT.row.add(toItem).draw();
+                    if (itemchk.prop("checked")) {
+                        if (parseInt(row_data.remainingQuantity) > 0) {
+                            if (parseInt(row_data.remainingQuantity) < parseInt($("#add-quantity").val())) {
+                                $("#add-quantity").val(parseInt(row_data.remainingQuantity));
+                                toastrNoDuplicate("Partial Quantity exceed the Remaining Quantity. Auto adjusted", "Remaining Quantity", "info");
+                            }
+                            var quantityToPack = 0;
+                            if ($("#add-partial").prop("checked")) {
+                                quantityToPack = parseInt($("#add-quantity").val());
+                                row_data.remainingQuantity = parseInt(row_data.remainingQuantity) - parseInt($("#add-quantity").val());
+                                row_data.packedQuantity = parseInt(row_data.packedQuantity) + parseInt($("#add-quantity").val());
+                            } else {
+                                quantityToPack = parseInt(row_data.remainingQuantity);
+                                row_data.packedQuantity = parseInt(row_data.remainingQuantity) + parseInt(row_data.packedQuantity);
+                                row_data.remainingQuantity = 0;
+                            }
+                            var toItem = {
+                                id: row_data.id,
+                                boxNumber: $("#add-box").val(),
+                                packType: $("#add-type").val(),
+                                packTypeName: $("#add-type").select2("data")[0].text,
+                                itemId: row_data.itemId,
+                                itemCode: row_data.itemCode,
+                                itemName: row_data.itemName,
+                                quantityToPack: quantityToPack
+                            };
+                            itemDT.row.add(toItem).draw();
+                            toastrNoDuplicate("Added " + row_data.itemCode + " on Packed Item(s)", "Success", "success");
 
-                        this.data(row_data);
+                            this.data(row_data);
+                            if (row_data.remainingQuantity == 0) {
+                                $(this.node()).addClass("text-muted");
+                            }
+                        } else {
+                            toastrNoDuplicate(row_data.itemName + " has 0 remaining quantity", "Remaining Quantity", "warning");
+                        }
                     }
                 });
                 $(".chkclassorderall").prop("checked", false);
@@ -295,9 +345,9 @@
 
         $("#add-box").on("change", function () {
             if ($("#add-box").val() == 0) {
-                toastrNoDuplicate("Please enter box number", "Required field &lt;Box Number&gt;", "warning");
+                toastrNoDuplicate("Please enter package number", "Required field &lt;Package Number&gt;", "warning");
                 $("#add-box").addClass("text-danger");
-                $('span[data-valmsg-for="add-box"]').text("Please enter box number");
+                $('span[data-valmsg-for="add-box"]').text("Please enter package number");
             } else {
                 $("#add-box").removeClass("text-danger");
                 $('span[data-valmsg-for="add-box"]').text("");
@@ -332,6 +382,7 @@
                     }
                 },
                 { data: "boxNumber", name: "BoxNumber", visible: false },
+                { data: "packTypeName", name: "PackTypeName", visible: false },
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemName", name: "ItemName" },
                 { data: "quantityToPack", name: "QuantityToPack", className: "text-end" }
@@ -339,34 +390,41 @@
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
-                columnDTTotalInteger(api, 4);
+                columnDTTotalInteger(api, 5);
             },
-            order: [[2, "asc"]],
-            orderFixed: [[1, 'asc']],
+            order: [[3, "asc"]],
+            orderFixed: [[1, 'asc'], [2, 'asc']],
             rowGroup: {
                 startRender: function (rows, group) {
                     return $('<tr/>')
-                        .append('<td colspan="4"><strong>Box ' + group + '</strong></td>');
+                        .append('<td colspan="4"><strong>Package ' + group + '</strong></td>');
                 },
                 endRender: function (rows, group) {
                     return $('<tr/>')
-                        .append('<td colspan="3" class="text-end">Total Quantity for <strong>Box ' + group + '</strong></td>')
+                        .append('<td colspan="3" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data().pluck("quantityToPack").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
-                dataSrc: "boxNumber"
+                dataSrc: function (row) {
+                    return "#" + row.boxNumber + " (" + row.packTypeName + ")";
+                }
             }
         });
 
         itemDT.on("draw", function () {
             $(".btn-remove-item").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
-                
+
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
                     if (row_data.id == rowdata.id) {
                         row_data.remainingQuantity = parseInt(row_data.remainingQuantity) + parseInt(rowdata.quantityToPack);
                         row_data.packedQuantity = parseInt(row_data.packedQuantity) - parseInt(rowdata.quantityToPack);
                         this.data(row_data);
+                        if (row_data.remainingQuantity == 0) {
+                            $(this.node()).addClass("text-muted");
+                        } else {
+                            $(this.node()).removeClass("text-muted");
+                        }
                     }
                 });
 
@@ -443,6 +501,7 @@
                 var row_data = this.data();
                 item_to_pack.push({
                     boxNumber: row_data.boxNumber,
+                    packType: row_data.packType,
                     item: row_data.itemId,
                     quantity: row_data.quantityToPack,
                 });
@@ -450,7 +509,7 @@
             return item_to_pack;
         }
 
-        function SavePack() {
+        function SavePack(savingAs) {
             var itemsToPack = GetItemsToPack();
             if (itemsToPack.length == 0) {
                 toastrNoDuplicate("No item to pack. Add an item to the list to continue", "Warning", "warning");
@@ -463,8 +522,9 @@
                     type: "POST",
                     url: "@Url.Action("SaveJson")",
                     data: {
-                        SONumber: @Model?.Id,
-                        Items: itemsToPack
+                        SalesOrderId: @Model?.Id,
+                        Items: itemsToPack,
+                        SavingAs: savingAs
                     },
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {

@@ -13,26 +13,32 @@
         <div class="card-header">
             <span class="card-title po-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                @if (Model.Status != "Cancelled")
+                @if (Model!.Status != "Cancelled")
                 {
-                    <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
-                        <span class="fas fa-trash"></span> Cancel
+                    @if (this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer))
+                    {
+                        <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
+                            <span class="fas fa-trash"></span> Cancel
+                        </button>
+                        @if (Model!.CurrentUsersDraft == true)
+                        {
+                            <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
+                                <span class="fas fa-save"></span> Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
+                                <span class="fas fa-paper-plane"></span> Post
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="update">
+                                <span class="fas fa-save"></span> Update
+                            </button>
+                        }
+                    }
+                    <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                        <span class="fas fa-print"></span> Print
                     </button>
-                    @if (Model.Status == "Draft")
-                    {
-                        <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
-                            <span class="fas fa-save"></span> Save as Draft
-                        </button>
-                        <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
-                            <span class="fas fa-paper-plane"></span> Post
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-                            <span class="fas fa-print"></span> Print
-                        </button>
-                    }
                 }
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
                     <span class="fas fa-arrow-left"></span> Back to List
@@ -64,7 +70,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (Model?.Status == "Draft")
+                        @*@if (Model?.Status == "Draft")
+                        {*@
+                        @if (Model!.Status != "Cancelled" && (this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer)))
                         {
                             <label for="invoice-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceDate1)</label>
                             <input type="date" id="invoice-date" class="form-control form-control-sm" value="@(Model?.InvoiceDate3)" />
@@ -83,7 +91,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (Model?.Status == "Draft")
+                        @*@if (Model?.Status == "Draft")
+                        {*@
+                        @if (Model!.Status != "Cancelled" && (this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer)))
                         {
                             <label for="invoice-control-number" class="form-label fw-normal mb-0">BIR Invoice Number</label>
                             <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" value="@Model?.ControlNumber" />
@@ -102,7 +112,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (Model?.Status == "Draft")
+                        @*@if (Model?.Status == "Draft")
+                        {*@
+                        @if (Model!.Status != "Cancelled" && (this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer)))
                         {
                             <label for="invoice-invoice-type" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceType)</label>
                             <select id="invoice-invoice-type" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
@@ -120,7 +132,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (Model?.Status == "Draft")
+                        @*@if (Model?.Status == "Draft")
+                        {*@
+                        @if (Model!.Status != "Cancelled" && (this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer)))
                         {
                             <label for="invoice-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
                             <input type="text" id="invoice-remarks" class="form-control form-control-sm" value="@(Model?.Remarks == "-" ? "" : Model?.Remarks)" />
@@ -244,7 +258,7 @@
                     <div class="card">
                         <div class="card-header bg-light">
                             <span class="card-title">Invoice Item(s)</span>
-                            @if (Model!.Status == "Draft")
+                            @if (Model!.Status == "Draft" && (this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer)))
                             {
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-primary btn-sm float-right btn-create ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -363,7 +377,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        if (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin")) {
+                            actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        }
                         return actions;
                     }
                 },
@@ -491,7 +507,7 @@
         itemDT.on("draw", function () {
             hideLoader();
 
-            itemDT.column(0).visible($("#invoice-status").val() == "Draft");
+            itemDT.column(0).visible($("#invoice-status").val() == "Draft" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin") || userIsInRole("Telemarketer")));
 
             $(".table-item th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");

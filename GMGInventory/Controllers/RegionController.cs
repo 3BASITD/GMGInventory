@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    //[Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector)]
     [Authorize]
     public class RegionController : Controller
     {

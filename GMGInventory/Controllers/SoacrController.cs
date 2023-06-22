@@ -1,26 +1,21 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Humanizer.On;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + "," + Roles.SystemAdmin)]
+    [Authorize(Roles = Roles.Accounting + ","
+                     + Roles.SystemAdmin)]
     public class SoacrController : Controller
     {
         private readonly ISoacrRepository soaRepository;
-        private readonly IInvoiceRepository invoiceRepository;
         private readonly ISoacrLineItemRepository soacrLineItemRepository;
 
-        public SoacrController(ISoacrRepository soaRepository, IInvoiceRepository invoiceRepository, ISoacrLineItemRepository soacrLineItemRepository)
+        public SoacrController(ISoacrRepository soaRepository, ISoacrLineItemRepository soacrLineItemRepository)
         {
             this.soaRepository = soaRepository;
-            this.invoiceRepository = invoiceRepository;
             this.soacrLineItemRepository = soacrLineItemRepository;
         }
 
@@ -202,12 +197,24 @@ namespace GMGInventory.Controllers
         public async Task<JsonResult> AddPaymentDetailsJson(SOACRPaymentDetails payment)
         {
             ResponseModel<int> responseModel = new ResponseModel<int>();
-            if (await soaRepository.IsCollectorReceiptNumberInUse(payment.CollectorReceiptNumber))
+            if (payment.CollectorReceiptNumber == null || payment.CollectorReceiptNumber.Length > 500)
+            {
+                responseModel.Status = "Warning";
+                responseModel.Message = payment.CollectorReceiptNumber == null 
+                                      ? "Collector Receipt Number cannot be empty"
+                                      : "Collector Receipt Number cannot exceed 50 characters";
+            }
+            else if (payment.Remarks != null && payment.Remarks.Length > 500)
+            {
+                responseModel.Status = "Warning";
+                responseModel.Message = "Remarks cannot exceed 500 characters";
+            }
+            else if (await soaRepository.IsCollectorReceiptNumberInUse(payment.CollectorReceiptNumber))
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Collector Receipt Number already in use";
             }
-            else if(await soaRepository.AddPaymentDetails(payment))
+            else if (await soaRepository.AddPaymentDetails(payment))
             {
                 responseModel.Status = "Success";
                 responseModel.Message = "Payment added successfully";

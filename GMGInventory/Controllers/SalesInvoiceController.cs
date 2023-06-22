@@ -8,10 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + ","
-                     + Roles.InvoicingClerk + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
     public class SalesInvoiceController : Controller
     {
         private readonly IInvoiceRepository invoiceRepository;
@@ -31,11 +28,19 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetInvoiceByCustomer(search, page, customer));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public ActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> GetListJson(ListFilterCommonModel filter)
         {
@@ -43,6 +48,10 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetListDTAsync(form, filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Details(int? Id)
         {
             var order = await invoiceRepository.GetDetailsAsync(Id);
@@ -53,12 +62,20 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> GetItemsJson(int invoiceId)
         {
             return Json(await invoiceRepository.GetItemsAsync(invoiceId));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> GetItemsDTJson(int invoiceId)
         {
@@ -66,12 +83,18 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetItemsDTAsync(form, invoiceId));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> PrintReceipt(int Id)
         {
             var invoice = await invoiceRepository.GetDetailsWithItemsAsync(Id);
             return View(invoice);
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin)]
         public async Task<ActionResult> Create(int? Id)
         {
             var order = await invoiceRepository.GetDetailsByPackAsync(Id);
@@ -83,6 +106,8 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> SaveJson(InvoiceFormVM form)
         {
@@ -113,6 +138,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> UpdateJson(InvoiceFormVM form)
         {
@@ -137,7 +165,7 @@ namespace GMGInventory.Controllers
                 }
                 else
                 {
-                    var submitMessage = "Sales Invoice successfully " + (form.SavingAs == "post" ? "posted" : form.SavingAs == "delete" ? "cancelled" : "saved");
+                    var submitMessage = "Sales Invoice successfully " + (form.SavingAs == "post" ? "posted" : form.SavingAs == "delete" ? "cancelled" : form.SavingAs == "update" ? "updated" : "saved");
                     responseModel.Status = "Success";
                     responseModel.Message = submitMessage;
                     TempData["SuccessMessage"] = submitMessage;

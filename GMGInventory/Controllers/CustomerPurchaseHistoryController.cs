@@ -6,12 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + ","
-                     + Roles.InventoryManager + ","
-                     + Roles.InvoicingClerk + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
     public class CustomerPurchaseHistoryController : Controller
     {
         private readonly ICustomerPurchaseRepository customerPurchaseRepository;

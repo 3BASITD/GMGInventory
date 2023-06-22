@@ -351,6 +351,7 @@ namespace GMGInventory.Common.Models
         public string Customer { get; set; }
         public string Agent { get; set; }
         public string Status { get; set; }
+        public string Region { get; set; }
         public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
         public decimal TotalAmountD { get; set; }
     }

@@ -1,12 +1,15 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class ItemController : Controller
     {
         public IItemRepository itemRepository;
@@ -53,6 +56,11 @@ namespace GMGInventory.Controllers
             return Json(await itemRepository.GetUnitOptions(IncludeId));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Index()
         {
             ItemFilterVM itemFilterVM = new ItemFilterVM();
@@ -64,6 +72,11 @@ namespace GMGInventory.Controllers
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> GetListJson(ItemFilterVM filter)
         {
@@ -71,6 +84,10 @@ namespace GMGInventory.Controllers
             return Json(await itemRepository.GetAllForDataTablesAsync(form, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> CreateJson(ItemCommonVM itemVM)
         {
@@ -89,6 +106,10 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> EditJson(ItemCommonVM itemVM)
         {
@@ -115,6 +136,12 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public ActionResult Details(int id)
         {
             var item = itemRepository.GetItemViewVM(id);
@@ -125,12 +152,23 @@ namespace GMGInventory.Controllers
             return View(item);
         }
 
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public ActionResult DetailsJson(int id)
         {
             return Json(itemRepository.GetItemViewVM(id));
         }
 
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> EditDetailQuantity(int id, int quantity, string remarks)
         {
@@ -141,6 +179,26 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
+        [HttpPost]
+        public async Task<JsonResult> DeleteWarehouse(int id)
+        {
+            ResponseModel responseModel = new ResponseModel();
+            await itemRepository.DeleteWarehouse(id);
+            responseModel.Status = "Success";
+            responseModel.Message = "Item warehouse successfully deleted";
+            return Json(responseModel);
+        }
+
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -162,6 +220,11 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
@@ -175,6 +238,11 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> UploadJson(ItemFileVM itemVM)
         {
@@ -281,6 +349,11 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<IActionResult> DownloadFile(ItemFilterVM filter)
         {
             DataTable dt = new DataTable("Items");

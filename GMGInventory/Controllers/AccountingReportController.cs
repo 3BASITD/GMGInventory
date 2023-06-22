@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,9 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Roles.InventoryManager + ","
+                     + Roles.SalesDirector + ","
+                     + Roles.SystemAdmin)]
     public class AccountingReportController : Controller
     {
         private readonly IReportAccountingRepository reportAccountingRepository;

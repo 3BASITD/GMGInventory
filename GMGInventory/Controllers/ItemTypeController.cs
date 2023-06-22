@@ -8,8 +8,7 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
-    //[Authorize]
+    [Authorize]
     public class ItemTypeController : Controller
     {
         private readonly IItemTypeRepository itemTypeRepository;
@@ -27,11 +26,17 @@ namespace GMGInventory.Controllers
             return Json(await itemTypeRepository.GetOptions(IncludeId));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetListJson()
         {
@@ -39,6 +44,9 @@ namespace GMGInventory.Controllers
             return Json(await itemTypeRepository.GetListDTAsync(dtForm));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> CreateJson(ItemTypeVM itemTypeVM)
         {
@@ -57,6 +65,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> UploadJson(ItemTypeVM itemTypeVM)
         {
@@ -90,6 +101,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> EditJson(ItemTypeVM itemTypeVM)
         {
@@ -116,6 +130,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Item Types");
@@ -143,6 +160,9 @@ namespace GMGInventory.Controllers
             }
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -164,6 +184,9 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)

@@ -15,6 +15,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
 
+        [Display(Name = "BIR Invoice Number")]
+        public string BIRInvoiceNumber { get; set; }
+
         [Display(Name = "Invoice Type")]
         public string InvoiceType { get; set; }
 
@@ -63,6 +66,8 @@ namespace GMGInventory.Common.Models
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
         //public decimal? BalanceD { get; set; }
         public decimal BalanceD => TotalAmountD - (TBRD ?? 0) - (CreditD ?? 0) + (DebitD ?? 0) - (PaidAmountD ?? 0m) + (FreightChargeD ?? 0);
+
+        public bool CurrentUsersDraft { get; set; }
     }
 
     public class InvoiceDetailsVM
@@ -124,6 +129,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Invoice Type")]
         public string InvoiceType { get; set; }
+        public bool CurrentUsersDraft { get; set; }
     }
 
     public class InvoiceDetailsWithItemsVM : InvoiceDetailsVM

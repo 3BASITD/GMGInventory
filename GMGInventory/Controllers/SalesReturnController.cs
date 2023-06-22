@@ -7,12 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + ","
-                     + Roles.InventoryManager + ","
-                     + Roles.InvoicingClerk + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
     public class SalesReturnController : Controller
     {
         private readonly ISalesReturnRepository salesReturnRepository;
@@ -50,11 +45,21 @@ namespace GMGInventory.Controllers
             return Json(await salesReturnRepository.GetItemsAsync(salesReturnId));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.Telemarketer)]
         public ActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> SaveJson(SalesReturnFormVM form)
         {

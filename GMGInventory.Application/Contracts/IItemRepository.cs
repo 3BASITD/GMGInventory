@@ -26,6 +26,7 @@ namespace GMGInventory.Application.Contracts
         Task UpdateAsync(ItemCommonVM itemVM);
         Task DeleteAsync(int id);
         Task UpdateQuantityAsync(int id, int quantity, string remarks);
+        Task DeleteWarehouse(int id);
         Task<bool> UpdateOrAddItemWarehouse(int itemId, int warehouseId, int quantity, string remarks);
         Task<ForDataTables<ItemDetailWarehouseVM>> GetItemWarehouseDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailPurchaseVM>> GetItemPurchaseDTAsync(DataTablesRequestForm form, int id);

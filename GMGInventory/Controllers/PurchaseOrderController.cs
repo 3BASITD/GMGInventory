@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin + "," + Roles.Telemarketer)]
+    [Authorize]
     public class PurchaseOrderController : Controller
     {
         private readonly IPurchaseOrderRepository purchaseOrderRepository;
@@ -26,11 +26,19 @@ namespace GMGInventory.Controllers
             return Json(await purchaseOrderRepository.GetCurrencyOptions(IncludeId));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public ActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> GetListDTJson()
         {
@@ -38,6 +46,10 @@ namespace GMGInventory.Controllers
             return Json(await purchaseOrderRepository.GetListDTAsync(form));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Details(int? Id)
         {
             var order = await purchaseOrderRepository.GetDetailsAsync(Id);
@@ -69,11 +81,19 @@ namespace GMGInventory.Controllers
             return Json(await purchaseOrderRepository.GetItemsDTAsync(form, purchaseOrderId));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public ActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> SaveJson(PurchaseOrderFormVM form, string type)
         {
@@ -95,6 +115,10 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> DeleteDraftJson(int Id)
         {

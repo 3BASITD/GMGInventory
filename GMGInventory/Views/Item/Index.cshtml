@@ -8,16 +8,22 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                <span class="fas fa-plus"></span> New Item
-            </button>
             @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"])
-            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                <span class="fas fa-upload"></span> Upload
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
-                <span class="fas fa-download"></span> Download
-            </button>
+            @if (this.User.IsInRole(Roles.InventoryManager) || this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SalesDirector) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer))
+            {
+                if (this.User.IsInRole(Roles.InventoryManager) || this.User.IsInRole(Roles.SalesDirector) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer))
+                {
+                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                        <span class="fas fa-plus"></span> New Item
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                }
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -442,17 +448,27 @@
                 { data: "warehouse", name: "Warehouse" },
                 { data: "retailPrice", name: "RetailPrice", className: "text-end" },
                 { data: "netPrice", name: "NetPrice", className: "text-end" },
-                { data: "quantity", name: "Quantity", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<span data-microtip-title="[Inventory:' + FormatStringInteger(data.quantityInventoryD) + ']+[Served:' + FormatStringInteger(data.quantityServedD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityServedD) + ']-[Invoiced:' + FormatStringInteger(data.quantityInvoiceD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityInvoiceD) + ']" data-microtip-position="top-left" role="tooltip">' + data.quantity + '</span>';
+                    },
+                    name: "Quantity",
+                    className: "text-end"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-                        if (data.isActive) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
-                        } else {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                        if (data.giveAction) { // check if first item specially for multiple warehouse
+                            actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                            if (userIsInRole("Inventory Manager") || userIsInRole("System Admin") || userIsInRole("Sales Director") || userIsInRole("Telemarketer")) {
+                                if (data.isActive) {
+                                    actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                } else {
+                                    actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                }
+                            }
                         }
                         return actions + "</div>";
                     }

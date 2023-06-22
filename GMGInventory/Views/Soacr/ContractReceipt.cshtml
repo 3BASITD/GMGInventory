@@ -234,7 +234,6 @@
                         $("#createInvoiceModal").modal("hide");
                         soaDT.ajax.reload();
                         hideLoader();
-                        console.log(data);
                         window.location = '@Url.Action("Details")/' + data.newRow;
                     }
                 }

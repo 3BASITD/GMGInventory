@@ -9,8 +9,7 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
-    //[Authorize]
+    [Authorize]
     public class AgentController : Controller
     {
         private readonly IAgentRepository agentRepository;
@@ -40,6 +39,9 @@ namespace GMGInventory.Controllers
             return Json(await agentRepository.GetOptionsWithOrder(search, page, CustomerId, DateFrom, DateTo));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<ActionResult> Index()
         {
             AgentFilterVM agentFilterVM = new AgentFilterVM();
@@ -48,6 +50,9 @@ namespace GMGInventory.Controllers
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetListJson(AgentFilterVM filter)
         {
@@ -55,6 +60,9 @@ namespace GMGInventory.Controllers
             return Json(await agentRepository.GetAllForDataTablesAsync(form, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public ActionResult Details(int id)
         {
             var agent = agentRepository.GetAgentDtlVM(id);
@@ -65,6 +73,9 @@ namespace GMGInventory.Controllers
             return View(agent);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetDetailsJson(int id)
         {
@@ -72,6 +83,9 @@ namespace GMGInventory.Controllers
             return Json(await agentRepository.GetAgentDTAsync(form, id));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> CreateJson(AgentVM agentVM)
         {
@@ -90,6 +104,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> UploadJson(AgentVM agentVM)
         {
@@ -123,6 +140,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> EditJson(AgentVM agentVM)
         {
@@ -149,8 +169,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Agent");
@@ -181,6 +202,9 @@ namespace GMGInventory.Controllers
             }
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -202,6 +226,9 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)

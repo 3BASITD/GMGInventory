@@ -11,7 +11,10 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin + "," + Roles.Telemarketer)]
+    [Authorize(Roles = Roles.InventoryManager + ","
+                     + Roles.SalesDirector + ","
+                     + Roles.SystemAdmin + ","
+                     + Roles.Telemarketer)]
     public class PriceUpdateController : Controller
     {
         private readonly IItemPriceRepository itemPriceRepository;

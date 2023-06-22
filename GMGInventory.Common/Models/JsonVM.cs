@@ -167,6 +167,7 @@ namespace GMGInventory.Common.Models
         public int? Item { get; set; }
         public string? ItemKeyword { get; set; }
         public int? Region { get; set; }
+        public string? Region2 { get; set; }
     }
 
     public class ListFilterCustomerModel : ListFilterCommonModel

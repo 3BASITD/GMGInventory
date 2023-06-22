@@ -8,7 +8,7 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + "," + Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
+    [Authorize]
     public class CustomerController : Controller
     {
         private readonly ICustomerRepository customerRepository;
@@ -38,6 +38,11 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetOptions(search, page));
         }
 
+        public async Task<IActionResult> GetByAgentOptions(string search, int page, int? agent)
+        {
+            return Json(await customerRepository.GetByAgentOptions(search, page, agent));
+        }
+        
         public async Task<IActionResult> GetOptionsWithOrder(string search, int page)
         {
             return Json(await customerRepository.GetOptionsWithOrder(search, page));
@@ -48,11 +53,19 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetOptions2(IncludeId));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public ActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetListJson()
         {
@@ -60,6 +73,10 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetListDataTables(dtForm));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> CreateJson(CustomerVM custVM)
         {
@@ -78,6 +95,10 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> CreateShippingJson(CustomerVM shippingVM)
         {
@@ -100,6 +121,10 @@ namespace GMGInventory.Controllers
         //    return Json(responseModel);
         //}
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> EditJson(CustomerVM custVM)
         {
@@ -126,6 +151,10 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public ActionResult Details(int id)
         {
             var cust = customerRepository.GetCustomerDtlVM(id);
@@ -136,6 +165,10 @@ namespace GMGInventory.Controllers
             return View(cust);
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public ActionResult MoreDetails(int id)
         {
             var cust = customerRepository.GetCustomerDtlVM(id); // gawa ka panibagong GetCustomerVM(id) na andun mga kailangan mo sa modal
@@ -146,6 +179,10 @@ namespace GMGInventory.Controllers
             return Json(cust);
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetCustomerJson(int id)
         {
@@ -153,6 +190,10 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetCustomerDetailsDTAsync(form, id));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetShippingJson(int id)
         {
@@ -167,6 +208,10 @@ namespace GMGInventory.Controllers
         //    return Json(await customerRepository.GetCustomerForwarderDTAsync(form, id));
         //}
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetPaymentJson(int id)
         {
@@ -174,6 +219,10 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetCustomerPaymentDTAsync(form, id));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetReceivableJson(int id)
         {
@@ -181,6 +230,10 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetCustomerReceivableDTAsync(form, id));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -193,6 +246,10 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
@@ -202,6 +259,10 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Customer");
@@ -249,7 +310,10 @@ namespace GMGInventory.Controllers
 
         }
 
-
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> UploadJson(CustomerVM customerVM)
         {

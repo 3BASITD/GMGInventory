@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,6 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
     public class SalesReportController : Controller
     {
         private readonly IReportSalesRepository reportSalesRepository;
@@ -26,17 +26,25 @@ namespace GMGInventory.Controllers
         //"SalesReportBasis", "SalesReturnListingReport", "UnservedItem"
 
         #region Agent Sales per Item
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult AgentSalesPerItem()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintAgentSalesPerItem(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintAgentSalesPerItem(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetAgentSalesPerItemDT(ListFilterSalesModel filter)
         {
@@ -44,6 +52,9 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetAgentSalesPerItemDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadAgentSalesPerItem(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Agent Sales per Item");
@@ -83,21 +94,28 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Agent Sales per Item
 
         #region Brand Sales
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult BrandSales()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintBrandSales(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintBrandSales(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetBrandSalesDT(ListFilterSalesModel filter)
         {
@@ -105,6 +123,9 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetBrandSalesDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadBrandSales(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Brand Sales");
@@ -136,21 +157,28 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Brand Sales
 
         #region Best Selling Item
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult BestSellingItem()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintBestSellingItem(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintBestSellingItem(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetBestSellingItemDT(ListFilterSalesModel filter)
         {
@@ -158,6 +186,9 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetBestSellingItemDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadBestSellingItem(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Best Selling Item (" + filter.Basis + ")");
@@ -195,21 +226,31 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Best Selling Item
 
         #region Commission
-
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult Commission()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCommission(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintCommission(filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetCommissionDT(ListFilterSalesModel filter)
         {
@@ -217,6 +258,10 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetCommissionDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCommission(ListFilterSalesModel filter)
         {
             DataTable dt = new("Commission");
@@ -254,21 +299,28 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Commission
 
         #region Customer Sales Ranking
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult CustomerSalesRanking()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSalesRanking(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintCustomerSalesRanking(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetCustomerSalesRankingDT(ListFilterSalesModel filter)
         {
@@ -276,6 +328,9 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetCustomerSalesRankingDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCustomerSalesRanking(ListFilterSalesModel filter)
         {
             DataTable dt = new("Customer Sales Ranking");
@@ -307,26 +362,36 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Customer Sales Ranking
 
         #region Customer Sales
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult CustomerSales()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult CustomerSalesCompare()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSales(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintCustomerSales(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSalesCompare(ListFilterSalesModel filter1, ListFilterSalesModel filter2)
         {
             var sales = new CustomerSalesComparePVM
@@ -337,6 +402,9 @@ namespace GMGInventory.Controllers
             return View(sales);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetCustomerSalesDT(ListFilterSalesModel filter)
         {
@@ -379,6 +447,9 @@ namespace GMGInventory.Controllers
             }
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCustomerSalesCompare(ListFilterSalesModel filter1, ListFilterSalesModel filter2)
         {
             DataTable dt1 = new DataTable("Sales Report #1");
@@ -422,21 +493,31 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Customer Sales
 
         #region Daily Sales
-
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult DailySales()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintDailySales(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintDailySales(filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetDailySalesDT(ListFilterSalesModel filter)
         {
@@ -444,6 +525,10 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetDailySalesDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadDailySales(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Daily Sales");
@@ -483,21 +568,31 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Daily Sales
 
         #region Sales Invoice
-
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult SalesInvoice()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesInvoice(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintSalesInvoice(filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetSalesInvoiceDT(ListFilterSalesModel filter)
         {
@@ -505,6 +600,10 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesInvoiceDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesInvoice(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Sales Invoice Listing");
@@ -544,26 +643,36 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Sales Invoice
 
         #region Sales by Agent-Area
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult SalesAgentArea()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesAgentArea(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintSalesAgentArea(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> GetSalesAgentArea(ListFilterSalesModel filter)
         {
             return Json(await reportSalesRepository.GetSalesAgentArea(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetSalesAgentAreaDT(ListFilterSalesModel filter)
         {
@@ -571,6 +680,9 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesAgentAreaDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesAgentArea(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Sales by Agent-Area");
@@ -604,21 +716,28 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Sales by Agent-Area
 
         #region Sales Report by Basis
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult SalesReportBasis()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesReportBasis(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintSalesReportBasis(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetSalesReportBasisDT(ListFilterSalesModel filter)
         {
@@ -626,6 +745,9 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesReportBasisDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesReportBasis(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Sales Report by Basis");
@@ -655,21 +777,31 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Sales Report by Basis
 
         #region Sales Return
-
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult SalesReturn()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesReturn(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintSalesReturn(filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetSalesReturnDT(ListFilterSalesModel filter)
         {
@@ -677,6 +809,10 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesReturnDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesReturn(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Sales Return Listing");
@@ -728,21 +864,28 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Sales Return
 
         #region Unserved Items
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public IActionResult UnservedItem()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintUnservedItem(ListFilterSalesModel filter)
         {
             return View(await reportSalesRepository.PrintUnservedItem(filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetUnservedItemDT(ListFilterSalesModel filter)
         {
@@ -750,6 +893,9 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetUnservedItemDT(dtForm, filter));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadUnservedItem(ListFilterSalesModel filter)
         {
             DataTable dt = new DataTable("Unserved Item "
@@ -787,7 +933,6 @@ namespace GMGInventory.Controllers
                 }
             }
         }
-
         #endregion Unserved Items
     }
 }

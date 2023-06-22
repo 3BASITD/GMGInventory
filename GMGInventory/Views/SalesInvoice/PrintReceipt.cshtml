@@ -60,6 +60,7 @@
                                 <td>@item.ItemName</td>
                                 <td style="width: 80px;" class="currency">@item.NetPrice</td>
                                 <td style="width: 125px;" class="currency">@item.GrossPriceNoDiscount</td>
+                                <td style="width: 30px;"></td>
                             </tr>
                         }
                         else
@@ -75,6 +76,7 @@
                             <td style="width: 75px;">@otherQuantity</td>
                             <td colspan="3">+@(Model.Items.Count - 17) more item(s)</td>
                             <td style="width: 125px;" class="currency">@string.Format("{0:#,##0.00}",otherGrossPrice)</td>
+                            <td style="width: 30px;"></td>
                         </tr>
                     }
                     else
@@ -87,6 +89,7 @@
                                 <td></td>
                                 <td style="width: 80px;" class="currency"></td>
                                 <td style="width: 125px;" class="currency"></td>
+                                <td style="width: 30px;"></td>
                             </tr>
                         }
                     }
@@ -94,51 +97,61 @@
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency">Total:</td>
                         <td style="width: 125px;" class="currency">@Model.Total</td>
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency">LESS @Model.DiscountPercent:</td>
                         <td style="width: 125px;" class="currency">@Model.DiscountAmount</td>
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency">Total Amount:</td>
                         <td style="width: 125px;" class="currency">@Model.TotalAmount</td>
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency"></td> <!-- Total Sales(VAT Inclusive) -->
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency">@Model.VATExclusive</td> <!--Less: VAT -->
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency"></td> <!-- Amount: Net of VAT -->
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency"></td> <!-- Less: Discount -->
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency"></td> <!-- Amount Due -->
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency">@Model.VATAmount</td> <!-- Add: VAT -->
+                        <td style="width: 30px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency">@Model.TotalAmount</td> <!-- TOTAL AMOUNT DUE -->
+                        <td style="width: 30px;"></td>
                     </tr>
                 }
             </tbody>
@@ -147,7 +160,8 @@
     else
     {
         <!-- DELIVERY RECEIPT -->
-        <table style="margin-top: 115px;">
+        @*<table style="margin-top: 115px;">*@
+        <table style="margin-top: 140px;">
             <tbody>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
@@ -184,7 +198,7 @@
                     @foreach (var item in Model.Items)
                     {
                         rowctr++;
-                        if (rowctr < 9 || Model.Items.Count == 9)
+                        if (rowctr < 12 || Model.Items.Count == 12)
                         {
                             <tr>
                                 <td style="width: 75px;">@item.Quantity</td>
@@ -205,13 +219,13 @@
                     {
                         <tr>
                             <td style="width: 75px;">@otherQuantity</td>
-                            <td colspan="4">+@(Model.Items.Count - 8) more item(s)</td>
+                            <td colspan="4">+@(Model.Items.Count - 11) more item(s)</td>
                             <td style="width: 125px;" class="currency">@string.Format("{0:#,##0.00}",otherGrossPrice)</td>
                         </tr>
                     }
                     else
                     {
-                        for (int rem = 0; rem <= 8 - Model.Items.Count; rem++)
+                        for (int rem = 0; rem <= 11 - Model.Items.Count; rem++)
                         {
                             <tr>
                                 <td style="width: 75px;"></td>

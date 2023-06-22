@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +44,7 @@ namespace GMGInventory.Application.Repositories
                             TBRD = tbr,
                             CreditD = soalit.Sum(s => s.CreditAmount),
                             DebitD = soalit.Sum(s => s.DebitAmount),
-                            PaidAmountD = soalit.Sum(s => s.PaidAmount),
+                            PaidAmountD = soa.AmountToPay,// soalit.Sum(s => s.PaidAmount) + over,
                             FreightChargeD = soalit.Sum(s => s.FreightCost),
                             OverPaymentD = over
                         };
@@ -577,7 +578,7 @@ namespace GMGInventory.Application.Repositories
                 CustomerId = soacr.CustomerId,
                 Discount = payment.Discount,
                 OffSet = payment.Offset,
-                OverPayment = payment.OverPayment,
+                OverPayment = payment.OverPayment,// 0,
                 Remarks = payment.Remarks + "",
                 SOACRId = soacr.Id,
                 Tax = payment.Tax,
@@ -593,7 +594,7 @@ namespace GMGInventory.Application.Repositories
             await context.CustomerPayments.AddAsync(customerPayment);
             await context.SaveChangesAsync(currentUserId);
 
-            soacr.AmountToPay = customerPayment.TotalAmountPaid;
+            soacr.AmountToPay += customerPayment.TotalAmountPaid;
             //soacr.TotalBalance = soacr.TotalAmount - soacr.TotalTBRAmount - soacr.TotalCMAAmount + soacr.TotalDMAAmount - soacr.AmountToPay + soacr.TotalFreightCost;
 
             context.SOACRs.Update(soacr);
@@ -617,7 +618,7 @@ namespace GMGInventory.Application.Repositories
                 }
             }
 
-            var PaymentAmount = soacr.AmountToPay;
+            var PaymentAmount = customerPayment.TotalAmountPaid;
 
             Array.Sort(payment.InvoiceIds);
 
@@ -653,13 +654,13 @@ namespace GMGInventory.Application.Repositories
                                 invoice.PaidAmount += toPay;
                                 PaymentAmount -= toPay;
 
-                                if (payment.InvoiceIds.Last() == InvoiceId) // overpayment to last soa line item
-                                {
-                                    //soacrLineItem.PaidAmount += PaymentAmount;
-                                    //invoice.PaidAmount += PaymentAmount;
-                                    customerPayment.OverPayment += PaymentAmount;
-                                    context.CustomerPayments.Update(customerPayment);
-                                }
+                                //if (payment.InvoiceIds.Last() == InvoiceId) // overpayment to last soa line item
+                                //{
+                                //    //soacrLineItem.PaidAmount += PaymentAmount;
+                                //    //invoice.PaidAmount += PaymentAmount;
+                                //    customerPayment.OverPayment += PaymentAmount;
+                                //    context.CustomerPayments.Update(customerPayment);
+                                //}
                             }
                         }
 
@@ -772,7 +773,7 @@ namespace GMGInventory.Application.Repositories
                            select new SOACRInvoiceTBRVM
                            {
                                Id = ret.Id,
-                               Text = ret.Invoice == null ? "TBR" : ret.Invoice!.InvoiceNumber,
+                               Text = ret.SalesReturn.SalesReturnNumber + " (" + (ret.Invoice == null ? "TBR" : ret.Invoice!.InvoiceNumber) + ")",
                                InvoiceAmount = ret.Quantity * (((100m - ret.Discount1 - ret.Discount2) * ret.SellingPrice) / 100m) - (tbr.Count == 0 ? 0 : tbr.Sum(s => s.Amount))
                            };
             var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
@@ -806,7 +807,7 @@ namespace GMGInventory.Application.Repositories
                        {
                            AmountD = tbr.Amount,
                            DateCreatedD = tbr.DateCreated,
-                           InvoiceNumber = tbr.SalesReturnLineItem.Invoice == null ? "TBR" : tbr.SalesReturnLineItem.Invoice!.InvoiceNumber,
+                           InvoiceNumber = tbr.SalesReturnLineItem.SalesReturn.SalesReturnNumber + " (" + (tbr.SalesReturnLineItem.Invoice == null ? "TBR" : tbr.SalesReturnLineItem.Invoice!.InvoiceNumber) + ")",
                            UserCreated = usr.Nickname
                        };
             return await tbrh.ToListAsync();

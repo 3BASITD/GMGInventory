@@ -942,6 +942,12 @@ namespace GMGInventory.Application.Repositories
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
                            && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
+                           && (filter.Region2 == null ||
+                              (filter.Region2 == "ML" && (invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "MM"
+                                                       || invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "LUZ")) ||
+                              (filter.Region2 == "VM" && (invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "VIS"
+                                                       || invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "MIN"))
+                           )
                            select new SalesInvoiceRVM
                            {
                                Agent = invoice.Invoice.SalesOrder.Agent.FirstName
@@ -1068,6 +1074,7 @@ namespace GMGInventory.Application.Repositories
                       : agent.FirstName + " " + (agent.MiddleName == null ? "" : agent.MiddleName + " ") + agent.LastName,
                 Customer = filter.Customer == null || customer == null ? "All" : customer.Name,
                 Status = filter.StatusCode == null ? "All" : filter.StatusCode,
+                Region = filter.Region2 == "ML" ? "Metro Manila & Luzon" : filter.Region2 == "VM" ? "Visayas & Mindanao" : "All",
                 TotalAmountD = items.Sum(s => s.AmountD)
             };
         }

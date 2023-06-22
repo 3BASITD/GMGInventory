@@ -56,9 +56,14 @@ namespace GMGInventory.Common.Models
         public string Size { get; set; }
 
         [Display(Name = "Quantity on Hand")]
-        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityTotalD);
         public int QuantityD { get; set; }
-
+        public int QuantityTotalD => QuantityInventoryD 
+                                   + (QuantityServedD != null && Warehouse.ToLower().Contains("main") ? (int)QuantityServedD : 0) 
+                                   - (QuantityInvoiceD != null && Warehouse.ToLower().Contains("main") ? (int)QuantityInvoiceD : 0);
+        public int QuantityInventoryD { get; set; }
+        public int? QuantityServedD { get; set; }
+        public int? QuantityInvoiceD { get; set; }
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }
@@ -90,6 +95,7 @@ namespace GMGInventory.Common.Models
         public int WarehouseId { get; set; }
 
         public bool IsActive { get; set; }
+        public bool GiveAction { get; set; }
     }
 
     public class ItemVM

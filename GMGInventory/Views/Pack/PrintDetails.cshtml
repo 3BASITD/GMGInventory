@@ -63,19 +63,19 @@
                 var allquantity = 0;
                 foreach (var item in Model.Contents)
                 {
-                    if((item.BoxNumber + "") != group)
+                    if((item.BoxNumber + " " + item.PackTypeName) != group)
                     {
                         if(group != "")
                         {
                             <tr>
-                                <td colspan="2" class="right-text">Total Quantity for <strong>Box @group</strong></td>
+                                <td colspan="2" class="right-text">Total Quantity for <strong>Package #@group</strong></td>
                                 <td class="right-text"><nobr>@totalquantity</nobr></td>
                             </tr>
                         }
                         <tr>
                             <td colspan="3"><strong>Box @item.BoxNumber</strong></td>
                         </tr>
-                        group = item.BoxNumber + "";
+                        group = item.BoxNumber + " (" + item.PackTypeName + ")";
                         totalquantity = 0;
                     }
                     totalquantity += item.Quantity;

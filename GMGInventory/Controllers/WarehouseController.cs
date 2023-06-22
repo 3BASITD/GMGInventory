@@ -1,9 +1,12 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class WarehouseController : Controller
     {
         private readonly IWarehouseRepository warehouseRepository;
@@ -21,12 +24,20 @@ namespace GMGInventory.Controllers
             return Json(await warehouseRepository.GetOptions(IncludeId));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Index()
         {
             var warehouses = await warehouseRepository.GetAllAsync();
             return View(warehouses);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Details(int id)
         {
             var warehouse = await warehouseRepository.GetAsync(id);
@@ -38,11 +49,19 @@ namespace GMGInventory.Controllers
             return View(warehouse);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public ActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(WarehouseFormVM warehouseVM)
@@ -63,6 +82,10 @@ namespace GMGInventory.Controllers
             return View(warehouseVM);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Edit(int id)
         {
             var warehouse = await warehouseRepository.GetToEditAsync(id);
@@ -74,6 +97,10 @@ namespace GMGInventory.Controllers
             return View(warehouse);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(WarehouseFormVM warehouseVM)
@@ -87,6 +114,10 @@ namespace GMGInventory.Controllers
             return View(warehouseVM);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -108,6 +139,10 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)

@@ -49,6 +49,34 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<Select2Model<JsonAddressOptionsModel>> GetByAgentOptions(string search, int page, int? agent)
+        {
+            var customers = await context.Customers
+                                         .Where(s => (string.IsNullOrWhiteSpace(search)
+                                                 || (s.Code.ToLower().Contains(search.ToLower()))
+                                                 || (s.Name.ToLower().Contains(search.ToLower())))
+                                                 && (agent == null || s.AgentId == agent))
+                                         .Select(s => new JsonAddressOptionsModel
+                                         {
+                                             Id = s.Id.ToString(),
+                                             Text = s.Code,
+                                             Name = s.Name,
+                                             Address = s.Address,
+                                             CreditTerm = s.CreditTerm.Name,
+                                             Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
+                                             OutstandingBalanceD = s.OutstandingBalance
+                                         })
+                                         .OrderBy(s => s.Text)
+                                         .ToListAsync();
+            var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonAddressOptionsModel>
+            {
+                //incomplete_results = false,
+                items = customersFiltered,
+                total_count = customers.Count
+            };
+        }
+
         public async Task<Select2Model<JsonAddressOptionsModel>> GetOptionsWithOrder(string search, int page)
         {
             var customers = await (from c in context.Customers

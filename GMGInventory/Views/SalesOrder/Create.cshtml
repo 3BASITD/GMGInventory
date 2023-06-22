@@ -30,6 +30,16 @@
             <div class="row">
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
+                        <label for="order-agent-code" class="form-label mb-0">Agent Code</label>
+                        <select id="order-agent-code" name="AgentCode" style="width: 100%"></select>
+                        <span data-valmsg-for="order-agent-code" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-agent-name" class="form-label mb-0">Agent Name</label>
+                        <input type="text" id="order-agent-name" class="form-control form-control-sm" readonly="readonly" />
+                        <span data-valmsg-for="order-agent-name" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
                         <label for="order-customer-code" class="form-label mb-0">Customer Code</label>
                         <select id="order-customer-code" name="CustomerCode" style="width: 100%"></select>
                         <span data-valmsg-for="order-customer-code" data-valmsg-replace="true" class="text-danger"></span>
@@ -43,16 +53,6 @@
                         <label for="order-customer-address" class="form-label mb-0">Customer Address</label>
                         <input type="text" id="order-customer-address" class="form-control form-control-sm" readonly="readonly" />
                         <span data-valmsg-for="order-customer-address" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="order-agent-code" class="form-label mb-0">Agent Code</label>
-                        <select id="order-agent-code" name="AgentCode" style="width: 100%"></select>
-                        <span data-valmsg-for="order-agent-code" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="order-agent-name" class="form-label mb-0">Agent Name</label>
-                        <input type="text" id="order-agent-name" class="form-control form-control-sm" readonly="readonly" />
-                        <span data-valmsg-for="order-agent-name" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -246,60 +246,9 @@
 
 @section Scripts {
     <script>
-        // Load customer data for select2
-        $("#order-customer-code").select2({
-            minimumInputLength: 1,
-            placeholder: '<empty>',
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-            },
-            ajax: {
-                url: "@Url.Action("GetOptions", "Customer")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            }
-        });
-
-        $("#order-customer-code").on("select2:select", function () {
-            $("#order-customer-name").val($(this).select2("data")[0].name);
-            $("#order-customer-address").val($(this).select2("data")[0].address);
-            $("#order-customer-balance").val($(this).select2("data")[0].outstandingBalance);
-            $("#order-credit-term").val($(this).select2("data")[0].creditTerm);
-
-            if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
-                toastrNoDuplicate("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance", "warning");
-            }
-        });
-
-        $("#order-customer-code").on("select2:unselecting", function (e) {
-            $("#order-customer-name").val("");
-            $("#order-customer-address").val("");
-            $("#order-customer-balance").val("");
-            $("#order-credit-term").val("");
-        });
-
         // Load agent data for select2
         $("#order-agent-code").select2({
-            minimumInputLength: 1,
+            //minimumInputLength: 1,
             placeholder: '<empty>',
             templateResult: function (repo) {
                 if (repo.loading) {
@@ -336,6 +285,58 @@
 
         $("#order-agent-code").on("select2:unselecting", function (e) {
             $("#order-agent-name").val("");
+        });
+
+        // Load customer data for select2
+        $("#order-customer-code").select2({
+            //minimumInputLength: 1,
+            placeholder: '<empty>',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetByAgentOptions", "Customer")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        agent: $("#order-agent-code").val()
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $("#order-customer-code").on("select2:select", function () {
+            $("#order-customer-name").val($(this).select2("data")[0].name);
+            $("#order-customer-address").val($(this).select2("data")[0].address);
+            $("#order-customer-balance").val($(this).select2("data")[0].outstandingBalance);
+            $("#order-credit-term").val($(this).select2("data")[0].creditTerm);
+
+            if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
+                toastrNoDuplicate("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance", "warning");
+            }
+        });
+
+        $("#order-customer-code").on("select2:unselecting", function (e) {
+            $("#order-customer-name").val("");
+            $("#order-customer-address").val("");
+            $("#order-customer-balance").val("");
+            $("#order-credit-term").val("");
         });
 
         // Load price type data for select2

@@ -114,6 +114,16 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-region" class="form-label mb-0">Region</label>
+                            <select id="filter-region" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="ML">MM & Luzon</option>
+                                <option value="VM">Visayas & Mindanao</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-6">
@@ -259,12 +269,14 @@
                     var agentId = $("#filter-agent").val();
                     var customerId = $("#filter-customer").val();
                     var statusId = $("#filter-status").val();
+                    var region = $("#filter-region").val();
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     if (agentId) data.Agent = agentId;
                     if (customerId) data.Customer = customerId;
                     if (statusId) data.StatusCode = statusId;
+                    if (region) data.Region2 = region;
                 }
             },
             processing: true,
@@ -313,6 +325,7 @@
             if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
             if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-custoemr").val()); }
             if ($("#filter-status").val()) { urlQuery.push("StatusCode=" + $("#filter-status").val()); }
+            if ($("#filter-region").val()) { urlQuery.push("Region2=" + $("#filter-region").val()); }
             window.location = "@Url.Action("DownloadSalesInvoice")?" + urlQuery.join("&");
         });
 
@@ -327,6 +340,7 @@
             if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
             if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-custoemr").val()); }
             if ($("#filter-status").val()) { urlQuery.push("StatusCode=" + $("#filter-status").val()); }
+            if ($("#filter-region").val()) { urlQuery.push("Region2=" + $("#filter-region").val()); }
             setTimeout(function () {
                 let win = window.open('@Url.Action("PrintSalesInvoice")?' + urlQuery.join("&"), '');
                 var wintimer = setInterval(function () {

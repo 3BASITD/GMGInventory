@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin + "," + Roles.Telemarketer)]
+    [Authorize(Roles = Roles.InventoryManager + ","
+                     + Roles.SalesDirector + ","
+                     + Roles.SystemAdmin + ","
+                     + Roles.Telemarketer)]
     public class PriceListController : Controller
     {
         private readonly IItemPriceRepository itemPriceRepository;

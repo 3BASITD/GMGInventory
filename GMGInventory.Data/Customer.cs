@@ -41,13 +41,13 @@ namespace GMGInventory.Data
         public int AgentId { get; set; }
         public Agent Agent { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(150)")]
         public string? ContactPerson { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string? ContactNumber { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string? FaxNumber { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]

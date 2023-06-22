@@ -17,7 +17,7 @@ namespace GMGInventory.Data
         public int ForwarderId { get; set; }
         public Forwarder Forwarder { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(150)")]
         public string Waybill { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]

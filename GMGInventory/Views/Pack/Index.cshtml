@@ -60,12 +60,25 @@
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
                     </div>
-                    </div>
+                </div>
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
                             <label for="filter-to" class="control-label mb-0">Packed Date To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-status" class="control-label mb-0">Status</label>
+                            <select id="filter-status" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="Draft">My Drafts</option>
+                                <option value="Invoicing">For Invoicing</option>
+                                <option value="Invoiced">Invoiced</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -114,6 +127,7 @@
                 data: function (data) {
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
+                    data.StatusCode = $("#filter-status").val();
                 },
                 type: "POST",
             },
@@ -136,10 +150,10 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-                        @*if (data.status == "Draft" && data.packedBy == $("#current-user-nickname").val()) {
-                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
-                        }*@
-                                if (data.status == "Posted" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin"))) {
+                        //if (data.currentUsersDraft == true) {
+                        //    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        //}
+                        if (data.status == "Posted" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin"))) {
                             actions += '<a href="@Url.Action("Create","SalesInvoice")/' + data.id + '" class="btn btn-primary btn-xs invoiceBtn" type="button" data-microtip-title="Start Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-file-invoice"></i></a>';
                         }
                         return actions + "</div>";

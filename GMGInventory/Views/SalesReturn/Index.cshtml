@@ -8,9 +8,12 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
-                <span class="fas fa-plus"></span> New Sales Return
-            </a>
+            @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.Telemarketer))
+            {
+                <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                    <span class="fas fa-plus"></span> New Sales Return
+                </a>
+            }
         </div>
     </div>
     <div class="card-body">

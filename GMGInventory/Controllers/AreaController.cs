@@ -11,8 +11,7 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
-    //[Authorize]
+    [Authorize]
     public class AreaController : Controller
     {
         private readonly IAreaRepository areaRepository;
@@ -28,11 +27,27 @@ namespace GMGInventory.Controllers
             this.mapper = mapper;
         }
 
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await areaRepository.GetOptions(IncludeId));
+        }
+
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await areaRepository.GetOptions2(search, page));
+        }
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public ActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> CreateJson(AreaVM areaVM)
         {
@@ -51,6 +66,10 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetListJson()
         {
@@ -58,19 +77,9 @@ namespace GMGInventory.Controllers
             return Json(await areaRepository.GetAllForDataTablesAsync(form));
         }
 
-        
-
-        public async Task<IActionResult> GetOptions(int? IncludeId)
-        {
-            return Json(await areaRepository.GetOptions(IncludeId));
-        }
-
-        public async Task<IActionResult> GetOptions2(string search, int page)
-        {
-            return Json(await areaRepository.GetOptions2(search, page));
-        }
-
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> EditJson(AreaVM areaVM)
         {
@@ -97,7 +106,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -119,6 +130,9 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
@@ -132,7 +146,9 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Area");
@@ -162,6 +178,9 @@ namespace GMGInventory.Controllers
 
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> UploadJson(AreaVM areaVM)
         {

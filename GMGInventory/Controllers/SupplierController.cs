@@ -10,7 +10,7 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + "," + Roles.SalesDirector + "," + Roles.SystemAdmin)]
+    [Authorize]
     public class SupplierController : Controller
     {
         private readonly ISupplierRepository supplierRepository;
@@ -34,12 +34,17 @@ namespace GMGInventory.Controllers
             return Json(await supplierRepository.GetOptions(IncludeId));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public ActionResult Index()
         {
             return View();
         }
 
-
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> CreateJson(SupplierVM supplierVM)
         {
@@ -58,6 +63,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> GetListJson()
         {
@@ -65,6 +73,9 @@ namespace GMGInventory.Controllers
             return Json(await supplierRepository.GetAllForDataTablesAsync(form));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Details(int? id)
         {
             var supplierVM = await supplierRepository.GetSupplierViewVMAsync(id);
@@ -75,6 +86,9 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Create()
         {
             var supplierVM = new SupplierVM
@@ -86,6 +100,9 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SupplierVM supplierVM)
@@ -110,6 +127,9 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Edit(int? id)
         {
             var supplierVM = await supplierRepository.GetSupplierVMAsync(id);
@@ -125,6 +145,9 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> EditJson(SupplierVM supplierVM)
         {
@@ -151,7 +174,9 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -173,6 +198,9 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
@@ -186,6 +214,9 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Supplier");
@@ -225,9 +256,11 @@ namespace GMGInventory.Controllers
                     DateTime.Now.ToString("yyyyMMdd") + " Suppliers.xlsx");
                 }
             }
-
         }
 
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<JsonResult> UploadJson(SupplierVM supplierVM)
         {
@@ -267,8 +300,5 @@ namespace GMGInventory.Controllers
             }
             return Json(responseModel);
         }
-
-
-
     }
 }

@@ -180,6 +180,8 @@
 
 @section Scripts {
     <script>
+        $("#invoice-date").val(DateForInput(new Date()));
+
         $("#invoice-pack-number").select2({
             minimumInputLength: 1,
             placeholder: '@Model?.PackNumber',

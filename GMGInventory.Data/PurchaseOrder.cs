@@ -36,7 +36,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? TotalPurchaseAmount { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string? ReferenceNumber { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]

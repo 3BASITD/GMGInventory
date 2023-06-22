@@ -24,6 +24,8 @@ namespace GMGInventory.Application.Repositories
             var salesOrder = from l in context.SalesOrderLineItems
                              join u in userManager.Users on l.SalesOrder.UserCreated equals u.Id
                              let i = context.ItemInventories.Where(s => s.ItemId == l.ItemId).Sum(s => s.Quantity)
+                             let served = context.SalesOrderLineItems.Where(s => s.ItemId == l.ItemId).Sum(s => (int?)s.Quantity) ?? 0
+                             let invoice = context.SalesOrderLineItems.Where(s => s.ItemId == l.ItemId).Sum(s => (int?)s.Quantity) ?? 0
                              where l.UnservedQuantity > 0
                              && (filter.Region == null || l.SalesOrder.Customer.Area.Region.Id == filter.Region
                              || (filter.Region != null && regionSelected == "Luzon" && l.SalesOrder.Customer.Area.Region.Name == "Metro Manila"))
@@ -41,7 +43,7 @@ namespace GMGInventory.Application.Repositories
                                  OrderDateD = l.SalesOrder.DateCreated,
                                  PackedQuantityD = l.PackedQuantity,
                                  QuantityD = l.Quantity,
-                                 QuantityOnHandD = i,
+                                 QuantityOnHandD = i + served - invoice,
                                  SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
                                  UnitPriceD = l.SellingPrice,
                                  UnservedQuantityD = l.UnservedQuantity

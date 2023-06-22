@@ -35,10 +35,32 @@ namespace GMGInventory.Controllers
             return View();
         }
 
+        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        //public IActionResult Error()
+        //{
+        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        //}
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(int statuscode)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            Response.StatusCode = statuscode;
+            //Response.StatusDescription = "Forbidden"; //403
+            //Response.StatusDescription = "Page not found"; //404
+            //Response.StatusDescription = "Service Unavailable"; //503
+            if (statuscode == 401)
+            {
+                return View($"/Views/Home/Login.cshtml");
+            }
+            else if (statuscode == 403 || statuscode == 404 || statuscode == 500)// || statuscode == 503)
+            {
+                return View($"/Views/Home/HTTP{statuscode}.cshtml");
+            }
+            else
+            {
+                ViewBag["statuscode"] = statuscode;
+                return View();
+            }
         }
     }
 

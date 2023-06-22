@@ -25,6 +25,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Status")]
         public string Status { get; set; }
+        
+        public bool CurrentUsersDraft { get; set; }
     }
 
     public class PackDetailsVM
@@ -34,6 +36,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
+        public int SalesOrderId { get; set; }
 
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
@@ -63,8 +66,12 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
 
-        [Display(Name = "Box Number")]
+        [Display(Name = "Package Number")]
         public int BoxNumber { get; set; }
+
+        [Display(Name = "Package Type")]
+        public int PackType { get; set; }
+        public string PackTypeName { get; set; }
 
         public int ItemId { get; set; }
 
@@ -98,12 +105,15 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Extended Price")]
         public string ExtendedPrice => string.Format(SystemFormat.StringDecimalComma, ExtendedPriceD);
         public decimal ExtendedPriceD => Quantity * (((100m - Discount1D - Discount2D) * SellingPriceD) / 100m);
+
+        public int SalesOrderLineItemId { get; set; }
     }
 
     public class PackFormVM
     {
         public int? Id { get; set; }
-        public int SONumber { get; set; }
+        public int SalesOrderId { get; set; }
+        public string SavingAs { get; set; }
         public IList<PackFormItemVM> Items { get; set; }
     }
 
@@ -112,6 +122,7 @@ namespace GMGInventory.Common.Models
         public int Item { get; set; }
         public int Quantity { get; set; }
         public int BoxNumber { get; set; }
+        public int PackType { get; set; }
     }
 
     public class PackDetailsPVM

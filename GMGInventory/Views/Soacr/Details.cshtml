@@ -166,21 +166,24 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
-                                <input type="number" step="0.01" min="0" max="1999999.99" name="Debit" id="edit-debit" class="form-control form-control-sm" />
+                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="Debit" id="edit-debit" class="form-control form-control-sm" />*@
+                                <input type="text" name="Debit" id="edit-debit" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm mask-input-number" />
                                 <span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
-                                <input type="number" step="0.01" min="0" max="1999999.99" name="Credit" id="edit-credit" class="form-control form-control-sm" />
+                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="Credit" id="edit-credit" class="form-control form-control-sm" />*@
+                                <input type="text" name="Credit" id="edit-credit" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
-                                <input type="number" step="0.01" min="0" max="1999999.99" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />
+                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />*@
+                                <input type="text" name="FreightCost" id="edit-freight-cost" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
@@ -227,7 +230,7 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label for="tbr-invoice" class="control-label mb-0 d-block">Invoice Number</label>
+                                <label for="tbr-invoice" class="control-label mb-0 d-block">Sales Return Invoice Number</label>
                                 <select id="tbr-invoice" name="InvoiceNumber" style="width: 100%"></select>
                                 <span data-valmsg-for="tbr-invoice" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -235,7 +238,9 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="tbr-amount" class="control-label mb-0 d-block">Amount</label>
-                                <input type="number" step="0.01" min="0" max="1999999.99" name="Amount" id="tbr-amount" class="form-control form-control-sm" />
+                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="Amount" id="tbr-amount" class="form-control form-control-sm" />
+                                *@
+                                <input type="text" name="Amount" data-mask="9,999,990.00" data-mask-reverse="true" id="tbr-amount" class="form-control form-control-sm" />
                                 <input type="hidden" id="tbr-amount-max" class="form-control form-control-sm" />
                                 <span data-valmsg-for="tbr-amount" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -349,13 +354,16 @@
                         <label for="payment-over-payment" class="control-label mb-0">Over Payment</label>
                     </div>
                     <div class="col-8 col-lg-3">
-                        <input type="number" step="0.01" min="0" max="1999999.99" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm" />
+                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm" />*@
+                        <input type="text" name="OverPayment" id="payment-over-payment" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        
                     </div>
                     <div class="col-4 col-lg-3">
                         <label for="payment-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
                     </div>
                     <div class="col-8 col-lg-3">
-                        <input type="number" step="0.01" min="0" max="1999999.99" name="TKT" id="payment-tkt" class="form-control form-control-sm" />
+                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="TKT" id="payment-tkt" class="form-control form-control-sm" />*@
+                        <input type="text" name="TKT" id="payment-tkt" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                     </div>
                 </div>
                 <div class="row align-items-center form-group">
@@ -363,13 +371,15 @@
                         <label for="payment-tax" class="control-label mb-0">Tax</label>
                     </div>
                     <div class="col-8 col-lg-3">
-                        <input type="number" step="0.01" min="0" max="1999999.99" name="TAX" id="payment-tax" class="form-control form-control-sm" />
+                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="TAX" id="payment-tax" class="form-control form-control-sm" />*@
+                        <input type="text" name="TAX" id="payment-tax" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                     </div>
                     <div class="col-4 col-lg-3">
                         <label for="payment-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
                     </div>
                     <div class="col-8 col-lg-3">
-                        <input type="number" step="0.01" min="0" max="1999999.99" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm" />
+                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm" />*@
+                        <input type="text" name="CashAdvanced" id="payment-cash-advanced" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                     </div>
                 </div>
                 <div class="row align-items-center form-group">
@@ -377,13 +387,15 @@
                         <label for="payment-discount" class="control-label mb-0">Discount</label>
                     </div>
                     <div class="col-8 col-lg-3">
-                        <input type="number" step="0.01" min="0" max="1999999.99" name="Discount" id="payment-discount" class="form-control form-control-sm" />
+                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="Discount" id="payment-discount" class="form-control form-control-sm" />*@
+                        <input type="text" name="Discount" id="payment-discount" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                     </div>
                     <div class="col-4 col-lg-3">
                         <label for="payment-offset" class="control-label mb-0 d-block">Offset</label>
                     </div>
                     <div class="col-8 col-lg-3">
-                        <input type="number" step="0.01" min="0" max="1999999.99" name="Offset" id="payment-offset" class="form-control form-control-sm" />
+                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="Offset" id="payment-offset" class="form-control form-control-sm" />*@
+                        <input type="text" name="Offset" id="payment-offset" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                     </div>
                 </div>
                 <div class="row align-items-center form-group">
@@ -391,13 +403,15 @@
                         <label for="payment-cash-amount" class="control-label mb-0">Cash Amount</label>
                     </div>
                     <div class="col-8 col-lg-3">
-                        <input type="number" step="0.01" min="0" max="1999999.99" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm" />
+                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm" />*@
+                        <input type="text" name="CashAmount" id="payment-cash-amount" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                     </div>
                     <div class="col-4 col-lg-3">
                         <label for="payment-backload" class="control-label mb-0 d-block">Back Load</label>
                     </div>
                     <div class="col-8 col-lg-3">
-                        <input type="number" step="0.01" min="0" max="1999999.99" name="BackLoad" id="payment-backload" class="form-control form-control-sm" />
+                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="BackLoad" id="payment-backload" class="form-control form-control-sm" />*@
+                        <input type="text" name="BackLoad" id="payment-backload" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                     </div>
                 </div>
 
@@ -427,7 +441,8 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="check-checkamount" class="control-label mb-0 d-block">Check Amount</label>
-                                                <input type="number" step="0.01" min="0" max="1999999.99" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm" />
+                                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm" />*@
+                                                <input type="text" name="CheckAmount" id="check-checkamount" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
                                                 <span data-valmsg-for="check-checkamount" data-valmsg-replace="true" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -598,7 +613,10 @@
                 columnDTTotalDecimal(api, 6);
                 columnDTTotalDecimal(api, 7);
                 columnDTTotalDecimal(api, 8);
-                columnDTTotalDecimal(api, 9);
+                var baltotal = api.rows().data().reduce(function (a, b) {
+                    return a + b.invoiceAmountD - b.tbrd - b.creditD + b.debitD - b.paidAmountD + b.freightChargeD;
+                }, 0);
+                $(api.column(9).footer()).html(FormatStringDecimal(baltotal));
             }
         });
 
@@ -694,19 +712,16 @@
         var validateEdit = $("#editForm").validate({
             errorClass: 'text-danger text-xs',
             rules: {
-                Debit: { range: [0, 1999999.99] },
-                Credit: { range: [0, 1999999.99] },
-                FreightCost: { range: [0, 1999999.99] },
+                Debit: { rangeForMasked: [0, 1999999.99] },
+                Credit: { rangeForMasked: [0, 1999999.99] },
+                FreightCost: { rangeForMasked: [0, 1999999.99] },
                 FreightWaybill: {
                     required: function (element) {
-                        return $("#edit-freight-cost").val() != "" && parseInt($("#edit-freight-cost").val()) != 0;
+                        return $("#edit-freight-cost").val() != "" && removeCommaOfNumber($("#edit-freight-cost").val()) != 0;
                     }
                 }
             },
             messages: {
-                Debit: { range: "Debit Limit must be between 0-1999999.99." },
-                Credit: { range: "Credit Limit must be between 0-1999999.99." },
-                FreightCost: { range: "Freight Cost must be between 0-1999999.99." },
                 FreightWaybill: { required: "Freight's Waybill is required" }
             },
             submitHandler: function (form, event) {
@@ -723,9 +738,9 @@
                 url: "@Url.Action("EditInvoiceJson")",
                 data: {
                     Id: $("#edit-debit").data("id"),
-                    Debit: $("#edit-debit").val(),
-                    Credit: $("#edit-credit").val(),
-                    FreightCharge: $("#edit-freight-cost").val(),
+                    Debit: removeCommaOfNumber($("#edit-debit").val()),
+                    Credit: removeCommaOfNumber($("#edit-credit").val()),
+                    FreightCharge: removeCommaOfNumber($("#edit-freight-cost").val()),
                     FreightWaybill: $("#edit-frieght-waybill").val(),
                 },
                 error: jQueryCommonError,
@@ -811,14 +826,14 @@
                         SOACRId: @Model?.Id,
                         CollectorReceiptNumber: $("#payment-collector-receipt").val(),
                         Remarks: $("#payment-remarks").val(),
-                        OverPayment: $("#payment-over-payment").val(),
-                        TKTSolicitation: $("#payment-tkt").val(),
-                        Tax: $("#payment-tax").val(),
-                        CashAdvance: $("#payment-cash-advanced").val(),
-                        Discount: $("#payment-discount").val(),
-                        Offset: $("#payment-offset").val(),
-                        CashAmount: $("#payment-cash-amount").val(),
-                        BackLoad: $("#payment-backload").val(),
+                        OverPayment: removeCommaOfNumber($("#payment-over-payment").val()),
+                        TKTSolicitation: removeCommaOfNumber($("#payment-tkt").val()),
+                        Tax: removeCommaOfNumber($("#payment-tax").val()),
+                        CashAdvance: removeCommaOfNumber($("#payment-cash-advanced").val()),
+                        Discount: removeCommaOfNumber($("#payment-discount").val()),
+                        Offset: removeCommaOfNumber($("#payment-offset").val()),
+                        CashAmount: removeCommaOfNumber($("#payment-cash-amount").val()),
+                        BackLoad: removeCommaOfNumber($("#payment-backload").val()),
                         Checks: checkData,
                         InvoiceIds: GetInvoiceSelected()
                     },
@@ -846,7 +861,7 @@
                         search: params.term,
                         page: params.page || 1,
                         CustomerId: @Model?.CustomerId
-                                                            };
+                    };
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
@@ -863,6 +878,7 @@
         });
 
         $("#tbr-invoice").on("select2:select", function () {
+            //$("#tbr-amount").val(FormatStringDecimal($(this).select2("data")[0].invoiceAmount.toFixed(2)));
             $("#tbr-amount").val($(this).select2("data")[0].invoiceAmount.toFixed(2));
             $("#tbr-amount-max").val($(this).select2("data")[0].invoiceAmount.toFixed(2));
         });
@@ -883,7 +899,7 @@
             },
             messages: {
                 InvoiceNumber: { required: "Please select an Invoice Number" },
-                Amount: { required: "Amount is required", isNotZero: "Amount cannot be 0", lessThanOrEqual: "Cannot exceed " + FormatStringDecimal($("#tbr-amount").val()) }
+                Amount: { required: "Amount is required", isNotZero: "Amount cannot be 0", lessThanOrEqual: function() { return "Cannot exceed invoice amount " + FormatStringDecimal($("#tbr-amount-max").val()); } }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -900,7 +916,7 @@
                 data: {
                     soaLineItemId: $("#tbr-for").data("id"),
                     salesReturnId: $("#tbr-invoice").val(),
-                    amount: $("#tbr-amount").val()
+                    amount: removeCommaOfNumber($("#tbr-amount").val())
                 },
                 error: jQueryCommonError,
                 success: function (data, status, xhr) {
@@ -1038,14 +1054,14 @@
             rules: {
                 BankName: { required: true, maxlength: 100 },
                 CheckDate: { required: true },
-                CheckAmount: { required: true, range: [0.01, 1999999.99] },
+                CheckAmount: { required: true, rangeForMasked: [0.01, 1999999.99] },
                 BankBranch: { required: true, maxlength: 100 },
                 CheckNumber: { required: true, maxlength: 50 }
             },
             messages: {
                 BankName: { required: "Please enter Bank Name", maxlength: "Bank Name must not exceed 100 characters." },
                 CheckDate: { required: "Please enter Check Date" },
-                CheckAmount: { required: "Please enter Check Amount", range: "Check Amount must be between 0.01-1999999.99." },
+                CheckAmount: { required: "Please enter Check Amount", rangeForMasked: "Check Amount must be between 0.01-1999999.99." },
                 BankBranch: { required: "Please enter Bank Branch", maxlength: "Bank Branch must not exceed 100 characters." },
                 CheckNumber: { required: "Please enter Check Number", maxlength: "Check Number must not exceed 50 characters." }
             },
@@ -1114,14 +1130,10 @@
             var checks = [];
             checkTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
-                var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
-                var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
-                var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
                 checks.push({
                     BankName: row_data.BankName,
                     CheckDate: row_data.CheckDate,
-                    CheckAmount: row_data.CheckAmount,
+                    CheckAmount: removeCommaOfNumber(row_data.CheckAmount),
                     BankBranch: row_data.BankBranch,
                     CheckNumber: row_data.CheckNumber
                 });
