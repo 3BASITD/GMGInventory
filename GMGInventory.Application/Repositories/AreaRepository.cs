@@ -27,6 +27,69 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.Areas
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .OrderBy(s => s.Text)
+                .ToListAsync();
+        }
+
+        public async Task<Select2Model<JsonAddressOptionsModel>> GetOptions2(string search, int page)
+        {
+            var areas = await context.Areas
+                                     .Include(s => s.Region)
+                                     .Where(s => string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower())))
+                                     .Select(s => new JsonAddressOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Code,
+                                         Name = s.Name,
+                                         Region = s.Region.Name,
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+            var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonAddressOptionsModel>
+            {
+                //incomplete_results = false,
+                items = areasFiltered,
+                total_count = areas.Count
+            };
+        }
+
+        public async Task<Select2Model<JsonAddressOptionsModel>> GetByRegionOptions(string search, int page, int? region)
+        {
+            var areas = await context.Areas
+                                     .Where(s => (string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower())))
+                                              && s.RegionId == region)
+                                     .Select(s => new JsonAddressOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Code,
+                                         Name = s.Name
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+            var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonAddressOptionsModel>
+            {
+                //incomplete_results = false,
+                items = areasFiltered,
+                total_count = areas.Count
+            };
+        }
+
         public async Task<int?> GetIdAsync(string? Name)
         {
             var area = await context.Areas.Where(s => s.Name == Name).FirstOrDefaultAsync();
@@ -254,48 +317,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> IsCodeExist(string code)
         {
             return await context.Areas.AnyAsync(c => c.Code == code);
-        }
-
-
-
-        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
-        {
-            return await context.Areas
-                .Where(s => s.IsActive || s.Id == IncludeId)
-                .Select(s => new JsonOptionsModel
-                {
-                    Id = s.Id.ToString(),
-                    Text = s.Name,
-                    Selected = IncludeId != null && IncludeId == s.Id
-                })
-                .OrderBy(s => s.Text)
-                .ToListAsync();
-        }
-
-
-        public async Task<Select2Model<JsonAddressOptionsModel>> GetOptions2(string search, int page)
-        {
-            var areas = await context.Areas
-                                     .Include(s => s.Region)
-                                     .Where(s => string.IsNullOrWhiteSpace(search)
-                                              || (s.Code.ToLower().Contains(search.ToLower()))
-                                              || (s.Name.ToLower().Contains(search.ToLower())))
-                                     .Select(s => new JsonAddressOptionsModel
-                                     {
-                                         Id = s.Id.ToString(),
-                                         Text = s.Code,
-                                         Name = s.Name,
-                                         Region  = s.Region.Name,
-                                     })
-                                     .OrderBy(s => s.Text)
-                                     .ToListAsync();
-            var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
-            return new Select2Model<JsonAddressOptionsModel>
-            {
-                //incomplete_results = false,
-                items = areasFiltered,
-                total_count = areas.Count
-            };
         }
     }
 }

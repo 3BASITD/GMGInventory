@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,29 +25,65 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ItemPriceVM?> GetAsync(int? id)
         {
+            //var priceVM = from item in context.Items
+            //              from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated >= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
+            //              join inventory in context.ItemInventories on item.Id equals inventory.Id
+            //              group inventory by new { item, price } into i
+            //              let served = context.SalesOrderLineItems.Where(s => s.ItemId == i.Key.item.Id).ToList()
+            //              where i.Key.item.Id == id
+            //              select new ItemPriceVM
+            //              {
+            //                  Brand = i.Key.item.Brand.Code,
+            //                  Category = i.Key.item.Category.Code,
+            //                  Code = i.Key.item.Code,
+            //                  Id = i.Key.item.Id,
+            //                  ItemType = i.Key.item.ItemType.Code,
+            //                  ModelNumber = string.IsNullOrWhiteSpace(i.Key.item.ModelNumber) ? "-" : i.Key.item.ModelNumber,
+            //                  Name = i.Key.item.Name,
+            //                  NetPrice = i.Key.price.NetSellingPrice,
+            //                  PartNumber = string.IsNullOrWhiteSpace(i.Key.item.PartNumber) ? "-" : i.Key.item.PartNumber,
+            //                  Quantity = i.Sum(s => s.Quantity) + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
+            //                  RetailPrice = i.Key.price.RetailSellingPrice,
+            //                  Size = i.Key.item.Size,
+            //                  Unit = i.Key.item.Unit.Code
+            //              };
+
+            var WarehouseInventory = await (from inv in context.ItemInventories
+                                            where inv.ItemId == id
+                                            select inv.Quantity).FirstAsync();
+            var ServedQuantity = await (from soli in context.SalesOrderLineItems
+                                        where soli.ItemId == id
+                                        select (decimal?)soli.ServedQuantity).SumAsync() ?? 0;
+            var InvoicedQuantity = await (from inv in context.InvoiceLineItems
+                                          where inv.ItemId == id
+                                          select (decimal?)inv.Quantity).SumAsync() ?? 0;
             var priceVM = from item in context.Items
-                          from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated >= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
-                          join inventory in context.ItemInventories on item.Id equals inventory.Id
-                          group inventory by new { item, price } into i
-                          let served = context.SalesOrderLineItems.Where(s => s.ItemId == i.Key.item.Id).ToList()
-                          where i.Key.item.Id == id
+                          from price in context.ItemPrices
+                                               .Where(s => s.ItemId == item.Id
+                                                        && s.DateCreated <= item.DateCreated)
+                                               .OrderByDescending(s => s.DateCreated)
+                                               .Take(1)
+                                               .DefaultIfEmpty()
+                          join user in userManager.Users on price.UserCreated equals user.Id
+                          where item.Id == id
                           select new ItemPriceVM
                           {
-                              Brand = i.Key.item.Brand.Code,
-                              Category = i.Key.item.Category.Code,
-                              Code = i.Key.item.Code,
-                              Id = i.Key.item.Id,
-                              ItemType = i.Key.item.ItemType.Code,
-                              ModelNumber = string.IsNullOrWhiteSpace(i.Key.item.ModelNumber) ? "-" : i.Key.item.ModelNumber,
-                              Name = i.Key.item.Name,
-                              NetPrice = i.Key.price.NetSellingPrice,
-                              PartNumber = string.IsNullOrWhiteSpace(i.Key.item.PartNumber) ? "-" : i.Key.item.PartNumber,
-                              Quantity = i.Sum(s => s.Quantity) + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
-                              RetailPrice = i.Key.price.RetailSellingPrice,
-                              Size = i.Key.item.Size,
-                              Unit = i.Key.item.Unit.Code
+                              Brand = item.Brand.Code,
+                              Category = item.Category.Code,
+                              Code = item.Code,
+                              Id = item.Id,
+                              ItemType = item.ItemType.Code,
+                              ModelNumber = string.IsNullOrWhiteSpace(item.ModelNumber) ? "-" : item.ModelNumber,
+                              Name = item.Name,
+                              NetPrice = price.NetSellingPrice,
+                              PartNumber = string.IsNullOrWhiteSpace(item.PartNumber) ? "-" : item.PartNumber,
+                              QuantityInventoryD = WarehouseInventory,
+                              QuantityServedD = (int?)ServedQuantity,
+                              QuantityInvoiceD = (int?)InvoicedQuantity,
+                              RetailPrice = price.RetailSellingPrice,
+                              Size = item.Size,
+                              Unit = item.Unit.Code
                           };
-
             if (priceVM == null)
             {
                 return null;
@@ -56,15 +93,46 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ItemPriceVM>> GetAllItemPriceAsync(ItemFilterVM filter)
         {
+            var WarehouseInventory = from inv in context.ItemInventories
+                                     group inv by inv.ItemId into invgrp
+                                     select new
+                                     {
+                                         ItemId = invgrp.Key,
+                                         Quantity = invgrp.Sum(s => s.Quantity)
+                                     };
+            var ServedQuantity = from soli in context.SalesOrderLineItems
+                                 group soli by soli.ItemId into soligrp
+                                 select new
+                                 {
+                                     ItemId = soligrp.Key,
+                                     Quantity = soligrp.Sum(s => s.ServedQuantity)
+                                 };
+            var InvoicedQuantity = from inv in context.InvoiceLineItems
+                                   group inv by inv.ItemId into invgrp
+                                   select new
+                                   {
+                                       ItemId = invgrp.Key,
+                                       Quantity = invgrp.Sum(s => s.Quantity)
+                                   };
             var pricesVM = (from item in context.Items
-                            from price in context.ItemPrices.Where(s => s.ItemId == item.Id).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
+                            from price in context.ItemPrices
+                                                 .Where(s => s.ItemId == item.Id
+                                                          && s.DateCreated <= item.DateCreated)
+                                                 .OrderByDescending(s => s.DateCreated)
+                                                 .Take(1)
+                                                 .DefaultIfEmpty()
                             join user in userManager.Users on price.UserCreated equals user.Id
-                            let quantity = context.ItemInventories.Where(s => s.ItemId == item.Id).Sum(s => s.Quantity)
-                            let served = context.SalesOrderLineItems.Where(s => s.ItemId == item.Id).ToList()
+                            join inventory in WarehouseInventory on item.Id equals inventory.ItemId
+                            join soli in ServedQuantity on item.Id equals soli.ItemId into soligrp
+                            from subsoli in soligrp.DefaultIfEmpty()
+                            join inv in InvoicedQuantity on item.Id equals inv.ItemId into invgrp
+                            from subinv in invgrp.DefaultIfEmpty()
                             where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
                                 && (filter.BrandId == null || filter.BrandId == item.BrandId || (filter.BrandId == 0 && item.Brand.Code.ToLower().Contains((filter.BrandKeyword + "").ToLower())))
                                 && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId || (filter.ItemTypeId == 0 && item.ItemType.Code.ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
-                                && (filter.ItemId == null || filter.ItemId == item.Id || (filter.ItemId == 0 && (item.Code + "|" + item.Name).ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                                && (filter.ItemId == null || filter.ItemId == 0 || filter.ItemId == item.Id)
+                                && (filter.ItemKeyword == null || item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower()))
+                                && (filter.ItemNameKeyword == null || item.Name.ToLower().Contains((filter.ItemNameKeyword + "").ToLower()))
                                 && (filter.ModelNumber == null || (item.ModelNumber + "").ToLower().Contains(filter.ModelNumber.ToLower()))
                                 && (filter.Size == null || item.Size.ToLower().Contains(filter.Size.ToLower()))
                             select new ItemPriceVM
@@ -78,7 +146,9 @@ namespace GMGInventory.Application.Repositories
                                 Name = item.Name,
                                 NetPrice = price == null ? 0 : price.NetSellingPrice,
                                 PartNumber = string.IsNullOrWhiteSpace(item.PartNumber) ? "-" : item.PartNumber + "",
-                                Quantity = quantity + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
+                                QuantityInventoryD = inventory.Quantity,
+                                QuantityServedD = subsoli != null ? subsoli.Quantity : null,
+                                QuantityInvoiceD = subinv != null ? subinv.Quantity : null,
                                 RetailPrice = price == null ? 0 : price.RetailSellingPrice,
                                 Size = item.Size,
                                 Unit = item.Unit.Code
@@ -102,10 +172,10 @@ namespace GMGInventory.Application.Repositories
                                     || x.ItemType.ToLower().Contains(form.SearchValue)
                                     || x.ModelNumber.ToLower().Contains(form.SearchValue)
                                     || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.NetPrice.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.NetPrice.ToString().Contains(form.SearchValue)
                                     || x.PartNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Quantity.ToString().ToLower().Contains(form.SearchValue)
-                                    || x.RetailPrice.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.QuantityD.ToString().Contains(form.SearchValue)
+                                    || x.RetailPrice.ToString().Contains(form.SearchValue)
                                     || x.Size.ToLower().Contains(form.SearchValue)
                                     || x.Unit.ToLower().Contains(form.SearchValue));
             }
@@ -126,7 +196,7 @@ namespace GMGInventory.Application.Repositories
                         case "Name": data = data.OrderBy(s => s.Name); break;
                         case "NetPrice": data = data.OrderBy(s => s.NetPrice); break;
                         case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
                         case "RetailPrice": data = data.OrderBy(s => s.RetailPrice); break;
                         case "Size": data = data.OrderBy(s => s.Size); break;
                         case "Unit": data = data.OrderBy(s => s.Unit); break;
@@ -145,7 +215,7 @@ namespace GMGInventory.Application.Repositories
                         case "Name": data = data.OrderByDescending(s => s.Name); break;
                         case "NetPrice": data = data.OrderByDescending(s => s.NetPrice); break;
                         case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
                         case "RetailPrice": data = data.OrderByDescending(s => s.RetailPrice); break;
                         case "Size": data = data.OrderByDescending(s => s.Size); break;
                         case "Unit": data = data.OrderByDescending(s => s.Unit); break;

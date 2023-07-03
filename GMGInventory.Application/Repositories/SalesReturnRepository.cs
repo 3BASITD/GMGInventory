@@ -180,5 +180,14 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
             return salesReturn.Id;
         }
+
+        public async Task<SalesReturnDetailPVM> PrintDetails(int returnId)
+        {
+            return new SalesReturnDetailPVM
+            {
+                Contents = await GetItemsAsync(returnId),
+                Details = await GetDetailsAsync(returnId) ?? new SalesReturnVM()
+            };
+        }
     }
 }

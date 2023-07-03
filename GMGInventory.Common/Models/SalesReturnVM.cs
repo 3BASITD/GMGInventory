@@ -66,6 +66,17 @@ namespace GMGInventory.Common.Models
         public string ReferenceNumber { get; set; }
     }
 
+    public class SalesReturnDetailPVM
+    {
+        public IList<SalesReturnItemVM> Contents { get; set; }
+        public SalesReturnVM Details { get; set; }
+        public string TotalQuantity => string.Format(SystemFormat.StringIntegerComma, TotalQuantityD);
+        public int TotalQuantityD => Contents.Sum(s => s.Quantity);
+        public string TotalGrossPrice => string.Format(SystemFormat.StringDecimalComma, TotalGrossPriceD);
+        public decimal TotalGrossPriceD => Contents.Sum(s => s.GrossPriceD);
+
+    }
+
     public class SalesReturnFormVM
     {
         public int? Id { get; set; }

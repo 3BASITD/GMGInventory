@@ -108,7 +108,7 @@
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency">Total Amount:</td>
-                        <td style="width: 125px;" class="currency">@Model.TotalAmount</td>
+                        <td style="width: 125px;" class="currency">@Model.DiscountedTotal</td>
                         <td style="width: 30px;"></td>
                     </tr>
                     <tr>
@@ -150,7 +150,7 @@
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
-                        <td style="width: 125px;" class="currency">@Model.TotalAmount</td> <!-- TOTAL AMOUNT DUE -->
+                        <td style="width: 125px;" class="currency">@Model.DiscountedTotal</td> <!-- TOTAL AMOUNT DUE -->
                         <td style="width: 30px;"></td>
                     </tr>
                 }
@@ -253,10 +253,10 @@
                     </tr>
                     <tr>
                         <td style="width: 75px;" class="currency">Total Amount:</td>
-                        <td style="width: 125px;" colspan="2" class="currency">@Model.TotalAmount</td>
+                        <td style="width: 125px;" colspan="2" class="currency">@Model.DiscountedTotal</td>
                         <td>&nbsp;</td>
                         <td style="width: 80px;" class="currency"></td>
-                        <td style="width: 125px;" class="currency">@Model.TotalAmount</td>
+                        <td style="width: 125px;" class="currency">@Model.DiscountedTotal</td>
                     </tr>
                 }
             </tbody>

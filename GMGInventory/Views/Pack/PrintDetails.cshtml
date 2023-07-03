@@ -2,7 +2,7 @@
 
 @{
     Layout = "";
-    var title = "Pack Listing";
+    var title = "Pack Listing" + (Model.Details.Status == "Draft" ? " (Draft)" : "");
 }
 
 <!DOCTYPE html>
@@ -15,44 +15,50 @@
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
 </head>
 <body>
-    <h3>@title</h3>
+    <h3 class="center-text">@title</h3>
     <table class="table-header">
         <tr>
-            <th>Pack Number</th>
-            <td>@Model.Details.Id</td>
+            <th>Customer Name</th>
+            <td>@Model.Details.CustomerName</td>
             <th>Sales Order Number</th>
             <td>@Model.Details.SONumber</td>
         </tr>
         <tr>
-            <th>Customer Code</th>
-            <td>@Model.Details.CustomerCode</td>
+            <th>Forwarder</th>
+            <td>@Model.Details.Forwarder</td>
             <th>Sales Order Date</th>
             <td>@Model.Details.SalesOrderDate</td>
         </tr>
         <tr>
-            <th>Customer Name</th>
-            <td>@Model.Details.CustomerName</td>
+            <th>Pack Number</th>
+            <td>@Model.Details.Id</td>
             <th>Pack Date</th>
             <td>@Model.Details.PackDate</td>
         </tr>
         <tr>
-            <th>Forwarder</th>
-            <td>@Model.Details.Forwarder</td>
+            <th>Agent Name</th>
+            <td>@Model.Details.Agent</td>
             <th>Packed By</th>
             <td>@Model.Details.PackBy</td>
         </tr>
     </table>
-    <table class="table-items">
+    <table class="table-items no-border">
         <thead>
             <tr>
-                <th>
+                <th class="min-width-50">
+                    Qty
+                </th>
+                <th class="min-width-50">
+                    @Html.DisplayNameFor(model => model.Contents.First().Unit)
+                </th>
+                @*<th>
                     @Html.DisplayNameFor(model => model.Contents.First().ItemCode)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().ItemName)
-                </th>
+                </th>*@
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().Quantity)
+                    Item
                 </th>
             </tr>
         </thead>
@@ -63,39 +69,44 @@
                 var allquantity = 0;
                 foreach (var item in Model.Contents)
                 {
-                    if((item.BoxNumber + " " + item.PackTypeName) != group)
+                    if ((item.BoxNumber + " (" + item.PackTypeName + ")") != group)
                     {
-                        if(group != "")
+                        if (group != "")
                         {
-                            <tr>
+                            @*<tr>
                                 <td colspan="2" class="right-text">Total Quantity for <strong>Package #@group</strong></td>
                                 <td class="right-text"><nobr>@totalquantity</nobr></td>
+            </tr>*@
+                            <tr>
+                                <td colspan="3">&nbsp;</td>
                             </tr>
                         }
-                        <tr>
-                            <td colspan="3"><strong>Box @item.BoxNumber</strong></td>
-                        </tr>
                         group = item.BoxNumber + " (" + item.PackTypeName + ")";
+                        <tr>
+                            <td colspan="3"><strong>Package @group</strong> Qty: @(Model.Contents.Where(s => s.BoxNumber == item.BoxNumber && s.PackTypeName == item.PackTypeName).Sum(s => s.Quantity))</td>
+                        </tr>
                         totalquantity = 0;
                     }
                     totalquantity += item.Quantity;
                     allquantity += item.Quantity;
                     <tr>
-                        <td>@item.ItemCode</td>
-                        <td>@item.ItemName</td>
-                        <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                        <td class="min-width-50"><nobr>@item.Quantity</nobr></td>
+                        <td class="min-width-50"><nobr>@item.Unit</nobr></td>
+                        @*<td>@item.ItemCode</td>
+                <td>@item.ItemName</td>*@
+                        <td>@item.ItemCode - @item.ItemName</td>
                     </tr>
                 }
-                <tr>
+                @*<tr>
                     <td colspan="2" class="right-text">Total Quantity for <strong>Box @group</strong></td>
                     <td class="right-text"><nobr>@totalquantity</nobr></td>
-                </tr>
+                </tr>*@
             }
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="2" class="right-text">Total</th>
-                <th class="right-text"><nobr>@allquantity</nobr></th>
+                <th class="left-text min-width-50"><nobr>@allquantity</nobr></th>
+                <th colspan="2" class="left-text">Total Overall</th>
             </tr>
         </tfoot>
     </table>

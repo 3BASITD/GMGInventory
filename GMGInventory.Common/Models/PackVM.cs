@@ -60,6 +60,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Packed By")]
         public string PackBy { get; set; }
+
+        [Display(Name = "Agent")]
+        public string Agent { get; set; }
     }
 
     public class PackItemVM
@@ -80,6 +83,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
+
+        [Display(Name = "Unit")]
+        public string Unit { get; set; }
 
         [Display(Name = "Quantity")]
         public int Quantity { get; set; }

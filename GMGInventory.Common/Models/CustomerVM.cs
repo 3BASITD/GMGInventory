@@ -96,7 +96,7 @@ namespace GMGInventory.Common.Models
 
         [MaxLength(100)]
         [MinLength(3)]
-        [Display(Name = "Remarks")]
+        [Display(Name = "Customer Status")]
         public string? Remarks { get; set; }
 
         [Display(Name = "Outstanding Balance")]

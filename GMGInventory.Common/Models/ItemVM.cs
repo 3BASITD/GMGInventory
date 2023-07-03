@@ -27,6 +27,7 @@ namespace GMGInventory.Common.Models
 
         public int? ItemId { get; set; }
         public string? ItemKeyword { get; set; }
+        public string? ItemNameKeyword { get; set; }
 
         public string? ModelNumber { get; set; }
         public string? Size { get; set; }

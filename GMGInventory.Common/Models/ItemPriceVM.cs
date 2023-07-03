@@ -32,7 +32,13 @@ namespace GMGInventory.Common.Models
         public decimal NetPrice { get; set; }
 
         [Display(Name = "Quantity on Hand")]
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD => QuantityInventoryD
+                             + (QuantityServedD != null ? (int)QuantityServedD : 0)
+                             - (QuantityInvoiceD != null ? (int)QuantityInvoiceD : 0);
+        public int QuantityInventoryD { get; set; }
+        public int? QuantityServedD { get; set; }
+        public int? QuantityInvoiceD { get; set; }
 
         [Display(Name = "Category")]
         public string Category { get; set; }

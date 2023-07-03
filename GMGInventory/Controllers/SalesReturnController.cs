@@ -71,5 +71,10 @@ namespace GMGInventory.Controllers
 
             return Json(responseModel);
         }
+
+        public async Task<IActionResult> PrintDetails(int Id)
+        {
+            return View(await salesReturnRepository.PrintDetails(Id));
+        }
     }
 }

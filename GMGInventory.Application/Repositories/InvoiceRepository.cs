@@ -79,6 +79,26 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetOptionsBIRInvoiceNumber(string search, int page)
+        {
+            var invoices = from invoice in context.Invoices
+                           where (string.IsNullOrWhiteSpace(search)
+                              || invoice.ControlNumber.ToLower().Contains(search.ToLower()))
+                           orderby invoice.ControlNumber ascending
+                           select new JsonOptionsModel
+                           {
+                               Id = invoice.Id.ToString(),
+                               Text = invoice.ControlNumber
+                           };
+            var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
+                //incomplete_results = false,
+                items = invoicesFiltered,
+                total_count = invoices.Count()
+            };
+        }
+
         public async Task<Select2Model<JsonOptionsModel>> GetInvoiceByCustomer(string search, int page, int customer)
         {
             var invoices = from invoice in context.Invoices
@@ -185,8 +205,10 @@ namespace GMGInventory.Application.Repositories
             var items = await GetItemsAsync(Id);
             invoiceDetails.Items = items;
             invoiceDetails.TotalD = items.Sum(s => s.GrossPriceNoDiscountD);
-            invoiceDetails.DiscountAmountD = items.Sum(s => s.GrossPriceD);
-            invoiceDetails.DiscountPercentD = 100 - (items.Sum(s => s.GrossPriceD) / items.Sum(s => s.GrossPriceNoDiscountD) * 100);
+            invoiceDetails.DiscountedTotalD = items.Sum(s => s.GrossPriceD);
+            invoiceDetails.DiscountPercentD = items.Count() > 0
+                                            ? (100 - (items.Sum(s => s.GrossPriceD) / items.Sum(s => s.GrossPriceNoDiscountD) * 100))
+                                            : 0;
             invoiceDetails.TotalAmountD = items.Sum(s => s.GrossPriceNoDiscountD);
             return invoiceDetails;
         }
@@ -606,6 +628,15 @@ namespace GMGInventory.Application.Repositories
                 }
                 else if (form.SavingAs == "update")
                 {
+                    if (await context.Agents.AnyAsync(s => s.Id == form.Agent))
+                    {
+                        var so = await context.SalesOrders.Where(s => s.Id == invoice.SalesOrderId).FirstOrDefaultAsync();
+                        if (so != null)
+                        {
+                            so.AgentId = form.Agent;
+                            context.SalesOrders.Update(so);
+                        }
+                    }
                     invoice.ControlNumber = form.BIRInvoiceNumber;
                     invoice.InvoiceTypeId = form.InvoiceType;
                     invoice.InvoiceDate = form.InvoiceDate;
@@ -617,6 +648,15 @@ namespace GMGInventory.Application.Repositories
                 } else
                 {
                     await DeleteInvoiceItems(form, true);
+                    if (await context.Agents.AnyAsync(s => s.Id == form.Agent))
+                    {
+                        var so = await context.SalesOrders.Where(s => s.Id == invoice.SalesOrderId).FirstOrDefaultAsync();
+                        if (so != null)
+                        {
+                            so.AgentId = form.Agent;
+                            context.SalesOrders.Update(so);
+                        }
+                    }
                     int statusId = await context.Statuses
                                                 .Where(s => ((s.Name == "Invoice Draft" && form.SavingAs == "save")
                                                           || (s.Name == "Invoice Submitted" && form.SavingAs == "post")))

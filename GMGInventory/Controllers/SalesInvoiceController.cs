@@ -94,7 +94,8 @@ namespace GMGInventory.Controllers
         }
 
         [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin)]
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Create(int? Id)
         {
             var order = await invoiceRepository.GetDetailsByPackAsync(Id);
@@ -107,7 +108,8 @@ namespace GMGInventory.Controllers
         }
 
         [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin)]
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> SaveJson(InvoiceFormVM form)
         {

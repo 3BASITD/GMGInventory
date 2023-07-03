@@ -22,11 +22,18 @@ namespace GMGInventory.Application.Repositories
                                                .ThenInclude(s => s.Unit) on so.Id equals sl.SalesOrderId
                              join iv in context.Invoices
                                                .Include(s => s.Status) on so.Id equals iv.SalesOrderId
-                             where (filter.CustomerId == null || filter.CustomerId == so.CustomerId)
-                                && (filter.ItemId == null || filter.ItemId == sl.ItemId)
-                                && (filter.CategoryId == null || filter.CategoryId == sl.Item.CategoryId)
-                                && (filter.ItemTypeId == null || filter.ItemTypeId == sl.Item.ItemTypeId)
-                                && (filter.BrandId == null || filter.BrandId == sl.Item.BrandId)
+                             where (filter.CategoryId == null || filter.CategoryId == sl.Item.Category.Id || (filter.CategoryId == 0 && (sl.Item.Category.Code + " " + sl.Item.Category.Name).ToLower().Contains((filter.CustomerKeyword + "").ToLower())))
+                                && (filter.BrandId == null || filter.BrandId == sl.Item.Brand.Id || (filter.BrandId == 0 && (sl.Item.Brand.Code + " " + sl.Item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
+                                && (filter.ItemTypeId == null || filter.ItemTypeId == sl.Item.ItemType.Id || (filter.ItemTypeId == 0 && (sl.Item.ItemType.Code + " " + sl.Item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
+                                && (filter.CustomerId == null || filter.CustomerId == so.Customer.Id || (filter.CustomerId == 0 && (so.Customer.Code + " " + so.Customer.Name).ToLower().Contains((filter.CustomerKeyword + "").ToLower())))
+                                && (filter.ItemId == null || filter.ItemId == 0 || filter.ItemId == sl.Item.Id)
+                                && (filter.ItemKeyword == null || sl.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower()))
+                                && (filter.ItemNameKeyword == null || sl.Item.Name.ToLower().Contains((filter.ItemNameKeyword + "").ToLower()))
+                                //(filter.CustomerId == null || filter.CustomerId == so.CustomerId)
+                                //&& (filter.ItemId == null || filter.ItemId == sl.ItemId)
+                                //&& (filter.CategoryId == null || filter.CategoryId == sl.Item.CategoryId)
+                                //&& (filter.ItemTypeId == null || filter.ItemTypeId == sl.Item.ItemTypeId)
+                                //&& (filter.BrandId == null || filter.BrandId == sl.Item.BrandId)
                                 && filter.DateFrom <= iv.InvoiceDate.Date
                                 && iv.InvoiceDate.Date <= filter.DateTo
                                 //&& iv.Status.Name == "Invoice Submitted"

@@ -170,6 +170,14 @@ namespace GMGInventory.Application.Repositories
                     context.SalesOrderDeliveryMonitorings.Update(delivery);
                     message = "Delivery details updated successfully";
                 }
+
+                var so = await context.SalesOrders.Where(s => s.Id == delivery.SalesOrderId).FirstOrDefaultAsync();
+                if(so != null)
+                {
+                    so.ForwarderId = delivery.ForwarderId;
+                    context.SalesOrders.Update(so);
+                }
+
                 await context.SaveChangesAsync(currentUserId);
 
                 return message;

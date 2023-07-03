@@ -100,9 +100,8 @@ namespace GMGInventory.Controllers
         }
 
         [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
                          + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         public async Task<ActionResult> Create(int? Id)
         {
@@ -115,10 +114,10 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> SaveJson(SalesOrderFormVM form)
@@ -131,10 +130,10 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
+        [Authorize(Roles = Roles.Accounting + ","
+                         + Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> SaveItemsJson(SalesOrderFormVM form)
@@ -213,11 +212,6 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Details), new { id = Id });
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<ActionResult> UpdateServedSOItem(int salesOrderLineItemId, int quantity)
         {

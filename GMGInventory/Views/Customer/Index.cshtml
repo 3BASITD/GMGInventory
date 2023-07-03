@@ -209,7 +209,7 @@
                         </div>
                         <div class="col-md-8">
                             <div class="form-group">
-                                <label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
+                                <label for="create-remarks" class="control-label mb-0 d-block">Customer Status</label>
                                 <input name="Remarks" id="create-remarks" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-remarks" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -446,20 +446,37 @@
             }
         });
 
+        $("#create-region").on("select2:select", function () {
+            $("#edit-area").val('').trigger('change');
+        });
+
         // Load Select2 Area
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Area")",
-            success: function (data, status, xhr) {
-                $("#create-area").select2({
-                    data: data,
-                    dropdownParent: $("#createModal")
-                });
-                $("#edit-area").select2({
-                    data: data,
-                    dropdownParent: $("#editModal")
-                });
-            }
+        $("#create-area").select2({
+            //minimumInputLength: 1,
+            placeholder: "",
+            ajax: {
+                url: "@Url.Action("GetByRegionOptions", "Area")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        region: $("#create-region").val()
+                            };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#createModal")
         });
 
         // Load Select2 Customer Type

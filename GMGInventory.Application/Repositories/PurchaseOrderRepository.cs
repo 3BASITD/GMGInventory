@@ -76,6 +76,7 @@ namespace GMGInventory.Application.Repositories
                                Address1 = order.Supplier.AddressLine1,
                                Address2 = order.Supplier.AddressLine2,
                                Currency = order.Currency.Code,
+                               CurrencyId = order.CurrencyId,
                                CurrencyRateD = order.CurrencyRate,
                                DateCreatedD = order.DateCreated,
                                DateModifiedD = order.DateModified,
@@ -271,6 +272,11 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        private decimal ComputeDiscount(decimal Amount, decimal Discount)
+        {
+            return (Amount * (100 - Discount)) / 100m;
+        }
+
         private async Task<int> SaveOrderAsync(PurchaseOrderFormVM form, int statusId)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
@@ -283,7 +289,10 @@ namespace GMGInventory.Application.Repositories
                 poNumber = string.Format("{0:PO00000000}", previousOrders);
             }
 
-            decimal totalPurchaseAmount = form.Items.Sum(s => (decimal)s.Quantity * ((s.UnitPrice * (100 - s.Discount1 - s.Discount2 - s.Discount3)) / 100m));
+            decimal totalPurchaseAmount = form.Items.Sum(s => (decimal)s.Quantity * ComputeDiscount(ComputeDiscount(ComputeDiscount(s.UnitPrice, s.Discount1), s.Discount2), s.Discount3));
+
+            //decimal totalPurchaseAmount = form.Items.Sum(s => (decimal)s.Quantity * ((s.UnitPrice * (100 - s.Discount1 - s.Discount2 - s.Discount3)) / 100m));
+            
             if (orderVM == null)
             {
                 orderVM = new PurchaseOrder
@@ -304,6 +313,9 @@ namespace GMGInventory.Application.Repositories
             {
                 orderVM.StatusId = statusId;
                 orderVM.TotalPurchaseAmount = totalPurchaseAmount;
+                orderVM.CurrencyId = form.Currency;
+                orderVM.CurrencyRate = form.CurrencyRate;
+                orderVM.ReferenceNumber = form.ReferenceNumber;
                 context.PurchaseOrders.Update(orderVM);
             }
             await context.SaveChangesAsync(currentUserId);

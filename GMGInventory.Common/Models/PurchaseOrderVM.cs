@@ -49,6 +49,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Currency")]
         public string Currency { get; set; }
+        public int CurrencyId { get; set; }
 
         [Display(Name = "Currency Rate")]
         public string CurrencyRate => string.Format(SystemFormat.StringDecimalComma, CurrencyRateD);
@@ -89,7 +90,12 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Gross Price")]
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
-        public decimal NetPriceD => Quantity * (((100m - Discount1D - Discount2D - Discount3D) * UnitPriceD) / 100m);
+        //public decimal NetPriceD => Quantity * (((100m - Discount1D - Discount2D - Discount3D) * UnitPriceD) / 100m);
+        public decimal NetPriceD => Quantity * ComputeDiscount(ComputeDiscount(ComputeDiscount(UnitPriceD, Discount1D), Discount2D), Discount3D);
+        private decimal ComputeDiscount(decimal Amount, decimal Discount)
+        {
+            return (Amount * (100 - Discount)) / 100m;
+        }
     }
 
     public class PurchaseOrderFormVM

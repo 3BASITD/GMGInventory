@@ -153,7 +153,7 @@
                         //if (data.currentUsersDraft == true) {
                         //    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         //}
-                        if (data.status == "Posted" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin"))) {
+                        if (data.status == "Posted" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin"))) {// || userIsInRole("Telemarketer"))) {
                             actions += '<a href="@Url.Action("Create","SalesInvoice")/' + data.id + '" class="btn btn-primary btn-xs invoiceBtn" type="button" data-microtip-title="Start Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-file-invoice"></i></a>';
                         }
                         return actions + "</div>";

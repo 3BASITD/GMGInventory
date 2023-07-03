@@ -795,51 +795,79 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<DailySalesRVM>> GetDailySales(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && invoice.Invoice.InvoiceNumber.CompareTo(filter.InvoiceNumberFrom) >= 0
-                           && invoice.Invoice.InvoiceNumber.CompareTo(filter.InvoiceNumberTo) <= 0
-                           && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
+            //var invoices = from invoice in context.InvoiceLineItems
+            //               where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
+            //               && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
+            //               && (filter.InvoiceNumberFrom == null || invoice.Invoice.InvoiceNumber.CompareTo(filter.InvoiceNumberFrom) >= 0)
+            //               && (filter.InvoiceNumberTo == null || invoice.Invoice.InvoiceNumber.CompareTo(filter.InvoiceNumberTo) <= 0)
+            //               && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
+            //               select new DailySalesRVM
+            //               {
+            //                   Agent = invoice.Invoice.SalesOrder.Agent.FirstName
+            //                         + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
+            //                         + invoice.Invoice.SalesOrder.Agent.LastName,
+            //                   AmountD = invoice.UnitPrice * invoice.Quantity,
+            //                   //CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
+            //                   //                ? invoice.Invoice.SalesOrder.Agent.CommissionRate
+            //                   //                : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
+            //                   CustomerCode = invoice.Invoice.SalesOrder.Customer.Code,
+            //                   CustomerName = invoice.Invoice.SalesOrder.Customer.Name,
+            //                   InvoiceDateD = invoice.Invoice.InvoiceDate,
+            //                   InvoiceNumber = invoice.Invoice.InvoiceNumber,
+            //                   BIRInvoiceNumber = invoice.Invoice.ControlNumber,
+            //                   Term = invoice.Invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.Invoice.SalesOrder.Customer.CreditTerm.Name
+            //               };
+            //var grpinvoice = from invoice in await invoices.ToListAsync()
+            //                 orderby invoice.InvoiceDateD ascending, invoice.BIRInvoiceNumber ascending
+            //                 group invoice by new
+            //                 {
+            //                     invoice.Agent,
+            //                     //invoice.CommissionRateD,
+            //                     invoice.CustomerCode,
+            //                     invoice.CustomerName,
+            //                     invoice.InvoiceDateD,
+            //                     invoice.InvoiceNumber,
+            //                     invoice.BIRInvoiceNumber,
+            //                     invoice.Term
+            //                 } into i
+            //                 select new DailySalesRVM
+            //                 {
+            //                     Agent = i.Key.Agent,
+            //                     AmountD = i.Sum(s => s.AmountD),
+            //                     //CommissionRateD = i.Key.CommissionRateD,
+            //                     CustomerCode = i.Key.CustomerCode,
+            //                     CustomerName = i.Key.CustomerName,
+            //                     InvoiceDateD = i.Key.InvoiceDateD,
+            //                     InvoiceNumber = i.Key.InvoiceNumber,
+            //                     BIRInvoiceNumber = i.Key.BIRInvoiceNumber,
+            //                     Term = i.Key.Term
+            //                 };
+            //return grpinvoice.ToList();
+
+            var invoices = from invoice in context.Invoices
+                           where filter.DateFrom <= invoice.InvoiceDate.Date
+                           && invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.InvoiceNumberFrom == null || invoice.ControlNumber.CompareTo(filter.InvoiceNumberFrom) >= 0)
+                           && (filter.InvoiceNumberTo == null || invoice.ControlNumber.CompareTo(filter.InvoiceNumberTo) <= 0)
+                           && (filter.StatusCode == null || invoice.Status.Code == filter.StatusCode)
                            select new DailySalesRVM
                            {
-                               Agent = invoice.Invoice.SalesOrder.Agent.FirstName
-                                     + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
-                                     + invoice.Invoice.SalesOrder.Agent.LastName,
-                               AmountD = invoice.UnitPrice * invoice.Quantity,
-                               CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
-                                               ? invoice.Invoice.SalesOrder.Agent.CommissionRate
-                                               : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
-                               CustomerCode = invoice.Invoice.SalesOrder.Customer.Code,
-                               CustomerName = invoice.Invoice.SalesOrder.Customer.Name,
-                               InvoiceDateD = invoice.Invoice.InvoiceDate,
-                               InvoiceNumber = invoice.Invoice.InvoiceNumber,
-                               Term = invoice.Invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.Invoice.SalesOrder.Customer.CreditTerm.Name
+                               Agent = invoice.SalesOrder.Agent.FirstName
+                                     + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) + " "
+                                     + invoice.SalesOrder.Agent.LastName,
+                               AmountD = invoice.Amount,
+                               //CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
+                               //                ? invoice.Invoice.SalesOrder.Agent.CommissionRate
+                               //                : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
+                               CustomerCode = invoice.SalesOrder.Customer.Code,
+                               CustomerName = invoice.SalesOrder.Customer.Name,
+                               InvoiceDateD = invoice.InvoiceDate,
+                               InvoiceNumber = invoice.InvoiceNumber,
+                               BIRInvoiceNumber = invoice.ControlNumber,
+                               Term = invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.SalesOrder.Customer.CreditTerm.Name,
+                               PercentD = invoice.SalesOrder.Agent.CommissionRate
                            };
-            var grpinvoice = from invoice in await invoices.ToListAsync()
-                             orderby invoice.InvoiceDateD ascending, invoice.InvoiceNumber ascending
-                             group invoice by new
-                             {
-                                 invoice.Agent,
-                                 invoice.CommissionRateD,
-                                 invoice.CustomerCode,
-                                 invoice.CustomerName,
-                                 invoice.InvoiceDateD,
-                                 invoice.InvoiceNumber,
-                                 invoice.Term
-                             } into i
-                             select new DailySalesRVM
-                             {
-                                 Agent = i.Key.Agent,
-                                 AmountD = i.Sum(s => s.AmountD),
-                                 CommissionRateD = i.Key.CommissionRateD,
-                                 CustomerCode = i.Key.CustomerCode,
-                                 CustomerName = i.Key.CustomerName,
-                                 InvoiceDateD = i.Key.InvoiceDateD,
-                                 InvoiceNumber = i.Key.InvoiceNumber,
-                                 Term = i.Key.Term
-                             };
-            return grpinvoice.ToList();
+            return await invoices.ToListAsync();
         }
 
         public async Task<ForDataTables<DailySalesRVM>> GetDailySalesDT(DataTablesRequestForm form, ListFilterSalesModel filter)
@@ -858,7 +886,8 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue)
                                     || x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.CommissionRateD.ToString().Contains(form.SearchValue)
+                                    || x.BIRInvoiceNumber.ToLower().Contains(form.SearchValue)
+                                    //|| x.CommissionRateD.ToString().Contains(form.SearchValue)
                                     || x.CustomerCode.ToLower().Contains(form.SearchValue)
                                     || x.CustomerName.ToLower().Contains(form.SearchValue)
                                     || x.InvoiceDate.ToLower().Contains(form.SearchValue)
@@ -876,7 +905,8 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Agent": data = data.OrderBy(s => s.Agent); break;
                         case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "CommissionRate": data = data.OrderBy(s => s.CommissionRateD); break;
+                        case "BIRInvoiceNumber": data = data.OrderBy(s => s.BIRInvoiceNumber); break;
+                        //case "CommissionRate": data = data.OrderBy(s => s.CommissionRateD); break;
                         case "CustomerCode": data = data.OrderBy(s => s.CustomerCode); break;
                         case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
                         case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDateD); break;
@@ -891,7 +921,8 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Agent": data = data.OrderByDescending(s => s.Agent); break;
                         case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "CommissionRate": data = data.OrderByDescending(s => s.CommissionRateD); break;
+                        case "BIRInvoiceNumber": data = data.OrderByDescending(s => s.BIRInvoiceNumber); break;
+                        //case "CommissionRate": data = data.OrderByDescending(s => s.CommissionRateD); break;
                         case "CustomerCode": data = data.OrderByDescending(s => s.CustomerCode); break;
                         case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
                         case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDateD); break;
@@ -936,55 +967,87 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<SalesInvoiceRVM>> GetSalesInvoice(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
-                           && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
-                           && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
+            //var invoices = from invoice in context.InvoiceLineItems
+            //               where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
+            //               && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
+            //               && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
+            //               && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
+            //               && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
+            //               && (filter.Region2 == null ||
+            //                  (filter.Region2 == "ML" && (invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "MM"
+            //                                           || invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "LUZ")) ||
+            //                  (filter.Region2 == "VM" && (invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "VIS"
+            //                                           || invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "MIN"))
+            //               )
+            //               select new SalesInvoiceRVM
+            //               {
+            //                   Agent = invoice.Invoice.SalesOrder.Agent.FirstName
+            //                         + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
+            //                         + invoice.Invoice.SalesOrder.Agent.LastName,
+            //                   AgentCode = invoice.Invoice.SalesOrder.Agent.Code,
+            //                   AmountD = invoice.UnitPrice * invoice.Quantity,
+            //                   ControlNumber = invoice.Invoice.ControlNumber,
+            //                   CustomerCode = invoice.Invoice.SalesOrder.Customer.Code,
+            //                   CustomerName = invoice.Invoice.SalesOrder.Customer.Name,
+            //                   InvoiceDateD = invoice.Invoice.InvoiceDate.Date,
+            //                   InvoiceNumber = invoice.Invoice.InvoiceNumber,
+            //                   Status = invoice.Invoice.Status.Code
+            //               };
+            //var grpinvoice = from invoice in await invoices.ToListAsync()
+            //                 orderby invoice.ControlNumber ascending, invoice.InvoiceDateD ascending, invoice.CustomerCode ascending
+            //                 group invoice by new
+            //                 {
+            //                     invoice.Agent,
+            //                     invoice.AgentCode,
+            //                     invoice.ControlNumber,
+            //                     invoice.CustomerCode,
+            //                     invoice.CustomerName,
+            //                     invoice.InvoiceDateD,
+            //                     invoice.InvoiceNumber,
+            //                     invoice.Status
+            //                 } into i
+            //                 select new SalesInvoiceRVM
+            //                 {
+            //                     Agent = i.Key.Agent,
+            //                     AgentCode = i.Key.AgentCode,
+            //                     AmountD = i.Sum(s => s.AmountD),
+            //                     ControlNumber = i.Key.ControlNumber,
+            //                     CustomerCode = i.Key.CustomerCode,
+            //                     CustomerName = i.Key.CustomerName,
+            //                     InvoiceDateD = i.Key.InvoiceDateD,
+            //                     InvoiceNumber = i.Key.InvoiceNumber,
+            //                     Status = i.Key.Status
+            //                 };
+            //return grpinvoice.ToList();
+
+
+            var invoices = from invoice in context.Invoices
+                           where filter.DateFrom <= invoice.InvoiceDate.Date
+                           && invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.Agent == null || invoice.SalesOrder.Agent.Id == filter.Agent)
+                           && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
+                           && (filter.StatusCode == null || invoice.Status.Code == filter.StatusCode)
                            && (filter.Region2 == null ||
-                              (filter.Region2 == "ML" && (invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "MM"
-                                                       || invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "LUZ")) ||
-                              (filter.Region2 == "VM" && (invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "VIS"
-                                                       || invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "MIN"))
+                              (filter.Region2 == "ML" && (invoice.SalesOrder.Customer.Area.Region.Code == "MM"
+                                                       || invoice.SalesOrder.Customer.Area.Region.Code == "LUZ")) ||
+                              (filter.Region2 == "VM" && (invoice.SalesOrder.Customer.Area.Region.Code == "VIS"
+                                                       || invoice.SalesOrder.Customer.Area.Region.Code == "MIN"))
                            )
                            select new SalesInvoiceRVM
                            {
-                               Agent = invoice.Invoice.SalesOrder.Agent.FirstName
-                                     + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
-                                     + invoice.Invoice.SalesOrder.Agent.LastName,
-                               AmountD = invoice.UnitPrice * invoice.Quantity,
-                               ControlNumber = invoice.Invoice.ControlNumber,
-                               CustomerCode = invoice.Invoice.SalesOrder.Customer.Code,
-                               CustomerName = invoice.Invoice.SalesOrder.Customer.Name,
-                               InvoiceDateD = invoice.Invoice.InvoiceDate.Date,
-                               InvoiceNumber = invoice.Invoice.InvoiceNumber,
-                               Status = invoice.Invoice.Status.Code
+                               Agent = invoice.SalesOrder.Agent.FirstName
+                                     + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) + " "
+                                     + invoice.SalesOrder.Agent.LastName,
+                               AgentCode = invoice.SalesOrder.Agent.Code,
+                               AmountD = invoice.Amount,
+                               ControlNumber = invoice.ControlNumber,
+                               CustomerCode = invoice.SalesOrder.Customer.Code,
+                               CustomerName = invoice.SalesOrder.Customer.Name,
+                               InvoiceDateD = invoice.InvoiceDate.Date,
+                               InvoiceNumber = invoice.InvoiceNumber,
+                               Status = invoice.Status.Code
                            };
-            var grpinvoice = from invoice in await invoices.ToListAsync()
-                             orderby invoice.ControlNumber ascending, invoice.InvoiceDateD ascending, invoice.CustomerCode ascending
-                             group invoice by new
-                             {
-                                 invoice.Agent,
-                                 invoice.ControlNumber,
-                                 invoice.CustomerCode,
-                                 invoice.CustomerName,
-                                 invoice.InvoiceDateD,
-                                 invoice.InvoiceNumber,
-                                 invoice.Status
-                             } into i
-                             select new SalesInvoiceRVM
-                             {
-                                 Agent = i.Key.Agent,
-                                 AmountD = i.Sum(s => s.AmountD),
-                                 ControlNumber = i.Key.ControlNumber,
-                                 CustomerCode = i.Key.CustomerCode,
-                                 CustomerName = i.Key.CustomerName,
-                                 InvoiceDateD = i.Key.InvoiceDateD,
-                                 InvoiceNumber = i.Key.InvoiceNumber,
-                                 Status = i.Key.Status
-                             };
-            return grpinvoice.ToList();
+            return await invoices.ToListAsync();
         }
 
         public async Task<ForDataTables<SalesInvoiceRVM>> GetSalesInvoiceDT(DataTablesRequestForm form, ListFilterSalesModel filter)

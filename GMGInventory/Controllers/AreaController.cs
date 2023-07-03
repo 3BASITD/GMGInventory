@@ -37,6 +37,11 @@ namespace GMGInventory.Controllers
             return Json(await areaRepository.GetOptions2(search, page));
         }
 
+        public async Task<IActionResult> GetByRegionOptions(string search, int page, int? region)
+        {
+            return Json(await areaRepository.GetByRegionOptions(search, page, region));
+        }
+
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]

@@ -57,6 +57,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Address")]
         public string CustomerAddress { get; set; }
 
+        [Display(Name = "Customer Status")]
+        public string CustomerStatus { get; set; }
+
         [Display(Name = "Outstanding Balance")]
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
         public decimal OutstandingBalanceD { get; set; }

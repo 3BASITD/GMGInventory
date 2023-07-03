@@ -167,7 +167,7 @@
                             <div class="form-group">
                                 <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
                                 @*<input type="number" step="0.01" min="0" max="1999999.99" name="Debit" id="edit-debit" class="form-control form-control-sm" />*@
-                                <input type="text" name="Debit" id="edit-debit" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm mask-input-number" />
+                                <input type="text" name="Debit" id="edit-debit" class="form-control form-control-sm mask-decimal" />
                                 <span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
@@ -175,7 +175,7 @@
                             <div class="form-group">
                                 <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
                                 @*<input type="number" step="0.01" min="0" max="1999999.99" name="Credit" id="edit-credit" class="form-control form-control-sm" />*@
-                                <input type="text" name="Credit" id="edit-credit" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                                <input type="text" name="Credit" id="edit-credit" class="form-control form-control-sm mask-decimal" />
                                 <span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
@@ -183,7 +183,7 @@
                             <div class="form-group">
                                 <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
                                 @*<input type="number" step="0.01" min="0" max="1999999.99" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />*@
-                                <input type="text" name="FreightCost" id="edit-freight-cost" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                                <input type="text" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm mask-decimal" />
                                 <span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
@@ -240,7 +240,7 @@
                                 <label for="tbr-amount" class="control-label mb-0 d-block">Amount</label>
                                 @*<input type="number" step="0.01" min="0" max="1999999.99" name="Amount" id="tbr-amount" class="form-control form-control-sm" />
                                 *@
-                                <input type="text" name="Amount" data-mask="9,999,990.00" data-mask-reverse="true" id="tbr-amount" class="form-control form-control-sm" />
+                                <input type="text" name="Amount" id="tbr-amount" class="form-control form-control-sm mask-decimal" />
                                 <input type="hidden" id="tbr-amount-max" class="form-control form-control-sm" />
                                 <span data-valmsg-for="tbr-amount" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -355,7 +355,7 @@
                     </div>
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm" />*@
-                        <input type="text" name="OverPayment" id="payment-over-payment" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        <input type="text" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm mask-decimal" />
                         
                     </div>
                     <div class="col-4 col-lg-3">
@@ -363,7 +363,7 @@
                     </div>
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="TKT" id="payment-tkt" class="form-control form-control-sm" />*@
-                        <input type="text" name="TKT" id="payment-tkt" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        <input type="text" name="TKT" id="payment-tkt" class="form-control form-control-sm mask-decimal" />
                     </div>
                 </div>
                 <div class="row align-items-center form-group">
@@ -372,14 +372,14 @@
                     </div>
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="TAX" id="payment-tax" class="form-control form-control-sm" />*@
-                        <input type="text" name="TAX" id="payment-tax" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        <input type="text" name="TAX" id="payment-tax" class="form-control form-control-sm mask-decimal" />
                     </div>
                     <div class="col-4 col-lg-3">
                         <label for="payment-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
                     </div>
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm" />*@
-                        <input type="text" name="CashAdvanced" id="payment-cash-advanced" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        <input type="text" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm mask-decimal" />
                     </div>
                 </div>
                 <div class="row align-items-center form-group">
@@ -388,14 +388,14 @@
                     </div>
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="Discount" id="payment-discount" class="form-control form-control-sm" />*@
-                        <input type="text" name="Discount" id="payment-discount" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        <input type="text" name="Discount" id="payment-discount" class="form-control form-control-sm mask-decimal" />
                     </div>
                     <div class="col-4 col-lg-3">
                         <label for="payment-offset" class="control-label mb-0 d-block">Offset</label>
                     </div>
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="Offset" id="payment-offset" class="form-control form-control-sm" />*@
-                        <input type="text" name="Offset" id="payment-offset" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        <input type="text" name="Offset" id="payment-offset" class="form-control form-control-sm mask-decimal" />
                     </div>
                 </div>
                 <div class="row align-items-center form-group">
@@ -404,14 +404,14 @@
                     </div>
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm" />*@
-                        <input type="text" name="CashAmount" id="payment-cash-amount" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        <input type="text" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm mask-decimal" />
                     </div>
                     <div class="col-4 col-lg-3">
                         <label for="payment-backload" class="control-label mb-0 d-block">Back Load</label>
                     </div>
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="BackLoad" id="payment-backload" class="form-control form-control-sm" />*@
-                        <input type="text" name="BackLoad" id="payment-backload" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                        <input type="text" name="BackLoad" id="payment-backload" class="form-control form-control-sm mask-decimal" />
                     </div>
                 </div>
 
@@ -442,7 +442,7 @@
                                             <div class="form-group">
                                                 <label for="check-checkamount" class="control-label mb-0 d-block">Check Amount</label>
                                                 @*<input type="number" step="0.01" min="0" max="1999999.99" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm" />*@
-                                                <input type="text" name="CheckAmount" id="check-checkamount" data-mask="9,999,990.00" data-mask-reverse="true" class="form-control form-control-sm" />
+                                                <input type="text" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm mask-decimal" />
                                                 <span data-valmsg-for="check-checkamount" data-valmsg-replace="true" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -616,7 +616,7 @@
                 var baltotal = api.rows().data().reduce(function (a, b) {
                     return a + b.invoiceAmountD - b.tbrd - b.creditD + b.debitD - b.paidAmountD + b.freightChargeD;
                 }, 0);
-                $(api.column(9).footer()).html(FormatStringDecimal(baltotal));
+                $(api.column(9).footer()).html(FormatStringDecimal(Math.max(baltotal, 0)));
             }
         });
 
@@ -715,14 +715,14 @@
                 Debit: { rangeForMasked: [0, 1999999.99] },
                 Credit: { rangeForMasked: [0, 1999999.99] },
                 FreightCost: { rangeForMasked: [0, 1999999.99] },
-                FreightWaybill: {
-                    required: function (element) {
-                        return $("#edit-freight-cost").val() != "" && removeCommaOfNumber($("#edit-freight-cost").val()) != 0;
-                    }
-                }
+                //FreightWaybill: {
+                //    required: function (element) {
+                //        return $("#edit-freight-cost").val() != "" && removeCommaOfNumber($("#edit-freight-cost").val()) != 0;
+                //    }
+                //}
             },
             messages: {
-                FreightWaybill: { required: "Freight's Waybill is required" }
+                //FreightWaybill: { required: "Freight's Waybill is required" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();

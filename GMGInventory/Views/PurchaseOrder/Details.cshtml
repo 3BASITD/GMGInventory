@@ -8,10 +8,10 @@
     <li class="breadcrumb-item"><a asp-controller="Replenish" asp-action="Index">Replenish Orders</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
+<div class="card card-default">
+    <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
-            <div class="card-tools">
+        <div class="card-tools">
             @if (Model.Status == "Draft")
             {
                 <button type="button" onclick="SaveReplenish('Replenish')" class="btn btn-primary btn-sm float-right ml-2 btn-details-replenish">
@@ -20,40 +20,42 @@
                 <button type="button" onclick="SaveReplenish('Draft')" class="btn btn-secondary btn-sm float-right ml-2 btn-details-draft">
                     <span class="fab fa-firstdraft"></span> Save as Draft
                 </button>
-            } else {
-            <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-print">
+            }
+            else
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-print">
                     <span class="fas fa-print"></span> Print
                 </button>
             }
-                <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
-            </div>
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-4">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Supplier)
-                        </span>
-                        <b class="d-block">
-                            @Model?.Supplier
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Address1)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrEmpty(Model?.Address1.Trim()) ? "-" : Model.Address1)
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Supplier)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.Supplier
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Address1)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrEmpty(Model?.Address1.Trim()) ? "-" : Model.Address1)
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Address2)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @(string.IsNullOrEmpty(Model?.Address2.Trim()) ? "-" : Model.Address2)
                     </b>
                 </p>
@@ -61,7 +63,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Destination)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.Destination
                     </b>
                 </p>
@@ -71,25 +73,42 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.OrderDate)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.OrderDate
                     </b>
                 </p>
                 <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Currency)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Currency
-                    </b>
+                    @if (Model!.Status == "Draft")
+                    {
+                        <label for="replenish-currency" class="form-label fw-normal mb-0">Currency</label>
+                        <select id="replenish-currency" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Currency)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.Currency
+                        </b>
+                    }
                 </p>
                 <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CurrencyRate)
-                    </span>
-                    <b class="d-block">
-                        @Model?.CurrencyRate
-                    </b>
+                    @if (Model!.Status == "Draft")
+                    {
+                        <label for="replenish-currency-rate" class="form-label fw-normal mb-0">Currency Rate</label>
+                        <input type="number" id="replenish-currency-rate" name="CurrencyRate" step="0.01" min="0" max="1999999" class="form-control form-control-sm" value="@Model.CurrencyRate" />
+                        <span data-valmsg-for="replenish-currency-rate" data-valmsg-replace="true" class="text-danger"></span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CurrencyRate)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.CurrencyRate
+                        </b>
+                    }
                 </p>
             </div>
             <div class="col-4">
@@ -97,7 +116,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.OrderBy)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.OrderBy
                     </b>
                 </p>
@@ -105,17 +124,26 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.PONumber)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model?.PONumber
                     </b>
                 </p>
                 <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ReferenceNumber)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrEmpty(Model?.ReferenceNumber?.Trim()) ? "-" : Model.ReferenceNumber)
-                    </b>
+                    @if (Model!.Status == "Draft")
+                    {
+                        <label for="replenish-reference-number" class="form-label fw-normal mb-0">Reference Number</label>
+                        <input type="text" id="replenish-reference-number" name="ReferenceNumber" class="form-control form-control-sm" value="@Model?.ReferenceNumber" />
+                        <span data-valmsg-for="replenish-reference-number" data-valmsg-replace="true" class="text-danger"></span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ReferenceNumber)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @(string.IsNullOrEmpty(Model?.ReferenceNumber?.Trim()) ? "-" : Model.ReferenceNumber)
+                        </b>
+                    }
                 </p>
             </div>
         </div>
@@ -125,12 +153,12 @@
                     <div class="card-header bg-light">
                         <span class="card-title">Replenish Item(s)</span>
                         <div class="card-tools">
-            @if (Model?.Status == "Draft")
-            {
-                            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                <span class="fas fa-plus"></span> Add Replenish Item
-                            </button>
-            }
+                            @if (Model?.Status == "Draft")
+                            {
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                    <span class="fas fa-plus"></span> Add Replenish Item
+                                </button>
+                            }
                         </div>
                     </div>
                     <div class="card-body">
@@ -279,6 +307,27 @@
 
 @section Scripts {
     <script>
+        // Load currency data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetCurrencyOptions")",
+            data: {
+                IncludeId: @Model.CurrencyId
+            },
+            success: function (data, status, xhr) {
+                $("#replenish-currency").select2({
+                    data: data
+                });
+                $("#replenish-currency").on("select2:select", function () {
+                    $("#replenish-currency-rate").val($("#replenish-currency").select2("data")[0].rate);
+                });
+                //$("#replenish-currency").val(@Model.CurrencyId).trigger("change");
+                //setTimeout(function() {
+                //    $("#replenish-currency-rate").val(@(Model.CurrencyRateD).toFixed(2));
+                //}, 1000);
+            }
+        });
+
         // Load item for select2
         $("#add-code").select2({
             minimumInputLength: 1,
@@ -332,7 +381,11 @@
             var discount2 = parseFloat($("#add-discount2").val());
             var discount3 = parseFloat($("#add-discount3").val());
 
-            $("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+            var discounted1 = DeductDiscount(unit_price, discount1);
+            var discounted2 = DeductDiscount(discounted1, discount2);
+            var discounted3 = DeductDiscount(discounted2, discount3);
+            //$("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+            $("#add-net-price").val(Round2Decimal(quantity * discounted3));
         });
 
         function clearItemForm() {
@@ -518,7 +571,11 @@
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
                 var discount3 = parseFloat($(this).parents("tr").find(".discount3").val());
 
-                var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+                var discounted1 = DeductDiscount(unit_price, discount1);
+                var discounted2 = DeductDiscount(discounted1, discount2);
+                var discounted3 = DeductDiscount(discounted2, discount3);
+                //var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+                var net_price = FormatStringDecimal(Round2Decimal(quantity * discounted3));
                 $(this).parents("tr").find(".netprice").html(net_price);
                 ComputeTotalQuantity();
                 ComputeTotalNetPrice();
@@ -577,7 +634,10 @@
                     data: {
                         type: submitter,
                         Id: @Model?.Id,
-                        Items: itemsToReplenish
+                        Items: itemsToReplenish,
+                        Currency: $("#replenish-currency").val(),
+                        CurrencyRate: $("#replenish-currency-rate").val(),
+                        ReferenceNumber: $("#replenish-reference-number").val()
                     },
                     error: jQueryCommonError,
                     success: function (data, status, xhr) {

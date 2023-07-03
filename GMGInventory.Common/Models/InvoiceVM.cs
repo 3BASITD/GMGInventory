@@ -147,15 +147,21 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Discount Amount")]
         public string DiscountAmount => string.Format(SystemFormat.StringDecimalComma, DiscountAmountD);
-        public decimal DiscountAmountD { get; set; }
+        public decimal DiscountAmountD => TotalD - DiscountedTotalD;
+
+        [Display(Name = "Discounted Total")]
+        public string DiscountedTotal => string.Format(SystemFormat.StringDecimalComma, DiscountedTotalD);
+        public decimal DiscountedTotalD { get; set; }
 
         [Display(Name = "VAT Exclusive")]
         public string VATExclusive => string.Format(SystemFormat.StringDecimalComma, VATExclusiveD);
-        public decimal VATExclusiveD => TotalAmountD * 0.88m;
+        //public decimal VATExclusiveD => DiscountedTotalD * 0.88m;
+        public decimal VATExclusiveD => DiscountedTotalD / 1.12m;
 
         [Display(Name = "VAT Amount")]
         public string VATAmount => string.Format(SystemFormat.StringDecimalComma, VATAmountD);
-        public decimal VATAmountD => TotalAmountD * 0.12m;
+        //public decimal VATAmountD => DiscountedTotalD * 0.12m;
+        public decimal VATAmountD => VATExclusiveD * 0.12m;
 
         [Display(Name = "Total Amount")]
         public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
@@ -224,6 +230,7 @@ namespace GMGInventory.Common.Models
         public DateTime InvoiceDate { get; set; }
         public int InvoiceType { get; set; }
         public string Remarks { get; set; }
+        public int Agent { get; set; }
         public string SavingAs { get; set; }
         public IList<InvoiceFormItemVM> Items { get; set; }
     }

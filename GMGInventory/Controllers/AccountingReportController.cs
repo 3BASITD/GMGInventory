@@ -9,7 +9,8 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
+    [Authorize(Roles = Roles.Accounting + ","
+                     + Roles.InventoryManager + ","
                      + Roles.SalesDirector + ","
                      + Roles.SystemAdmin)]
     public class AccountingReportController : Controller

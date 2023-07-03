@@ -271,11 +271,14 @@ namespace GMGInventory.Common.Models
     public class DailySalesRVM
     {
         [Display(Name = "Invoice Date")]
-        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
+        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate2);
         public DateTime InvoiceDateD { get; set; }
 
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
+
+        [Display(Name = "BIR Invoice Number")]
+        public string BIRInvoiceNumber { get; set; }
 
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
@@ -289,9 +292,13 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Term")]
         public string Term { get; set; }
 
-        [Display(Name = "Commission Rate")]
-        public string CommissionRate => string.Format(SystemFormat.StringDecimalComma, CommissionRateD);
-        public decimal CommissionRateD { get; set; }
+        [Display(Name = "Percent")]
+        public string Percent => string.Format(SystemFormat.StringIntegerComma, Math.Round(PercentD));
+        public decimal PercentD { get; set; }
+
+        //[Display(Name = "Commission Rate")]
+        //public string CommissionRate => string.Format(SystemFormat.StringDecimalComma, CommissionRateD);
+        //public decimal CommissionRateD { get; set; }
 
         [Display(Name = "Total Amount")]
         public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
@@ -301,9 +308,9 @@ namespace GMGInventory.Common.Models
     public class DailySalesPVM
     {
         public IList<DailySalesRVM> Contents { get; set; }
-        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate2);
         public DateTime DateFromD { get; set; }
-        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate2);
         public DateTime DateToD { get; set; }
         public string InvoiceNumberFrom { get; set; }
         public string InvoiceNumberTo { get; set; }
@@ -316,12 +323,12 @@ namespace GMGInventory.Common.Models
     {
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
-    
+
         [Display(Name = "Control Number")]
         public string ControlNumber { get; set; }
 
         [Display(Name = "Invoice Date")]
-        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
+        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate2);
         public DateTime InvoiceDateD { get; set; }
 
         [Display(Name = "Customer Code")]
@@ -332,6 +339,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Agent")]
         public string Agent { get; set; }
+        public string AgentCode { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }
@@ -344,9 +352,9 @@ namespace GMGInventory.Common.Models
     public class SalesInvoicePVM
     {
         public IList<SalesInvoiceRVM> Contents { get; set; }
-        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate2);
         public DateTime DateFromD { get; set; }
-        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate2);
         public DateTime DateToD { get; set; }
         public string Customer { get; set; }
         public string Agent { get; set; }

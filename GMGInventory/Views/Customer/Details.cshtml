@@ -31,7 +31,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Code)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-code">
                         @Model?.Code
                     </b>
                 </p>
@@ -39,7 +39,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.RegionName)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-region">
                         @Model?.RegionName
                     </b>
                 </p>
@@ -47,7 +47,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.ContactPerson)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-contact-person">
                         @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
                     </b>
                 </p>
@@ -55,7 +55,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Email)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-email">
                         @(string.IsNullOrWhiteSpace(Model?.Email) ? "-" : Model?.Email)
                     </b>
                 </p>
@@ -63,7 +63,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.TIN)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-tin">
                         @(string.IsNullOrWhiteSpace(Model?.TIN) ? "-" : Model?.TIN)
                     </b>
                 </p>
@@ -71,7 +71,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CreditLimit)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-credit-limit">
                         @Model?.CreditLimit
                     </b>
                 </p>
@@ -81,7 +81,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Name)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-name">
                         @Model?.Name
                     </b>
                 </p>
@@ -89,7 +89,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.AreaName)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-area">
                         @Model?.AreaName
                     </b>
                 </p>
@@ -97,7 +97,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.ContactNumber)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-contact-number">
                         @(string.IsNullOrWhiteSpace(Model?.ContactNumber) ? "-" : Model?.ContactNumber)
                     </b>
                 </p>
@@ -105,7 +105,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.AgentName)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-agent">
                         @(string.IsNullOrWhiteSpace(Model?.AgentName) ? "-" : Model?.AgentName)
                     </b>
                 </p>
@@ -113,7 +113,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.VAT)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-vat">
                         @(string.IsNullOrWhiteSpace(Model?.VAT) ? "-" : Model?.VAT)
                     </b>
                 </p>
@@ -121,7 +121,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-remarks">
                         @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model?.Remarks)
                     </b>
                 </p>
@@ -148,7 +148,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CustomerTypeName)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-type">
                         @Model?.CustomerTypeName
                     </b>
                 </p>
@@ -156,7 +156,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Address)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-address">
                         @(string.IsNullOrWhiteSpace(Model?.Address) ? "-" : Model?.Address)
                     </b>
                 </p>
@@ -164,7 +164,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.FaxNumber)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-fax-number">
                         @(string.IsNullOrWhiteSpace(Model?.FaxNumber) ? "-" : Model?.FaxNumber)
                     </b>
                 </p>
@@ -172,7 +172,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CreditTermName)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-credit-term">
                         @Model?.CreditTermName
                     </b>
                 </p>
@@ -180,7 +180,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CommissionRate)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block details-commission-rate">
                         @(string.IsNullOrWhiteSpace(Model?.CommissionRate) ? "-" : Model?.CommissionRate)
                     </b>
                 </p>
@@ -413,7 +413,7 @@
                         </div>
                         <div class="col-md-4">
                             <label for="edit-area" class="control-label mb-0 d-block">Area</label>
-                            <select name="Area" id="edit-area" class="form-control" style="width: 100%">
+                            <select name="Area" id="edit-area" class="form-control s2ph-dark" style="width: 100%">
                             </select>
                             <span data-valmsg-for="edit-area" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
@@ -508,7 +508,7 @@
                         </div>
                         <div class="col-md-8">
                             <div class="form-group">
-                                <label for="edit-remarks" class="control-label mb-0 d-block">Remarks</label>
+                                <label for="edit-remarks" class="control-label mb-0 d-block">Customer Status</label>
                                 <input name="Remarks" id="edit-remarks" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-remarks" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
@@ -717,20 +717,38 @@
             }
         });
 
+        $("#edit-region").on("select2:select", function () {
+            $("#edit-area").val('').trigger('change');
+        });
+
         // Load Select2 Area
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Area")",
-            success: function (data, status, xhr) {
-                $("#create-area").select2({
-                    data: data,
-                    dropdownParent: $("#createModal")
-                });
-                $("#edit-area").select2({
-                    data: data,
-                    dropdownParent: $("#editModal")
-                });
-            }
+        $("#edit-area").select2({
+            //minimumInputLength: 1,
+            placeholder: "",
+            ajax: {
+                url: "@Url.Action("GetByRegionOptions", "Area")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        region: $("#edit-region").val(),
+                        includeId: @Model?.AreaId
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#editModal")
         });
 
         // Load Select2 Customer Type
@@ -935,7 +953,7 @@
                 $("#edit-commission").val(0);
                 $("#edit-commission").removeAttr("readonly")
             }
-        })
+        });
 
         $(".editBtn").click(function (e) {
             //var data = dataTable.row($(this).parents('tr')).data();
@@ -955,8 +973,9 @@
                     $("#edit-address").val(data.address);
                     $("#edit-agent").val(data.agentId).trigger("change");
                     $("#edit-region").val(data.regionId).trigger("change");
+                    $('#select2-edit-area-container').find('.select2-selection__placeholder').text(data.areaName);
+                    //$("#edit-area").val(data.areaId).trigger("change");
                     $("#edit-credit-term").val(data.creditTermId).trigger("change");
-                    $("#edit-area").val(data.areaId).trigger("change");
                     $("#edit-customer-type").val(data.customerTypeId).trigger("change");
                     $("#edit-email").val(data.email);
                     $("#edit-fax-number").val(data.faxNumber);
@@ -1011,7 +1030,7 @@
                 data: {
                     Code: $("#edit-code").val(),
                     Name: $("#edit-name").val(),
-                    AreaId: $("#edit-area").val(),
+                    AreaId: $("#edit-area").val() ?? @Model?.AreaId,
                     CommissionRateD: $("#edit-commission").val(),
                     UseAreaRate: $("#edit-usearearate").prop("checked"),
                     CustomerTypeId: $("#edit-customer-type").val(),
@@ -1036,9 +1055,26 @@
                         toastrNoDuplicate(data.message, "Success", "success");
                         $("#editModal").modal("hide");
 
-                        // dataTable.ajax.reload();
+                        $(".details-code").text($("#edit-code").val());
+                        $(".details-region").text($("#edit-region").select2("data")[0].text);
+                        $(".details-contact-person").text($("#edit-contact-person").val() || "-");
+                        $(".details-email").text($("#edit-email").val() || "-");
+                        $(".details-tin").text($("#edit-tin").val() || "-");
+                        $(".details-credit-limit").text(FormatStringDecimal($("#edit-credit-limit").val()));
+                        $(".details-name").text($("#edit-name").val());
+                        if($("#edit-area").val() != null) {
+                        $(".details-area").text($("#edit-area").select2("data")[0].text);
+                        }
+                        $(".details-contact-number").text($("#edit-contact-number").val() || "-");
+                        $(".details-agent").text($("#edit-agent").select2("data")[0].text || "-");
+                        $(".details-vat").text($("#edit-vat").val() || "-");
+                        $(".details-remarks").text($("#edit-remarks").val() || "-");
+                        $(".details-type").text($("#edit-customer-type").select2("data")[0].text);
+                        $(".details-address").text($("#edit-address").val() || "-");
+                        $(".details-fax-number").text($("#edit-fax-number").val() || "-");
+                        $(".details-credit-term").text($("#edit-credit-term").select2("data")[0].text);
+                        $(".details-commission-rate").text($("#edit-usearearate").prop("checked") ? FormatStringDecimal($("#edit-commission").val()) : "-");
                         hideLoader();
-                        lo
                     }
                 }
             });

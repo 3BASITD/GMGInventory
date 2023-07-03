@@ -48,7 +48,7 @@ namespace GMGInventory.Common.Models
         public string FreightCharge => string.Format(SystemFormat.StringDecimalComma, FreightChargeD);
         public decimal FreightChargeD { get; set; }
 
-        private decimal BalanceComputation => TotalAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD;
+        private decimal BalanceComputation => TotalAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD; 
 
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);

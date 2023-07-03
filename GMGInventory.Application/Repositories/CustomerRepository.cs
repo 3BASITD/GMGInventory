@@ -64,7 +64,8 @@ namespace GMGInventory.Application.Repositories
                                              Address = s.Address,
                                              CreditTerm = s.CreditTerm.Name,
                                              Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
-                                             OutstandingBalanceD = s.OutstandingBalance
+                                             OutstandingBalanceD = s.OutstandingBalance,
+                                             CustomerStatus = s.Remarks + ""
                                          })
                                          .OrderBy(s => s.Text)
                                          .ToListAsync();

@@ -92,8 +92,8 @@ namespace GMGInventory.Application.Repositories
         {
             var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
             var currentUserId = currentUser.Id;
-            var currentUserRoles = await userManager.GetRolesAsync(currentUser);
-            var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
+            //var currentUserRoles = await userManager.GetRolesAsync(currentUser);
+            //var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
 
             var orderVM = (from order in context.SalesOrders
                                                 .Include(s => s.Agent)
@@ -105,7 +105,7 @@ namespace GMGInventory.Application.Repositories
                            from approve in userManager.Users.Where(s => s.Id == order.ApprovedBy).DefaultIfEmpty()
                            from disapprove in userManager.Users.Where(s => s.Id == order.DisapprovedBy).DefaultIfEmpty()
                            where order.Id == Id
-                           && (currentUserId == order.UserCreated || isAdminOrManager)
+                           //&& (currentUserId == order.UserCreated || isAdminOrManager)
                            select new SalesOrderDetailsVM
                            {
                                AgentCode = order.Agent.Code,
@@ -118,6 +118,7 @@ namespace GMGInventory.Application.Repositories
                                CustomerCode = order.Customer.Code,
                                CustomerId = order.Customer.Id,
                                CustomerName = order.Customer.Name,
+                               CustomerStatus = order.Customer.Remarks + "",
                                DeclaredValueD = order.DeclaredValue,
                                DisapprovedBy = disapprove.Nickname,
                                DisapprovedDateD = order.DisapprovedDate,
@@ -163,8 +164,8 @@ namespace GMGInventory.Application.Repositories
         {
             var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
             var currentUserId = currentUser.Id;
-            var currentUserRoles = await userManager.GetRolesAsync(currentUser);
-            var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
+            //var currentUserRoles = await userManager.GetRolesAsync(currentUser);
+            //var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
 
             var users = userManager.Users;
 
@@ -174,13 +175,13 @@ namespace GMGInventory.Application.Repositories
                            join user in users on order.UserCreated equals user.Id
                            let auser = users.Where(s => s.Id == order.ApprovedBy).Select(s => s.Nickname).First()
                            let duser = users.Where(s => s.Id == order.DisapprovedBy).Select(s => s.Nickname).First()
-                           where (order.UserCreated == currentUserId || isAdminOrManager)
-                           && (filter.AgentId == null || order.AgentId == filter.AgentId)
+                           where /*(order.UserCreated == currentUserId || isAdminOrManager)
+                           &&*/ (filter.AgentId == null || order.AgentId == filter.AgentId)
                            && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
                            && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
                            && filter.DateFrom <= order.DateCreated.Date
                            && order.DateCreated.Date <= filter.DateTo
-                           && (filter.StatusCode == null
+                           && (filter.StatusCode == null || filter.StatusCode.Trim() == ""
                            || (filter.StatusCode == "Submitted" && order.UserCreated == currentUserId)
                            || (filter.StatusCode == "ApprovedDisapproved" && (order.Status.Name == "Sales Order Approved" || order.Status.Name == "Sales Order Disapproved"))
                            || (filter.StatusCode == "Approval" && order.Status.Name == "Sales Order Submitted")

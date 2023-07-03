@@ -28,8 +28,7 @@ namespace GMGInventory.Controllers
             return Json(await forwarderRepository.GetOptions(IncludeId));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public ActionResult Index()
@@ -37,9 +36,7 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
@@ -49,8 +46,7 @@ namespace GMGInventory.Controllers
             return Json(await forwarderRepository.GetAllForDataTablesAsync(form));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> Details(int? id)
@@ -63,8 +59,7 @@ namespace GMGInventory.Controllers
             return View(forwarderVM);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
@@ -85,8 +80,7 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
@@ -115,8 +109,7 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
@@ -140,8 +133,7 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
@@ -157,8 +149,7 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
@@ -189,8 +180,7 @@ namespace GMGInventory.Controllers
             }
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
+        [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]

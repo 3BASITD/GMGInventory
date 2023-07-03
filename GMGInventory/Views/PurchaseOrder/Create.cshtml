@@ -255,7 +255,7 @@
             }
         });
 
-        // Load destination data for select2
+        // Load currency data for select2
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetCurrencyOptions")",
@@ -323,7 +323,11 @@
             var discount2 = parseFloat($("#add-discount2").val());
             var discount3 = parseFloat($("#add-discount3").val());
 
-            $("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+            var discounted1 = DeductDiscount(unit_price, discount1);
+            var discounted2 = DeductDiscount(discounted1, discount2);
+            var discounted3 = DeductDiscount(discounted2, discount3);
+            //$("#add-net-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+            $("#add-net-price").val(Round2Decimal(quantity * discounted3));
         });
 
         function clearItemForm() {
@@ -460,7 +464,11 @@
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
                 var discount3 = parseFloat($(this).parents("tr").find(".discount3").val());
 
-                var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+                var discounted1 = DeductDiscount(unit_price, discount1);
+                var discounted2 = DeductDiscount(discounted1, discount2);
+                var discounted3 = DeductDiscount(discounted2, discount3);
+                //var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+                var net_price = FormatStringDecimal(Round2Decimal(quantity * discounted3));
                 $(this).parents("tr").find(".netprice").html(net_price);
                 ComputeTotalQuantity();
                 ComputeTotalNetPrice();

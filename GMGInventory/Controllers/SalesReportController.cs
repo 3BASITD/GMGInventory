@@ -498,6 +498,7 @@ namespace GMGInventory.Controllers
         #region Daily Sales
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public IActionResult DailySales()
@@ -507,6 +508,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintDailySales(ListFilterSalesModel filter)
@@ -516,6 +518,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
@@ -527,6 +530,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadDailySales(ListFilterSalesModel filter)
@@ -535,11 +539,12 @@ namespace GMGInventory.Controllers
             dt.Columns.AddRange(new DataColumn[8] {
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("InvoiceDate")),
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("InvoiceNumber")),
+                new DataColumn(chelper.DisplayName<DailySalesRVM>("BIRInvoiceNumber")),
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("CustomerCode")),
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("CustomerName")),
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("Agent")),
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("Term")),
-                new DataColumn(chelper.DisplayName<DailySalesRVM>("CommissionRate")),
+                //new DataColumn(chelper.DisplayName<DailySalesRVM>("CommissionRate")),
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("Amount"))
             });
             var sales = await reportSalesRepository.GetDailySales(filter);
@@ -547,11 +552,12 @@ namespace GMGInventory.Controllers
             {
                 dt.Rows.Add(sale.InvoiceDate,
                             sale.InvoiceNumber,
+                            sale.BIRInvoiceNumber,
                             sale.CustomerCode,
                             sale.CustomerName,
                             sale.Agent,
                             sale.Term,
-                            sale.CommissionRate,
+                            //sale.CommissionRate,
                             sale.Amount);
             }
 
@@ -573,6 +579,7 @@ namespace GMGInventory.Controllers
         #region Sales Invoice
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public IActionResult SalesInvoice()
@@ -582,6 +589,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesInvoice(ListFilterSalesModel filter)
@@ -591,6 +599,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
@@ -602,6 +611,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InventoryManager + ","
+                         + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesInvoice(ListFilterSalesModel filter)

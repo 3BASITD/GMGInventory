@@ -36,14 +36,17 @@
                         @Html.DisplayNameFor(model => model.CustomerName)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.BIRInvoiceNumber)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Agent)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Term)
                     </th>
-                    <th>
+                    @*<th>
                         @Html.DisplayNameFor(model => model.CommissionRate)
-                    </th>
+                    </th>*@
                     <th>
                         @Html.DisplayNameFor(model => model.Amount)
                     </th>
@@ -73,7 +76,7 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-invoice-from" class="form-label mb-0">Invoice From</label>
+                            <label for="filter-invoice-from" class="form-label mb-0">BIR Invoice From</label>
                             <select id="filter-invoice-from" style="width:100%">
                                 <option></option>
                             </select>
@@ -81,7 +84,7 @@
                     </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-invoice-to" class="form-label mb-0">Invoice To</label>
+                            <label for="filter-invoice-to" class="form-label mb-0">BIR Invoice To</label>
                             <select id="filter-invoice-to" style="width:100%">
                                 <option></option>
                             </select>
@@ -149,7 +152,7 @@
 
         // Load Select2 for Invoice
         $("#filter-invoice-from, #filter-invoice-to").select2({
-            minimumInputLength: 1,
+            //minimumInputLength: 1,
             allowClear: true,
             placeholder: 'All',
             templateResult: function (repo) {
@@ -159,7 +162,7 @@
                 return $("<strong>" + repo.text + "</strong>");
             },
             ajax: {
-                url: "@Url.Action("GetOptionsInvoiceNumber", "Invoice")",
+                url: "@Url.Action("GetOptionsBIRInvoiceNumber", "Invoice")",
                 dataType: 'json',
                 type: "POST",
                 data: function (params) {
@@ -214,9 +217,10 @@
                 { data: "invoiceNumber", name: "InvoiceNumber" },
                 { data: "customerCode", name: "CustomerCode" },
                 { data: "customerName", name: "CustomerName" },
+                { data: "birInvoiceNumber", name: "BIRInvoiceNumber" },
                 { data: "agent", name: "Agent" },
                 { data: "term", name: "Term" },
-                { data: "commissionRate", name: "CommissionRate" },
+                //{ data: "commissionRate", name: "CommissionRate" },
                 { data: "amount", name: "Amount", className: "text-end" }
             ],
             footerCallback: function (row, data, start, end, display) {

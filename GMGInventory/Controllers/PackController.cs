@@ -86,7 +86,8 @@ namespace GMGInventory.Controllers
         }
 
         [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin)]
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         public async Task<ActionResult> Create(int? Id)
         {
             var order = await packRepository.GetDetailsBySOAsync(Id);
@@ -99,7 +100,8 @@ namespace GMGInventory.Controllers
         }
 
         [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin)]
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> SaveJson(PackFormVM form)
         {
@@ -120,7 +122,8 @@ namespace GMGInventory.Controllers
         }
 
         [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin)]
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> UpdateJson(PackFormVM form)
         {

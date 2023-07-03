@@ -15,9 +15,9 @@
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
 </head>
 <body>
-    <h3>@title</h3>
-    <p>
-        <strong>Invoice Number From</strong>
+    <h3 class="center-text">@title</h3>
+    <p class="center-text">
+        @*<strong>Invoice Number From</strong>
         <span>@Model.InvoiceNumberFrom</span>
         <br />
         <strong>Invoice Number To</strong>
@@ -30,16 +30,20 @@
         <span>@Model.DateFrom</span>
         <br />
         <strong>Date To</strong>
-        <span>@Model.DateTo</span>
+        <span>@Model.DateTo</span>*@
+        <span>From: @Model.DateFrom  To: @Model.DateTo</span>
     </p>
-    <table class="table-items">
+    <table class="table-items no-border">
         <thead>
             <tr>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
                 </th>
+                @*<th>
+                @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
+                </th>*@
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
+                    @Html.DisplayNameFor(model => model.Contents.First().BIRInvoiceNumber)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().CustomerCode)
@@ -54,32 +58,62 @@
                     @Html.DisplayNameFor(model => model.Contents.First().Term)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().CommissionRate)
+                    Pct
                 </th>
+                @*<th>
+                @Html.DisplayNameFor(model => model.Contents.First().CommissionRate)
+                </th>*@
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().Amount)
                 </th>
+                <th class="min-width-90">&nbsp;</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Contents)
-            {
-                <tr>
-                    <td><nobr>@item.InvoiceDate</nobr></td>
-                    <td><nobr>@item.InvoiceNumber</nobr></td>
-                    <td><nobr>@item.CustomerCode</nobr></td>
-                    <td>@item.CustomerName</td>
-                    <td>@item.Agent</td>
-                    <td>@item.Term</td>
-                    <td><nobr>@item.CommissionRate</nobr></td>
-                    <td class="right-text"><nobr>@item.Amount</nobr></td>
-                </tr>
+            @{
+                var dates = Model.Contents.OrderBy(s => s.InvoiceDateD).Select(s => s.InvoiceDate).Distinct();
+                foreach(var date in dates)
+                {
+                    var items = Model.Contents.Where(s => s.InvoiceDate == date).OrderBy(s => s.CustomerCode).Select((item, id) => new { Item = item, Id = id });
+                    foreach(var item in items)
+                    {
+                        <tr>
+                            <td><nobr>@(item.Id == 0 ? date : "")</nobr></td>
+                            @*<td><nobr>@item.InvoiceNumber</nobr></td>*@
+                            <td><nobr>@item.Item.BIRInvoiceNumber</nobr></td>
+                            <td><nobr>@item.Item.CustomerCode</nobr></td>
+                            <td>@item.Item.CustomerName</td>
+                            <td>@item.Item.Agent</td>
+                            <td>@item.Item.Term</td>
+                            <td>@item.Item.Percent</td>
+                            @*<td><nobr>@item.CommissionRate</nobr></td>*@
+                            <td class="right-text"><nobr>@item.Item.Amount</nobr></td>
+                            <td></td>
+                        </tr>
+                        if(item.Id == items.Count() - 1)
+                        {
+                            <tr>
+                                <td></td>
+                                <td colspan="2" class="left-text">@items.Count() invoice(s)</td>
+                                <td colspan="4" class="right-text">Total for @date</td>
+                                <td class="right-text bold">
+                                    <nobr>@(string.Format(SystemFormat.StringDecimalComma, items.Sum(s => s.Item.AmountD)))</nobr>
+                                </td>
+                                <td></td>
+                            </tr>
+                        }
+                    }
+                }
             }
-        </tbody>
-        <tfoot>
             <tr>
                 <th colspan="7" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+                <th></th>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="9">&nbsp;</th>
             </tr>
         </tfoot>
     </table>

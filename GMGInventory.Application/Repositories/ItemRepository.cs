@@ -62,7 +62,7 @@ namespace GMGInventory.Application.Repositories
                         select new JsonItemOptionsModel
                         {
                             Id = item.Id.ToString(),
-                            InventoryCount = inventory + soli - inv,
+                            InventoryCount = inventory,// + soli - inv,
                             Text = item.Code,
                             Name = item.Name,
                             NetPriceD = price.NetSellingPrice,
@@ -237,7 +237,7 @@ namespace GMGInventory.Application.Repositories
             var itemsVM = await (from item in context.Items
                                  from price in context.ItemPrices
                                                       .Where(s => s.ItemId == item.Id
-                                                               && s.DateCreated <= DateTime.Now)
+                                                               && s.DateCreated <= item.DateCreated)
                                                       .OrderByDescending(s => s.DateCreated)
                                                       .Take(1)
                                                       .DefaultIfEmpty()
@@ -267,8 +267,8 @@ namespace GMGInventory.Application.Repositories
                                      NetPriceD = price == null ? 0 : price.NetSellingPrice,
                                      PartNumber = item.PartNumber + "",
                                      QuantityInventoryD = inventory.Quantity,
-                                     QuantityServedD = subsoli != null ? subsoli.Quantity : null,
-                                     QuantityInvoiceD = subinv != null ? subinv.Quantity : null,
+                                     //QuantityServedD = subsoli != null ? subsoli.Quantity : null,
+                                     //QuantityInvoiceD = subinv != null ? subinv.Quantity : null,
                                      RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                      Size = item.Size,
                                      Unit = item.Unit.Name,

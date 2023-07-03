@@ -12,29 +12,35 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (Model.Status == "Posted")
+            <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                <span class="fas fa-print"></span> Print
+            </button>
+            @if (this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SystemAdmin))
             {
-                <a href="@Url.Action("Create", "SalesInvoice")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
-                    <span class="fas fa-file-invoice"></span> Start Invoice
-                </a>
-            }
-            @if (Model?.Status == "Draft")
-            {
-                <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="DeletePack()">
-                    <span class="fas fa-trash"></span> Delete
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm float-right ml-2" onclick="SavePack('save')">
-                    <span class="fas fa-save"></span> Save as Draft
-                </button>
-                <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack('post')">
-                    <span class="fas fa-paper-plane"></span> Post
-                </button>
-            }
-            else
-            {
+                @if (Model.Status == "Posted")
+                {
+                    <a href="@Url.Action("Create", "SalesInvoice")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                        <span class="fas fa-file-invoice"></span> Start Invoice
+                    </a>
+                }
+                @if (Model?.Status == "Draft")
+                {
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="DeletePack()">
+                        <span class="fas fa-trash"></span> Delete
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2" onclick="SavePack('save')">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack('post')">
+                        <span class="fas fa-paper-plane"></span> Post
+                    </button>
+                }@*
+                else
+                {
                 <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-                    <span class="fas fa-print"></span> Print
+                <span class="fas fa-print"></span> Print
                 </button>
+                }*@
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -251,7 +257,7 @@
                 url: "@Url.Action("GetItemsForPackJson", "SalesOrder")",
                 data: {
                     salesOrderId: @Model?.SalesOrderId
-                        },
+                                                },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },

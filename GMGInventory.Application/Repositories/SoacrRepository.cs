@@ -31,7 +31,8 @@ namespace GMGInventory.Application.Repositories
         {
             var soacr = from soa in context.SOACRs
                         let soalit = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).ToList()
-                        let over = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.OverPayment)
+                        //let over = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.OverPayment)
+                        let paid = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.TotalAmountPaid)
                         let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
                         select new SOACRVM
                         {
@@ -44,9 +45,10 @@ namespace GMGInventory.Application.Repositories
                             TBRD = tbr,
                             CreditD = soalit.Sum(s => s.CreditAmount),
                             DebitD = soalit.Sum(s => s.DebitAmount),
-                            PaidAmountD = soa.AmountToPay,// soalit.Sum(s => s.PaidAmount) + over,
+                            PaidAmountD = paid,
                             FreightChargeD = soalit.Sum(s => s.FreightCost),
-                            OverPaymentD = over
+                            //OverPaymentD = over
+                            OverPaymentD = Math.Max(0, paid - soalit.Sum(s => s.Invoice.Amount))
                         };
             return await soacr.ToListAsync();
         }
@@ -432,7 +434,7 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<SOACRItemsVM>> GetSOACRItemsAsync(int id)
         {
             var soa = from sl in context.SOACRLineItems
-                      let tbr = context.SOACRLineItemTBRs.Where(s=>s.SOACRLineItemId == sl.Id).Sum(s=>s.Amount)
+                      let tbr = context.SOACRLineItemTBRs.Where(s => s.SOACRLineItemId == sl.Id).Sum(s => s.Amount)
                       where sl.SOACR.Id == id
                       select new SOACRItemsVM
                       {
@@ -638,7 +640,7 @@ namespace GMGInventory.Application.Repositories
                                                 .Where(s => s.SalesReturnLineItemId == soacrLineItem.Id)
                                                 .SumAsync(s => (decimal?)s.Amount) ?? 0;
                         //if (soacrLineItem.InvoiceAmount >= soacrLineItem.PaidAmount)
-                            if (soacrLineItem.InvoiceAmount >= tbrs + soacrLineItem.CreditAmount - soacrLineItem.DebitAmount + soacrLineItem.PaidAmount - soacrLineItem.FreightCost)
+                        if (soacrLineItem.InvoiceAmount >= tbrs + soacrLineItem.CreditAmount - soacrLineItem.DebitAmount + soacrLineItem.PaidAmount - soacrLineItem.FreightCost)
                         {
                             //var toPay = soacrLineItem.InvoiceAmount - soacrLineItem.PaidAmount;
                             var toPay = soacrLineItem.InvoiceAmount - tbrs - soacrLineItem.CreditAmount + soacrLineItem.DebitAmount - soacrLineItem.PaidAmount + soacrLineItem.FreightCost;
@@ -767,7 +769,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<SOACRInvoiceTBRVM>> GetInvoicesTBRAsync(string search, int page, int CustomerId)
         {
             var invoices = from ret in context.SalesReturnLineItems
-                           let tbr = context.SOACRLineItemTBRs.Where(s=>s.SalesReturnLineItem.InvoiceId == ret.Invoice!.Id).ToList()
+                           let tbr = context.SOACRLineItemTBRs.Where(s => s.SalesReturnLineItem.InvoiceId == ret.Invoice!.Id).ToList()
                            where (string.IsNullOrWhiteSpace(search) || ret.Invoice!.InvoiceNumber.ToLower().Contains(search.ToLower()) || ("tbr".Contains(search.ToLower()) && ret.InvoiceId == null))
                            && ret.SalesReturn.Customer.Id == CustomerId
                            select new SOACRInvoiceTBRVM

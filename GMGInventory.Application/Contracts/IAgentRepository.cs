@@ -10,7 +10,7 @@ namespace GMGInventory.Application.Contracts
         Task<Select2Model<JsonNameOptionsModel>> GetOptionsWithOrder(string search, int page, int? CustomerId, DateTime? DateFrom, DateTime? DateTo);
         Task<int?> GetIdAsync(string? Name);
         Task<IList<AgentViewVM>> GetListAsync();
-        Task<ForDataTables <AgentViewVM>> GetListDTAsync(DataTablesRequestForm form);
+        Task<ForDataTables<AgentViewVM>> GetListDTAsync(DataTablesRequestForm form);
 
         Task<IList<AgentViewVM>> GetAllAsync(AgentFilterVM filter);
         Task<ForDataTables<AgentViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, AgentFilterVM filter);

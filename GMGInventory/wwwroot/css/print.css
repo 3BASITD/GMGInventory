@@ -5,6 +5,9 @@
         margin-top: 0.3in;
         margin-bottom: 0.3in;
     }
+    body {
+        overflow: visible !important;
+    }
 }
 
 * {
@@ -50,6 +53,14 @@ h3 {
     text-align: right;
 }
 
+.left-text {
+    text-align: left;
+}
+
+.center-text {
+    text-align: center;
+}
+
 p {
     margin-bottom: 5px;
 }
@@ -75,4 +86,16 @@ p strong {
     font-weight: bold;
     display: block;
     width: 25%;
+}
+
+.min-width-50 {
+    min-width: 50px;
+}
+
+.min-width-90 {
+    min-width: 90px !important;
+}
+
+.bold {
+    font-weight: bold;
 }

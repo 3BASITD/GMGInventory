@@ -175,87 +175,100 @@
         });
 
         $(".btn-details-print").on("click", function () {
-            var html = '<h3>Sales Return Details</h3>';
-            html += '<table class="table-header w100">';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.SRNumber)</th><td>@Model?.SRNumber</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.ReturnDate)</th><td>@Model?.ReturnDate</td>';
-            html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.CustomerCode)</th><td>@Model?.CustomerCode</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.ReturnBy)</th><td>@Model?.ReturnBy</td>';
-            html += '</tr>';
-            html += '<tr>';
-            html += '<th>@Html.DisplayNameFor(model => model.CustomerName)</th><td>@Model?.CustomerName</td>';
-            html += '<th>@Html.DisplayNameFor(model => model.Remarks)</th><td>@(string.IsNullOrEmpty(Model?.Remarks.Trim()) ? "-" : Model.Remarks)</td>';
-            html += '</tr>';
-            html += '</table>';
-
-            html += '<table class="table-items">';
-            html += '<tr>';
-            html += '<thead>';
-            html += '<th>Defective</th>';
-            html += '<th>Item Code</th>';
-            html += '<th>Item Name</th>';
-            html += '<th>Quantity</th>';
-            html += '<th>Unit</th>';
-            html += '<th>Selling Price</th>';
-            html += '<th>Discount 1</th>';
-            html += '<th>Discount 2</th>';
-            html += '<th>Gross Price</th>';
-            html += '<th>Reference Number</th>';
-            html += '</thead>';
-            html += '</tr>';
-            var totalQuantity = 0, totalNetPrice = 0;
-            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var row_data = this.data();
-                html += '<tr>';
-                html += '<td>';
-                if (row_data.isDefective) {
-                    html += '✔';
-                } else {
-                    html += '🞮';
-                }
-                html += '</td>';
-                html += '<td>' + row_data.itemCode + '</td>';
-                html += '<td>' + row_data.itemName + '</td>';
-                html += '<td class="right-text">' + row_data.quantity + '</td>';
-                html += '<td>' + row_data.unit + '</td>';
-                html += '<td class="right-text">' + row_data.sellingPrice + '</td>';
-                html += '<td class="right-text">' + row_data.discount1 + '</td>';
-                html += '<td class="right-text">' + row_data.discount2 + '</td>';
-                html += '<td class="right-text">' + row_data.grossPrice + '</td>';
-                html += '<td>' + row_data.referenceNumber + '</td>';
-                html += '</tr>';
-
-                totalQuantity += parseInt(row_data.quantity);
-                totalNetPrice += parseFloat(row_data.netAmountD);
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
             });
-            html += '<tr>';
-            html += '<tfoot>';
-            html += '<th colspan="3" class="right-text">Total</th>';
-            html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
-            html += '<th colspan="4"></th>';
-            html += '<th class="right-text">' + FormatStringDecimal(totalNetPrice) + '</th>';
-            html += '<th></th>';
-            html += '</tfoot>';
-            html += '</tr>';
-            html += '</table>';
-            $("#for-print").html(html);
-            $("#for-print").printThis({
-                importCSS: false,
-                loadCSS: "/css/print.css",
-                pageTitle: "BAS/GMG Inventory",
-                beforePrint: function () {
-                    $.LoadingOverlay("show", {
-                        image: "",
-                        fontawesome: "fas fa-print"
-                    });
-                },
-                afterPrint: function () {
-                    hideLoader();
-                }
-            });
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id, '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
+            //var html = '<h3>Sales Return Details</h3>';
+            //html += '<table class="table-header w100">';
+            //html += '<tr>';
+            //html += '<th>@Html.DisplayNameFor(model => model.SRNumber)</th><td>@Model?.SRNumber</td>';
+            //html += '<th>@Html.DisplayNameFor(model => model.ReturnDate)</th><td>@Model?.ReturnDate</td>';
+            //html += '</tr>';
+            //html += '<tr>';
+            //html += '<th>@Html.DisplayNameFor(model => model.CustomerCode)</th><td>@Model?.CustomerCode</td>';
+            //html += '<th>@Html.DisplayNameFor(model => model.ReturnBy)</th><td>@Model?.ReturnBy</td>';
+            //html += '</tr>';
+            //html += '<tr>';
+            //html += '<th>@Html.DisplayNameFor(model => model.CustomerName)</th><td>@Model?.CustomerName</td>';
+            //html += '<th>@Html.DisplayNameFor(model => model.Remarks)</th><td>@(string.IsNullOrEmpty(Model?.Remarks.Trim()) ? "-" : Model.Remarks)</td>';
+            //html += '</tr>';
+            //html += '</table>';
+
+            //html += '<table class="table-items">';
+            //html += '<tr>';
+            //html += '<thead>';
+            //html += '<th>Defective</th>';
+            //html += '<th>Item Code</th>';
+            //html += '<th>Item Name</th>';
+            //html += '<th>Quantity</th>';
+            //html += '<th>Unit</th>';
+            //html += '<th>Selling Price</th>';
+            //html += '<th>Discount 1</th>';
+            //html += '<th>Discount 2</th>';
+            //html += '<th>Gross Price</th>';
+            //html += '<th>Reference Number</th>';
+            //html += '</thead>';
+            //html += '</tr>';
+            //var totalQuantity = 0, totalNetPrice = 0;
+            //itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+            //    var row_data = this.data();
+            //    html += '<tr>';
+            //    html += '<td>';
+            //    if (row_data.isDefective) {
+            //        html += '✔';
+            //    } else {
+            //        html += '🞮';
+            //    }
+            //    html += '</td>';
+            //    html += '<td>' + row_data.itemCode + '</td>';
+            //    html += '<td>' + row_data.itemName + '</td>';
+            //    html += '<td class="right-text">' + row_data.quantity + '</td>';
+            //    html += '<td>' + row_data.unit + '</td>';
+            //    html += '<td class="right-text">' + row_data.sellingPrice + '</td>';
+            //    html += '<td class="right-text">' + row_data.discount1 + '</td>';
+            //    html += '<td class="right-text">' + row_data.discount2 + '</td>';
+            //    html += '<td class="right-text">' + row_data.grossPrice + '</td>';
+            //    html += '<td>' + row_data.referenceNumber + '</td>';
+            //    html += '</tr>';
+
+            //    totalQuantity += parseInt(row_data.quantity);
+            //    totalNetPrice += parseFloat(row_data.netAmountD);
+            //});
+            //html += '<tr>';
+            //html += '<tfoot>';
+            //html += '<th colspan="3" class="right-text">Total</th>';
+            //html += '<th class="right-text">' + FormatStringInteger(totalQuantity) + '</th>';
+            //html += '<th colspan="4"></th>';
+            //html += '<th class="right-text">' + FormatStringDecimal(totalNetPrice) + '</th>';
+            //html += '<th></th>';
+            //html += '</tfoot>';
+            //html += '</tr>';
+            //html += '</table>';
+            //$("#for-print").html(html);
+            //$("#for-print").printThis({
+            //    importCSS: false,
+            //    loadCSS: "/css/print.css",
+            //    pageTitle: "BAS/GMG Inventory",
+            //    beforePrint: function () {
+            //        $.LoadingOverlay("show", {
+            //            image: "",
+            //            fontawesome: "fas fa-print"
+            //        });
+            //    },
+            //    afterPrint: function () {
+            //        hideLoader();
+            //    }
+            //});
         });
     </script>
 }

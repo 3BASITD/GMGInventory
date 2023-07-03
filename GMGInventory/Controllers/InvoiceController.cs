@@ -24,5 +24,10 @@ namespace GMGInventory.Controllers
         {
             return Json(await invoiceRepository.GetOptionsInvoiceNumber(search, page));
         }
+
+        public async Task<IActionResult> GetOptionsBIRInvoiceNumber(string search, int page)
+        {
+            return Json(await invoiceRepository.GetOptionsBIRInvoiceNumber(search, page));
+        }
     }
 }

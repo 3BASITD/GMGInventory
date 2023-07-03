@@ -45,9 +45,11 @@
     $(document).ajaxSuccess(function (event, jqxhr, settings) {
     });
 
+    var requestURL = "";
     $(document).ajaxComplete(function (event, jqxhr, settings) {
         $.LoadingOverlay("hide");
         reloadInputNumberRule();
+        requestURL = settings.url;
     });
 
     $(document).ajaxStop(function (event, jqxhr, settings) {
@@ -69,7 +71,7 @@
         logTime += ":" + String(ajax_run_mm).padStart(2, "0");
         logTime += ":" + String(ajax_run_ss).padStart(2, "0");
         logTime += "." + String(ajax_run_time).padStart(3, "0");
-        console.log('%c %s%c %s ', 'background-color:lightblue;font-weight:bold;', log, 'background-color:transparent;', logTime);
+        console.log('%c %s%c %s %s', 'background-color:lightblue;font-weight:bold;', log, 'background-color:transparent;', logTime, requestURL);
     });
 
     $.validator.addMethod('lessThanOrEqual', function (value, element, param) {
@@ -90,6 +92,17 @@
         var val = removeCommaOfNumber(value);
         return this.optional(element) || (param[0] <= val && val <= param[1]);
     }, "Please enter a value between {0} and {1}.");
+
+    //$('.mask-decimal').mask('9,999,999.00', {
+    //    reverse: true
+    //});
+    $(".mask-decimal").on("change", function () {
+        if ($(this).val().includes(".")) {
+            $(this).val($.number($(this).val(), 2));
+        } else {
+            $(this).val($.number($(this).val(), 0));
+        }
+    });
 });
 
 function removeCommaOfNumber(value) {
@@ -219,17 +232,28 @@ function ReplaceEmptyString(str, replacement) {
         return replacement;
     return str;
 }
+function DeductDiscount(amount, discount) {
+    return Round2Decimal(((100 - discount) * amount) / 100);
+}
 
 function Round2Decimal(num) {
     return parseFloat(Math.round(parseFloat(num) * 100) / 100, 2).toFixed(2);
 }
 
 function FormatStringDecimal(num) {
-    return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add comma every 3 digits
+    if (isNaN(num)) {
+        return "0.00";
+    } else {
+        return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add comma every 3 digits
+    }
 }
 
 function FormatStringInteger(num) {
-    return parseFloat(num).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add comma every 3 digits
+    if (isNaN(num)) {
+        return "0";
+    } else {
+        return parseFloat(num).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add comma every 3 digits
+    }
 }
 
 function DateForInput(date) {

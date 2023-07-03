@@ -58,9 +58,15 @@ namespace GMGInventory.Common.Models
     public class CustomerPurchaseFilterVM : ListFilterCommonModel
     {
         public int? CustomerId { get; set; }
+        public string? CustomerKeyword { get; set; }
         public int? ItemId { get; set; }
+        public string? ItemKeyword { get; set; }
+        public string? ItemNameKeyword { get; set; }
         public int? CategoryId { get; set; }
+        public string? CategoryKeyword { get; set; }
         public int? ItemTypeId { get; set; }
+        public string? ItemTypeKeyword { get; set; }
         public int? BrandId { get; set; }
+        public string? BrandKeyword { get; set; }
     }
 }

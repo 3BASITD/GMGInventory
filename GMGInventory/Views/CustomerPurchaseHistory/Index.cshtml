@@ -6,7 +6,7 @@
 
 <div class="card card-default">
     <div class="card-header">
-        <span class="card-title">@ViewData["Title"]</span>
+        <span class="card-title">@ViewData["Title"] (Customer: <strong class="customer-name">All</strong>)</span>
         <div class="card-tools">
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
@@ -76,6 +76,25 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
+                            <label for="filter-item-code" class="form-label mb-0">Item Code</label>
+                            <select id="filter-item-code" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item-name" class="form-label mb-0">Item Name</label>@*
+                            <input type="text" id="filter-item-name" class="form-control form-control-sm" readonly="readonly" />*@
+                            <select id="filter-item-name" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
                             <label for="filter-customer" class="form-label mb-0">Customer Code</label>
                             <select id="filter-customer" style="width:100%">
                                 <option></option>
@@ -84,36 +103,14 @@
                     </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-customer-name" class="form-label mb-0">Customer Name</label>
-                            <input type="text" id="filter-customer-name" class="form-control form-control-sm" readonly="readonly" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label for="filter-item" class="form-label mb-0">Item Code</label>
-                            <select id="filter-item" style="width:100%">
-                                <option></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label for="filter-item-name" class="form-label mb-0">Item Name</label>
-                            <input type="text" id="filter-item-name" class="form-control form-control-sm" readonly="readonly" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
                             <label for="filter-category" class="form-label mb-0">Category</label>
                             <select id="filter-category" style="width:100%">
                                 <option></option>
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-item-type" class="form-label mb-0">Item Type</label>
@@ -122,8 +119,6 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-brand" class="form-label mb-0">Brand</label>
@@ -186,14 +181,17 @@
             loadfilterloaded = true;
             // Load Select2 for Customer
             $("#filter-customer").select2({
-                minimumInputLength: 1,
+                tags: true,
                 allowClear: true,
-                placeholder: '<empty>',
+                placeholder: 'All',
                 templateResult: function (repo) {
                     if (repo.loading) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                    if (repo.name) {
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                    }
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Customer")",
@@ -219,24 +217,22 @@
                 dropdownParent: $("#filterModal")
             });
 
-            $("#filter-customer").on("select2:select", function () {
-                $("#filter-customer-name").val($(this).select2("data")[0].name);
-            });
-
-            $("#filter-customer").on("select2:unselecting", function (e) {
-                $("#filter-customer-name").val("");
-            });
-
-            // Load Select2 for Item
-            $("#filter-item").select2({
-                minimumInputLength: 1,
+            // Load Select2 for Item Code
+            $("#filter-item-code").select2({
+                tags: true,
                 allowClear: true,
-                placeholder: '<empty>',
+                placeholder: {
+                    id: "",
+                    text: "All"
+                },
                 templateResult: function (repo) {
                     if (repo.loading) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                    if (repo.name) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Item")",
@@ -262,12 +258,86 @@
                 dropdownParent: $("#filterModal")
             });
 
-            $("#filter-item").on("select2:select", function () {
-                $("#filter-item-name").val($(this).select2("data")[0].name);
+            $("#filter-item-code").on("select2:select", function () {
+                if ($(this).select2("data")[0].name) {
+                    //$("#filter-item-name").val($(this).select2("data")[0].name);
+                    $("#filter-item-name").val(null).trigger("change");
+                    $('#select2-filter-item-name-container').find('.select2-selection__placeholder').text($(this).select2("data")[0].name);
+                    $('#select2-filter-item-name-container').attr("title", $(this).select2("data")[0].name);
+                } else if ($(this).val()) {
+                    //$("#filter-item-name").val($("#filter-item").val());
+                    $('#select2-filter-item-name-container').find('.select2-selection__placeholder').text("All");
+                    $('#select2-filter-item-name-container').attr("title", "All");
+                }
             });
 
-            $("#filter-item").on("select2:unselecting", function (e) {
-                $("#filter-item-name").val("");
+            $("#filter-item-code").on("select2:unselecting", function (e) {
+                //$("#filter-item-name").val("");
+                $('#select2-filter-item-name-container').find('.select2-selection__placeholder').text("All");
+                $('#select2-filter-item-name-container').attr("title", "All");
+            });
+
+            // Load Select2 for Item Name
+            $("#filter-item-name").select2({
+                tags: true,
+                allowClear: true,
+                placeholder: {
+                    id: "",
+                    text: "All"
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    if (repo.name) {
+                        return repo.name;
+                    }
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions", "Item")",
+                    dataType: 'json',
+                    type: "POST",
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                dropdownParent: $("#filterModal")
+            });
+
+            $("#filter-item-name").on("select2:select", function () {
+                if ($(this).select2("data")[0].name) {
+                    $("#filter-item-code").val(null).trigger("change");
+                    $('#select2-filter-item-code-container').find('.select2-selection__placeholder').text($(this).select2("data")[0].text);
+                    $('#select2-filter-item-code-container').attr("title", $(this).select2("data")[0].text);
+
+                    var selected_name = $(this).select2("data")[0].name;
+                    setTimeout(function () {
+                        $("#select2-filter-item-name-container").text(selected_name);
+                        $("#select2-filter-item-name-container").attr("title", selected_name);
+                    }, 100);
+                } else if ($(this).val()) {
+                    $('#select2-filter-item-code-container').find('.select2-selection__placeholder').text("All");
+                    $('#select2-filter-item-code-container').attr("title", "All");
+                }
+            });
+
+            $("#filter-item-name").on("select2:unselecting", function (e) {
+                $('#select2-filter-item-code-container').find('.select2-selection__placeholder').text("All");
+                $('#select2-filter-item-code-container').attr("title", "All");
             });
 
             // Load Select2 for Category
@@ -276,9 +346,16 @@
                 url: "@Url.Action("GetOptions", "Category")",
                 success: function (data, status, xhr) {
                     $("#filter-category").select2({
+                        tags: true,
                         data: data,
                         allowClear: true,
-                        placeholder: '<empty>',
+                        placeholder: 'All',
+                        templateResult: function (repo) {
+                            if (repo.element) {
+                                return repo.text;
+                            }
+                            return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                        },
                         dropdownParent: $("#filterModal")
                     });
                 }
@@ -290,9 +367,16 @@
                 url: "@Url.Action("GetOptions", "ItemType")",
                 success: function (data, status, xhr) {
                     $("#filter-item-type").select2({
+                        tags: true,
                         data: data,
                         allowClear: true,
-                        placeholder: '<empty>',
+                        placeholder: 'All',
+                templateResult: function (repo) {
+                            if (repo.element) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                },
                         dropdownParent: $("#filterModal")
                     });
                 }
@@ -304,9 +388,16 @@
                 url: "@Url.Action("GetOptions", "Brand")",
                 success: function (data, status, xhr) {
                     $("#filter-brand").select2({
+                        tags: true,
                         data: data,
                         allowClear: true,
-                        placeholder: '<empty>',
+                        placeholder: 'All',
+                        templateResult: function (repo) {
+                            if (repo.element) {
+                                return repo.text;
+                            }
+                            return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                        },
                         dropdownParent: $("#filterModal")
                     });
                 }
@@ -325,17 +416,75 @@
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 data: function (data) {
-                    var customerId = $("#filter-customer").val();
-                    var itemId = $("#filter-item").val();
                     var categoryId = $("#filter-category").val();
-                    var itemTypeId = $("#filter-item-type").val();
-                    var brandId = $("#filter-brand").val();
+                    if (categoryId) {
+                        if ($("#filter-category").select2("data")[0].name) {
+                            data.CategoryId = categoryId;
+                        } else {
+                            data.CategoryId = 0;
+                            data.CategoryKeyword = categoryId;
+                        }
+                    }
 
-                    if (customerId) data.CustomerId = customerId;
-                    if (itemId) data.ItemId = itemId;
-                    if (categoryId) data.CategoryId = categoryId;
-                    if (itemTypeId) data.ItemTypeId = itemTypeId;
-                    if (brandId) data.BrandId = brandId;
+                    var brandId = $("#filter-brand").val();
+                    if (brandId) {
+                        if ($("#filter-brand").select2("data")[0].name) {
+                            data.BrandId = brandId;
+                        } else {
+                            data.BrandId = 0;
+                            data.BrandKeyword = brandId;
+                        }
+                    }
+
+                    var itemTypeId = $("#filter-item-type").val();
+                    if (itemTypeId) {
+                        if ($("#filter-item-type").select2("data")[0].name) {
+                            data.ItemTypeId = itemTypeId;
+                        } else {
+                            data.ItemTypeId = 0;
+                            data.ItemTypeKeyword = itemTypeId;
+                        }
+                    }
+
+                    var itemId = $("#filter-item-code").val();
+                    if (itemId) {
+                        if ($("#filter-item-code").select2("data")[0].name) {
+                            data.ItemId = itemId;
+                        } else {
+                            data.ItemId = 0;
+                            data.ItemKeyword = itemId;
+                        }
+                    }
+
+                    var itemNameId = $("#filter-item-name").val();
+                    if (itemNameId) {
+                        if ($("#filter-item-name").select2("data")[0].name) {
+                            data.ItemId = itemNameId;
+                        } else {
+                            data.ItemNameKeyword = itemNameId;
+                        }
+                    }
+
+                    var customerId = $("#filter-customer").val();
+                    if (customerId) {
+                        if ($("#filter-customer").select2("data")[0].name) {
+                            data.CustomerId = customerId;
+                        } else {
+                            data.CustomerId = 0;
+                            data.CustomerKeyword = customerId;
+                        }
+                    }
+                    //var customerId = $("#filter-customer").val();
+                    //var itemId = $("#filter-item").val();
+                    //var categoryId = $("#filter-category").val();
+                    //var itemTypeId = $("#filter-item-type").val();
+                    //var brandId = $("#filter-brand").val();
+
+                    //if (customerId) data.CustomerId = customerId;
+                    //if (itemId) data.ItemId = itemId;
+                    //if (categoryId) data.CategoryId = categoryId;
+                    //if (itemTypeId) data.ItemTypeId = itemTypeId;
+                    //if (brandId) data.BrandId = brandId;
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
@@ -372,6 +521,7 @@
             hideLoader();
 
             LoadFilterSelect2();
+            $(".customer-name").text($("#filter-customer").select2("data")[0].name ?? "All");
         });
     </script>
     }

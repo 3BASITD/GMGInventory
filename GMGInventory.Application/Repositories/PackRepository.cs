@@ -66,6 +66,7 @@ namespace GMGInventory.Application.Repositories
                            where order.Id == Id
                            select new PackDetailsVM
                            {
+                               Agent = order.SalesOrder.Agent.FirstName + " " + order.SalesOrder.Agent.LastName,
                                CustomerCode = order.SalesOrder.Customer.Code,
                                CustomerName = order.SalesOrder.Customer.Name,
                                Forwarder = order.SalesOrder.Forwarder.Name,
@@ -215,7 +216,8 @@ namespace GMGInventory.Application.Repositories
                              PackType = pack.PackType.Id,
                              PackTypeName = pack.PackType.Code,
                              Quantity = pack.Quantity,
-                             SalesOrderLineItemId = order.Id
+                             SalesOrderLineItemId = order.Id,
+                             Unit = pack.Item.Unit.Code
                          };
             return await itemVM.ToListAsync();
         }
