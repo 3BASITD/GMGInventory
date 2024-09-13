@@ -60,7 +60,7 @@ namespace GMGInventory.Application.Repositories
             var priceVM = from item in context.Items
                           from price in context.ItemPrices
                                                .Where(s => s.ItemId == item.Id
-                                                        && s.DateCreated <= item.DateCreated)
+                                                        && s.DateCreated <= DateTime.Now)
                                                .OrderByDescending(s => s.DateCreated)
                                                .Take(1)
                                                .DefaultIfEmpty()
@@ -117,7 +117,7 @@ namespace GMGInventory.Application.Repositories
             var pricesVM = (from item in context.Items
                             from price in context.ItemPrices
                                                  .Where(s => s.ItemId == item.Id
-                                                          && s.DateCreated <= item.DateCreated)
+                                                          && s.DateCreated <= DateTime.Now)
                                                  .OrderByDescending(s => s.DateCreated)
                                                  .Take(1)
                                                  .DefaultIfEmpty()

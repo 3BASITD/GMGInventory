@@ -30,6 +30,7 @@ namespace GMGInventory.Application.Repositories
                            where ret.Id == Id
                            select new SalesReturnVM
                            {
+                               CustomerId = ret.CustomerId,
                                CustomerCode = ret.Customer.Code,
                                CustomerName = ret.Customer.Name,
                                Id = ret.Id,
@@ -48,6 +49,7 @@ namespace GMGInventory.Application.Repositories
                           join usr in userManager.Users on ret.UserCreated equals usr.Id
                           select new SalesReturnVM
                           {
+                              CustomerId = ret.CustomerId,
                               CustomerCode = ret.Customer.Code,
                               CustomerName = ret.Customer.Name,
                               Id = ret.Id,
@@ -138,7 +140,7 @@ namespace GMGInventory.Application.Repositories
                              ItemCode = rturn.Item.Code,
                              ItemName = rturn.Item.Name,
                              Quantity = rturn.Quantity,
-                             ReferenceNumber = rturn.Invoice == null ? "TBR" : rturn.Invoice.ControlNumber,
+                             ReferenceNumber = rturn.InvoiceLineItemId == null ? "TBR" : rturn.InvoiceLineItem!.Invoice.ControlNumber,
                              Unit = rturn.Item.Unit.Code
                          };
             return await itemVM.ToListAsync();
@@ -167,7 +169,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     Discount1 = item.Discount1,
                     Discount2 = item.Discount2,
-                    InvoiceId = item.Invoice,
+                    InvoiceLineItemId = item.Invoice,
                     IsDefective = item.IsDefective,
                     ItemId = item.Item,
                     Quantity = item.Quantity,
@@ -177,6 +179,32 @@ namespace GMGInventory.Application.Repositories
 
                 context.SalesReturnLineItems.Add(salesReturnLineItem);
             }
+            await context.SaveChangesAsync(currentUserId);
+            return salesReturn.Id;
+        }
+
+        public async Task<bool> IsNumberInUse(int Id, string Number)
+        {
+            return await context.SalesReturns.AnyAsync(s => s.Id != Id && s.SalesReturnNumber == Number);
+        }
+
+        public async Task<int> UpdateAsync(SalesReturnUpdateVM form)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            var salesReturn = await context.SalesReturns.Where(s=>s.Id == form.Id).FirstOrDefaultAsync();
+
+            if(salesReturn == null)
+            {
+                return -1;
+            }
+
+            salesReturn.SalesReturnNumber = form.ReturnNumber;
+            salesReturn.CustomerId = form.Customer;
+            salesReturn.DateCreated = form.ReturnDate;
+            salesReturn.Remarks = form.Remarks + "";
+
+            context.SalesReturns.Update(salesReturn);
             await context.SaveChangesAsync(currentUserId);
             return salesReturn.Id;
         }

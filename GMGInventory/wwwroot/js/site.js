@@ -103,6 +103,15 @@
             $(this).val($.number($(this).val(), 0));
         }
     });
+
+    $(window).on("scroll", function () {
+        checkScroll();
+    });
+
+
+    $(window).on("resize", function () {
+        checkScroll();
+    });
 });
 
 function removeCommaOfNumber(value) {
@@ -156,14 +165,33 @@ function reloadInputNumberRule() {
     });
 }
 
+
+var startTime;
+
 function showLoader() {
     $.LoadingOverlay("show", {
         image: "",
         fontawesome: "fa fa-cog fa-spin"
     });
+
+    startTime = new Date();
 }
 
 function hideLoader() {
+    if (startTime) {
+        const endTime = new Date();
+        const timeDifference = endTime - startTime;
+
+        const milliseconds = timeDifference % 1000;
+        const totalSeconds = Math.floor(timeDifference / 1000);
+        const seconds = totalSeconds % 60;
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const minutes = totalMinutes % 60;
+        const hours = Math.floor(totalMinutes / 60);
+
+        console.info(`Loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
+        startTime = null;
+    }
     $.LoadingOverlay("hide");
 }
 
@@ -312,3 +340,12 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
         return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     }
 });
+
+checkScroll();
+function checkScroll() {
+    if ($(window).scrollTop() > 81 && $(window).width() > 992) {
+        $(".main-header").addClass("nav-sticked");
+    } else {
+        $(".main-header").removeClass("nav-sticked");
+    }
+}

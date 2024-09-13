@@ -8,9 +8,9 @@ namespace GMGInventory.Data
         public int SalesReturnId { get; set; }
         public SalesReturn SalesReturn { get; set; }
 
-        [ForeignKey("Invoice")]
-        public int? InvoiceId { get; set; }
-        public Invoice? Invoice { get; set; }
+        [ForeignKey("InvoiceLineItem")]
+        public int? InvoiceLineItemId { get; set; }
+        public InvoiceLineItem? InvoiceLineItem { get; set; }
 
         [ForeignKey("ItemId")]
         public int ItemId { get; set; }

@@ -208,6 +208,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Gross Price (No Discount)")]
         public string GrossPriceNoDiscount => string.Format(SystemFormat.StringDecimalComma, GrossPriceNoDiscountD);
         public decimal GrossPriceNoDiscountD => Quantity * NetPriceD;
+        public string ReferenceNumber { get; set; }
     }
 
     //public class InvoiceFormUpdateVM

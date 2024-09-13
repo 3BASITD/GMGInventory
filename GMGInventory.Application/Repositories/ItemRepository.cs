@@ -163,7 +163,7 @@ namespace GMGInventory.Application.Repositories
                                    Id = item.ItemId.ToString(),
                                    Text = item.Item.Code,
                                    Name = item.Item.Name,
-                                   Quantity = item.Quantity + served - inv,
+                                   Quantity = item.Quantity,// + served - inv,
                                    Unit = item.Item.Unit.Code
                                }).ToListAsync();
 
@@ -237,7 +237,7 @@ namespace GMGInventory.Application.Repositories
             var itemsVM = await (from item in context.Items
                                  from price in context.ItemPrices
                                                       .Where(s => s.ItemId == item.Id
-                                                               && s.DateCreated <= item.DateCreated)
+                                                               && s.DateCreated.Date <= DateTime.Now)
                                                       .OrderByDescending(s => s.DateCreated)
                                                       .Take(1)
                                                       .DefaultIfEmpty()

@@ -48,7 +48,8 @@ namespace GMGInventory.Application.Repositories
                             PaidAmountD = paid,
                             FreightChargeD = soalit.Sum(s => s.FreightCost),
                             //OverPaymentD = over
-                            OverPaymentD = Math.Max(0, paid - soalit.Sum(s => s.Invoice.Amount))
+                            //OverPaymentD = Math.Max(0, paid - soalit.Sum(s => s.Invoice.Amount))
+                            //invoice amount - tbr - credit + debit - paid amount + frieght charge
                         };
             return await soacr.ToListAsync();
         }
@@ -769,13 +770,13 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<SOACRInvoiceTBRVM>> GetInvoicesTBRAsync(string search, int page, int CustomerId)
         {
             var invoices = from ret in context.SalesReturnLineItems
-                           let tbr = context.SOACRLineItemTBRs.Where(s => s.SalesReturnLineItem.InvoiceId == ret.Invoice!.Id).ToList()
-                           where (string.IsNullOrWhiteSpace(search) || ret.Invoice!.InvoiceNumber.ToLower().Contains(search.ToLower()) || ("tbr".Contains(search.ToLower()) && ret.InvoiceId == null))
+                           let tbr = context.SOACRLineItemTBRs.Where(s => s.SalesReturnLineItemId == ret.Id).ToList()
+                           where (string.IsNullOrWhiteSpace(search) || ret.InvoiceLineItem!.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) || ("tbr".Contains(search.ToLower()) && ret.InvoiceLineItemId == null))
                            && ret.SalesReturn.Customer.Id == CustomerId
                            select new SOACRInvoiceTBRVM
                            {
                                Id = ret.Id,
-                               Text = ret.SalesReturn.SalesReturnNumber + " (" + (ret.Invoice == null ? "TBR" : ret.Invoice!.InvoiceNumber) + ")",
+                               Text = ret.SalesReturn.SalesReturnNumber + " (" + (ret.InvoiceLineItem == null ? "TBR" : ret.InvoiceLineItem!.Invoice.InvoiceNumber) + ")",
                                InvoiceAmount = ret.Quantity * (((100m - ret.Discount1 - ret.Discount2) * ret.SellingPrice) / 100m) - (tbr.Count == 0 ? 0 : tbr.Sum(s => s.Amount))
                            };
             var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
@@ -809,7 +810,7 @@ namespace GMGInventory.Application.Repositories
                        {
                            AmountD = tbr.Amount,
                            DateCreatedD = tbr.DateCreated,
-                           InvoiceNumber = tbr.SalesReturnLineItem.SalesReturn.SalesReturnNumber + " (" + (tbr.SalesReturnLineItem.Invoice == null ? "TBR" : tbr.SalesReturnLineItem.Invoice!.InvoiceNumber) + ")",
+                           InvoiceNumber = tbr.SalesReturnLineItem.SalesReturn.SalesReturnNumber + " (" + (tbr.SalesReturnLineItem.InvoiceLineItem == null ? "TBR" : tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.InvoiceNumber) + ")",
                            UserCreated = usr.Nickname
                        };
             return await tbrh.ToListAsync();

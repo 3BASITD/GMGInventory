@@ -52,7 +52,7 @@
                             </a>
                         </li>
                     }
-                    @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InvoicingClerk)
+                    @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InvoicingClerk)|| User.IsInRole(Roles.SalesDirector)
                    || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
                     {
                         <li class="nav-item">

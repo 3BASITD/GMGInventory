@@ -226,6 +226,8 @@
 
 @section Scripts {
     <script>
+        document.getElementById('replenish-date').valueAsDate = new Date();
+
         // Load supplier data for select2
         $.ajax({
             type: "POST",
@@ -252,6 +254,9 @@
                 $("#replenish-destination").select2({
                     data: data
                 });
+            },
+            complete: function (xhr, status) {
+                $("#replenish-destination").val(2).trigger("change");
             }
         });
 
@@ -408,7 +413,13 @@
                         return actions;
                     }
                 },
-                { data: "code", name: "Code", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.code + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.id + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "Code",
+                    className: "form-cell"
+                },
                 { data: "name", name: "Name", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
@@ -506,6 +517,7 @@
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
                 var row_discount3 = parseFloat($(this.node()).find(".discount3").val());
                 item_to_replenish.push({
+                    id: rowIdx,
                     item: row_data.id,
                     quantity: row_quantity,
                     unitPrice: row_unitprice,

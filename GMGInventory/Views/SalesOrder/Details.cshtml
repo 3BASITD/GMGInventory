@@ -53,7 +53,7 @@
                 }
                 if (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
                 {
-                if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null && Model?.ResubmitId == null)
+                    if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null && Model?.ResubmitId == null)
                     {
                         <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
                             <span class="fas fa-edit"></span> Update to Resubmit
@@ -683,7 +683,15 @@
                     className: "form-cell"
                 },
                 { data: "itemName", name: "ItemName", className: "form-cell" },
-                { data: "inventoryCount", name: "InventoryCount", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return (data.inventoryCount == 0 ? "<span class='text-danger'>" : "")
+                             + data.inventoryCount
+                             + (data.inventoryCount == 0 ? "</span>" : "");
+                    },
+                    name: "InventoryCount",
+                    className: "form-cell text-end"
+                },
                 {
                     data: function (data, type, dataToSet) {
                         if ($("#po-status").val() == "Submitted" && validUser) {

@@ -20,6 +20,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Control Number")]
         public string ControlNumber { get; set; }
 
+        [Display(Name = "Brand")]
+        public string Brand { get; set; }
+
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
 

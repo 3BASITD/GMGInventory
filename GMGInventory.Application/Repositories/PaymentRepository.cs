@@ -54,7 +54,8 @@ namespace GMGInventory.Application.Repositories
         private async Task<List<PaymentVM>> GetList()
         {
             var customerPayment = (from cp in context.CustomerPayments
-                                     .Include(s => s.Customer)
+                                   let soalit = context.SOACRLineItems.Where(s => s.SOACRId == cp.SOACRId).ToList()
+                                   let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
                                    join user in userManager.Users on cp.UserCreated equals user.Id
                                    select new PaymentVM
                                    {
@@ -64,7 +65,10 @@ namespace GMGInventory.Application.Repositories
                                        CustomerName = cp.Customer.Name,
                                        TotalInvoiceAmountD = cp.TotalInvoiceAmount,
                                        AmountPaidD = cp.TotalAmountPaid,
-                                       OverPaymentD = cp.OverPayment,
+                                       //OverPaymentD = cp.OverPayment,
+                                       OverPaymentD = 0 > (soalit.Sum(s => s.Invoice.Amount - s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid)
+                                                    ? (soalit.Sum(s => s.Invoice.Amount - s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid) * -1
+                                                    : 0,
                                        TransactionDateD = cp.DateCreated,
                                        CreatedBy = user.Nickname,
                                        Remarks = cp.Remarks
@@ -262,7 +266,7 @@ namespace GMGInventory.Application.Repositories
                               InvoiceDateD = pay.Invoice.InvoiceDate,
                               InvoiceType = pay.Invoice.InvoiceType.Name,
                               InvoiceAmountD = pay.Invoice.Amount,
-                              BalanceAmountD = pay.Invoice.Amount - pay.Invoice.PaidAmount,
+                              BalanceAmountD = Math.Max(0, pay.Invoice.Amount - pay.Invoice.PaidAmount),
                               PackNo = pay.Invoice.Pack.Id,
                               SalesOrderNo = pay.Invoice.SalesOrder.SalesOrderNumber
                           };

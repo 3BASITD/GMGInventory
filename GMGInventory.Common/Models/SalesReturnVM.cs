@@ -10,6 +10,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Sales Return Number")]
         public string SRNumber { get; set; }
 
+        public int CustomerId { get; set; }
+
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
 
@@ -17,7 +19,8 @@ namespace GMGInventory.Common.Models
         public string CustomerName { get; set; }
 
         [Display(Name = "Return Date")]
-        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDate);
+        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDate2);
+        public string ReturnDate3 => ReturnDateD.ToString(SystemFormat.StringDate3);
         public DateTime ReturnDateD { get; set; }
 
         [Display(Name = "Return By")]
@@ -83,6 +86,15 @@ namespace GMGInventory.Common.Models
         public int Customer { get; set; }
         public string Remarks { get; set; }
         public IList<SalesReturnFormItemVM> Items { get; set; }
+    }
+
+    public class SalesReturnUpdateVM
+    {
+        public int Id { get; set; }
+        public string ReturnNumber { get; set; }
+        public int Customer { get; set; }
+        public DateTime ReturnDate { get; set; }
+        public string Remarks { get; set; }
     }
 
     public class SalesReturnFormItemVM

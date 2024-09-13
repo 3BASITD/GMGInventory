@@ -16,6 +16,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Purchase Date")]
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
+        public string OrderDate3 => OrderDateD.ToString(SystemFormat.StringDate3);
         public DateTime OrderDateD { get; set; }
 
         [Display(Name = "Purchase By")]
@@ -112,6 +113,7 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseOrderFormItemVM
     {
+        public int Id { get; set; }
         public int Item { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }

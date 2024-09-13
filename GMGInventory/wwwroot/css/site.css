@@ -7,18 +7,91 @@ body {
     body {
         zoom: 90%;
     }
-    /*html { -moz-transform: scale(0.9, 0.9); zoom: 0.9; zoom: 90%; }*/
-    .main-sidebar {
-        height: 111vh;
-    }
-
-    .layout-fixed .wrapper .sidebar {
-        height: calc(111vh - (3.5rem + 1px));
-    }
 
     .text-sm, .input-group-sm > .btn, .input-group-sm > .form-control, .input-group-sm > .form-select, .input-group-sm > .input-group-text {
         font-size: .86rem !important;
     }
+
+    .main-header.nav-sticked {
+        position: sticky;
+        top: 0;
+    }
+
+    nav .dropdown-menu {
+        opacity: 0;
+        transform: scaleY(0);
+        transform-origin: top;
+        /*transition: opacity 0.5s ease, transform 0.5s ease;*/
+        transition: all 0.5s ease-in-out;
+        display: block;
+        visibility: hidden;
+    }
+
+        nav .dropdown-menu.dropdown-menu-reports,
+        nav .dropdown-menu.dropdown-menu-option {
+            right: 0;
+            left: auto;
+        }
+
+        nav .dropdown-menu.dropdown-menu-reports {
+            width: 725px;
+        }
+
+        nav .dropdown-menu.show {
+            opacity: 1;
+            transform: scaleY(1);
+            visibility: visible;
+        }
+
+    nav .dropdown-menu a {
+        transition: all 0.5s ease-in-out;
+    }
+
+    .main-header * {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .main-header.nav-sticked .dropdown-menu {
+        top: 32px;
+    }
+
+    .main-header:not(.nav-sticked) .dropdown-menu {
+        top: 50px;
+    }
+
+    .main-header:not(.nav-sticked) .navbar-brand {
+        padding: 8px;
+    }
+
+    .main-header.nav-sticked .navbar-brand {
+        padding: 0px;
+    }
+
+    .main-header:not(.nav-sticked) .sticked-hide {
+        display: block;
+    }
+
+    .main-header:not(.nav-sticked) .nav-link,
+    .main-header:not(.nav-sticked) .navbar-brand {
+        align-items: center !important;
+        justify-content: center !important;
+        display: -ms-flexbox !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+        .main-header:not(.nav-sticked) .nav-link .fas, .main-header:not(.nav-sticked) .nav-link .far {
+            font-size: 2em;
+        }
+
+    .table.table-head-fixed thead tr:nth-child(1) th {
+        top: 56px;
+    }
+}
+
+
+.main-header .sticked-hide {
+    display: none;
 }
 
 .zoom-ignore {
@@ -26,6 +99,7 @@ body {
     position: relative;
     left: -5.5%;
 }
+
 .zoom-ignore-modal {
     zoom: 111%;
     position: relative;
@@ -108,8 +182,15 @@ a .fas, a .far {
     margin-right: 5px;
 }
 
+.main-header:not(.nav-sticked) button.dropdown-item .fas, .main-header:not(.nav-sticked) button.dropdown-item .far,
+.main-header:not(.nav-sticked) a.dropdown-item .fas, .main-header:not(.nav-sticked) a.dropdown-item .far {
+    margin-right: 5px !important;
+}
+
 tr button .fas, tr button .far,
-tr a .fas, tr a .far {
+tr a .fas, tr a .far,
+.main-header:not(.nav-sticked) button .fas, .main-header:not(.nav-sticked) button .far,
+.main-header:not(.nav-sticked) a .fas, .main-header:not(.nav-sticked) a .far {
     margin-right: 0;
 }
 
@@ -156,12 +237,12 @@ table tr td > input {
     min-width: 100px;
 }
 
-table tr th > input[type=checkbox],
-table tr td > input[type=checkbox],
-table tr th > input[type=radio],
-table tr td > input[type=radio]{
-    min-width: 20px;
-}
+    table tr th > input[type=checkbox],
+    table tr td > input[type=checkbox],
+    table tr th > input[type=radio],
+    table tr td > input[type=radio] {
+        min-width: 20px;
+    }
 
 .form-check-input {
     position: static !important;

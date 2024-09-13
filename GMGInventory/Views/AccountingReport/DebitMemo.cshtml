@@ -207,6 +207,11 @@
             hideLoader();
 
             $(".table-memo thead th").removeClass("text-end");
+            if ($("#filter-customer").val() == "") {
+                $(".table-memo tfoot").hide();
+            } else {
+                $(".table-memo tfoot").show();
+            }
         });
 
         $(".btnFilter").on("click", function () {

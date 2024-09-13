@@ -606,7 +606,7 @@
             $("#create-brand").prop("selectedIndex", 0).trigger("change");
             $("#create-retail-price").val("");
             $("#create-net-price").val("");
-        });
+        }); 
 
         // Validation for Create Modal
         var validateCreate = $("#createForm").validate({
@@ -649,8 +649,8 @@
                     PartNumber: $("#create-part-number").val(),
                     InterchangeNumber: $("#create-interchange-number").val(),
                     ModelNumber: $("#create-model-number").val(),
-                    NetPrice: $("#create-net-price").val(),
-                    RetailPrice: $("#create-retail-price").val(),
+                    NetPriceD: $("#create-net-price").val(),
+                    RetailPriceD: $("#create-retail-price").val(),
                     Size: $("#create-size").val(),
                     UnitId: $("#create-unit").val(),
                     CategoryId: $("#create-category").val(),

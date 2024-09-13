@@ -84,6 +84,7 @@ namespace GMGInventory.Common.Models
         public string Id { get; set; }
         public string Text { get; set; }
         public string Name { get; set; }
+        public bool Selected { get; set; } = false;
     }
 
     public class JsonAddressOptionsModel

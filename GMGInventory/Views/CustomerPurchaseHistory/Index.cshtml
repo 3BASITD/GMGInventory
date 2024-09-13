@@ -30,6 +30,9 @@
                         @Html.DisplayNameFor(model => model.ControlNumber)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.ItemCode)
                     </th>
                     <th>
@@ -428,7 +431,7 @@
 
                     var brandId = $("#filter-brand").val();
                     if (brandId) {
-                        if ($("#filter-brand").select2("data")[0].name) {
+                        if ($("#filter-brand").select2("data")[0].text != $("#filter-brand").val()) {
                             data.BrandId = brandId;
                         } else {
                             data.BrandId = 0;
@@ -503,6 +506,7 @@
                 { data: "soNumber", name: "SONumber" },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
                 { data: "controlNumber", name: "ControlNumber" },
+                { data: "brand", name: "Brand" },
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemName", name: "ItemName" },
                 { data: "partNumber", name: "PartNumber" },

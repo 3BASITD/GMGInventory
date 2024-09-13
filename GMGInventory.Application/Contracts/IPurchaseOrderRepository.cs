@@ -12,6 +12,7 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<PurchaseOrderItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int purchaseOrderId);
         Task<int> SaveDraftAsync(PurchaseOrderFormVM form);
         Task<int> SaveReplenishAsync(PurchaseOrderFormVM form);
+        Task<int> UpdateItemsAsync(PurchaseOrderFormVM form);
         Task SaveReplenishItemsAsync(IList<PurchaseOrderFormItemVM> Items, int PurchaseOrderId);
         Task<bool> DeleteDraftAsync(int purchaseOrderId);
         //Task AddAsync(TransferFormVM formVM);

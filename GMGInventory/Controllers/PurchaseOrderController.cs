@@ -120,6 +120,21 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
+        public async Task<JsonResult> UpdateJson(PurchaseOrderFormVM form)
+        {
+            ResponseModel<int> responseModel = new ResponseModel<int>();
+                var replenish = await purchaseOrderRepository.UpdateItemsAsync(form);
+                responseModel.Status = "Success";
+                responseModel.Message = replenish + " Item(s) updated successfully saved";
+                responseModel.NewRow = replenish;
+            return Json(responseModel);
+        }
+
+        [Authorize(Roles = Roles.InventoryManager + ","
+                         + Roles.SalesDirector + ","
+                         + Roles.SystemAdmin + ","
+                         + Roles.Telemarketer)]
+        [HttpPost]
         public async Task<JsonResult> DeleteDraftJson(int Id)
         {
             ResponseModel responseModel = new ResponseModel();

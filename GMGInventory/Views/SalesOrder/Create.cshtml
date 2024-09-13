@@ -630,7 +630,15 @@
                     className: "form-cell"
                 },
                 { data: "name", name: "Name", className: "form-cell" },
-                { data: "inventoryCount", name: "InventoryCount", className: "form-cell text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return (data.inventoryCount == 0 ? "<span class='text-danger'>" : "")
+                             + data.inventoryCount
+                             + (data.inventoryCount == 0 ? "</span>" : "");
+                    },
+                    name: "InventoryCount",
+                    className: "form-cell text-end"
+                },
                 {
                     data: function (data, type, dataToSet) {
                         return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + data.unitPrice + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
