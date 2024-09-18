@@ -1047,12 +1047,11 @@
                     Remarks: $("#edit-remarks").val(),
                     IsActive: $("#edit-isactive").val()
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#editModal").modal("hide");
 
                         $(".details-code").text($("#edit-code").val());
@@ -1127,12 +1126,11 @@
                     ShippingContactPerson: $("#create-shipping-cperson").val(),
                     ShippingFaxNo: $("#create-shipping-fnumber").val()
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#shippingModal").modal("hide");
                         shippingDT.ajax.reload();
 
@@ -1187,12 +1185,11 @@
                     ForwarderName: $("#create-forwarder-name").val(),
                     ForwarderFaxNo: $("#create-forwarder-fnumber").val()
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#forwarderModal").modal("hide");
                         forwarderDT.ajax.reload();
 

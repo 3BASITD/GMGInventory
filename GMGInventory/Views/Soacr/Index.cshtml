@@ -356,12 +356,11 @@
                     DateFrom: $("#soa-from").val(),
                     DateTo: $("#soa-to").val()
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#generateSOA").modal("hide");
                         soacrDT.ajax.reload();
                         hideLoader();

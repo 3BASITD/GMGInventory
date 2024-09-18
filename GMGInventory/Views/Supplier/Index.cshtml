@@ -816,7 +816,6 @@
                         IsForeign: $("#edit-isforeign").prop("checked")
 
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
@@ -911,7 +910,6 @@
                     IsForeign: $("#create-isforeign").prop("checked"),
                     CreditLimitD: $("#create-creditlimit").val()
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastr.error(data.message, "Error");
@@ -1033,9 +1031,6 @@
                     isForeign: isForeign,
                     isActive: isActive
 
-                },
-                error: function (xhr, status, error) {
-                    $("#upload-row" + rownum).html(error);
                 },
                 success: function (data, status, xhr) {
                     if (data.message == "Already exist") {

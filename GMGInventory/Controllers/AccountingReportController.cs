@@ -1,60 +1,68 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + ","
-                     + Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin)]
-    public class AccountingReportController : Controller
+    public class AccountingReportController(IAccessRepository accessRepository
+            , IReportAccountingRepository reportAccountingRepository
+            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IReportAccountingRepository reportAccountingRepository;
-        private readonly ControllerHelper chelper;
-
-        public AccountingReportController(IReportAccountingRepository reportAccountingRepository)
-        {
-            this.reportAccountingRepository = reportAccountingRepository;
-            chelper = new();
-        }
+        private readonly ControllerHelper chelper = new();
 
         #region Credit Memo
 
-        public IActionResult CreditMemo()
+        public async Task<IActionResult> CreditMemo()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CreditMemoListingReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.CreditMemoListingReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintCreditMemo(ListFilterCustomerModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CreditMemoListingReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportAccountingRepository.PrintCreditMemo(filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetCreditMemoDT(ListFilterCustomerModel filter)
+        public async Task<IActionResult> GetCreditMemoDT(ListFilterCustomerModel filter)
         {
-            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CreditMemoListingReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+             DataTablesRequestForm dtForm = new(Request.Form);
             return Json(await reportAccountingRepository.GetCreditMemoDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadCreditMemo(ListFilterCustomerModel filter)
         {
-            DataTable dt = new DataTable("Credit Memo "
-                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
-                                       + "-"
-                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
-            dt.Columns.AddRange(new DataColumn[4] {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CreditMemoListingReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Credit Memo "
+                             + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                             + "-"
+                             + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
+            dt.Columns.AddRange([
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoDate")),
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoNumber")),
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Customer")),
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Amount"))
-            });
+            ]);
             var credits = await reportAccountingRepository.GetCreditMemo(filter);
             foreach (var credit in credits)
             {
@@ -64,53 +72,62 @@ namespace GMGInventory.Controllers
                             credit.Amount);
             }
 
-            using (XLWorkbook wb = new())
-            {
-                wb.Worksheets.Add(dt);
-                using (MemoryStream stream = new())
-                {
-                    wb.SaveAs(stream);
-                    return File(stream.ToArray(),
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        DateTime.Now.ToString("yyyyMMdd") + " Credit Memo Listing Report.xlsx");
-                }
-            }
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                DateTime.Now.ToString("yyyyMMdd") + " Credit Memo Listing Report.xlsx");
         }
 
         #endregion Credit Memo
 
         #region Debit Memo
 
-        public IActionResult DebitMemo()
+        public async Task<IActionResult> DebitMemo()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DebitMemoListingReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.DebitMemoListingReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintDebitMemo(ListFilterCustomerModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DebitMemoListingReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportAccountingRepository.PrintDebitMemo(filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetDebitMemoDT(ListFilterCustomerModel filter)
+        public async Task<IActionResult> GetDebitMemoDT(ListFilterCustomerModel filter)
         {
-            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DebitMemoListingReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm dtForm = new(Request.Form);
             return Json(await reportAccountingRepository.GetDebitMemoDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadDebitMemo(ListFilterCustomerModel filter)
         {
-            DataTable dt = new DataTable("Debit Memo "
-                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
-                                       + "-"
-                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
-            CreditDebitMemoRVM debitVM = new CreditDebitMemoRVM();
-            dt.Columns.AddRange(new DataColumn[4] {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DebitMemoListingReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Debit Memo "
+                             + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                             + "-"
+                             + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
+            dt.Columns.AddRange([
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoDate")),
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("MemoNumber")),
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Customer")),
                 new DataColumn(chelper.DisplayName<CreditDebitMemoRVM>("Amount"))
-            });
+            ]);
             var debits = await reportAccountingRepository.GetDebitMemo(filter);
             foreach (var debit in debits)
             {
@@ -120,17 +137,13 @@ namespace GMGInventory.Controllers
                             debit.Amount);
             }
 
-            using (XLWorkbook wb = new())
-            {
-                wb.Worksheets.Add(dt);
-                using (MemoryStream stream = new())
-                {
-                    wb.SaveAs(stream);
-                    return File(stream.ToArray(),
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        DateTime.Now.ToString("yyyyMMdd") + " Debit Memo Listing Report.xlsx");
-                }
-            }
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                DateTime.Now.ToString("yyyyMMdd") + " Debit Memo Listing Report.xlsx");
         }
 
         #endregion Debit Memo

@@ -308,7 +308,7 @@
 
         $(".btn-invoice").on("click", function () {
             if ($("#return-customer-code").val() == "") {
-                toastrNoDuplicate("Please select customer first", "Warning", "warning");
+                toastr.warning("Please select customer first", "Warning");
             } else {
                 $("#invoice-invoice").html("");
                 invoiceDT.ajax.reload();
@@ -318,7 +318,7 @@
 
         $(".btn-tbr").on("click", function () {
             if ($("#return-customer-code").val() == "") {
-                toastrNoDuplicate("Please select customer first", "Warning", "warning");
+                toastr.warning("Please select customer first", "Warning");
             } else {
                 $("#item-code").val("").trigger("change");
                 ResetTBR();
@@ -488,7 +488,7 @@
                 if (rowdata) {
                     returnDT.row.add(rowdata).draw();
                     invoiceDT.row($(this).parents('tr')).remove().draw();
-                    toastrNoDuplicate("Added " + rowdata.itemCode + " on Return Item(s)", "Success", "success");
+                    toastr.success("Added " + rowdata.itemCode + " on Return Item(s)", "Success");
                 }
             });
         });
@@ -615,9 +615,9 @@
         function SaveReturn() {
             var itemsToReturn = GetItemsToReturn();
             if (itemsToReturn.length == 0) {
-                toastrNoDuplicate("No item to return. Add an item to the list to continue", "Warning", "warning");
+                toastr.warning("No item to return. Add an item to the list to continue", "Warning");
             } else if (itemsToReturn.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastrNoDuplicate("Some items have 0 quantity. Can't return an item with 0 quantity", "Warning", "warning");
+                toastr.warning("Some items have 0 quantity. Can't return an item with 0 quantity", "Warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -627,10 +627,9 @@
                         Remarks: $("#return-remarks").val(),
                         Items: itemsToReturn
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
                             window.location = "@Url.Action("Details")/" + data.newRow;
                         }

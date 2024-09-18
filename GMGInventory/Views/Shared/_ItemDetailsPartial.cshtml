@@ -255,10 +255,9 @@
             beforeSend: function (xhr, error) {
                 showLoader();
             },
-            error: jQueryCommonError,
             success: function (data, status, xhr) {
                 if (data == null) {
-                    toastrNoDuplicate("Cannot find item", "Error", "error");
+                    toastr.error("Cannot find item", "Error");
                 } else {
                     $(".modal-item-code").text(data.code);
                     $(".modal-item-name").text(data.name);

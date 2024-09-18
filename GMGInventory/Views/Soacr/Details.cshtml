@@ -654,12 +654,11 @@
                             data: {
                                 Id: btn_clicked.data("id")
                             },
-                            error: jQueryCommonError,
                             success: function (data, status, xhr) {
                                 if (data.status == "Error") {
-                                    toastrNoDuplicate(data.message, "Error", "error");
+                                    toastr.error(data.message, "Error");
                                 } else {
-                                    toastrNoDuplicate(data.message, "Success", "success");
+                                    toastr.success(data.message, "Success");
                                     soaDT.row(btn_clicked.parents('tr')).remove().draw();
                                 }
                             }
@@ -743,12 +742,11 @@
                     FreightCharge: removeCommaOfNumber($("#edit-freight-cost").val()),
                     FreightWaybill: $("#edit-frieght-waybill").val(),
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#editModal").modal("hide");
                         soaDT.ajax.reload();
                     }
@@ -761,7 +759,7 @@
         // Actions upon Display Payment Modal
         $(".paymentBtn").click(function (e) {
             if (GetInvoiceSelected().length == 0) {
-                toastrNoDuplicate("Please select atleast 1 invoice", "No Invoice Selected", "error");
+                toastr.error("Please select atleast 1 invoice", "No Invoice Selected");
             } else {
                 $("#payment-collector-receipt").val("");
                 $("#payment-remarks").val("");
@@ -781,7 +779,7 @@
 
         $("#payment-collector-receipt").on("change", function () {
             if ($("#payment-collector-receipt").val() == "") {
-                toastrNoDuplicate("Please enter collector receipt", "Required field &lt;Collector Receipt&gt;", "warning");
+                toastr.warning("Please enter collector receipt", "Required field &lt;Collector Receipt&gt;");
                 $("#payment-collector-receipt").addClass("text-danger");
                 $('span[data-valmsg-for="payment-collector-receipt"]').text("Please enter collector receipt");
             } else {
@@ -791,10 +789,9 @@
                 //    data: {
                 //        CollectorReceiptNumber: $("#payment-collector-receipt").val()
                 //    },
-                //    error: jQueryCommonError,
                 //    success: function (data, status, xhr) {
                 //        if (data.status == "Error") {
-                //            toastrNoDuplicate(data.message, "Error", "error");
+                //            toastr.error(data.message, "Error");
                 //            $("#payment-collector-receipt").addClass("text-danger");
                 //            $('span[data-valmsg-for="payment-collector-receipt"]').text(data.message);
                 //        } else {
@@ -809,14 +806,14 @@
         $(".btn-payment").on("click", function () {
             var checkData = GetChecks();
             if ($("#payment-collector-receipt").val() == "") {
-                toastrNoDuplicate("Please enter collector receipt", "Required field &lt;Collection Receipt&gt;", "warning");
+                toastr.warning("Please enter collector receipt", "Required field &lt;Collection Receipt&gt;");
                 $('span[data-valmsg-for="payment-collector-receipt"]').text("Please enter collector receipt");
             } else if ($("#payment-over-payment").val() == 0 && $("#payment-tkt").val() == 0
                 && $("#payment-tax").val() == 0 && $("#payment-cash-advanced").val() == 0
                 && $("#payment-discount").val() == 0 && $("#payment-offset").val() == 0
                 && $("#payment-cash-amount").val() == 0 && $("#payment-backload").val() == 0
                 && checkData.length == 0) {
-                toastrNoDuplicate("Please enter atleast 1 amount/check", "No amount available", "warning");
+                toastr.warning("Please enter atleast 1 amount/check", "No amount available");
             } else {
                 $('span[data-valmsg-for="payment-collector-receipt"]').text("");
                 $.ajax({
@@ -837,12 +834,11 @@
                         Checks: checkData,
                         InvoiceIds: GetInvoiceSelected()
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             $("#paymentModal").modal("hide");
                             soaDT.ajax.reload();
                         }
@@ -925,9 +921,8 @@
                     salesReturnId: $("#tbr-invoice").val(),
                     amount: removeCommaOfNumber($("#tbr-amount").val())
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
-                    toastrNoDuplicate(data.message, "Success", "success");
+                    toastr.success(data.message, "Success");
                     tbrselect();
                     $("#tbrModal").modal("hide");
                     soaDT.ajax.reload();
@@ -1090,10 +1085,9 @@
                 data: {
                     CheckNumber: $("#check-checknumber").val()
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate("Check Number already in use in other payment", "Required field &lt;Check Number&gt;", "warning");
+                        toastr.warning("Check Number already in use in other payment", "Required field &lt;Check Number&gt;");
                         $('span[data-valmsg-for="check-checknumber"]').text("Check Number already in use in other payment");
                         $("#check-checknumber").addClass("text-danger text-xs");
                     } else {
@@ -1103,7 +1097,7 @@
                             $("#check-checknumber").addClass("text-danger text-xs");
                         });
                         if (checkDuplicateNumber) {
-                            toastrNoDuplicate("Duplicate Check Number", "Required field &lt;Check Number&gt;", "warning");
+                            toastr.warning("Duplicate Check Number", "Required field &lt;Check Number&gt;");
                             $('span[data-valmsg-for="check-checknumber"]').text("Duplicate Check Number");
                         } else {
                             var invoiceForm = {
@@ -1237,12 +1231,11 @@
                     soaId: @Model?.Id,
                     invoiceIds: invoiceIds
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#addInvoiceModal").modal("hide");
                         soaDT.ajax.reload();
                         hideLoader();

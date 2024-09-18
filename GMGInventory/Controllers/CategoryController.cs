@@ -2,53 +2,50 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class CategoryController : Controller
+    public class CategoryController(IAccessRepository accessRepository
+                            , ICategoryRepository categoryRepository
+                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly ICategoryRepository categoryRepository;
-
-        public CategoryController(ICategoryRepository categoryRepository)
-        {
-            this.categoryRepository = categoryRepository;
-        }
-
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
             return Json(await categoryRepository.GetOptions(IncludeId));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Categories)).Convert();
+
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            var form = new DataTablesRequestForm(Request.Form);
             return Json(await categoryRepository.GetAllForDataTablesAsync(form));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> CreateJson(CategoryVM categoryVM)
+        public async Task<IActionResult> CreateJson(CategoryVM categoryVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = new ResponseModel();
             if (await categoryRepository.IsCategoryCodeExist(categoryVM.CategoryCode))
             {
                 responseModel.Status = "Error";
@@ -63,13 +60,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> EditJson(CategoryVM categoryVM)
+        public async Task<IActionResult> EditJson(CategoryVM categoryVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = new ResponseModel();
             try
             {
                 await categoryRepository.UpdateAsync(categoryVM);
@@ -92,11 +89,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Details(int? id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Categories)).Convert();
+
             var categoryVM = await categoryRepository.GetGenericVMAsync(id);
             if (categoryVM == null)
             {
@@ -105,18 +104,21 @@ namespace GMGInventory.Controllers
             return View(categoryVM);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             var category = await categoryRepository.GetAsync(id);
             if (category == null)
             {
@@ -136,13 +138,14 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             var category = await categoryRepository.GetAsync(id);
             if (category == null)
             {
@@ -154,43 +157,39 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
-            DataTable dt = new DataTable("Category");
-            dt.Columns.AddRange(new DataColumn[3] {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var dt = new DataTable("Category");
+            dt.Columns.AddRange([
                 new DataColumn("Code"),
                 new DataColumn("Name"),
                 new DataColumn("Is Active")
 
-            });
+            ]);
             var category = (await categoryRepository.GetAllGenericVMAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var categories in category)
             {
                 dt.Rows.Add(categories.Code, categories.Name, categories.IsActive);
             }
-            using (XLWorkbook wb = new())
-            {
-                wb.Worksheets.Add(dt);
-                using (MemoryStream stream = new())
-                {
-                    wb.SaveAs(stream);
-                    return File(stream.ToArray(),
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    DateTime.Now.ToString("yyyyMMdd") + " Category.xlsx");
-                }
-            }
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            DateTime.Now.ToString("yyyyMMdd") + " Category.xlsx");
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(CategoryVM categoryVM)
+        public async Task<IActionResult> UploadJson(CategoryVM categoryVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = new ResponseModel();
             if (await categoryRepository.UploadCombinationExistAsync(categoryVM))
             {
                 responseModel.Status = "Error";

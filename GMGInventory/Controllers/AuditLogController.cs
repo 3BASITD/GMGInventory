@@ -1,32 +1,31 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
+using GMGInventory.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin)]
-    public class AuditLogController : Controller
+    public class AuditLogController(IAccessRepository accessRepository
+                             , IAuditLogRepository auditLogRepository
+                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IAuditLogRepository auditLogRepository;
-
-        public AuditLogController(IAuditLogRepository auditLogRepository)
+        public async Task<IActionResult> Index()
         {
-            this.auditLogRepository = auditLogRepository;
-        }
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
 
-        public ActionResult Index()
-        {
             return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
-            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm dtForm = new(Request.Form);
             return Json(await auditLogRepository.GetListDataTablesAsync(dtForm));
         }
     }

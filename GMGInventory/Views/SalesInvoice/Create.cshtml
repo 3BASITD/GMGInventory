@@ -286,25 +286,25 @@
             $(".btn-add-item").off("click").on("click", function () {
                 var rowdata = packDT.row($(this).parents('tr')).data();
                 if (itemDT.rows().data().length == 0 && packDT.rows().data().length > 1) {
-                    //toastrNoDuplicate("You added an item with " + rowdata.sellingPriceType + " Selling Price, " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info", "info");
-                    toastrNoDuplicate("You added an item with " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info", "info");
+                    //toastr.info("You added an item with " + rowdata.sellingPriceType + " Selling Price, " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info");
+                    toastr.info("You added an item with " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info");
                 }
 
                 if (itemDT.rows().data().length != 0) {
                     var firstItem = itemDT.row(0).data();
                     /*if (firstItem.sellingPriceType != rowdata.sellingPriceType || firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
-                        toastrNoDuplicate("You can only add an item with the same data of the first added item. " + firstItem.sellingPriceType + " Selling Price, " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error", "error");
+                                toastr.error("You can only add an item with the same data of the first added item. " + firstItem.sellingPriceType + " Selling Price, " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
                     }*/ if (firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
-                        toastrNoDuplicate("You can only add an item with the same data of the first added item. " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error", "error");
+                        toastr.error("You can only add an item with the same data of the first added item. " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
                     } else {
                         itemDT.row.add(rowdata).draw();
                         packDT.row($(this).parents('tr')).remove().draw();
-                        toastrNoDuplicate("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success", "success");
+                        toastr.success("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success");
                     }
                 } else {
                     itemDT.row.add(rowdata).draw();
                     packDT.row($(this).parents('tr')).remove().draw();
-                    toastrNoDuplicate("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success", "success");
+                    toastr.success("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success");
                 }
             });
         });
@@ -361,7 +361,7 @@
                 var rowdata = itemDT.row($(this).parents('tr')).data();
                 packDT.row.add(rowdata).draw();
                 itemDT.row($(this).parents('tr')).remove().draw();
-                toastrNoDuplicate("Removed " + rowdata.itemCode + " on Invoice Item", "Warning", "warning");
+                toastr.warning("Removed " + rowdata.itemCode + " on Invoice Item", "Warning");
                 ComputeTotalQuantity();
                 ComputeTotalExtendedPrice();
             });
@@ -438,9 +438,9 @@
         function SaveInvoice(saving_as) {
             var itemsToInvoice = GetItemsToInvoice();
             if (itemsToInvoice.length == 0) {
-                toastrNoDuplicate("No item to invoice. Add an item to the list to continue", "Warning", "warning");
+                toastr.warning("No item to invoice. Add an item to the list to continue", "Warning");
             } else if (itemsToInvoice.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastrNoDuplicate("Some items have 0 quantity. Can't invoice an item with 0 quantity", "Warning", "warning");
+                toastr.warning("Some items have 0 quantity. Can't invoice an item with 0 quantity", "Warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -454,12 +454,11 @@
                         Items: itemsToInvoice,
                         SavingAs: saving_as
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            //toastrNoDuplicate(data.message, "Success", "success");
+                            //toastr.success(data.message, "Success");
                             //toastr.warning("Page will redirect to details", 'Page Redirect', {
                             //    timeOut: 3000,
                             //    onHidden: function () {

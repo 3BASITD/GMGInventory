@@ -443,7 +443,7 @@
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastrNoDuplicate($("#add-code").select2("data")[0].text + " has already been added", "Duplicate", "warning");
+                toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
             } else {
                 itemDT.row.add({
                     id: $("#add-code").select2("data")[0].id,
@@ -660,9 +660,9 @@
         function SaveReplenish(submitter) {
             var itemsToReplenish = GetItemsToReplenish();
             if (itemsToReplenish.length == 0) {
-                toastrNoDuplicate("No item to replenish. Add an item to the list to continue", "Warning", "warning");
+                toastr.warning("No item to replenish. Add an item to the list to continue", "Warning");
             } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastrNoDuplicate("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning", "warning");
+                toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -676,12 +676,11 @@
                         CurrencyRate: $("#replenish-currency-rate").val(),
                         ReferenceNumber: $("#replenish-reference-number").val()
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             $("#po-status").val(submitter);
                             itemDT.ajax.reload();
                         }
@@ -703,12 +702,11 @@
                     CurrencyRate: $("#replenish-currency-rate").val(),
                     ReferenceNumber: $("#replenish-reference-number").val()
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                     }
                 }
             });

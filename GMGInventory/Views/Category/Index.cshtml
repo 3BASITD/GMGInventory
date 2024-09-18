@@ -240,8 +240,8 @@
                 return: true,
             },
             columns: [
-                { data: "code", name: "Code" },
-                { data: "name", name: "Name" },
+                { data: "categoryCode", name: "CategoryCode" },
+                { data: "categoryName", name: "CategoryName" },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
                 { data: "userModified", name: "UserModified" },
@@ -358,12 +358,11 @@
                         Code: $("#edit-code").val(),
                         Name: $("#edit-name").val()
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             $("#editModal").modal("hide");
                             dataTable.ajax.reload();
                             hideLoader()
@@ -409,12 +408,11 @@
                     Code: $("#create-code").val(),
                     Name: $("#create-name").val(),
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#createModal").modal("hide");
                         dataTable.ajax.reload();
                         hideLoader()
@@ -467,9 +465,9 @@
 
         function DoUpload() {
             if (!$("#upload-file").val()) {
-                toastrNoDuplicate("Please select a file first", "Warning", "warning");
+                toastr.warning("Please select a file first", "Warning");
             } if (json_of_excel.length == 0) {
-                toastrNoDuplicate("The excel file is empty", "Warning", "warning");
+                toastr.warning("The excel file is empty", "Warning");
             } else {
                 var columns = Object.keys(json_of_excel[0]);
                 $("#upload-table tbody").html("");
@@ -507,9 +505,6 @@
                     Code: code,
                     Name: name,
                     IsActive: isActive
-                },
-                error: function (xhr, status, error) {
-                    $("#upload-row" + rownum).html(error);
                 },
                 success: function (data, status, xhr) {
                     if (data.message == "Already exist") {

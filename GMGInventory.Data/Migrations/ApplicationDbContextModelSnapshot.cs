@@ -22,6 +22,64 @@ namespace GMGInventory.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("GMGInventory.Data.Access", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("CanAdd")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("CanApproveDisapprove")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanEdit")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("CanPrint")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("CanUploadDownload")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanView")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PageId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Accesses");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Agent", b =>
                 {
                     b.Property<int>("Id")
@@ -1217,6 +1275,751 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PackTypes");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Page", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HasAdd")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasApproveDisapprove")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasEdit")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasPrint")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasUploadDownload")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasView")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Customer Purchase History"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Packing Listing"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Sales Invoice"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Sales Order"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Sales Order Delivery"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Sales Return"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Item"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Price List"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Price Update"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Purchase Return"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Replenish Inventory"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Warehouse"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Warehouse Transfer"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Unserved Item"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Purchase Request"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Purchase Order"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Purchase Receiving"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Purchase Return (New)"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Customer"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Payment"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "SOA / Counter Receipt"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Check / Cheque"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Agents"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Accesses"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Areas"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Brands"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Categories"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Forwarders"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Item Types"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Location Codes"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Reasons of Return"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Regions"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Suppliers"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Users"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Audit Logs"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Agent Sales per Item"
+                        },
+                        new
+                        {
+                            Id = 37,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Brand Sales Report"
+                        },
+                        new
+                        {
+                            Id = 38,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Best Selling Items"
+                        },
+                        new
+                        {
+                            Id = 39,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Commision Report"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Customer Sales Ranking Report"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Customer Sales Report"
+                        },
+                        new
+                        {
+                            Id = 42,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Daily Sales Report"
+                        },
+                        new
+                        {
+                            Id = 43,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Sales Invoice Listing Report"
+                        },
+                        new
+                        {
+                            Id = 44,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Sales by Agent/Area"
+                        },
+                        new
+                        {
+                            Id = 45,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Sales Report by Basis"
+                        },
+                        new
+                        {
+                            Id = 46,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Sales Return Listing Report"
+                        },
+                        new
+                        {
+                            Id = 47,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Unserved Item Report"
+                        },
+                        new
+                        {
+                            Id = 48,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Below Maintaining Items"
+                        },
+                        new
+                        {
+                            Id = 49,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Receiving Listing"
+                        },
+                        new
+                        {
+                            Id = 50,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Receiving Listing by Supplier"
+                        },
+                        new
+                        {
+                            Id = 51,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Receiving Summary"
+                        },
+                        new
+                        {
+                            Id = 52,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Stock Card"
+                        },
+                        new
+                        {
+                            Id = 53,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Stock Status Report"
+                        },
+                        new
+                        {
+                            Id = 54,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Supplier Purchase History"
+                        },
+                        new
+                        {
+                            Id = 55,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Credit Memo Listing Report"
+                        },
+                        new
+                        {
+                            Id = 56,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Debit Memo Listing Report"
+                        },
+                        new
+                        {
+                            Id = 57,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Purchase Order Report"
+                        },
+                        new
+                        {
+                            Id = 58,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Purchase Return Report"
+                        },
+                        new
+                        {
+                            Id = 59,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Purchase Receiving Report"
+                        });
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PhysicalCountHistory", b =>
@@ -2659,42 +3462,36 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            ConcurrencyStamp = "76b21123-3e6e-458b-8941-6d50784699d7",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            ConcurrencyStamp = "29089de7-3282-47bb-bae5-51a5be8363e2",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            ConcurrencyStamp = "ac2edca5-2c0e-485d-a8f8-acbdb863c147",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            ConcurrencyStamp = "2751372c-6858-469d-b531-a4f14502d254",
                             Name = "Sales Director",
                             NormalizedName = "SALES DIRECTOR"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            ConcurrencyStamp = "8af3acba-8ffd-419c-beb6-9da9bcc0f533",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            ConcurrencyStamp = "fe9850ff-e0f5-4b3d-9c50-e916b34739d3",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER"
                         });
@@ -2933,16 +3730,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "539746eb-2f89-4014-aa6e-a9b75df11d62",
+                            ConcurrencyStamp = "b30bda31-cc62-43dd-9c6b-e77de00acc9b",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAEAACcQAAAAEJ38KLRX71FZSv1KHtryw/+9ckf5S3OZnqBvjwGUSKQzUltD76ixluGl7stK0twSqw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKMetaLlJLfoJT7yB7PfdgXeKL6lAAhjKYRiOHS2+xIlGjq/Jy4Th5OpnpzoFGU76g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d46a2f9c-7815-45f7-afac-aaf3f12e734e",
+                            SecurityStamp = "b433e552-0152-4785-95ec-c424724290f1",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2023, 7, 30, 3, 59, 45, 693, DateTimeKind.Local).AddTicks(2848),
+                            DateCreated = new DateTime(2024, 9, 15, 21, 17, 37, 923, DateTimeKind.Local).AddTicks(8240),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -2954,16 +3751,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8222dd61-bc50-446d-89a7-4063559f91b3",
+                            ConcurrencyStamp = "dd2f1f9c-a145-4b50-9daa-7c36034490b9",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAEAACcQAAAAEDOoFUR0jwpf940742ZdfY4TBpji1FYYHzQHFb7oCVN5LFbhY1gZzE4aG01M8C17sg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGfl114aDabVR/cIMoLDknkMBg5A6u3A3D5Hc9acrWgh/oFQM7AuiWdNyYjafCchcA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "442455ca-0a55-4a51-bce7-8a39d9a7c339",
+                            SecurityStamp = "fe183808-a45a-484f-9eec-815374623366",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2023, 7, 30, 3, 59, 45, 700, DateTimeKind.Local).AddTicks(3790),
+                            DateCreated = new DateTime(2024, 9, 15, 21, 17, 38, 13, DateTimeKind.Local).AddTicks(9563),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,
@@ -2971,6 +3768,25 @@ namespace GMGInventory.Data.Migrations
                             Nickname = "GMG",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Access", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Page", "Page")
+                        .WithMany("Accesses")
+                        .HasForeignKey("PageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Page");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Agent", b =>
@@ -3890,6 +4706,11 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PackType", b =>
                 {
                     b.Navigation("Packs");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Page", b =>
+                {
+                    b.Navigation("Accesses");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PriceType", b =>

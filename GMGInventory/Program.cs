@@ -1,7 +1,9 @@
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using GMGInventory.Application.Configurations;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +23,7 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+builder.Services.AddScoped(typeof(IAccessRepository), typeof(AccessRepository));
 builder.Services.AddScoped(typeof(IAgentRepository), typeof(AgentRepository));
 builder.Services.AddScoped(typeof(IAreaRepository), typeof(AreaRepository));
 builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
@@ -79,6 +82,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     //app.UseStatusCodePagesWithReExecute("/Home/Error", "?statuscode={0}");
+    app.UseStatusCodePagesWithReExecute("/Home/Error", "?statuscode={0}");
     app.UseMigrationsEndPoint();
 }
 else

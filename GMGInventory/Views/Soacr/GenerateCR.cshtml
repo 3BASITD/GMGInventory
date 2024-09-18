@@ -204,7 +204,7 @@
 
         $(".btn-add").click(function (e) {
             if ($("#filter-customer").val() == "") {
-                toastrNoDuplicate("Please select a customer first", "Customer", "warning");
+                toastr.warning("Please select a customer first", "Customer");
             } else {
                 var invoiceIds = [];
 
@@ -216,7 +216,7 @@
                 });
 
                 if (invoiceIds.length == 0) {
-                    toastrNoDuplicate("Please select atleast 1 invoice", "No Invoice Selected", "error");
+                    toastr.error("Please select atleast 1 invoice", "No Invoice Selected");
                 } else {
                     $.ajax({
                         type: "POST",
@@ -227,9 +227,8 @@
                             CustomerId: $("#filter-customer").val()
 
                         },
-                        error: jQueryCommonError,
                         success: function (data, status, xhr) {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             hideLoader();
                             window.location = '@Url.Action("Details")/' + data.newRow;
                         }

@@ -12,10 +12,27 @@ body {
         font-size: .86rem !important;
     }
 
-    .main-header.nav-sticked {
+  /*  .main-header.nav-sticked {
         position: sticky;
         top: 0;
+    }*/
+
+    .main-header {
+        position: relative;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
     }
+
+    .main-header.to-stick {
+        position: fixed;
+        transform: translateY(-90px);
+    }
+
+        .main-header.nav-sticked {
+            transform: translateY(0);
+            transition: transform 0.5s ease;
+        }
 
     nav .dropdown-menu {
         opacity: 0;
