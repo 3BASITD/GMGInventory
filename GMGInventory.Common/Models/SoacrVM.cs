@@ -52,7 +52,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
-        public decimal BalanceD => BalanceComputation > 0 ? BalanceComputation : 0;
+        public decimal BalanceD => BalanceComputation; // > 0 ? BalanceComputation : 0;
 
         [Display(Name = "Over Payment")]
         public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
@@ -178,7 +178,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
-        public decimal BalanceD => Math.Max(0, BalanceComputation);
+        //public decimal BalanceD => Math.Max(0, BalanceComputation);
+        public decimal BalanceD => BalanceComputation; // > 0 ? BalanceComputation : 0;
 
         public bool IsPaid { get; set; }
     }

@@ -23,7 +23,7 @@ namespace GMGInventory.Data
         public string Name { get; set; }
         public bool IsActive { get; set; }
 
-        [Column(TypeName = "nvarchar(150)")]
+        [Column(TypeName = "nvarchar(MAX)")]
         public string Address { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
