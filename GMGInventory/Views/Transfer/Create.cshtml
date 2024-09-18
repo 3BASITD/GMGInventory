@@ -259,7 +259,7 @@
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastrNoDuplicate($("#source-code").select2("data")[0].text + " has already been added", "Duplicate", "warning");
+                toastr.warning($("#source-code").select2("data")[0].text + " has already been added", "Duplicate");
             } else {
                 destinationDT.row.add({
                     id: $("#source-code").select2("data")[0].id,
@@ -271,7 +271,7 @@
                 }).draw();
                 AddItemFormReset();
 
-                toastrNoDuplicate("Added " + $("#source-code").select2("data")[0].text + " on Transfer Item(s)", "Success", "success");
+                toastr.success("Added " + $("#source-code").select2("data")[0].text + " on Transfer Item(s)", "Success");
             }
         }
 
@@ -370,7 +370,6 @@
                     beforeSend: function (xhr, error) {
                         $(".save-overlay").showOverlay();
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");

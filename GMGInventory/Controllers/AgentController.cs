@@ -2,28 +2,21 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class AgentController : Controller
+    public class AgentController(IAccessRepository accessRepository
+                             , IAgentRepository agentRepository
+                             , IAreaRepository areaRepository
+                             , IRegionRepository regionRepository
+                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IAgentRepository agentRepository;
-        private readonly IAreaRepository areaRepository;
-        private readonly IRegionRepository regionRepository;
-
-        public AgentController(IAgentRepository agentRepository
-            , IAreaRepository areaRepository, IRegionRepository regionRepository)
-        {
-            this.agentRepository = agentRepository;
-            this.areaRepository = areaRepository;
-            this.regionRepository = regionRepository;
-        }
-
         public async Task<IActionResult> GetOptions2(string search, int page)
         {
             return Json(await agentRepository.GetOptions2(search, page));
@@ -39,56 +32,59 @@ namespace GMGInventory.Controllers
             return Json(await agentRepository.GetOptionsWithOrder(search, page, CustomerId, DateFrom, DateTo));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
-            AgentFilterVM agentFilterVM = new AgentFilterVM();
-            agentFilterVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Agents)).Convert();
+
+            var agentFilterVM = new AgentFilterVM()
+            {
+                Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name")
+            };
             ViewData["AgentFilter"] = agentFilterVM;
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson(AgentFilterVM filter)
+        public async Task<IActionResult> GetListJson(AgentFilterVM filter)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            var form = new DataTablesRequestForm(Request.Form);
             return Json(await agentRepository.GetAllForDataTablesAsync(form, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             var agent = agentRepository.GetAgentDtlVM(id);
             if (agent == null)
-            {
                 return NotFound();
-            }
+
             return View(agent);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetDetailsJson(int id)
+        public async Task<IActionResult> GetDetailsJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await agentRepository.GetAgentDTAsync(form, id));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> CreateJson(AgentVM agentVM)
+        public async Task<IActionResult> CreateJson(AgentVM agentVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await agentRepository.IsCodeExist(agentVM.Code))
             {
@@ -104,12 +100,12 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(AgentVM agentVM)
+        public async Task<IActionResult> UploadJson(AgentVM agentVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await agentRepository.UploadCombinationExistAsync(agentVM))
             {
@@ -140,13 +136,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> EditJson(AgentVM agentVM)
+        public async Task<IActionResult> EditJson(AgentVM agentVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = new ResponseModel();
             try
             {
                 await agentRepository.UpdateAsync(agentVM);
@@ -169,50 +165,44 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
-            DataTable dt = new DataTable("Agent");
-            dt.Columns.AddRange(new DataColumn[5] {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var dt = new DataTable("Agent");
+            dt.Columns.AddRange([
                 new DataColumn("Code"),
                 new DataColumn("First Name"),
                 new DataColumn("Middle Name"),
                 new DataColumn("Last Name"),
                 new DataColumn("Area")
-
-            });
+            ]);
 
             var agent = (await agentRepository.GetAllAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var agents in agent)
             {
-                dt.Rows.Add(agents.Code, agents.FirstName, (agents.MiddleName == null ? "" : " " + agents.MiddleName), agents.LastName, agents.AreaId);
+                dt.Rows.Add(agents.Code, agents.FirstName, agents.MiddleName == null ? "" : " " + agents.MiddleName, agents.LastName, agents.AreaId);
             }
-            using (XLWorkbook wb = new())
-            {
-                wb.Worksheets.Add(dt);
-                using (MemoryStream stream = new())
-                {
-                    wb.SaveAs(stream);
-                    return File(stream.ToArray(),
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    DateTime.Now.ToString("yyyyMMdd") + " Agents.xlsx");
-                }
-            }
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Agents.xlsx");
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             if (await agentRepository.IsAgentIdExistAsync(id) == false)
-            {
                 return NotFound();
-            }
+
             if (await agentRepository.IsAgentInUse(id))
             {
                 await agentRepository.DeactivateAgentAsync(id);
@@ -226,17 +216,17 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             if (await agentRepository.IsAgentIdExistAsync(id) == false)
-            {
                 return NotFound();
-            }
+
             await agentRepository.ReactivateAgentAsync(id);
             TempData["SuccessMessage"] = "Agent reactivated successfully";
             return RedirectToAction(nameof(Index));

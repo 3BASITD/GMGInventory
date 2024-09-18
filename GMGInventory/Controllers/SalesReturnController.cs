@@ -1,9 +1,11 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static ClosedXML.Excel.XLPredefinedFormat;
 
 namespace GMGInventory.Controllers
 {
@@ -75,6 +77,28 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> PrintDetails(int Id)
         {
             return View(await salesReturnRepository.PrintDetails(Id));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UpdateJson(SalesReturnUpdateVM form)
+        {
+            ResponseModel<int> responseModel = new();
+            if(await salesReturnRepository.IsNumberInUse(form.Id, form.ReturnNumber))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Sales Return Number already in use";
+            }
+            var orderId = await salesReturnRepository.UpdateAsync(form);
+            if(orderId == -1)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Sales Return cannot be found. Try reloading the page";
+            }
+            responseModel.Status = "Success";
+            responseModel.Message = "Pack successfully updated";
+            responseModel.NewRow = orderId;
+
+            return Json(responseModel);
         }
     }
 }

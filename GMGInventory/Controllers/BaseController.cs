@@ -1,0 +1,74 @@
+﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System.Reflection;
+
+namespace GMGInventory.Controllers
+{
+    public class BaseController : Controller
+    {
+        private readonly IAccessRepository _accessRepository;
+        private readonly UserManager<User> _userManager;
+        protected PageNames PageName { get; set; }
+
+        public BaseController(IAccessRepository accessRepository, UserManager<User> userManager)
+        {
+            _accessRepository = accessRepository ?? throw new ArgumentNullException(nameof(accessRepository));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        }
+
+        protected async Task<IActionResult> CheckAccessAndRedirectAsync(PageNames pageName, AccessTypes accessType)
+        {
+            var user = HttpContext.User;
+            if (user?.Identity == null || !user.Identity.IsAuthenticated)
+            {
+                if (IsAjaxRequest())
+                    return new JsonResult(new { error = "Not authenticated" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                else
+                    return Redirect("/Identity/Account/Login");
+            }
+
+            if (!await CheckAccessAsync(pageName, accessType))
+            {
+                if (IsAjaxRequest())
+                    return new JsonResult(new { error = "Access Denied" }) { StatusCode = StatusCodes.Status403Forbidden };
+                else
+                    return View("~/Views/Shared/E403.cshtml");
+            }
+
+            return null;
+        }
+        private bool IsAjaxRequest()
+        {
+            return HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest"
+                   || HttpContext.Request.Headers["Accept"].ToString().Contains("application/json");
+        }
+
+        protected async Task<bool> CheckAccessAsync(PageNames pageName, AccessTypes accessType)
+        {
+            var user = HttpContext.User;
+            var userId = _userManager.GetUserId(user);
+
+            if (userId == null || (user.Identity != null && !user.Identity.IsAuthenticated))
+                return false;
+
+            return await _accessRepository.HasAccessAsync(userId, pageName, accessType);
+        }
+
+        protected async Task<Access> GetAccessAsync(PageNames pageName)
+        {
+            var user = HttpContext.User;
+            var userId = _userManager.GetUserId(user);
+
+            if (userId == null || (user.Identity != null && !user.Identity.IsAuthenticated))
+                return new Access();
+
+            return await _accessRepository.GetUserAccessToPageAsync(userId, pageName);
+        }
+    }
+}

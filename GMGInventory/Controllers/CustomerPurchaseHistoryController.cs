@@ -1,30 +1,31 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
+using GMGInventory.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class CustomerPurchaseHistoryController : Controller
+    public class CustomerPurchaseHistoryController(IAccessRepository accessRepository
+                             , ICustomerPurchaseRepository customerPurchaseRepository
+                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly ICustomerPurchaseRepository customerPurchaseRepository;
-
-        public CustomerPurchaseHistoryController(ICustomerPurchaseRepository customerPurchaseRepository)
+        public async Task<IActionResult> Index()
         {
-            this.customerPurchaseRepository = customerPurchaseRepository;
-        }
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerPurchaseHistory, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
 
-        public ActionResult Index()
-        {
             return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson(CustomerPurchaseFilterVM filter)
+        public async Task<IActionResult> GetListJson(CustomerPurchaseFilterVM filter)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerPurchaseHistory, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            var form = new DataTablesRequestForm(Request.Form);
             return Json(await customerPurchaseRepository.GetListDataTablesAsync(form, filter));
         }
     }

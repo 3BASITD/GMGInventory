@@ -1,4 +1,43 @@
 ﻿$(document).ready(function () {
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-bottom-full-width",
+        "preventDuplicates": true,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "slideDown",
+        "hideMethod": "slideUp"
+    };
+
+    $.ajaxSetup({
+        error: function (xhr, status, error) {
+            if (xhr.status === 400)
+                toastr.error("The request was invalid. Please try again.", "400 Bad Request");
+            else if (xhr.status === 401)
+                toastr.error("Please log in to access this action.", "401 Unauthorized");
+            else if (xhr.status === 403)
+                toastr.error("You don't have permission to do this action.", "403 Forbidden");
+            else if (xhr.status === 404)
+                toastr.error("Function could not be found", "404 Not Found");
+            else if (xhr.status === 500)
+                toastr.error("Something went wrong on our end. Please try again later.", "500 Internal Server Error");
+            else if (xhr.status === 502)
+                toastr.error("We’re having trouble connecting to the server. Please try again soon.", "502 Bad Gateway");
+            else if (xhr.status === 503)
+                toastr.error("The service is temporarily unavailable. Please check back shortly.", "503 Service Unavailable");
+            else
+                toastr.error(xhr.responseJSON.error, xhr.status + " " + xhr.statusText);
+            hideLoader();
+        }
+    });
+
     $('.select2option').select2({
         allowClear: true,
         placeholder: {
@@ -103,30 +142,24 @@
             $(this).val($.number($(this).val(), 0));
         }
     });
+
+    $(window).on("scroll", function () {
+        checkScroll();
+    });
+
+
+    $(window).on("resize", function () {
+        checkScroll();
+    });
 });
 
 function removeCommaOfNumber(value) {
     return parseFloat(value.replace(/[\$,]/g, '') * 1);
 }
 
-function toastrNoDuplicate(message, title, type) {
-    var hasDuplicate = false;
-    $.each($(".toast-message"), function (i, v) {
-        if (message == $(v).text()) {
-            hasDuplicate = true;
-        }
-    });
-    if (!hasDuplicate) {
-        if (type == "success") toastr.success(message, title);
-        if (type == "error") toastr.error(message, title);
-        if (type == "warning") toastr.warning(message, title);
-        if (type == "info") toastr.info(message, title);
-    }
-}
-
 function validateShowErrors(m, l) {
     $.each(l, function (i, v) {
-        toastrNoDuplicate(v.message, "Required field &lt;" + $(v.element.labels[0]).text() + "&gt;", "warning");
+        toastr.warning(v.message, "Required field &lt;" + $(v.element.labels[0]).text() + "&gt;");
     });
     this.defaultShowErrors();
 }
@@ -156,14 +189,33 @@ function reloadInputNumberRule() {
     });
 }
 
+
+var startTime;
+
 function showLoader() {
     $.LoadingOverlay("show", {
         image: "",
         fontawesome: "fa fa-cog fa-spin"
     });
+
+    startTime = new Date();
 }
 
 function hideLoader() {
+    if (startTime) {
+        const endTime = new Date();
+        const timeDifference = endTime - startTime;
+
+        const milliseconds = timeDifference % 1000;
+        const totalSeconds = Math.floor(timeDifference / 1000);
+        const seconds = totalSeconds % 60;
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const minutes = totalMinutes % 60;
+        const hours = Math.floor(totalMinutes / 60);
+
+        console.info(`Loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
+        startTime = null;
+    }
     $.LoadingOverlay("hide");
 }
 
@@ -185,20 +237,6 @@ function HideTabLoader(mod) {
     if (tabLoaderDisplayed.length === 0) {
         $.LoadingOverlay("hide");
     }
-}
-
-var temp_xhr;
-function jQueryCommonError(xhr, status, error) {
-    if (xhr.status == 503) {
-        toastr.warning("Looks like you got signed out! Please reload the page", xhr.statusText);
-    } else if (xhr.status == 403) {
-        toastr.warning("You are not allowed to do this action.", xhr.statusText);
-    } else if (error.trim() != "") {
-        toastr.error(error, "Error");
-    } else {
-        toastr.warning(xhr.status, xhr.statusText);
-    }
-    hideLoader();
 }
 
 jQuery.fn.extend({
@@ -312,3 +350,22 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
         return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     }
 });
+
+checkScroll();
+function checkScroll() {
+    if ($(window).width() > 992) {
+        var navHeight = $(".main-header").height();
+        if ($(window).scrollTop() > navHeight) {
+            $(".main-header").addClass("to-stick");
+            $("body").css("margin-top", navHeight + "px");
+        } else {
+            $(".main-header").removeClass("to-stick");
+            $("body").css("margin-top", "0");
+        }
+        if ($(window).scrollTop() > navHeight * 1.2) {
+            $(".main-header").addClass("nav-sticked");
+        } else {
+            $(".main-header").removeClass("nav-sticked");
+        }
+    }
+}

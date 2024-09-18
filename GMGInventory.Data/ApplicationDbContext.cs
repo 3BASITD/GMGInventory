@@ -27,6 +27,7 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new UserSeedConfiguration());
             builder.ApplyConfiguration(new RoleSeedConfiguration());
             builder.ApplyConfiguration(new UserRoleSeedConfiguration());
+            builder.ApplyConfiguration(new PageSeedConfiguration());
         }
 
         public DbSet<AuditLog> AuditLogs { get; set; }
@@ -137,6 +138,7 @@ namespace GMGInventory.Data
         }
 
 
+        public DbSet<Access> Accesses { get; set; }
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Area> Areas { get; set; }
         public DbSet<Brand> Brands { get; set; }
@@ -164,6 +166,7 @@ namespace GMGInventory.Data
         public DbSet<PackReturn> PackReturns { get; set; }
         public DbSet<PackReturnLineItem> PackReturnLineItems { get; set; }
         public DbSet<PackType> PackTypes { get; set; }
+        public DbSet<Page> Pages { get; set; }
         //public DbSet<Payment> Payments { get; set; }
         //public DbSet<PaymentDetail> PaymentDetails { get; set; }
         public DbSet<PhysicalCountHistory> PhysicalCountHistories { get; set; }

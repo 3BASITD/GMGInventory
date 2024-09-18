@@ -4,6 +4,11 @@ namespace GMGInventory.Data
 {
     public class InvoiceLineItem : BaseEntity
     {
+        public InvoiceLineItem()
+        {
+            this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
+        }
+
         [ForeignKey("InvoiceId")]
         public int InvoiceId { get; set; }
         public Invoice Invoice { get; set; }
@@ -16,5 +21,7 @@ namespace GMGInventory.Data
         public decimal UnitPrice { get; set; }
 
         public int Quantity { get; set; }
+
+        public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
     }
 }

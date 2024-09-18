@@ -63,8 +63,6 @@
                 </dl>
             </div>
         </div>
-    </div>
-    <div class="col-6">
         @if (activeUser.IsActive)
         {
             <div class="card card-default">
@@ -75,14 +73,65 @@
                     <form id="themeForm" asp-action="ChangeTheme">
                         <input type="hidden" name="Id" value="@activeUser.Id" />
                         <input type="checkbox" id="themeCheckbox" name="IsDarkMode"
-                           value="@(activeUser.IsDarkMode ? "off" : "on")" @(activeUser.IsDarkMode ? "checked" : "")
-                           data-toggle="toggle" data-width="150" data-height="35"
-                           data-on="Dark Mode" data-onstyle="danger"
-                           data-off="Light Mode" data-offstyle="info" />
+                               value="@(activeUser.IsDarkMode ? "off" : "on")" @(activeUser.IsDarkMode ? "checked" : "")
+                               data-toggle="toggle" data-width="150" data-height="35"
+                               data-on="Dark Mode" data-onstyle="danger"
+                               data-off="Light Mode" data-offstyle="info" />
                     </form>
                 </div>
             </div>
         }
+    </div>
+    <div class="col-6">
+        <div class="card card-default">
+            <div class="card-header">
+                <span class="card-title">List of Access</span>
+            </div>
+            <div class="card-body">
+                <table class="table table-head-fixed table-striped table-hover table-access">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>
+                                <span data-microtip-title="Can View" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Add" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Edit" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Delete" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-trash-alt"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Approve / Disapprove" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Upload&#13; / Download" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-file-download"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Print" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-print"></i>
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -93,7 +142,7 @@
                 <span class="card-title">Audit Logs (Latest 100)</span>
             </div>
             <div class="card-body">
-                <table class="table table-head-fixed table-striped table-hover">
+                <table class="table table-head-fixed table-striped table-hover table-logs">
                     <thead>
                         <tr>
                             <th>Date Time</th>
@@ -119,10 +168,10 @@
                                     <td>@item.TableName</td>
                                     <td><pre>@item.PrimaryKey</pre></td>
                                     <td>
-                                        <pre>@item.OldValues.Replace("{", "").Replace("}", "").Replace(",\"",",\n\"")</pre>
+                                        <pre>@item.OldValues.Replace("{", "").Replace("}", "").Replace(",\"", ",\n\"")</pre>
                                     </td>
                                     <td>
-                                        <pre>@item.NewValues.Replace("{", "").Replace("}", "").Replace(",\"",",\n\"")</pre>
+                                        <pre>@item.NewValues.Replace("{", "").Replace("}", "").Replace(",\"", ",\n\"")</pre>
                                     </td>
                                 </tr>
                             }
@@ -135,11 +184,102 @@
 </div>
 @section Scripts {
     <script>
-        $('.table').DataTable({
+        var iconWithAccess = "<i class=\"fas fa-check text-success\"></i>";
+        var iconWithoutAccess = "<i class=\"fas fa-times text-danger\"></i>";
+        var iconNoAccess = "<i class=\"text-muted\">-</i>";
+        var accessDT = $('.table-access').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetUserAccessesDT", "Access")",
+                type: "POST",
+                data: function (data) {
+                    data.userId = "@activeUser.Id";
+                }
+            },
+            processing: true,
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<nobr>" + data.name + "</nobr>";
+                    }, name: "Name"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.hasView)
+                            return data.canView ? iconWithAccess : iconWithoutAccess;
+                        return iconNoAccess;
+                    },
+                    name: "CanView"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.hasAdd)
+                            return data.canAdd ? iconWithAccess : iconWithoutAccess;
+                        return iconNoAccess;
+                    },
+                    name: "CanAdd"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.hasEdit)
+                            return data.canEdit ? iconWithAccess : iconWithoutAccess;
+                        return iconNoAccess;
+                    },
+                    name: "CanEdit"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.hasDelete)
+                            return data.canDelete ? iconWithAccess : iconWithoutAccess;
+                        return iconNoAccess;
+                    },
+                    name: "CanDelete"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.hasApproveDisapprove)
+                            return data.canApproveDisapprove ? iconWithAccess : iconWithoutAccess;
+                        return iconNoAccess;
+                    },
+                    name: "CanApproveDisapprove"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.hasUploadDownload)
+                            return data.canUploadDownload ? iconWithAccess : iconWithoutAccess;
+                        return iconNoAccess;
+                    },
+                    name: "CanUploadDownload"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.hasPrint)
+                            return data.canPrint ? iconWithAccess : iconWithoutAccess;
+                        return iconNoAccess;
+                    },
+                    name: "CanPrint"
+                }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        accessDT.on("draw", function () {
+            hideLoader();
+        });
+
+        $('.table-logs').DataTable({
             order: [[0, "desc"]]
         });
 
-        $("#themeCheckbox").on("change", function(e) {
+        $("#themeCheckbox").on("change", function (e) {
             $("#themeForm").submit();
         });
     </script>

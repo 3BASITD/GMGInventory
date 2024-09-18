@@ -547,12 +547,11 @@
                         Waybill: $("#delivery-waybill").val(),
                         Remarks: $("#delivery-remarks").val()
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             $("#editModal").modal("hide");
                             deliveryDT.ajax.reload();
                         }

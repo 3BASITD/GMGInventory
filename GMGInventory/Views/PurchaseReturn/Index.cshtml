@@ -245,7 +245,7 @@
 
         $(".btn-post").on("click", function () {
             if ($("#po-number").val() == "") {
-                toastrNoDuplicate("Please select PO Number first", "Warning", "warning");
+                toastr.warning("Please select PO Number first", "Warning");
             } else {
                 var item_to_return = [];
                 itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -269,7 +269,7 @@
                     $("#save-remarks").val("");
                     $("#saveModal").modal("show");
                 } else {
-                    toastrNoDuplicate("No change in quantity. Nothing to return", "Warning", "warning");
+                    toastr.warning("No change in quantity. Nothing to return", "Warning");
                 }
             }
         });
@@ -292,26 +292,25 @@
                         Remarks: $("#save-remarks").val(),
                         Items: item_to_return
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             $("#saveModal").modal("hide");
                             itemDT.ajax.reload();
                         }
                     }
                 });
             } else {
-                toastrNoDuplicate("Seems like the list of items to return have been cleared out", "Warning", "warning");
+                toastr.warning("Seems like the list of items to return have been cleared out", "Warning");
             }
         });
 
         var historyDT;
         $(".btn-history").on("click", function () {
             if ($("#po-number").val() == "") {
-                toastrNoDuplicate("Please select PO Number first", "Warning", "warning");
+                toastr.warning("Please select PO Number first", "Warning");
             } else {
                 if ($.fn.DataTable.isDataTable('.table-return-history')) {
                     historyDT.destroy();

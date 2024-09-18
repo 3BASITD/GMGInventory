@@ -356,7 +356,7 @@
                     <div class="col-8 col-lg-3">
                         @*<input type="number" step="0.01" min="0" max="1999999.99" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm" />*@
                         <input type="text" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm mask-decimal" />
-                        
+
                     </div>
                     <div class="col-4 col-lg-3">
                         <label for="payment-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
@@ -654,12 +654,11 @@
                             data: {
                                 Id: btn_clicked.data("id")
                             },
-                            error: jQueryCommonError,
                             success: function (data, status, xhr) {
                                 if (data.status == "Error") {
-                                    toastrNoDuplicate(data.message, "Error", "error");
+                                    toastr.error(data.message, "Error");
                                 } else {
-                                    toastrNoDuplicate(data.message, "Success", "success");
+                                    toastr.success(data.message, "Success");
                                     soaDT.row(btn_clicked.parents('tr')).remove().draw();
                                 }
                             }
@@ -743,12 +742,11 @@
                     FreightCharge: removeCommaOfNumber($("#edit-freight-cost").val()),
                     FreightWaybill: $("#edit-frieght-waybill").val(),
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#editModal").modal("hide");
                         soaDT.ajax.reload();
                     }
@@ -761,7 +759,7 @@
         // Actions upon Display Payment Modal
         $(".paymentBtn").click(function (e) {
             if (GetInvoiceSelected().length == 0) {
-                toastrNoDuplicate("Please select atleast 1 invoice", "No Invoice Selected", "error");
+                toastr.error("Please select atleast 1 invoice", "No Invoice Selected");
             } else {
                 $("#payment-collector-receipt").val("");
                 $("#payment-remarks").val("");
@@ -781,7 +779,7 @@
 
         $("#payment-collector-receipt").on("change", function () {
             if ($("#payment-collector-receipt").val() == "") {
-                toastrNoDuplicate("Please enter collector receipt", "Required field &lt;Collector Receipt&gt;", "warning");
+                toastr.warning("Please enter collector receipt", "Required field &lt;Collector Receipt&gt;");
                 $("#payment-collector-receipt").addClass("text-danger");
                 $('span[data-valmsg-for="payment-collector-receipt"]').text("Please enter collector receipt");
             } else {
@@ -791,10 +789,9 @@
                 //    data: {
                 //        CollectorReceiptNumber: $("#payment-collector-receipt").val()
                 //    },
-                //    error: jQueryCommonError,
                 //    success: function (data, status, xhr) {
                 //        if (data.status == "Error") {
-                //            toastrNoDuplicate(data.message, "Error", "error");
+                //            toastr.error(data.message, "Error");
                 //            $("#payment-collector-receipt").addClass("text-danger");
                 //            $('span[data-valmsg-for="payment-collector-receipt"]').text(data.message);
                 //        } else {
@@ -809,14 +806,14 @@
         $(".btn-payment").on("click", function () {
             var checkData = GetChecks();
             if ($("#payment-collector-receipt").val() == "") {
-                toastrNoDuplicate("Please enter collector receipt", "Required field &lt;Collection Receipt&gt;", "warning");
+                toastr.warning("Please enter collector receipt", "Required field &lt;Collection Receipt&gt;");
                 $('span[data-valmsg-for="payment-collector-receipt"]').text("Please enter collector receipt");
             } else if ($("#payment-over-payment").val() == 0 && $("#payment-tkt").val() == 0
                 && $("#payment-tax").val() == 0 && $("#payment-cash-advanced").val() == 0
                 && $("#payment-discount").val() == 0 && $("#payment-offset").val() == 0
                 && $("#payment-cash-amount").val() == 0 && $("#payment-backload").val() == 0
                 && checkData.length == 0) {
-                toastrNoDuplicate("Please enter atleast 1 amount/check", "No amount available", "warning");
+                toastr.warning("Please enter atleast 1 amount/check", "No amount available");
             } else {
                 $('span[data-valmsg-for="payment-collector-receipt"]').text("");
                 $.ajax({
@@ -837,12 +834,11 @@
                         Checks: checkData,
                         InvoiceIds: GetInvoiceSelected()
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             $("#paymentModal").modal("hide");
                             soaDT.ajax.reload();
                         }
@@ -851,42 +847,49 @@
             }
         });
 
-        $("#tbr-invoice").select2({
-            ajax: {
-                url: "@Url.Action("GetInvoiceTBR")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1,
-                        CustomerId: @Model?.CustomerId
-                    };
+        tbrselect();
+        function tbrselect() {
+            //if ($('#tbr-invoice').hasClass("select2-hidden-accessible")){
+            //    $("#tbr-invoice").destroy();
+            //}
+            $("#tbr-invoice").select2().empty();
+            $("#tbr-invoice").select2({
+                ajax: {
+                    url: "@Url.Action("GetInvoiceTBR")",
+                    dataType: 'json',
+                    type: "POST",
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1,
+                            CustomerId: @Model?.CustomerId
+                            };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    //cache: true
                 },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            },
-            dropdownParent: $("#tbrModal")
-        });
+                dropdownParent: $("#tbrModal")
+            });
 
-        $("#tbr-invoice").on("select2:select", function () {
-            //$("#tbr-amount").val(FormatStringDecimal($(this).select2("data")[0].invoiceAmount.toFixed(2)));
-            $("#tbr-amount").val($(this).select2("data")[0].invoiceAmount.toFixed(2));
-            $("#tbr-amount-max").val($(this).select2("data")[0].invoiceAmount.toFixed(2));
-        });
+            $("#tbr-invoice").on("select2:select", function () {
+                //$("#tbr-amount").val(FormatStringDecimal($(this).select2("data")[0].invoiceAmount.toFixed(2)));
+                $("#tbr-amount").val($(this).select2("data")[0].invoiceAmount.toFixed(2));
+                $("#tbr-amount-max").val($(this).select2("data")[0].invoiceAmount.toFixed(2));
+            });
 
-        $("#tbr-invoice").on("select2:unselecting", function (e) {
-            $("#tbr-amount").val("0.00");
-            $("#tbr-amount-max").val("0.00");
-        });
+            $("#tbr-invoice").on("select2:unselecting", function (e) {
+                $("#tbr-amount").val("0.00");
+                $("#tbr-amount-max").val("0.00");
+            });
+        }
 
         // Validation for TBR Modal
         var validateTBR = $("#tbrForm").validate({
@@ -899,7 +902,7 @@
             },
             messages: {
                 InvoiceNumber: { required: "Please select an Invoice Number" },
-                Amount: { required: "Amount is required", isNotZero: "Amount cannot be 0", lessThanOrEqual: function() { return "Cannot exceed invoice amount " + FormatStringDecimal($("#tbr-amount-max").val()); } }
+                Amount: { required: "Amount is required", isNotZero: "Amount cannot be 0", lessThanOrEqual: function () { return "Cannot exceed invoice amount " + FormatStringDecimal($("#tbr-amount-max").val()); } }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -918,9 +921,9 @@
                     salesReturnId: $("#tbr-invoice").val(),
                     amount: removeCommaOfNumber($("#tbr-amount").val())
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
-                    toastrNoDuplicate(data.message, "Success", "success");
+                    toastr.success(data.message, "Success");
+                    tbrselect();
                     $("#tbrModal").modal("hide");
                     soaDT.ajax.reload();
                 },
@@ -1082,10 +1085,9 @@
                 data: {
                     CheckNumber: $("#check-checknumber").val()
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate("Check Number already in use in other payment", "Required field &lt;Check Number&gt;", "warning");
+                        toastr.warning("Check Number already in use in other payment", "Required field &lt;Check Number&gt;");
                         $('span[data-valmsg-for="check-checknumber"]').text("Check Number already in use in other payment");
                         $("#check-checknumber").addClass("text-danger text-xs");
                     } else {
@@ -1095,7 +1097,7 @@
                             $("#check-checknumber").addClass("text-danger text-xs");
                         });
                         if (checkDuplicateNumber) {
-                            toastrNoDuplicate("Duplicate Check Number", "Required field &lt;Check Number&gt;", "warning");
+                            toastr.warning("Duplicate Check Number", "Required field &lt;Check Number&gt;");
                             $('span[data-valmsg-for="check-checknumber"]').text("Duplicate Check Number");
                         } else {
                             var invoiceForm = {
@@ -1229,12 +1231,11 @@
                     soaId: @Model?.Id,
                     invoiceIds: invoiceIds
                 },
-                error: jQueryCommonError,
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
-                        toastrNoDuplicate(data.message, "Error", "error");
+                        toastr.error(data.message, "Error");
                     } else {
-                        toastrNoDuplicate(data.message, "Success", "success");
+                        toastr.success(data.message, "Success");
                         $("#addInvoiceModal").modal("hide");
                         soaDT.ajax.reload();
                         hideLoader();

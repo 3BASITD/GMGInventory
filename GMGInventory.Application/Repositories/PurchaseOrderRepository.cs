@@ -316,6 +316,7 @@ namespace GMGInventory.Application.Repositories
                 orderVM.CurrencyId = form.Currency;
                 orderVM.CurrencyRate = form.CurrencyRate;
                 orderVM.ReferenceNumber = form.ReferenceNumber;
+                orderVM.ReplenishDate = form.ReplenishDate;
                 context.PurchaseOrders.Update(orderVM);
             }
             await context.SaveChangesAsync(currentUserId);
@@ -341,7 +342,7 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var citemsVM = context.PurchaseOrderLineItems.Where(s => s.PurchaseOrderId == PurchaseOrderId);
-
+            /*
             // add item
             // check items not in db
             var items = citemsVM.Select(s => s.ItemId);
@@ -383,8 +384,63 @@ namespace GMGInventory.Application.Repositories
             context.PurchaseOrderLineItems.RemoveRange(ritems);
 
             await context.SaveChangesAsync(currentUserId);
+            */
+
+            context.PurchaseOrderLineItems.RemoveRange(citemsVM);
+            
+            await context.SaveChangesAsync(currentUserId);
+
+            var itemsVM = Items.Select(s => new PurchaseOrderLineItem
+            {
+                Discount1 = s.Discount1,
+                Discount2 = s.Discount2,
+                Discount3 = s.Discount3,
+                ItemId = s.Item,
+                PurchaseOrderId = PurchaseOrderId,
+                Quantity = s.Quantity,
+                UnitPrice = s.UnitPrice
+            });
+            context.PurchaseOrderLineItems.AddRange(itemsVM);
+
+            await context.SaveChangesAsync(currentUserId);
 
             await ReplenishInventory(PurchaseOrderId);
+        }
+
+        public async Task<int> UpdateItemsAsync(PurchaseOrderFormVM form)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            var purchaseOrder = await context.PurchaseOrders.Where(s => s.Id == form.Id).FirstAsync();
+            purchaseOrder.CurrencyId = form.Currency;
+            purchaseOrder.CurrencyRate = form.CurrencyRate;
+            purchaseOrder.ReferenceNumber = form.ReferenceNumber;
+            purchaseOrder.ReplenishDate = form.ReplenishDate;
+
+            context.PurchaseOrders.Update(purchaseOrder);
+            await context.SaveChangesAsync(currentUserId);
+
+            int success = 0;
+            var poItems = await context.PurchaseOrderLineItems.Where(s => s.PurchaseOrderId == form.Id).ToListAsync();
+            foreach(var item in poItems)
+            {
+                var formItem = form.Items.Where(s=>s.Item == item.ItemId).FirstOrDefault();
+                if(formItem != null && (item.UnitPrice != formItem.UnitPrice 
+                                     || item.Discount1 != formItem.Discount1 
+                                     || item.Discount2 != formItem.Discount2 
+                                     || item.Discount3 != formItem.Discount3))
+                {
+                    item.UnitPrice = formItem.UnitPrice;
+                    item.Discount1 = formItem.Discount1;
+                    item.Discount2 = formItem.Discount2;
+                    item.Discount3 = formItem.Discount3;
+
+                    context.PurchaseOrderLineItems.Update(item);
+                    await context.SaveChangesAsync(currentUserId);
+                    success++;
+                }
+            }
+            return success;
         }
 
         private async Task ReplenishInventory(int purchaseOrderId)

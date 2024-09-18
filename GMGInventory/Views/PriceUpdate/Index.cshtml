@@ -321,12 +321,11 @@
                         RetailPrice: $("#update-retail").val(),
                         NetPrice: $("#update-net").val()
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             $("#updateModal").modal("hide");
                             dataTable.ajax.reload();
                         }
@@ -378,9 +377,9 @@
 
         function DoUpload() {
             if (!$("#upload-file").val()) {
-                toastrNoDuplicate("Please select a file first", "Warning", "warning");
+                toastr.warning("Please select a file first", "Warning");
             } if (json_of_excel.length == 0) {
-                toastrNoDuplicate("The excel file is empty", "Warning", "warning");
+                toastr.warning("The excel file is empty", "Warning");
             } else {
                 var columns = Object.keys(json_of_excel[0]);
                 $("#upload-table tbody").html("");
@@ -422,9 +421,6 @@
                     Code: code,
                     RetailPrice: retailprice,
                     NetPrice: netprice
-                },
-                error: function (xhr, status, error) {
-                    $("#upload-row" + rownum + "td").html("Error: " + status + " " + error);
                 },
                 success: function (data, status, xhr) {
                     $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);

@@ -45,22 +45,16 @@ namespace GMGInventory.Controllers
         public IActionResult Error(int statuscode)
         {
             Response.StatusCode = statuscode;
-            //Response.StatusDescription = "Forbidden"; //403
-            //Response.StatusDescription = "Page not found"; //404
-            //Response.StatusDescription = "Service Unavailable"; //503
-            if (statuscode == 401)
+            return statuscode switch
             {
-                return View($"/Views/Home/Login.cshtml");
-            }
-            else if (statuscode == 403 || statuscode == 404 || statuscode == 500)// || statuscode == 503)
-            {
-                return View($"/Views/Home/HTTP{statuscode}.cshtml");
-            }
-            else
-            {
-                ViewBag["statuscode"] = statuscode;
-                return View();
-            }
+                400 => View("~/Views/Shared/E400.cshtml"),
+                403 => View("~/Views/Shared/E403.cshtml"),
+                404 => View("~/Views/Shared/E404.cshtml"),
+                500 => View("~/Views/Shared/E500.cshtml"),
+                502 => View("~/Views/Shared/E502.cshtml"),
+                503 => View("~/Views/Shared/E503.cshtml"),
+                _ => View("~/Views/Shared/Error.cshtml")
+            };
         }
     }
 

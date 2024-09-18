@@ -364,7 +364,8 @@ namespace GMGInventory.Application.Repositories
                              Quantity = invoicel.Quantity,
                              QuantityOfPack = pack,
                              Unit = item.Unit.Code,
-                             SellingPriceType = price.RetailSellingPrice > price.NetSellingPrice ? "Gross" : "Net"
+                             SellingPriceType = price.RetailSellingPrice > price.NetSellingPrice ? "Gross" : "Net",
+                             ReferenceNumber = invoicel.Invoice.ControlNumber
                          };
             return await itemVM.ToListAsync();
         }
@@ -438,7 +439,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsInvoiceInUse(int? invoiceId)
         {
-            var isInSalesReturn = await context.SalesReturnLineItems.AnyAsync(s=>s.InvoiceId == invoiceId);
+            var isInSalesReturn = await context.SalesReturnLineItems.AnyAsync(s=>s.InvoiceLineItem!.InvoiceId == invoiceId);
             var isInSOACR = await context.SOACRLineItems.AnyAsync(s => s.InvoiceId == invoiceId);
             return isInSalesReturn || isInSOACR;
         }

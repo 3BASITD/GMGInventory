@@ -30,6 +30,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         public ActionResult Index()
@@ -39,6 +40,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
@@ -50,6 +52,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         public async Task<ActionResult> Details(int? Id)
@@ -64,6 +67,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
@@ -74,6 +78,7 @@ namespace GMGInventory.Controllers
 
         [Authorize(Roles = Roles.Accounting + ","
                          + Roles.InvoicingClerk + ","
+                         + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]

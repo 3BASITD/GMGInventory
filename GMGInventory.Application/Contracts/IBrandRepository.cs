@@ -18,7 +18,7 @@ namespace GMGInventory.Application.Contracts
         Task ReactivateBrandAsync(int id);
         Task AddAsync(BrandVM brandVM);
         Task UpdateAsync(BrandVM brandVM);
-        Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId);
         Task<int?> GetIdAsync(string? Name);
     }
 }

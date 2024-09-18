@@ -1,0 +1,212 @@
+﻿@using GMGInventory.Data
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+@{
+    var activeUser = UserManager.FindByNameAsync(User.Identity?.Name).Result;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @ViewData["Title"]</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
+    <link rel="stylesheet" href="~/lib/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/datatables-bs5/datatables.min.css" />
+    <link rel="stylesheet" href="~/lib/adminlte/css/adminlte.min.css" />
+    <link rel="stylesheet" href="~/lib/jquery-ui/jquery-ui.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-toggle/css/bootstrap2-toggle.min.css" />
+    <link rel="stylesheet" href="~/lib/chart.js/Chart.min.css" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <link rel="stylesheet" href="~/lib/microtip/microtip.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="layout-top-nav @(activeUser.IsDarkMode ? "dark-mode" : "")">
+    <div class="wrapper">
+        <nav class="main-header navbar navbar-expand-lg @(activeUser.IsDarkMode ? "navbar-dark" : "navbar-white navbar-light")">
+            <div class="container-fluid">
+                <a asp-controller="Home" asp-action="Index" class="navbar-brand brand-link">
+                    <img src="~/images/BAS-02.png" alt="BAS" class="brand-image img-circle bg-white" style="margin-top:-3px;">
+                    <span class="brand-text font-weight-light">INVENTORY SYSTEM</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-lg-center" id="navbarCollapse">
+                    @if (activeUser.IsActive == false)
+                    {
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    YOUR ACCOUNT IS DEACTIVATED
+                                </a>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                    <partial name="_Navigation2" />
+                    }
+                </div>
+
+                <ul class="navbar-nav navbar-no-expand ml-auto">
+                    <li class="nav-item dropdown">
+                        <a id="menuOption" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">
+                            <i class="fas fa-cog"></i>
+                            <span class="sticked-hide">OPTIONS</span>
+                        </a>
+                        <ul aria-labelledby="menuOption" class="dropdown-menu dropdown-menu-option mt-md-3 border-0 shadow">
+                            <li>
+                                <a class="dropdown-item" asp-area="" asp-controller="Profile" asp-action="Index">
+                                    <i class="nav-icon fas fa-user"></i>
+                                    Profile
+                                </a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li class="bg-gradient-danger">
+                                <a href="#" class="dropdown-item" id="logout-link">
+                                    <i class="nav-icon fas fa-power-off"></i>
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="content-wrapper text-sm">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1></h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                @if (ViewContext.RouteData.Values["controller"]?.ToString() != "Home"
+                                                                                                   @*&& ViewContext.RouteData.Values["action"]?.ToString() != "Index"*@)
+                                {
+                                    <li class="breadcrumb-item">
+                                        <a asp-controller="Home" asp-action="Index">Home</a>
+                                    </li>
+                                }
+                                @await RenderSectionAsync("Breadcrumb", required: false)
+                                <li class="breadcrumb-item active">
+                                    @ViewData["Title"]
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    @*
+                    @if (TempData["SuccessMessage"] != null || TempData["WarningMessage"] != null || TempData["ErrorMessage"] != null)
+                    {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @(TempData["SuccessMessage"] ?? TempData["WarningMessage"] ?? TempData["ErrorMessage"])
+                    <button type="button" class="close" aria-label="Close" data-bs-dismiss="alert">
+                    <span aria-hidden="true">×</span>
+                    </button>
+                    </div>
+                    }
+                    *@
+                    @RenderBody()
+                </div>
+            </section>
+        </div>
+
+        <footer class="main-footer no-print text-sm">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 1.0.0
+            </div>
+            Copyright © 2022 MISNet
+        </footer>
+    </div>
+
+    <partial name="_ItemDetailsPartial" />
+
+    <form id="logoutForm" class="form-inline d-none" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+        <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+    </form>
+
+    <div id="partial-holder" class="text-sm"></div>
+    <div id="for-print"></div>
+    <input type="hidden" id="current-user-nickname" value="@activeUser.Nickname" />
+    <input type="hidden" class="current-user-role" value="temp" />
+    @foreach (var role in @UserManager.GetRolesAsync(activeUser).Result.ToList())
+    {
+        <input type="hidden" class="current-user-role" value="@role" />
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/datatables-bs5/datatables.min.js"></script>
+    <script src="~/lib/jquery-ui/jquery-ui.js"></script>
+    <script src="~/lib/sweetalert/sweetalert.min.js"></script>
+    <script src="~/lib/popper.js/umd/popper.min.js"></script>
+    <script src="~/lib/select2/js/select2.js"></script>
+    <script src="~/lib/bootstrap-toggle/js/bootstrap2-toggle.min.js"></script>
+    <script src="~/lib/chart.js/Chart.min.js"></script>
+    <script src="~/lib/loadingoverlay/loadingoverlay.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script src="~/lib/sheetjs/dist/xlsx.core.min.js"></script>
+    <script src="~/lib/filereader/filereader.js"></script>
+    <script src="~/lib/print-this/printThis.js"></script>
+    <script src="~/lib/jquery-mask/jquery.mask.js"></script>
+    <script src="~/lib/jquery-number-2.1.6/jquery.number.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function () {
+        @if (activeUser.IsDarkMode)
+        {
+            <text>
+                    $(".table").each(function () {
+                        $(this).addClass("table-dark");
+                    });
+            </text>
+        }
+                                                        });
+
+        @if (TempData["SuccessMessage"] != null || TempData["WarningMessage"] != null || TempData["ErrorMessage"] != null)
+        {
+            if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                    toastr.success("@TempData["SuccessMessage"]", "Success");
+                </text>
+            }
+            else if (TempData["WarningMessage"] != null)
+            {
+                <text>
+                    toastr.warning("@TempData["WarningMessage"]", "Warning");
+                </text>
+            }
+            else if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                    toastr.error("@TempData["ErrorMessage"]", "Error");
+                </text>
+            }
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

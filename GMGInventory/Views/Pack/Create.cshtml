@@ -220,7 +220,7 @@
                 },
                 type: "POST",
             },
-            serverSide: true,
+            serverSide: false,
             filter: true,
             responsive: true,
             autoWidth: false,
@@ -289,11 +289,11 @@
 
         $(".btn-add-item").on("click", function () {
             if ($("#add-box").val() == 0) {
-                toastrNoDuplicate("Please enter package number", "Required field &lt;Package Number&gt;", "warning");
+                toastr.warning("Please enter package number", "Required field &lt;Package Number&gt;");
                 $("#add-box").addClass("text-danger");
                 $('span[data-valmsg-for="add-box"]').text("Please enter package number");
             } else if ($("#add-quantity").val() == 0 && $("#add-partial").prop("checked")) {
-                toastrNoDuplicate("Please enter quantity", "Required field &lt;Quantity&gt;", "warning");
+                toastr.warning("Please enter quantity", "Required field &lt;Quantity&gt;");
                 $("#add-quantity").addClass("text-danger");
                 $('span[data-valmsg-for="add-quantity"]').text("Please enter collector receipt");
             } else {
@@ -304,7 +304,7 @@
                         if (parseInt(row_data.remainingQuantity) > 0) {
                             if (parseInt(row_data.remainingQuantity) < parseInt($("#add-quantity").val())) {
                                 $("#add-quantity").val(parseInt(row_data.remainingQuantity));
-                                toastrNoDuplicate("Partial Quantity exceed the Remaining Quantity. Auto adjusted", "Remaining Quantity", "info");
+                                toastr.info("Partial Quantity exceed the Remaining Quantity. Auto adjusted", "Remaining Quantity");
                             }
                             var quantityToPack = 0;
                             if ($("#add-partial").prop("checked")) {
@@ -327,14 +327,14 @@
                                 quantityToPack: quantityToPack
                             };
                             itemDT.row.add(toItem).draw();
-                            toastrNoDuplicate("Added " + row_data.itemCode + " on Packed Item(s)", "Success", "success");
+                            toastr.success("Added " + row_data.itemCode + " on Packed Item(s)", "Success");
 
                             this.data(row_data);
                             if (row_data.remainingQuantity == 0) {
                                 $(this.node()).addClass("text-muted");
                             }
                         } else {
-                            toastrNoDuplicate(row_data.itemName + " has 0 remaining quantity", "Remaining Quantity", "warning");
+                            toastr.warning(row_data.itemName + " has 0 remaining quantity", "Remaining Quantity");
                         }
                     }
                 });
@@ -345,7 +345,7 @@
 
         $("#add-box").on("change", function () {
             if ($("#add-box").val() == 0) {
-                toastrNoDuplicate("Please enter package number", "Required field &lt;Package Number&gt;", "warning");
+                toastr.warning("Please enter package number", "Required field &lt;Package Number&gt;");
                 $("#add-box").addClass("text-danger");
                 $('span[data-valmsg-for="add-box"]').text("Please enter package number");
             } else {
@@ -356,7 +356,7 @@
 
         $("#add-quantity").on("change", function () {
             if ($("#add-quantity").val() == 0 && $("#add-partial").prop("checked")) {
-                toastrNoDuplicate("Please enter quantity", "Required field &lt;Quantity&gt;", "warning");
+                toastr.warning("Please enter quantity", "Required field &lt;Quantity&gt;");
                 $("#add-quantity").addClass("text-danger");
                 $('span[data-valmsg-for="add-quantity"]').text("Please enter collector receipt");
             } else {
@@ -430,7 +430,7 @@
 
                 dtCheckboxes();
                 itemDT.row($(this).parents('tr')).remove().draw();
-                toastrNoDuplicate("Removed " + rowdata.itemCode + " on Packed Item(s)", "Warning", "warning");
+                toastr.warning("Removed " + rowdata.itemCode + " on Packed Item(s)", "Warning");
             });
 
             $(".table-item thead th").removeClass("form-cell");
@@ -512,11 +512,11 @@
         function SavePack(savingAs) {
             var itemsToPack = GetItemsToPack();
             if (itemsToPack.length == 0) {
-                toastrNoDuplicate("No item to pack. Add an item to the list to continue", "Warning", "warning");
+                toastr.warning("No item to pack. Add an item to the list to continue", "Warning");
                 //} else if (itemsToPack.filter(s => parseInt(s.quantity) > parseInt(s.served_quantity)).length > 0) {
-                //    toastrNoDuplicate("Some items have exceeded the served quantity. Please update the served quantity on sales order", "Warning", "warning");
+                //    toastr.warning("Some items have exceeded the served quantity. Please update the served quantity on sales order", "Warning");
             } else if (itemsToPack.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastrNoDuplicate("Some items have 0 quantity. Can't pack an item with 0 quantity", "Warning", "warning");
+                toastr.warning("Some items have 0 quantity. Can't pack an item with 0 quantity", "Warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -526,10 +526,9 @@
                         Items: itemsToPack,
                         SavingAs: savingAs
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
                             window.location = "@Url.Action("Details")/" + data.newRow;
                         }

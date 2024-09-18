@@ -204,14 +204,15 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Brands
                 .Where(s => s.IsActive || s.Id == IncludeId)
-                .Select(s => new JsonOptionsModel
+                .Select(s => new JsonNameOptionsModel
                 {
                     Id = s.Id.ToString(),
                     Text = s.Name,
+                    Name = s.Name,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
                 .OrderBy(s => s.Text)

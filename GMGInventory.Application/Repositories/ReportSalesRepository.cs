@@ -1390,9 +1390,9 @@ namespace GMGInventory.Application.Repositories
                            && (filter.Item == null || sreturn.Item.Id == filter.Item || (filter.Item == 0 && sreturn.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                            select new SalesReturnRVM
                            {
-                               Agent = sreturn.Invoice == null ? "" : sreturn.Invoice.SalesOrder.Agent.Code,
+                               Agent = sreturn.InvoiceLineItem == null ? "" : sreturn.InvoiceLineItem.Invoice.SalesOrder.Agent.Code,
                                Brand = sreturn.Item.Brand.Name,
-                               ControlNumber = sreturn.Invoice == null ? "TBR" : sreturn.Invoice.ControlNumber,
+                               ControlNumber = sreturn.InvoiceLineItem == null ? "TBR" : sreturn.InvoiceLineItem.Invoice.ControlNumber,
                                Customer = sreturn.SalesReturn.Customer.Name,
                                ItemCode = sreturn.Item.Code,
                                ItemName = sreturn.Item.Name,
@@ -1400,7 +1400,7 @@ namespace GMGInventory.Application.Repositories
                                PriceReturnedD = sreturn.SellingPrice,
                                QuantityReturnedD = sreturn.Quantity,
                                ReturnDateD = sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated,
-                               SINumber = sreturn.Invoice == null ? "" : sreturn.Invoice.InvoiceNumber,
+                               SINumber = sreturn.InvoiceLineItem == null ? "" : sreturn.InvoiceLineItem.Invoice.InvoiceNumber,
                                SRNumber = sreturn.SalesReturn.SalesReturnNumber,
                                Unit = sreturn.Item.Unit.Code
                            };

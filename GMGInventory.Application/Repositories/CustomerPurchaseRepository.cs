@@ -40,6 +40,7 @@ namespace GMGInventory.Application.Repositories
                                 && iv.StatusId == 8
                              select new CustomerPurchaseVM
                              {
+                                 Brand = sl.Item.Brand.Code,
                                  ControlNumber = iv.ControlNumber,
                                  Discount1D = sl.Discount1,
                                  Discount2D = sl.Discount2,
@@ -89,7 +90,8 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.ControlNumber.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue)
+                                    || x.ControlNumber.ToLower().Contains(form.SearchValue)
                                     || x.Discount1D.ToString().Contains(form.SearchValue)
                                     || x.Discount2D.ToString().Contains(form.SearchValue)
                                     || x.InvoiceDate.ToLower().Contains(form.SearchValue)
@@ -110,6 +112,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
+                        case "Brand": data = data.OrderBy(s => s.Brand); break;
                         case "ControlNumber": data = data.OrderBy(s => s.ControlNumber); break;
                         case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
@@ -128,6 +131,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
+                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
                         case "ControlNumber": data = data.OrderByDescending(s => s.ControlNumber); break;
                         case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;

@@ -1,56 +1,53 @@
-﻿using ClosedXML.Excel;
+﻿using AutoMapper;
+using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class BrandController : Controller
+    public class BrandController(IAccessRepository accessRepository
+                            , IItemTypeRepository itemTypeRepository
+                            , IBrandRepository brandRepository
+                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IItemTypeRepository itemTypeRepository;
-        private readonly IBrandRepository brandRepository;
-
-        public BrandController(IBrandRepository brandRepository
-            , IItemTypeRepository itemTypeRepository)
-        {
-            this.itemTypeRepository = itemTypeRepository;
-            this.brandRepository = brandRepository;
-        }
-
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
             return Json(await brandRepository.GetOptions(IncludeId));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Brands)).Convert();
+
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
-            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            var dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await brandRepository.GetListDTAsync(dtForm));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> CreateJson(BrandVM brandVM)
+        public async Task<IActionResult> CreateJson(BrandVM brandVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = new ResponseModel();
             if (await brandRepository.IsBrandCodeExist(brandVM.Code))
             {
                 responseModel.Status = "Error";
@@ -65,13 +62,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(BrandVM brandVM)
+        public async Task<IActionResult> UploadJson(BrandVM brandVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = new ResponseModel();
             if (await brandRepository.UploadCombinationExistAsync(brandVM))
             {
                 responseModel.Status = "Error";
@@ -101,13 +98,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> EditJson(BrandVM brandVM)
+        public async Task<IActionResult> EditJson(BrandVM brandVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = new ResponseModel();
             try
             {
                 await brandRepository.UpdateAsync(brandVM);
@@ -130,43 +127,39 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
-            DataTable dt = new DataTable("Item Types");
-            dt.Columns.AddRange(new DataColumn[3] {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var dt = new DataTable("Item Types");
+            dt.Columns.AddRange([
                 new DataColumn("Code"),
                 new DataColumn("Name"),
                 new DataColumn("Item Type")
-            });
+            ]);
             var brands = (await brandRepository.GetListAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var brand in brands)
             {
                 dt.Rows.Add(brand.Code, brand.Name, brand.ItemType);
             }
 
-            using (XLWorkbook wb = new())
-            {
-                wb.Worksheets.Add(dt);
-                using (MemoryStream stream = new())
-                {
-                    wb.SaveAs(stream);
-                    return File(stream.ToArray(),
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        DateTime.Now.ToString("yyyyMMdd") + " Brands.xlsx");
-                }
-            }
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                DateTime.Now.ToString("yyyyMMdd") + " Brands.xlsx");
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             if (await brandRepository.IsBrandIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -184,13 +177,14 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             if (await brandRepository.IsBrandIdExistAsync(id) == false)
             {
                 return NotFound();

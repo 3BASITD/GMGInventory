@@ -23,7 +23,10 @@
             }
             else
             {
-                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-print">
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-update">
+                    <span class="fas fa-save"></span> Update
+                </button>
+                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                     <span class="fas fa-print"></span> Print
                 </button>
             }
@@ -70,15 +73,24 @@
             </div>
             <div class="col-4">
                 <p class="text-sm">
+                    @if (Model!.Status == "Draft" || Model!.Status == "Approved")
+                    {
+                        <label for="replenish-date" class="form-label fw-normal mb-0">Purchase Date</label>
+                        <input type="date" id="replenish-date" name="OrderDate" class="form-control form-control-sm" value="@Model?.OrderDate3" />
+                        <span data-valmsg-for="replenish-date" data-valmsg-replace="true" class="text-danger"></span>
+                    }
+                    else
+                    {
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.OrderDate)
                     </span>
                     <b class="d-block form-gayahin">
                         @Model?.OrderDate
                     </b>
+                    }
                 </p>
                 <p class="text-sm">
-                    @if (Model!.Status == "Draft")
+                    @if (Model!.Status == "Draft" || Model!.Status == "Approved")
                     {
                         <label for="replenish-currency" class="form-label fw-normal mb-0">Currency</label>
                         <select id="replenish-currency" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
@@ -94,7 +106,7 @@
                     }
                 </p>
                 <p class="text-sm">
-                    @if (Model!.Status == "Draft")
+                    @if (Model!.Status == "Draft" || Model!.Status == "Approved")
                     {
                         <label for="replenish-currency-rate" class="form-label fw-normal mb-0">Currency Rate</label>
                         <input type="number" id="replenish-currency-rate" name="CurrencyRate" step="0.01" min="0" max="1999999" class="form-control form-control-sm" value="@Model.CurrencyRate" />
@@ -129,7 +141,7 @@
                     </b>
                 </p>
                 <p class="text-sm">
-                    @if (Model!.Status == "Draft")
+                    @if (Model!.Status == "Draft" || Model!.Status == "Approved")
                     {
                         <label for="replenish-reference-number" class="form-label fw-normal mb-0">Reference Number</label>
                         <input type="text" id="replenish-reference-number" name="ReferenceNumber" class="form-control form-control-sm" value="@Model?.ReferenceNumber" />
@@ -312,8 +324,8 @@
             type: "POST",
             url: "@Url.Action("GetCurrencyOptions")",
             data: {
-                IncludeId: @Model.CurrencyId
-            },
+                IncludeId: @Model!.CurrencyId
+                    },
             success: function (data, status, xhr) {
                 $("#replenish-currency").select2({
                     data: data
@@ -431,7 +443,7 @@
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastrNoDuplicate($("#add-code").select2("data")[0].text + " has already been added", "Duplicate", "warning");
+                toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
             } else {
                 itemDT.row.add({
                     id: $("#add-code").select2("data")[0].id,
@@ -481,67 +493,79 @@
                     },
                     visible: $("#po-status").val() == "Draft"
                 },
-                { data: "itemCode", name: "ItemCode" },
-                { data: "itemName", name: "ItemName" },
                 {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.id + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode",
+                    className: "form-cell"
+                },
+                { orderable: false,data: "itemName", name: "ItemName" },
+                {
+                    orderable: false,
                     data: function (data, type, dataToSet) {
                         if ($("#po-status").val() == "Draft") {
                             return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
-                            return data.quantity
+                            return '<input type="hidden" class="quantity" value="' + data.quantity + '" />' + data.quantity
                         }
                     },
                     name: "Quantity",
                     className: "text-end"
                 },
-                { data: "unit", name: "Unit" },
+                { orderable: false,data: "unit", name: "Unit" },
                 {
+                    orderable: false,
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Draft") {
-                            return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.unitPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
-                        } else {
-                            return data.unitPrice
-                        }
+                        //if ($("#po-status").val() == "Draft") {
+                        return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.unitPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
+                        //} else {
+                        //    return data.unitPrice
+                        //}
                     },
                     name: "UnitPrice",
                     className: "text-end"
                 },
                 {
+                    orderable: false,
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Draft") {
-                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
-                        } else {
-                            return data.discount1
-                        }
+                        //if ($("#po-status").val() == "Draft") {
+                        return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
+                        //} else {
+                        //    return data.discount1
+                        //}
                     },
                     name: "Discount1",
                     className: "text-end"
                 },
                 {
+                    orderable: false,
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Draft") {
-                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
-                        } else {
-                            return data.discount2
-                        }
+                        //if ($("#po-status").val() == "Draft") {
+                        return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
+                        //} else {
+                        //    return data.discount2
+                        //}
                     },
                     name: "Discount2",
                     className: "text-end"
                 },
                 {
+                    orderable: false,
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Draft") {
-                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3D) + '" class="form-control form-control-sm discount3" /><span class="input-group-text">%</span></div>';
-                        } else {
-                            return data.discount3
-                        }
+                        //if ($("#po-status").val() == "Draft") {
+                        return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3D) + '" class="form-control form-control-sm discount3" /><span class="input-group-text">%</span></div>';
+                        //} else {
+                        //    return data.discount3
+                        //}
                     },
                     name: "Discount3",
                     className: "text-end"
                 },
-                { data: "netPrice", name: "NetPrice", className: "form-cell text-end netprice" }
+                { orderable: false, data: "netPrice", name: "NetPrice", className: "form-cell text-end netprice" }
             ],
-            order: [[1, "asc"]],
+            //order: [[1, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
@@ -564,23 +588,34 @@
                 ComputeTotalQuantity();
             }
 
-            $(".quantity, .unitprice, .discount1, .discount2, .discount3").on("input", function () {
-                var quantity = parseInt($(this).parents("tr").find(".quantity").val());
-                var unit_price = parseFloat($(this).parents("tr").find(".unitprice").val());
-                var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
-                var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
-                var discount3 = parseFloat($(this).parents("tr").find(".discount3").val());
+            $(".quantity, .unitprice, .discount1, .discount2, .discount3").on("onleave", function () {
+                if ($(this).val() == "") {
+                    $(this).val("0");
+                }
+                ComputeRowsTotal(this);
+            });
 
-                var discounted1 = DeductDiscount(unit_price, discount1);
-                var discounted2 = DeductDiscount(discounted1, discount2);
-                var discounted3 = DeductDiscount(discounted2, discount3);
-                //var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
-                var net_price = FormatStringDecimal(Round2Decimal(quantity * discounted3));
-                $(this).parents("tr").find(".netprice").html(net_price);
-                ComputeTotalQuantity();
-                ComputeTotalNetPrice();
+            $(".quantity, .unitprice, .discount1, .discount2, .discount3").on("input", function () {
+                ComputeRowsTotal(this);
             });
         });
+
+        function ComputeRowsTotal(elem) {
+            var quantity = parseInt($(elem).parents("tr").find(".quantity").val());
+            var unit_price = parseFloat($(elem).parents("tr").find(".unitprice").val());
+            var discount1 = parseFloat($(elem).parents("tr").find(".discount1").val());
+            var discount2 = parseFloat($(elem).parents("tr").find(".discount2").val());
+            var discount3 = parseFloat($(elem).parents("tr").find(".discount3").val());
+
+            var discounted1 = DeductDiscount(unit_price, discount1);
+            var discounted2 = DeductDiscount(discounted1, discount2);
+            var discounted3 = DeductDiscount(discounted2, discount3);
+            //var net_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2 - discount3) * unit_price) / 100)));
+            var net_price = FormatStringDecimal(Round2Decimal(quantity * discounted3));
+            $(elem).parents("tr").find(".netprice").html(net_price);
+            ComputeTotalQuantity();
+            ComputeTotalNetPrice();
+        }
 
         function ComputeTotalQuantity() {
             quantities = $(".table-item").find(".quantity");
@@ -610,6 +645,7 @@
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
                 var row_discount3 = parseFloat($(this.node()).find(".discount3").val());
                 item_to_replenish.push({
+                    id: rowIdx,
                     item: row_data.id,
                     quantity: row_quantity,
                     unitPrice: row_unitprice,
@@ -624,9 +660,9 @@
         function SaveReplenish(submitter) {
             var itemsToReplenish = GetItemsToReplenish();
             if (itemsToReplenish.length == 0) {
-                toastrNoDuplicate("No item to replenish. Add an item to the list to continue", "Warning", "warning");
+                toastr.warning("No item to replenish. Add an item to the list to continue", "Warning");
             } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastrNoDuplicate("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning", "warning");
+                toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -635,16 +671,16 @@
                         type: submitter,
                         Id: @Model?.Id,
                         Items: itemsToReplenish,
+                        ReplenishDate: $("#replenish-date").val(),
                         Currency: $("#replenish-currency").val(),
                         CurrencyRate: $("#replenish-currency-rate").val(),
                         ReferenceNumber: $("#replenish-reference-number").val()
                     },
-                    error: jQueryCommonError,
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastrNoDuplicate(data.message, "Error", "error");
+                            toastr.error(data.message, "Error");
                         } else {
-                            toastrNoDuplicate(data.message, "Success", "success");
+                            toastr.success(data.message, "Success");
                             $("#po-status").val(submitter);
                             itemDT.ajax.reload();
                         }
@@ -652,6 +688,30 @@
                 });
             }
         }
+
+        $(".btn-details-update").on("click", function () {
+            var itemsToReplenish = GetItemsToReplenish();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UpdateJson")",
+                data: {
+                    Id: @Model?.Id,
+                    Items: itemsToReplenish,
+                    ReplenishDate: $("#replenish-date").val(),
+                    Currency: $("#replenish-currency").val(),
+                    CurrencyRate: $("#replenish-currency-rate").val(),
+                    ReferenceNumber: $("#replenish-reference-number").val()
+                },
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                    }
+                }
+            });
+
+        });
 
         $(".btn-details-print").on("click", function () {
             var html = '<h3>Replenishment Details</h3>';
