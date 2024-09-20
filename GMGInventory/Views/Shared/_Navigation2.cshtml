@@ -288,6 +288,7 @@
                         Access
                     </a>
                 </li>
+               
                 <li>
                     <a class="dropdown-item @(currentController == "Area" ? "active" : "")"
                        asp-area="" asp-controller="Area" asp-action="Index">
@@ -326,24 +327,25 @@
                 <li>
                     <a class="dropdown-item @(currentController == "LocationCode" ? "active" : "")"
                        asp-area="" asp-controller="LocationCode" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
+                        <i class="nav-icon fas fa fa-location-arrow"></i>
                         Location Codes
                     </a>
                 </li>
                 <li>
-                    <a class="dropdown-item @(currentController == "ReasonReturn" ? "active" : "")"
-                       asp-area="" asp-controller="ReasonReturn" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Reasons of Return
+                    <a class="dropdown-item @(currentController == "ReasonsOfReturn" ? "active" : "")"
+                       asp-area="" asp-controller="ReasonsOfReturn" asp-action="Index">
+                        <i class="nav-icon fas fa fa-undo"></i>
+                        Reasons Of Return
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item @(currentController == "Region" ? "active" : "")"
                        asp-area="" asp-controller="Region" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
+                        <i class="nav-icon fas fa fa-map"></i>
                         Regions
                     </a>
                 </li>
+          
                 <li>
                     <a class="dropdown-item @(currentController == "Supplier" ? "active" : "")"
                        asp-area="" asp-controller="Supplier" asp-action="Index">

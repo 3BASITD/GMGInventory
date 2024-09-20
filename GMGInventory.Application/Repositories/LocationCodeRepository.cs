@@ -1,0 +1,155 @@
+﻿using AutoMapper;
+using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
+using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+namespace GMGInventory.Application.Repositories
+{
+    public class LocationCodeRepository : GenericRepository<LocationCode>, ILocationCodeRepository
+    {
+        private readonly ApplicationDbContext context;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly UserManager<User> userManager;
+        private readonly IMapper mapper;
+
+        public LocationCodeRepository(ApplicationDbContext context
+            , IHttpContextAccessor httpContextAccessor
+            , UserManager<User> userManager
+            , IMapper mapper) : base(context, httpContextAccessor, userManager)
+        {
+            this.context = context;
+            this.httpContextAccessor = httpContextAccessor;
+            this.userManager = userManager;
+            this.mapper = mapper;
+        }
+
+        public async Task<ForDataTables<LocationCodeVM>> GetAllForDataTablesAsync(DataTablesRequestForm form)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetAllLocationCodeAsync()).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.LocationCode.ToLower().Contains(form.SearchValue)
+                                    || x.LocationName.ToLower().Contains(form.SearchValue)
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                                    || x.DateModified.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "LocationCode": data = data.OrderBy(s => s.LocationCode); break;
+                        case "LocationName": data = data.OrderBy(s => s.LocationName); break;
+                        case "IsActive": data = data.OrderBy(s => s.IsActive); break;
+                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "LocationCode": data = data.OrderByDescending(s => s.LocationCode); break;
+                        case "LocationName": data = data.OrderByDescending(s => s.LocationName); break;
+                        case "IsActive": data = data.OrderByDescending(s => s.IsActive); break;
+                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
+                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
+                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
+                        case "DateModified": data = data.OrderByDescending(s => s.DateModifiedD); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<LocationCodeVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+        public async Task<IList<LocationCodeVM>> GetAllLocationCodeAsync()
+        {
+
+            var locations = from location in context.LocationCodes
+
+                          join userc in userManager.Users on location.UserCreated equals userc.Id
+                          join userm in userManager.Users on location.UserModified equals userm.Id into m
+                          from um in m.DefaultIfEmpty()
+
+                          select new LocationCodeVM
+                          {
+                              Id = location.Id,
+                              LocationName = location.Name,
+                              LocationCode = location.Code,
+                              IsActive = location.IsActive,
+                              DateCreatedD = location.DateCreated,
+                              DateModifiedD = location.DateModified == null ? null : location.DateModified.Value,
+                              UserCreated = userc.Nickname,
+                              UserModified = um == null ? "-" : um.Nickname
+                          };
+            return await locations.ToListAsync();
+        }
+
+        public async Task<bool> IsLocationCodeInUse(int id)
+        {
+            return await context.ItemTypes.AnyAsync(s => s.Id == id);
+        }
+        public async Task<bool> IsLocationCodeExist(string code)
+        {
+            return await context.LocationCodes.AnyAsync(c => c.Code == code);
+        }
+
+        public async Task AddAsync(LocationCodeVM LocationCodeVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var location = new LocationCode
+            {
+                Code = LocationCodeVM.Code,
+                Name = LocationCodeVM.Name,
+                IsActive = true
+            };
+            await context.LocationCodes.AddAsync(location);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task UpdateAsync(LocationCodeVM LocationCodeVM)
+        {
+            var location = context.LocationCodes.Where(s => s.Id == LocationCodeVM.Id).FirstOrDefault();
+            if (location == null)
+            {
+                throw new DbUpdateConcurrencyException();
+            }
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            location.Id = LocationCodeVM.Id;
+
+            location.Code = LocationCodeVM.Code;
+            location.Name = LocationCodeVM.Name;
+            location.IsActive = true;
+            context.LocationCodes.Update(location);
+            await context.SaveChangesAsync(currentUserId);
+        }
+
+
+    }
+}

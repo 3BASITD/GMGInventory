@@ -1071,6 +1071,43 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("ItemTypes");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.LocationCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LocationCodes");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Pack", b =>
                 {
                     b.Property<int>("Id")
@@ -2291,6 +2328,43 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("PurchaseReturnLineItems");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.ReasonOfReturn", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReasonOfReturns");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Region", b =>
                 {
                     b.Property<int>("Id")
@@ -2301,11 +2375,27 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2316,25 +2406,37 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "LUZ",
-                            Name = "Luzon"
+                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 192, DateTimeKind.Local).AddTicks(7168),
+                            IsActive = false,
+                            Name = "Luzon",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = 2,
                             Code = "VIS",
-                            Name = "Visayas"
+                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 192, DateTimeKind.Local).AddTicks(7187),
+                            IsActive = false,
+                            Name = "Visayas",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = 3,
                             Code = "MIN",
-                            Name = "Mindanao"
+                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 192, DateTimeKind.Local).AddTicks(7190),
+                            IsActive = false,
+                            Name = "Mindanao",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = 4,
                             Code = "MM",
-                            Name = "Metro Manila"
+                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 192, DateTimeKind.Local).AddTicks(7192),
+                            IsActive = false,
+                            Name = "Metro Manila",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -3462,42 +3564,36 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            ConcurrencyStamp = "6ff86e3d-135e-4d71-8248-6d26d194b249",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            ConcurrencyStamp = "7b4f8169-7140-409e-90c0-f0b94bbfd7f5",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            ConcurrencyStamp = "a3c1a8fd-3c30-4bd5-a3d1-6170fc4e2b15",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            ConcurrencyStamp = "3937c0c1-f063-4a0b-bae6-7d85b321fc73",
                             Name = "Sales Director",
                             NormalizedName = "SALES DIRECTOR"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            ConcurrencyStamp = "57b40d43-3693-43e2-8e6d-4443037b7e27",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            ConcurrencyStamp = "044b59fb-28d0-4e7b-9557-fb5b89374437",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER"
                         });
@@ -3736,16 +3832,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2fb4d776-0ff7-41ea-98eb-f26e2e5806f1",
+                            ConcurrencyStamp = "cef40c76-a0c1-426e-94ed-5c62393fb816",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAEAACcQAAAAEAY1Ne58aMrbytcvJ4Ifrh02c6BdodnwODCSRm/+Lbqg4m3Kx3unG1sJPgEQyxF8XA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOIgOhxZc7SYslNgtyA1hgcY49RvHy0WkdQN99Z1v8sBIz1h/M+cMTSeynQaLAXCKw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e2bffb79-2376-4955-a9aa-6b61507231c1",
+                            SecurityStamp = "b940b505-f899-4a80-840d-7733444c3bc8",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2023, 6, 16, 23, 0, 51, 480, DateTimeKind.Local).AddTicks(9571),
+                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 278, DateTimeKind.Local).AddTicks(5590),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3757,16 +3853,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "71dace9a-40e0-4ac6-acb8-be5a97034cb7",
+                            ConcurrencyStamp = "306da8cf-4a9c-4c8c-b37e-244507d2504e",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAEAACcQAAAAEIp9WrqO3c0eChus/xoi0QnVUkTcW4r2u22fOkf4WE33luW1rq2jYbJI2ZBdK2FxPQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN0Sby7eGZ/Q9iqxNKP7JmRwWqliS+OU/hrnWcZN0ohi0NIBnTFWMcCqgqVNTFUGQA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "07d8648a-caa3-4322-aea9-79b0eb0858bb",
+                            SecurityStamp = "37707739-0a92-4b20-bb90-3f5fc1975f77",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2023, 6, 16, 23, 0, 51, 489, DateTimeKind.Local).AddTicks(9490),
+                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 363, DateTimeKind.Local).AddTicks(5091),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,
