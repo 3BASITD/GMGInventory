@@ -271,6 +271,39 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("Brands");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.BusinessStyle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BusinessStyles");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -2406,7 +2439,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "LUZ",
-                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 192, DateTimeKind.Local).AddTicks(7168),
+                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 580, DateTimeKind.Local).AddTicks(9301),
                             IsActive = false,
                             Name = "Luzon",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -2415,7 +2448,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 2,
                             Code = "VIS",
-                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 192, DateTimeKind.Local).AddTicks(7187),
+                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 580, DateTimeKind.Local).AddTicks(9319),
                             IsActive = false,
                             Name = "Visayas",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -2424,7 +2457,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 3,
                             Code = "MIN",
-                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 192, DateTimeKind.Local).AddTicks(7190),
+                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 580, DateTimeKind.Local).AddTicks(9321),
                             IsActive = false,
                             Name = "Mindanao",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -2433,7 +2466,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 4,
                             Code = "MM",
-                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 192, DateTimeKind.Local).AddTicks(7192),
+                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 580, DateTimeKind.Local).AddTicks(9323),
                             IsActive = false,
                             Name = "Metro Manila",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -3221,31 +3254,16 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<int>("AreaId")
+                    b.Property<int>("BusinessStyleId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Barangay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ContactNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ContactPerson")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("CreditLimit")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("CurrencyId")
                         .HasColumnType("int");
@@ -3256,20 +3274,29 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EmailAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsForeign")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("OfficeTelNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PriceList")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("RegionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TIN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(12)");
+
+                    b.Property<string>("Terms")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
@@ -3280,15 +3307,17 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ZipCode")
+                    b.Property<string>("VAT")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(12)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AreaId");
+                    b.HasIndex("BusinessStyleId");
 
                     b.HasIndex("CurrencyId");
+
+                    b.HasIndex("RegionId");
 
                     b.ToTable("Suppliers");
                 });
@@ -3832,16 +3861,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cef40c76-a0c1-426e-94ed-5c62393fb816",
+                            ConcurrencyStamp = "d7139ee1-95ca-4120-be38-2cca2217509f",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOIgOhxZc7SYslNgtyA1hgcY49RvHy0WkdQN99Z1v8sBIz1h/M+cMTSeynQaLAXCKw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPApT+7R3SL506vYUrfYf7s1A+yjI7/tD12hAXQHN0n5nlPuJuL8K2uoM0MFgcQpxg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b940b505-f899-4a80-840d-7733444c3bc8",
+                            SecurityStamp = "728d4639-e6c2-4b26-989d-c0c42276293f",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 278, DateTimeKind.Local).AddTicks(5590),
+                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 676, DateTimeKind.Local).AddTicks(9873),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3853,16 +3882,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "306da8cf-4a9c-4c8c-b37e-244507d2504e",
+                            ConcurrencyStamp = "24dd9dd7-ff55-4710-a93e-f13847d787fd",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN0Sby7eGZ/Q9iqxNKP7JmRwWqliS+OU/hrnWcZN0ohi0NIBnTFWMcCqgqVNTFUGQA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHBpGExfpyVcNH2CPSKtXR82NPqMmCrtU0YOKhuuYGZnhzNz/XtlAWy9AjrAJ0pnoA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "37707739-0a92-4b20-bb90-3f5fc1975f77",
+                            SecurityStamp = "87e9c421-5b82-4f11-b426-988b0c0eb16a",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2024, 9, 20, 10, 2, 33, 363, DateTimeKind.Local).AddTicks(5091),
+                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 808, DateTimeKind.Local).AddTicks(4654),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,
@@ -4555,9 +4584,9 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Supplier", b =>
                 {
-                    b.HasOne("GMGInventory.Data.Area", "Area")
-                        .WithMany("Suppliers")
-                        .HasForeignKey("AreaId")
+                    b.HasOne("GMGInventory.Data.BusinessStyle", "BusinessStyle")
+                        .WithMany()
+                        .HasForeignKey("BusinessStyleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -4567,9 +4596,17 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Area");
+                    b.HasOne("GMGInventory.Data.Region", "Region")
+                        .WithMany("Suppliers")
+                        .HasForeignKey("RegionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BusinessStyle");
 
                     b.Navigation("Currency");
+
+                    b.Navigation("Region");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItem", b =>
@@ -4673,8 +4710,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Agents");
 
                     b.Navigation("Customers");
-
-                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
@@ -4842,6 +4877,8 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Region", b =>
                 {
                     b.Navigation("Areas");
+
+                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrder", b =>

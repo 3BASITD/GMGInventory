@@ -198,5 +198,7 @@ namespace GMGInventory.Data
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<ReasonOfReturn> ReasonOfReturns { get; set; }
         public DbSet<LocationCode> LocationCodes { get; set; }
+        public DbSet<BusinessStyle> BusinessStyles { get; set; }
+
     }
 }

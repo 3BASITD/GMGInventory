@@ -31,10 +31,6 @@
                         @Html.DisplayNameFor(model => model.Name)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.CreditLimit)
-                    </th>
-
-                    <th>
                         @Html.DisplayNameFor(model => model.IsActive)
                     </th>
                     <th>
@@ -90,23 +86,33 @@
                                 <input type="text" name="Name" id="create-name" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
+                           
+                             <div class="form-group">
+                                <label for="create-tin" class="control-label mb-0 d-block">TIN</label>
+                                <input type="text" name="TIN" id="create-tin" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-tin" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
                             <div class="form-group">
                                 <label for="create-contact-person" class="control-label mb-0 d-block">Contact Person</label>
                                 <input type="text" name="ContactPerson" id="create-contact-person" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-contact-person" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
-                                <label for="create-contact-number" class="control-label mb-0 d-block">Contact Number</label>
-                                <input type="text" name="ContactNumber" id="create-contact-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-contact-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="create-email" class="control-label mb-0 d-block">Email</label>
-                                <input type="text" name="EmailAddress" id="create-email" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-email" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-officetelno" class="control-label mb-0 d-block">Office Tel No.</label>
+                                <input type="text" name="OfficeTelNo" id="create-officetelno" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-officetelno" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="create-region" class="control-label mb-0 d-block">Region</label>
+                                <select name="Region" id="create-region" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="create-region" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
                             <div class="form-group">
                                 <label for="create-addressline1" class="control-label mb-0 d-block">Address Line 1</label>
                                 <input type="text" name="AddressLine1" id="create-addressline1" class="form-control form-control-sm" />
@@ -117,70 +123,42 @@
                                 <input type="text" name="AddressLine2" id="create-addressline2" class="form-control form-control-sm" />
                                 <span data-valmsg-for="create-addressline2" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
-                                <label for="create-barangay" class="control-label mb-0 d-block">Barangay</label>
-                                <input type="text" name="Barangay" id="create-barangay" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-barangay" data-valmsg-replace="true" class="text-danger"></span>
+                          
+                              <div class="form-group">
+                                <label for="create-vat" class="control-label mb-0 d-block">VAT</label>
+                                <input type="text" name="VAT" id="create-vat" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-vat" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
-                                <label for="create-city" class="control-label mb-0 d-block">City/ Municipality</label>
-                                <input type="text" name="City" id="create-city" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-city" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="create-area" class="form-label mb-0">Area</label>
-                                <select id="create-area" style="width:100%">
-                                    <option></option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="create-region" class="form-label mb-0">Region</label>
-                                <input type="text" id="create-region" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                            @* <div class="form-group">
-                            <label for="create-region" class="control-label mb-0 d-block">Region</label>
-                            <select name="Region" id="create-region" class="form-control" style="width: 100%">
-                            </select>
-                            <span data-valmsg-for="create-region" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                            <label for="create-area" class="control-label mb-0 d-block">Area</label>
-                            <select name="Area" id="create-area" class="form-control" style="width: 100%">
-                            </select>
-                            <span data-valmsg-for="create-area" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>*@
-                            <div class="form-group">
-                                <label for="create-zip" class="control-label mb-0 d-block">Zip Code</label>
-                                <input type="number" name="ZipCode" id="create-zip" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-zip" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-
                         </div>
 
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-creditlimit" class="control-label mb-0 d-block">Credit Limit</label>
-                                <input type="number" name="CreditLimit" id="create-creditlimit" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-creditlimit" data-valmsg-replace="true" class="text-danger"></span>
+                             <div class="form-group">
+                                <label for="create-terms" class="control-label mb-0 d-block">Terms</label>
+                                <input type="text" name="Terms" id="create-terms" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-terms" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
+
+                            <div class="form-group">
+                                <label for="create-pricelist" class="control-label mb-0 d-block">Pricelist</label>
+                                <input type="text" name="Pricelist" id="create-pricelist" class="form-control form-control-sm" />
+                                <span data-valmsg-for="create-pricelist" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
                             <div class="form-group">
                                 <label for="create-currency" class="control-label mb-0 d-block">Currency</label>
                                 <select name="Currency" id="create-currency" class="form-control" style="width: 100%">
                                 </select>
                                 <span data-valmsg-for="create-currency" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
-                                <label class="control-label mb-0 d-block" for="create-isforeign"> Is Foreign? </label>
-                                <input class="form-check-input" type="checkbox" id="create-isforeign" name="IsForeign">
-                                <span data-valmsg-for="create-isforeign" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="create-businessStyle" class="control-label mb-0 d-block">Business Style</label>
+                                <select name="BusinessStyle" id="create-businessStyle" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="create-businessStyle" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
-
                         </div>
-
-
                     </div>
-
-
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
@@ -194,7 +172,6 @@
         </div>
     </div>
 </div>
-
 
 
 
@@ -222,23 +199,33 @@
                                 <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
+
+                            <div class="form-group">
+                                <label for="edit-tin" class="control-label mb-0 d-block">TIN</label>
+                                <input type="text" name="TIN" id="edit-tin" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-tin" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
                             <div class="form-group">
                                 <label for="edit-contact-person" class="control-label mb-0 d-block">Contact Person</label>
                                 <input type="text" name="ContactPerson" id="edit-contact-person" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-contact-person" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
-                                <label for="edit-contact-number" class="control-label mb-0 d-block">Contact Number</label>
-                                <input type="text" name="ContactNumber" id="edit-contact-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-contact-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-email" class="control-label mb-0 d-block">Email</label>
-                                <input type="text" name="EmailAddress" id="edit-email" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-email" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="edit-officetelno" class="control-label mb-0 d-block">Office Tel No.</label>
+                                <input type="text" name="OfficeTelNo" id="edit-officetelno" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-officetelno" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="edit-region" class="control-label mb-0 d-block">Region</label>
+                                <select name="Region" id="edit-region" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="edit-region" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
                             <div class="form-group">
                                 <label for="edit-addressline1" class="control-label mb-0 d-block">Address Line 1</label>
                                 <input type="text" name="AddressLine1" id="edit-addressline1" class="form-control form-control-sm" />
@@ -249,66 +236,41 @@
                                 <input type="text" name="AddressLine2" id="edit-addressline2" class="form-control form-control-sm" />
                                 <span data-valmsg-for="edit-addressline2" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
-                                <label for="edit-barangay" class="control-label mb-0 d-block">Barangay</label>
-                                <input type="text" name="Barangay" id="edit-barangay" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-barangay" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-city" class="control-label mb-0 d-block">City/ Municipality</label>
-                                <input type="text" name="City" id="edit-city" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-city" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-area" class="form-label mb-0">Area</label>
-                                <select id="edit-area" style="width:100%">
-                                    <option></option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-region" class="form-label mb-0">Region</label>
-                                <input type="text" id="edit-region" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                            @*  <div class="form-group">
-                            <label for="edit-region" class="control-label mb-0 d-block">Region</label>
-                            <select name="Region" id="edit-region" class="form-control" style="width: 100%">
-                            </select>
-                            <span data-valmsg-for="edit-region" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                            <label for="edit-area" class="control-label mb-0 d-block">Area</label>
-                            <select name="Area" id="edit-area" class="form-control" style="width: 100%">
-                            </select>
-                            <span data-valmsg-for="edit-area" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>*@
-                            <div class="form-group">
-                                <label for="edit-zip" class="control-label mb-0 d-block">Zip Code</label>
-                                <input type="number" name="ZipCode" id="edit-zip" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-zip" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
 
+                            <div class="form-group">
+                                <label for="edit-vat" class="control-label mb-0 d-block">VAT</label>
+                                <input type="text" name="VAT" id="edit-vat" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-vat" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
                         </div>
 
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-creditlimit" class="control-label mb-0 d-block">Credit Limit</label>
-                                <input type="number" name="CreditLimit" id="edit-creditlimit" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-creditlimit" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="edit-terms" class="control-label mb-0 d-block">Terms</label>
+                                <input type="text" name="Terms" id="edit-terms" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-terms" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
+
+                            <div class="form-group">
+                                <label for="edit-pricelist" class="control-label mb-0 d-block">Pricelist</label>
+                                <input type="text" name="Pricelist" id="edit-pricelist" class="form-control form-control-sm" />
+                                <span data-valmsg-for="edit-pricelist" data-valmsg-replace="true" class="text-danger"></span>
+                            </div>
+
                             <div class="form-group">
                                 <label for="edit-currency" class="control-label mb-0 d-block">Currency</label>
                                 <select name="Currency" id="edit-currency" class="form-control" style="width: 100%">
                                 </select>
                                 <span data-valmsg-for="edit-currency" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
-                                <label class="control-label mb-0 d-block" for="edit-isforeign"> Is Foreign? </label>
-                                <input class="form-check-input" type="checkbox" id="edit-isforeign" name="IsForeign">
-                                <span data-valmsg-for="edit-isforeign" data-valmsg-replace="true" class="text-danger"></span>
+                                <label for="edit-businessStyle" class="control-label mb-0 d-block">Business Style</label>
+                                <select name="BusinessStyle" id="edit-businessStyle" class="form-control" style="width: 100%">
+                                </select>
+                                <span data-valmsg-for="edit-businessStyle" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
-
                         </div>
-
 
                     </div>
                     <input type="hidden" id="edit-id" />
@@ -344,30 +306,28 @@
                     <dd class="col-sm-8 modal-detail-code"></dd>
                     <dt class="col-sm-4">Name</dt>
                     <dd class="col-sm-8 modal-detail-name"></dd>
-                    <dt class="col-sm-4">Contact Person</dt>
-                    <dd class="col-sm-8 modal-detail-contactperson"></dd>
-                    <dt class="col-sm-4">Contact Number</dt>
-                    <dd class="col-sm-8 modal-detail-contactnumber"></dd>
-                    <dt class="col-sm-4">Email</dt>
-                    <dd class="col-sm-8 modal-detail-email"></dd>
+                    <dt class="col-sm-4">TIN</dt>
+                    <dd class="col-sm-8 modal-detail-tin"></dd>
                     <dt class="col-sm-4">Address Line 1</dt>
                     <dd class="col-sm-8 modal-detail-addressline1"></dd>
                     <dt class="col-sm-4">Address Line 2</dt>
                     <dd class="col-sm-8 modal-detail-addressline2"></dd>
-                    <dt class="col-sm-4">Barangay</dt>
-                    <dd class="col-sm-8 modal-detail-barangay"></dd>
-                    <dt class="col-sm-4">City/ Municipality</dt>
-                    <dd class="col-sm-8 modal-detail-city"></dd>
-                    <dt class="col-sm-4">Area</dt>
-                    <dd class="col-sm-8 modal-detail-area"></dd>
-                    <dt class="col-sm-4">Zip Code</dt>
-                    <dd class="col-sm-8 modal-detail-zip"></dd>
-                    <dt class="col-sm-4">Credit Limit</dt>
-                    <dd class="col-sm-8 modal-detail-creditlimit"></dd>
+                    <dt class="col-sm-4">Office Tel No</dt>
+                    <dd class="col-sm-8 modal-detail-officetelno"></dd>
+                    <dt class="col-sm-4">Contact Person</dt>
+                    <dd class="col-sm-8 modal-detail-contactperson"></dd>
+                    <dt class="col-sm-4">Region</dt>
+                    <dd class="col-sm-8 modal-detail-region"></dd>
+                    <dt class="col-sm-4">Terms</dt>
+                    <dd class="col-sm-8 modal-detail-terms"></dd>
+                    <dt class="col-sm-4">Pricelist</dt>
+                    <dd class="col-sm-8 modal-detail-pricelist"></dd>
                     <dt class="col-sm-4">Currency</dt>
                     <dd class="col-sm-8 modal-detail-currency"></dd>
-                    <dt class="col-sm-4">Is Foreign?</dt>
-                    <dd class="col-sm-8 modal-detail-isforeign"></dd>
+                    <dt class="col-sm-4">Business Style</dt>
+                    <dd class="col-sm-8 modal-detail-businessStyle"></dd>
+                    <dt class="col-sm-4">VAT</dt>
+                    <dd class="col-sm-8 modal-detail-vat"></dd>
                     <dt class="col-sm-4">Is Active?</dt>
                     <dd class="col-sm-8 modal-detail-isactive"></dd>
                     <dt class="col-sm-4">User Created</dt>
@@ -428,128 +388,21 @@
 @section Scripts {
     <script>
 
-        // Load Select2 for Area
-        $("#create-area").select2({
-            minimumInputLength: 1,
-            allowClear: true,
-            placeholder: '<empty>',
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.region ? "<em class='fw-light text-secondary'> - " + repo.region + "</em>" : ""));
-            },
-            ajax: {
-                url: "@Url.Action("GetOptions2", "Area")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            },
-            dropdownParent: $("#createModal")
-        });
-
-        $("#create-area").on("select2:select", function () {
-            $("#create-region").val($(this).select2("data")[0].region);
-        });
-
-        $("#create-area").on("select2:unselecting", function (e) {
-            $("#create-region").val("");
-        });
-
-
-
-        // Load Select2 for Area
-        $("#edit-area").select2({
-            minimumInputLength: 1,
-            allowClear: true,
-            placeholder: '<empty>',
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.region ? "<em class='fw-light text-secondary'> - " + repo.region + "</em>" : ""));
-            },
-            ajax: {
-                url: "@Url.Action("GetOptions2", "Area")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            },
-            dropdownParent: $("#editModal")
-        });
-
-        $("#edit-area").on("select2:select", function () {
-            $("#edit-region").val($(this).select2("data")[0].region);
-        });
-
-        $("#edit-area").on("select2:unselecting", function (e) {
-            $("#edit-region").val("");
-        });
-
-
         // Load Select2 Region
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "Region")",
             success: function (data, status, xhr) {
-                //$("#create-region").select2({
-                //    data: data,
-                //    dropdownParent: $("#createModal")
-                //});
-                //$("#edit-region").select2({
-                //    data: data,
-                //    dropdownParent: $("#editModal")
-                //});
+                $("#create-region").select2({
+                   data: data,
+                   dropdownParent: $("#createModal")
+                });
+                $("#edit-region").select2({
+                   data: data,
+                   dropdownParent: $("#editModal")
+                });
             }
         });
-
-
-
-        //// Load Select2 Area
-        //$.ajax({
-        //    type: "POST",
-        //    url: "@Url.Action("GetOptions", "Area")",
-        //    success: function(data, status, xhr) {
-        //        $("#create-area").select2({
-        //            data: data,
-        //            dropdownParent: $("#createModal")
-        //        });
-        //        $("#edit-area").select2({
-        //            data: data,
-        //            dropdownParent: $("#editModal")
-        //        });
-        //    }
-        //});
 
         // Load Select2 Currency
         $.ajax({
@@ -561,6 +414,22 @@
                     dropdownParent: $("#createModal")
                 });
                 $("#edit-currency").select2({
+                    data: data,
+                    dropdownParent: $("#editModal")
+                });
+            }
+        });
+
+        // Load Select2 BusinessStyle
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "BusinessStyle")",
+            success: function (data, status, xhr) {
+                $("#create-businessStyle").select2({
+                    data: data,
+                    dropdownParent: $("#createModal")
+                });
+                $("#edit-businessStyle").select2({
                     data: data,
                     dropdownParent: $("#editModal")
                 });
@@ -590,7 +459,6 @@
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
-                { data: "creditLimit", name: "CreditLimit" },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.isActive) {
@@ -666,18 +534,17 @@
                 var data = dataTable.row($(this).parents('tr')).data();
                 $(".modal-detail-code").html(data.code);
                 $(".modal-detail-name").html(data.name);
-                $(".modal-detail-contactperson").html(data.contactPerson);
-                $(".modal-detail-contactnumber").html(data.contactNumber);
-                $(".modal-detail-email").html(data.emailAddress);
+                $(".modal-detail-tin").html(data.tin);
                 $(".modal-detail-addressline1").html(data.addressLine1);
                 $(".modal-detail-addressline2").html(data.addressLine2);
-                $(".modal-detail-barangay").html(data.barangay);
+                $(".modal-detail-officetelno").html(data.officeTelNo);
+                $(".modal-detail-contactperson").html(data.contactPerson);
+                $(".modal-detail-region").html(data.regionName);
+                $(".modal-detail-terms").html(data.terms);
+                $(".modal-detail-pricelist").html(data.priceList);
                 $(".modal-detail-currency").html(data.currencyName);
-                $(".modal-detail-area").html(data.areaName);
-                $(".modal-detail-city").html(data.city);
-                $(".modal-detail-zip").html(data.zipCode);
-                $(".modal-detail-creditlimit").html(data.creditLimit);
-                $(".modal-detail-isforeign").html(data.isForeign);
+                $(".modal-detail-businessStyle").html(data.businessStyleName);
+                $(".modal-detail-vat").html(data.vat);
                 $(".modal-detail-isactive").html(data.isActive);
                 $(".modal-detail-usercreated").html(data.userCreated);
                 $(".modal-detail-datecreated").html(data.dateCreated);
@@ -689,48 +556,21 @@
             // Actions upon Display Edit Modal
             $(".editBtn").click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
-
                 $("#edit-id").val(data.id);
                 $("#edit-code").val(data.code);
                 $("#edit-name").val(data.name);
-                $("#edit-contact-person").val(data.contactPerson);
-                $("#edit-contact-number").val(data.contactNumber);
-                $("#edit-email").val(data.emailAddress);
+                $("#edit-tin").val(data.tin);
                 $("#edit-addressline1").val(data.addressLine1);
                 $("#edit-addressline2").val(data.addressLine2);
-                $("#edit-barangay").val(data.barangay);
-                $("#edit-city").val(data.city);
-                $("#edit-zip").val(data.zipCode);
-                $("#edit-creditlimit").val(data.creditLimitD);
-                $(function () {
-                    if ($("#edit-isforeign").val(data.isforeign) == "true") {
-                        $("#edit-isforeign").prop('checked', true);
-                    } else {
-                        $("#edit-isforeign").prop('checked', false);
-                    }
-                });
-                // Load Select2 Area on Edit
-                if ($("#edit-area").attr("data-select2-id")) {
-                    $("#edit-area").select2("destroy");
-                    $("#edit-area").empty();
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "Area")",
-                    data: { includeId: data.areaId },
-                    success: function (data, status, xhr) {
-                        $("#edit-area").select2({
-                            data: data,
-                            allowClear: true,
-                            placeholder: {
-                                id: "",
-                                text: "<empty>"
-                            },
-                            dropdownParent: $('#editModal')
-                        });
-                    }
-                });
-
+                $("#edit-officetelno").val(data.officeTelNo);
+                $("#edit-contact-person").val(data.contactPerson);
+                $("#edit-region").val(data.regionId);
+                $("#edit-terms").val(data.terms);
+                $("#edit-pricelist").val(data.priceList);
+                $("#edit-currency").val(data.currencyId);
+                $("#edit-businessStyle").val(data.businessStyleId);
+                $("#edit-vat").val(data.vat);
+        
                 // Load Select2 Currency on Edit
                 if ($("#edit-currency").attr("data-select2-id")) {
                     $("#edit-currency").select2("destroy");
@@ -753,38 +593,79 @@
                     }
                 });
 
+                // Load Select2 BusinessStyle on Edit
+                if ($("#edit-businessStyle").attr("data-select2-id")) {
+                    $("#edit-businessStyle").select2("destroy");
+                    $("#edit-businessStyle").empty();
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions", "BusinessStyle")",
+                    data: { includeId: data.businessStyleId },
+                    success: function (data, status, xhr) {
+                        $("#edit-businessStyle").select2({
+                            data: data,
+                            allowClear: true,
+                            placeholder: {
+                                id: "",
+                                text: "<empty>"
+                            },
+                            dropdownParent: $('#editModal')
+                        });
+                    }
+                });
 
-
+                // Load Select2 Region on Edit
+                if ($("#edit-region").attr("data-select2-id")) {
+                    $("#edit-region").select2("destroy");
+                    $("#edit-region").empty();
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions", "Region")",
+                    data: { includeId: data.regionId },
+                    success: function (data, status, xhr) {
+                        $("#edit-region").select2({
+                            data: data,
+                            allowClear: true,
+                            placeholder: {
+                                id: "",
+                                text: "<empty>"
+                            },
+                            dropdownParent: $('#editModal')
+                        });
+                    }
+                });
             });
 
             // Validation for Edit Modal
             var validateEdit = $("#editForm").validate({
                 errorClass: 'text-danger text-xs',
                 rules: {
-                    Code: { required: true, maxlength: 10 },
+                    Code: { required: true, maxlength: 50 },
                     Name: { required: true, maxlength: 100 },
-                    ContactPerson: { maxlength: 50 },
-                    ContactNumber: { maxlength: 50 },
-                    EmailAddress: { maxlength: 20 },
-                    Barangay: { maxlength: 20 },
-                    City: { required: true, maxlength: 20 },
-                    AddressLine1: { required: true, maxlength: 50 },
-                    AddressLine2: { required: true, maxlength: 50 },
-                    ZipCode: { maxlength: 10 },
-                    CreditLimit: { required: true, range: [0, 1999999.99] }
+                    TIN: { maxlength: 12 },
+                    AddressLine1: { required: true, maxlength: 150 },
+                    AddressLine2: { maxlength: 150 },
+                    OfficeTelNo: { maxlength: 100 },
+                    ContactPerson: { maxlength: 100 },
+                    Terms: { maxlength: 100 },
+                    Pricelist: { maxlength: 100 },
+                    Region: { required: true },
+                    VAT: { maxlength: 12 }
                 },
                 messages: {
-                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                     Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
-                    ContactPerson: { maxlength: "Contact Person must not exceed 50 characters." },
-                    ContactNumber: { maxlength: "Contact Number number must not exceed 50 characters." },
-                    EmailAddress: { maxlength: "Email number must not exceed 20 characters." },
-                    Barangay: { maxlength: "Barangay must not exceed 20 characters." },
-                    ZipCode: { maxlength: "Zip number must not exceed 10 characters." },
-                    City: { required: "Please enter city.", maxlength: "City must not exceed 20 characters." },
-                    AddressLine1: { required: "Please enter address.", maxlength: "Address Line 1 must not exceed 50 characters." },
-                    AddressLine2: { required: "Please enter address.", maxlength: "Address Line 2 must not exceed 50 characters." },
-                    CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
+                    TIN: { maxlength: "Name must not exceed 12 characters." },
+                    AddressLine1: { required: "Please enter address.", maxlength: "Address Line 1 must not exceed 150 characters." },
+                    AddressLine2: { maxlength: "Address Line 2 must not exceed 150 characters." },
+                    OfficeTelNo: { maxlength: "Office Tel No must not exceed 100 characters." },
+                    ContactPerson: { maxlength: "Contact Person must not exceed 100 characters." },
+                    Terms: { maxlength: "Terms must not exceed 100 characters." },
+                    Pricelist: { maxlength: "Pricelist must not exceed 100 characters." },
+                    Region: { required: "Please enter region." },
+                    VAT: { maxlength: "Terms must not exceed 12 characters." },
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -802,19 +683,17 @@
                         Id: $("#edit-id").val(),
                         Code: $("#edit-code").val(),
                         Name: $("#edit-name").val(),
-                        ContactPerson: $("#edit-contact-person").val(),
-                        ContactNumber: $("#edit-contact-number").val(),
-                        EmailAddress: $("#edit-email").val(),
+                        TIN: $("#edit-tin").val(),
                         AddressLine1: $("#edit-addressline1").val(),
                         AddressLine2: $("#edit-addressline2").val(),
-                        Barangay: $("#edit-barangay").val(),
-                        City: $("#edit-city").val(),
-                        AreaId: $("#edit-area").val(),
-                        ZipCode: $("#edit-zip").val(),
-                        CreditLimitD: $("#edit-creditlimit").val(),
+                        OfficeTelNo: $("#edit-officetelno").val(),
+                        ContactPerson: $("#edit-contact-person").val(),
+                        RegionId: $("#edit-region").val(),
+                        Terms: $("#edit-terms").val(),
+                        Pricelist: $("#edit-pricelist").val(),
                         CurrencyId: $("#edit-currency").val(),
-                        IsForeign: $("#edit-isforeign").prop("checked")
-
+                        BusinessStyleId: $("#edit-businessStyle").val(),
+                        VAT: $("#edit-vat").val()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
@@ -837,50 +716,47 @@
         $(".createBtn").click(function (e) {
             $("#create-code").val("");
             $("#create-name").val("");
-            $("#create-contact-person").val("");
-            $("#create-contact-number").val("");
-            $("#create-email").val("");
-            $("#create-area").prop("selectedIndex", 0).trigger("change");
-            $("#create-region").prop("selectedIndex", 0).trigger("change");
-            $("#create-currency").prop("selectedIndex", 0).trigger("change");
+            $("#create-tin").val("");
             $("#create-addressline1").val("");
             $("#create-addressline2").val("");
-            $("#create-barangay").val("");
-            $("#create-city").val("");
-            $("#create-zip").val("");
-            $("#create-creditlimit").val("");
-            $("#create-isforeign").val("");
+            $("#create-officetelno").val("");
+            $("#create-contact-person").val("");
+            $("#create-region").prop("selectedIndex", 0).trigger("change");
+            $("#create-terms").val("");
+            $("#create-pricelist").val("");
+            $("#create-currency").prop("selectedIndex", 0).trigger("change");
+            $("#create-businessStyle").prop("selectedIndex", 0).trigger("change");
+            $("#create-vat").val("");
         });
 
         // Validation for Create Modal
         var validateCreate = $("#createForm").validate({
             errorClass: 'text-danger text-xs',
             rules: {
-                Code: { required: true, maxlength: 10 },
+                Code: { required: true, maxlength: 50 },
                 Name: { required: true, maxlength: 100 },
-                ContactPerson: { maxlength: 50 },
-                ContactNumber: { maxlength: 50 },
-                EmailAddress: { maxlength: 20 },
-                Barangay: { maxlength: 20 },
-                City: { required: true, maxlength: 20 },
-                AddressLine1: { required: true, maxlength: 50 },
-                AddressLine2: { required: true, maxlength: 50 },
-                ZipCode: { maxlength: 10 },
-                CreditLimit: { required: true, range: [0, 1999999.99] }
+                TIN: {  maxlength: 12 },
+                AddressLine1: { required: true, maxlength: 150 },
+                AddressLine2: { maxlength: 150 },
+                OfficeTelNo: { maxlength: 100 },
+                ContactPerson: { maxlength: 100 },
+                Terms: { maxlength: 100 },
+                Pricelist: { maxlength: 100 },
+                Region: { required: true },
+                VAT: { maxlength: 12 }
             },
             messages: {
-                Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                 Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
-                ContactPerson: { maxlength: "Contact Person must not exceed 50 characters." },
-                ContactNumber: { maxlength: "Contact Number number must not exceed 50 characters." },
-                EmailAddress: { maxlength: "Email number must not exceed 20 characters." },
-                Barangay: { maxlength: "Barangay must not exceed 20 characters." },
-                ZipCode: { maxlength: "Zip number must not exceed 10 characters." },
-                City: { required: "Please enter city.", maxlength: "City must not exceed 20 characters." },
-                AddressLine1: { required: "Please enter address.", maxlength: "Address Line 1 must not exceed 50 characters." },
-                AddressLine2: { required: "Please enter address.", maxlength: "Address Line 2 must not exceed 50 characters." },
-                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
-
+                TIN: { maxlength: "Name must not exceed 12 characters." },
+                AddressLine1: { required: "Please enter address.", maxlength: "Address Line 1 must not exceed 150 characters." },
+                AddressLine2: { maxlength: "Address Line 2 must not exceed 150 characters." },
+                OfficeTelNo: { maxlength: "Office Tel No must not exceed 100 characters." },
+                ContactPerson: { maxlength: "Contact Person must not exceed 100 characters." },
+                Terms: { maxlength: "Terms must not exceed 100 characters." },
+                Pricelist: { maxlength: "Pricelist must not exceed 100 characters." },
+                Region: { required: "Please enter region." },
+                VAT: { maxlength: "Terms must not exceed 12 characters." },
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -897,18 +773,17 @@
                 data: {
                     Code: $("#create-code").val(),
                     Name: $("#create-name").val(),
-                    ContactPerson: $("#create-contact-person").val(),
-                    ContactNumber: $("#create-contact-number").val(),
-                    EmailAddress: $("#create-email").val(),
+                    TIN: $("#create-tin").val(),
                     AddressLine1: $("#create-addressline1").val(),
                     AddressLine2: $("#create-addressline2").val(),
-                    Barangay: $("#create-barangay").val(),
-                    City: $("#create-city").val(),
-                    AreaId: $("#create-area").val(),
-                    ZipCode: $("#create-zip").val(),
+                    OfficeTelNo: $("#create-officetelno").val(),
+                    ContactPerson: $("#create-contact-person").val(),
+                    RegionId: $("#create-region").val(),
+                    Terms: $("#create-terms").val(),
+                    Pricelist: $("#create-pricelist").val(),
                     CurrencyId: $("#create-currency").val(),
-                    IsForeign: $("#create-isforeign").prop("checked"),
-                    CreditLimitD: $("#create-creditlimit").val()
+                    BusinessStyleId: $("#create-businessStyle").val(),
+                    VAT: $("#create-vat").val()
                 },
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {

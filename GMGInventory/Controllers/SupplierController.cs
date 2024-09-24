@@ -1,12 +1,15 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Linq;
 
 namespace GMGInventory.Controllers
 {
@@ -17,16 +20,19 @@ namespace GMGInventory.Controllers
         private readonly IAreaRepository areaRepository;
         private readonly ICurrencyRepository currencyRepository;
         private readonly IRegionRepository regionRepository;
+        private readonly IBusinessStyleRepository businessStyleRepository;
 
         public SupplierController(ISupplierRepository supplierRepository
             , IAreaRepository areaRepository
             , ICurrencyRepository currencyRepository
-            , IRegionRepository regionRepository)
+            , IRegionRepository regionRepository
+            , IBusinessStyleRepository businessStyleRepository)
         {
             this.supplierRepository = supplierRepository;
             this.areaRepository = areaRepository;
             this.currencyRepository = currencyRepository;
             this.regionRepository = regionRepository;
+            this.businessStyleRepository = businessStyleRepository;
         }
 
         public async Task<IActionResult> GetOptions(int? IncludeId)
@@ -93,7 +99,7 @@ namespace GMGInventory.Controllers
         {
             var supplierVM = new SupplierVM
             {
-                Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name"),
+               // Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name"),
                 Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(-1), "Id", "Name"),
                 Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name")
             };
@@ -121,7 +127,7 @@ namespace GMGInventory.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(supplierVM.AreaId), "Id", "Name", supplierVM.AreaId);
+           // supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(supplierVM.AreaId), "Id", "Name", supplierVM.AreaId);
             supplierVM.Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(supplierVM.CurrencyId), "Id", "Name", supplierVM.CurrencyId);
             supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(supplierVM.RegionId), "Id", "Name", supplierVM.RegionId);
             return View(supplierVM);
@@ -137,10 +143,10 @@ namespace GMGInventory.Controllers
             {
                 return NotFound();
             }
-            supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name");
-
+         
             supplierVM.Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(-1), "Id", "Name");
             supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name");
+            supplierVM.BusinessStyles = new SelectList(await businessStyleRepository.GetAllBusinessStyleAsync(-1), "Id", "Name");
 
             return View(supplierVM);
         }
@@ -220,30 +226,41 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> DownloadFile()
         {
             DataTable dt = new DataTable("Supplier");
-            dt.Columns.AddRange(new DataColumn[15] {
+            dt.Columns.AddRange(new DataColumn[14] {
                 new DataColumn("Code"),
                 new DataColumn("Name"),
-                new DataColumn("Contact Person"),
-                new DataColumn("Contact Number"),
-                new DataColumn("Email"),
+                new DataColumn("TIN"),
                 new DataColumn("Address Line 1"),
                 new DataColumn("Address Line 2"),
-                new DataColumn("Barangay"),
-                new DataColumn("City/ Municipality"),
-                new DataColumn("Area"),
-                new DataColumn("Zip Code"),
-                new DataColumn("Credit Limit"),
+                new DataColumn("Office Tel No"),
+                new DataColumn("Contact Person"),
+                new DataColumn("Region"),
+                new DataColumn("Terms"),
+                new DataColumn("PriceList"),
                 new DataColumn("Currency"),
-                new DataColumn("Is Foreign"),
+                new DataColumn("BusinessStyle"),
+                new DataColumn("VAT"),
                 new DataColumn("Is Active")
-
             });
             var supplier = (await supplierRepository.GetAllSupplierAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var suppliers in supplier)
             {
-                dt.Rows.Add(suppliers.Code, suppliers.Name, suppliers.ContactPerson, suppliers.ContactNumber, suppliers.EmailAddress,
-                    suppliers.AddressLine1, suppliers.AddressLine2, suppliers.Barangay, suppliers.City, suppliers.AreaName,
-                    suppliers.ZipCode, suppliers.CreditLimit, suppliers.CurrencyName, suppliers.IsForeign, suppliers.IsActive);
+                dt.Rows.Add(
+                    suppliers.Code,
+                    suppliers.Name,
+                    suppliers.TIN,
+                    suppliers.AddressLine1,
+                    suppliers.AddressLine2,
+                    suppliers.OfficeTelNo,
+                    suppliers.ContactPerson,
+                    suppliers.RegionName,
+                    suppliers.Terms,
+                    suppliers.PriceList,
+                    suppliers.CurrencyName,
+                    suppliers.BusinessStyleName,
+                    suppliers.VAT,
+                    suppliers.IsActive
+                );
             }
             using (XLWorkbook wb = new())
             {
@@ -277,9 +294,11 @@ namespace GMGInventory.Controllers
             }
             else
             {
-                int? AreaId = await areaRepository.GetIdAsync(supplierVM.AreaName);
+                int? RegionId = await areaRepository.GetIdAsync(supplierVM.RegionName);
                 int? CurrencyId = await currencyRepository.GetIdAsync(supplierVM.CurrencyName);
-                if (AreaId == null)
+                int? BusinessStyleId = await businessStyleRepository.GetIdAsync(supplierVM.BusinessStyleName);
+
+                if (RegionId == null)
                 {
                     responseModel.Status = "Error";
                     responseModel.Message = "Unknown Area";
@@ -291,8 +310,10 @@ namespace GMGInventory.Controllers
                 }
                 else
                 {
-                    supplierVM.AreaId = AreaId.Value;
+                    supplierVM.RegionId = RegionId.Value;
                     supplierVM.CurrencyId = CurrencyId.Value;
+                    supplierVM.BusinessStyleId = BusinessStyleId.Value;
+
                     await supplierRepository.AddAsync(supplierVM);
                     responseModel.Status = "Success";
                     responseModel.Message = "Area added";

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
@@ -8,23 +9,16 @@ namespace GMGInventory.Data
         {
             this.PurchaseOrder = new HashSet<PurchaseOrder>();
         }
-
+        [Required]
         [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
 
+        [Required]
         [Column(TypeName = "nvarchar(100)")]
         public string Name { get; set; }
 
-        [ForeignKey("AreaId")]
-        public int AreaId { get; set; }
-        public Area Area { get; set; }
-
-        [ForeignKey("CurrencyId")]
-        public int CurrencyId { get; set; }
-        public Currency Currency { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal CreditLimit { get; set; }
+        [Column(TypeName = "nvarchar(12)")]
+        public string TIN { get; set; }
 
         [Column(TypeName = "nvarchar(150)")]
         public string AddressLine1 { get; set; }
@@ -33,26 +27,78 @@ namespace GMGInventory.Data
         public string AddressLine2 { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string Barangay { get; set; }
-
-        [Column(TypeName = "nvarchar(100)")]
-        public string City { get; set; }
-
-        [Column(TypeName = "nvarchar(50)")]
-        public string ZipCode { get; set; }
+        public string OfficeTelNo { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string ContactPerson { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
-        public string ContactNumber { get; set; }
+        [Required]
+        [ForeignKey("RegionId")]
+        public int RegionId { get; set; }
+        public Region Region { get; set; }
+
+        [ForeignKey("BusinessStyleId")]
+        public int BusinessStyleId { get; set; }
+        public BusinessStyle BusinessStyle { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string EmailAddress { get; set; }
+        public string Terms { get; set; }
 
+        [Column(TypeName = "nvarchar(100)")]
+        public string PriceList { get; set; }
+
+        [ForeignKey("CurrencyId")]
+        public int CurrencyId { get; set; }
+        public Currency Currency { get; set; }
+
+        [Column(TypeName = "nvarchar(12)")]
+        public string VAT { get; set; }
         public bool IsActive { get; set; }
-        public bool IsForeign { get; set; }
-        public bool IsDeleted { get; set; }
+
+
+        //[Column(TypeName = "nvarchar(50)")]
+        //public string Code { get; set; }
+
+        //[Column(TypeName = "nvarchar(100)")]
+        //public string Name { get; set; }
+
+        //[ForeignKey("AreaId")]
+        //public int AreaId { get; set; }
+        //public Area Area { get; set; }
+
+        //[ForeignKey("CurrencyId")]
+        //public int CurrencyId { get; set; }
+        //public Currency Currency { get; set; }
+
+        //[Column(TypeName = "decimal(18, 2)")]
+        //public decimal CreditLimit { get; set; }
+
+        //[Column(TypeName = "nvarchar(150)")]
+        //public string AddressLine1 { get; set; }
+
+        //[Column(TypeName = "nvarchar(150)")]
+        //public string AddressLine2 { get; set; }
+
+        //[Column(TypeName = "nvarchar(100)")]
+        //public string Barangay { get; set; }
+
+        //[Column(TypeName = "nvarchar(100)")]
+        //public string City { get; set; }
+
+        //[Column(TypeName = "nvarchar(50)")]
+        //public string ZipCode { get; set; }
+
+        //[Column(TypeName = "nvarchar(100)")]
+        //public string ContactPerson { get; set; }
+
+        //[Column(TypeName = "nvarchar(50)")]
+        //public string ContactNumber { get; set; }
+
+        //[Column(TypeName = "nvarchar(100)")]
+        //public string EmailAddress { get; set; }
+
+        //public bool IsForeign { get; set; }
+        //public bool IsDeleted { get; set; }
 
         public ICollection<PurchaseOrder> PurchaseOrder { get; set; }
     }

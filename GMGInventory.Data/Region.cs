@@ -7,6 +7,7 @@ namespace GMGInventory.Data
         public Region()
         {
             this.Areas = new HashSet<Area>();
+            this.Suppliers = new HashSet<Supplier>();
         }
 
         [Column(TypeName = "nvarchar(10)")]
@@ -18,5 +19,6 @@ namespace GMGInventory.Data
         public bool IsActive { get; set; }
 
         public ICollection<Area> Areas { get; set; }
+        public ICollection<Supplier> Suppliers { get; set; }
     }
 }
