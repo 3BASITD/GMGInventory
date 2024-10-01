@@ -8,8 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     public class CustomerPurchaseHistoryController(IAccessRepository accessRepository
-                             , ICustomerPurchaseRepository customerPurchaseRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                                                 , ICustomerPurchaseRepository customerPurchaseRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {

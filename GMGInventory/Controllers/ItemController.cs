@@ -2,35 +2,21 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class ItemController : Controller
+    public class ItemController(IAccessRepository accessRepository
+                              , IItemRepository itemRepository
+                              , ICategoryRepository categoryRepository
+                              , IItemTypeRepository itemTypeRepository
+                              , IBrandRepository brandRepository
+                              , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
     {
-        public IItemRepository itemRepository;
-        private readonly ICategoryRepository categoryRepository;
-        private readonly IItemTypeRepository itemTypeRepository;
-        private readonly IBrandRepository brandRepository;
-        private readonly IWarehouseRepository warehouseRepository;
-
-        public ItemController(IItemRepository itemRepository
-            , ICategoryRepository categoryRepository
-            , IItemTypeRepository itemTypeRepository
-            , IBrandRepository brandRepository
-            , IWarehouseRepository warehouseRepository)
-        {
-            this.itemRepository = itemRepository;
-            this.categoryRepository = categoryRepository;
-            this.itemTypeRepository = itemTypeRepository;
-            this.brandRepository = brandRepository;
-            this.warehouseRepository = warehouseRepository;
-        }
-
         public async Task<IActionResult> GetOptions(string search, int page)
         {
             return Json(await itemRepository.GetOptions(search, page));
@@ -56,42 +42,39 @@ namespace GMGInventory.Controllers
             return Json(await itemRepository.GetUnitOptions(IncludeId));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
-            ItemFilterVM itemFilterVM = new ItemFilterVM();
-            itemFilterVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
-            itemFilterVM.ItemTypes = new SelectList(await itemTypeRepository.GetAllActiveItemTypeAsync(-1), "Id", "Name");
-            itemFilterVM.Brands = new SelectList(await brandRepository.GetAllActiveBrandAsync(-1), "Id", "Name");
-            itemFilterVM.Warehouses = new SelectList(await warehouseRepository.GetAllActiveWarehouseAsync(-1), "Id", "Name");
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
+
+            ItemFilterVM itemFilterVM = new();
+            itemFilterVM.Categories = new(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
+            itemFilterVM.ItemTypes = new(await itemTypeRepository.GetAllActiveItemTypeAsync(-1), "Id", "Name");
+            itemFilterVM.Brands = new(await brandRepository.GetAllActiveBrandAsync(-1), "Id", "Name");
+            itemFilterVM.Warehouses = new(await warehouseRepository.GetAllActiveWarehouseAsync(-1), "Id", "Name");
             ViewData["ItemFilter"] = itemFilterVM;
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson(ItemFilterVM filter)
+        public async Task<IActionResult> GetListJson(ItemFilterVM filter)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetAllForDataTablesAsync(form, filter));
         }
-
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
+        
         [HttpPost]
-        public async Task<JsonResult> CreateJson(ItemCommonVM itemVM)
+        public async Task<IActionResult> CreateJson(ItemCommonVM itemVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             if (await itemRepository.IsCodeExistAsync(itemVM.Code))
             {
                 responseModel.Status = "Error";
@@ -106,14 +89,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> EditJson(ItemCommonVM itemVM)
+        public async Task<IActionResult> EditJson(ItemCommonVM itemVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             try
             {
                 await itemRepository.UpdateAsync(itemVM);
@@ -136,14 +118,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
+
             var item = itemRepository.GetItemViewVM(id);
             if (item == null)
             {
@@ -152,57 +133,50 @@ namespace GMGInventory.Controllers
             return View(item);
         }
 
-
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
-        public ActionResult DetailsJson(int id)
+        public async Task<IActionResult> DetailsJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
+
             return Json(itemRepository.GetItemViewVM(id));
         }
 
-
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> EditDetailQuantity(int id, int quantity, string remarks)
+        public async Task<IActionResult> EditDetailQuantity(int id, int quantity, string remarks)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             await itemRepository.UpdateQuantityAsync(id, quantity, remarks);
             responseModel.Status = "Success";
             responseModel.Message = "Item quantity successfully updated";
             return Json(responseModel);
         }
 
-
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> DeleteWarehouse(int id)
+        public async Task<IActionResult> DeleteWarehouse(int id)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             await itemRepository.DeleteWarehouse(id);
             responseModel.Status = "Success";
             responseModel.Message = "Item warehouse successfully deleted";
             return Json(responseModel);
         }
 
-
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             if (await itemRepository.IsIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -220,15 +194,14 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             if (await itemRepository.IsIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -238,15 +211,13 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(ItemFileVM itemVM)
+        public async Task<IActionResult> UploadJson(ItemFileVM itemVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             if (await itemRepository.UploadCombinationExistAsync(itemVM))
             {
                 responseModel.Status = "Warning";
@@ -349,15 +320,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> DownloadFile(ItemFilterVM filter)
         {
-            DataTable dt = new DataTable("Items");
-            dt.Columns.AddRange(new DataColumn[12] {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Items");
+            dt.Columns.AddRange([
                 new DataColumn("Code"),
                 new DataColumn("Name"),
                 new DataColumn("Part Number"),
@@ -370,7 +339,7 @@ namespace GMGInventory.Controllers
                 new DataColumn("Size"),
                 new DataColumn("Unit"),
                 new DataColumn("Quantity on Hand")
-            });
+            ]);
             //var items = await itemRepository.GetAllFileAsync();
             var items = (await itemRepository.GetAllAsync(filter)).Where(s=>s.IsActive == true);
 
@@ -390,65 +359,82 @@ namespace GMGInventory.Controllers
                             item.Quantity);
             }
 
-            using (XLWorkbook wb = new())
-            {
-                wb.Worksheets.Add(dt);
-                using (MemoryStream stream = new())
-                {
-                    wb.SaveAs(stream);
-                    return File(stream.ToArray(),
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         DateTime.Now.ToString("yyyyMMdd") + " Items.xlsx");
-                }
-            }
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetWarehousesJson(int id)
+        public async Task<IActionResult> GetWarehousesJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemWarehouseDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetPurchasesJson(int id)
+        public async Task<IActionResult> GetPurchasesJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemPurchaseDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetSalesJson(int id)
+        public async Task<IActionResult> GetSalesJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemSalesDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetCountsJson(int id)
+        public async Task<IActionResult> GetCountsJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemCountDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetPricesJson(int id)
+        public async Task<IActionResult> GetPricesJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemPriceDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetTransfersJson(int id)
+        public async Task<IActionResult> GetTransfersJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemTransferDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetReturnsJson(int id)
+        public async Task<IActionResult> GetReturnsJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemReturnDTAsync(form, id));
         }
     }

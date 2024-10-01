@@ -39,4 +39,17 @@ namespace GMGInventory.Common.Models
         public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
     }
+
+    public class RoleVM
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public bool IsActive { get; set; }
+        public string UserCreated { get; set; }
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+        public string? UserModified { get; set; }
+        public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
+    }
 }

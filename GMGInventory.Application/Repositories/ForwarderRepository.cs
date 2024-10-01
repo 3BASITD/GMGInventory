@@ -140,8 +140,8 @@ namespace GMGInventory.Application.Repositories
             var forwardersViewVM = mapper.Map<List<ForwarderViewVM>>(forwarders);
             foreach (ForwarderViewVM ivm in forwardersViewVM)
             {
-                ivm.UserCreated = await GetUserName(ivm.UserCreated);
-                ivm.UserModified = await GetUserName(ivm.UserModified);
+                ivm.UserCreated = await GetNickname(ivm.UserCreated);
+                ivm.UserModified = await GetNickname(ivm.UserModified);
             }
             return forwardersViewVM;
         }
@@ -155,8 +155,8 @@ namespace GMGInventory.Application.Repositories
                 return null;
             }
             var forwardersViewVM = mapper.Map<ForwarderViewVM>(forwarders);
-            forwardersViewVM.UserCreated = await GetUserName(forwardersViewVM.UserCreated);
-            forwardersViewVM.UserModified = await GetUserName(forwardersViewVM.UserModified);
+            forwardersViewVM.UserCreated = await GetNickname(forwardersViewVM.UserCreated);
+            forwardersViewVM.UserModified = await GetNickname(forwardersViewVM.UserModified);
             return forwardersViewVM;
         }
 

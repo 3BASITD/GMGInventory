@@ -1,15 +1,12 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
     public class AuditLogController(IAccessRepository accessRepository
-                             , IAuditLogRepository auditLogRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                                  , IAuditLogRepository auditLogRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {

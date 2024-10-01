@@ -2,37 +2,20 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class CustomerController : Controller
+    public class CustomerController(IAccessRepository accessRepository
+                                  , ICustomerRepository customerRepository
+                                  , IAreaRepository areaRepository
+                                  , IRegionRepository regionRepository
+                                  , ICreditTermRepository credittermRepository
+                                  , ICustomerTypeRepository customertypeRepository
+                                  , IAgentRepository agentRepository) : BaseController(accessRepository)
     {
-        private readonly ICustomerRepository customerRepository;
-        private readonly IAreaRepository areaRepository;
-        private readonly IRegionRepository regionRepository;
-        private readonly ICreditTermRepository credittermRepository;
-        private readonly ICustomerTypeRepository customertypeRepository;
-        private readonly IAgentRepository agentRepository;
-
-        public CustomerController(ICustomerRepository customerRepository
-            , IAreaRepository areaRepository
-            , IRegionRepository regionRepository
-            , ICreditTermRepository credittermRepository
-            , ICustomerTypeRepository customertypeRepository
-            , IAgentRepository agentRepository)
-        {
-            this.customerRepository = customerRepository;
-            this.areaRepository = areaRepository;
-            this.regionRepository = regionRepository;
-            this.credittermRepository = credittermRepository;
-            this.customertypeRepository = customertypeRepository;
-            this.agentRepository = agentRepository;
-        }
-
         public async Task<IActionResult> GetOptions(string search, int page)
         {
             return Json(await customerRepository.GetOptions(search, page));
@@ -42,7 +25,7 @@ namespace GMGInventory.Controllers
         {
             return Json(await customerRepository.GetByAgentOptions(search, page, agent));
         }
-        
+
         public async Task<IActionResult> GetOptionsWithOrder(string search, int page)
         {
             return Json(await customerRepository.GetOptionsWithOrder(search, page));
@@ -53,34 +36,33 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetOptions2(IncludeId));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Customer)).Convert();
+
             return View();
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
-            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm dtForm = new(Request.Form);
             return Json(await customerRepository.GetListDataTables(dtForm));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> CreateJson(CustomerVM custVM)
+        public async Task<IActionResult> CreateJson(CustomerVM custVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             if (await customerRepository.IsCodeExistAsync(custVM.Code))
             {
                 responseModel.Status = "Error";
@@ -95,14 +77,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> CreateShippingJson(CustomerVM shippingVM)
+        public async Task<IActionResult> CreateShippingJson(CustomerVM shippingVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             await customerRepository.AddShippingAsync(shippingVM);
             responseModel.Status = "Success";
             responseModel.Message = "Shipping successfully added";
@@ -121,14 +102,13 @@ namespace GMGInventory.Controllers
         //    return Json(responseModel);
         //}
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> EditJson(CustomerVM custVM)
+        public async Task<IActionResult> EditJson(CustomerVM custVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             try
             {
                 await customerRepository.UpdateAsync(custVM);
@@ -151,12 +131,13 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Customer)).Convert();
+
             var cust = customerRepository.GetCustomerDtlVM(id);
             if (cust == null)
             {
@@ -164,13 +145,12 @@ namespace GMGInventory.Controllers
             }
             return View(cust);
         }
-
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
-        public ActionResult MoreDetails(int id)
+        
+        public async Task<IActionResult> MoreDetails(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             var cust = customerRepository.GetCustomerDtlVM(id); // gawa ka panibagong GetCustomerVM(id) na andun mga kailangan mo sa modal
             if (cust == null)
             {
@@ -179,25 +159,23 @@ namespace GMGInventory.Controllers
             return Json(cust);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetCustomerJson(int id)
+        public async Task<IActionResult> GetCustomerJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await customerRepository.GetCustomerDetailsDTAsync(form, id));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetShippingJson(int id)
+        public async Task<IActionResult> GetShippingJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await customerRepository.GetCustomerShippingDTAsync(form, id));
         }
 
@@ -208,65 +186,66 @@ namespace GMGInventory.Controllers
         //    return Json(await customerRepository.GetCustomerForwarderDTAsync(form, id));
         //}
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetPaymentJson(int id)
+        public async Task<IActionResult> GetPaymentJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await customerRepository.GetCustomerPaymentDTAsync(form, id));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetReceivableJson(int id)
+        public async Task<IActionResult> GetReceivableJson(int id)
         {
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
             return Json(await customerRepository.GetCustomerReceivableDTAsync(form, id));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            if(await customerRepository.IsCustomerInUse(id))
             {
                 await customerRepository.DeactivateCustomerAsync(id);
                 TempData["WarningMessage"] = "Customer has been deactivated";
+            } else
+            {
+                await customerRepository.DeleteAsync(id);
+                TempData["WarningMessage"] = "Customer has been deleted";
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             await customerRepository.ReactivateCustomerAsync(id);
             TempData["SuccessMessage"] = "Customer reactivated successfully";
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
-            DataTable dt = new DataTable("Customer");
-            dt.Columns.AddRange(new DataColumn[17] {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Customer");
+            dt.Columns.AddRange([
                 new DataColumn("Code"),
                 new DataColumn("Name"),
                 new DataColumn("Commission Rate"),
@@ -284,9 +263,7 @@ namespace GMGInventory.Controllers
                 new DataColumn("Credit Term"),
                 new DataColumn("Credit Limit"),
                 new DataColumn("Remarks")
-
-
-            });
+            ]);
             var customer = (await customerRepository.GetAllCustomerAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var customers in customer)
             {
@@ -296,28 +273,22 @@ namespace GMGInventory.Controllers
                     customers.AgentName, customers.FaxNumber, customers.TIN, customers.VAT, customers.CreditTermName,
                     customers.CreditLimit, customers.Remarks);
             }
-            using (XLWorkbook wb = new())
-            {
-                wb.Worksheets.Add(dt);
-                using (MemoryStream stream = new())
-                {
-                    wb.SaveAs(stream);
-                    return File(stream.ToArray(),
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    DateTime.Now.ToString("yyyyMMdd") + " Customers.xlsx");
-                }
-            }
-
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            DateTime.Now.ToString("yyyyMMdd") + " Customers.xlsx");
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(CustomerVM customerVM)
+        public async Task<IActionResult> UploadJson(CustomerVM customerVM)
         {
-            ResponseModel responseModel = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
             if (await customerRepository.UploadCombinationExistAsync(customerVM))
             {
                 responseModel.Status = "Error";

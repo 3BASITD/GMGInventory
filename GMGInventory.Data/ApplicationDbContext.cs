@@ -26,8 +26,9 @@ namespace GMGInventory.Data
 
             builder.ApplyConfiguration(new UserSeedConfiguration());
             builder.ApplyConfiguration(new RoleSeedConfiguration());
-            builder.ApplyConfiguration(new UserRoleSeedConfiguration());
             builder.ApplyConfiguration(new PageSeedConfiguration());
+            builder.ApplyConfiguration(new AccessSeedConfiguration());
+            builder.ApplyConfiguration(new UserRoleSeedConfiguration());
         }
 
         public DbSet<AuditLog> AuditLogs { get; set; }

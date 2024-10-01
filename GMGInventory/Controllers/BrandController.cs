@@ -1,20 +1,16 @@
-﻿using AutoMapper;
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
     public class BrandController(IAccessRepository accessRepository
-                            , IItemTypeRepository itemTypeRepository
-                            , IBrandRepository brandRepository
-                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                               , IItemTypeRepository itemTypeRepository
+                               , IBrandRepository brandRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {

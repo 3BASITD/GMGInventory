@@ -38,8 +38,8 @@ namespace GMGInventory.Application.Repositories
             var credittermsVM = mapper.Map<List<CreditTermVM>>(creditterms);
             foreach (CreditTermVM cvm in credittermsVM)
             {
-                cvm.UserCreated = await GetUserName(cvm.UserCreated);
-                cvm.UserModified = await GetUserName(cvm.UserModified);
+                cvm.UserCreated = await GetNickname(cvm.UserCreated);
+                cvm.UserModified = await GetNickname(cvm.UserModified);
             }
             return credittermsVM;
         }
@@ -52,8 +52,8 @@ namespace GMGInventory.Application.Repositories
                 return null;
             }
             var credittermsVM = mapper.Map<CreditTermVM>(creditterms);
-            credittermsVM.UserCreated = await GetUserName(credittermsVM.UserCreated);
-            credittermsVM.UserModified = await GetUserName(credittermsVM.UserModified);
+            credittermsVM.UserCreated = await GetNickname(credittermsVM.UserCreated);
+            credittermsVM.UserModified = await GetNickname(credittermsVM.UserModified);
             return credittermsVM;
         }
 

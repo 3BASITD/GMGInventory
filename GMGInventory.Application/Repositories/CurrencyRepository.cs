@@ -53,8 +53,8 @@ namespace GMGInventory.Application.Repositories
             var currenciesVM = mapper.Map<List<CurrencyVM>>(currencies);
             foreach (CurrencyVM cvm in currenciesVM)
             {
-                cvm.UserCreated = await GetUserName(cvm.UserCreated);
-                cvm.UserModified = await GetUserName(cvm.UserModified);
+                cvm.UserCreated = await GetNickname(cvm.UserCreated);
+                cvm.UserModified = await GetNickname(cvm.UserModified);
             }
             return currenciesVM;
         }
@@ -67,8 +67,8 @@ namespace GMGInventory.Application.Repositories
                 return null;
             }
             var currenciesVM = mapper.Map<CurrencyVM>(currencies);
-            currenciesVM.UserCreated = await GetUserName(currenciesVM.UserCreated);
-            currenciesVM.UserModified = await GetUserName(currenciesVM.UserModified);
+            currenciesVM.UserCreated = await GetNickname(currenciesVM.UserCreated);
+            currenciesVM.UserModified = await GetNickname(currenciesVM.UserModified);
             return currenciesVM;
         }
 

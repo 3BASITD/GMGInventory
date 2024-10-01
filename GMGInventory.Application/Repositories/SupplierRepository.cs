@@ -175,8 +175,8 @@ namespace GMGInventory.Application.Repositories
             var suppliersViewVM = mapper.Map<List<SupplierViewVM>>(suppliers);
             foreach (SupplierViewVM ivm in suppliersViewVM)
             {
-                ivm.UserCreated = await GetUserName(ivm.UserCreated);
-                ivm.UserModified = await GetUserName(ivm.UserModified);
+                ivm.UserCreated = await GetNickname(ivm.UserCreated);
+                ivm.UserModified = await GetNickname(ivm.UserModified);
             }
             return suppliersViewVM;
         }
@@ -192,8 +192,8 @@ namespace GMGInventory.Application.Repositories
                 return null;
             }
             var suppliersViewVM = mapper.Map<SupplierViewVM>(suppliers);
-            suppliersViewVM.UserCreated = await GetUserName(suppliersViewVM.UserCreated);
-            suppliersViewVM.UserModified = await GetUserName(suppliersViewVM.UserModified);
+            suppliersViewVM.UserCreated = await GetNickname(suppliersViewVM.UserCreated);
+            suppliersViewVM.UserModified = await GetNickname(suppliersViewVM.UserModified);
             return suppliersViewVM;
         }
 

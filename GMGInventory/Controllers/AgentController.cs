@@ -2,9 +2,7 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
@@ -12,10 +10,9 @@ using System.Data;
 namespace GMGInventory.Controllers
 {
     public class AgentController(IAccessRepository accessRepository
-                             , IAgentRepository agentRepository
-                             , IAreaRepository areaRepository
-                             , IRegionRepository regionRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                               , IAgentRepository agentRepository
+                               , IAreaRepository areaRepository
+                               , IRegionRepository regionRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions2(string search, int page)
         {

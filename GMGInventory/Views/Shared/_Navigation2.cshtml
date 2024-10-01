@@ -3,444 +3,659 @@
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var navPages = (List<string>?)ViewData["NavigationPages"];
 }
 
-
-<ul class="navbar-nav">
-    @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager)
-    || User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SalesDirector)
-    || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-    {
-        var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice" }).Contains(currentController ?? "");
-
-        <li class="nav-item dropdown">
-            <a id="menuSales" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navSalesActive ? "active" : "")">
-                <i class="fas fa-chart-line"></i>
-                SALES
+@if (navPages == null || navPages.Count == 0)
+{
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a href="#" class="nav-link text-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Your account does not have access to any pages. Please contact the administrator to add a role to your account.
             </a>
-            <ul aria-labelledby="menuSales" class="dropdown-menu mt-lg-3 border-0 shadow">
-                <li>
-                    <a class="dropdown-item @(currentController == "CustomerPurchaseHistory" ? "active" : "")"
-                       asp-area="" asp-controller="CustomerPurchaseHistory" asp-action="Index">
-                        <i class="nav-icon fas fa-user-clock"></i>
-                        Customer Purchase History
-                    </a>
-                </li>
-                @if (User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SystemAdmin)
-               || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "Pack" ? "active" : "")"
-                           asp-area="" asp-controller="Pack" asp-action="Index">
-                            <i class="nav-icon fas fa-cubes"></i>
-                            Packing Listing
-                        </a>
-                    </li>
-                }
-                @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SalesDirector)
-               || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "SalesInvoice" ? "active" : "")"
-                           asp-area="" asp-controller="SalesInvoice" asp-action="Index">
-                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                            Sales Invoice
-                        </a>
-                    </li>
-                }
-                <li>
-                    <a class="dropdown-item @(currentController == "SalesOrder" ? "active" : "")"
-                       asp-area="" asp-controller="SalesOrder" asp-action="Index">
-                        <i class="nav-icon fas fa-file-invoice"></i>
-                        Sales Order
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "SalesOrderDelivery" ? "active" : "")"
-                       asp-area="" asp-controller="SalesOrderDelivery" asp-action="Index">
-                        <i class="nav-icon fas fa-truck"></i>
-                        Sales Order Delivery
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "SalesReturn" ? "active" : "")"
-                       asp-area="" asp-controller="SalesReturn" asp-action="Index">
-                        <i class="nav-icon fas fa-undo"></i>
-                        Sales Return
-                    </a>
-                </li>
-            </ul>
         </li>
-    }
+    </ul>
+}
+else
+{
+    <ul class="navbar-nav">
+        @if (navPages.Contains(PageNames.CustomerPurchaseHistory.ToEnumString())
+       || navPages.Contains(PageNames.PackingListing.ToEnumString())
+       || navPages.Contains(PageNames.SalesReturn.ToEnumString())
+       || navPages.Contains(PageNames.SalesOrder.ToEnumString())
+       || navPages.Contains(PageNames.SalesOrderDelivery.ToEnumString())
+       || navPages.Contains(PageNames.SalesInvoice.ToEnumString()))
+        {
+            var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice" }).Contains(currentController ?? "");
 
-    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.InvoicingClerk)
-    || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin)
-    || User.IsInRole(Roles.Telemarketer))
-    {
-        var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "PurchaseOrder", "Warehouse", "Transfer", "UnservedItem" }).Contains(currentController ?? "");
+            <li class="nav-item dropdown">
+                <a id="menuSales" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navSalesActive ? "active" : "")">
+                    <i class="fas fa-chart-line"></i>
+                    SALES
+                </a>
+                <ul aria-labelledby="menuSales" class="dropdown-menu mt-lg-3 border-0 shadow">
+                    @if (navPages.Contains(PageNames.CustomerPurchaseHistory.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "CustomerPurchaseHistory" ? "active" : "")"
+                               asp-area="" asp-controller="CustomerPurchaseHistory" asp-action="Index">
+                                <i class="nav-icon fas fa-user-clock"></i>
+                                Customer Purchase History
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.PackingListing.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Pack" ? "active" : "")"
+                               asp-area="" asp-controller="Pack" asp-action="Index">
+                                <i class="nav-icon fas fa-cubes"></i>
+                                Packing Listing
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.SalesInvoice.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "SalesInvoice" ? "active" : "")"
+                               asp-area="" asp-controller="SalesInvoice" asp-action="Index">
+                                <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                                Sales Invoice
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.SalesOrder.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "SalesOrder" ? "active" : "")"
+                               asp-area="" asp-controller="SalesOrder" asp-action="Index">
+                                <i class="nav-icon fas fa-file-invoice"></i>
+                                Sales Order
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.SalesOrderDelivery.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "SalesOrderDelivery" ? "active" : "")"
+                               asp-area="" asp-controller="SalesOrderDelivery" asp-action="Index">
+                                <i class="nav-icon fas fa-truck"></i>
+                                Sales Order Delivery
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.CustomerPurchaseHistory.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "SalesReturn" ? "active" : "")"
+                               asp-area="" asp-controller="SalesReturn" asp-action="Index">
+                                <i class="nav-icon fas fa-undo"></i>
+                                Sales Return
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
 
-        <li class="nav-item dropdown">
-            <a id="menuInventory" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navInventoryActive ? "active" : "")">
-                <i class="fas fa-box"></i>
-                INVENTORY
-            </a>
-            <ul aria-labelledby="menuInventory" class="dropdown-menu mt-lg-3 border-0 shadow">
-                <li>
-                    <a class="dropdown-item @(currentController == "Item" ? "active" : "")"
-                       asp-area="" asp-controller="Item" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Item
-                    </a>
-                </li>
-                @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
-               || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "PriceList" ? "active" : "")"
-                           asp-area="" asp-controller="PriceList" asp-action="Index">
-                            <i class="nav-icon fas fa-money-check-alt"></i>
-                            Price List
-                        </a>
-                    </li>
-                }
-                @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
-               || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "PriceUpdate" ? "active" : "")"
-                           asp-area="" asp-controller="PriceUpdate" asp-action="Index">
-                            <i class="nav-icon fas fa-money-bill-wave"></i>
-                            Price Update
-                        </a>
-                    </li>
-                }
-                @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
-               || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "PurchaseReturn" ? "active" : "")"
-                           asp-area="" asp-controller="PurchaseReturn" asp-action="Index">
-                            <i class="nav-icon fas fa-shapes"></i>
-                            Purchase Return
-                        </a>
-                    </li>
-                }
-                @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
-               || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "PurchaseOrder" ? "active" : "")"
-                           asp-area="" asp-controller="PurchaseOrder" asp-action="Index">
-                            <i class="nav-icon fas fa-shapes"></i>
-                            Replenish Inventory
-                        </a>
-                    </li>
-                }
-                @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
-               || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "Warehouse" ? "active" : "")"
-                           asp-area="" asp-controller="Warehouse" asp-action="Index">
-                            <i class="nav-icon fas fa-warehouse"></i>
-                            Warehouse
-                        </a>
-                    </li>
-                }
-                @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
-               || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "Transfer" ? "active" : "")"
-                           asp-area="" asp-controller="Transfer" asp-action="Index">
-                            <i class="nav-icon fas fa-truck-loading"></i>
-                            Warehouse Transfer
-                        </a>
-                    </li>
-                }
-                @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
-               || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-                {
-                    <li>
-                        <a class="dropdown-item @(currentController == "UnservedItem" ? "active" : "")"
-                           asp-area="" asp-controller="UnservedItem" asp-action="Index">
-                            <i class="nav-icon fas fa-shapes"></i>
-                            Unserved Item
-                        </a>
-                    </li>
-                }
-            </ul>
-        </li>
-    }
+        @if (navPages.Contains(PageNames.Item.ToEnumString())
+       || navPages.Contains(PageNames.PriceList.ToEnumString())
+       || navPages.Contains(PageNames.PriceUpdate.ToEnumString())
+       || navPages.Contains(PageNames.PurchaseReturn.ToEnumString())
+       || navPages.Contains(PageNames.PurchaseOrder.ToEnumString())
+       || navPages.Contains(PageNames.Warehouse.ToEnumString())
+       || navPages.Contains(PageNames.WarehouseTransfer.ToEnumString())
+       || navPages.Contains(PageNames.UnservedItem.ToEnumString()))
+        {
+            var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "PurchaseOrder", "Warehouse", "Transfer", "UnservedItem" }).Contains(currentController ?? "");
 
-    @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager)
-    || User.IsInRole(Roles.InvoicingClerk) || User.IsInRole(Roles.SalesDirector)
-    || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
-    {
-        var navProcurementActive = (new List<string> { "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturn" }).Contains(currentController ?? "");
+            <li class="nav-item dropdown">
+                <a id="menuInventory" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navInventoryActive ? "active" : "")">
+                    <i class="fas fa-box"></i>
+                    INVENTORY
+                </a>
+                <ul aria-labelledby="menuInventory" class="dropdown-menu mt-lg-3 border-0 shadow">
+                    @if (navPages.Contains(PageNames.Item.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Item" ? "active" : "")"
+                               asp-area="" asp-controller="Item" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Item
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.PriceList.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "PriceList" ? "active" : "")"
+                               asp-area="" asp-controller="PriceList" asp-action="Index">
+                                <i class="nav-icon fas fa-money-check-alt"></i>
+                                Price List
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.PriceUpdate.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "PriceUpdate" ? "active" : "")"
+                               asp-area="" asp-controller="PriceUpdate" asp-action="Index">
+                                <i class="nav-icon fas fa-money-bill-wave"></i>
+                                Price Update
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.PurchaseReturn.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "PurchaseReturn" ? "active" : "")"
+                               asp-area="" asp-controller="PurchaseReturn" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Purchase Return
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.ReplenishInventory.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "ReplenishInventory" ? "active" : "")"
+                               asp-area="" asp-controller="ReplenishInventory" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Replenish Inventory
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Warehouse.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Warehouse" ? "active" : "")"
+                               asp-area="" asp-controller="Warehouse" asp-action="Index">
+                                <i class="nav-icon fas fa-warehouse"></i>
+                                Warehouse
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.WarehouseTransfer.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Transfer" ? "active" : "")"
+                               asp-area="" asp-controller="Transfer" asp-action="Index">
+                                <i class="nav-icon fas fa-truck-loading"></i>
+                                Warehouse Transfer
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.UnservedItem.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "UnservedItem" ? "active" : "")"
+                               asp-area="" asp-controller="UnservedItem" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Unserved Item
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
 
-        <li class="nav-item dropdown">
-            <a id="menuProcurement" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navProcurementActive ? "active" : "")">
-                <i class="fas fa-coins"></i>
-                PROCUREMENT
-            </a>
-            <ul aria-labelledby="menuProcurement" class="dropdown-menu mt-lg-3 border-0 shadow">
-                <li>
-                    <a class="dropdown-item @(currentController == "PurchaseRequest" ? "active" : "")"
-                       asp-area="" asp-controller="PurchaseRequest" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Purchase Request
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "PurchaseOrder" ? "active" : "")"
-                       asp-area="" asp-controller="PurchaseOrder" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Purchase Order
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "PurchaseReceiving" ? "active" : "")"
-                       asp-area="" asp-controller="PurchaseReceivingPurchaseReceiving" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Purchase Receiving
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "PurchaseReturn" ? "active" : "")"
-                       asp-area="" asp-controller="PurchaseReturn" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Purchase Return
-                    </a>
-                </li>
-            </ul>
-        </li>
-    }
+        @if (navPages.Contains(PageNames.PurchaseRequest.ToEnumString())
+       || navPages.Contains(PageNames.PurchaseOrder.ToEnumString())
+       || navPages.Contains(PageNames.PurchaseReceiving.ToEnumString())
+       || navPages.Contains(PageNames.PurchaseReturnNew.ToEnumString()))
+        {
+            var navProcurementActive = (new List<string> { "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturnNew" }).Contains(currentController ?? "");
 
-    @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager)
-    || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
-    {
-        var navCreditsCollectionActive = (new List<string> { "Customer", "Payment", "Soacr" }).Contains(currentController ?? "");
+            <li class="nav-item dropdown">
+                <a id="menuProcurement" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navProcurementActive ? "active" : "")">
+                    <i class="fas fa-coins"></i>
+                    PROCUREMENT
+                </a>
+                <ul aria-labelledby="menuProcurement" class="dropdown-menu mt-lg-3 border-0 shadow">
+                    @if (navPages.Contains(PageNames.PurchaseRequest.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "PurchaseRequest" ? "active" : "")"
+                               asp-area="" asp-controller="PurchaseRequest" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Purchase Request
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.PurchaseOrder.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "PurchaseOrder" ? "active" : "")"
+                               asp-area="" asp-controller="PurchaseOrder" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Purchase Order
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.PurchaseReceiving.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "PurchaseReceiving" ? "active" : "")"
+                               asp-area="" asp-controller="PurchaseReceivingPurchaseReceiving" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Purchase Receiving
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.PurchaseReturnNew.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "PurchaseReturnNew" ? "active" : "")"
+                               asp-area="" asp-controller="PurchaseReturnNew" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Purchase Return (New)
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
 
-        <li class="nav-item dropdown">
-            <a id="menuCC" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navCreditsCollectionActive ? "active" : "")">
-                <i class="fas fa-coins"></i>
-                CREDITS &amp; COLLECTION
-            </a>
-            <ul aria-labelledby="menuCC" class="dropdown-menu mt-lg-3 border-0 shadow">
-                <li class="nav-item">
-                    <a class="dropdown-item @(currentController == "Customer" ? "active" : "")"
-                       asp-area="" asp-controller="Customer" asp-action="Index">
-                        <i class="nav-icon fas fa-users"></i>
-                        Customer
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="dropdown-item @(currentController == "Payment" ? "active" : "")"
-                       asp-area="" asp-controller="Payment" asp-action="Index">
-                        <i class="nav-icon fas fa-money-bill-alt"></i>
-                        Payment
-                    </a>
-                </li>
-                @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.SystemAdmin))
-                {
-                    <li class="nav-item">
-                        <a class="dropdown-item @(currentController == "Soacr" ? "active" : "")"
-                           asp-area="" asp-controller="Soacr" asp-action="Index">
-                            <i class="nav-icon fas fa-receipt"></i>
-                            SOA / Counter Receipt
-                        </a>
-                    </li>
-                }
-                <li>
-                    <a class="dropdown-item @(currentController == "Check" ? "active" : "")"
-                       asp-area="" asp-controller="Check" asp-action="Index">
-                        <i class="nav-icon fas fa-money-check"></i>
-                        Check / Cheque
-                    </a>
-                </li>
-            </ul>
-        </li>
-    }
+        @if (navPages.Contains(PageNames.Customer.ToEnumString())
+       || navPages.Contains(PageNames.Payment.ToEnumString())
+       || navPages.Contains(PageNames.SOACR.ToEnumString())
+       || navPages.Contains(PageNames.Check.ToEnumString()))
+        {
+            var navCreditsCollectionActive = (new List<string> { "Customer", "Payment", "Soacr", "Check" }).Contains(currentController ?? "");
 
-    @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector)
-    || User.IsInRole(Roles.SystemAdmin))
-    {
-        var navAdministrationActive = (new List<string> { "Agent", "Area", "Brand", "Category", "Forwarder", "ItemType", "User", "Supplier", "AuditLog" }).Contains(currentController ?? "");
+            <li class="nav-item dropdown">
+                <a id="menuCC" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navCreditsCollectionActive ? "active" : "")">
+                    <i class="fas fa-coins"></i>
+                    CREDITS &amp; COLLECTION
+                </a>
+                <ul aria-labelledby="menuCC" class="dropdown-menu mt-lg-3 border-0 shadow">
+                    @if (navPages.Contains(PageNames.Customer.ToEnumString()))
+                    {
+                        <li class="nav-item">
+                            <a class="dropdown-item @(currentController == "Customer" ? "active" : "")"
+                               asp-area="" asp-controller="Customer" asp-action="Index">
+                                <i class="nav-icon fas fa-users"></i>
+                                Customer
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Payment.ToEnumString()))
+                    {
+                        <li class="nav-item">
+                            <a class="dropdown-item @(currentController == "Payment" ? "active" : "")"
+                               asp-area="" asp-controller="Payment" asp-action="Index">
+                                <i class="nav-icon fas fa-money-bill-alt"></i>
+                                Payment
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.SOACR.ToEnumString()))
+                    {
+                        <li class="nav-item">
+                            <a class="dropdown-item @(currentController == "Soacr" ? "active" : "")"
+                               asp-area="" asp-controller="Soacr" asp-action="Index">
+                                <i class="nav-icon fas fa-receipt"></i>
+                                SOA / Counter Receipt
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Check.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Check" ? "active" : "")"
+                               asp-area="" asp-controller="Check" asp-action="Index">
+                                <i class="nav-icon fas fa-money-check"></i>
+                                Check / Cheque
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
 
-        <li class="nav-item dropdown">
-            <a id="menuAdministration" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navAdministrationActive ? "active" : "")">
-                <i class="fas fa-cogs"></i>
-                ADMINISTRATION
-            </a>
-            <ul aria-labelledby="menuAdministration" class="dropdown-menu mt-lg-3 border-0 shadow">
-                <li>
-                    <a class="dropdown-item @(currentController == "Agent" ? "active" : "")"
-                       asp-area="" asp-controller="Agent" asp-action="Index">
-                        <i class="nav-icon fas fa-user-secret"></i>
-                        Agents
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "Access" ? "active" : "")"
-                       asp-area="" asp-controller="Access" asp-action="Index">
-                        <i class="nav-icon fas fa-user-tag"></i>
-                        Access
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "Area" ? "active" : "")"
-                       asp-area="" asp-controller="Area" asp-action="Index">
-                        <i class="nav-icon fas fa-map-marker-alt"></i>
-                        Areas
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "Brand" ? "active" : "")"
-                       asp-area="" asp-controller="Brand" asp-action="Index">
-                        <i class="nav-icon fas fa-trademark"></i>
-                        Brands
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "Category" ? "active" : "")"
-                       asp-area="" asp-controller="Category" asp-action="Index">
-                        <i class="nav-icon fas fa-network-wired"></i>
-                        Categories
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "Forwarder" ? "active" : "")"
-                       asp-area="" asp-controller="Forwarder" asp-action="Index">
-                        <i class="nav-icon fas fa-shipping-fast"></i>
-                        Forwarders
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "ItemType" ? "active" : "")"
-                       asp-area="" asp-controller="ItemType" asp-action="Index">
-                        <i class="nav-icon fas fa-keyboard"></i>
-                        Item Types
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "LocationCode" ? "active" : "")"
-                       asp-area="" asp-controller="LocationCode" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Location Codes
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "ReasonReturn" ? "active" : "")"
-                       asp-area="" asp-controller="ReasonReturn" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Reasons of Return
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "Region" ? "active" : "")"
-                       asp-area="" asp-controller="Region" asp-action="Index">
-                        <i class="nav-icon fas fa-shapes"></i>
-                        Regions
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "Supplier" ? "active" : "")"
-                       asp-area="" asp-controller="Supplier" asp-action="Index">
-                        <i class="nav-icon fas fa-handshake"></i>
-                        Suppliers
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "User" ? "active" : "")"
-                       asp-area="" asp-controller="User" asp-action="Index">
-                        <i class="nav-icon fas fa-user-cog"></i>
-                        Users
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item @(currentController == "AuditLog" ? "active" : "")"
-                       asp-area="" asp-controller="AuditLog" asp-action="Index">
-                        <i class="nav-icon fas fa-clipboard-list"></i>
-                        Audit Logs
-                    </a>
-                </li>
-            </ul>
-        </li>
-    }
+        @if (navPages.Contains(PageNames.Agents.ToEnumString())
+       || navPages.Contains(PageNames.Accesses.ToEnumString())
+       || navPages.Contains(PageNames.Areas.ToEnumString())
+       || navPages.Contains(PageNames.Brands.ToEnumString())
+       || navPages.Contains(PageNames.Categories.ToEnumString())
+       || navPages.Contains(PageNames.Forwarders.ToEnumString())
+       || navPages.Contains(PageNames.ItemTypes.ToEnumString())
+       || navPages.Contains(PageNames.LocationCodes.ToEnumString())
+       || navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString())
+       || navPages.Contains(PageNames.Regions.ToEnumString())
+       || navPages.Contains(PageNames.Suppliers.ToEnumString())
+       || navPages.Contains(PageNames.Users.ToEnumString())
+       || navPages.Contains(PageNames.AuditLogs.ToEnumString()))
+        {
+            var navAdministrationActive = (new List<string> { "Agent", "Access", "Area", "Brand", "Category", "Forwarder", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "Supplier", "User", "AuditLog" }).Contains(currentController ?? "");
 
-    @if (User.IsInRole(Roles.Accounting) || User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.InvoicingClerk)
-    || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin))
-    {
-        <li class="nav-item dropdown">
-            <a id="menuReport" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">
-                <i class="fas fa-file-invoice"></i>
-                REPORTS
-            </a>
-            <div aria-labelledby="menuReport" class="dropdown-menu dropdown-menu-reports mt-lg-3 border-0 shadow">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <span class="dropdown-header">SALES REPORT</span>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "AgentSalesPerItem" ? "active" : "")" 
-                               asp-area="" asp-controller="SalesReport" asp-action="AgentSalesPerItem">Agent Sales per Item</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "BrandSales" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="BrandSales">Brand Sales Report</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "BestSellingItem" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="BestSellingItem">Best Selling Items</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "Commission" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="Commission">Commission Report</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "CustomerSalesRanking" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesRanking">Customer Sales Ranking Report</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && (currentAction == "CustomerSales" || currentAction == "CustomerSalesCompare") ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="CustomerSales">Customer Sales Report</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "DailySales" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="DailySales">Daily Sales Report</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "SalesInvoice" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="SalesInvoice">Sales Invoice Listing Report</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "SalesAgentArea" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="SalesAgentArea">Sales by Agent/Area</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "SalesReportBasis" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="SalesReportBasis">Sales Report by Basis</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "SalesReturn" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="SalesReturn">Sales Return Listing Report</a>
-                            <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "UnservedItem" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReport" asp-action="UnservedItem">Unserved Item</a>
-                        </div>
-                        <div class="col-md-4">
-                            <span class="dropdown-header">INVENTORY REPORT</span>
-                            <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "BelowMaintainingItem" ? "active" : "")"
-                               asp-area="" asp-controller="InventoryReport" asp-action="BelowMaintainingItem">Below Maintaining Items</a>
-                            <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "ReceivingListing" ? "active" : "")"
-                               asp-area="" asp-controller="InventoryReport" asp-action="ReceivingListing">Receiving Listing</a>
-                            <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "ReceivingListingSupplier" ? "active" : "")"
-                               asp-area="" asp-controller="InventoryReport" asp-action="ReceivingListingSupplier">Receiving Listing by Supplier</a>
-                            <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "ReceivingSummary" ? "active" : "")"
-                               asp-area="" asp-controller="InventoryReport" asp-action="ReceivingSummary">Receiving Summary</a>
-                            <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "StockCard" ? "active" : "")"
-                               asp-area="" asp-controller="InventoryReport" asp-action="StockCard">Stock Card</a>
-                            <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "StockStatus" ? "active" : "")"
-                               asp-area="" asp-controller="InventoryReport" asp-action="StockStatus">Stock Status Report</a>
-                            <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "SupplierPurchase" ? "active" : "")"
-                               asp-area="" asp-controller="InventoryReport" asp-action="SupplierPurchase">Supplier Purchase History</a>
-                        </div>
-                        <div class="col-md-4">
-                            <span class="dropdown-header">ACCOUNTING REPORT</span>
-                            <a class="dropdown-item @(currentController=="AccountingReport" && currentAction == "CreditMemo" ? "active" : "")"
-                               asp-area="" asp-controller="AccountingReport" asp-action="CreditMemo">Credit Memo Listing Report</a>
-                            <a class="dropdown-item @(currentController=="AccountingReport" && currentAction == "DebitMemo" ? "active" : "")"
-                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Debit Memo Listing Report</a>
-                            <span class="dropdown-header">PROCUREMENT REPORT</span>
-                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Order" ? "active" : "")"
-                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Order Report</a>
-                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Return" ? "active" : "")"
-                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Return Report</a>
-                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Receiving" ? "active" : "")"
-                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Receiving Report</a>
+            <li class="nav-item dropdown">
+                <a id="menuAdministration" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navAdministrationActive ? "active" : "")">
+                    <i class="fas fa-cogs"></i>
+                    ADMINISTRATION
+                </a>
+                <ul aria-labelledby="menuAdministration" class="dropdown-menu mt-lg-3 border-0 shadow">
+                    @if (navPages.Contains(PageNames.Agents.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Agent" ? "active" : "")"
+                               asp-area="" asp-controller="Agent" asp-action="Index">
+                                <i class="nav-icon fas fa-user-secret"></i>
+                                Agents
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Accesses.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Access" ? "active" : "")"
+                               asp-area="" asp-controller="Access" asp-action="Index">
+                                <i class="nav-icon fas fa-user-tag"></i>
+                                Access
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Areas.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Area" ? "active" : "")"
+                               asp-area="" asp-controller="Area" asp-action="Index">
+                                <i class="nav-icon fas fa-map-marker-alt"></i>
+                                Areas
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Brands.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Brand" ? "active" : "")"
+                               asp-area="" asp-controller="Brand" asp-action="Index">
+                                <i class="nav-icon fas fa-trademark"></i>
+                                Brands
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Categories.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Category" ? "active" : "")"
+                               asp-area="" asp-controller="Category" asp-action="Index">
+                                <i class="nav-icon fas fa-network-wired"></i>
+                                Categories
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Forwarders.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Forwarder" ? "active" : "")"
+                               asp-area="" asp-controller="Forwarder" asp-action="Index">
+                                <i class="nav-icon fas fa-shipping-fast"></i>
+                                Forwarders
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.ItemTypes.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "ItemType" ? "active" : "")"
+                               asp-area="" asp-controller="ItemType" asp-action="Index">
+                                <i class="nav-icon fas fa-keyboard"></i>
+                                Item Types
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.LocationCodes.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "LocationCode" ? "active" : "")"
+                               asp-area="" asp-controller="LocationCode" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Location Codes
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "ReasonReturn" ? "active" : "")"
+                               asp-area="" asp-controller="ReasonReturn" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Reasons of Return
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Regions.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Region" ? "active" : "")"
+                               asp-area="" asp-controller="Region" asp-action="Index">
+                                <i class="nav-icon fas fa-shapes"></i>
+                                Regions
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Suppliers.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Supplier" ? "active" : "")"
+                               asp-area="" asp-controller="Supplier" asp-action="Index">
+                                <i class="nav-icon fas fa-handshake"></i>
+                                Suppliers
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Users.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "User" ? "active" : "")"
+                               asp-area="" asp-controller="User" asp-action="Index">
+                                <i class="nav-icon fas fa-user-cog"></i>
+                                Users
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.AuditLogs.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "AuditLog" ? "active" : "")"
+                               asp-area="" asp-controller="AuditLog" asp-action="Index">
+                                <i class="nav-icon fas fa-clipboard-list"></i>
+                                Audit Logs
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+
+        @if (navPages.Contains(PageNames.AuditLogs.ToEnumString()))
+        {
+            var navReportActive = (new List<string> { "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturnNew" }).Contains(currentController ?? "")
+            && (new List<string> { "AgentSalesPerItem", "BrandSales", "BestSellingItem", "Commission", "CustomerSalesRanking", "CustomerSales", "DailySales", "SalesInvoice", "SalesAgentArea", "SalesReportBasis", "SalesReturn", "UnservedItem", "BelowMaintainingItem", "ReceivingListing", "ReceivingListingSupplier", "ReceivingSummary", "StockCard", "StockStatus", "SupplierPurchase", "CreditMemo", "DebitMemo", "Order", "Return", "Receiving" }).Contains(currentAction ?? "");
+
+            <li class="nav-item dropdown">
+                <a id="menuReport" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navReportActive ? "active" : "")">
+                    <i class="fas fa-file-invoice"></i>
+                    REPORTS
+                </a>
+                <div aria-labelledby="menuReport" class="dropdown-menu dropdown-menu-reports mt-lg-3 border-0 shadow">
+                    <div class="container">
+                        <div class="row" style="width:100%">
+                            @if (navPages.Contains(PageNames.AgentSalesPerItemReport.ToEnumString())
+                           || navPages.Contains(PageNames.BrandSalesReport.ToEnumString())
+                           || navPages.Contains(PageNames.BestSellingItemsReport.ToEnumString())
+                           || navPages.Contains(PageNames.CommissionReport.ToEnumString())
+                           || navPages.Contains(PageNames.CustomerSalesRankingReport.ToEnumString())
+                           || navPages.Contains(PageNames.CustomerSalesReport.ToEnumString())
+                           || navPages.Contains(PageNames.DailySalesReport.ToEnumString())
+                           || navPages.Contains(PageNames.SalesInvoiceListingReport.ToEnumString())
+                           || navPages.Contains(PageNames.SalesByAgentAreaReport.ToEnumString())
+                           || navPages.Contains(PageNames.SalesReportByBasisReport.ToEnumString())
+                           || navPages.Contains(PageNames.SalesReturnListingReport.ToEnumString())
+                           || navPages.Contains(PageNames.UnservedItemReport.ToEnumString()))
+                            {
+                                <div class="col-md-4 col-report">
+                                    <span class="dropdown-header">SALES REPORT</span>
+                                    @if (navPages.Contains(PageNames.AgentSalesPerItemReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "AgentSalesPerItem" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="AgentSalesPerItem">Agent Sales per Item</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.BrandSalesReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "BrandSales" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="BrandSales">Brand Sales Report</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.BestSellingItemsReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "BestSellingItem" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="BestSellingItem">Best Selling Items</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.CommissionReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "Commission" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="Commission">Commission Report</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.CustomerSalesRankingReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "CustomerSalesRanking" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesRanking">Customer Sales Ranking Report</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.CustomerSalesReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && (currentAction == "CustomerSales" || currentAction == "CustomerSalesCompare") ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="CustomerSales">Customer Sales Report</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.DailySalesReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "DailySales" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="DailySales">Daily Sales Report</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.SalesInvoiceListingReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "SalesInvoice" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="SalesInvoice">Sales Invoice Listing Report</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.SalesByAgentAreaReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "SalesAgentArea" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="SalesAgentArea">Sales by Agent/Area</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.SalesReportByBasisReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "SalesReportBasis" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="SalesReportBasis">Sales Report by Basis</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.SalesReturnListingReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "SalesReturn" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="SalesReturn">Sales Return Listing Report</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.UnservedItemReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="SalesReport" && currentAction == "UnservedItem" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="UnservedItem">Unserved Item</a>
+                                    }
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.BelowMaintainingItemsReport.ToEnumString())
+                           || navPages.Contains(PageNames.ReceivingListingReport.ToEnumString())
+                           || navPages.Contains(PageNames.ReceivingListingBySupplierReport.ToEnumString())
+                           || navPages.Contains(PageNames.ReceivingSummaryReport.ToEnumString())
+                           || navPages.Contains(PageNames.StockCardReport.ToEnumString())
+                           || navPages.Contains(PageNames.StockStatusReport.ToEnumString())
+                           || navPages.Contains(PageNames.SupplierPurchaseHistoryReport.ToEnumString()))
+                            {
+                                <div class="col-md-4 col-report">
+                                    <span class="dropdown-header">INVENTORY REPORT</span>
+                                    @if (navPages.Contains(PageNames.BelowMaintainingItemsReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "BelowMaintainingItem" ? "active" : "")"
+                                           asp-area="" asp-controller="InventoryReport" asp-action="BelowMaintainingItem">Below Maintaining Items</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.ReceivingListingReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "ReceivingListing" ? "active" : "")"
+                                           asp-area="" asp-controller="InventoryReport" asp-action="ReceivingListing">Receiving Listing</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.ReceivingListingBySupplierReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "ReceivingListingSupplier" ? "active" : "")"
+                                           asp-area="" asp-controller="InventoryReport" asp-action="ReceivingListingSupplier">Receiving Listing by Supplier</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.ReceivingSummaryReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "ReceivingSummary" ? "active" : "")"
+                                           asp-area="" asp-controller="InventoryReport" asp-action="ReceivingSummary">Receiving Summary</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.StockCardReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "StockCard" ? "active" : "")"
+                                           asp-area="" asp-controller="InventoryReport" asp-action="StockCard">Stock Card</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.StockStatusReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "StockStatus" ? "active" : "")"
+                                           asp-area="" asp-controller="InventoryReport" asp-action="StockStatus">Stock Status Report</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.SupplierPurchaseHistoryReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController=="InventoryReport" && currentAction == "SupplierPurchase" ? "active" : "")"
+                                           asp-area="" asp-controller="InventoryReport" asp-action="SupplierPurchase">Supplier Purchase History</a>
+                                    }
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.CreditMemoListingReport.ToEnumString())
+                           || navPages.Contains(PageNames.DebitMemoListingReport.ToEnumString())
+                           || navPages.Contains(PageNames.PurchaseOrderReport.ToEnumString())
+                           || navPages.Contains(PageNames.PurchaseReturnReport.ToEnumString())
+                           || navPages.Contains(PageNames.PurchaseReceivingReport.ToEnumString()))
+                            {
+                                <div class="col-md-4 col-report">
+                                    @if (navPages.Contains(PageNames.CreditMemoListingReport.ToEnumString())
+                                   || navPages.Contains(PageNames.DebitMemoListingReport.ToEnumString()))
+                                    {
+                                        <span class="dropdown-header">ACCOUNTING REPORT</span>
+                                        @if (navPages.Contains(PageNames.CreditMemoListingReport.ToEnumString()))
+                                        {
+                                            <a class="dropdown-item @(currentController=="AccountingReport" && currentAction == "CreditMemo" ? "active" : "")"
+                                               asp-area="" asp-controller="AccountingReport" asp-action="CreditMemo">Credit Memo Listing Report</a>
+                                        }
+                                        @if (navPages.Contains(PageNames.DebitMemoListingReport.ToEnumString()))
+                                        {
+                                            <a class="dropdown-item @(currentController=="AccountingReport" && currentAction == "DebitMemo" ? "active" : "")"
+                                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Debit Memo Listing Report</a>
+                                        }
+                                    }
+                                    @if (navPages.Contains(PageNames.PurchaseOrderReport.ToEnumString())
+                                   || navPages.Contains(PageNames.PurchaseReturnReport.ToEnumString())
+                                   || navPages.Contains(PageNames.PurchaseReceivingReport.ToEnumString()))
+                                    {
+                                        <span class="dropdown-header">PROCUREMENT REPORT</span>
+                                        @if (navPages.Contains(PageNames.PurchaseOrderReport.ToEnumString()))
+                                        {
+                                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Order" ? "active" : "")"
+                                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Order Report</a>
+                                        }
+                                        @if (navPages.Contains(PageNames.PurchaseReturnReport.ToEnumString()))
+                                        {
+                                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Return" ? "active" : "")"
+                                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Return Report</a>
+                                        }
+                                        @if (navPages.Contains(PageNames.PurchaseReceivingReport.ToEnumString()))
+                                        {
+                                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Receiving" ? "active" : "")"
+                                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Receiving Report</a>
+                                        }
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
-            </div>
-        </li>
-    }
-</ul>
+            </li>
+        }
+    </ul>
+}

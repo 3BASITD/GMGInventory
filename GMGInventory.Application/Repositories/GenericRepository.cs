@@ -13,8 +13,8 @@ namespace GMGInventory.Application.Repositories
         private readonly UserManager<User> userManager;
 
         public GenericRepository(ApplicationDbContext context
-            , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager)
+             , IHttpContextAccessor httpContextAccessor
+             , UserManager<User> userManager)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
@@ -23,17 +23,19 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<T> AddAsync(T entity)
         {
-            string userId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            //string userId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             await context.AddAsync(entity);
-            await context.SaveChangesAsync(userId);
+            await context.SaveChangesAsync(userId ?? "");
             return entity;
         }
 
         public async Task AddRangeAsync(List<T> entities)
         {
-            string userId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            //string userId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             await context.AddRangeAsync(entities);
-            await context.SaveChangesAsync(userId);
+            await context.SaveChangesAsync(userId ?? "");
         }
 
         public async Task DeleteAsync(int id)
@@ -68,16 +70,18 @@ namespace GMGInventory.Application.Repositories
 
         public async Task UpdateAsync(T entity)
         {
-            string userId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            //string userId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             context.Update(entity);
-            await context.SaveChangesAsync(userId);
+            await context.SaveChangesAsync(userId ?? "");
         }
 
-        public async Task<string> GetUserName(string? userId)
+        public async Task<string> GetNickname(string? userId)
         {
-            //var user = await userManager.FindByIdAsync(userId);
-            var user = await userManager.Users.Where(s => s.Id == userId).FirstOrDefaultAsync();
-            return user != null ? user.Nickname : "-";
+            var user = from u in userManager.Users
+                       where u.Id == userId
+                       select u.Nickname;
+            return await user.FirstOrDefaultAsync() ?? "";
         }
     }
 }

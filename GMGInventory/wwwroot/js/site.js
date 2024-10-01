@@ -147,10 +147,16 @@
         checkScroll();
     });
 
-
     $(window).on("resize", function () {
         checkScroll();
     });
+
+    var col_report = 12 / $(".col-report").length;
+    if (!isFinite(col_report) || isNaN(col_report)) {
+        col_report = 12;
+    }
+    $(".col-report").removeClass("col-md-4 col-md-6 col-md-12");
+    $(".col-report").addClass("col-md-" + col_report);
 });
 
 function removeCommaOfNumber(value) {

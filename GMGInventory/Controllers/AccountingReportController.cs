@@ -1,11 +1,9 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Helpers;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -13,8 +11,7 @@ using System.Data;
 namespace GMGInventory.Controllers
 {
     public class AccountingReportController(IAccessRepository accessRepository
-            , IReportAccountingRepository reportAccountingRepository
-            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                                          , IReportAccountingRepository reportAccountingRepository) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 

@@ -16,3 +16,16 @@
             integrity="sha384-R3vNCHsZ+A2Lo3d5A6XNP7fdQkeswQWTIPfiYwSpEP3YV079R+93YzTeZRah7f/F">
     </script>
 </environment>
+<script>
+    $("form#account").on("submit", function (event) {
+        if ($(this).valid()) {
+            var btn = $(this).find("button[type=submit]");
+            var spn = $(this).find("button[type=submit] span.fas");
+            var msg = $(this).find("button[type=submit] span.submit-message");
+            btn.prop("disabled", true);
+            spn.removeClass("fa-sign-in-alt").addClass("fa-spinner fa-spin");
+            msg.html("Signing In...");
+        }
+        //event.preventDefault();
+    });
+</script>
