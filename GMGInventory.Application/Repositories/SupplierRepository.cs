@@ -3,9 +3,11 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -36,13 +38,20 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(SupplierVM supplierVM)
         {
-            return (await GetAllSupplierAsync()).Any(s => s.Code == supplierVM.Code && s.Name == supplierVM.Name &&
-            s.ContactPerson == supplierVM.ContactPerson && s.ContactNumber == supplierVM.ContactNumber &&
-            s.EmailAddress == supplierVM.EmailAddress && s.AddressLine1 == supplierVM.AddressLine1 &&
-            s.AddressLine2 == supplierVM.AddressLine2 && s.Barangay == supplierVM.Barangay &&
-            s.City == supplierVM.City && s.AreaName == supplierVM.AreaName && 
-            s.ZipCode == supplierVM.ZipCode && s.CreditLimit == supplierVM.CreditLimit &&
-            s.CurrencyName == supplierVM.CurrencyName);
+            return (await GetAllSupplierAsync()).Any(s => 
+            s.Code == supplierVM.Code &&
+            s.Name == supplierVM.Name &&
+            s.TIN == supplierVM.TIN &&
+            s.AddressLine1 == supplierVM.AddressLine1 &&
+            s.AddressLine2 == supplierVM.AddressLine2 &&
+            s.OfficeTelNo == supplierVM.OfficeTelNo &&
+            s.ContactPerson == supplierVM.ContactPerson && 
+            s.RegionName == supplierVM.RegionName &&
+            s.Terms == supplierVM.Terms &&
+            s.PriceList == supplierVM.PriceList &&
+            s.CurrencyName == supplierVM.CurrencyName &&
+            s.BusinessStyleName == supplierVM.BusinessStyleName &&
+            s.VAT == supplierVM.VAT);
         }
 
         public async Task<IList<JsonSupplierOptionsModel>> GetOptions(int? IncludeId)
@@ -65,10 +74,10 @@ namespace GMGInventory.Application.Repositories
         {
 
             var suppliers = from supplier in context.Suppliers
-                         join area in context.Areas
-                                   on supplier.AreaId equals area.Id
-                         join currency in context.Currencies
-                                   on supplier.CurrencyId equals currency.Id
+                         join region in context.Regions
+                                   on supplier.RegionId equals region.Id
+                         //join currency in context.Currencies
+                         //          on supplier.CurrencyId equals currency.Id
                          join userc in userManager.Users on supplier.UserCreated equals userc.Id
                          join userm in userManager.Users on supplier.UserModified equals userm.Id into m
                          from um in m.DefaultIfEmpty()
@@ -76,23 +85,23 @@ namespace GMGInventory.Application.Repositories
                          select new SupplierViewVM
                          {
                              Id = supplier.Id,
-                             Name = supplier.Name,
                              Code = supplier.Code,
-                             CreditLimitD = supplier.CreditLimit,
-                             ContactPerson = supplier.ContactPerson,
-                             ContactNumber = supplier.ContactNumber,
-                             EmailAddress = supplier.EmailAddress,
+                             Name = supplier.Name,
+                             TIN = supplier.TIN,
                              AddressLine1 = supplier.AddressLine1,
                              AddressLine2 = supplier.AddressLine2,
-                             Barangay = supplier.Barangay,
-                             AreaName = area.Name,
-                             CurrencyName = currency.Name,
-                             City = supplier.City,
-                             AreaId = supplier.AreaId,
+                             OfficeTelNo = supplier.OfficeTelNo,
+                             ContactPerson = supplier.ContactPerson,
+                             RegionName = region.Name,
+                             RegionId = supplier.RegionId,
+                             Terms = supplier.Terms,
+                             PriceList = supplier.PriceList,
                              CurrencyId = supplier.CurrencyId,
+                             CurrencyName = supplier.Currency.Name,
+                             BusinessStyleId = supplier.BusinessStyleId,
+                             BusinessStyleName = supplier.BusinessStyle.Name,
+                             VAT = supplier.VAT,
                              IsActive = supplier.IsActive,
-                             ZipCode = supplier.ZipCode,
-                             IsForeign = supplier.IsForeign,
                              DateCreatedD = supplier.DateCreated,
                              DateModifiedD = supplier.DateModified,
                              UserCreated = userc.Nickname,
@@ -113,7 +122,6 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
                                     || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.CreditLimit.ToString().Contains(form.SearchValue)
                                     || x.UserCreated.ToLower().Contains(form.SearchValue)
                                     || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
                                     || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
@@ -130,7 +138,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Code": data = data.OrderBy(s => s.Code); break;
                         case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "CreditLimit": data = data.OrderBy(s => s.CreditLimit); break;
+                      //  case "CreditLimit": data = data.OrderBy(s => s.CreditLimit); break;
                         case "IsActive": data = data.OrderBy(s => s.IsActive); break;
                         case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
@@ -145,7 +153,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Code": data = data.OrderByDescending(s => s.Code); break;
                         case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "CreditLimit": data = data.OrderByDescending(s => s.CreditLimit); break;
+                        //case "CreditLimit": data = data.OrderByDescending(s => s.CreditLimit); break;
                         case "IsActive": data = data.OrderByDescending(s => s.IsActive); break;
                         case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
@@ -170,7 +178,7 @@ namespace GMGInventory.Application.Repositories
         {
             var suppliers = await context.Suppliers
                 .Include(s => s.Currency)
-                .Include(s => s.Area)
+                .Include(s => s.Region)
                 .ToListAsync();
             var suppliersViewVM = mapper.Map<List<SupplierViewVM>>(suppliers);
             foreach (SupplierViewVM ivm in suppliersViewVM)
@@ -185,7 +193,7 @@ namespace GMGInventory.Application.Repositories
         {
             var suppliers = await context.Suppliers
                 .Include(s => s.Currency)
-                .Include(s => s.Area)
+                .Include(s => s.Region)
                 .Where(s => s.Id == id).FirstOrDefaultAsync();
             if (suppliers == null)
             {
@@ -201,7 +209,8 @@ namespace GMGInventory.Application.Repositories
         {
             var suppliers = await context.Suppliers
                 .Include(s => s.Currency)
-                .Include(s => s.Area)
+                .Include(s => s.Region)
+                .Include(s => s.BusinessStyle)
                 .Where(s => s.Id == id).FirstOrDefaultAsync();
             if (suppliers == null)
             {
@@ -258,19 +267,17 @@ namespace GMGInventory.Application.Repositories
             {
                 Code = supplierVM.Code,
                 Name = supplierVM.Name,
-                ContactPerson = supplierVM.ContactPerson + "",
-                ContactNumber = supplierVM.ContactNumber + "",
-                EmailAddress = supplierVM.EmailAddress + "",
+                TIN = supplierVM.TIN + "",
                 AddressLine1 = supplierVM.AddressLine1,
                 AddressLine2 = supplierVM.AddressLine2,
-                Barangay = supplierVM.Barangay + "",
-                City = supplierVM.City,
-                ZipCode = supplierVM.ZipCode + "",
-                AreaId = supplierVM.AreaId,
+                OfficeTelNo = supplierVM.OfficeTelNo + "",
+                ContactPerson = supplierVM.ContactPerson + "",
+                RegionId = supplierVM.RegionId,
+                Terms = supplierVM.Terms + "",
+                PriceList = supplierVM.PriceList,
                 CurrencyId = supplierVM.CurrencyId,
-                IsForeign = supplierVM.IsForeign,
-                CreditLimit = supplierVM.CreditLimitD,
-
+                BusinessStyleId  = supplierVM.BusinessStyleId,
+                VAT = supplierVM.VAT + "",
                 IsActive = true
             };
             await context.Suppliers.AddAsync(supplier);
@@ -290,18 +297,17 @@ namespace GMGInventory.Application.Repositories
             supplier.Id = supplierVM.Id;
             supplier.Code = supplierVM.Code;
             supplier.Name = supplierVM.Name;
-            supplier.ContactPerson = supplierVM.ContactPerson + "";
-            supplier.ContactNumber = supplierVM.ContactNumber + "";
-            supplier.EmailAddress = supplierVM.EmailAddress + "";
+            supplier.TIN = supplierVM.TIN + "";
             supplier.AddressLine1 = supplierVM.AddressLine1;
             supplier.AddressLine2 = supplierVM.AddressLine2;
-            supplier.Barangay = supplierVM.Barangay + "";
-            supplier.City = supplierVM.City;
-            supplier.ZipCode = supplierVM.ZipCode + "";
-            supplier.AreaId = supplierVM.AreaId;
+            supplier.OfficeTelNo = supplierVM.OfficeTelNo + "";
+            supplier.ContactPerson = supplierVM.ContactPerson + "";
+            supplier.RegionId = supplierVM.RegionId;
+            supplier.Terms = supplierVM.Terms + "";
+            supplier.PriceList = supplierVM.PriceList;
             supplier.CurrencyId = supplierVM.CurrencyId;
-            supplier.IsForeign = supplierVM.IsForeign;
-            supplier.CreditLimit = supplierVM.CreditLimitD;
+            supplier.BusinessStyleId  = supplierVM.BusinessStyleId;
+            supplier.VAT = supplierVM.VAT + "";
             supplier.IsActive = true;
 
             context.Suppliers.Update(supplier);

@@ -34,6 +34,7 @@ namespace GMGInventory.Application.Repositories
                         //let over = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.OverPayment)
                         let paid = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.TotalAmountPaid)
                         let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
+                        // where soa.Customer.Name == "ROX - RIX AUTO SUPPLY" // for testing only
                         select new SOACRVM
                         {
                             Id = soa.Id,
@@ -125,6 +126,8 @@ namespace GMGInventory.Application.Repositories
                 }
             }
             //pagination
+            //var pageList = data.ToList(); // for testing
+
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
             return new ForDataTables<SOACRVM>
             {
@@ -199,11 +202,13 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<SOACRInvoices>> GetInvoiceListAsync(ListFilterSalesModel filter)
         {
             var invoices = from inv in context.Invoices
-                           where (filter.Customer == null || filter.Customer == inv.SalesOrder.Customer.Id)
+                           where
+                           (filter.Customer == null || filter.Customer == inv.SalesOrder.Customer.Id)
                               && (filter.Agent == null || filter.Agent == inv.SalesOrder.Agent.Id)
                               && filter.DateFrom <= inv.InvoiceDate.Date
                               && inv.InvoiceDate.Date <= filter.DateTo
-                              && inv.Status.Name == "Invoice Submitted"
+                              && inv.Status.Name == "Invoice Draft"
+
                            select new SOACRInvoices
                            {
                                Agent = inv.SalesOrder.Agent.FirstName + " " + inv.SalesOrder.Agent.LastName,
@@ -224,6 +229,8 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetInvoiceListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
+
+          //  var test = data.Select(x => x.InvoiceNumber = "DR-0549638")
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {

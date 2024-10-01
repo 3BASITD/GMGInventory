@@ -999,7 +999,7 @@
                 ContactPerson: { maxlength: 150 },
                 ContactNumber: { maxlength: 100 },
                 Email: { maxlength: 50 },
-                Address: { required: true, maxlength: 50 },
+                Address: { required: true },
                 CreditLimit: { required: true, range: [0, 1999999.99] },
                 FaxNumber: { maxlength: 100 },
             },
@@ -1009,7 +1009,7 @@
                 ContactPerson: { maxlength: "Contact Person must not exceed 150 characters." },
                 ContactNumber: { maxlength: "Contact Number number must not exceed 100 characters." },
                 Email: { maxlength: "Email number must not exceed 50 characters." },
-                Address: { required: "Please enter address.", maxlength: "Address must not exceed 50 characters." },
+                Address: { required: "Please enter address." },
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
                 FaxNumber: { maxlength: "Fax Number number must not exceed 100 characters." }
 

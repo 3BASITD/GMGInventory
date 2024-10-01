@@ -65,6 +65,10 @@ builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepositor
 builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseRepository));
+builder.Services.AddScoped(typeof(IReasonOfReturnRepository), typeof(ReasonOfReturnRepository));
+builder.Services.AddScoped(typeof(ILocationCodeRepository), typeof(LocationCodeRepository));
+builder.Services.AddScoped(typeof(IBusinessStyleRepository), typeof(BusinessStyleRepository));
+
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 
