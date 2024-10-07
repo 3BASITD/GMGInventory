@@ -3,6 +3,7 @@ using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
+
             return View();
         }
 
@@ -60,6 +62,8 @@ namespace GMGInventory.Controllers
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesInvoice)).Convert();
 
             var order = await invoiceRepository.GetDetailsAsync(Id);
             if (order == null)
@@ -103,6 +107,8 @@ namespace GMGInventory.Controllers
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesInvoice)).Convert();
 
             var invoice = await invoiceRepository.GetDetailsWithItemsAsync(Id);
             return View(invoice);

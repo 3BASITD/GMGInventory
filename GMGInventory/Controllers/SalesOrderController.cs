@@ -4,6 +4,7 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,8 @@ namespace GMGInventory.Controllers
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
+        
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
 
             return View();
         }
@@ -53,6 +56,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
 
             var order = await salesOrderRepository.GetDetailsAsync(Id);
             if (order == null)
@@ -132,6 +136,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
 
             var order = await salesOrderRepository.GetDetailsAsync(Id);
             if (Id != null && (order == null || order.DisapprovedBy == null || order.DisapprovedDateD == null))

@@ -106,7 +106,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseOrder)).Convert();
 
             return View();
         }

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Sales Orders";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
@@ -10,9 +11,12 @@
         <div class="card-tools">
             @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
             {
-                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
-                    <span class="fas fa-plus"></span> New Sales Order
-            </a>
+                @if (userAccess.CanAdd)
+                {
+                    <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
+                        <span class="fas fa-plus"></span> New Sales Order
+                    </a>
+                }
             }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
@@ -142,6 +146,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -331,10 +337,10 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '"  data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-                        if (data.status == "Submitted" && data.orderBy == $("#current-user-nickname").val()) {
+                        if (data.status == "Submitted" && data.orderBy == $("#current-user-nickname").val() && user_access.canDelete) {
                             actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button"  data-microtip-title="Delete Sales Order" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }
-                        if (data.status == "Approved" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin")/* || userIsInRole("Telemarketer")*/)) {
+                        if  user_access.canAdd &&  data.status == "Approved" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin")/* || userIsInRole("Telemarketer")*/)) {
                             //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></button>';
                             actions += '<a href="@Url.Action("Create","Pack")/' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></a>';
                         }
