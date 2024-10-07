@@ -1,20 +1,17 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class PurchaseOrderController : Controller
+    public class AgentCPurchaseOrderControllerontroller(IAccessRepository accessRepository
+                            , IPurchaseOrderRepository purchaseOrderRepository) : BaseController(accessRepository)
     {
-        private readonly IPurchaseOrderRepository purchaseOrderRepository;
-
-        public PurchaseOrderController(IPurchaseOrderRepository purchaseOrderRepository)
-        {
-            this.purchaseOrderRepository = purchaseOrderRepository;
-        }
 
         public async Task<IActionResult> GetOptions(string search, int page)
         {
@@ -30,8 +27,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseOrder)).Convert();
+
             return View();
         }
 
@@ -40,8 +42,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> GetListDTJson()
+        public async Task<IActionResult> GetListDTJson()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await purchaseOrderRepository.GetListDTAsync(form));
         }
@@ -50,8 +55,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Details(int? Id)
+        public async Task<IActionResult> Details(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseOrder)).Convert();
+
             var order = await purchaseOrderRepository.GetDetailsAsync(Id);
             if (order == null)
             {
@@ -69,14 +79,20 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsJson(int purchaseOrderId)
+        public async Task<IActionResult> GetItemsJson(int purchaseOrderId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await purchaseOrderRepository.GetItemsAsync(purchaseOrderId));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsDTJson(int purchaseOrderId)
+        public async Task<IActionResult> GetItemsDTJson(int purchaseOrderId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await purchaseOrderRepository.GetItemsDTAsync(form, purchaseOrderId));
         }
@@ -85,8 +101,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseOrder)).Convert();
+
             return View();
         }
 
@@ -95,8 +116,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> SaveJson(PurchaseOrderFormVM form, string type)
+        public async Task<IActionResult> SaveJson(PurchaseOrderFormVM form, string type)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             if (type == "Draft")
             {
@@ -135,8 +159,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> DeleteDraftJson(int Id)
+        public async Task<IActionResult> DeleteDraftJson(int Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await purchaseOrderRepository.DeleteDraftAsync(Id))
             {

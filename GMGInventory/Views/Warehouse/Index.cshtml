@@ -2,15 +2,19 @@
 
 @{
     ViewData["Title"] = "Warehouse";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <a class="btn btn-primary btn-sm float-right" asp-action="Create">
-                <span class="fas fa-plus"></span> New Warehouse
-            </a>
+            @if (userAccess.CanAdd)
+            {
+                <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                    <span class="fas fa-plus"></span> New Warehouse
+                </a>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -53,18 +57,27 @@
                                     </a>
                                     @if (warehouse.IsActive)
                                     {
-                                        <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@warehouse.Id" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </a>
-                                        <button data-id="@warehouse.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip">
-                                            <i class="far fa-trash-alt"></i>
-                                        </button>
+                                        @if (userAccess.CanEdit)
+                                        {
+                                            <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@warehouse.Id" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        }
+                                        @if (userAccess.CanDelete)
+                                        {
+                                            <button data-id="@warehouse.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip">
+                                                <i class="far fa-trash-alt"></i>
+                                            </button>
+                                        }
                                     }
                                     else
                                     {
-                                        <button data-id="@warehouse.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip">
-                                            <i class="fas fa-check"></i>
-                                        </button>
+                                        @if (userAccess.CanAdd || userAccess.CanEdit)
+                                        {
+                                            <button data-id="@warehouse.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        }
                                     }
                                 </div>
                             </td>
@@ -76,52 +89,60 @@
     </div>
 </div>
 
-<form id="deleteWarehouseForm" asp-action="Delete">
-    <input type="hidden" id="deleteWarehouseId" name="Id" />
-</form>
-
-<form id="reactivateWarehouseForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateWarehouseId" name="Id" />
-</form>
-
+@if (userAccess.CanDelete)
+{
+    <form id="deleteWarehouseForm" asp-action="Delete">
+        <input type="hidden" id="deleteWarehouseId" name="Id" />
+    </form>
+}
+@if (userAccess.CanAdd || userAccess.CanEdit)
+{
+    <form id="reactivateWarehouseForm" asp-action="Reactivate">
+        <input type="hidden" id="reactivateWarehouseId" name="Id" />
+    </form>
+}
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         $('.table').DataTable({
             order: [[0, "desc"]]
         });
-
-        $('.deleteBtn').click(function(e) {
-            swal({
-                title: "Delete / Deactivate Warehouse",
-                text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true
-            }).then((confirm) => {
-                if (confirm) {
-                    var btn = $(this);
-                    var id = btn.data("id");
-                    $('#deleteWarehouseId').val(id);
-                    $('#deleteWarehouseForm').submit();
-                }
+        if (user_access.canDelete) {
+            $('.deleteBtn').click(function (e) {
+                swal({
+                    title: "Delete / Deactivate Warehouse",
+                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#deleteWarehouseId').val(id);
+                        $('#deleteWarehouseForm').submit();
+                    }
+                });
             });
-        });
-
-        $('.reactivateBtn').click(function(e) {
-            swal({
-                title: "Reactivate Warehouse",
-                text: "Are you sure you want to reactivate this record?",
-                icon: "info",
-                buttons: true,
-                infoMode: true
-            }).then((confirm) => {
-                if (confirm) {
-                    var btn = $(this);
-                    var id = btn.data("id");
-                    $('#reactivateWarehouseId').val(id);
-                    $('#reactivateWarehouseForm').submit();
-                }
+        }
+        if (user_access.canAdd || user_access.canEdit) {
+            $('.reactivateBtn').click(function (e) {
+                swal({
+                    title: "Reactivate Warehouse",
+                    text: "Are you sure you want to reactivate this record?",
+                    icon: "info",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#reactivateWarehouseId').val(id);
+                        $('#reactivateWarehouseForm').submit();
+                    }
+                });
             });
-        });
+        }
     </script>
 }

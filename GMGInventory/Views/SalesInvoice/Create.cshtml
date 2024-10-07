@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Sales Invoice";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -13,12 +14,15 @@
         <div class="card-header">
             <span class="card-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
-                    <span class="fas fa-save"></span> Save as Draft
-                </button>
-                <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
-                    <span class="fas fa-paper-plane"></span> Post
-                </button>
+                @if (userAccess.CanAdd)
+                {
+                    <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
+                        <span class="fas fa-paper-plane"></span> Post
+                    </button>
+                }
                 <a class="btn btn-light btn-sm float-right" asp-action="Index" asp-controller="Pack">
                     <span class="fas fa-arrow-left"></span> Back to List
                 </a>
@@ -141,45 +145,50 @@
     </form>
 </div>
 
-<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Invoice Item</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form id="form-item">
-                <div class="modal-body">
-                    <table class="table table-head-fixed table-striped table-hover table-pack">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Selling Price</th>
-                                <th>Packed Quantity</th>
-                                <th>Gross Price</th>
-                                <th>Discount 1</th>
-                                <th>Discount 2</th>
-                                <th>Extended Price</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Close
+@if (userAccess.CanAdd)
+{
+    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Invoice Item</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-            </form>
+                <form id="form-item">
+                    <div class="modal-body">
+                        <table class="table table-head-fixed table-striped table-hover table-pack">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Selling Price</th>
+                                    <th>Packed Quantity</th>
+                                    <th>Gross Price</th>
+                                    <th>Discount 1</th>
+                                    <th>Discount 2</th>
+                                    <th>Extended Price</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Close
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+}
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         $("#invoice-date").val(DateForInput(new Date()));
 
         $("#invoice-pack-number").select2({
@@ -259,7 +268,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        if (user_access.canAdd) {
+                            actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        }
                         return actions;
                     }
                 },
@@ -282,31 +293,32 @@
 
         packDT.on("draw", function () {
             $(".table-item thead th").removeClass("text-end");
+            if (user_access.canAdd) {
+                $(".btn-add-item").off("click").on("click", function () {
+                    var rowdata = packDT.row($(this).parents('tr')).data();
+                    if (itemDT.rows().data().length == 0 && packDT.rows().data().length > 1) {
+                        //toastr.info("You added an item with " + rowdata.sellingPriceType + " Selling Price, " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info");
+                        toastr.info("You added an item with " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info");
+                    }
 
-            $(".btn-add-item").off("click").on("click", function () {
-                var rowdata = packDT.row($(this).parents('tr')).data();
-                if (itemDT.rows().data().length == 0 && packDT.rows().data().length > 1) {
-                    //toastr.info("You added an item with " + rowdata.sellingPriceType + " Selling Price, " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info");
-                    toastr.info("You added an item with " + rowdata.discount1 + "% Discount 1, and " + rowdata.discount2 + "% Discount 2. You can add more with the same information only. To change required information, you need to clear the list.", "Info");
-                }
-
-                if (itemDT.rows().data().length != 0) {
-                    var firstItem = itemDT.row(0).data();
+                    if (itemDT.rows().data().length != 0) {
+                        var firstItem = itemDT.row(0).data();
                     /*if (firstItem.sellingPriceType != rowdata.sellingPriceType || firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
                                 toastr.error("You can only add an item with the same data of the first added item. " + firstItem.sellingPriceType + " Selling Price, " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
                     }*/ if (firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
-                        toastr.error("You can only add an item with the same data of the first added item. " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
+                            toastr.error("You can only add an item with the same data of the first added item. " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
+                        } else {
+                            itemDT.row.add(rowdata).draw();
+                            packDT.row($(this).parents('tr')).remove().draw();
+                            toastr.success("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success");
+                        }
                     } else {
                         itemDT.row.add(rowdata).draw();
                         packDT.row($(this).parents('tr')).remove().draw();
                         toastr.success("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success");
                     }
-                } else {
-                    itemDT.row.add(rowdata).draw();
-                    packDT.row($(this).parents('tr')).remove().draw();
-                    toastr.success("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success");
-                }
-            });
+                });
+            }
         });
 
         var itemDT = $('.table-item').DataTable({
@@ -319,7 +331,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        if (user_access.canAdd || user_access.canEdit) {
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        }
                         return actions;
                     }
                 },
@@ -357,15 +371,16 @@
             $(".table-item th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
 
-            $(".btn-remove-item").on("click", function () {
-                var rowdata = itemDT.row($(this).parents('tr')).data();
-                packDT.row.add(rowdata).draw();
-                itemDT.row($(this).parents('tr')).remove().draw();
-                toastr.warning("Removed " + rowdata.itemCode + " on Invoice Item", "Warning");
-                ComputeTotalQuantity();
-                ComputeTotalExtendedPrice();
-            });
-
+            if (user_access.canAdd || user_access.canEdit) {
+                $(".btn-remove-item").on("click", function () {
+                    var rowdata = itemDT.row($(this).parents('tr')).data();
+                    packDT.row.add(rowdata).draw();
+                    itemDT.row($(this).parents('tr')).remove().draw();
+                    toastr.warning("Removed " + rowdata.itemCode + " on Invoice Item", "Warning");
+                    ComputeTotalQuantity();
+                    ComputeTotalExtendedPrice();
+                });
+            }
             $(".quantity").on("input", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());

@@ -3,20 +3,17 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class SalesOrderController : Controller
+     public class SalesOrderController(IAccessRepository accessRepository
+                            , ISalesOrderRepository salesOrderRepository) : BaseController(accessRepository)
     {
-        private readonly ISalesOrderRepository salesOrderRepository;
-
-        public SalesOrderController(ISalesOrderRepository salesOrderRepository)
-        {
-            this.salesOrderRepository = salesOrderRepository;
-        }
 
         public async Task<IActionResult> GetOptions(string search, int page)
         {
@@ -33,20 +30,34 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderRepository.GetPriceTypeOptions(IncludeId));
         }
 
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+        
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
+
             return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListDTJson(SalesOrderFilterVM filter)
+        public async Task<IActionResult> GetListDTJson(SalesOrderFilterVM filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await salesOrderRepository.GetListDTAsync(form, filter));
         }
 
-        public async Task<ActionResult> Details(int? Id)
+        public async Task<IActionResult> Details(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
+
             var order = await salesOrderRepository.GetDetailsAsync(Id);
             if (order == null)
             {
@@ -64,13 +75,20 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> DetailsJson(int? Id)
+        public async Task<IActionResult> DetailsJson(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await salesOrderRepository.GetDetailsAsync(Id));
         }
 
-        public async Task<ActionResult> Print(int? Id)
+        public async Task<IActionResult> Print(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
+
             var order = await salesOrderRepository.PrintDetailsAsync(Id);
             if (order == null)
             {
@@ -81,20 +99,30 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsJson(int salesOrderId)
+        public async Task<IActionResult> GetItemsJson(int salesOrderId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await salesOrderRepository.GetItemsAsync(salesOrderId));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsForPackJson(int salesOrderId)
+        public async Task<IActionResult> GetItemsForPackJson(int salesOrderId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+
             return Json(await salesOrderRepository.GetItemsAsync(salesOrderId, true));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsDTJson(int salesOrderId)
+        public async Task<IActionResult> GetItemsDTJson(int salesOrderId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await salesOrderRepository.GetItemsDTAsync(form, salesOrderId));
         }
@@ -103,8 +131,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Create(int? Id)
+        public async Task<IActionResult> Create(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
+
             var order = await salesOrderRepository.GetDetailsAsync(Id);
             if (Id != null && (order == null || order.DisapprovedBy == null || order.DisapprovedDateD == null))
             {
@@ -120,8 +153,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> SaveJson(SalesOrderFormVM form)
+        public async Task<IActionResult> SaveJson(SalesOrderFormVM form)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             var orderId = await salesOrderRepository.SaveAsync(form);
             responseModel.Status = "Success";
@@ -136,8 +172,12 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> SaveItemsJson(SalesOrderFormVM form)
+        public async Task<IActionResult> SaveItemsJson(SalesOrderFormVM form)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             if (form.Id != null)
             {
@@ -156,8 +196,12 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.SystemAdmin + ","
                          + Roles.SalesDirector)]
         [HttpPost]
-        public async Task<JsonResult> ApproveJson(int Id)
+        public async Task<IActionResult> ApproveJson(int Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.ApproveDisapprove);
+            if (redirectResult != null) return redirectResult;
+
+
             ResponseModel responseModel = new ResponseModel();
             if (await salesOrderRepository.ApproveAsync(Id))
             {
@@ -176,8 +220,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Approve(int Id)
+        public async Task<IActionResult> Approve(int Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.ApproveDisapprove);
+            if (redirectResult != null) return redirectResult;
+
             if (ModelState.IsValid)
             {
                 if (await salesOrderRepository.ApproveAsync(Id))
@@ -196,8 +243,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Disapprove(int Id, string? Reason)
+        public async Task<IActionResult> Disapprove(int Id, string? Reason)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.ApproveDisapprove);
+            if (redirectResult != null) return redirectResult;
+
             if (ModelState.IsValid)
             {
                 if (await salesOrderRepository.DisapproveAsync(Id, Reason + ""))
@@ -213,8 +263,11 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> UpdateServedSOItem(int salesOrderLineItemId, int quantity)
+        public async Task<IActionResult> UpdateServedSOItem(int salesOrderLineItemId, int quantity)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await salesOrderRepository.UpdateServedSOItem(salesOrderLineItemId, quantity))
             {

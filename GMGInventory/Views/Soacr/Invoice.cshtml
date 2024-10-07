@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Invoices";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -15,9 +16,12 @@
             <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
-            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
-                <span class="fas fa-print"></span> Print
-            </button>
+            @if (userAccess.CanPrint)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
             <button type="button" class="btn btn-primary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-file-alt"></span> Filter
             </button>

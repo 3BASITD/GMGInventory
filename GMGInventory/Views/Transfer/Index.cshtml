@@ -2,15 +2,19 @@
 
 @{
     ViewData["Title"] = "Warehouse Transfer";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <a asp-action="Create" class="btn btn-primary btn-sm float-right">
-                <span class="fas fa-plus"></span> New Warehouse Transfer
-            </a>
+            @if (userAccess.CanAdd)
+            {
+                <a asp-action="Create" class="btn btn-primary btn-sm float-right">
+                    <span class="fas fa-plus"></span> New Warehouse Transfer
+                </a>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -96,6 +100,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         var dataTable = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({

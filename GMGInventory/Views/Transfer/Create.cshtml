@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "New Warehouse Transfer";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -10,14 +11,17 @@
         <div class="card card-default">
             <div class="card-header">
                 <span class="card-title">@ViewData["Title"]</span>
-                <div class="card-tools">
+            <div class="card-tools">
+                @if (userAccess.CanEdit)
+                {
                     <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
                         <span class="fas fa-dolly-flatbed"></span> Transfer Item
                     </button>
-                    <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                        <span class="fas fa-arrow-left"></span> Back to List
-                    </a>
-                </div>
+                }
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -57,14 +61,17 @@
                         <div class="card">
                             <div class="card-header bg-light">
                                 <span class="card-title">Transfer Item(s)</span>
-                                <div class="card-tools">
+                            <div class="card-tools">
+                                @if (userAccess.CanAdd)
+                                {
                                     <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
                                         <span class="fas fa-plus"></span> Add Replenish Item
                                     </button>
-                                </div>
+                                }
                             </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-item-destination">
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item-destination">
                                     <thead>
                                         <tr>
                                             <th></th>
@@ -83,7 +90,9 @@
             </div>
         </div>
     </form>
-
+     
+@if (userAccess.CanAdd)
+{
     <!-- Save Transfer Modal -->
     <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog" role="document">
@@ -133,9 +142,11 @@
             </div>
         </div>
     </div>
-
+}
     @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         // Load warehouse data for select2
         var warehouseOption;
         $.ajax({
@@ -283,10 +294,11 @@
             $("#source-unit").val("");
         }
 
-        $(".createBtn").on("click", function () {
-            AddItemFormReset();
-        });
-
+        if (user_access.canAdd) {
+            $(".createBtn").on("click", function () {
+                AddItemFormReset();
+            });
+        }
         // Validation for Create Modal
         var validateCreate = $("#form-transfer").validate({
             errorClass: 'text-danger text-xs',

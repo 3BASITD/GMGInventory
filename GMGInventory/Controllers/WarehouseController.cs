@@ -1,24 +1,19 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
     [Authorize]
-    public class WarehouseController : Controller
+    public class WarehouseController(IAccessRepository accessRepository
+                             , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
     {
-        private readonly IWarehouseRepository warehouseRepository;
-        private readonly IItemRepository itemRepository;
-
-        public WarehouseController(IWarehouseRepository warehouseRepository,
-            IItemRepository itemRepository)
-        {
-            this.warehouseRepository = warehouseRepository;
-            this.itemRepository = itemRepository;
-        }
-
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
             return Json(await warehouseRepository.GetOptions(IncludeId));
@@ -28,8 +23,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Warehouse)).Convert();
+
             var warehouses = await warehouseRepository.GetAllAsync();
             return View(warehouses);
         }
@@ -38,8 +38,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Warehouse)).Convert();
+
             var warehouse = await warehouseRepository.GetAsync(id);
             if (warehouse == null)
             {
@@ -64,8 +69,11 @@ namespace GMGInventory.Controllers
                          + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(WarehouseFormVM warehouseVM)
+        public async Task<IActionResult> Create(WarehouseFormVM warehouseVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             if (ModelState.IsValid)
             {
                 if (await warehouseRepository.IsCodeExists(warehouseVM.Code))
@@ -86,8 +94,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             var warehouse = await warehouseRepository.GetToEditAsync(id);
             if (warehouse == null)
             {
@@ -103,8 +114,11 @@ namespace GMGInventory.Controllers
                          + Roles.Telemarketer)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(WarehouseFormVM warehouseVM)
+        public async Task<IActionResult> Edit(WarehouseFormVM warehouseVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             if (ModelState.IsValid)
             {
                 await warehouseRepository.UpdateAsync(warehouseVM);
@@ -122,6 +136,9 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             if (await warehouseRepository.IsIdExists(id) != true)
             {
                 return NotFound();
@@ -147,6 +164,10 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             if (await warehouseRepository.IsIdExists(id) != true)
             {
                 return NotFound();

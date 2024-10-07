@@ -4,8 +4,10 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
@@ -15,35 +17,38 @@ namespace GMGInventory.Controllers
                      + Roles.SalesDirector + ","
                      + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
-    public class PriceUpdateController : Controller
+    public class PriceUpdateController(IAccessRepository accessRepository
+                             , IItemPriceRepository itemPriceRepository
+                             , IItemRepository itemRepository) : BaseController(accessRepository)
     {
-        private readonly IItemPriceRepository itemPriceRepository;
-        private readonly IItemRepository itemRepository;
-        private readonly ControllerHelper chelper;
+        private readonly ControllerHelper chelper = new();
 
-        public PriceUpdateController(IItemPriceRepository itemPriceRepository
-                                    , IItemRepository itemRepository)
+        public async Task<IActionResult> Index()
         {
-            this.itemPriceRepository = itemPriceRepository;
-            this.itemRepository = itemRepository;
-            chelper = new();
-        }
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PriceUpdate, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
 
-        public ActionResult Index()
-        {
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PriceUpdate)).Convert();
+
             return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson(ItemFilterVM filter)
+        public async Task<IActionResult> GetListJson(ItemFilterVM filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PriceUpdate, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemPriceRepository.GetAllItemPriceUpdateDataTablesAsync(form, filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> UpdateJson(int? Id, decimal RetailPrice, decimal NetPrice)
+        public async Task<IActionResult> UpdateJson(int? Id, decimal RetailPrice, decimal NetPrice)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PriceUpdate, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             var update = await itemPriceRepository.UpdateAsync(Id, RetailPrice, NetPrice);
             if (update == null)
@@ -60,8 +65,12 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> UploadJson(string Code, string RetailPrice, string NetPrice)
+        public async Task<IActionResult> UploadJson(string Code, string RetailPrice, string NetPrice)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PriceUpdate, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+
             ResponseModel responseModel = new ResponseModel();
 
             if ((await itemRepository.IsCodeExistAsync(Code)) == false)
@@ -99,6 +108,10 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadFile(ItemFilterVM filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PriceUpdate, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+
             DataTable dt = new DataTable("Price Update");
             dt.Columns.AddRange(new DataColumn[4] {
                 new DataColumn(chelper.DisplayName<ItemPriceVM>("Code")),

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Items";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
@@ -13,15 +14,21 @@
             {
                 if (this.User.IsInRole(Roles.InventoryManager) || this.User.IsInRole(Roles.SalesDirector) || this.User.IsInRole(Roles.SystemAdmin) || this.User.IsInRole(Roles.Telemarketer))
                 {
-                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                        <span class="fas fa-plus"></span> New Item
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                        <span class="fas fa-upload"></span> Upload
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
-                        <span class="fas fa-download"></span> Download
-                    </button>
+                    @if (userAccess.CanAdd)
+                    {
+                        <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                            <span class="fas fa-plus"></span> New Item
+                        </button>
+                    }
+                    @if (userAccess.CanUploadDownload)
+                    {
+                        <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                            <span class="fas fa-upload"></span> Upload
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                            <span class="fas fa-download"></span> Download
+                        </button>
+                    }
                 }
             }
         </div>
@@ -61,289 +68,302 @@
     </div>
 </div>
 
-<form id="deleteItemForm" asp-action="Delete">
-    <input type="hidden" id="deleteItemId" name="Id" />
-</form>
-
-<form id="reactivateItemForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateItemId" name="Id" />
-</form>
-
-<!-- Create Modal -->
-<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">New Item</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+@if (userAccess.CanDelete)
+{
+    <form id="deleteItemForm" asp-action="Delete">
+        <input type="hidden" id="deleteItemId" name="Id" />
+    </form>
+}
+@if (userAccess.CanAdd || userAccess.CanEdit)
+{
+    <form id="reactivateItemForm" asp-action="Reactivate">
+        <input type="hidden" id="reactivateItemId" name="Id" />
+    </form>
+}
+@if (userAccess.CanAdd)
+{
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Item</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="createForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-code" class="control-label mb-0 d-block">Code</label>
+                                    <input type="text" name="Code" id="create-code" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-name" class="control-label mb-0 d-block">Name</label>
+                                    <input type="text" name="Name" id="create-name" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-part-number" class="control-label mb-0 d-block">Part Number</label>
+                                    <input type="text" name="PartNumber" id="create-part-number" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-part-number" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-interchange-number" class="control-label mb-0 d-block">Interchange Number</label>
+                                    <input type="text" name="InterchangeNumber" id="create-interchange-number" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-interchange-number" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-model-number" class="control-label mb-0 d-block">Model Number</label>
+                                    <input type="text" name="ModelNumber" id="create-model-number" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-model-number" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-size" class="control-label mb-0 d-block">Size</label>
+                                    <input type="text" name="Size" id="create-size" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-size" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-unit" class="control-label mb-0 d-block">Unit</label>
+                                    <select name="Unit" id="create-unit" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="create-unit" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-category" class="control-label mb-0 d-block">Category</label>
+                                    <select name="Category" id="create-category" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="create-category" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-item-type" class="control-label mb-0 d-block">Item Type</label>
+                                    <select name="ItemType" id="create-item-type" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="create-item-type" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-brand" class="control-label mb-0 d-block">Brand</label>
+                                    <select name="Brand" id="create-brand" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="create-brand" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-retail-price" class="control-label mb-0 d-block">Gross Price</label>
+                                    <input type="number" step="0.01" min="0" max="1999999.99" name="RetailPrice" id="create-retail-price" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-retail-price" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-net-price" class="control-label mb-0 d-block">Net Price</label>
+                                    <input type="number" step="0.01" min="0" max="1999999.99" name="NetPrice" id="create-net-price" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-net-price" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
             </div>
-            <form autocomplete="off" id="createForm">
+        </div>
+    </div>
+}
+@if (userAccess.CanEdit)
+{
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Item</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-code" class="control-label mb-0 d-block">Code</label>
+                                    <input type="text" name="Code" id="edit-code" class="form-control form-control-sm" readonly="readonly" />
+                                    <span data-valmsg-for="edit-code" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-name" class="control-label mb-0 d-block">Name</label>
+                                    <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-part-number" class="control-label mb-0 d-block">Part Number</label>
+                                    <input type="text" name="PartNumber" id="edit-part-number" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-part-number" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-interchange-number" class="control-label mb-0 d-block">Interchange Number</label>
+                                    <input type="text" name="InterchangeNumber" id="edit-interchange-number" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-interchange-number" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-model-number" class="control-label mb-0 d-block">Model Number</label>
+                                    <input type="text" name="ModelNumber" id="edit-model-number" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-model-number" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-size" class="control-label mb-0 d-block">Size</label>
+                                    <input type="text" name="Size" id="edit-size" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-size" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-unit" class="control-label mb-0 d-block">Unit</label>
+                                    <select name="Unit" id="edit-unit" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="edit-unit" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-category" class="control-label mb-0 d-block">Category</label>
+                                    <select name="Category" id="edit-category" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="edit-category" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-item-type" class="control-label mb-0 d-block">Item Type</label>
+                                    <select name="ItemType" id="edit-item-type" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="edit-item-type" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-brand" class="control-label mb-0 d-block">Brand</label>
+                                    <select name="Brand" id="edit-brand" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="edit-brand" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="edit-id" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@if (userAccess.CanUploadDownload)
+{
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload Item</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-code" class="control-label mb-0 d-block">Code</label>
-                                <input type="text" name="Code" id="create-code" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-name" class="control-label mb-0 d-block">Name</label>
-                                <input type="text" name="Name" id="create-name" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label mb-0" for="upload-file">Excel File</label>
+                        <input type="file" id="upload-file" name="file"
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        class="form-control form-control-sm" />
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-part-number" class="control-label mb-0 d-block">Part Number</label>
-                                <input type="text" name="PartNumber" id="create-part-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-part-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-interchange-number" class="control-label mb-0 d-block">Interchange Number</label>
-                                <input type="text" name="InterchangeNumber" id="create-interchange-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-interchange-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-model-number" class="control-label mb-0 d-block">Model Number</label>
-                                <input type="text" name="ModelNumber" id="create-model-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-model-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-size" class="control-label mb-0 d-block">Size</label>
-                                <input type="text" name="Size" id="create-size" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-size" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-unit" class="control-label mb-0 d-block">Unit</label>
-                                <select name="Unit" id="create-unit" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-unit" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-category" class="control-label mb-0 d-block">Category</label>
-                                <select name="Category" id="create-category" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-category" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-item-type" class="control-label mb-0 d-block">Item Type</label>
-                                <select name="ItemType" id="create-item-type" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-item-type" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-brand" class="control-label mb-0 d-block">Brand</label>
-                                <select name="Brand" id="create-brand" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-brand" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-retail-price" class="control-label mb-0 d-block">Gross Price</label>
-                                <input type="number" step="0.01" min="0" max="1999999.99" name="RetailPrice" id="create-retail-price" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-retail-price" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="create-net-price" class="control-label mb-0 d-block">Net Price</label>
-                                <input type="number" step="0.01" min="0" max="1999999.99" name="NetPrice" id="create-net-price" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-net-price" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
+                    <table class="table table-striped" id="upload-table">
+                        <thead>
+                            <tr><th>Row #</th><th>Code</th><th>Name</th><th>Status</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-plus"></span> Add
+                    <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                        <span class="fas fa-upload"></span> Upload
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <span class="fas fa-times"></span> Cancel
                     </button>
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Item</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form autocomplete="off" id="editForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-code" class="control-label mb-0 d-block">Code</label>
-                                <input type="text" name="Code" id="edit-code" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="edit-code" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-name" class="control-label mb-0 d-block">Name</label>
-                                <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-part-number" class="control-label mb-0 d-block">Part Number</label>
-                                <input type="text" name="PartNumber" id="edit-part-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-part-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-interchange-number" class="control-label mb-0 d-block">Interchange Number</label>
-                                <input type="text" name="InterchangeNumber" id="edit-interchange-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-interchange-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-model-number" class="control-label mb-0 d-block">Model Number</label>
-                                <input type="text" name="ModelNumber" id="edit-model-number" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-model-number" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-size" class="control-label mb-0 d-block">Size</label>
-                                <input type="text" name="Size" id="edit-size" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-size" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-unit" class="control-label mb-0 d-block">Unit</label>
-                                <select name="Unit" id="edit-unit" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-unit" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-category" class="control-label mb-0 d-block">Category</label>
-                                <select name="Category" id="edit-category" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-category" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-item-type" class="control-label mb-0 d-block">Item Type</label>
-                                <select name="ItemType" id="edit-item-type" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-item-type" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit-brand" class="control-label mb-0 d-block">Brand</label>
-                                <select name="Brand" id="edit-brand" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-brand" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <input type="hidden" id="edit-id" />
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-edit"></span> Update
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Upload Modal -->
-<div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Upload Item</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label mb-0" for="upload-file">Excel File</label>
-                    <input type="file" id="upload-file" name="file"
-                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                           class="form-control form-control-sm" />
-                </div>
-                <table class="table table-striped" id="upload-table">
-                    <thead>
-                        <tr><th>Row #</th><th>Code</th><th>Name</th><th>Status</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="DoUpload()">
-                    <span class="fas fa-upload"></span> Upload
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <span class="fas fa-times"></span> Cancel
-                </button>
             </div>
         </div>
     </div>
-</div>
-
+}
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         var loadselect2loaded = false;
         function LoadSelect2() {
             if (loadselect2loaded) return;
@@ -464,10 +484,16 @@
                             actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                             if (userIsInRole("Inventory Manager") || userIsInRole("System Admin") || userIsInRole("Sales Director") || userIsInRole("Telemarketer")) {
                                 if (data.isActive) {
-                                    actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                                    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                    if (user_access.canEdit) {
+                                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                    }
+                                    if (user_access.canDelete) {
+                                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                    }
                                 } else {
-                                    actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                    if (user_access.canAdd || user_access.canEdit) {
+                                        actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                    }
                                 }
                             }
                         }
@@ -482,337 +508,342 @@
             hideLoader();
 
             LoadSelect2();
+            if (user_access.canDelete) {
+                $('.deleteBtn').click(function (e) {
+                    swal({
+                        title: "Delete / Deactivate Item",
+                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#deleteItemId').val(id);
+                            $('#deleteItemForm').submit();
+                        }
+                    });
+                });
+            }
+            if (user_access.canAdd || user_access.canEdit) {
+                $('.reactivateBtn').click(function (e) {
+                    swal({
+                        title: "Reactivate Item",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#reactivateItemId').val(id);
+                            $('#reactivateItemForm').submit();
+                        }
+                    });
+                });
+            }
+            if (user_access.canEdit) {
+                // Actions upon Display Edit Modal
+                $(".editBtn").click(function (e) {
+                    var data = itemDT.row($(this).parents('tr')).data();
 
-            $('.deleteBtn').click(function (e) {
-                swal({
-                    title: "Delete / Deactivate Item",
-                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#deleteItemId').val(id);
-                        $('#deleteItemForm').submit();
+                    $("#edit-id").val(data.id);
+                    $("#edit-code").val(data.code);
+                    $("#edit-name").val(data.name);
+                    $("#edit-part-number").val(data.partNumber);
+                    $("#edit-interchange-number").val(data.interchangeNumber);
+                    $("#edit-model-number").val(data.modelNumber);
+                    $("#edit-size").val(data.size);
+                    $("#edit-unit").val(data.unitId).trigger("change");
+                    $("#edit-category").val(data.categoryId).trigger("change");
+                    $("#edit-item-type").val(data.itemTypeId).trigger("change");
+                    $("#edit-brand").val(data.brandId).trigger("change");
+                });
+
+                // Validation for Edit Modal
+                var validateEdit = $("#editForm").validate({
+                    errorClass: 'text-danger text-xs',
+                    rules: {
+                        Code: { required: true, maxlength: 50 },
+                        Name: { required: true, maxlength: 100 },
+                        PartNumber: { maxlength: 50 },
+                        InterchangeNumber: { maxlength: 50 },
+                        ModelNumber: { maxlength: 50 },
+                        Size: { required: true, maxlength: 50 }
+                    },
+                    messages: {
+                        Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
+                        Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
+                        PartNumber: { maxlength: "Part number must not exceed 50 characters." },
+                        InterchangeNumber: { maxlength: "Interchange number must not exceed 50 characters." },
+                        ModelNumber: { maxlength: "Model number must not exceed 50 characters." },
+                        Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoEdit();
+                    },
+                    showErrors: validateShowErrors
+                });
+
+                // Send Edit to Controller
+                function DoEdit() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("EditJson")",
+                        data: {
+                            Id: $("#edit-id").val(),
+                            Code: $("#edit-code").val(),
+                            Name: $("#edit-name").val(),
+                            PartNumber: $("#edit-part-number").val(),
+                            InterchangeNumber: $("#edit-interchange-number").val(),
+                            ModelNumber: $("#edit-model-number").val(),
+                            Size: $("#edit-size").val(),
+                            UnitId: $("#edit-unit").val(),
+                            CategoryId: $("#edit-category").val(),
+                            ItemTypeId: $("#edit-item-type").val(),
+                            BrandId: $("#edit-brand").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#editModal").modal("hide");
+                                itemDT.ajax.reload();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        if (user_access.canAdd) {
+            // Actions upon Display Create Modal
+            $(".createBtn").click(function (e) {
+                $("#create-code").val("");
+                $("#create-name").val("");
+                $("#create-part-number").val("");
+                $("#create-interchange-number").val("");
+                $("#create-model-number").val("");
+                $("#create-size").val("");
+                $("#create-unit").prop("selectedIndex", 0).trigger("change");
+                $("#create-category").prop("selectedIndex", 0).trigger("change");
+                $("#create-item-type").prop("selectedIndex", 0).trigger("change");
+                $("#create-brand").prop("selectedIndex", 0).trigger("change");
+                $("#create-retail-price").val("");
+                $("#create-net-price").val("");
+            });
+
+            // Validation for Create Modal
+            var validateCreate = $("#createForm").validate({
+                errorClass: 'text-danger text-xs',
+                rules: {
+                    Code: { required: true, maxlength: 50 },
+                    Name: { required: true, maxlength: 100 },
+                    PartNumber: { maxlength: 50 },
+                    InterchangeNumber: { maxlength: 50 },
+                    ModelNumber: { maxlength: 50 },
+                    Size: { required: true, maxlength: 50 },
+                    RetailPrice: { required: true, range: [0, 1999999.99] },
+                    NetPrice: { required: true, range: [0, 1999999.99] }
+                },
+                messages: {
+                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
+                    Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
+                    PartNumber: { maxlength: "Part number must not exceed 50 characters." },
+                    InterchangeNumber: { maxlength: "Interchange number must not exceed 50 characters." },
+                    ModelNumber: { maxlength: "Model number must not exceed 50 characters." },
+                    Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." },
+                    RetailPrice: { required: "Please enter new Retail Price.", range: "Price must be between 0-1999999.99." },
+                    NetPrice: { required: "Please enter new Net Price.", range: "Price must be between 0-1999999.99." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoCreate();
+                },
+                showErrors: validateShowErrors
+            });
+
+            // Send Create to Controller
+            function DoCreate() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("CreateJson")",
+                    data: {
+                        Code: $("#create-code").val(),
+                        Name: $("#create-name").val(),
+                        PartNumber: $("#create-part-number").val(),
+                        InterchangeNumber: $("#create-interchange-number").val(),
+                        ModelNumber: $("#create-model-number").val(),
+                        NetPriceD: $("#create-net-price").val(),
+                        RetailPriceD: $("#create-retail-price").val(),
+                        Size: $("#create-size").val(),
+                        UnitId: $("#create-unit").val(),
+                        CategoryId: $("#create-category").val(),
+                        ItemTypeId: $("#create-item-type").val(),
+                        BrandId: $("#create-brand").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.success(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#createModal").modal("hide");
+                            itemDT.ajax.reload();
+                        }
                     }
                 });
-            });
-
-            $('.reactivateBtn').click(function (e) {
-                swal({
-                    title: "Reactivate Item",
-                    text: "Are you sure you want to reactivate this record?",
-                    icon: "info",
-                    buttons: true,
-                    infoMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#reactivateItemId').val(id);
-                        $('#reactivateItemForm').submit();
-                    }
-                });
-            });
-
-            // Actions upon Display Edit Modal
-            $(".editBtn").click(function (e) {
-                var data = itemDT.row($(this).parents('tr')).data();
-
-                $("#edit-id").val(data.id);
-                $("#edit-code").val(data.code);
-                $("#edit-name").val(data.name);
-                $("#edit-part-number").val(data.partNumber);
-                $("#edit-interchange-number").val(data.interchangeNumber);
-                $("#edit-model-number").val(data.modelNumber);
-                $("#edit-size").val(data.size);
-                $("#edit-unit").val(data.unitId).trigger("change");
-                $("#edit-category").val(data.categoryId).trigger("change");
-                $("#edit-item-type").val(data.itemTypeId).trigger("change");
-                $("#edit-brand").val(data.brandId).trigger("change");
-            });
-        });
-
-        // Validation for Edit Modal
-        var validateEdit = $("#editForm").validate({
-            errorClass: 'text-danger text-xs',
-            rules: {
-                Code: { required: true, maxlength: 50 },
-                Name: { required: true, maxlength: 100 },
-                PartNumber: { maxlength: 50 },
-                InterchangeNumber: { maxlength: 50 },
-                ModelNumber: { maxlength: 50 },
-                Size: { required: true, maxlength: 50 }
-            },
-            messages: {
-                Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
-                Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
-                PartNumber: { maxlength: "Part number must not exceed 50 characters." },
-                InterchangeNumber: { maxlength: "Interchange number must not exceed 50 characters." },
-                ModelNumber: { maxlength: "Model number must not exceed 50 characters." },
-                Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." }
-            },
-            submitHandler: function (form, event) {
-                event.preventDefault();
-                DoEdit();
-            },
-            showErrors: validateShowErrors
-        });
-
-        // Send Edit to Controller
-        function DoEdit() {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("EditJson")",
-                data: {
-                    Id: $("#edit-id").val(),
-                    Code: $("#edit-code").val(),
-                    Name: $("#edit-name").val(),
-                    PartNumber: $("#edit-part-number").val(),
-                    InterchangeNumber: $("#edit-interchange-number").val(),
-                    ModelNumber: $("#edit-model-number").val(),
-                    Size: $("#edit-size").val(),
-                    UnitId: $("#edit-unit").val(),
-                    CategoryId: $("#edit-category").val(),
-                    ItemTypeId: $("#edit-item-type").val(),
-                    BrandId: $("#edit-brand").val()
-                },
-                success: function (data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
-                    } else {
-                        toastr.success(data.message, "Success");
-                        $("#editModal").modal("hide");
-                        itemDT.ajax.reload();
-                    }
-                }
-            });
+            }
         }
-
-        // Actions upon Display Create Modal
-        $(".createBtn").click(function (e) {
-            $("#create-code").val("");
-            $("#create-name").val("");
-            $("#create-part-number").val("");
-            $("#create-interchange-number").val("");
-            $("#create-model-number").val("");
-            $("#create-size").val("");
-            $("#create-unit").prop("selectedIndex", 0).trigger("change");
-            $("#create-category").prop("selectedIndex", 0).trigger("change");
-            $("#create-item-type").prop("selectedIndex", 0).trigger("change");
-            $("#create-brand").prop("selectedIndex", 0).trigger("change");
-            $("#create-retail-price").val("");
-            $("#create-net-price").val("");
-        }); 
-
-        // Validation for Create Modal
-        var validateCreate = $("#createForm").validate({
-            errorClass: 'text-danger text-xs',
-            rules: {
-                Code: { required: true, maxlength: 50 },
-                Name: { required: true, maxlength: 100 },
-                PartNumber: { maxlength: 50 },
-                InterchangeNumber: { maxlength: 50 },
-                ModelNumber: { maxlength: 50 },
-                Size: { required: true, maxlength: 50 },
-                RetailPrice: { required: true, range: [0, 1999999.99] },
-                NetPrice: { required: true, range: [0, 1999999.99] }
-            },
-            messages: {
-                Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
-                Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
-                PartNumber: { maxlength: "Part number must not exceed 50 characters." },
-                InterchangeNumber: { maxlength: "Interchange number must not exceed 50 characters." },
-                ModelNumber: { maxlength: "Model number must not exceed 50 characters." },
-                Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." },
-                RetailPrice: { required: "Please enter new Retail Price.", range: "Price must be between 0-1999999.99." },
-                NetPrice: { required: "Please enter new Net Price.", range: "Price must be between 0-1999999.99." }
-            },
-            submitHandler: function (form, event) {
-                event.preventDefault();
-                DoCreate();
-            },
-            showErrors: validateShowErrors
-        });
-
-        // Send Create to Controller
-        function DoCreate() {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("CreateJson")",
-                data: {
-                    Code: $("#create-code").val(),
-                    Name: $("#create-name").val(),
-                    PartNumber: $("#create-part-number").val(),
-                    InterchangeNumber: $("#create-interchange-number").val(),
-                    ModelNumber: $("#create-model-number").val(),
-                    NetPriceD: $("#create-net-price").val(),
-                    RetailPriceD: $("#create-retail-price").val(),
-                    Size: $("#create-size").val(),
-                    UnitId: $("#create-unit").val(),
-                    CategoryId: $("#create-category").val(),
-                    ItemTypeId: $("#create-item-type").val(),
-                    BrandId: $("#create-brand").val()
-                },
-                success: function (data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastr.success(data.message, "Error");
-                    } else {
-                        toastr.success(data.message, "Success");
-                        $("#createModal").modal("hide");
-                        itemDT.ajax.reload();
-                    }
-                }
-            });
-        }
-
         function ApplyFilter() {
             itemDT.ajax.reload();
             $("#filterModal").modal("hide");
         }
 
-        var json_of_excel_headers;
-        var json_of_excel;
-        var colnumber = 10; // number of columns required for upload
-        var done_upload_excel = 0;
-        var duplicate_upload = 0;
+        if (user_access.canUploadDownload) {
+            var json_of_excel_headers;
+            var json_of_excel;
+            var colnumber = 10; // number of columns required for upload
+            var done_upload_excel = 0;
+            var duplicate_upload = 0;
 
-        var opts = {
-            readAsDefault: 'ArrayBuffer',
-            dragClass: 'drag',
-            on: {
-                load: function (e, file) {
-                    var result = new Uint8Array(e.target.result);
+            var opts = {
+                readAsDefault: 'ArrayBuffer',
+                dragClass: 'drag',
+                on: {
+                    load: function (e, file) {
+                        var result = new Uint8Array(e.target.result);
 
-                    var xlsread = XLSX.read(result, { type: 'array' });
-                    json_of_excel = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                        var xlsread = XLSX.read(result, { type: 'array' });
+                        json_of_excel = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                    }
                 }
-            }
-        };
-        $("#upload-file").fileReaderJS(opts);
+            };
+            $("#upload-file").fileReaderJS(opts);
 
-        // Actions upon file selection
-        $("#upload-file").on("change", function () {
-            done_upload_excel = 0;
-            $("#upload-table tbody").html("");
-            $("#upload-table").hide();
-        });
-
-        // Actions upon Display Upload Modal
-        $(".uploadBtn").click(function (e) {
-            done_upload_excel = 0;
-            $("#upload-file").val("");
-            $("#upload-table tbody").html("");
-            $("#upload-table").hide();
-        });
-
-        function DoUpload() {
-            if (!$("#upload-file").val()) {
-                toastr.warning("Please select a file first", "Warning");
-            } if (json_of_excel.length == 0) {
-                toastr.warning("The excel file is empty", "Warning");
-            } else {
-                var columns = Object.keys(json_of_excel[0]);
+            // Actions upon file selection
+            $("#upload-file").on("change", function () {
+                done_upload_excel = 0;
                 $("#upload-table tbody").html("");
-                $("#upload-table").show();
-                duplicate_upload = 0;
-                for (var i = 0; i < json_of_excel.length; i++) {
-                    var rowNum = json_of_excel[i].__rowNum__;
-                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
-                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
-                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
-                        var cellValue = json_of_excel[i][columns[colIndex]];
-                        if (cellValue == null)
-                            cellValue = "";
-                        if (colIndex == 0 || colIndex == 1)
-                            row$.append($('<td/>').html(cellValue));
+                $("#upload-table").hide();
+            });
+
+            // Actions upon Display Upload Modal
+            $(".uploadBtn").click(function (e) {
+                done_upload_excel = 0;
+                $("#upload-file").val("");
+                $("#upload-table tbody").html("");
+                $("#upload-table").hide();
+            });
+
+            function DoUpload() {
+                if (!$("#upload-file").val()) {
+                    toastr.warning("Please select a file first", "Warning");
+                } if (json_of_excel.length == 0) {
+                    toastr.warning("The excel file is empty", "Warning");
+                } else {
+                    var columns = Object.keys(json_of_excel[0]);
+                    $("#upload-table tbody").html("");
+                    $("#upload-table").show();
+                    duplicate_upload = 0;
+                    for (var i = 0; i < json_of_excel.length; i++) {
+                        var rowNum = json_of_excel[i].__rowNum__;
+                        var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                        row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                        for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                            var cellValue = json_of_excel[i][columns[colIndex]];
+                            if (cellValue == null)
+                                cellValue = "";
+                            if (colIndex == 0 || colIndex == 1)
+                                row$.append($('<td/>').html(cellValue));
+                        }
+                        if (columns.includes("Code") == false
+                            || columns.includes("Name") == false
+                            || columns.includes("Part Number") == false
+                            || columns.includes("Interchange Number") == false
+                            || columns.includes("Warehouse") == false
+                            || columns.includes("Model Number") == false
+                            || columns.includes("Category") == false
+                            || columns.includes("Item Type") == false
+                            || columns.includes("Brand") == false
+                            || columns.includes("Size") == false
+                            || columns.includes("Unit") == false
+                            || columns.includes("Quantity on Hand") == false) {
+                            row$.append($('<td/>').html("Unexpected columns"));
+                            UploadRowDone();
+                        } else {
+                            SaveXLSX(json_of_excel[i]["Code"],
+                                json_of_excel[i]["Name"],
+                                json_of_excel[i]["Part Number"],
+                                json_of_excel[i]["Interchange Number"],
+                                json_of_excel[i]["Warehouse"],
+                                json_of_excel[i]["Model Number"],
+                                json_of_excel[i]["Category"],
+                                json_of_excel[i]["Item Type"],
+                                json_of_excel[i]["Brand"],
+                                json_of_excel[i]["Size"],
+                                json_of_excel[i]["Unit"],
+                                json_of_excel[i]["Quantity on Hand"],
+                                rowNum);
+                            row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                        }
+                        $("#upload-table").append(row$);
                     }
-                    if (columns.includes("Code") == false
-                        || columns.includes("Name") == false
-                        || columns.includes("Part Number") == false
-                        || columns.includes("Interchange Number") == false
-                        || columns.includes("Warehouse") == false
-                        || columns.includes("Model Number") == false
-                        || columns.includes("Category") == false
-                        || columns.includes("Item Type") == false
-                        || columns.includes("Brand") == false
-                        || columns.includes("Size") == false
-                        || columns.includes("Unit") == false
-                        || columns.includes("Quantity on Hand") == false) {
-                        row$.append($('<td/>').html("Unexpected columns"));
-                        UploadRowDone();
-                    } else {
-                        SaveXLSX(json_of_excel[i]["Code"],
-                            json_of_excel[i]["Name"],
-                            json_of_excel[i]["Part Number"],
-                            json_of_excel[i]["Interchange Number"],
-                            json_of_excel[i]["Warehouse"],
-                            json_of_excel[i]["Model Number"],
-                            json_of_excel[i]["Category"],
-                            json_of_excel[i]["Item Type"],
-                            json_of_excel[i]["Brand"],
-                            json_of_excel[i]["Size"],
-                            json_of_excel[i]["Unit"],
-                            json_of_excel[i]["Quantity on Hand"],
-                            rowNum);
-                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
-                    }
-                    $("#upload-table").append(row$);
                 }
             }
-        }
 
-        function SaveXLSX(code, name, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, rownum) {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("UploadJson")",
-                data: {
-                    Code: code,
-                    Name: name,
-                    PartNumber: part,
-                    InterchangeNumber: interchange,
-                    Warehouse: warehouse,
-                    ModelNumber: model,
-                    Category: category,
-                    ItemType: itemtype,
-                    Brand: brand,
-                    Unit: unit,
-                    Size: size,
-                    Quantity: quantity
-                },
-                success: function (data, status, xhr) {
-                    if (data.message == "Nothing to change") {
-                        $("#upload-row" + rownum + "tr").remove();
-                        duplicate_upload++;
-                    } else {
-                        $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+            function SaveXLSX(code, name, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, rownum) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadJson")",
+                    data: {
+                        Code: code,
+                        Name: name,
+                        PartNumber: part,
+                        InterchangeNumber: interchange,
+                        Warehouse: warehouse,
+                        ModelNumber: model,
+                        Category: category,
+                        ItemType: itemtype,
+                        Brand: brand,
+                        Unit: unit,
+                        Size: size,
+                        Quantity: quantity
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.message == "Nothing to change") {
+                            $("#upload-row" + rownum + "tr").remove();
+                            duplicate_upload++;
+                        } else {
+                            $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                        }
+                    },
+                    complete: function (xhr, status) {
+                        UploadRowDone();
                     }
-                },
-                complete: function (xhr, status) {
-                    UploadRowDone();
+                });
+            }
+
+            function UploadRowDone() {
+                done_upload_excel++;
+                $.LoadingOverlay("progress", parseInt((done_upload_excel / json_of_excel.length) * 100));
+                if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                    $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                    $("#upload-file").val("");
                 }
+            }
+
+            $(".downloadBtn").click(function (e) {
+                //window.location = "@Url.Action("DownloadFile")";
+                var urlQuery = [];
+                if ($("#CategoryId").val()) { urlQuery.push("CategoryId=" + $("#CategoryId").val()); }
+                if ($("#ItemTypeId").val()) { urlQuery.push("ItemTypeId=" + $("#ItemTypeId").val()); }
+                if ($("#BrandId").val()) { urlQuery.push("BrandId=" + $("#BrandId").val()); }
+                if ($("#WarehouseId").val()) { urlQuery.push("WarehouseId=" + $("#WarehouseId").val()); }
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
             });
         }
-
-        function UploadRowDone() {
-            done_upload_excel++;
-            $.LoadingOverlay("progress", parseInt((done_upload_excel / json_of_excel.length) * 100));
-            if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
-                $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
-                $("#upload-file").val("");
-            }
-        }
-
-        $(".downloadBtn").click(function (e) {
-            //window.location = "@Url.Action("DownloadFile")";
-            var urlQuery = [];
-            if ($("#CategoryId").val()) { urlQuery.push("CategoryId=" + $("#CategoryId").val()); }
-            if ($("#ItemTypeId").val()) { urlQuery.push("ItemTypeId=" + $("#ItemTypeId").val()); }
-            if ($("#BrandId").val()) { urlQuery.push("BrandId=" + $("#BrandId").val()); }
-            if ($("#WarehouseId").val()) { urlQuery.push("WarehouseId=" + $("#WarehouseId").val()); }
-            window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
-        });
     </script>
 }

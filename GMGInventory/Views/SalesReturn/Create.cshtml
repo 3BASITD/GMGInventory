@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "New Sales Return";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -11,10 +12,13 @@
             <div class="card-header">
                 <span class="card-title">@ViewData["Title"]</span>
                 <div class="card-tools">
+                @if (userAccess.CanAdd)
+                {
                     <button type="submit" class="btn btn-primary btn-sm float-right btn-save ml-2">
                         <span class="fas fa-save"></span> Save
                     </button>
-                    <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                }
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
                         <span class="fas fa-arrow-left"></span> Back to List
                     </a>
                 </div>
@@ -236,6 +240,8 @@
 
     @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         $("#return-customer-code").select2({
             minimumInputLength: 1,
             placeholder: '<empty>',
@@ -464,7 +470,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        if (user_access.canAdd) {
+                            actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        }
                         return actions;
                     }
                 },
@@ -502,7 +510,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        if (user_access.canAdd || user_access.canEdit) {
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        }
                         return actions;
                     }
                 },

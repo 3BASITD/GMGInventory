@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Item Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -364,6 +365,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         $("#item-code").select2({
             minimumInputLength: 1,
             placeholder: '@Model?.Code',
@@ -438,7 +441,9 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (userIsInRole("Inventory Manager") || userIsInRole("System Admin") || userIsInRole("Sales Director") || userIsInRole("Telemarketer")) {
-                            actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="top-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                            if (user_access.canEdit) {
+                                actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="top-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                            }
                         }
                         return actions;
                     }
@@ -449,61 +454,63 @@
 
             HideTabLoader("warehouse");
 
-            // Actions upon Display Edit Quantity Modal
-            $(".quantityBtn").click(function (e) {
-                var data = warehouseDT.row($(this).parents('tr')).data();
-                validateEdit.hideThese(validateEdit.errors());
-                $("#quantity-warehouse").val(data.name);
-                $("#quantity-current").val(data.quantity);
-                $("#quantity-new").val(data.quantity);
-                $("#quantity-remarks").val("");
-                $("#quantity-id").val(data.id);
-            });
-        });
+            if (user_access.canEdit) {
+                // Actions upon Display Edit Quantity Modal
+                $(".quantityBtn").click(function (e) {
+                    var data = warehouseDT.row($(this).parents('tr')).data();
+                    validateEdit.hideThese(validateEdit.errors());
+                    $("#quantity-warehouse").val(data.name);
+                    $("#quantity-current").val(data.quantity);
+                    $("#quantity-new").val(data.quantity);
+                    $("#quantity-remarks").val("");
+                    $("#quantity-id").val(data.id);
+                });
 
-        // Validation for Edit Quantity Modal
-        var validateEdit = $("#quantityForm").validate({
-            errorClass: 'text-danger text-xs',
-            rules: {
-                New: {
-                    required: true,
-                    notEqualTo: "#quantity-current"
-                }
-            },
-            messages: {
-                New: {
-                    required: "Please enter new quantity.",
-                    notEqualTo: "Equal quantity. No change will be done."
-                }
-            },
-            submitHandler: function (form) {
-                DoQuantity();
-                return false;
-            },
-            showErrors: validateShowErrors
-        });
+                // Validation for Edit Quantity Modal
+                var validateEdit = $("#quantityForm").validate({
+                    errorClass: 'text-danger text-xs',
+                    rules: {
+                        New: {
+                            required: true,
+                            notEqualTo: "#quantity-current"
+                        }
+                    },
+                    messages: {
+                        New: {
+                            required: "Please enter new quantity.",
+                            notEqualTo: "Equal quantity. No change will be done."
+                        }
+                    },
+                    submitHandler: function (form) {
+                        DoQuantity();
+                        return false;
+                    },
+                    showErrors: validateShowErrors
+                });
 
-        // Send Quantity to Controller
-        function DoQuantity() {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("EditDetailQuantity")",
-                data: {
-                    Id: $("#quantity-id").val(),
-                    Quantity: $("#quantity-new").val(),
-                    Remarks: $("#quantity-remarks").val()
-                },
-                success: function (data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
-                    } else {
-                        toastr.success(data.message, "Success");
-                        $("#quantityModal").modal("hide");
-                        warehouseDT.ajax.reload();
-                    }
+                // Send Quantity to Controller
+                function DoQuantity() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("EditDetailQuantity")",
+                        data: {
+                            Id: $("#quantity-id").val(),
+                            Quantity: $("#quantity-new").val(),
+                            Remarks: $("#quantity-remarks").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#quantityModal").modal("hide");
+                                warehouseDT.ajax.reload();
+                            }
+                        }
+                    });
                 }
-            });
-        }
+            }
+        });
 
         // Purchase Order Details
         var purchaseDT = $('.table-purchase').on('preXhr.dt', function (e, settings, data) {

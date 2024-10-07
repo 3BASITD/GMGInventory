@@ -1,14 +1,18 @@
 ﻿@{
     ViewData["Title"] = "Purchase Return";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary btn-sm float-right btn-post ml-2">
-                <span class="fas fa-save"></span> Post Return
+            @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right btn-post ml-2">
+                    <span class="fas fa-save"></span> Post Return
             </button>
+            }
             <button type="button" class="btn btn-secondary btn-sm float-right btn-history" data-bs-toggle="modal" data-bs-target="#historyModal">
                 <span class="fas fa-history"></span> History
             </button>
@@ -53,7 +57,8 @@
         </table>
     </div>
 </div>
-
+@if (userAccess.CanAdd)
+            {
 <!-- Save Return Modal -->
 <div class="modal fade" id="saveModal" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog" role="document">
@@ -96,8 +101,8 @@
             </div>
         </div>
     </div>
-</div>
-
+    </div>
+}
 <!-- History Return Modal -->
 <div class="modal fade" id="historyModal" role="dialog" aria-labelledby="historyModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg" role="document">
@@ -140,6 +145,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         $("#po-number").select2({
             minimumInputLength: 3,
             placeholder: 'Select PO Number',
@@ -227,7 +234,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        if (user_access.canDelete) {
+                           actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        }
                         return actions;
                     }
                 },
@@ -242,71 +251,71 @@
                 returnDT.row($(this).parents('tr')).remove().draw();
             })
         });
-
-        $(".btn-post").on("click", function () {
-            if ($("#po-number").val() == "") {
-                toastr.warning("Please select PO Number first", "Warning");
-            } else {
-                var item_to_return = [];
-                itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    var row_data = this.data();
-                    var row_input = parseInt($(this.node()).find("input").val());
-                    if (row_input > 0) {
-                        item_to_return.push({
-                            id: row_data.id,
-                            code: row_data.itemCode,
-                            name: row_data.itemName,
-                            quantity: row_input
-                        });
-                    }
-                });
-                if (item_to_return.length) {
-                    returnDT.clear().draw();
-                    $.each(item_to_return, function (i, item) {
-                        returnDT.row.add(item).draw();
-                    });
-                    $("#save-po-number").val($("#po-number").text());
-                    $("#save-remarks").val("");
-                    $("#saveModal").modal("show");
+        if (user_access.canAdd) {
+            $(".btn-post").on("click", function () {
+                if ($("#po-number").val() == "") {
+                    toastr.warning("Please select PO Number first", "Warning");
                 } else {
-                    toastr.warning("No change in quantity. Nothing to return", "Warning");
-                }
-            }
-        });
-
-        $(".btn-save").on("click", function () {
-            if (returnDT.rows().count() > 0) {
-                var item_to_return = [];
-                returnDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    var row_data = this.data();
-                    item_to_return.push({
-                        POItemId: row_data.id,
-                        Quantity: row_data.quantity
-                    });
-                });
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("SaveJson", "PurchaseReturn")",
-                    data: {
-                        PurchaseOrderId: $("#po-number").val(),
-                        Remarks: $("#save-remarks").val(),
-                        Items: item_to_return
-                    },
-                    success: function (data, status, xhr) {
-                        if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
-                        } else {
-                            toastr.success(data.message, "Success");
-                            $("#saveModal").modal("hide");
-                            itemDT.ajax.reload();
+                    var item_to_return = [];
+                    itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                        var row_data = this.data();
+                        var row_input = parseInt($(this.node()).find("input").val());
+                        if (row_input > 0) {
+                            item_to_return.push({
+                                id: row_data.id,
+                                code: row_data.itemCode,
+                                name: row_data.itemName,
+                                quantity: row_input
+                            });
                         }
+                    });
+                    if (item_to_return.length) {
+                        returnDT.clear().draw();
+                        $.each(item_to_return, function (i, item) {
+                            returnDT.row.add(item).draw();
+                        });
+                        $("#save-po-number").val($("#po-number").text());
+                        $("#save-remarks").val("");
+                        $("#saveModal").modal("show");
+                    } else {
+                        toastr.warning("No change in quantity. Nothing to return", "Warning");
                     }
-                });
-            } else {
-                toastr.warning("Seems like the list of items to return have been cleared out", "Warning");
-            }
-        });
+                }
+            });
 
+            $(".btn-save").on("click", function () {
+                if (returnDT.rows().count() > 0) {
+                    var item_to_return = [];
+                    returnDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                        var row_data = this.data();
+                        item_to_return.push({
+                            POItemId: row_data.id,
+                            Quantity: row_data.quantity
+                        });
+                    });
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveJson", "PurchaseReturn")",
+                        data: {
+                            PurchaseOrderId: $("#po-number").val(),
+                            Remarks: $("#save-remarks").val(),
+                            Items: item_to_return
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#saveModal").modal("hide");
+                                itemDT.ajax.reload();
+                            }
+                        }
+                    });
+                } else {
+                    toastr.warning("Seems like the list of items to return have been cleared out", "Warning");
+                }
+            });
+        }
         var historyDT;
         $(".btn-history").on("click", function () {
             if ($("#po-number").val() == "") {
@@ -352,42 +361,44 @@
             }
         });
 
-        $(".btn-history-print").on("click", function () {
-            var history_html = '<h3>Purchase Return History</h3>';
-            history_html += '<table class="table-header">';
-            history_html += '<tr><th>PO Number</th><td>' + $("#po-number").select2("data")[0].text + '</td></tr>';
-            history_html += '<tr><th>Supplier</th><td>' + $(".selected-supplier").html() + '</td></tr>';
-            history_html += '<tr><th>Order By</th><td>' + $(".selected-order-by").html() + '</td></tr>';
-            history_html += '<tr><th>Order Date</th><td>' + $(".selected-order-date").html() + '</td></tr>';
-            history_html += '</table>';
+        if (user_access.canPrint) {
+            $(".btn-history-print").on("click", function () {
+                var history_html = '<h3>Purchase Return History</h3>';
+                history_html += '<table class="table-header">';
+                history_html += '<tr><th>PO Number</th><td>' + $("#po-number").select2("data")[0].text + '</td></tr>';
+                history_html += '<tr><th>Supplier</th><td>' + $(".selected-supplier").html() + '</td></tr>';
+                history_html += '<tr><th>Order By</th><td>' + $(".selected-order-by").html() + '</td></tr>';
+                history_html += '<tr><th>Order Date</th><td>' + $(".selected-order-date").html() + '</td></tr>';
+                history_html += '</table>';
 
-            history_html += '<table class="table-items">';
-            history_html += '<tr>';
-            history_html += '<th>Item Code</th>';
-            history_html += '<th>Item Name</th>';
-            history_html += '<th>Quantity</th>';
-            history_html += '<th>Return By</th>';
-            history_html += '<th>Return Date</th>';
-            history_html += '<th>Remarks</th>';
-            history_html += '</th>';
-            historyDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var row_data = this.data();
+                history_html += '<table class="table-items">';
                 history_html += '<tr>';
-                history_html += '<td>' + row_data.itemCode + '</td>';
-                history_html += '<td>' + row_data.itemName + '</td>';
-                history_html += '<td>' + row_data.quantity + '</td>';
-                history_html += '<td>' + row_data.returnBy + '</td>';
-                history_html += '<td>' + row_data.returnDate + '</td>';
-                history_html += '<td>' + row_data.remarks + '</td>';
-                history_html += '</tr>';
+                history_html += '<th>Item Code</th>';
+                history_html += '<th>Item Name</th>';
+                history_html += '<th>Quantity</th>';
+                history_html += '<th>Return By</th>';
+                history_html += '<th>Return Date</th>';
+                history_html += '<th>Remarks</th>';
+                history_html += '</th>';
+                historyDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var row_data = this.data();
+                    history_html += '<tr>';
+                    history_html += '<td>' + row_data.itemCode + '</td>';
+                    history_html += '<td>' + row_data.itemName + '</td>';
+                    history_html += '<td>' + row_data.quantity + '</td>';
+                    history_html += '<td>' + row_data.returnBy + '</td>';
+                    history_html += '<td>' + row_data.returnDate + '</td>';
+                    history_html += '<td>' + row_data.remarks + '</td>';
+                    history_html += '</tr>';
+                });
+                history_html += '</table>';
+                $("#for-print").html(history_html);
+                $("#for-print").printThis({
+                    importCSS: false,
+                    loadCSS: "/css/print.css",
+                    pageTitle: "BAS/GMG Inventory"
+                });
             });
-            history_html += '</table>';
-            $("#for-print").html(history_html);
-            $("#for-print").printThis({
-                importCSS: false,
-                loadCSS: "/css/print.css",
-                pageTitle: "BAS/GMG Inventory"
-            });
-        });
+        }
     </script>
 }

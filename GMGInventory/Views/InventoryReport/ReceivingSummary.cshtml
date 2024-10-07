@@ -2,18 +2,25 @@
 
 @{
     ViewData["Title"] = "Receiving Summary";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
+        @if (userAccess.CanPrint)
+        {
             <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
                 <span class="fas fa-print"></span> Print
             </button>
+        }
+        @if (userAccess.CanUploadDownload)
+        {
             <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
                 <span class="fas fa-download"></span> Download
             </button>
+        }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -101,6 +108,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -193,33 +202,35 @@
             receiveDT.ajax.reload();
             $("#filterModal").modal("hide");
         });
-
-        $(".downloadBtn").click(function (e) {
-            var urlQuery = [];
-            urlQuery.push("DateFrom=" + $("#filter-from").val());
-            urlQuery.push("DateTo=" + $("#filter-to").val());
-            if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
-            window.location = "@Url.Action("DownloadReceivingSummary")?" + urlQuery.join("&");
-        });
-
-        $(".printBtn").on("click", function () {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fas fa-print"
+        if (user_access.canUploadDownload) {
+            $(".downloadBtn").click(function (e) {
+                var urlQuery = [];
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+                if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+                window.location = "@Url.Action("DownloadReceivingSummary")?" + urlQuery.join("&");
             });
-            var urlQuery = [];
-            urlQuery.push("DateFrom=" + $("#filter-from").val());
-            urlQuery.push("DateTo=" + $("#filter-to").val());
-            if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
-            setTimeout(function () {
-                let win = window.open('@Url.Action("PrintReceivingSummary")?' + urlQuery.join("&"), '');
-                var wintimer = setInterval(function () {
-                    if (win.closed) {
-                        clearInterval(wintimer);
-                        hideLoader();
-                    }
-                }, 100);
-            }, 500);
-        });
+        }
+        if (user_access.canPrint) {
+            $(".printBtn").on("click", function () {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                var urlQuery = [];
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+                if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("PrintReceivingSummary")?' + urlQuery.join("&"), '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            });
+        }
     </script>
     }

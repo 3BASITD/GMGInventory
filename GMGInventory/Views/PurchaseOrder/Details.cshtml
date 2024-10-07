@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Replenishment Details " + (Model.Status == "Draft" ? " (Draft)" : "");
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -14,21 +15,30 @@
         <div class="card-tools">
             @if (Model.Status == "Draft")
             {
-                <button type="button" onclick="SaveReplenish('Replenish')" class="btn btn-primary btn-sm float-right ml-2 btn-details-replenish">
-                    <span class="fas fa-sync"></span> Replenish Item
+                @if (userAccess.CanAdd)
+                {
+                    <button type="button" onclick="SaveReplenish('Replenish')" class="btn btn-primary btn-sm float-right ml-2 btn-details-replenish">
+                        <span class="fas fa-sync"></span> Replenish Item
+                    </button>
+                    <button type="button" onclick="SaveReplenish('Draft')" class="btn btn-secondary btn-sm float-right ml-2 btn-details-draft">
+                        <span class="fab fa-firstdraft"></span> Save as Draft
                 </button>
-                <button type="button" onclick="SaveReplenish('Draft')" class="btn btn-secondary btn-sm float-right ml-2 btn-details-draft">
-                    <span class="fab fa-firstdraft"></span> Save as Draft
-                </button>
+                }
             }
             else
             {
-                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-update">
-                    <span class="fas fa-save"></span> Update
+                @if (userAccess.CanEdit)
+                {
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-update">
+                        <span class="fas fa-save"></span> Update
                 </button>
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-                    <span class="fas fa-print"></span> Print
+                }
+                @if (userAccess.CanPrint)
+                {
+                    <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                        <span class="fas fa-print"></span> Print
                 </button>
+                }
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -167,9 +177,12 @@
                         <div class="card-tools">
                             @if (Model?.Status == "Draft")
                             {
-                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                    <span class="fas fa-plus"></span> Add Replenish Item
-                                </button>
+                                @if (userAccess.CanAdd)
+                                {
+                                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                        <span class="fas fa-plus"></span> Add Replenish Item
+                                    </button>
+                                }
                             }
                         </div>
                     </div>
@@ -206,116 +219,119 @@
 </div>
 <input type="hidden" id="po-status" value="@Model?.Status" />
 
-<!-- Save Replenish Item Modal -->
-<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Replenish Item</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+@if (userAccess.CanAdd)
+{
+    <!-- Save Replenish Item Modal -->
+    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Replenish Item</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form-item">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-code" class="form-label mb-0">Code</label>
+                                    <div>
+                                        <select id="add-code" name="Code" style="width: 100%;">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                    <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-name" class="form-label mb-0">Name</label>
+                                    <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                                    <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-quantity" class="form-label mb-0">Quantity</label>
+                                    <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-unit" class="form-label mb-0">Unit</label>
+                                    <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-unit-price" class="form-label mb-0">Unit Price</label>
+                                    <input type="number" step="0.01" min="0" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="add-unit-price" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-discount1" class="form-label mb-0">Discount 1</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.01" min="0" max="100" id="add-discount1" name="Discount1" class="form-control form-control-sm" />
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                    <span data-valmsg-for="add-discount1" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-discount2" class="form-label mb-0">Discount 2</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.01" min="0" max="100" id="add-discount2" name="Discount2" class="form-control form-control-sm" />
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                    <span data-valmsg-for="add-discount2" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-discount3" class="form-label mb-0">Discount 3</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.01" min="0" max="100" id="add-discount3" name="Discount3" class="form-control form-control-sm" />
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                    <span data-valmsg-for="add-discount3" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-net-price" class="form-label mb-0">Net Price</label>
+                                    <input type="number" id="add-net-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
+                                    <span data-valmsg-for="add-net-price" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-add">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
             </div>
-            <form id="form-item">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-code" class="form-label mb-0">Code</label>
-                                <div>
-                                    <select id="add-code" name="Code" style="width: 100%;">
-                                        <option></option>
-                                    </select>
-                                </div>
-                                <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-name" class="form-label mb-0">Name</label>
-                                <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-quantity" class="form-label mb-0">Quantity</label>
-                                <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
-                                <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-unit" class="form-label mb-0">Unit</label>
-                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-unit-price" class="form-label mb-0">Unit Price</label>
-                                <input type="number" step="0.01" min="0" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
-                                <span data-valmsg-for="add-unit-price" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-discount1" class="form-label mb-0">Discount 1</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" step="0.01" min="0" max="100" id="add-discount1" name="Discount1" class="form-control form-control-sm" />
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <span data-valmsg-for="add-discount1" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-discount2" class="form-label mb-0">Discount 2</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" step="0.01" min="0" max="100" id="add-discount2" name="Discount2" class="form-control form-control-sm" />
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <span data-valmsg-for="add-discount2" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-discount3" class="form-label mb-0">Discount 3</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" step="0.01" min="0" max="100" id="add-discount3" name="Discount3" class="form-control form-control-sm" />
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <span data-valmsg-for="add-discount3" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="add-net-price" class="form-label mb-0">Net Price</label>
-                                <input type="number" id="add-net-price" name="NetPrice" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="add-net-price" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-add">
-                        <span class="fas fa-plus"></span> Add
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
+}
 
 @section Scripts {
     <script>

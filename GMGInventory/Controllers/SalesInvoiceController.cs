@@ -3,20 +3,16 @@ using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class SalesInvoiceController : Controller
+     public class SalesInvoiceController(IAccessRepository accessRepository
+                           , IInvoiceRepository invoiceRepository) : BaseController(accessRepository)
     {
-        private readonly IInvoiceRepository invoiceRepository;
-
-        public SalesInvoiceController(IInvoiceRepository invoiceRepository)
-        {
-            this.invoiceRepository = invoiceRepository;
-        }
 
         public async Task<IActionResult> GetInvoiceTypeOptions(int? IncludeId)
         {
@@ -33,8 +29,12 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+
             return View();
         }
 
@@ -44,8 +44,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson(ListFilterCommonModel filter)
+        public async Task<IActionResult> GetListJson(ListFilterCommonModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await invoiceRepository.GetListDTAsync(form, filter));
         }
@@ -55,8 +58,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Details(int? Id)
+        public async Task<IActionResult> Details(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesInvoice)).Convert();
+
             var order = await invoiceRepository.GetDetailsAsync(Id);
             if (order == null)
             {
@@ -71,8 +79,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> GetItemsJson(int invoiceId)
+        public async Task<IActionResult> GetItemsJson(int invoiceId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await invoiceRepository.GetItemsAsync(invoiceId));
         }
 
@@ -92,8 +103,13 @@ namespace GMGInventory.Controllers
                          + Roles.InvoicingClerk + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> PrintReceipt(int Id)
+        public async Task<IActionResult> PrintReceipt(int Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesInvoice)).Convert();
+
             var invoice = await invoiceRepository.GetDetailsWithItemsAsync(Id);
             return View(invoice);
         }
@@ -101,8 +117,11 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InvoicingClerk + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Create(int? Id)
+        public async Task<IActionResult> Create(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             var order = await invoiceRepository.GetDetailsByPackAsync(Id);
             if (order == null)
             {
@@ -116,8 +135,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> SaveJson(InvoiceFormVM form)
+        public async Task<IActionResult> SaveJson(InvoiceFormVM form)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             if (await invoiceRepository.IsBIRInvoiceNumberInUser(form.Id, form.BIRInvoiceNumber))
             {
@@ -149,8 +171,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> UpdateJson(InvoiceFormVM form)
+        public async Task<IActionResult> UpdateJson(InvoiceFormVM form)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             if (await invoiceRepository.IsBIRInvoiceNumberInUser(form.Id, form.BIRInvoiceNumber))
             {
