@@ -101,9 +101,37 @@ body {
             font-size: 2em;
         }
 
-    .table.table-head-fixed thead tr:nth-child(1) th {
+/*    .table.table-head-fixed thead tr:nth-child(1) th {
+        top: 56px;
+    }*/
+    .table.table-head-fixed:not(.modal .table.table-head-fixed) thead tr:nth-child(1) th {
         top: 56px;
     }
+    .modal .table.table.table-head-fixed thead tr:nth-child(1) th {
+        top: -2px;
+    }
+
+    .modal .modal-footer,
+    .modal .modal-footer .btn {
+        position: sticky;
+        bottom: -10px;
+        transition: all 0.5s ease-in-out;
+    }
+
+        .modal .modal-footer.sticky-active {
+            border-top: none;
+        }
+            .modal .modal-footer.sticky-active .btn {
+                width: 36px;
+                height: 32px;
+            }
+        .modal .modal-footer:not(.sticky-active) {
+            border-top: 1px solid #e9ecef;
+        }
+            .modal .modal-footer:not(.sticky-active) .btn {
+                width: initial;
+                height: initial;
+            }
 }
 
 

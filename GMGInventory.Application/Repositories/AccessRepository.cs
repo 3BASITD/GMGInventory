@@ -12,6 +12,7 @@ namespace GMGInventory.Application.Repositories
     public class AccessRepository : GenericRepository<Access>, IAccessRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
         private readonly RoleManager<Role> roleManager;
 
@@ -21,9 +22,175 @@ namespace GMGInventory.Application.Repositories
                               , RoleManager<Role> roleManager) : base(context, httpContextAccessor, userManager)
         {
             this.context = context;
+            this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
             this.roleManager = roleManager;
         }
+
+        public async Task<RolesPagesVM> GetRolesPagesAsync(string RoleId)
+        {
+            var role = context.Roles.Where(s => s.Id == RoleId).FirstOrDefault();
+            var accesses = from p in context.Pages
+                           from a in context.Accesses.Where(s => s.PageId == p.Id && s.RoleId == RoleId).DefaultIfEmpty()
+                           select new AccessVM
+                           {
+                               AccessId = a == null ? -1 : a.Id,
+                               PageId = p.Id,
+                               Name = p.Name,
+                               HasView = p.HasView,
+                               CanView = a != null && a.CanView,
+                               HasAdd = p.HasAdd,
+                               CanAdd = a != null && a.CanAdd,
+                               HasEdit = p.HasEdit,
+                               CanEdit = a != null && a.CanEdit,
+                               HasDelete = p.HasDelete,
+                               CanDelete = a != null && a.CanDelete,
+                               HasApproveDisapprove = p.HasApproveDisapprove,
+                               CanApproveDisapprove = a != null && a.CanApproveDisapprove != null && a.CanApproveDisapprove == true,
+                               HasUploadDownload = p.HasUploadDownload,
+                               CanUploadDownload = a != null && a.CanUploadDownload != null && a.CanUploadDownload == true,
+                               HasPrint = p.HasPrint,
+                               CanPrint = a != null && a.CanPrint != null && a.CanPrint == true,
+                               UserCreated = a == null ? "" : a.UserCreated,
+                               UserModified = a == null ? null : a.UserModified,
+                               DateCreatedD = a == null ? DateTime.Now : a.DateCreated,
+                               DateModifiedD = a == null ? null : a.DateModified
+                           };
+            return new RolesPagesVM
+            {
+                RoleName = role?.Name ?? "",
+                RoleId = RoleId,
+                Accesses = await accesses.ToListAsync()
+            };
+        }
+
+        public async Task<IList<string>> GetRolesUsersAsync(string RoleId)
+        {
+            var users = new List<string>();
+            var role = await roleManager.FindByIdAsync(RoleId);
+            if(role!= null)
+            {
+                var userInRole = await userManager.GetUsersInRoleAsync(role.Name);
+                users = userInRole.Select(s => s.FirstName + " " + s.LastName).ToList();
+            }
+            return users;
+        }
+
+        public async Task<ResponseModel> SaveRolesPagesAsync(string RoleId, string RoleName, IList<AccessVM> accesses)
+        {
+            var response = new ResponseModel();
+            if (string.IsNullOrWhiteSpace(RoleName))
+            {
+                response.Status = "Error";
+                response.Message = "Role name is required.";
+            }
+            else if (context.Roles.Any(s => s.Name == RoleName && s.Id != RoleId))
+            {
+                response.Status = "Error";
+                response.Message = "Role name already exists.";
+            }
+            else
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                var role = await roleManager.FindByIdAsync(RoleId);
+                if (role == null)
+                {
+                    // Add
+                    var newRole = new Role
+                    {
+                        Name = RoleName,
+                        NormalizedName = RoleName.ToUpper(),
+                        IsActive = true,
+                        UserCreated = currentUserId,
+                        DateCreated = DateTime.Now
+                    };
+                    var result = await roleManager.CreateAsync(newRole);
+                    if (result.Succeeded)
+                    {
+                        var newRoleId = newRole.Id;
+
+                        foreach (var access in accesses)
+                        {
+                            var newAccess = new Access
+                            {
+                                RoleId = newRoleId,
+                                PageId = access.PageId,
+                                CanView = access.CanView,
+                                CanAdd = access.CanAdd,
+                                CanEdit = access.CanEdit,
+                                CanDelete = access.CanDelete,
+                                CanApproveDisapprove = access.CanApproveDisapprove,
+                                CanUploadDownload = access.CanUploadDownload,
+                                CanPrint = access.CanPrint,
+                                UserCreated = currentUserId,
+                                DateCreated = DateTime.Now
+                            };
+                            context.Accesses.Add(newAccess);
+                        }
+                        await context.SaveChangesAsync(currentUserId);
+
+                        response.Status = "Success";
+                        response.Message = "The role has been successfully added. You can now assign it to users.";
+                    }
+                    else
+                    {
+                        response.Status = "Error";
+                        response.Message = string.Join(", ", result.Errors.Select(e => e.Description));
+                    }
+                }
+                else
+                {
+                    // Edit
+                    role.Name = RoleName;
+                    role.NormalizedName = RoleName.ToUpper();
+                    role.UserCreated = currentUserId;
+                    role.DateCreated = DateTime.Now;
+                    context.Roles.Update(role);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    foreach (var access in accesses)
+                    {
+                        var acc = await context.Accesses.Where(s => s.PageId == access.PageId && s.RoleId == RoleId).FirstOrDefaultAsync();
+                        if (acc == null)
+                        {
+                            var newAccess = new Access
+                            {
+                                RoleId = RoleId,
+                                PageId = access.PageId,
+                                CanView = access.CanView,
+                                CanAdd = access.CanAdd,
+                                CanEdit = access.CanEdit,
+                                CanDelete = access.CanDelete,
+                                CanApproveDisapprove = access.CanApproveDisapprove,
+                                CanUploadDownload = access.CanUploadDownload,
+                                CanPrint = access.CanPrint,
+                                UserCreated = currentUserId,
+                                DateCreated = DateTime.Now
+                            };
+                            context.Accesses.Add(newAccess);
+                        } else
+                        {
+                            acc.CanView = access.CanView;
+                            acc.CanAdd = access.CanAdd;
+                            acc.CanEdit = access.CanEdit;
+                            acc.CanDelete = access.CanDelete;
+                            acc.CanApproveDisapprove = access.CanApproveDisapprove;
+                            acc.CanUploadDownload = access.CanUploadDownload;
+                            acc.CanPrint = access.CanPrint;
+                            acc.UserModified = currentUserId;
+                            acc.DateModified = DateTime.Now;
+                            context.Accesses.Update(acc);
+                        }
+                    }
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "The role has been successfully update.";
+                }
+            }
+            return response;
+        }
+
 
         public async Task<IList<string>> GetUserAllowedPagesAsync(string UserId)
         {

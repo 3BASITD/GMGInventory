@@ -18,10 +18,8 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
-                            <label asp-for="RegionId" class="control-label mb-0"></label>
-                            <select asp-for="RegionId" asp-items="@Model?.Regions" class="select2option" style="width:100%">
-                                <option></option>
-                            </select>
+                            <label for="create-code" class="control-label mb-0 d-block">Code</label>
+                            <input name="code" id="create-code" class="form-control form-control-sm" />
                         </div>
                     </div>
                 </div>

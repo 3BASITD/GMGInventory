@@ -1,16 +1,13 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
     public class LocationCodeController(IAccessRepository accessRepository
-                         , ILocationCodeRepository locationCodeRepository
-                         , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                         , ILocationCodeRepository locationCodeRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()

@@ -40,6 +40,13 @@ namespace GMGInventory.Common.Models
         public DateTime? DateModifiedD { get; set; }
     }
 
+    public class RolesPagesVM
+    {
+        public string RoleName { get; set; }
+        public string RoleId { get; set; }
+        public IList<AccessVM> Accesses { get; set; }
+    }
+
     public class RoleVM
     {
         public string Id { get; set; }

@@ -32,8 +32,10 @@
                 toastr.error("We’re having trouble connecting to the server. Please try again soon.", "502 Bad Gateway");
             else if (xhr.status === 503)
                 toastr.error("The service is temporarily unavailable. Please check back shortly.", "503 Service Unavailable");
-            else
+            else {
                 toastr.error(xhr.responseJSON.error, xhr.status + " " + xhr.statusText);
+                console.error(xhr);
+            }
             hideLoader();
         }
     });
@@ -157,7 +159,24 @@
     }
     $(".col-report").removeClass("col-md-4 col-md-6 col-md-12");
     $(".col-report").addClass("col-md-" + col_report);
+    $('.modal').on('shown.bs.modal', function () {
+        checkFooterStickiness($(this));
+
+        $(this).off('scroll').on('scroll', function () {
+            checkFooterStickiness($(this));
+        });
+    });
 });
+function checkFooterStickiness($modal) {
+    var $footer = $modal.find('.modal-footer');
+    var footerOffset = $footer.offset().top + $footer.outerHeight();
+    var windowHeight = $(window).height() + 15;
+    if (footerOffset >= windowHeight) {
+        $footer.addClass('sticky-active');
+    } else {
+        $footer.removeClass('sticky-active');
+    }
+}
 
 function removeCommaOfNumber(value) {
     return parseFloat(value.replace(/[\$,]/g, '') * 1);

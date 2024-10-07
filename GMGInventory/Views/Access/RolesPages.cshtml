@@ -1,0 +1,189 @@
+﻿@model RolesPagesVM
+
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Pages Role</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <form id="rolesPagesForm" asp-action="RolesPages" method="post">
+            <div class="modal-body">
+                <table class="table table-head-fixed table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>
+                                <span data-microtip-title="Can View" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Add" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Edit" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Delete" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-trash-alt"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Approve / Disapprove" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Upload&#13; / Download" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-file-download"></i>
+                                </span>
+                            </th>
+                            <th>
+                                <span data-microtip-title="Can Print" data-microtip-position="bottom" role="tooltip">
+                                    <i class="fas fa-print"></i>
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="RoleName" class="control-label mb-0 d-block">Role Name</label>
+                                <input type="text" name="RoleName" id="RoleName" class="form-control form-control-sm" value="@Model.RoleName" />
+                                <input type="hidden" name="RoleId" value="@Model.RoleId" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="control-label mb-0 d-block">Access</label>
+                                @for (int i = 0; i < Model.Accesses.Count; i++)
+                                {
+                            <tr>
+                                <td>
+                                    <span>@Model.Accesses[i].Name</span>
+                                    <input type="hidden" name="accesses[@i].Name" value="@Model.Accesses[i].Name" />
+                                    <input type="hidden" name="accesses[@i].AccessId" value="@Model.Accesses[i].AccessId" />
+                                    <input type="hidden" name="accesses[@i].PageId" value="@Model.Accesses[i].PageId" />
+                                </td>
+                                <td>
+                                            @if (Model.Accesses[i].HasView)
+                                            {
+                                        <input type="hidden" name="accesses[@i].HasView" value="true" />
+                                                @if (Model.Accesses[i].CanView)
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanView" value="true" checked="checked" />
+                                                }
+                                                else
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanView" value="true" />
+                                                }
+                                            }
+                                </td>
+                                <td>
+                                            @if (Model.Accesses[i].HasAdd)
+                                            {
+                                        <input type="hidden" name="[@i].HasAdd" value="true" />
+                                                @if (Model.Accesses[i].CanAdd)
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanAdd" value="true" checked="checked" />
+                                                }
+                                                else
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanAdd" value="true" />
+                                                }
+                                            }
+                                </td>
+                                <td>
+                                            @if (Model.Accesses[i].HasEdit)
+                                            {
+                                        <input type="hidden" name="[@i].HasEdit" value="true" />
+                                                @if (Model.Accesses[i].CanEdit)
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanEdit" value="true" checked="checked" />
+                                                }
+                                                else
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanEdit" value="true" />
+                                                }
+                                            }
+                                </td>
+                                <td>
+                                            @if (Model.Accesses[i].HasDelete)
+                                            {
+                                        <input type="hidden" name="[@i].HasDelete" value="true" />
+                                                @if (Model.Accesses[i].CanDelete)
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanDelete" value="true" checked="checked" />
+                                                }
+                                                else
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanDelete" value="true" />
+                                                }
+                                            }
+                                </td>
+                                <td>
+                                            @if (Model.Accesses[i].HasApproveDisapprove)
+                                            {
+                                        <input type="hidden" name="[@i].HasApproveDisapprove" value="true" />
+                                                @if (Model.Accesses[i].CanApproveDisapprove)
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanApproveDisapprove" value="true" checked="checked" />
+                                                }
+                                                else
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanApproveDisapprove" value="true" />
+                                                }
+                                            }
+                                </td>
+                                <td>
+                                            @if (Model.Accesses[i].HasUploadDownload)
+                                            {
+                                        <input type="hidden" name="[@i].HasUploadDownload" value="true" />
+                                                @if (Model.Accesses[i].CanUploadDownload)
+                                                {
+                                            <input type="checkbox" name="accesses[@i].)" value="true" checked="checked" />
+                                                }
+                                                else
+                                                {
+                                            <input type="checkbox" name="accesses[@i].)" value="true" />
+                                                }
+                                            }
+                                </td>
+                                <td>
+                                            @if (Model.Accesses[i].HasPrint)
+                                            {
+                                        <input type="hidden" name="[@i].HasPrint" value="true" />
+                                                @if (Model.Accesses[i].CanPrint)
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanPrint" value="true" checked="checked" />
+                                                }
+                                                else
+                                                {
+                                            <input type="checkbox" name="accesses[@i].CanPrint" value="true" />
+                                                }
+                                            }
+                                </td>
+                            </tr>
+                                }
+            </div>
+    </div>
+    </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary btn-save">
+        <span class="fas fa-save"></span> Save
+    </button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <span class="fas fa-times"></span> Cancel
+    </button>
+</div>
+        </form>
+    </div>
+</div>

@@ -37,5 +37,24 @@ namespace GMGInventory.Controllers
             var form = new DataTablesRequestForm(Request.Form);
             return Json(await accessRepository.GetRolesDTAsync(form));
         }
+
+        public async Task<PartialViewResult> RolesPages(string RoleId)
+        {
+            var accesses = await accessRepository.GetRolesPagesAsync(RoleId);
+            return PartialView(accesses);
+        }
+
+        public async Task<PartialViewResult> RoleDetails(string RoleId)
+        {
+            var accesses = await accessRepository.GetRolesPagesAsync(RoleId);
+            ViewData["RoleUsers"] = await accessRepository.GetRolesUsersAsync(RoleId);
+            return PartialView(accesses);
+        }
+
+        public async Task<IActionResult> SaveRolesPages(string RoleId, string RoleName, IList<AccessVM> accesses)
+        {
+            var responseModel = await accessRepository.SaveRolesPagesAsync(RoleId, RoleName, accesses);
+            return Json(responseModel);
+        }
     }
 }
