@@ -13,8 +13,7 @@ namespace GMGInventory.Controllers
                      + Roles.SystemAdmin)]
     public class SoacrController(IAccessRepository accessRepository
                              , ISoacrRepository soaRepository
-                             , ISoacrLineItemRepository soacrLineItemRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , ISoacrLineItemRepository soacrLineItemRepository) : BaseController(accessRepository)
     {
         #region for SOACR/Index
         public async Task<IActionResult> Index()

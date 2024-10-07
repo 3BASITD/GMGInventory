@@ -21,8 +21,7 @@ namespace GMGInventory.Controllers
                              , IAreaRepository areaRepository
                              , ICurrencyRepository currencyRepository
                              , IRegionRepository regionRepository
-                             , IBusinessStyleRepository businessStyleRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , IBusinessStyleRepository businessStyleRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {

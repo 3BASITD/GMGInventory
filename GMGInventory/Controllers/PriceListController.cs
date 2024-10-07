@@ -18,8 +18,7 @@ namespace GMGInventory.Controllers
                              , IItemPriceRepository itemPriceRepository
                              , ICategoryRepository categoryRepository
                              , IItemTypeRepository itemTypeRepository
-                             , IBrandRepository brandRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , IBrandRepository brandRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()

@@ -10,18 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    //[Authorize]
-    //public class SalesOrderController : Controller
-    //{
-    //    private readonly ISalesOrderRepository salesOrderRepository;
-
-    //    public SalesOrderController(ISalesOrderRepository salesOrderRepository)
-    //    {
-    //        this.salesOrderRepository = salesOrderRepository;
-    //    }
-    public class SalesOrderController(IAccessRepository accessRepository
-                            , ISalesOrderRepository salesOrderRepository
-                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+     public class SalesOrderController(IAccessRepository accessRepository
+                            , ISalesOrderRepository salesOrderRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetOptions(string search, int page)

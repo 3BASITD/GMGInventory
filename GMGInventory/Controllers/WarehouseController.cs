@@ -12,8 +12,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class WarehouseController(IAccessRepository accessRepository
-                             , IWarehouseRepository warehouseRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {

@@ -9,18 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    //[Authorize]
-    //public class SalesInvoiceController : Controller
-    //{
-    //    private readonly IInvoiceRepository invoiceRepository;
-
-    //    public SalesInvoiceController(IInvoiceRepository invoiceRepository)
-    //    {
-    //        this.invoiceRepository = invoiceRepository;
-    //    }
-    public class SalesInvoiceController(IAccessRepository accessRepository
-                           , IInvoiceRepository invoiceRepository
-                           , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+     public class SalesInvoiceController(IAccessRepository accessRepository
+                           , IInvoiceRepository invoiceRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetInvoiceTypeOptions(int? IncludeId)

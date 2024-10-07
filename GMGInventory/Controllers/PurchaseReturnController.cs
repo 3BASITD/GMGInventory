@@ -14,8 +14,7 @@ namespace GMGInventory.Controllers
                      + Roles.Telemarketer)]
    
     public class PurchaseReturnController(IAccessRepository accessRepository
-                             , IPurchaseReturnRepository purchaseReturnRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , IPurchaseReturnRepository purchaseReturnRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()

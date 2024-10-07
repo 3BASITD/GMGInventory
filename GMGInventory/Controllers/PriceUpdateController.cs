@@ -19,8 +19,7 @@ namespace GMGInventory.Controllers
                      + Roles.Telemarketer)]
     public class PriceUpdateController(IAccessRepository accessRepository
                              , IItemPriceRepository itemPriceRepository
-                             , IItemRepository itemRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , IItemRepository itemRepository) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 

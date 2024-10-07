@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     public class ReasonsOfReturnController(IAccessRepository accessRepository
-                         , IReasonOfReturnRepository reasonOfReturnRepository
-                         , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                         , IReasonOfReturnRepository reasonOfReturnRepository) : BaseController(accessRepository)
     {
        
         public async Task<IActionResult> Index()

@@ -14,8 +14,7 @@ namespace GMGInventory.Controllers
    [Authorize]
     public class ItemTypeController(IAccessRepository accessRepository
                             , IItemTypeRepository itemTypeRepository
-                            , ICategoryRepository categoryRepository
-                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                            , ICategoryRepository categoryRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {

@@ -12,8 +12,7 @@ using static ClosedXML.Excel.XLPredefinedFormat;
 namespace GMGInventory.Controllers
 {
     public class SalesReturnController(IAccessRepository accessRepository
-                            , ISalesReturnRepository salesReturnRepository
-                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                            , ISalesReturnRepository salesReturnRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {

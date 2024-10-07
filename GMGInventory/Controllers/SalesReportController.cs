@@ -12,8 +12,7 @@ using System.Data;
 namespace GMGInventory.Controllers
 {
     public class SalesReportController(IAccessRepository accessRepository
-                            , IReportSalesRepository reportSalesRepository
-                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                            , IReportSalesRepository reportSalesRepository) : BaseController(accessRepository)
     {
 
         private readonly ControllerHelper chelper = new();

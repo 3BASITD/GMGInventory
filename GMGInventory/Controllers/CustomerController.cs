@@ -17,8 +17,7 @@ namespace GMGInventory.Controllers
                              , IRegionRepository regionRepository
                              , IAgentRepository agentRepository
                              , ICustomerTypeRepository customertypeRepository
-                             , ICreditTermRepository credittermRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , ICreditTermRepository credittermRepository) : BaseController(accessRepository)
         {
         public async Task<IActionResult> GetOptions(string search, int page)
         {

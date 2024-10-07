@@ -14,8 +14,7 @@ namespace GMGInventory.Controllers
                      + Roles.SalesDirector + ","
                      + Roles.SystemAdmin)]
     public class PaymentController(IAccessRepository accessRepository
-                             , IPaymentRepository customerpaymentRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , IPaymentRepository customerpaymentRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()

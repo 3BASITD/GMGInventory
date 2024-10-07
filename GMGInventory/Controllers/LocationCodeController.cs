@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     public class LocationCodeController(IAccessRepository accessRepository
-                            , ILocationCodeRepository locationCodeRepository
-                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                            , ILocationCodeRepository locationCodeRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {

@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     public class PackController(IAccessRepository accessRepository
-                           , IPackRepository packRepository
-                           , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                           , IPackRepository packRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetPackTypeOptions(int? IncludeId)

@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     public class AgentCPurchaseOrderControllerontroller(IAccessRepository accessRepository
-                            , IPurchaseOrderRepository purchaseOrderRepository
-                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                            , IPurchaseOrderRepository purchaseOrderRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetOptions(string search, int page)

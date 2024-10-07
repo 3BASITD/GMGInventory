@@ -11,8 +11,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class RegionController(IAccessRepository accessRepository
-                         , IRegionRepository regionRepository
-                         , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                         , IRegionRepository regionRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetOptions(int? IncludeId)

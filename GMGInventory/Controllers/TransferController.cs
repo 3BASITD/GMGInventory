@@ -14,8 +14,7 @@ namespace GMGInventory.Controllers
                      + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
     public class TransferController(IAccessRepository accessRepository
-                             , IItemTransferRepository itemTransferRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , IItemTransferRepository itemTransferRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()

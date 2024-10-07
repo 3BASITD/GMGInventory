@@ -13,8 +13,7 @@ namespace GMGInventory.Controllers
                      + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
     public class UnservedItemController(IAccessRepository accessRepository
-                             , IUnservedItemRepository unservedItemRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , IUnservedItemRepository unservedItemRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {

@@ -8,18 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    //[Authorize]
-    //public class SalesOrderDeliveryController : Controller
-    //{
-    //    private readonly ISalesOrderDeliveryRepository salesOrderDeliveryRepository;
-
-    //    public SalesOrderDeliveryController(ISalesOrderDeliveryRepository salesOrderDeliveryRepository)
-    //    {
-    //        this.salesOrderDeliveryRepository = salesOrderDeliveryRepository;
-    //    }
     public class SalesOrderDeliveryController(IAccessRepository accessRepository
-                             , ISalesOrderDeliveryRepository salesOrderDeliveryRepository
-                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                             , ISalesOrderDeliveryRepository salesOrderDeliveryRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()
