@@ -6,10 +6,13 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IAccessRepository : IGenericRepository<Access>
     {
+        Task<IList<string>> GetUserAllowedPagesAsync(string UserId);
         Task<bool> HasAccessAsync(string UserId, PageNames PageName, AccessTypes AccessType);
         Task<Access> GetUserAccessToPageAsync(string UserId, PageNames PageName);
         Task<IList<AccessVM>> GetUserAccessesAsync(string UserId);
         Task<ForDataTables<AccessVM>> GetUserAccessesDTAsync(DataTablesRequestForm form, string UserId);
+        Task<IList<RoleVM>> GetRolesAsync();
+        Task<ForDataTables<RoleVM>> GetRolesDTAsync(DataTablesRequestForm form);
         //Task<IList<AccessVM>> GetListAsync();
         //Task<ForDataTables<AccessVM>> GetListDTAsync(DataTablesRequestForm form);
     }

@@ -28,7 +28,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<UserInformationVM>> GetUsersInformationVMAsync()
         {
-            var users = userManager.Users.ToList();
+            var users = await userManager.Users.ToListAsync();
             var usersVM = mapper.Map<List<UserInformationVM>>(users);
             foreach (var userVM in usersVM)
             {
@@ -244,8 +244,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<string> GetUserIdByNameAsync(string name)
         {
-            var user = await userManager.FindByNameAsync(name);
-            return user.Id;
+            //var user = await userManager.FindByNameAsync(name);
+            var user = await userManager.Users.Where(s => s.UserName == name).FirstOrDefaultAsync();
+            return user?.Id ?? "";
         }
     }
 }

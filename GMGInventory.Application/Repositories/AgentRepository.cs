@@ -17,9 +17,9 @@ namespace GMGInventory.Application.Repositories
         private readonly IMapper mapper;
 
         public AgentRepository(ApplicationDbContext context
-            , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager
-            , IMapper mapper) : base(context, httpContextAccessor, userManager)
+             , IHttpContextAccessor httpContextAccessor
+             , UserManager<User> userManager
+             , IMapper mapper) : base(context, httpContextAccessor, userManager)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
@@ -31,8 +31,8 @@ namespace GMGInventory.Application.Repositories
         {
             var agents = await context.Agents
                                       .Where(s => string.IsNullOrWhiteSpace(search)
-                                               || (s.Code.ToLower().Contains(search.ToLower()))
-                                               || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).ToLower().Contains(search.ToLower())))
+                                               || s.Code.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+                                               || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).Contains(search, StringComparison.CurrentCultureIgnoreCase)))
                                       .Select(s => new JsonNameOptionsModel
                                       {
                                           Id = s.Id.ToString(),

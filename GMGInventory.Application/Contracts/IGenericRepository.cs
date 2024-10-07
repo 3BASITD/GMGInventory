@@ -9,6 +9,6 @@
         Task<bool> Exists(int id);
         Task DeleteAsync(int id);
         Task UpdateAsync(T entity);
-        Task<string> GetUserName(string? userId);
+        Task<string> GetNickname(string? userId);
     }
 }

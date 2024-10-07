@@ -32,8 +32,8 @@ namespace GMGInventory.Application.Repositories
             var regionsVM = mapper.Map<List<RegionVM>>(regions);
             foreach (RegionVM cvm in regionsVM)
             {
-                cvm.UserCreated = await GetUserName(cvm.UserCreated);
-                cvm.UserModified = await GetUserName(cvm.UserModified);
+                cvm.UserCreated = await GetNickname(cvm.UserCreated);
+                cvm.UserModified = await GetNickname(cvm.UserModified);
             }
             return regionsVM;
         }
@@ -46,8 +46,8 @@ namespace GMGInventory.Application.Repositories
                 return null;
             }
             var regionsVM = mapper.Map<RegionVM>(regions);
-            regionsVM.UserCreated = await GetUserName(regionsVM.UserCreated);
-            regionsVM.UserModified = await GetUserName(regionsVM.UserModified);
+            regionsVM.UserCreated = await GetNickname(regionsVM.UserCreated);
+            regionsVM.UserModified = await GetNickname(regionsVM.UserModified);
             return regionsVM;
         }
 

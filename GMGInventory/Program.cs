@@ -6,19 +6,26 @@ using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString)
+    .EnableSensitiveDataLogging()
+    .LogTo(Console.WriteLine));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 //builder.Services.AddHttpContextAccessor();
 
+//builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
+//    .AddRoles<IdentityRole>()
+//    .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>()
+    .AddRoles<Role>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

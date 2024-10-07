@@ -139,8 +139,8 @@ namespace GMGInventory.Application.Repositories
             var categoriesVM = mapper.Map<List<GenericAuditVM>>(categories);
             foreach (GenericAuditVM cvm in categoriesVM)
             {
-                cvm.UserCreated = await GetUserName(cvm.UserCreated);
-                cvm.UserModified = await GetUserName(cvm.UserModified);
+                cvm.UserCreated = await GetNickname(cvm.UserCreated);
+                cvm.UserModified = await GetNickname(cvm.UserModified);
             }
             return categoriesVM;
         }
@@ -153,8 +153,8 @@ namespace GMGInventory.Application.Repositories
                 return null;
             }
             var categoryVM = mapper.Map<GenericAuditVM>(category);
-            categoryVM.UserCreated = await GetUserName(categoryVM.UserCreated);
-            categoryVM.UserModified = await GetUserName(categoryVM.UserModified);
+            categoryVM.UserCreated = await GetNickname(categoryVM.UserCreated);
+            categoryVM.UserModified = await GetNickname(categoryVM.UserModified);
             return categoryVM;
         }
 

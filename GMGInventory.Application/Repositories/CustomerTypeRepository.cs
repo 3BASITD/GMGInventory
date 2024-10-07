@@ -37,8 +37,8 @@ namespace GMGInventory.Application.Repositories
             var customertypeVM = mapper.Map<List<CustomerTypeVM>>(customertype);
             foreach (CustomerTypeVM cvm in customertypeVM)
             {
-                cvm.UserCreated = await GetUserName(cvm.UserCreated);
-                cvm.UserModified = await GetUserName(cvm.UserModified);
+                cvm.UserCreated = await GetNickname(cvm.UserCreated);
+                cvm.UserModified = await GetNickname(cvm.UserModified);
             }
             return customertypeVM;
         }
@@ -51,8 +51,8 @@ namespace GMGInventory.Application.Repositories
                 return null;
             }
             var customertypeVM = mapper.Map<CustomerTypeVM>(customertype);
-            customertypeVM.UserCreated = await GetUserName(customertypeVM.UserCreated);
-            customertypeVM.UserModified = await GetUserName(customertypeVM.UserModified);
+            customertypeVM.UserCreated = await GetNickname(customertypeVM.UserCreated);
+            customertypeVM.UserModified = await GetNickname(customertypeVM.UserModified);
             return customertypeVM;
         }
 

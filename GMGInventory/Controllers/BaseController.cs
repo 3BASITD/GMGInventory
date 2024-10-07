@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Data;
 using GMGInventory.Helpers;
@@ -13,19 +14,23 @@ namespace GMGInventory.Controllers
     public class BaseController : Controller
     {
         private readonly IAccessRepository _accessRepository;
-        private readonly UserManager<User> _userManager;
         protected PageNames PageName { get; set; }
 
-        public BaseController(IAccessRepository accessRepository, UserManager<User> userManager)
+        public BaseController(IAccessRepository accessRepository)
         {
             _accessRepository = accessRepository ?? throw new ArgumentNullException(nameof(accessRepository));
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        }
+
+        public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            var userId = HttpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            ViewData["NavigationPages"] = _accessRepository.GetUserAllowedPagesAsync(userId ?? "").Result;
+            return base.OnActionExecutionAsync(context, next);
         }
 
         protected async Task<IActionResult> CheckAccessAndRedirectAsync(PageNames pageName, AccessTypes accessType)
         {
-            var user = HttpContext.User;
-            if (user?.Identity == null || !user.Identity.IsAuthenticated)
+            if (HttpContext.User?.Identity?.IsAuthenticated != true)
             {
                 if (IsAjaxRequest())
                     return new JsonResult(new { error = "Not authenticated" }) { StatusCode = StatusCodes.Status401Unauthorized };
@@ -43,18 +48,20 @@ namespace GMGInventory.Controllers
 
             return null;
         }
+
         private bool IsAjaxRequest()
         {
-            return HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest"
-                   || HttpContext.Request.Headers["Accept"].ToString().Contains("application/json");
+            return HttpContext.Request.Headers.XRequestedWith == "XMLHttpRequest"
+                || HttpContext.Request.Headers.Accept.ToString().Contains("application/json");
         }
 
         protected async Task<bool> CheckAccessAsync(PageNames pageName, AccessTypes accessType)
         {
-            var user = HttpContext.User;
-            var userId = _userManager.GetUserId(user);
+            if (HttpContext.User?.Identity?.IsAuthenticated != true)
+                return false;
+            var userId = HttpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            if (userId == null || (user.Identity != null && !user.Identity.IsAuthenticated))
+            if (userId == null)
                 return false;
 
             return await _accessRepository.HasAccessAsync(userId, pageName, accessType);
@@ -62,10 +69,11 @@ namespace GMGInventory.Controllers
 
         protected async Task<Access> GetAccessAsync(PageNames pageName)
         {
-            var user = HttpContext.User;
-            var userId = _userManager.GetUserId(user);
+            if (HttpContext.User?.Identity?.IsAuthenticated != true)
+                return new Access();
+            var userId = HttpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            if (userId == null || (user.Identity != null && !user.Identity.IsAuthenticated))
+            if (userId == null)
                 return new Access();
 
             return await _accessRepository.GetUserAccessToPageAsync(userId, pageName);

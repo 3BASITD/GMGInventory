@@ -6,19 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     [Authorize]
-    public class ProfileController : Controller
-    {
-        private readonly IUserRepository userRepository;
-
-        public ProfileController(IUserRepository userRepository)
-        {
-            this.userRepository = userRepository;
-        }
+    public class ProfileController(IAccessRepository accessRepository
+                                 , IUserRepository userRepository) : BaseController(accessRepository)
+    { 
 
         public async Task<ActionResult> Index()
         {
-            var userId = await userRepository.GetUserIdByNameAsync(User?.Identity?.Name ?? "");
-            return View(await userRepository.GetAuditLogAsync(userId));
+            //var userId = await userRepository.GetUserIdByNameAsync(User?.Identity?.Name ?? "");
+            var userId = HttpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            return View(await userRepository.GetAuditLogAsync(userId ?? ""));
         }
 
         [HttpPost]

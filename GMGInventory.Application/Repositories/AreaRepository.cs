@@ -103,7 +103,6 @@ namespace GMGInventory.Application.Repositories
             var agents = from area in context.Areas
                          join region in context.Regions
                                     on area.RegionId equals region.Id
-                        
                          join userc in userManager.Users on area.UserCreated equals userc.Id
                          join userm in userManager.Users on area.UserModified equals userm.Id into m
                          from um in m.DefaultIfEmpty()
@@ -196,8 +195,8 @@ namespace GMGInventory.Application.Repositories
             var areasViewVM = mapper.Map<List<AreaViewVM>>(areas);
             foreach (AreaViewVM ivm in areasViewVM)
             {
-                ivm.UserCreated = await GetUserName(ivm.UserCreated);
-                ivm.UserModified = await GetUserName(ivm.UserModified);
+                ivm.UserCreated = await GetNickname(ivm.UserCreated);
+                ivm.UserModified = await GetNickname(ivm.UserModified);
             }
             return areasViewVM;
         }
@@ -210,8 +209,8 @@ namespace GMGInventory.Application.Repositories
                 return null;
             }
             var areasViewVM = mapper.Map<AreaViewVM>(areas);
-            areasViewVM.UserCreated = await GetUserName(areasViewVM.UserCreated);
-            areasViewVM.UserModified = await GetUserName(areasViewVM.UserModified);
+            areasViewVM.UserCreated = await GetNickname(areasViewVM.UserCreated);
+            areasViewVM.UserModified = await GetNickname(areasViewVM.UserModified);
             return areasViewVM;
         }
 

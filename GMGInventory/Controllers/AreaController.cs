@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
@@ -14,10 +11,8 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class AreaController(IAccessRepository accessRepository
-                            , IAreaRepository areaRepository
-                            , IRegionRepository regionRepository
-                            , IMapper mapper
-                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+                              , IAreaRepository areaRepository
+                              , IRegionRepository regionRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
