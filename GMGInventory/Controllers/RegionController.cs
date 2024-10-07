@@ -22,10 +22,10 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReasonsOfReturn, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Regions, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
-            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.ReasonsOfReturn)).Convert();
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Regions)).Convert();
 
             return View();
         }
@@ -34,7 +34,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> GetListJson()
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReasonsOfReturn, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Regions, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             var form = new DataTablesRequestForm(Request.Form);
@@ -44,7 +44,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateJson(RegionVM regionVM)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReasonsOfReturn, AccessTypes.Add);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Regions, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
             var responseModel = new ResponseModel();
@@ -65,7 +65,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> EditJson(RegionVM regionVM)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReasonsOfReturn, AccessTypes.Edit);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Regions, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
             var responseModel = new ResponseModel();
@@ -95,7 +95,7 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReasonsOfReturn, AccessTypes.Delete);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Regions, AccessTypes.Delete);
             if (redirectResult != null) return redirectResult;
 
             var reason = await regionRepository.GetAsync(id);
@@ -122,8 +122,8 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
-            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.ReasonsOfReturn, AccessTypes.Add);
-            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.ReasonsOfReturn, AccessTypes.Edit);
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Regions, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Regions, AccessTypes.Edit);
             if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
 
             var reason = await regionRepository.GetAsync(id);

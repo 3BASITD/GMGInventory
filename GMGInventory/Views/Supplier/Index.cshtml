@@ -2,21 +2,28 @@
 
 @{
     ViewData["Title"] = "Supplier";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                <span class="fas fa-plus"></span> New Supplier
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                <span class="fas fa-upload"></span> Upload
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
-                <span class="fas fa-download"></span> Download
-            </button>
+            @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                    <span class="fas fa-plus"></span> New Supplier
+                </button>
+            }
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                    <span class="fas fa-upload"></span> Upload
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -53,242 +60,248 @@
         </table>
     </div>
 </div>
+@if (userAccess.CanDelete)
+{
+    <form id="deleteSupplierForm" asp-action="Delete">
+        <input type="hidden" id="deleteSupplierId" name="Id" />
+    </form>
+}
+@if (userAccess.CanAdd || userAccess.CanEdit)
+{
+    <form id="reactivateSupplierForm" asp-action="Reactivate">
+        <input type="hidden" id="reactivateSupplierId" name="Id" />
+    </form>
+}
+@if (userAccess.CanAdd)
+{
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" style="max-width: 75%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Supplier</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="createForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="create-code" class="control-label mb-0 d-block">Code</label>
+                                    <input type="text" name="Code" id="create-code" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-name" class="control-label mb-0 d-block">Name</label>
+                                    <input type="text" name="Name" id="create-name" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
-<form id="deleteSupplierForm" asp-action="Delete">
-    <input type="hidden" id="deleteSupplierId" name="Id" />
-</form>
+                                <div class="form-group">
+                                    <label for="create-tin" class="control-label mb-0 d-block">TIN</label>
+                                    <input type="text" name="TIN" id="create-tin" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-tin" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
-<form id="reactivateSupplierForm" asp-action="Reactivate">
-    <input type="hidden" id="reactivateSupplierId" name="Id" />
-</form>
+                                <div class="form-group">
+                                    <label for="create-contact-person" class="control-label mb-0 d-block">Contact Person</label>
+                                    <input type="text" name="ContactPerson" id="create-contact-person" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-contact-person" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
-<!-- Create Modal -->
-<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" style="max-width: 75%;" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">New Supplier</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form autocomplete="off" id="createForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-code" class="control-label mb-0 d-block">Code</label>
-                                <input type="text" name="Code" id="create-code" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
+                                <div class="form-group">
+                                    <label for="create-officetelno" class="control-label mb-0 d-block">Office Tel No.</label>
+                                    <input type="text" name="OfficeTelNo" id="create-officetelno" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-officetelno" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="create-name" class="control-label mb-0 d-block">Name</label>
-                                <input type="text" name="Name" id="create-name" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                           
-                             <div class="form-group">
-                                <label for="create-tin" class="control-label mb-0 d-block">TIN</label>
-                                <input type="text" name="TIN" id="create-tin" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-tin" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="create-region" class="control-label mb-0 d-block">Region</label>
+                                    <select name="Region" id="create-region" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="create-region" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="create-contact-person" class="control-label mb-0 d-block">Contact Person</label>
-                                <input type="text" name="ContactPerson" id="create-contact-person" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-contact-person" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
+                                <div class="form-group">
+                                    <label for="create-addressline1" class="control-label mb-0 d-block">Address Line 1</label>
+                                    <input type="text" name="AddressLine1" id="create-addressline1" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-addressline1" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-addressline2" class="control-label mb-0 d-block">Address Line 2</label>
+                                    <input type="text" name="AddressLine2" id="create-addressline2" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-addressline2" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="create-officetelno" class="control-label mb-0 d-block">Office Tel No.</label>
-                                <input type="text" name="OfficeTelNo" id="create-officetelno" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-officetelno" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="create-region" class="control-label mb-0 d-block">Region</label>
-                                <select name="Region" id="create-region" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-region" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="create-addressline1" class="control-label mb-0 d-block">Address Line 1</label>
-                                <input type="text" name="AddressLine1" id="create-addressline1" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-addressline1" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="create-addressline2" class="control-label mb-0 d-block">Address Line 2</label>
-                                <input type="text" name="AddressLine2" id="create-addressline2" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-addressline2" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                          
-                              <div class="form-group">
-                                <label for="create-vat" class="control-label mb-0 d-block">VAT</label>
-                                <input type="text" name="VAT" id="create-vat" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-vat" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                             <div class="form-group">
-                                <label for="create-terms" class="control-label mb-0 d-block">Terms</label>
-                                <input type="text" name="Terms" id="create-terms" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-terms" data-valmsg-replace="true" class="text-danger"></span>
+                                <div class="form-group">
+                                    <label for="create-vat" class="control-label mb-0 d-block">VAT</label>
+                                    <input type="text" name="VAT" id="create-vat" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-vat" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="create-pricelist" class="control-label mb-0 d-block">Pricelist</label>
-                                <input type="text" name="Pricelist" id="create-pricelist" class="form-control form-control-sm" />
-                                <span data-valmsg-for="create-pricelist" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="create-terms" class="control-label mb-0 d-block">Terms</label>
+                                    <input type="text" name="Terms" id="create-terms" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-terms" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="create-currency" class="control-label mb-0 d-block">Currency</label>
-                                <select name="Currency" id="create-currency" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-currency" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
+                                <div class="form-group">
+                                    <label for="create-pricelist" class="control-label mb-0 d-block">Pricelist</label>
+                                    <input type="text" name="Pricelist" id="create-pricelist" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="create-pricelist" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="create-businessStyle" class="control-label mb-0 d-block">Business Style</label>
-                                <select name="BusinessStyle" id="create-businessStyle" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="create-businessStyle" data-valmsg-replace="true" class="text-danger"></span>
+                                <div class="form-group">
+                                    <label for="create-currency" class="control-label mb-0 d-block">Currency</label>
+                                    <select name="Currency" id="create-currency" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="create-currency" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="create-businessStyle" class="control-label mb-0 d-block">Business Style</label>
+                                    <select name="BusinessStyle" id="create-businessStyle" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="create-businessStyle" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-plus"></span> Add
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+}
 
+@if (userAccess.CanEdit)
+{
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" style="max-width: 75%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Supplier</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="edit-code" class="control-label mb-0 d-block">Code</label>
+                                    <input type="text" name="Code" id="edit-code" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-code" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-name" class="control-label mb-0 d-block">Name</label>
+                                    <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
+                                <div class="form-group">
+                                    <label for="edit-tin" class="control-label mb-0 d-block">TIN</label>
+                                    <input type="text" name="TIN" id="edit-tin" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-tin" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
 
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" style="max-width: 75%;" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Supplier</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form autocomplete="off" id="editForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="edit-code" class="control-label mb-0 d-block">Code</label>
-                                <input type="text" name="Code" id="edit-code" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-code" data-valmsg-replace="true" class="text-danger"></span>
+                                <div class="form-group">
+                                    <label for="edit-contact-person" class="control-label mb-0 d-block">Contact Person</label>
+                                    <input type="text" name="ContactPerson" id="edit-contact-person" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-contact-person" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="edit-officetelno" class="control-label mb-0 d-block">Office Tel No.</label>
+                                    <input type="text" name="OfficeTelNo" id="edit-officetelno" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-officetelno" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="edit-name" class="control-label mb-0 d-block">Name</label>
-                                <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="edit-region" class="control-label mb-0 d-block">Region</label>
+                                    <select name="Region" id="edit-region" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="edit-region" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="edit-addressline1" class="control-label mb-0 d-block">Address Line 1</label>
+                                    <input type="text" name="AddressLine1" id="edit-addressline1" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-addressline1" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-addressline2" class="control-label mb-0 d-block">Address Line 2</label>
+                                    <input type="text" name="AddressLine2" id="edit-addressline2" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-addressline2" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="edit-vat" class="control-label mb-0 d-block">VAT</label>
+                                    <input type="text" name="VAT" id="edit-vat" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-vat" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="edit-tin" class="control-label mb-0 d-block">TIN</label>
-                                <input type="text" name="TIN" id="edit-tin" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-tin" data-valmsg-replace="true" class="text-danger"></span>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="edit-terms" class="control-label mb-0 d-block">Terms</label>
+                                    <input type="text" name="Terms" id="edit-terms" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-terms" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="edit-pricelist" class="control-label mb-0 d-block">Pricelist</label>
+                                    <input type="text" name="Pricelist" id="edit-pricelist" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-pricelist" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="edit-currency" class="control-label mb-0 d-block">Currency</label>
+                                    <select name="Currency" id="edit-currency" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="edit-currency" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="edit-businessStyle" class="control-label mb-0 d-block">Business Style</label>
+                                    <select name="BusinessStyle" id="edit-businessStyle" class="form-control" style="width: 100%">
+                                    </select>
+                                    <span data-valmsg-for="edit-businessStyle" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="edit-contact-person" class="control-label mb-0 d-block">Contact Person</label>
-                                <input type="text" name="ContactPerson" id="edit-contact-person" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-contact-person" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="edit-officetelno" class="control-label mb-0 d-block">Office Tel No.</label>
-                                <input type="text" name="OfficeTelNo" id="edit-officetelno" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-officetelno" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="edit-region" class="control-label mb-0 d-block">Region</label>
-                                <select name="Region" id="edit-region" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-region" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="edit-addressline1" class="control-label mb-0 d-block">Address Line 1</label>
-                                <input type="text" name="AddressLine1" id="edit-addressline1" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-addressline1" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit-addressline2" class="control-label mb-0 d-block">Address Line 2</label>
-                                <input type="text" name="AddressLine2" id="edit-addressline2" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-addressline2" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="edit-vat" class="control-label mb-0 d-block">VAT</label>
-                                <input type="text" name="VAT" id="edit-vat" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-vat" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="edit-terms" class="control-label mb-0 d-block">Terms</label>
-                                <input type="text" name="Terms" id="edit-terms" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-terms" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="edit-pricelist" class="control-label mb-0 d-block">Pricelist</label>
-                                <input type="text" name="Pricelist" id="edit-pricelist" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-pricelist" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="edit-currency" class="control-label mb-0 d-block">Currency</label>
-                                <select name="Currency" id="edit-currency" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-currency" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="edit-businessStyle" class="control-label mb-0 d-block">Business Style</label>
-                                <select name="BusinessStyle" id="edit-businessStyle" class="form-control" style="width: 100%">
-                                </select>
-                                <span data-valmsg-for="edit-businessStyle" data-valmsg-replace="true" class="text-danger"></span>
-                            </div>
-                        </div>
+                        <input type="hidden" id="edit-id" />
 
                     </div>
-                    <input type="hidden" id="edit-id" />
-
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-edit"></span> Update
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-
+}
 
 <!-- Details Modal -->
 <div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -348,45 +361,48 @@
 </div>
 
 
-<!-- Upload Modal -->
-<div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" style="max-width: 80%;" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Upload Supplier</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label mb-0" for="upload-file">Excel File</label>
-                    <input type="file" id="upload-file" name="file"
-                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                           class="form-control form-control-sm" />
+@if (userAccess.CanUploadDownload)
+{
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" style="max-width: 80%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload Supplier</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <table class="table table-striped" id="upload-table">
-                    <thead>
-                        <tr><th>Row #</th><th>Code</th><th>Name</th><th>Contact Person</th><th>Contact Number</th><th>Email</th><th>Address Line 1</th><th>Address Line 2</th><th>Barangay</th><th>City/ Municipality</th><th>Area</th><th>Zip Code</th><th>Credit Limit</th><th>Currency</th><th>Is Foreign</th><th>Is Active</th><th>Status</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="DoUpload()">
-                    <span class="fas fa-upload"></span> Upload
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <span class="fas fa-times"></span> Cancel
-                </button>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label mb-0" for="upload-file">Excel File</label>
+                        <input type="file" id="upload-file" name="file"
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        class="form-control form-control-sm" />
+                    </div>
+                    <table class="table table-striped" id="upload-table">
+                        <thead>
+                            <tr><th>Row #</th><th>Code</th><th>Name</th><th>Contact Person</th><th>Contact Number</th><th>Email</th><th>Address Line 1</th><th>Address Line 2</th><th>Barangay</th><th>City/ Municipality</th><th>Area</th><th>Zip Code</th><th>Credit Limit</th><th>Currency</th><th>Is Foreign</th><th>Is Active</th><th>Status</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
+}
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         // Load Select2 Region
         $.ajax({
@@ -479,10 +495,16 @@
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Supplier" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            if (user_access.canEdit) {
+                                actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            }
+                            if (user_access.canDelete) {
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Supplier" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            }
                         } else {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Supplier" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            if (user_access.canAdd || user_access.canEdit) {
+                                actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Supplier" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            }
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
@@ -496,40 +518,42 @@
         dataTable.on("draw", function () {
             hideLoader();
 
-            $('.deleteBtn').click(function (e) {
-                swal({
-                    title: "Delete / Deactivate Supplier",
-                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#deleteSupplierId').val(id);
-                        $('#deleteSupplierForm').submit();
-                    }
+            if (user_access.canDelete) {
+                $('.deleteBtn').click(function (e) {
+                    swal({
+                        title: "Delete / Deactivate Supplier",
+                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#deleteSupplierId').val(id);
+                            $('#deleteSupplierForm').submit();
+                        }
+                    });
                 });
-            });
-
-            $('.reactivateBtn').click(function (e) {
-                swal({
-                    title: "Reactivate Supplier",
-                    text: "Are you sure you want to reactivate this record?",
-                    icon: "info",
-                    buttons: true,
-                    infoMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#reactivateSupplierId').val(id);
-                        $('#reactivateSupplierForm').submit();
-                    }
+            }
+            if (user_access.canAdd || user_access.canEdit) {
+                $('.reactivateBtn').click(function (e) {
+                    swal({
+                        title: "Reactivate Supplier",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#reactivateSupplierId').val(id);
+                            $('#reactivateSupplierForm').submit();
+                        }
+                    });
                 });
-            });
-
+            }
             $('.detailsBtn').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
                 $(".modal-detail-code").html(data.code);
@@ -552,94 +576,185 @@
                 $(".modal-detail-datemodified").html(data.dateModified);
             });
 
+            if (user_access.canEdit) {
 
-            // Actions upon Display Edit Modal
-            $(".editBtn").click(function (e) {
-                var data = dataTable.row($(this).parents('tr')).data();
-                $("#edit-id").val(data.id);
-                $("#edit-code").val(data.code);
-                $("#edit-name").val(data.name);
-                $("#edit-tin").val(data.tin);
-                $("#edit-addressline1").val(data.addressLine1);
-                $("#edit-addressline2").val(data.addressLine2);
-                $("#edit-officetelno").val(data.officeTelNo);
-                $("#edit-contact-person").val(data.contactPerson);
-                $("#edit-region").val(data.regionId);
-                $("#edit-terms").val(data.terms);
-                $("#edit-pricelist").val(data.priceList);
-                $("#edit-currency").val(data.currencyId);
-                $("#edit-businessStyle").val(data.businessStyleId);
-                $("#edit-vat").val(data.vat);
-        
-                // Load Select2 Currency on Edit
-                if ($("#edit-currency").attr("data-select2-id")) {
-                    $("#edit-currency").select2("destroy");
-                    $("#edit-currency").empty();
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "Currency")",
-                    data: { includeId: data.currencyId },
-                    success: function (data, status, xhr) {
-                        $("#edit-currency").select2({
-                            data: data,
-                            allowClear: true,
-                            placeholder: {
-                                id: "",
-                                text: "<empty>"
-                            },
-                            dropdownParent: $('#editModal')
-                        });
+                // Actions upon Display Edit Modal
+                $(".editBtn").click(function (e) {
+                    var data = dataTable.row($(this).parents('tr')).data();
+                    $("#edit-id").val(data.id);
+                    $("#edit-code").val(data.code);
+                    $("#edit-name").val(data.name);
+                    $("#edit-tin").val(data.tin);
+                    $("#edit-addressline1").val(data.addressLine1);
+                    $("#edit-addressline2").val(data.addressLine2);
+                    $("#edit-officetelno").val(data.officeTelNo);
+                    $("#edit-contact-person").val(data.contactPerson);
+                    $("#edit-region").val(data.regionId);
+                    $("#edit-terms").val(data.terms);
+                    $("#edit-pricelist").val(data.priceList);
+                    $("#edit-currency").val(data.currencyId);
+                    $("#edit-businessStyle").val(data.businessStyleId);
+                    $("#edit-vat").val(data.vat);
+
+                    // Load Select2 Currency on Edit
+                    if ($("#edit-currency").attr("data-select2-id")) {
+                        $("#edit-currency").select2("destroy");
+                        $("#edit-currency").empty();
                     }
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetOptions", "Currency")",
+                        data: { includeId: data.currencyId },
+                        success: function (data, status, xhr) {
+                            $("#edit-currency").select2({
+                                data: data,
+                                allowClear: true,
+                                placeholder: {
+                                    id: "",
+                                    text: "<empty>"
+                                },
+                                dropdownParent: $('#editModal')
+                            });
+                        }
+                    });
+
+                    // Load Select2 BusinessStyle on Edit
+                    if ($("#edit-businessStyle").attr("data-select2-id")) {
+                        $("#edit-businessStyle").select2("destroy");
+                        $("#edit-businessStyle").empty();
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetOptions", "BusinessStyle")",
+                        data: { includeId: data.businessStyleId },
+                        success: function (data, status, xhr) {
+                            $("#edit-businessStyle").select2({
+                                data: data,
+                                allowClear: true,
+                                placeholder: {
+                                    id: "",
+                                    text: "<empty>"
+                                },
+                                dropdownParent: $('#editModal')
+                            });
+                        }
+                    });
+
+                    // Load Select2 Region on Edit
+                    if ($("#edit-region").attr("data-select2-id")) {
+                        $("#edit-region").select2("destroy");
+                        $("#edit-region").empty();
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetOptions", "Region")",
+                        data: { includeId: data.regionId },
+                        success: function (data, status, xhr) {
+                            $("#edit-region").select2({
+                                data: data,
+                                allowClear: true,
+                                placeholder: {
+                                    id: "",
+                                    text: "<empty>"
+                                },
+                                dropdownParent: $('#editModal')
+                            });
+                        }
+                    });
                 });
 
-                // Load Select2 BusinessStyle on Edit
-                if ($("#edit-businessStyle").attr("data-select2-id")) {
-                    $("#edit-businessStyle").select2("destroy");
-                    $("#edit-businessStyle").empty();
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "BusinessStyle")",
-                    data: { includeId: data.businessStyleId },
-                    success: function (data, status, xhr) {
-                        $("#edit-businessStyle").select2({
-                            data: data,
-                            allowClear: true,
-                            placeholder: {
-                                id: "",
-                                text: "<empty>"
-                            },
-                            dropdownParent: $('#editModal')
-                        });
-                    }
+                // Validation for Edit Modal
+                var validateEdit = $("#editForm").validate({
+                    errorClass: 'text-danger text-xs',
+                    rules: {
+                        Code: { required: true, maxlength: 50 },
+                        Name: { required: true, maxlength: 100 },
+                        TIN: { maxlength: 12 },
+                        AddressLine1: { required: true, maxlength: 150 },
+                        AddressLine2: { maxlength: 150 },
+                        OfficeTelNo: { maxlength: 100 },
+                        ContactPerson: { maxlength: 100 },
+                        Terms: { maxlength: 100 },
+                        Pricelist: { maxlength: 100 },
+                        Region: { required: true },
+                        VAT: { maxlength: 12 }
+                    },
+                    messages: {
+                        Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
+                        Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
+                        TIN: { maxlength: "Name must not exceed 12 characters." },
+                        AddressLine1: { required: "Please enter address.", maxlength: "Address Line 1 must not exceed 150 characters." },
+                        AddressLine2: { maxlength: "Address Line 2 must not exceed 150 characters." },
+                        OfficeTelNo: { maxlength: "Office Tel No must not exceed 100 characters." },
+                        ContactPerson: { maxlength: "Contact Person must not exceed 100 characters." },
+                        Terms: { maxlength: "Terms must not exceed 100 characters." },
+                        Pricelist: { maxlength: "Pricelist must not exceed 100 characters." },
+                        Region: { required: "Please enter region." },
+                        VAT: { maxlength: "Terms must not exceed 12 characters." },
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoEdit();
+                    },
+                    showErrors: validateShowErrors
                 });
 
-                // Load Select2 Region on Edit
-                if ($("#edit-region").attr("data-select2-id")) {
-                    $("#edit-region").select2("destroy");
-                    $("#edit-region").empty();
+                // Send Edit to Controller
+                function DoEdit() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("EditJson")",
+                        data: {
+                            Id: $("#edit-id").val(),
+                            Code: $("#edit-code").val(),
+                            Name: $("#edit-name").val(),
+                            TIN: $("#edit-tin").val(),
+                            AddressLine1: $("#edit-addressline1").val(),
+                            AddressLine2: $("#edit-addressline2").val(),
+                            OfficeTelNo: $("#edit-officetelno").val(),
+                            ContactPerson: $("#edit-contact-person").val(),
+                            RegionId: $("#edit-region").val(),
+                            Terms: $("#edit-terms").val(),
+                            Pricelist: $("#edit-pricelist").val(),
+                            CurrencyId: $("#edit-currency").val(),
+                            BusinessStyleId: $("#edit-businessStyle").val(),
+                            VAT: $("#edit-vat").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#editModal").modal("hide");
+                                dataTable.ajax.reload();
+                                hideLoader()
+                            }
+                        }
+                    });
                 }
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "Region")",
-                    data: { includeId: data.regionId },
-                    success: function (data, status, xhr) {
-                        $("#edit-region").select2({
-                            data: data,
-                            allowClear: true,
-                            placeholder: {
-                                id: "",
-                                text: "<empty>"
-                            },
-                            dropdownParent: $('#editModal')
-                        });
-                    }
-                });
+            }
+        });
+
+        if (user_access.canAdd) {
+            // Actions upon Display Create Modal
+            $(".createBtn").click(function (e) {
+                $("#create-code").val("");
+                $("#create-name").val("");
+                $("#create-tin").val("");
+                $("#create-addressline1").val("");
+                $("#create-addressline2").val("");
+                $("#create-officetelno").val("");
+                $("#create-contact-person").val("");
+                $("#create-region").prop("selectedIndex", 0).trigger("change");
+                $("#create-terms").val("");
+                $("#create-pricelist").val("");
+                $("#create-currency").prop("selectedIndex", 0).trigger("change");
+                $("#create-businessStyle").prop("selectedIndex", 0).trigger("change");
+                $("#create-vat").val("");
             });
 
-            // Validation for Edit Modal
-            var validateEdit = $("#editForm").validate({
+            // Validation for Create Modal
+            var validateCreate = $("#createForm").validate({
                 errorClass: 'text-danger text-xs',
                 rules: {
                     Code: { required: true, maxlength: 50 },
@@ -669,269 +784,174 @@
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
-                    DoEdit();
+                    DoCreate();
                 },
                 showErrors: validateShowErrors
             });
 
-            // Send Edit to Controller
-            function DoEdit() {
+            // Send Create to Controller
+            function DoCreate() {
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("EditJson")",
+                    url: "@Url.Action("CreateJson")",
                     data: {
-                        Id: $("#edit-id").val(),
-                        Code: $("#edit-code").val(),
-                        Name: $("#edit-name").val(),
-                        TIN: $("#edit-tin").val(),
-                        AddressLine1: $("#edit-addressline1").val(),
-                        AddressLine2: $("#edit-addressline2").val(),
-                        OfficeTelNo: $("#edit-officetelno").val(),
-                        ContactPerson: $("#edit-contact-person").val(),
-                        RegionId: $("#edit-region").val(),
-                        Terms: $("#edit-terms").val(),
-                        Pricelist: $("#edit-pricelist").val(),
-                        CurrencyId: $("#edit-currency").val(),
-                        BusinessStyleId: $("#edit-businessStyle").val(),
-                        VAT: $("#edit-vat").val()
+                        Code: $("#create-code").val(),
+                        Name: $("#create-name").val(),
+                        TIN: $("#create-tin").val(),
+                        AddressLine1: $("#create-addressline1").val(),
+                        AddressLine2: $("#create-addressline2").val(),
+                        OfficeTelNo: $("#create-officetelno").val(),
+                        ContactPerson: $("#create-contact-person").val(),
+                        RegionId: $("#create-region").val(),
+                        Terms: $("#create-terms").val(),
+                        Pricelist: $("#create-pricelist").val(),
+                        CurrencyId: $("#create-currency").val(),
+                        BusinessStyleId: $("#create-businessStyle").val(),
+                        VAT: $("#create-vat").val()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
                             toastr.success(data.message, "Success");
-                            $("#editModal").modal("hide");
+                            $("#createModal").modal("hide");
                             dataTable.ajax.reload();
-                            hideLoader()
+                            hideLoader();
                         }
                     }
                 });
             }
-
-
-        });
-
-
-        // Actions upon Display Create Modal
-        $(".createBtn").click(function (e) {
-            $("#create-code").val("");
-            $("#create-name").val("");
-            $("#create-tin").val("");
-            $("#create-addressline1").val("");
-            $("#create-addressline2").val("");
-            $("#create-officetelno").val("");
-            $("#create-contact-person").val("");
-            $("#create-region").prop("selectedIndex", 0).trigger("change");
-            $("#create-terms").val("");
-            $("#create-pricelist").val("");
-            $("#create-currency").prop("selectedIndex", 0).trigger("change");
-            $("#create-businessStyle").prop("selectedIndex", 0).trigger("change");
-            $("#create-vat").val("");
-        });
-
-        // Validation for Create Modal
-        var validateCreate = $("#createForm").validate({
-            errorClass: 'text-danger text-xs',
-            rules: {
-                Code: { required: true, maxlength: 50 },
-                Name: { required: true, maxlength: 100 },
-                TIN: {  maxlength: 12 },
-                AddressLine1: { required: true, maxlength: 150 },
-                AddressLine2: { maxlength: 150 },
-                OfficeTelNo: { maxlength: 100 },
-                ContactPerson: { maxlength: 100 },
-                Terms: { maxlength: 100 },
-                Pricelist: { maxlength: 100 },
-                Region: { required: true },
-                VAT: { maxlength: 12 }
-            },
-            messages: {
-                Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
-                Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
-                TIN: { maxlength: "Name must not exceed 12 characters." },
-                AddressLine1: { required: "Please enter address.", maxlength: "Address Line 1 must not exceed 150 characters." },
-                AddressLine2: { maxlength: "Address Line 2 must not exceed 150 characters." },
-                OfficeTelNo: { maxlength: "Office Tel No must not exceed 100 characters." },
-                ContactPerson: { maxlength: "Contact Person must not exceed 100 characters." },
-                Terms: { maxlength: "Terms must not exceed 100 characters." },
-                Pricelist: { maxlength: "Pricelist must not exceed 100 characters." },
-                Region: { required: "Please enter region." },
-                VAT: { maxlength: "Terms must not exceed 12 characters." },
-            },
-            submitHandler: function (form, event) {
-                event.preventDefault();
-                DoCreate();
-            },
-            showErrors: validateShowErrors
-        });
-
-        // Send Create to Controller
-        function DoCreate() {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("CreateJson")",
-                data: {
-                    Code: $("#create-code").val(),
-                    Name: $("#create-name").val(),
-                    TIN: $("#create-tin").val(),
-                    AddressLine1: $("#create-addressline1").val(),
-                    AddressLine2: $("#create-addressline2").val(),
-                    OfficeTelNo: $("#create-officetelno").val(),
-                    ContactPerson: $("#create-contact-person").val(),
-                    RegionId: $("#create-region").val(),
-                    Terms: $("#create-terms").val(),
-                    Pricelist: $("#create-pricelist").val(),
-                    CurrencyId: $("#create-currency").val(),
-                    BusinessStyleId: $("#create-businessStyle").val(),
-                    VAT: $("#create-vat").val()
-                },
-                success: function (data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
-                    } else {
-                        toastr.success(data.message, "Success");
-                        $("#createModal").modal("hide");
-                        dataTable.ajax.reload();
-                        hideLoader();
-                    }
-                }
-            });
         }
 
+        if (user_access.canUploadDownload) {
 
+            $(".downloadBtn").click(function (e) {
+                window.location = "@Url.Action("DownloadFile")";
+            });
 
+            var json_of_excel;
+            var colnumber = 15; // number of columns required for upload
+            var done_upload_excel = 0;
+            var duplicate_upload = 0;
 
-        $(".downloadBtn").click(function (e) {
-            window.location = "@Url.Action("DownloadFile")";
-        });
-
-        var json_of_excel;
-        var colnumber = 15; // number of columns required for upload
-        var done_upload_excel = 0;
-        var duplicate_upload = 0;
-
-        var opts = {
-            readAsDefault: 'ArrayBuffer',
-            dragClass: 'drag',
-            on: {
-                load: function (e, file) {
-                    var result = new Uint8Array(e.target.result);
-                    var xlsread = XLSX.read(result, { type: 'array' });
-                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
-                    json_of_excel = xlsjson;
+            var opts = {
+                readAsDefault: 'ArrayBuffer',
+                dragClass: 'drag',
+                on: {
+                    load: function (e, file) {
+                        var result = new Uint8Array(e.target.result);
+                        var xlsread = XLSX.read(result, { type: 'array' });
+                        var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                        json_of_excel = xlsjson;
+                    }
                 }
-            }
-        };
-        $("#upload-file").fileReaderJS(opts);
+            };
+            $("#upload-file").fileReaderJS(opts);
 
-        // Actions upon file selection
-        $("#upload-file").on("change", function () {
-            done_upload_excel = 0;
-            $("#upload-table tbody").html("");
-            $("#upload-table").hide();
-        });
-
-        // Actions upon Display Upload Modal
-        $(".uploadBtn").click(function (e) {
-            done_upload_excel = 0;
-            $("#upload-file").val("");
-            $("#upload-table tbody").html("");
-            $("#upload-table").hide();
-        });
-
-        function DoUpload() {
-            if (!$("#upload-file").val()) {
-                toastr.error("Please select a file first");
-            } if (json_of_excel.length == 0) {
-                toastr.error("The excel file is empty");
-            } else {
-                var columns = Object.keys(json_of_excel[0]);
+            // Actions upon file selection
+            $("#upload-file").on("change", function () {
+                done_upload_excel = 0;
                 $("#upload-table tbody").html("");
-                $("#upload-table").show();
-                duplicate_upload = 0;
-                for (var i = 0; i < json_of_excel.length; i++) {
-                    var rowNum = json_of_excel[i].__rowNum__;
-                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
-                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
-                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
-                        var cellValue = json_of_excel[i][columns[colIndex]];
-                        if (cellValue == null)
-                            cellValue = "";
-                        row$.append($('<td/>').html(cellValue));
-                    }
-                    if (columns.includes("Code") == false
-                        || columns.includes("Name") == false
-                        || columns.includes("Contact Person") == false
-                        || columns.includes("Contact Number") == false
-                        || columns.includes("Email") == false
-                        || columns.includes("Address Line 1") == false
-                        || columns.includes("Address Line 2") == false
-                        || columns.includes("Barangay") == false
-                        || columns.includes("City/ Municipality") == false
-                        || columns.includes("Area") == false
-                        || columns.includes("Zip Code") == false
-                        || columns.includes("Credit Limit") == false
-                        || columns.includes("Currency") == false
-                        || columns.includes("Is Foreign") == false
-                        || columns.includes("Is Active") == false) {
-                        row$.append($('<td/>').html("Unexpected columns"));
-                        UploadRowDone();
-                    } else {
-                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Contact Person"], json_of_excel[i]["Contact Number"], json_of_excel[i]["Email"], json_of_excel[i]["Address Line 1"], json_of_excel[i]["Address Line 2"], json_of_excel[i]["Barangay"], json_of_excel[i]["City/ Municipality"], json_of_excel[i]["Area"], json_of_excel[i]["Zip Code"], json_of_excel[i]["Credit Limit"], json_of_excel[i]["Currency"], json_of_excel[i]["Is Foreign"], json_of_excel[i]["Is Active"], rowNum);
-                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
-                    }
-                    $("#upload-table").append(row$);
-                }
-            }
-        }
-
-        function SaveXLSX(code, name, contactPerson, contactNumber, emailAddress, addressLine1, addressLine2, barangay, city, areaName, zipCode, creditLimitD, currencyName, isForeign, isActive, rownum) {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("UploadJson")",
-                data: {
-                    Code: code,
-                    Name: name,
-                    ContactPerson: contactPerson,
-                    ContactNumber: contactNumber,
-                    EmailAddress: emailAddress,
-                    AddressLine1: addressLine1,
-                    AddressLine2: addressLine2,
-                    Barangay: barangay,
-                    City: city,
-                    AreaName: areaName,
-                    ZipCode: zipCode,
-                    CreditLimitD: creditLimitD,
-                    CurrencyName: currencyName,
-                    isForeign: isForeign,
-                    isActive: isActive
-
-                },
-                success: function (data, status, xhr) {
-                    if (data.message == "Already exist") {
-                        $("#upload-row" + rownum + "tr").remove();
-                        duplicate_upload++;
-                    } else {
-                        $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
-                    }
-                },
-                complete: function (xhr, status) {
-                    UploadRowDone();
-                }
+                $("#upload-table").hide();
             });
-        }
 
-        function UploadRowDone() {
-            done_upload_excel++;
-            if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
-                $("#upload-table").append('<tr><td>*</td><td colspan="15">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+            // Actions upon Display Upload Modal
+            $(".uploadBtn").click(function (e) {
+                done_upload_excel = 0;
                 $("#upload-file").val("");
+                $("#upload-table tbody").html("");
+                $("#upload-table").hide();
+            });
+
+            function DoUpload() {
+                if (!$("#upload-file").val()) {
+                    toastr.error("Please select a file first");
+                } if (json_of_excel.length == 0) {
+                    toastr.error("The excel file is empty");
+                } else {
+                    var columns = Object.keys(json_of_excel[0]);
+                    $("#upload-table tbody").html("");
+                    $("#upload-table").show();
+                    duplicate_upload = 0;
+                    for (var i = 0; i < json_of_excel.length; i++) {
+                        var rowNum = json_of_excel[i].__rowNum__;
+                        var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                        row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                        for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                            var cellValue = json_of_excel[i][columns[colIndex]];
+                            if (cellValue == null)
+                                cellValue = "";
+                            row$.append($('<td/>').html(cellValue));
+                        }
+                        if (columns.includes("Code") == false
+                            || columns.includes("Name") == false
+                            || columns.includes("Contact Person") == false
+                            || columns.includes("Contact Number") == false
+                            || columns.includes("Email") == false
+                            || columns.includes("Address Line 1") == false
+                            || columns.includes("Address Line 2") == false
+                            || columns.includes("Barangay") == false
+                            || columns.includes("City/ Municipality") == false
+                            || columns.includes("Area") == false
+                            || columns.includes("Zip Code") == false
+                            || columns.includes("Credit Limit") == false
+                            || columns.includes("Currency") == false
+                            || columns.includes("Is Foreign") == false
+                            || columns.includes("Is Active") == false) {
+                            row$.append($('<td/>').html("Unexpected columns"));
+                            UploadRowDone();
+                        } else {
+                            SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Contact Person"], json_of_excel[i]["Contact Number"], json_of_excel[i]["Email"], json_of_excel[i]["Address Line 1"], json_of_excel[i]["Address Line 2"], json_of_excel[i]["Barangay"], json_of_excel[i]["City/ Municipality"], json_of_excel[i]["Area"], json_of_excel[i]["Zip Code"], json_of_excel[i]["Credit Limit"], json_of_excel[i]["Currency"], json_of_excel[i]["Is Foreign"], json_of_excel[i]["Is Active"], rowNum);
+                            row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                        }
+                        $("#upload-table").append(row$);
+                    }
+                }
+            }
+
+            function SaveXLSX(code, name, contactPerson, contactNumber, emailAddress, addressLine1, addressLine2, barangay, city, areaName, zipCode, creditLimitD, currencyName, isForeign, isActive, rownum) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadJson")",
+                    data: {
+                        Code: code,
+                        Name: name,
+                        ContactPerson: contactPerson,
+                        ContactNumber: contactNumber,
+                        EmailAddress: emailAddress,
+                        AddressLine1: addressLine1,
+                        AddressLine2: addressLine2,
+                        Barangay: barangay,
+                        City: city,
+                        AreaName: areaName,
+                        ZipCode: zipCode,
+                        CreditLimitD: creditLimitD,
+                        CurrencyName: currencyName,
+                        isForeign: isForeign,
+                        isActive: isActive
+
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.message == "Already exist") {
+                            $("#upload-row" + rownum + "tr").remove();
+                            duplicate_upload++;
+                        } else {
+                            $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                        }
+                    },
+                    complete: function (xhr, status) {
+                        UploadRowDone();
+                    }
+                });
+            }
+
+            function UploadRowDone() {
+                done_upload_excel++;
+                if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                    $("#upload-table").append('<tr><td>*</td><td colspan="15">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                    $("#upload-file").val("");
+                }
             }
         }
-
-
-
-
-
     </script>
 }

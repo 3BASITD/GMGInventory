@@ -2,20 +2,18 @@
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class PackController : Controller
+    public class PackController(IAccessRepository accessRepository
+                           , IPackRepository packRepository
+                           , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IPackRepository packRepository;
-
-        public PackController(IPackRepository packRepository)
-        {
-            this.packRepository = packRepository;
-        }
 
         public async Task<IActionResult> GetPackTypeOptions(int? IncludeId)
         {
@@ -30,8 +28,14 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InvoicingClerk + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PackingListing)).Convert();
+            ViewData["UserAccess_SalesInvoice"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesInvoice)).Convert();
+
             return View();
         }
 
@@ -39,8 +43,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson(ListFilterCommonModel filter)
+        public async Task<IActionResult> GetListJson(ListFilterCommonModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await packRepository.GetListDTAsync(form, filter));
         }
@@ -48,8 +55,13 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InvoicingClerk + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Details(int? Id)
+        public async Task<IActionResult> Details(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PackingListing)).Convert();
+
             var order = await packRepository.GetDetailsAsync(Id);
             if (order == null)
             {
@@ -63,24 +75,36 @@ namespace GMGInventory.Controllers
                          + Roles.Telemarketer)]
         public async Task<IActionResult> PrintDetails(int Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await packRepository.PrintDetailsAsync(Id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsJson(int packId)
+        public async Task<IActionResult> GetItemsJson(int packId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await packRepository.GetItemsAsync(packId));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsWithPriceJson(int packId)
+        public async Task<IActionResult> GetItemsWithPriceJson(int packId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await packRepository.GetItemsWithPriceAsync(packId));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsDTJson(int packId)
+        public async Task<IActionResult> GetItemsDTJson(int packId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await packRepository.GetItemsDTAsync(form, packId));
         }
@@ -88,8 +112,11 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InvoicingClerk + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Create(int? Id)
+        public async Task<IActionResult> Create(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             var order = await packRepository.GetDetailsBySOAsync(Id);
             if (order == null)
             {
@@ -103,8 +130,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> SaveJson(PackFormVM form)
+        public async Task<IActionResult> SaveJson(PackFormVM form)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             var orderId = await packRepository.SaveAsync(form);
             if (orderId == -1)
@@ -125,8 +155,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> UpdateJson(PackFormVM form)
+        public async Task<IActionResult> UpdateJson(PackFormVM form)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             var packId = await packRepository.UpdateAsync(form);
             if (packId == -1)

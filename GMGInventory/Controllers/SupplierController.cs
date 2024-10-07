@@ -4,7 +4,9 @@ using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,27 +16,14 @@ using System.Linq;
 namespace GMGInventory.Controllers
 {
     [Authorize]
-    public class SupplierController : Controller
+    public class SupplierController(IAccessRepository accessRepository
+                             , ISupplierRepository supplierRepository
+                             , IAreaRepository areaRepository
+                             , ICurrencyRepository currencyRepository
+                             , IRegionRepository regionRepository
+                             , IBusinessStyleRepository businessStyleRepository
+                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly ISupplierRepository supplierRepository;
-        private readonly IAreaRepository areaRepository;
-        private readonly ICurrencyRepository currencyRepository;
-        private readonly IRegionRepository regionRepository;
-        private readonly IBusinessStyleRepository businessStyleRepository;
-
-        public SupplierController(ISupplierRepository supplierRepository
-            , IAreaRepository areaRepository
-            , ICurrencyRepository currencyRepository
-            , IRegionRepository regionRepository
-            , IBusinessStyleRepository businessStyleRepository)
-        {
-            this.supplierRepository = supplierRepository;
-            this.areaRepository = areaRepository;
-            this.currencyRepository = currencyRepository;
-            this.regionRepository = regionRepository;
-            this.businessStyleRepository = businessStyleRepository;
-        }
-
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
             return Json(await supplierRepository.GetOptions(IncludeId));
@@ -43,8 +32,13 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Suppliers)).Convert();
+
             return View();
         }
 
@@ -52,8 +46,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> CreateJson(SupplierVM supplierVM)
+        public async Task<IActionResult> CreateJson(SupplierVM supplierVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await supplierRepository.IsSupplierCodeExist(supplierVM.Code))
             {
@@ -73,8 +70,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await supplierRepository.GetAllForDataTablesAsync(form));
         }
@@ -84,6 +84,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> Details(int? id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             var supplierVM = await supplierRepository.GetSupplierViewVMAsync(id);
             if (supplierVM == null)
             {
@@ -97,6 +100,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> Create()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             var supplierVM = new SupplierVM
             {
                // Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name"),
@@ -113,6 +119,9 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SupplierVM supplierVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             if (ModelState.IsValid)
             {
                 if (await supplierRepository.IsSupplierCodeExist(supplierVM.Code))
@@ -138,6 +147,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> Edit(int? id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             var supplierVM = await supplierRepository.GetSupplierVMAsync(id);
             if (supplierVM == null)
             {
@@ -155,8 +167,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> EditJson(SupplierVM supplierVM)
+        public async Task<IActionResult> EditJson(SupplierVM supplierVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             try
             {
@@ -187,6 +202,9 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             if (await supplierRepository.IsSupplierIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -211,6 +229,10 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             if (await supplierRepository.IsSupplierIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -225,6 +247,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Supplier");
             dt.Columns.AddRange(new DataColumn[14] {
                 new DataColumn("Code"),
@@ -279,8 +304,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(SupplierVM supplierVM)
+        public async Task<IActionResult> UploadJson(SupplierVM supplierVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await supplierRepository.UploadCombinationExistAsync(supplierVM))
             {

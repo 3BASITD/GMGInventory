@@ -32,7 +32,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> GetListJson()
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             var form = new DataTablesRequestForm(Request.Form);
@@ -42,7 +42,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateJson(CategoryVM categoryVM)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Add);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
             var responseModel = new ResponseModel();
@@ -63,7 +63,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> EditJson(CategoryVM categoryVM)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.Edit);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
             var responseModel = new ResponseModel();

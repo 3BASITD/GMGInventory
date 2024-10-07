@@ -1,45 +1,56 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
     [Authorize(Roles = Roles.Accounting + ","
                      + Roles.SystemAdmin)]
-    public class SoacrController : Controller
+    public class SoacrController(IAccessRepository accessRepository
+                             , ISoacrRepository soaRepository
+                             , ISoacrLineItemRepository soacrLineItemRepository
+                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly ISoacrRepository soaRepository;
-        private readonly ISoacrLineItemRepository soacrLineItemRepository;
-
-        public SoacrController(ISoacrRepository soaRepository, ISoacrLineItemRepository soacrLineItemRepository)
-        {
-            this.soaRepository = soaRepository;
-            this.soacrLineItemRepository = soacrLineItemRepository;
-        }
-
         #region for SOACR/Index
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SOACR)).Convert();
+
             return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await soaRepository.SOACRListDT(form));
         }
 
-        public IActionResult GenerateCR()
+        public async Task<IActionResult> GenerateCR()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GenerateSOAJson(GenerateSOAVM soaVM)
+        public async Task<IActionResult> GenerateSOAJson(GenerateSOAVM soaVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             var soaId = await soaRepository.GenerateSOAAsync(soaVM);
             if (soaId == 0)
@@ -58,20 +69,31 @@ namespace GMGInventory.Controllers
         #endregion
 
         #region for SOACR/Invoice
-        public ActionResult Invoice()
+        public async Task<IActionResult> Invoice()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SOACR)).Convert();
+
             return View();
 		}
 
 		[HttpPost]
-		public async Task<JsonResult> GetInvoiceJson(ListFilterSalesModel filter)
+		public async Task<IActionResult> GetInvoiceJson(ListFilterSalesModel filter)
 		{
-			DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
 			return Json(await soaRepository.GetInvoiceListDTAsync(form, filter));
         }
 
         public async Task<IActionResult> PrintInvoice(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await soaRepository.PrintInvoice(filter));
         }
         #endregion
@@ -79,13 +101,19 @@ namespace GMGInventory.Controllers
         #region for SOACR/Generate CR
         public async Task<IActionResult> GetCustomerInvoiceToAddDT(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await soaRepository.GetCustomerInvoiceToAddDT(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GenerateCRJson(int CustomerId, int[] InvoiceIds)
+        public async Task<IActionResult> GenerateCRJson(int CustomerId, int[] InvoiceIds)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             responseModel.Status = "Success";
             responseModel.Message = "Counter Receipt Successfully added";
@@ -98,8 +126,13 @@ namespace GMGInventory.Controllers
         #endregion
 
         #region for SOACR/Details
-        public async Task<ActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SOACR)).Convert();
+
             var soa = await soaRepository.GetSOACRDetails(id);
             if (soa == null)
             {
@@ -116,8 +149,11 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> EditInvoiceJson(SOACRItemsForm soaVM)
+        public async Task<IActionResult> EditInvoiceJson(SOACRItemsForm soaVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             try
             {
@@ -144,6 +180,9 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteInvoiceJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await soacrLineItemRepository.IsSoaLineItemIdExistAsync(id) == false)
             {
@@ -162,6 +201,9 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> CheckCheckNumberJson(string CheckNumber)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await soaRepository.IsCheckNumberInUse(CheckNumber))
             {
@@ -179,6 +221,9 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> CollectorReceiptNumberJson(string CollectorReceiptNumber)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await soaRepository.IsCollectorReceiptNumberInUse(CollectorReceiptNumber))
             {
@@ -194,8 +239,11 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> AddPaymentDetailsJson(SOACRPaymentDetails payment)
+        public async Task<IActionResult> AddPaymentDetailsJson(SOACRPaymentDetails payment)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ResponseModel<int>();
             if (payment.CollectorReceiptNumber == null || payment.CollectorReceiptNumber.Length > 500)
             {
@@ -229,17 +277,26 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> PrintCRDetails(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await soaRepository.PrintCRDetails(id));
         }
 
         public async Task<IActionResult> PrintSOADetails(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await soaRepository.PrintSOADetails(id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> AddInvoices(int soaId, int[] invoiceIds)
+        public async Task<IActionResult> AddInvoices(int soaId, int[] invoiceIds)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             responseModel.Status = "Success";
             responseModel.Message = "Invoice Successfully Added";
@@ -249,15 +306,21 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetInvoiceTBR(string search, int page, int CustomerId)
+        public async Task<IActionResult> GetInvoiceTBR(string search, int page, int CustomerId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await soaRepository.GetInvoicesTBRAsync(search, page, CustomerId));
         }
 
         [HttpPost]
-        public async Task<JsonResult> AddInvoiceTBR(int soaLineItemId, int salesReturnId, decimal amount)
+        public async Task<IActionResult> AddInvoiceTBR(int soaLineItemId, int salesReturnId, decimal amount)
         {
-                await soaRepository.AddInvoiceTBRAsync(soaLineItemId, salesReturnId, amount);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            await soaRepository.AddInvoiceTBRAsync(soaLineItemId, salesReturnId, amount);
             ResponseModel responseModel = new ResponseModel();
             responseModel.Status = "Success";
             responseModel.Message = "TBR Successfully Added";
@@ -266,8 +329,11 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetInvoiceTBRHistory(int soaLineItemId)
+        public async Task<IActionResult> GetInvoiceTBRHistory(int soaLineItemId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await soaRepository.GetInvoiceTBRHistoryDTAsync(form, soaLineItemId));
         }

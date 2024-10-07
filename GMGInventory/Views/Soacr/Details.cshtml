@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "SOA/CR Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 @section Breadcrumb {
     <li class="breadcrumb-item"><a asp-controller="Soacr" asp-action="Index">SOA / Counter Receipt</a></li>
@@ -14,9 +15,12 @@
             <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
-            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
-                <span class="fas fa-print"></span> Print
-            </button>
+            @if (userAccess.CanPrint)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -83,13 +87,19 @@
                 <div class="card-tools">
                     @if (Model?.Type == "Counter Receipt")
                     {
-                        <a class="btn btn-primary btn-sm float-right ml-2 btn-add-invoice">
-                            <span class="fas fa-plus"></span> Add Invoice
-                        </a>
+                        @if (userAccess.CanAdd)
+                        {
+                            <a class="btn btn-primary btn-sm float-right ml-2 btn-add-invoice">
+                                <span class="fas fa-plus"></span> Add Invoice
+                            </a>
+                        }
                     }
-                    <button type="button" class="btn btn-primary btn-sm float-right paymentBtn ml-2">
-                        <span class="fas fa-money-bill"></span> Add Payment
-                    </button>
+                    @if (userAccess.CanAdd)
+                    {
+                        <button type="button" class="btn btn-primary btn-sm float-right paymentBtn ml-2">
+                            <span class="fas fa-money-bill"></span> Add Payment
+                        </button>
+                    }
                 </div>
             </div>
             <div class="card-body">
@@ -149,66 +159,67 @@
         </div>
     </div>
 </div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Invoice</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form autocomplete="off" id="editForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
-                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="Debit" id="edit-debit" class="form-control form-control-sm" />*@
-                                <input type="text" name="Debit" id="edit-debit" class="form-control form-control-sm mask-decimal" />
-                                <span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
+@if (userAccess.CanEdit)
+{
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Invoice</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
+                                    @*<input type="number" step="0.01" min="0" max="1999999.99" name="Debit" id="edit-debit" class="form-control form-control-sm" />*@
+                                    <input type="text" name="Debit" id="edit-debit" class="form-control form-control-sm mask-decimal" />
+                                    <span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
-                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="Credit" id="edit-credit" class="form-control form-control-sm" />*@
-                                <input type="text" name="Credit" id="edit-credit" class="form-control form-control-sm mask-decimal" />
-                                <span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
+                                    @*<input type="number" step="0.01" min="0" max="1999999.99" name="Credit" id="edit-credit" class="form-control form-control-sm" />*@
+                                    <input type="text" name="Credit" id="edit-credit" class="form-control form-control-sm mask-decimal" />
+                                    <span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
-                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />*@
-                                <input type="text" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm mask-decimal" />
-                                <span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
+                                    @*<input type="number" step="0.01" min="0" max="1999999.99" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />*@
+                                    <input type="text" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm mask-decimal" />
+                                    <span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label for="edit-freight-waybill" class="control-label mb-0 d-block">Freight's Waybill</label>
-                                <input type="text" name="FreightWaybill" id="edit-freight-waybill" class="form-control form-control-sm" />
-                                <span data-valmsg-for="edit-freight-waybill" data-valmsg-replace="true" class="text-danger"></span>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="edit-freight-waybill" class="control-label mb-0 d-block">Freight's Waybill</label>
+                                    <input type="text" name="FreightWaybill" id="edit-freight-waybill" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="edit-freight-waybill" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-plus"></span> Add
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-
+}
 <!-- TBR Modal -->
 <div class="modal fade" id="tbrModal" role="dialog" aria-labelledby="tbrModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog modal-sm" role="document">
@@ -318,238 +329,241 @@
         </div>
     </div>
 </div>
+@if (userAccess.CanEdit)
+{
+    <!-- Update Payment Modal -->
+    <div class="modal fade" id="paymentModal" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-fullscreen-md-down" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Payment</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row align-items-center form-group">
+                        <div class="col-12 col-lg-3">
+                            <label for="payment-collector-receipt" class="control-label mb-0">Collector Receipt No</label>
+                        </div>
+                        <div class="col-12 col-lg-5">
+                            <input type="text" name="CollectorReceipt" id="payment-collector-receipt" class="form-control form-control-sm" autocomplete="off" />
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <span data-valmsg-for="payment-collector-receipt" data-valmsg-replace="true" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row align-items-center form-group">
+                        <div class="col-12 col-lg-3">
+                            <label for="payment-remarks" class="control-label mb-0">Remarks</label>
+                        </div>
+                        <div class="col-12 col-lg-9">
+                            <input type="text" name="Remarks" id="payment-remarks" class="form-control form-control-sm" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="row align-items-center form-group">
+                        <div class="col-4 col-lg-3">
+                            <label for="payment-over-payment" class="control-label mb-0">Over Payment</label>
+                        </div>
+                        <div class="col-8 col-lg-3">
+                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm" />*@
+                            <input type="text" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm mask-decimal" />
 
-<!-- Update Payment Modal -->
-<div class="modal fade" id="paymentModal" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-fullscreen-md-down" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Payment</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="row align-items-center form-group">
-                    <div class="col-12 col-lg-3">
-                        <label for="payment-collector-receipt" class="control-label mb-0">Collector Receipt No</label>
+                        </div>
+                        <div class="col-4 col-lg-3">
+                            <label for="payment-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
+                        </div>
+                        <div class="col-8 col-lg-3">
+                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="TKT" id="payment-tkt" class="form-control form-control-sm" />*@
+                            <input type="text" name="TKT" id="payment-tkt" class="form-control form-control-sm mask-decimal" />
+                        </div>
                     </div>
-                    <div class="col-12 col-lg-5">
-                        <input type="text" name="CollectorReceipt" id="payment-collector-receipt" class="form-control form-control-sm" autocomplete="off" />
+                    <div class="row align-items-center form-group">
+                        <div class="col-4 col-lg-3">
+                            <label for="payment-tax" class="control-label mb-0">Tax</label>
+                        </div>
+                        <div class="col-8 col-lg-3">
+                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="TAX" id="payment-tax" class="form-control form-control-sm" />*@
+                            <input type="text" name="TAX" id="payment-tax" class="form-control form-control-sm mask-decimal" />
+                        </div>
+                        <div class="col-4 col-lg-3">
+                            <label for="payment-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
+                        </div>
+                        <div class="col-8 col-lg-3">
+                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm" />*@
+                            <input type="text" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm mask-decimal" />
+                        </div>
                     </div>
-                    <div class="col-12 col-lg-4">
-                        <span data-valmsg-for="payment-collector-receipt" data-valmsg-replace="true" class="text-danger"></span>
+                    <div class="row align-items-center form-group">
+                        <div class="col-4 col-lg-3">
+                            <label for="payment-discount" class="control-label mb-0">Discount</label>
+                        </div>
+                        <div class="col-8 col-lg-3">
+                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="Discount" id="payment-discount" class="form-control form-control-sm" />*@
+                            <input type="text" name="Discount" id="payment-discount" class="form-control form-control-sm mask-decimal" />
+                        </div>
+                        <div class="col-4 col-lg-3">
+                            <label for="payment-offset" class="control-label mb-0 d-block">Offset</label>
+                        </div>
+                        <div class="col-8 col-lg-3">
+                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="Offset" id="payment-offset" class="form-control form-control-sm" />*@
+                            <input type="text" name="Offset" id="payment-offset" class="form-control form-control-sm mask-decimal" />
+                        </div>
                     </div>
-                </div>
-                <div class="row align-items-center form-group">
-                    <div class="col-12 col-lg-3">
-                        <label for="payment-remarks" class="control-label mb-0">Remarks</label>
+                    <div class="row align-items-center form-group">
+                        <div class="col-4 col-lg-3">
+                            <label for="payment-cash-amount" class="control-label mb-0">Cash Amount</label>
+                        </div>
+                        <div class="col-8 col-lg-3">
+                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm" />*@
+                            <input type="text" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm mask-decimal" />
+                        </div>
+                        <div class="col-4 col-lg-3">
+                            <label for="payment-backload" class="control-label mb-0 d-block">Back Load</label>
+                        </div>
+                        <div class="col-8 col-lg-3">
+                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="BackLoad" id="payment-backload" class="form-control form-control-sm" />*@
+                            <input type="text" name="BackLoad" id="payment-backload" class="form-control form-control-sm mask-decimal" />
+                        </div>
                     </div>
-                    <div class="col-12 col-lg-9">
-                        <input type="text" name="Remarks" id="payment-remarks" class="form-control form-control-sm" autocomplete="off" />
-                    </div>
-                </div>
-                <div class="row align-items-center form-group">
-                    <div class="col-4 col-lg-3">
-                        <label for="payment-over-payment" class="control-label mb-0">Over Payment</label>
-                    </div>
-                    <div class="col-8 col-lg-3">
-                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm" />*@
-                        <input type="text" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm mask-decimal" />
 
-                    </div>
-                    <div class="col-4 col-lg-3">
-                        <label for="payment-tkt" class="control-label mb-0 d-block">TKT/ Solicitation</label>
-                    </div>
-                    <div class="col-8 col-lg-3">
-                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="TKT" id="payment-tkt" class="form-control form-control-sm" />*@
-                        <input type="text" name="TKT" id="payment-tkt" class="form-control form-control-sm mask-decimal" />
-                    </div>
-                </div>
-                <div class="row align-items-center form-group">
-                    <div class="col-4 col-lg-3">
-                        <label for="payment-tax" class="control-label mb-0">Tax</label>
-                    </div>
-                    <div class="col-8 col-lg-3">
-                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="TAX" id="payment-tax" class="form-control form-control-sm" />*@
-                        <input type="text" name="TAX" id="payment-tax" class="form-control form-control-sm mask-decimal" />
-                    </div>
-                    <div class="col-4 col-lg-3">
-                        <label for="payment-cash-advanced" class="control-label mb-0 d-block">Cash Advanced</label>
-                    </div>
-                    <div class="col-8 col-lg-3">
-                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm" />*@
-                        <input type="text" name="CashAdvanced" id="payment-cash-advanced" class="form-control form-control-sm mask-decimal" />
-                    </div>
-                </div>
-                <div class="row align-items-center form-group">
-                    <div class="col-4 col-lg-3">
-                        <label for="payment-discount" class="control-label mb-0">Discount</label>
-                    </div>
-                    <div class="col-8 col-lg-3">
-                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="Discount" id="payment-discount" class="form-control form-control-sm" />*@
-                        <input type="text" name="Discount" id="payment-discount" class="form-control form-control-sm mask-decimal" />
-                    </div>
-                    <div class="col-4 col-lg-3">
-                        <label for="payment-offset" class="control-label mb-0 d-block">Offset</label>
-                    </div>
-                    <div class="col-8 col-lg-3">
-                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="Offset" id="payment-offset" class="form-control form-control-sm" />*@
-                        <input type="text" name="Offset" id="payment-offset" class="form-control form-control-sm mask-decimal" />
-                    </div>
-                </div>
-                <div class="row align-items-center form-group">
-                    <div class="col-4 col-lg-3">
-                        <label for="payment-cash-amount" class="control-label mb-0">Cash Amount</label>
-                    </div>
-                    <div class="col-8 col-lg-3">
-                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm" />*@
-                        <input type="text" name="CashAmount" id="payment-cash-amount" class="form-control form-control-sm mask-decimal" />
-                    </div>
-                    <div class="col-4 col-lg-3">
-                        <label for="payment-backload" class="control-label mb-0 d-block">Back Load</label>
-                    </div>
-                    <div class="col-8 col-lg-3">
-                        @*<input type="number" step="0.01" min="0" max="1999999.99" name="BackLoad" id="payment-backload" class="form-control form-control-sm" />*@
-                        <input type="text" name="BackLoad" id="payment-backload" class="form-control form-control-sm mask-decimal" />
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card border-secondary border-1">
-                            <div class="card-header bg-secondary">
-                                <strong>Check</strong>
-                            </div>
-                            <div class="card-body pb-0">
-                                <form autocomplete="off" id="checkForm">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="check-bankname" class="control-label mb-0 d-block">Bank Name</label>
-                                                <input type="text" name="BankName" id="check-bankname" class="form-control form-control-sm" />
-                                                <span data-valmsg-for="check-bankname" data-valmsg-replace="true" class="text-danger"></span>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-secondary border-1">
+                                <div class="card-header bg-secondary">
+                                    <strong>Check</strong>
+                                </div>
+                                <div class="card-body pb-0">
+                                    <form autocomplete="off" id="checkForm">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="check-bankname" class="control-label mb-0 d-block">Bank Name</label>
+                                                    <input type="text" name="BankName" id="check-bankname" class="form-control form-control-sm" />
+                                                    <span data-valmsg-for="check-bankname" data-valmsg-replace="true" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="check-checkdate" class="control-label mb-0 d-block">Check Date</label>
+                                                    <input type="date" name="CheckDate" id="check-checkdate" class="form-control form-control-sm" />
+                                                    <span data-valmsg-for="check-checkdate" data-valmsg-replace="true" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="check-checkamount" class="control-label mb-0 d-block">Check Amount</label>
+                                                    @*<input type="number" step="0.01" min="0" max="1999999.99" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm" />*@
+                                                    <input type="text" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm mask-decimal" />
+                                                    <span data-valmsg-for="check-checkamount" data-valmsg-replace="true" class="text-danger"></span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="check-checkdate" class="control-label mb-0 d-block">Check Date</label>
-                                                <input type="date" name="CheckDate" id="check-checkdate" class="form-control form-control-sm" />
-                                                <span data-valmsg-for="check-checkdate" data-valmsg-replace="true" class="text-danger"></span>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="check-bankbranch" class="control-label mb-0 d-block">Bank Branch</label>
+                                                    <input type="text" name="BankBranch" id="check-bankbranch" class="form-control form-control-sm" />
+                                                    <span data-valmsg-for="check-bankbranch" data-valmsg-replace="true" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="check-checknumber" class="control-label mb-0 d-block">Check Number</label>
+                                                    <input type="text" name="CheckNumber" id="check-checknumber" class="form-control form-control-sm" />
+                                                    <span data-valmsg-for="check-checknumber" data-valmsg-replace="true" class="text-danger text-xs"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-secondary btn-sm float-right btnClearCheck ml-2">
+                                                        <span class="fas fa-undo-alt"></span> Clear
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary btn-sm float-right">
+                                                        <span class="fas fa-arrow-down"></span> Add Check
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="check-checkamount" class="control-label mb-0 d-block">Check Amount</label>
-                                                @*<input type="number" step="0.01" min="0" max="1999999.99" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm" />*@
-                                                <input type="text" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm mask-decimal" />
-                                                <span data-valmsg-for="check-checkamount" data-valmsg-replace="true" class="text-danger"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="check-bankbranch" class="control-label mb-0 d-block">Bank Branch</label>
-                                                <input type="text" name="BankBranch" id="check-bankbranch" class="form-control form-control-sm" />
-                                                <span data-valmsg-for="check-bankbranch" data-valmsg-replace="true" class="text-danger"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="check-checknumber" class="control-label mb-0 d-block">Check Number</label>
-                                                <input type="text" name="CheckNumber" id="check-checknumber" class="form-control form-control-sm" />
-                                                <span data-valmsg-for="check-checknumber" data-valmsg-replace="true" class="text-danger text-xs"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <button type="button" class="btn btn-secondary btn-sm float-right btnClearCheck ml-2">
-                                                    <span class="fas fa-undo-alt"></span> Clear
-                                                </button>
-                                                <button type="submit" class="btn btn-primary btn-sm float-right">
-                                                    <span class="fas fa-arrow-down"></span> Add Check
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-check">
-                                    <thead>
-                                        <tr>
-                                            <th>Bank Name</th>
-                                            <th>Bank Branch</th>
-                                            <th>Check Number</th>
-                                            <th>Check Amount</th>
-                                            <th>Check Date</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th colspan="3" class="text-end">Total</th>
-                                            <th>0.00</th>
-                                            <th colspan="2"></th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                                    </form>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-head-fixed table-striped table-hover table-check">
+                                        <thead>
+                                            <tr>
+                                                <th>Bank Name</th>
+                                                <th>Bank Branch</th>
+                                                <th>Check Number</th>
+                                                <th>Check Amount</th>
+                                                <th>Check Date</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="3" class="text-end">Total</th>
+                                                <th>0.00</th>
+                                                <th colspan="2"></th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary btn-payment">
-                    <span class="fas fa-edit"></span> Update
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <span class="fas fa-times"></span> Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add Invoice Modal   -->
-<div class="modal fade" id="addInvoiceModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Invoice</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-head-fixed table-striped table-hover table-invoice">
-                    <thead>
-                        <tr>
-                            <th>
-                                <input class="chkclassaddinvoiceall" type="checkbox" />
-                            </th>
-                            <th>Invoice Date</th>
-                            <th>Invoice Number</th>
-                            <th>Invoice Type</th>
-                            <th>Total Amount</th>
-                        </tr>
-                    </thead>
-                </table>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary btn-add-selected-invoice">
-                    <span class="fas fa-plus"></span> Add
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <span class="fas fa-times"></span> Cancel
-                </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-payment">
+                        <span class="fas fa-edit"></span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
+@if (userAccess.CanAdd)
+{
+    <!-- Add Invoice Modal   -->
+    <div class="modal fade" id="addInvoiceModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Invoice</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-head-fixed table-striped table-hover table-invoice">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input class="chkclassaddinvoiceall" type="checkbox" />
+                                </th>
+                                <th>Invoice Date</th>
+                                <th>Invoice Number</th>
+                                <th>Invoice Type</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                    </table>
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-add-selected-invoice">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @section Scripts {
     <script>
         var soaDT = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
@@ -593,10 +607,14 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (data.isPaid == false) {
-                            actions += '<button class="btn btn-info btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            if (user_access.canEdit) {
+                                actions += '<button class="btn btn-info btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            }
                             actions += '<button class="btn btn-warning btn-xs tbrBtn" data-bs-toggle="modal" data-bs-target="#tbrModal" data-microtip-title="TBR" data-microtip-position="top-left" role="tooltip"><i class="fas fa-exchange-alt"></i></button>';
                             if ($(".SoacrType").text().trim() == "Counter Receipt"/* && data.invoiceAmount == data.balance*/) {
-                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                if (user_access.canDelete) {
+                                    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                }
                             }
                             actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         }
@@ -628,45 +646,47 @@
             $(".chkclassinvoiceall").prop("checked", false);
             $(".chkclassinvoiceall").prop("indeterminate", false);
 
-            // Actions upon Display Edit Modal
-            $(".editBtn").click(function (e) {
-                var data = soaDT.row($(this).parents('tr')).data();
-                $("#edit-debit").data("id", data.id);
-                $("#edit-debit").val(data.debitD.toFixed(2));
-                $("#edit-credit").val(data.creditD.toFixed(2));
-                $("#edit-freight-cost").val(data.freightChargeD.toFixed(2));
-                $("#edit-frieght-waybill").val(data.frieghtWaybill);
-            });
-
-            $('.deleteBtn').click(function (e) {
-                swal({
-                    title: "Delete Invoice",
-                    text: "Are you sure you want to delete this record?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn_clicked = $(this);
-                        $.ajax({
-                            type: "POST",
-                            url: "@Url.Action("DeleteInvoiceJson")",
-                            data: {
-                                Id: btn_clicked.data("id")
-                            },
-                            success: function (data, status, xhr) {
-                                if (data.status == "Error") {
-                                    toastr.error(data.message, "Error");
-                                } else {
-                                    toastr.success(data.message, "Success");
-                                    soaDT.row(btn_clicked.parents('tr')).remove().draw();
-                                }
-                            }
-                        });
-                    }
+            if (user_access.canEdit) {
+                // Actions upon Display Edit Modal
+                $(".editBtn").click(function (e) {
+                    var data = soaDT.row($(this).parents('tr')).data();
+                    $("#edit-debit").data("id", data.id);
+                    $("#edit-debit").val(data.debitD.toFixed(2));
+                    $("#edit-credit").val(data.creditD.toFixed(2));
+                    $("#edit-freight-cost").val(data.freightChargeD.toFixed(2));
+                    $("#edit-frieght-waybill").val(data.frieghtWaybill);
                 });
-            });
-
+            }
+            if (user_access.canDelete) {
+                $('.deleteBtn').click(function (e) {
+                    swal({
+                        title: "Delete Invoice",
+                        text: "Are you sure you want to delete this record?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn_clicked = $(this);
+                            $.ajax({
+                                type: "POST",
+                                url: "@Url.Action("DeleteInvoiceJson")",
+                                data: {
+                                    Id: btn_clicked.data("id")
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Error") {
+                                        toastr.error(data.message, "Error");
+                                    } else {
+                                        toastr.success(data.message, "Success");
+                                        soaDT.row(btn_clicked.parents('tr')).remove().draw();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
             $(".chkclassinvoiceall").on("change", function () {
                 soaDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     $(this.node()).find(".chkclassinvoice").prop("checked", $(".chkclassinvoiceall").prop("checked"));
@@ -1031,7 +1051,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button class="btn btn-danger btn-xs btn-remove-check" data-microtip-title="Remove Check" data-microtip-position="top-left" role="tooltip"><i class="fas fa-trash"></i></button>';
+                        if (user_access.canEdit) {
+                            actions += '<button class="btn btn-danger btn-xs btn-remove-check" data-microtip-title="Remove Check" data-microtip-position="top-left" role="tooltip"><i class="fas fa-trash"></i></button>';
+                        }
                         return actions;
                     }
                 }
@@ -1045,10 +1067,11 @@
 
         checkTable.on("draw", function () {
             hideLoader();
-
-            $(".btn-remove-check").on("click", function () {
-                checkTable.row($(this).parents('tr')).remove().draw();
-            });
+            if (user_access.canEdit) {
+                $(".btn-remove-check").on("click", function () {
+                    checkTable.row($(this).parents('tr')).remove().draw();
+                });
+            }
         });
 
         // Validation for Check Modal
@@ -1143,10 +1166,12 @@
             return checks;
         }
 
-        $(".btn-add-invoice").on("click", function () {
-            invoiceDT.ajax.reload();
-            $("#addInvoiceModal").modal("show");
-        });
+        if (user_access.canAdd) {
+            $(".btn-add-invoice").on("click", function () {
+                invoiceDT.ajax.reload();
+                $("#addInvoiceModal").modal("show");
+            });
+        }
 
         var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -1214,8 +1239,8 @@
                 }
             });
         });
-
-        $(".btn-add-selected-invoice").on("click", function () {
+        if (user_access.canAdd) {
+           $(".btn-add-selected-invoice").on("click", function () {
             var invoiceIds = [];
             invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var invlist = $(this.node()).find(".chkclassaddinvoice");
@@ -1243,7 +1268,7 @@
                 }
             });
         });
-
+        }
     </script>
 	}
 

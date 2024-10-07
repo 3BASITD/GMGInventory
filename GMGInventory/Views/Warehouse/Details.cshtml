@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Warehouse Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -14,9 +15,12 @@
             <div class="card-tools">
                 @if (Model?.IsActive == true)
             {
-                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
-                    <span class="fas fa-edit"></span> Edit Warehouse
+                @if (userAccess.CanEdit)
+                {
+                    <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                        <span class="fas fa-edit"></span> Edit Warehouse
                 </a>
+                }
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List

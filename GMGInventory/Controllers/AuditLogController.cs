@@ -13,7 +13,7 @@ namespace GMGInventory.Controllers
     {
         public async Task<IActionResult> Index()
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.AuditLogs, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             return View();
@@ -22,7 +22,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> GetListJson()
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Agents, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.AuditLogs, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             DataTablesRequestForm dtForm = new(Request.Form);

@@ -1,7 +1,9 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
@@ -10,23 +12,24 @@ namespace GMGInventory.Controllers
                      + Roles.SalesDirector + ","
                      + Roles.SystemAdmin + ","
                      + Roles.Telemarketer)]
-    public class UnservedItemController : Controller
+    public class UnservedItemController(IAccessRepository accessRepository
+                             , IUnservedItemRepository unservedItemRepository
+                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IUnservedItemRepository unservedItemRepository;
-
-        public UnservedItemController(IUnservedItemRepository unservedItemRepository)
+        public async Task<IActionResult> Index()
         {
-            this.unservedItemRepository = unservedItemRepository;
-        }
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
 
-        public ActionResult Index()
-        {
             return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson(UnservedItemFilter filter)
+        public async Task<IActionResult> GetListJson(UnservedItemFilter filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await unservedItemRepository.GetListDataTablesAsync(form, filter));
         }

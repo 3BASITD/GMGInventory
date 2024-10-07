@@ -2,7 +2,10 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,18 +13,22 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class ForwarderController : Controller
-    {
-        private readonly IForwarderRepository forwarderRepository;
-        private readonly ICustomerRepository customerRepository;
+    public class ForwarderController(IAccessRepository accessRepository
+                            , IForwarderRepository forwarderRepository 
+                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
+    { 
+    //[Authorize]
+    //public class ForwarderController : Controller
+    //{
+    //    private readonly IForwarderRepository forwarderRepository;
+    //    private readonly ICustomerRepository customerRepository;
 
-        public ForwarderController(IForwarderRepository forwarderRepository
-            , ICustomerRepository customerRepository)
-        {
-            this.forwarderRepository = forwarderRepository;
-            this.customerRepository = customerRepository;
-        }
+        //public ForwarderController(IForwarderRepository forwarderRepository
+        //    , ICustomerRepository customerRepository)
+        //{
+        //    this.forwarderRepository = forwarderRepository;
+        //    this.customerRepository = customerRepository;
+        //}
 
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
@@ -31,8 +38,13 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Forwarders)).Convert();
+
             return View();
         }
 
@@ -40,8 +52,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await forwarderRepository.GetAllForDataTablesAsync(form));
         }
@@ -51,6 +66,10 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> Details(int? id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Forwarders)).Convert();
+
             var forwarderVM = await forwarderRepository.GetForwarderViewVMAsync(id);
             if (forwarderVM == null)
             {
@@ -63,8 +82,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> CreateJson(ForwarderVM forwarderVM)
+        public async Task<IActionResult> CreateJson(ForwarderVM forwarderVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await forwarderRepository.IsForwarderCodeExist(forwarderVM.Name))
             {
@@ -116,6 +138,9 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             if (await forwarderRepository.IsForwarderIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -140,6 +165,10 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             if (await forwarderRepository.IsForwarderIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -154,6 +183,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Forwarder");
             dt.Columns.AddRange(new DataColumn[4] {
                 new DataColumn("Name"),
@@ -184,8 +216,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(ForwarderVM forwarderVM)
+        public async Task<IActionResult> UploadJson(ForwarderVM forwarderVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Forwarders, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await forwarderRepository.UploadCombinationExistAsync(forwarderVM))
             {

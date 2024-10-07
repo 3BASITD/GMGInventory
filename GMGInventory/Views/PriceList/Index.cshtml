@@ -2,15 +2,19 @@
 
 @{
     ViewData["Title"] = "Price List";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
-                <span class="fas fa-print"></span> Print
-            </button>
+            @if (userAccess.CanPrint)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterPriceModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -131,6 +135,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         // Load Select2 for Brand
         $.ajax({
             type: "POST",
@@ -485,86 +491,88 @@
             $("#filterPriceModal").modal("hide");
         }
 
-        $(".printBtn").on("click", function () {
-            if (priceDT.page.info().recordsTotal > 1000) {
-                swal({
-                    title: "A lot of records to print",
-                    text: "You are trying to print " + priceDT.page.info().recordsTotal + " record(s). Genererating a page to print for this much will take a while. Would you like to continue?",
-                    icon: "info",
-                    buttons: {
-                        cancel: "No",
-                        filter: "Do Filter",
-                        continue: "Yes"
-                    },
-                    infoMode: true
-                }).then((value) => {
-                    if (value == "filter") {
-                        $("#filterPriceModal").modal("show");
-                    } else if (value == "continue") {
-                        DoPrint();
-                    }
-                });
-            } else {
-                DoPrint();
-            }
-        });
-
-        function DoPrint() {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fas fa-print"
+        if (user_access.canPrint) {
+            $(".printBtn").on("click", function () {
+                if (priceDT.page.info().recordsTotal > 1000) {
+                    swal({
+                        title: "A lot of records to print",
+                        text: "You are trying to print " + priceDT.page.info().recordsTotal + " record(s). Genererating a page to print for this much will take a while. Would you like to continue?",
+                        icon: "info",
+                        buttons: {
+                            cancel: "No",
+                            filter: "Do Filter",
+                            continue: "Yes"
+                        },
+                        infoMode: true
+                    }).then((value) => {
+                        if (value == "filter") {
+                            $("#filterPriceModal").modal("show");
+                        } else if (value == "continue") {
+                            DoPrint();
+                        }
+                    });
+                } else {
+                    DoPrint();
+                }
             });
-            var urlQuery = [];
 
-            var brandId = $("#filter-brand").val();
-            if (brandId) {
-                if (isNaN(brandId)) {
-                    urlQuery.push("BrandId=0");
-                    urlQuery.push("BrandKeyword=" + brandId);
-                } else {
-                    urlQuery.push("BrandId=" + brandId);
-                }
-            }
+            function DoPrint() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                var urlQuery = [];
 
-            var itemTypeId = $("#filter-type").val();
-            if (itemTypeId) {
-                if (isNaN(itemTypeId)) {
-                    urlQuery.push("ItemTypeId=0");
-                    urlQuery.push("ItemTypeKeyword=" + itemTypeId);
-                } else {
-                    urlQuery.push("ItemTypeId=" + itemTypeId);
-                }
-            }
-
-            var itemId = $("#filter-item-code").val();
-            if (itemId) {
-                if (isNaN(itemId)) {
-                    urlQuery.push("ItemId=0");
-                    urlQuery.push("ItemCategory=" + itemId);
-                } else {
-                    urlQuery.push("ItemId=" + itemId);
-                }
-            }
-
-            var model = $("#filter-model").select2("data")[0].text;
-            if (model) {
-                urlQuery.push("ModelNumber=" + model);
-            }
-
-            var size = $("#filter-size").select2("data")[0].text;
-            if (size) {
-                urlQuery.push("Size=" + size);
-            }
-
-            setTimeout(function () {
-                let win = window.open('@Url.Action("Print")?' + urlQuery.join("&"), '');
-                var wintimer = setInterval(function () {
-                    if (win.closed) {
-                        clearInterval(wintimer);
-                        hideLoader();
+                var brandId = $("#filter-brand").val();
+                if (brandId) {
+                    if (isNaN(brandId)) {
+                        urlQuery.push("BrandId=0");
+                        urlQuery.push("BrandKeyword=" + brandId);
+                    } else {
+                        urlQuery.push("BrandId=" + brandId);
                     }
-                }, 100);
-            }, 500);
+                }
+
+                var itemTypeId = $("#filter-type").val();
+                if (itemTypeId) {
+                    if (isNaN(itemTypeId)) {
+                        urlQuery.push("ItemTypeId=0");
+                        urlQuery.push("ItemTypeKeyword=" + itemTypeId);
+                    } else {
+                        urlQuery.push("ItemTypeId=" + itemTypeId);
+                    }
+                }
+
+                var itemId = $("#filter-item-code").val();
+                if (itemId) {
+                    if (isNaN(itemId)) {
+                        urlQuery.push("ItemId=0");
+                        urlQuery.push("ItemCategory=" + itemId);
+                    } else {
+                        urlQuery.push("ItemId=" + itemId);
+                    }
+                }
+
+                var model = $("#filter-model").select2("data")[0].text;
+                if (model) {
+                    urlQuery.push("ModelNumber=" + model);
+                }
+
+                var size = $("#filter-size").select2("data")[0].text;
+                if (size) {
+                    urlQuery.push("Size=" + size);
+                }
+
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("Print")?' + urlQuery.join("&"), '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            }
         }
     </script>
 }

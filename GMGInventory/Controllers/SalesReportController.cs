@@ -2,23 +2,21 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    public class SalesReportController : Controller
+    public class SalesReportController(IAccessRepository accessRepository
+                            , IReportSalesRepository reportSalesRepository
+                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IReportSalesRepository reportSalesRepository;
-        private readonly ControllerHelper chelper;
 
-        public SalesReportController(IReportSalesRepository reportSalesRepository)
-        {
-            this.reportSalesRepository = reportSalesRepository;
-            chelper = new();
-        }
+        private readonly ControllerHelper chelper = new();
 
         //"AgentSalesPerItem", "BrandSalesReport", "BestSellingItem", "BestSellingItemInvoice",
         //"CommissionReport", "CustomerSalesAnalysisReport", "CustomerSalesRanking", "DailySalesReport",
@@ -39,6 +37,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintAgentSalesPerItem(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.AgentSalesPerItemReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintAgentSalesPerItem(filter));
         }
 
@@ -46,8 +47,12 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetAgentSalesPerItemDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetAgentSalesPerItemDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.AgentSalesPerItemReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetAgentSalesPerItemDT(dtForm, filter));
         }
@@ -57,6 +62,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadAgentSalesPerItem(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.AgentSalesPerItemReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Agent Sales per Item");
             dt.Columns.AddRange(new DataColumn[8] {
                 new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Agent")),
@@ -100,8 +108,11 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult BrandSales()
+        public async Task<IActionResult> BrandSales()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BrandSalesReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -110,6 +121,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintBrandSales(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BrandSalesReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintBrandSales(filter));
         }
 
@@ -117,8 +131,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetBrandSalesDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetBrandSalesDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BrandSalesReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetBrandSalesDT(dtForm, filter));
         }
@@ -128,6 +145,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadBrandSales(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BrandSalesReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Brand Sales");
             dt.Columns.AddRange(new DataColumn[4] {
                 new DataColumn(chelper.DisplayName<BrandSalesRVM>("Brand")),
@@ -163,8 +183,11 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult BestSellingItem()
+        public async Task<IActionResult> BestSellingItem()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BestSellingItemsReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -173,6 +196,10 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintBestSellingItem(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BestSellingItemsReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
+
             return View(await reportSalesRepository.PrintBestSellingItem(filter));
         }
 
@@ -180,8 +207,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetBestSellingItemDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetBestSellingItemDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BestSellingItemsReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetBestSellingItemDT(dtForm, filter));
         }
@@ -191,6 +221,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadBestSellingItem(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BestSellingItemsReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Best Selling Item (" + filter.Basis + ")");
             dt.Columns.AddRange(new DataColumn[7] {
                 new DataColumn(chelper.DisplayName<BestSellingItemRVM>("Brand")),
@@ -233,8 +266,11 @@ namespace GMGInventory.Controllers
                          + Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult Commission()
+        public async Task<IActionResult> Commission()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CommissionReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -244,6 +280,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCommission(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CommissionReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintCommission(filter));
         }
 
@@ -252,8 +291,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetCommissionDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetCommissionDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CommissionReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetCommissionDT(dtForm, filter));
         }
@@ -264,6 +306,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCommission(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CommissionReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new("Commission");
             dt.Columns.AddRange(new DataColumn[7] {
                 new DataColumn(chelper.DisplayName<CommissionRVM>("InvoiceDate")),
@@ -305,8 +350,11 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult CustomerSalesRanking()
+        public async Task<IActionResult> CustomerSalesRanking()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesRankingReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -315,6 +363,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSalesRanking(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesRankingReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintCustomerSalesRanking(filter));
         }
 
@@ -322,8 +373,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetCustomerSalesRankingDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetCustomerSalesRankingDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesRankingReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetCustomerSalesRankingDT(dtForm, filter));
         }
@@ -333,6 +387,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCustomerSalesRanking(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesRankingReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new("Customer Sales Ranking");
             dt.Columns.AddRange(new DataColumn[4] {
                 new DataColumn(chelper.DisplayName<CustomerSalesRankingRVM>("Rank")),
@@ -368,16 +425,22 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult CustomerSales()
+        public async Task<IActionResult> CustomerSales()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult CustomerSalesCompare()
+        public async Task<IActionResult> CustomerSalesCompare()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -386,6 +449,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSales(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintCustomerSales(filter));
         }
 
@@ -394,6 +460,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSalesCompare(ListFilterSalesModel filter1, ListFilterSalesModel filter2)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             var sales = new CustomerSalesComparePVM
             {
                 CustomerSales1 = await reportSalesRepository.PrintCustomerSales(filter1),
@@ -406,14 +475,20 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetCustomerSalesDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetCustomerSalesDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetCustomerSalesDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadCustomerSales(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Sales Report "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"
@@ -452,6 +527,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCustomerSalesCompare(ListFilterSalesModel filter1, ListFilterSalesModel filter2)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt1 = new DataTable("Sales Report #1");
             dt1.Columns.AddRange(new DataColumn[3] {
                 new DataColumn("Customer"),
@@ -501,8 +579,11 @@ namespace GMGInventory.Controllers
                          + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult DailySales()
+        public async Task<IActionResult> DailySales()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailySalesReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -513,6 +594,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintDailySales(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailySalesReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintDailySales(filter));
         }
 
@@ -522,8 +606,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetDailySalesDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetDailySalesDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailySalesReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetDailySalesDT(dtForm, filter));
         }
@@ -535,6 +622,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadDailySales(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailySalesReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Daily Sales");
             dt.Columns.AddRange(new DataColumn[8] {
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("InvoiceDate")),
@@ -582,8 +672,11 @@ namespace GMGInventory.Controllers
                          + Roles.InvoicingClerk + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult SalesInvoice()
+        public async Task<IActionResult> SalesInvoice()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -594,6 +687,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesInvoice(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintSalesInvoice(filter));
         }
 
@@ -603,8 +699,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetSalesInvoiceDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetSalesInvoiceDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetSalesInvoiceDT(dtForm, filter));
         }
@@ -616,6 +715,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesInvoice(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Sales Invoice Listing");
             dt.Columns.AddRange(new DataColumn[8] {
                 new DataColumn(chelper.DisplayName<SalesInvoiceRVM>("InvoiceNumber")),
@@ -659,8 +761,11 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult SalesAgentArea()
+        public async Task<IActionResult> SalesAgentArea()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -669,6 +774,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesAgentArea(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintSalesAgentArea(filter));
         }
 
@@ -677,6 +785,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> GetSalesAgentArea(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await reportSalesRepository.GetSalesAgentArea(filter));
         }
 
@@ -684,8 +795,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetSalesAgentAreaDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetSalesAgentAreaDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetSalesAgentAreaDT(dtForm, filter));
         }
@@ -695,6 +809,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesAgentArea(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Sales by Agent-Area");
             dt.Columns.AddRange(new DataColumn[5] {
                 new DataColumn(chelper.DisplayName<SalesAgentAreaRVM>("AgentCode")),
@@ -732,8 +849,11 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult SalesReportBasis()
+        public async Task<IActionResult> SalesReportBasis()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReportByBasisReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -742,6 +862,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesReportBasis(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReportByBasisReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintSalesReportBasis(filter));
         }
 
@@ -749,8 +872,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetSalesReportBasisDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetSalesReportBasisDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReportByBasisReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetSalesReportBasisDT(dtForm, filter));
         }
@@ -760,6 +886,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesReportBasis(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReportByBasisReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Sales Report by Basis");
             dt.Columns.AddRange(new DataColumn[3] {
                 new DataColumn(filter.Basis + " " + chelper.DisplayName<SalesReportBasisRVM>("Code")),
@@ -794,8 +923,11 @@ namespace GMGInventory.Controllers
                          + Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult SalesReturn()
+        public async Task<IActionResult> SalesReturn()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -805,6 +937,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesReturn(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintSalesReturn(filter));
         }
 
@@ -813,8 +948,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetSalesReturnDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetSalesReturnDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetSalesReturnDT(dtForm, filter));
         }
@@ -825,6 +963,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesReturn(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Sales Return Listing");
             dt.Columns.AddRange(new DataColumn[14] {
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("Brand")),
@@ -880,8 +1021,11 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult UnservedItem()
+        public async Task<IActionResult> UnservedItem()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -890,6 +1034,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintUnservedItem(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportSalesRepository.PrintUnservedItem(filter));
         }
 
@@ -897,8 +1044,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetUnservedItemDT(ListFilterSalesModel filter)
+        public async Task<IActionResult> GetUnservedItemDT(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportSalesRepository.GetUnservedItemDT(dtForm, filter));
         }
@@ -908,6 +1058,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadUnservedItem(ListFilterSalesModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Unserved Item "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"

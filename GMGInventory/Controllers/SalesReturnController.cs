@@ -3,36 +3,41 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static ClosedXML.Excel.XLPredefinedFormat;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class SalesReturnController : Controller
+    public class SalesReturnController(IAccessRepository accessRepository
+                            , ISalesReturnRepository salesReturnRepository
+                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly ISalesReturnRepository salesReturnRepository;
-
-        public SalesReturnController(ISalesReturnRepository salesReturnRepository)
+        public async Task<IActionResult> Index()
         {
-            this.salesReturnRepository = salesReturnRepository;
-        }
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
 
-        public ActionResult Index()
-        {
             return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await salesReturnRepository.GetListDTAsync(form));
         }
 
-        public async Task<ActionResult> Details(int? Id)
+        public async Task<IActionResult> Details(int? Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             var rturn = await salesReturnRepository.GetDetailsAsync(Id);
             if (rturn == null)
             {
@@ -42,8 +47,11 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetItemsJson(int salesReturnId)
+        public async Task<IActionResult> GetItemsJson(int salesReturnId)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(await salesReturnRepository.GetItemsAsync(salesReturnId));
         }
 
@@ -52,8 +60,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.SalesDirector + ","
                          + Roles.Telemarketer)]
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
@@ -63,8 +74,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> SaveJson(SalesReturnFormVM form)
+        public async Task<IActionResult> SaveJson(SalesReturnFormVM form)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new ();
             var orderId = await salesReturnRepository.SaveAsync(form);
             responseModel.Status = "Success";
@@ -76,12 +90,18 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> PrintDetails(int Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await salesReturnRepository.PrintDetails(Id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> UpdateJson(SalesReturnUpdateVM form)
+        public async Task<IActionResult> UpdateJson(SalesReturnUpdateVM form)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel<int> responseModel = new();
             if(await salesReturnRepository.IsNumberInUse(form.Id, form.ReturnNumber))
             {

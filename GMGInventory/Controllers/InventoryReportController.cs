@@ -2,8 +2,10 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
@@ -12,38 +14,58 @@ namespace GMGInventory.Controllers
     [Authorize(Roles = Roles.InventoryManager + ","
                      + Roles.SalesDirector + ","
                      + Roles.SystemAdmin)]
-    public class InventoryReportController : Controller
+    public class InventoryReportController(IAccessRepository accessRepository
+                             , IReportInventoryRepository reportInventoryRepository
+                             , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IReportInventoryRepository reportInventoryRepository;
-        private readonly ControllerHelper chelper;
+        private readonly ControllerHelper chelper = new();
 
-        public InventoryReportController(IReportInventoryRepository reportInventoryRepository)
-        {
-            this.reportInventoryRepository = reportInventoryRepository;
-            chelper = new();
-        }
+        //public class InventoryReportController : Controller
+        //{
+        //    private readonly IReportInventoryRepository reportInventoryRepository;
+        //    private readonly ControllerHelper chelper;
+
+        //    public InventoryReportController(IReportInventoryRepository reportInventoryRepository)
+        //    {
+        //        this.reportInventoryRepository = reportInventoryRepository;
+        //        chelper = new();
+        //    }
 
         #region Items Below Maintaining Quantity
 
-        public IActionResult BelowMaintainingItem()
+        public async Task<IActionResult> BelowMaintainingItem()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BelowMaintainingItemsReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.BelowMaintainingItemsReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintBelowMaintaining(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BelowMaintainingItemsReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportInventoryRepository.PrintBelowMaintaining(filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetBelowMaintainingDT(ListFilterInventoryModel filter)
+        public async Task<IActionResult> GetBelowMaintainingDT(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BelowMaintainingItemsReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportInventoryRepository.GetBelowMaintainingDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadBelowMaintaining(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BelowMaintainingItemsReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Below Maintaining Quantity");
             dt.Columns.AddRange(new DataColumn[7] {
                 new DataColumn(chelper.DisplayName<BelowMaintainingRVM>("Brand")),
@@ -83,25 +105,39 @@ namespace GMGInventory.Controllers
 
         #region Receiving Listing
 
-        public IActionResult ReceivingListing()
+        public async Task<IActionResult> ReceivingListing()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingListingReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.ReceivingListingReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintReceiving(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingListingReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportInventoryRepository.PrintReceiving(filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetReceivingDT(ListFilterInventoryModel filter)
+        public async Task<IActionResult> GetReceivingDT(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingListingReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportInventoryRepository.GetReceivingDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadReceiving(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingListingReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Receiving Listing "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"
@@ -148,25 +184,39 @@ namespace GMGInventory.Controllers
 
         #region Receiving Listing by Supplier
 
-        public IActionResult ReceivingListingSupplier()
+        public async Task<IActionResult> ReceivingListingSupplier()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingListingBySupplierReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.ReceivingListingBySupplierReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintReceivingSupplier(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingListingBySupplierReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportInventoryRepository.PrintReceivingSupplier(filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetReceivingSupplierDT(ListFilterInventoryModel filter)
+        public async Task<IActionResult> GetReceivingSupplierDT(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingListingBySupplierReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportInventoryRepository.GetReceivingSupplierDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadReceivingSupplier(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingListingBySupplierReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("RL by Supplier "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"
@@ -211,25 +261,39 @@ namespace GMGInventory.Controllers
 
         #region Receiving Summary
 
-        public IActionResult ReceivingSummary()
+        public async Task<IActionResult> ReceivingSummary()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingSummaryReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.ReceivingSummaryReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintReceivingSummary(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingSummaryReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportInventoryRepository.PrintReceivingSummary(filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetReceivingSummaryDT(ListFilterInventoryModel filter)
+        public async Task<IActionResult> GetReceivingSummaryDT(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingSummaryReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportInventoryRepository.GetReceivingSummaryDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadReceivingSummary(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReceivingSummaryReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Receiving Summary "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"
@@ -272,25 +336,39 @@ namespace GMGInventory.Controllers
 
         #region Stock Card Report
 
-        public IActionResult StockCard()
+        public async Task<IActionResult> StockCard()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.StockCardReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.StockCardReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintStockCard(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.StockCardReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportInventoryRepository.PrintStockCard(filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetStockCardDT(ListFilterInventoryModel filter)
+        public async Task<IActionResult> GetStockCardDT(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.StockCardReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportInventoryRepository.GetStockCardDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadStockCard(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.StockCardReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Stock Card "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"
@@ -331,27 +409,39 @@ namespace GMGInventory.Controllers
 
         #region Stock Status
 
-        public IActionResult StockStatus()
+        public async Task<IActionResult> StockStatus()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.StockStatusReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.StockStatusReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintStockStatus(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.StockStatusReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportInventoryRepository.PrintStockStatus(filter));
         }
 
-
-
         [HttpPost]
-        public async Task<JsonResult> GetStockStatusDT(ListFilterInventoryModel filter)
+        public async Task<IActionResult> GetStockStatusDT(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.StockStatusReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportInventoryRepository.GetStockStatusDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadStockStatus(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.StockStatusReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Stock Status");
             dt.Columns.AddRange(new DataColumn[9] {
                 new DataColumn(chelper.DisplayName<StockStatusRVM>("Brand")),
@@ -395,25 +485,39 @@ namespace GMGInventory.Controllers
 
         #region Supplier Purchase History
 
-        public IActionResult SupplierPurchase()
+        public async Task<IActionResult> SupplierPurchase()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SupplierPurchaseHistoryReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SupplierPurchaseHistoryReport)).Convert();
+
             return View();
         }
 
         public async Task<IActionResult> PrintSupplierPurchase(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SupplierPurchaseHistoryReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
             return View(await reportInventoryRepository.PrintSupplierPurchase(filter));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetSupplierPurchaseDT(ListFilterInventoryModel filter)
+        public async Task<IActionResult> GetSupplierPurchaseDT(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SupplierPurchaseHistoryReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await reportInventoryRepository.GetSupplierPurchaseDT(dtForm, filter));
         }
 
         public async Task<IActionResult> DownloadSupplierPurchase(ListFilterInventoryModel filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SupplierPurchaseHistoryReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Supplier Purchase "
                                        + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
                                        + "-"

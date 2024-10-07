@@ -2,25 +2,21 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class ItemTypeController : Controller
+   [Authorize]
+    public class ItemTypeController(IAccessRepository accessRepository
+                            , IItemTypeRepository itemTypeRepository
+                            , ICategoryRepository categoryRepository
+                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        private readonly IItemTypeRepository itemTypeRepository;
-        private readonly ICategoryRepository categoryRepository;
-
-        public ItemTypeController(IItemTypeRepository itemTypeRepository
-            , ICategoryRepository categoryRepository)
-        {
-            this.itemTypeRepository = itemTypeRepository;
-            this.categoryRepository = categoryRepository;
-        }
-
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
             return Json(await itemTypeRepository.GetOptions(IncludeId));
@@ -29,8 +25,13 @@ namespace GMGInventory.Controllers
         [Authorize(Roles = Roles.InventoryManager + ","
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.ItemTypes)).Convert();
+
             return View();
         }
 
@@ -38,8 +39,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson()
+        public async Task<IActionResult> GetListJson()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
             return Json(await itemTypeRepository.GetListDTAsync(dtForm));
         }
@@ -48,8 +52,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> CreateJson(ItemTypeVM itemTypeVM)
+        public async Task<IActionResult> CreateJson(ItemTypeVM itemTypeVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await itemTypeRepository.IsCodeExist(itemTypeVM.Code))
             {
@@ -69,8 +76,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(ItemTypeVM itemTypeVM)
+        public async Task<IActionResult> UploadJson(ItemTypeVM itemTypeVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await itemTypeRepository.UploadCombinationExistAsync(itemTypeVM))
             {
@@ -105,8 +115,11 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin)]
         [HttpPost]
-        public async Task<JsonResult> EditJson(ItemTypeVM itemTypeVM)
+        public async Task<IActionResult> EditJson(ItemTypeVM itemTypeVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             try
             {
@@ -135,6 +148,9 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Item Types");
             dt.Columns.AddRange(new DataColumn[3] {
                 new DataColumn("Code"),
@@ -167,6 +183,9 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             if (await itemTypeRepository.IsItemTypeIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -191,6 +210,10 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             if (await itemTypeRepository.IsItemTypeIdExistAsync(id) == false)
             {
                 return NotFound();

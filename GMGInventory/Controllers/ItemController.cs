@@ -2,34 +2,24 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
-    public class ItemController : Controller
+    public class ItemController(IAccessRepository accessRepository
+                            , IItemRepository itemRepository
+                            , ICategoryRepository categoryRepository
+                            , IItemTypeRepository itemTypeRepository
+                            , IBrandRepository brandRepository
+                            , IWarehouseRepository warehouseRepository
+                            , UserManager<User> userManager) : BaseController(accessRepository, userManager)
     {
-        public IItemRepository itemRepository;
-        private readonly ICategoryRepository categoryRepository;
-        private readonly IItemTypeRepository itemTypeRepository;
-        private readonly IBrandRepository brandRepository;
-        private readonly IWarehouseRepository warehouseRepository;
-
-        public ItemController(IItemRepository itemRepository
-            , ICategoryRepository categoryRepository
-            , IItemTypeRepository itemTypeRepository
-            , IBrandRepository brandRepository
-            , IWarehouseRepository warehouseRepository)
-        {
-            this.itemRepository = itemRepository;
-            this.categoryRepository = categoryRepository;
-            this.itemTypeRepository = itemTypeRepository;
-            this.brandRepository = brandRepository;
-            this.warehouseRepository = warehouseRepository;
-        }
 
         public async Task<IActionResult> GetOptions(string search, int page)
         {
@@ -61,8 +51,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
+
             ItemFilterVM itemFilterVM = new ItemFilterVM();
             itemFilterVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
             itemFilterVM.ItemTypes = new SelectList(await itemTypeRepository.GetAllActiveItemTypeAsync(-1), "Id", "Name");
@@ -78,8 +73,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> GetListJson(ItemFilterVM filter)
+        public async Task<IActionResult> GetListJson(ItemFilterVM filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemRepository.GetAllForDataTablesAsync(form, filter));
         }
@@ -89,8 +87,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> CreateJson(ItemCommonVM itemVM)
+        public async Task<IActionResult> CreateJson(ItemCommonVM itemVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await itemRepository.IsCodeExistAsync(itemVM.Code))
             {
@@ -111,8 +112,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> EditJson(ItemCommonVM itemVM)
+        public async Task<IActionResult> EditJson(ItemCommonVM itemVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             try
             {
@@ -142,8 +146,13 @@ namespace GMGInventory.Controllers
                          + Roles.SalesDirector + ","
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
+
             var item = itemRepository.GetItemViewVM(id);
             if (item == null)
             {
@@ -159,8 +168,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public ActionResult DetailsJson(int id)
+        public async Task<IActionResult> DetailsJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             return Json(itemRepository.GetItemViewVM(id));
         }
 
@@ -170,8 +182,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> EditDetailQuantity(int id, int quantity, string remarks)
+        public async Task<IActionResult> EditDetailQuantity(int id, int quantity, string remarks)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             await itemRepository.UpdateQuantityAsync(id, quantity, remarks);
             responseModel.Status = "Success";
@@ -185,8 +200,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> DeleteWarehouse(int id)
+        public async Task<IActionResult> DeleteWarehouse(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             await itemRepository.DeleteWarehouse(id);
             responseModel.Status = "Success";
@@ -203,6 +221,9 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
             if (await itemRepository.IsIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -229,6 +250,10 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
         {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
             if (await itemRepository.IsIdExistAsync(id) == false)
             {
                 return NotFound();
@@ -244,8 +269,11 @@ namespace GMGInventory.Controllers
                          + Roles.SystemAdmin + ","
                          + Roles.Telemarketer)]
         [HttpPost]
-        public async Task<JsonResult> UploadJson(ItemFileVM itemVM)
+        public async Task<IActionResult> UploadJson(ItemFileVM itemVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             ResponseModel responseModel = new ResponseModel();
             if (await itemRepository.UploadCombinationExistAsync(itemVM))
             {
@@ -356,6 +384,9 @@ namespace GMGInventory.Controllers
                          + Roles.Telemarketer)]
         public async Task<IActionResult> DownloadFile(ItemFilterVM filter)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
             DataTable dt = new DataTable("Items");
             dt.Columns.AddRange(new DataColumn[12] {
                 new DataColumn("Code"),
@@ -404,50 +435,71 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetWarehousesJson(int id)
+        public async Task<IActionResult> GetWarehousesJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemRepository.GetItemWarehouseDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetPurchasesJson(int id)
+        public async Task<IActionResult> GetPurchasesJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemRepository.GetItemPurchaseDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetSalesJson(int id)
+        public async Task<IActionResult> GetSalesJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemRepository.GetItemSalesDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetCountsJson(int id)
+        public async Task<IActionResult> GetCountsJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemRepository.GetItemCountDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetPricesJson(int id)
+        public async Task<IActionResult> GetPricesJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemRepository.GetItemPriceDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetTransfersJson(int id)
+        public async Task<IActionResult> GetTransfersJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemRepository.GetItemTransferDTAsync(form, id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetReturnsJson(int id)
+        public async Task<IActionResult> GetReturnsJson(int id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             return Json(await itemRepository.GetItemReturnDTAsync(form, id));
         }

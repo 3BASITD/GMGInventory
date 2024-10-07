@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Payment";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
@@ -51,6 +52,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         // Load List on DataTable
         var dataTable = $('.table-payment').on('preXhr.dt', function(e, settings, data) {
             showLoader();
