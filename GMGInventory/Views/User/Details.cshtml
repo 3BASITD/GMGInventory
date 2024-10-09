@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "User Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -11,7 +12,7 @@
         <div class="card-header">
             <span class="card-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                @if (Model?.IsActive == true)
+                @if (Model?.IsActive == true && userAccess.CanEdit)
             {
                 <a class="btn btn-warning btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.UserId">
                     <span class="fas fa-edit"></span> Edit Details
@@ -68,23 +69,36 @@
                         }
                     </dd>
                     <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Role)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @(Model?.Role ?? "-")
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.UserCreated)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Model?.UserCreated
+                    </dd>
+                    <dt class="col-sm-6">
                         @Html.DisplayNameFor(model => model.DateCreated)
                     </dt>
                     <dd class="col-sm-6">
-                        @Model?.DateCreated
+                        @Model?.DateCreatedS
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.UserModified)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Model?.UserModified
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.DateModified)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Model?.DateModifiedS
                     </dd>
                 </dl>
-            </div>
-            <div class="col-md-6">
-                <strong class="mb-1">Role(s)</strong>
-                <ul class="list-group">
-                    @foreach (var role in (Model?.Role ?? new string[0]))
-                    {
-                        <li class="list-group-item">
-                            @role
-                        </li>
-                    }
-                </ul>
             </div>
         </div>
     </div>

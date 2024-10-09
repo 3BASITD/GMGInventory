@@ -1,18 +1,15 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-     public class SalesOrderController(IAccessRepository accessRepository
-                            , ISalesOrderRepository salesOrderRepository) : BaseController(accessRepository)
+    [Authorize]
+    public class SalesOrderController(IAccessRepository accessRepository
+                                    , ISalesOrderRepository salesOrderRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetOptions(string search, int page)
@@ -127,10 +124,6 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderRepository.GetItemsDTAsync(form, salesOrderId));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> Create(int? Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Add);
@@ -147,11 +140,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> SaveJson(SalesOrderFormVM form)
         {
@@ -166,11 +154,6 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> SaveItemsJson(SalesOrderFormVM form)
         {
@@ -193,8 +176,6 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.SystemAdmin + ","
-                         + Roles.SalesDirector)]
         [HttpPost]
         public async Task<IActionResult> ApproveJson(int Id)
         {
@@ -216,8 +197,6 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.SystemAdmin + ","
-                         + Roles.SalesDirector)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int Id)
@@ -239,8 +218,6 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Details), new { id = Id });
         }
 
-        [Authorize(Roles = Roles.SystemAdmin + ","
-                         + Roles.SalesDirector)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Disapprove(int Id, string? Reason)

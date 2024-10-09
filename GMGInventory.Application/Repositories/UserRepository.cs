@@ -8,24 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GMGInventory.Application.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository(ApplicationDbContext context
+                              , IHttpContextAccessor httpContextAccessor
+                              , UserManager<User> userManager
+                              , IMapper mapper) : IUserRepository
     {
-        private readonly ApplicationDbContext context;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
-
-        public UserRepository(ApplicationDbContext context
-            , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager
-            , IMapper mapper)
-        {
-            this.context = context;
-            this.httpContextAccessor = httpContextAccessor;
-            this.userManager = userManager;
-            this.mapper = mapper;
-        }
-
         public async Task<IList<UserInformationVM>> GetUsersInformationVMAsync()
         {
             var users = await userManager.Users.ToListAsync();
@@ -33,6 +20,23 @@ namespace GMGInventory.Application.Repositories
             foreach (var userVM in usersVM)
             {
                 userVM.UserId = await GetUserIdByNameAsync(userVM.Username);
+                var role = await (from r in context.Roles
+                                  join ur in context.UserRoles on r.Id equals ur.RoleId
+                                  where ur.UserId == userVM.UserId
+                                  select r).FirstOrDefaultAsync();
+                userVM.RoleId = role == null ? "" : role.Id;
+                userVM.Role = role == null ? "-" : role.Name;
+                userVM.UserCreated = await userManager.Users
+                                                      .Where(s => s.Id == userVM.UserCreated)
+                                                      .Select(s => s.FirstName + " " + s.LastName)
+                                                      .FirstOrDefaultAsync() ?? "-";
+                userVM.DateCreatedS = userVM.DateCreated?.ToString("yyyy/MM/dd HH:ss") ?? "-";
+                userVM.UserModified = await userManager.Users
+                                                       .Where(s => s.Id == userVM.UserModified)
+                                                       .Select(s => s.FirstName + " " + s.LastName)
+                                                       .FirstOrDefaultAsync() ?? "-";
+                userVM.DateModifiedS = userVM.DateModified?.ToString("yyyy/MM/dd HH:ss") ?? "-";
+
             }
             return usersVM;
         }
@@ -50,12 +54,31 @@ namespace GMGInventory.Application.Repositories
             {
                 return null;
             }
-            var userData = userManager.Users.Where(s => s.Id == id).First();
-            var user = await userManager.FindByNameAsync(userData.UserName);
-            var userVM = mapper.Map<UserInformationForUpdateVM>(user);
-            var userRole = userManager.GetRolesAsync(user).Result;
-            userVM.Role = userRole.ToArray();
-            return userVM;
+            //var userData = userManager.Users.Where(s => s.Id == id).First();
+            //var user = await userManager.FindByNameAsync(userData.UserName);
+            //var userVM = mapper.Map<UserInformationForUpdateVM>(user);
+            //var userRole = await userManager.GetRolesAsync(user);
+            //userVM.UserId = user.Id;
+            //userVM.RoleId = userRole.FirstOrDefault() ?? "";
+            //userVM.Role = await context.Roles.Where(s => userRole.Contains(s.Id)).Select(s => s.Name).FirstOrDefaultAsync() ?? "";
+
+            var userVM = from user in userManager.Users
+                         join userRole in context.UserRoles on user.Id equals userRole.UserId into ur
+                         from userRole in ur.DefaultIfEmpty()
+                         join role in context.Roles on userRole.RoleId equals role.Id into r
+                         from role in r.DefaultIfEmpty()
+                         where user.Id == id
+                         select new UserInformationForUpdateVM
+                         {
+                             UserId = user.Id,
+                             Username = user.UserName,
+                             RoleId = role == null ? "" : role.Id,
+                             Role = role == null ? "" : role.Name,
+                             FirstName = user.FirstName,
+                             LastName = user.LastName,
+                             Nickname = user.Nickname
+                         };
+            return await userVM.FirstOrDefaultAsync();
         }
 
         public async Task<UserInformationVM?> GetUserInformationVMByIdAsync(string id)
@@ -64,12 +87,39 @@ namespace GMGInventory.Application.Repositories
             {
                 return null;
             }
-            var userData = userManager.Users.Where(s => s.Id == id).First();
-            var user = await userManager.FindByNameAsync(userData.UserName);
-            var userVM = mapper.Map<UserInformationVM>(user);
-            var userRole = userManager.GetRolesAsync(user).Result;
-            userVM.Role = userRole.ToArray();
-            return userVM;
+            //var userData = userManager.Users.Where(s => s.Id == id).First();
+            //var user = await userManager.FindByNameAsync(userData.UserName);
+            //var userVM = mapper.Map<UserInformationVM>(user);
+            //var userRole = await userManager.GetRolesAsync(user);
+            //userVM.RoleId = userRole.FirstOrDefault() ?? "";
+            //userVM.Role = await context.Roles.Where(s => userRole.Contains(s.Id)).Select(s => s.Name).FirstOrDefaultAsync() ?? "";
+
+            var userVM = from user in userManager.Users
+                         join userRole in context.UserRoles on user.Id equals userRole.UserId into ur
+                         from userRole in ur.DefaultIfEmpty()
+                         join role in context.Roles on userRole.RoleId equals role.Id into r
+                         from role in r.DefaultIfEmpty()
+                         join userc in userManager.Users on user.UserCreated equals userc.Id into c
+                         from userc in c.DefaultIfEmpty()
+                         join userm in userManager.Users on user.UserModified equals userm.Id into m
+                         from userm in m.DefaultIfEmpty()
+                         where user.Id == id
+                         select new UserInformationVM
+                         {
+                             UserId = user.Id,
+                             Username = user.UserName,
+                             RoleId = role == null ? "" : role.Id,
+                             Role = role == null ? "-" : role.Name,
+                             FirstName = user.FirstName,
+                             LastName = user.LastName,
+                             Nickname = user.Nickname,
+                             IsActive = user.IsActive,
+                             UserCreated = userc == null ? "-" : userc.FirstName + " " + userc.LastName,
+                             DateCreatedS = user.DateCreated.ToString("MMMM d, yyyy hh:mm:ss tt"),
+                             UserModified = userm == null ? "-" : userm.FirstName + " " + userm.LastName,
+                             DateModifiedS = user.DateModified == null ? "-" : user.DateModified!.Value.ToString("MMMM d, yyyy hh:mm:ss tt")
+                         };
+            return await userVM.FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsUserInUseAsync(string id)
@@ -134,15 +184,7 @@ namespace GMGInventory.Application.Repositories
             return await userManager.Users.AnyAsync(s => s.UserName == username);
         }
 
-        private async Task ChangeRolesAsync(User user, IEnumerable<string> roles)
-        {
-            var userRoles = await userManager.GetRolesAsync(user);
-            await userManager.RemoveFromRolesAsync(user, userRoles.ToArray());
-            await userManager.AddToRolesAsync(user, roles);
-            //await userManager.UpdateAsync(user);
-        }
-
-        public async Task AddAsync(UserInformationVM userInformationVM)
+        public async Task<int> AddAsync(UserInformationVM userInformationVM)
         {
             var hasher = new PasswordHasher<User>();
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
@@ -152,9 +194,13 @@ namespace GMGInventory.Application.Repositories
             user.NormalizedUserName = user.UserName.ToUpper();
             user.PasswordHash = hasher.HashPassword(null, userInformationVM.ConfirmPassword);
             await context.AddAsync(user);
-            await context.SaveChangesAsync(currentUserId);
+            var saved = await context.SaveChangesAsync(currentUserId);
 
-            await ChangeRolesAsync(user, userInformationVM.Role);
+            var role = await context.Roles.Where(s => s.Id == userInformationVM.Role).FirstOrDefaultAsync();
+            if (role != null)
+                await userManager.AddToRoleAsync(user, role.Name);
+
+            return saved;
         }
 
         public async Task UpdateThemeAsync(string id, bool isDarkMode)
@@ -165,7 +211,7 @@ namespace GMGInventory.Application.Repositories
             await userManager.UpdateAsync(user);
         }
 
-        public async Task UpdateUserAsync(UserInformationForUpdateVM userInformationVM)
+        public async Task<int> UpdateUserAsync(UserInformationForUpdateVM userInformationVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var userId = await GetUserIdByNameAsync(userInformationVM.Username);
@@ -174,10 +220,16 @@ namespace GMGInventory.Application.Repositories
             user.LastName = userInformationVM.LastName;
             user.Nickname = userInformationVM.Nickname;
 
-            await ChangeRolesAsync(user, userInformationVM.Role);
+            var role = await context.Roles.Where(s => s.Id == userInformationVM.Role).FirstOrDefaultAsync();
+            if (role != null)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                await userManager.RemoveFromRolesAsync(user, roles);
+                await userManager.AddToRoleAsync(user, role.Name);
+            }
 
             context.Update(user);
-            await context.SaveChangesAsync(currentUserId);
+            return await context.SaveChangesAsync(currentUserId);
             //await userManager.UpdateAsync(user);
         }
 
@@ -203,7 +255,7 @@ namespace GMGInventory.Application.Repositories
         {
             var user = await userManager.FindByIdAsync(id);
             var userRoles = await userManager.GetRolesAsync(user);
-            await userManager.RemoveFromRolesAsync(user, userRoles.ToArray());
+            await userManager.RemoveFromRolesAsync(user, [.. userRoles]);
             await userManager.DeleteAsync(user);
         }
 

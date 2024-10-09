@@ -3,11 +3,13 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class BrandController(IAccessRepository accessRepository
                                , IItemTypeRepository itemTypeRepository
                                , IBrandRepository brandRepository) : BaseController(accessRepository)

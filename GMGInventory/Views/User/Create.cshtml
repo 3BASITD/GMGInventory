@@ -9,74 +9,54 @@
     <li class="breadcrumb-item"><a asp-controller="User" asp-action="Index">Users</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                <a class="btn btn-light btn-sm float-right mr-2" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
-            </div>
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right mr-2" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
         </div>
-        <form asp-action="Create">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <div class="form-group">
-                            <label asp-for="Username" class="control-label mb-0"></label>
-                            <input asp-for="Username" class="form-control form-control-sm" />
-                            <span asp-validation-for="Username" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="FirstName" class="control-label mb-0"></label>
-                            <input asp-for="FirstName" class="form-control form-control-sm" />
-                            <span asp-validation-for="FirstName" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="LastName" class="control-label mb-0"></label>
-                            <input asp-for="LastName" class="form-control form-control-sm" />
-                            <span asp-validation-for="LastName" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Nickname" class="control-label mb-0"></label>
-                            <input asp-for="Nickname" class="form-control form-control-sm" />
-                            <span asp-validation-for="Nickname" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="NewPassword" class="control-label mb-0"></label>
-                            <input asp-for="NewPassword" class="form-control form-control-sm" />
-                            <span asp-validation-for="NewPassword" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="ConfirmPassword" class="control-label mb-0"></label>
-                            <input asp-for="ConfirmPassword" class="form-control form-control-sm" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                        </div>
+    </div>
+    <form asp-action="Create">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Username" class="control-label mb-0"></label>
+                        <input asp-for="Username" class="form-control form-control-sm" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label mb-1">Role(s):</label>
-
-                            @{
-                                var roles = new string[6];
-                                roles[0] = Roles.Accounting;
-                                roles[1] = Roles.InventoryManager;
-                                roles[2] = Roles.InvoicingClerk;
-                                roles[3] = Roles.SalesDirector;
-                                roles[4] = Roles.SystemAdmin;
-                                roles[5] = Roles.Telemarketer;
-                            }
-                        <ul class="list-group">
-                            @foreach (var role in roles)
-                            {
-                                <li class="list-group-item">
-                                    <input type="checkbox" class="form-check-input me-1" value="@role" name="Role" />
-                                    @role
-                                </li>
-                            }
-                        </ul>
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="control-label mb-0"></label>
+                        <input asp-for="FirstName" class="form-control form-control-sm" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LastName" class="control-label mb-0"></label>
+                        <input asp-for="LastName" class="form-control form-control-sm" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Nickname" class="control-label mb-0"></label>
+                        <input asp-for="Nickname" class="form-control form-control-sm" />
+                        <span asp-validation-for="Nickname" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Role" class="control-label mb-0"></label>
+                        <select asp-for="Role" class="form-control form-control-sm"></select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewPassword" class="control-label mb-0"></label>
+                        <input asp-for="NewPassword" class="form-control form-control-sm" />
+                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword" class="control-label mb-0"></label>
+                        <input asp-for="ConfirmPassword" class="form-control form-control-sm" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
                 </div>
             </div>
@@ -95,4 +75,16 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    }
+
+    <script>
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetRolesOptions", "Access")",
+            success: function (data, status, xhr) {
+                $("#Role").select2({
+                    data: data
+                });
+            }
+        });
+    </script>
+}

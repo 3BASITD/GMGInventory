@@ -5,14 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     [Authorize]
-    public class CreditTermController : Controller
+    public class CreditTermController(IAccessRepository accessRepository
+                                    , ICreditTermRepository creditTermRepository) : BaseController(accessRepository)
     {
-        private readonly ICreditTermRepository creditTermRepository;
-
-        public CreditTermController(ICreditTermRepository creditTermRepository)
-        {
-            this.creditTermRepository = creditTermRepository;
-        }
 
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {

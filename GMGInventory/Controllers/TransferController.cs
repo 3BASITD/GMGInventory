@@ -1,20 +1,15 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
     public class TransferController(IAccessRepository accessRepository
-                             , IItemTransferRepository itemTransferRepository) : BaseController(accessRepository)
+                                  , IItemTransferRepository itemTransferRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()

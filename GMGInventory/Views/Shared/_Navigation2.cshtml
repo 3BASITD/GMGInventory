@@ -237,7 +237,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "PurchaseReceiving" ? "active" : "")"
-                               asp-area="" asp-controller="PurchaseReceivingPurchaseReceiving" asp-action="Index">
+                               asp-area="" asp-controller="PurchaseReceiving" asp-action="Index">
                                 <i class="nav-icon fas fa-shapes"></i>
                                 Purchase Receiving
                             </a>
@@ -419,8 +419,8 @@ else
                     @if (navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "ReasonReturn" ? "active" : "")"
-                               asp-area="" asp-controller="ReasonReturn" asp-action="Index">
+                            <a class="dropdown-item @(currentController == "ReasonsOfReturn" ? "active" : "")"
+                               asp-area="" asp-controller="ReasonsOfReturn" asp-action="Index">
                                 <i class="nav-icon fas fa-shapes"></i>
                                 Reasons of Return
                             </a>

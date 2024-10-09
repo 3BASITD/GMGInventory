@@ -1,13 +1,8 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Data;
-using GMGInventory.Helpers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Reflection;
 
 namespace GMGInventory.Controllers
 {
@@ -34,6 +29,8 @@ namespace GMGInventory.Controllers
             {
                 if (IsAjaxRequest())
                     return new JsonResult(new { error = "Not authenticated" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                else if (Request.Headers.XRequestedWith == "XMLHttpRequest")
+                    return PartialView("~/Views/Shared/_NotAuthenticatedPartial.cshtml");
                 else
                     return Redirect("/Identity/Account/Login");
             }
@@ -42,6 +39,8 @@ namespace GMGInventory.Controllers
             {
                 if (IsAjaxRequest())
                     return new JsonResult(new { error = "Access Denied" }) { StatusCode = StatusCodes.Status403Forbidden };
+                else if (Request.Headers.XRequestedWith == "XMLHttpRequest")
+                    return PartialView("~/Views/Shared/_AccessDeniedPartial.cshtml");
                 else
                     return View("~/Views/Shared/E403.cshtml");
             }

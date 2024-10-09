@@ -1,25 +1,18 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
     public class PriceUpdateController(IAccessRepository accessRepository
-                             , IItemPriceRepository itemPriceRepository
-                             , IItemRepository itemRepository) : BaseController(accessRepository)
+                                     , IItemPriceRepository itemPriceRepository
+                                     , IItemRepository itemRepository) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 

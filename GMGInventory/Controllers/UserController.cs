@@ -1,96 +1,107 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin)]
-    public class UserController : Controller
+    [Authorize]
+    public class UserController(IAccessRepository accessRepository
+                              , IUserRepository userRepository) : BaseController(accessRepository)
     {
-        public IUserRepository userRepository;
-
-        public UserController(IUserRepository userRepository)
+        public async Task<IActionResult> Index()
         {
-            this.userRepository = userRepository;
-        }
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
 
-        public async Task<ActionResult> Index()
-        {
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Users)).Convert();
             var users = await userRepository.GetUsersInformationVMAsync();
             return View(users);
         }
 
-        public async Task<ActionResult> Details(string id)
+        public async Task<IActionResult> Details(string id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Users)).Convert();
             var user = await userRepository.GetUserInformationVMByIdAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
+
             user.UserId = id;
             return View(user);
         }
 
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(UserInformationVM userInformationVM)
+        public async Task<IActionResult> Create(UserInformationVM userInformationVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+            userInformationVM.RoleId = userInformationVM.Role;
+
             if (ModelState.IsValid)
             {
                 if (await userRepository.IsUsernameExistAsync(userInformationVM.Username) == true)
-                {
                     TempData["ErrorMessage"] = "Username already in use";
-                }
                 else
                 {
-                    await userRepository.AddAsync(userInformationVM);
-                    TempData["SuccessMessage"] = "User successfully created";
+                    if (await userRepository.AddAsync(userInformationVM) > 0)
+                    {
+                        TempData["SuccessMessage"] = "User successfully created";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+            return View(userInformationVM);
+        }
+
+        public async Task<IActionResult> Edit(string id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+            var user = await userRepository.GetUserInformationVMToEditAsync(id);
+            if (user == null) return NotFound();
+
+            return View(user);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(UserInformationForUpdateVM userInformationVM)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            if (ModelState.IsValid)
+            {
+                if (await userRepository.UpdateUserAsync(userInformationVM) > 0)
+                {
+                    TempData["SuccessMessage"] = "User details of " + userInformationVM.Username + " was successfully updated";
                     return RedirectToAction(nameof(Index));
                 }
             }
             return View(userInformationVM);
         }
 
-        public async Task<ActionResult> Edit(string id)
+        public async Task<IActionResult> Password(string id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             var user = await userRepository.GetUserInformationVMToEditAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
 
-            return View(user);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(UserInformationForUpdateVM userInformationVM)
-        {
-            if (ModelState.IsValid)
-            {
-                await userRepository.UpdateUserAsync(userInformationVM);
-                TempData["SuccessMessage"] = "User details of " + userInformationVM.Username + " was successfully updated";
-                return RedirectToAction(nameof(Index));
-            }
-            return View(userInformationVM);
-        }
-
-        public async Task<ActionResult> Password(string id)
-        {
-            var user = await userRepository.GetUserInformationVMToEditAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
             var userPasswordVM = new UserResetPasswordVM()
             {
                 Id = id,
@@ -103,6 +114,9 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Password(UserResetPasswordVM userPasswordVM)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
             if (ModelState.IsValid)
             {
                 await userRepository.ResetPassword(userPasswordVM);
@@ -116,10 +130,11 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {
-            if (await userRepository.IsUserIdExistAsync(id) != true)
-            {
-                return NotFound();
-            }
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            if (await userRepository.IsUserIdExistAsync(id) != true) return NotFound();
+
             if (await userRepository.IsUserInUseAsync(id))
             {
                 await userRepository.DeactivateUserAsync(id);
@@ -137,10 +152,12 @@ namespace GMGInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(string id)
         {
-            if (await userRepository.IsUserIdExistAsync(id) != true)
-            {
-                return NotFound();
-            }
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Users, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
+            if (await userRepository.IsUserIdExistAsync(id) != true) return NotFound();
+
             await userRepository.ReactivateUserAsync(id);
             TempData["SuccessMessage"] = "User successfully reactivated";
             return RedirectToAction(nameof(Index));

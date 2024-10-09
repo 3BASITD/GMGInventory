@@ -1,14 +1,13 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class SalesOrderDeliveryController(IAccessRepository accessRepository
                              , ISalesOrderDeliveryRepository salesOrderDeliveryRepository) : BaseController(accessRepository)
     {
@@ -33,11 +32,6 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderDeliveryRepository.GetListDataTablesAsync(form, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> EditJson(SalesOrderDeliveryFormVM form)
         {

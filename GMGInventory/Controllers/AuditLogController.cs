@@ -1,10 +1,12 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class AuditLogController(IAccessRepository accessRepository
                                   , IAuditLogRepository auditLogRepository) : BaseController(accessRepository)
     {

@@ -6,9 +6,12 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IAccessRepository : IGenericRepository<Access>
     {
+        Task<IList<JsonOptionsModel>> GetRolesOptions(string? IncludeId);
         Task<RolesPagesVM> GetRolesPagesAsync(string RoleId);
         Task<IList<string>> GetRolesUsersAsync(string RoleId);
         Task<ResponseModel> SaveRolesPagesAsync(string RoleId, string RoleName, IList<AccessVM> accesses);
+        Task<ResponseModel> DeleteDeactivateRoleAsync(string RoleId);
+        Task<ResponseModel> ReactivateRoleAsync(string RoleId);
         Task<IList<string>> GetUserAllowedPagesAsync(string UserId);
         Task<bool> HasAccessAsync(string UserId, PageNames PageName, AccessTypes AccessType);
         Task<Access> GetUserAccessToPageAsync(string UserId, PageNames PageName);

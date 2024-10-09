@@ -2,25 +2,24 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
    
     public class PurchaseReturnController(IAccessRepository accessRepository
-                             , IPurchaseReturnRepository purchaseReturnRepository) : BaseController(accessRepository)
+                                        , IPurchaseReturnRepository purchaseReturnRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReturn, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReturn)).Convert();
 
             return View();
         }

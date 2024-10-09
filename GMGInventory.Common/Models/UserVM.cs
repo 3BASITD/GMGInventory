@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
@@ -53,14 +54,18 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Date Created")]
         public DateTime? DateCreated { get; set; }
+        public string? DateCreatedS { get; set; }
 
         [Display(Name = "User Modified")]
         public string? UserModified { get; set; }
 
         [Display(Name = "Date Modified")]
         public DateTime? DateModified { get; set; }
+        public string? DateModifiedS { get; set; }
 
-        public string[] Role { get; set; }
+        public string? RoleId { get; set; }
+        [Display(Name = "Role")]
+        public string? Role { get; set; }
     }
     public class UserInformationForUpdateVM
     {
@@ -87,8 +92,10 @@ namespace GMGInventory.Common.Models
         [MinLength(2)]
         [Display(Name = "Nickname")]
         public string Nickname { get; set; }
-        
-        public string[] Role { get; set; }
+
+        public string? RoleId { get; set; }
+        [Display(Name = "Role")]
+        public string Role { get; set; }
     }
 
     public class UserPasswordVM

@@ -1,5 +1,9 @@
 ﻿@model RolesPagesVM
 
+@{
+    var users = (List<string>)ViewData["RoleUsers"]!;
+}
+
 <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
         <div class="modal-header">
@@ -23,6 +27,9 @@
             </div>
             <div class="row">
                 <div class="col-8">
+                    <span class="text-muted">
+                        Access
+                    </span>
                     <table class="table table-head-fixed table-striped table-hover">
                         <thead>
                             <tr>
@@ -65,7 +72,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <label class="control-label mb-0 d-block">Access</label>
                             @for (int i = 0; i < Model.Accesses.Count; i++)
                             {
                                 <tr>
@@ -84,14 +90,16 @@
                                                 <i class="fas fa-times text-danger"></i>
                                             }
                                         }
-                                        else {
+                                        else
+                                        {
                                             <i class="text-muted">-</i>
                                         }
                                     </td>
                                     <td>
                                         @if (Model.Accesses[i].HasAdd)
                                         {
-                                            @if (Model.Accesses[i].CanAdd){
+                                            @if (Model.Accesses[i].CanAdd)
+                                            {
                                                 <i class="fas fa-check text-success"></i>
                                             }
                                             else
@@ -99,7 +107,8 @@
                                                 <i class="fas fa-times text-danger"></i>
                                             }
                                         }
-                                        else {
+                                        else
+                                        {
                                             <i class="text-muted">-</i>
                                         }
                                     </td>
@@ -187,6 +196,43 @@
                                         {
                                             <i class="text-muted">-</i>
                                         }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-4">
+                    <span class="text-muted">
+                        Users
+                    </span>
+                    <table class="table table-head-fixed table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (users.Count > 0)
+                            {
+                                @foreach (var user in users)
+                                {
+                                    <tr>
+                                        <td>
+                                            @user
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td class="text-center">
+                                        <i>No user's using this Role.</i>
+                                        <br />
+                                        <small><i>Add via users page</i></small>
                                     </td>
                                 </tr>
                             }

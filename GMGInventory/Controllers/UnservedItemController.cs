@@ -1,17 +1,12 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
     public class UnservedItemController(IAccessRepository accessRepository
                              , IUnservedItemRepository unservedItemRepository) : BaseController(accessRepository)
     {

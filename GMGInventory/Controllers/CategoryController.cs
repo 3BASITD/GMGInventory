@@ -2,14 +2,14 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class CategoryController(IAccessRepository accessRepository
                                   , ICategoryRepository categoryRepository) : BaseController(accessRepository)
     {

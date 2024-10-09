@@ -27,6 +27,20 @@ namespace GMGInventory.Application.Repositories
             this.roleManager = roleManager;
         }
 
+        public async Task<IList<JsonOptionsModel>> GetRolesOptions(string? IncludeId)
+        {
+            return await roleManager.Roles
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .OrderBy(s => s.Text)
+                .ToListAsync();
+        }
+
         public async Task<RolesPagesVM> GetRolesPagesAsync(string RoleId)
         {
             var role = context.Roles.Where(s => s.Id == RoleId).FirstOrDefault();
@@ -68,7 +82,7 @@ namespace GMGInventory.Application.Repositories
         {
             var users = new List<string>();
             var role = await roleManager.FindByIdAsync(RoleId);
-            if(role!= null)
+            if (role != null)
             {
                 var userInRole = await userManager.GetUsersInRoleAsync(role.Name);
                 users = userInRole.Select(s => s.FirstName + " " + s.LastName).ToList();
@@ -168,7 +182,8 @@ namespace GMGInventory.Application.Repositories
                                 DateCreated = DateTime.Now
                             };
                             context.Accesses.Add(newAccess);
-                        } else
+                        }
+                        else
                         {
                             acc.CanView = access.CanView;
                             acc.CanAdd = access.CanAdd;
@@ -191,6 +206,94 @@ namespace GMGInventory.Application.Repositories
             return response;
         }
 
+        public async Task<ResponseModel> DeleteDeactivateRoleAsync(string RoleId)
+        {
+            var response = new ResponseModel();
+            var role = await roleManager.FindByIdAsync(RoleId);
+            if (role == null)
+            {
+                response.Status = "Error";
+                response.Message = "Invalid role";
+            }
+            else
+            {
+                var userInRole = await userManager.GetUsersInRoleAsync(role.Name);
+                if (userInRole.Count > 0)
+                {
+                    // Deactivate
+                    role.IsActive = false;
+
+                    var result = await roleManager.UpdateAsync(role);
+                    if (result.Succeeded)
+                    {
+                        response.Status = "Success";
+                        response.Message = "Role successully deactivated";
+                    }
+                    else
+                    {
+                        response.Status = "Error";
+                        response.Message = string.Join(", ", result.Errors.Select(e => e.Description));
+                    }
+                }
+                else
+                {
+                    // Delete
+                    var accesses = await context.Accesses.Where(s => s.RoleId == RoleId).ToListAsync();
+                    context.Accesses.RemoveRange(accesses);
+                    await context.SaveChangesAsync();
+
+                    var result = await roleManager.DeleteAsync(role);
+                    if (result.Succeeded)
+                    {
+                        response.Status = "Success";
+                        response.Message = "Role successully deleted";
+                    }
+                    else
+                    {
+                        response.Status = "Error";
+                        response.Message = string.Join(", ", result.Errors.Select(e => e.Description));
+                    }
+
+                }
+            }
+            return response;
+        }
+
+        public async Task<ResponseModel> ReactivateRoleAsync(string RoleId)
+        {
+            var response = new ResponseModel();
+            var role = await roleManager.FindByIdAsync(RoleId);
+            if (role == null)
+            {
+                response.Status = "Error";
+                response.Message = "Invalid role";
+            }
+            else
+            {
+                if (role.IsActive)
+                {
+                    response.Status = "Warning";
+                    response.Message = "The role is already active.";
+                }
+                else
+                {
+                    role.IsActive = true;
+
+                    var result = await roleManager.UpdateAsync(role);
+                    if (result.Succeeded)
+                    {
+                        response.Status = "Success";
+                        response.Message = "Role successully activated";
+                    }
+                    else
+                    {
+                        response.Status = "Error";
+                        response.Message = string.Join(", ", result.Errors.Select(e => e.Description));
+                    }
+                }
+            }
+            return response;
+        }
 
         public async Task<IList<string>> GetUserAllowedPagesAsync(string UserId)
         {

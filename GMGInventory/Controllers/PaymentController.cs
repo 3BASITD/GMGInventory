@@ -4,15 +4,11 @@ using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.Accounting + ","
-                     + Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin)]
+    [Authorize]
     public class PaymentController(IAccessRepository accessRepository
                              , IPaymentRepository customerpaymentRepository) : BaseController(accessRepository)
     {

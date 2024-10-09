@@ -1,6 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -9,19 +9,11 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin)]
-    public class ManagementReportController : Controller
+    [Authorize]
+    public class ManagementReportController(IAccessRepository accessRepository
+                                          , IReportManagementRepository reportManagementRepository) : BaseController(accessRepository)
     {
-        private readonly IReportManagementRepository reportManagementRepository;
-        private readonly ControllerHelper chelper;
-
-        public ManagementReportController(IReportManagementRepository reportManagementRepository)
-        {
-            this.reportManagementRepository = reportManagementRepository;
-            chelper = new();
-        }
+        private readonly ControllerHelper chelper = new();
 
         #region Check Register by Date
 

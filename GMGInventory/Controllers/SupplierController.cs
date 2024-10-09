@@ -1,17 +1,12 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Linq;
 
 namespace GMGInventory.Controllers
 {
@@ -28,9 +23,6 @@ namespace GMGInventory.Controllers
             return Json(await supplierRepository.GetOptions(IncludeId));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.View);
@@ -41,9 +33,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> CreateJson(SupplierVM supplierVM)
         {
@@ -65,9 +54,6 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetListJson()
         {
@@ -78,9 +64,6 @@ namespace GMGInventory.Controllers
             return Json(await supplierRepository.GetAllForDataTablesAsync(form));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Details(int? id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.View);
@@ -94,9 +77,6 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Create()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Add);
@@ -111,9 +91,6 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SupplierVM supplierVM)
@@ -141,9 +118,6 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Edit(int? id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.Edit);
@@ -162,9 +136,6 @@ namespace GMGInventory.Controllers
             return View(supplierVM);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> EditJson(SupplierVM supplierVM)
         {
@@ -194,9 +165,6 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -221,9 +189,6 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reactivate(int id)
@@ -241,9 +206,6 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadFile()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.UploadDownload);
@@ -299,9 +261,6 @@ namespace GMGInventory.Controllers
             }
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> UploadJson(SupplierVM supplierVM)
         {

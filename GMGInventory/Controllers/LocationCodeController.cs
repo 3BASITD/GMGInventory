@@ -2,10 +2,12 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class LocationCodeController(IAccessRepository accessRepository
                             , ILocationCodeRepository locationCodeRepository) : BaseController(accessRepository)
     {

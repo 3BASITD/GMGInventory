@@ -4,12 +4,14 @@ using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class AccountingReportController(IAccessRepository accessRepository
                                           , IReportAccountingRepository reportAccountingRepository) : BaseController(accessRepository)
     {
