@@ -1,15 +1,15 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
+using GMGInventory.Common.Models;
+using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    public class PurchaseOrderController(IAccessRepository accessRepository
-                            , IPurchaseOrderRepository purchaseOrderRepository) : BaseController(accessRepository)
     [Authorize]
-    public class PurchaseOrderController(IAccessRepository accessRepository) : BaseController(accessRepository)
+    public class PurchaseOrderController(IAccessRepository accessRepository, IPurchaseOrderRepository purchaseOrderRepository)  : BaseController(accessRepository)
     {
-
         public async Task<IActionResult> GetOptions(string search, int page)
         {
             return Json(await purchaseOrderRepository.GetOptions(search, page));
@@ -18,6 +18,15 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetCurrencyOptions(int? IncludeId)
         {
             return Json(await purchaseOrderRepository.GetCurrencyOptions(IncludeId));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetItemsJson(int purchaseOrderId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await purchaseOrderRepository.GetItemsAsync(purchaseOrderId));
         }
 
         [Authorize(Roles = Roles.InventoryManager + ","
@@ -75,12 +84,6 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> GetItemsJson(int purchaseOrderId)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
-
-        }
+      
     }
 }
