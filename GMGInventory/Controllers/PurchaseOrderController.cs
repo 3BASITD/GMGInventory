@@ -7,83 +7,94 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
+
     [Authorize]
-    public class PurchaseOrderController(IAccessRepository accessRepository, IPurchaseOrderRepository purchaseOrderRepository)  : BaseController(accessRepository)
+    public class PurchaseOrderController(IAccessRepository accessRepository) : BaseController(accessRepository)
     {
-        public async Task<IActionResult> GetOptions(string search, int page)
+        public IActionResult Index()
         {
-            return Json(await purchaseOrderRepository.GetOptions(search, page));
+            return View("~/Views/Shared/Temp.cshtml");
+
         }
+    }
 
-        public async Task<IActionResult> GetCurrencyOptions(int? IncludeId)
-        {
-            return Json(await purchaseOrderRepository.GetCurrencyOptions(IncludeId));
-        }
+    //    [Authorize]
+    //public class PurchaseOrderController(IAccessRepository accessRepository, IPurchaseOrderRepository purchaseOrderRepository)  : BaseController(accessRepository)
+    //{
+    //    public async Task<IActionResult> GetOptions(string search, int page)
+    //    {
+    //        return Json(await purchaseOrderRepository.GetOptions(search, page));
+    //    }
 
-        [HttpPost]
-        public async Task<IActionResult> GetItemsJson(int purchaseOrderId)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+    //    public async Task<IActionResult> GetCurrencyOptions(int? IncludeId)
+    //    {
+    //        return Json(await purchaseOrderRepository.GetCurrencyOptions(IncludeId));
+    //    }
 
-            return Json(await purchaseOrderRepository.GetItemsAsync(purchaseOrderId));
-        }
+    //    [HttpPost]
+    //    public async Task<IActionResult> GetItemsJson(int purchaseOrderId)
+    //    {
+    //        var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+    //        if (redirectResult != null) return redirectResult;
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
-        public async Task<IActionResult> Index()
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+    //        return Json(await purchaseOrderRepository.GetItemsAsync(purchaseOrderId));
+    //    }
 
-            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseOrder)).Convert();
+    //    [Authorize(Roles = Roles.InventoryManager + ","
+    //                     + Roles.SalesDirector + ","
+    //                     + Roles.SystemAdmin + ","
+    //                     + Roles.Telemarketer)]
+    //    public async Task<IActionResult> Index()
+    //    {
+    //        var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+    //        if (redirectResult != null) return redirectResult;
 
-            return View();
-        }
+    //        ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseOrder)).Convert();
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
-        [HttpPost]
-        public async Task<IActionResult> GetListDTJson()
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+    //        return View();
+    //    }
 
-            DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await purchaseOrderRepository.GetListDTAsync(form));
-        }
+    //    [Authorize(Roles = Roles.InventoryManager + ","
+    //                     + Roles.SalesDirector + ","
+    //                     + Roles.SystemAdmin + ","
+    //                     + Roles.Telemarketer)]
+    //    [HttpPost]
+    //    public async Task<IActionResult> GetListDTJson()
+    //    {
+    //        var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+    //        if (redirectResult != null) return redirectResult;
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
-        public async Task<IActionResult> Details(int? Id)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+    //        DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
+    //        return Json(await purchaseOrderRepository.GetListDTAsync(form));
+    //    }
 
-            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseOrder)).Convert();
+    //    [Authorize(Roles = Roles.InventoryManager + ","
+    //                     + Roles.SalesDirector + ","
+    //                     + Roles.SystemAdmin + ","
+    //                     + Roles.Telemarketer)]
+    //    public async Task<IActionResult> Details(int? Id)
+    //    {
+    //        var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+    //        if (redirectResult != null) return redirectResult;
 
-            var order = await purchaseOrderRepository.GetDetailsAsync(Id);
-            if (order == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
+    //        ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseOrder)).Convert();
 
-            var dtNow = DateTime.Now;
-            var newChecker = dtNow.AddMinutes(-1) <= order.OrderDateD && order.OrderDateD <= dtNow;
-            if (newChecker)
-            {
-                TempData["SuccessMessage"] = order.Status + " successfully saved";
-            }
+    //        var order = await purchaseOrderRepository.GetDetailsAsync(Id);
+    //        if (order == null)
+    //        {
+    //            return RedirectToAction(nameof(Index));
+    //        }
 
-            return View(order);
-        }
+    //        var dtNow = DateTime.Now;
+    //        var newChecker = dtNow.AddMinutes(-1) <= order.OrderDateD && order.OrderDateD <= dtNow;
+    //        if (newChecker)
+    //        {
+    //            TempData["SuccessMessage"] = order.Status + " successfully saved";
+    //        }
+
+    //        return View(order);
+    //    }
 
       
-    }
+    //}
 }
