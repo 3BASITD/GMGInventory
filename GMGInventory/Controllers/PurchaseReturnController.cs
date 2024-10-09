@@ -9,19 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize(Roles = Roles.InventoryManager + ","
-                     + Roles.SalesDirector + ","
-                     + Roles.SystemAdmin + ","
-                     + Roles.Telemarketer)]
+    [Authorize]
    
     public class PurchaseReturnController(IAccessRepository accessRepository
-                             , IPurchaseReturnRepository purchaseReturnRepository) : BaseController(accessRepository)
+                                        , IPurchaseReturnRepository purchaseReturnRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReturn, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReturn)).Convert();
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReturn)).Convert();
 

@@ -1,10 +1,13 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    public class InvoiceController(IInvoiceRepository invoiceRepository) : Controller
+    [Authorize]
+    public class InvoiceController(IAccessRepository accessRepository
+                                 , IInvoiceRepository invoiceRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(string search, int page)
         {

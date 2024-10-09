@@ -2,15 +2,14 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class SalesReportController(IAccessRepository accessRepository
                             , IReportSalesRepository reportSalesRepository) : BaseController(accessRepository)
     {
@@ -23,17 +22,11 @@ namespace GMGInventory.Controllers
         //"SalesReportBasis", "SalesReturnListingReport", "UnservedItem"
 
         #region Agent Sales per Item
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public IActionResult AgentSalesPerItem()
         {
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintAgentSalesPerItem(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.AgentSalesPerItemReport, AccessTypes.Print);
@@ -42,9 +35,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintAgentSalesPerItem(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetAgentSalesPerItemDT(ListFilterSalesModel filter)
         {
@@ -56,9 +46,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetAgentSalesPerItemDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadAgentSalesPerItem(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.AgentSalesPerItemReport, AccessTypes.UploadDownload);
@@ -104,9 +91,6 @@ namespace GMGInventory.Controllers
         #endregion Agent Sales per Item
 
         #region Brand Sales
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> BrandSales()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BrandSalesReport, AccessTypes.View);
@@ -115,9 +99,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintBrandSales(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BrandSalesReport, AccessTypes.Print);
@@ -126,9 +107,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintBrandSales(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetBrandSalesDT(ListFilterSalesModel filter)
         {
@@ -139,9 +117,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetBrandSalesDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadBrandSales(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BrandSalesReport, AccessTypes.UploadDownload);
@@ -179,9 +154,6 @@ namespace GMGInventory.Controllers
         #endregion Brand Sales
 
         #region Best Selling Item
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> BestSellingItem()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BestSellingItemsReport, AccessTypes.View);
@@ -190,9 +162,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintBestSellingItem(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BestSellingItemsReport, AccessTypes.Print);
@@ -202,9 +171,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintBestSellingItem(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetBestSellingItemDT(ListFilterSalesModel filter)
         {
@@ -215,9 +181,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetBestSellingItemDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadBestSellingItem(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BestSellingItemsReport, AccessTypes.UploadDownload);
@@ -261,10 +224,6 @@ namespace GMGInventory.Controllers
         #endregion Best Selling Item
 
         #region Commission
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> Commission()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CommissionReport, AccessTypes.View);
@@ -273,10 +232,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCommission(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CommissionReport, AccessTypes.Print);
@@ -285,10 +240,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintCommission(filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetCommissionDT(ListFilterSalesModel filter)
         {
@@ -299,10 +250,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetCommissionDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCommission(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CommissionReport, AccessTypes.UploadDownload);
@@ -346,9 +293,6 @@ namespace GMGInventory.Controllers
         #endregion Commission
 
         #region Customer Sales Ranking
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> CustomerSalesRanking()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesRankingReport, AccessTypes.View);
@@ -357,9 +301,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSalesRanking(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesRankingReport, AccessTypes.Print);
@@ -368,9 +309,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintCustomerSalesRanking(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetCustomerSalesRankingDT(ListFilterSalesModel filter)
         {
@@ -381,9 +319,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetCustomerSalesRankingDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCustomerSalesRanking(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesRankingReport, AccessTypes.UploadDownload);
@@ -421,9 +356,6 @@ namespace GMGInventory.Controllers
         #endregion Customer Sales Ranking
 
         #region Customer Sales
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> CustomerSales()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.View);
@@ -432,9 +364,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> CustomerSalesCompare()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.View);
@@ -443,9 +372,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSales(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.Print);
@@ -454,9 +380,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintCustomerSales(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintCustomerSalesCompare(ListFilterSalesModel filter1, ListFilterSalesModel filter2)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.Print);
@@ -470,9 +393,6 @@ namespace GMGInventory.Controllers
             return View(sales);
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetCustomerSalesDT(ListFilterSalesModel filter)
         {
@@ -521,9 +441,6 @@ namespace GMGInventory.Controllers
             }
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadCustomerSalesCompare(ListFilterSalesModel filter1, ListFilterSalesModel filter2)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.CustomerSalesReport, AccessTypes.UploadDownload);
@@ -573,11 +490,6 @@ namespace GMGInventory.Controllers
         #endregion Customer Sales
 
         #region Daily Sales
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DailySales()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailySalesReport, AccessTypes.View);
@@ -586,11 +498,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintDailySales(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailySalesReport, AccessTypes.Print);
@@ -599,11 +506,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintDailySales(filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetDailySalesDT(ListFilterSalesModel filter)
         {
@@ -614,11 +516,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetDailySalesDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadDailySales(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailySalesReport, AccessTypes.UploadDownload);
@@ -666,11 +563,6 @@ namespace GMGInventory.Controllers
         #endregion Daily Sales
 
         #region Sales Invoice
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> SalesInvoice()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
@@ -679,11 +571,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesInvoice(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Print);
@@ -692,11 +579,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintSalesInvoice(filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetSalesInvoiceDT(ListFilterSalesModel filter)
         {
@@ -707,11 +589,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesInvoiceDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesInvoice(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.UploadDownload);
@@ -757,9 +634,6 @@ namespace GMGInventory.Controllers
         #endregion Sales Invoice
 
         #region Sales by Agent-Area
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> SalesAgentArea()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.View);
@@ -768,9 +642,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesAgentArea(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.Print);
@@ -779,9 +650,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintSalesAgentArea(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> GetSalesAgentArea(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.View);
@@ -790,9 +658,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesAgentArea(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetSalesAgentAreaDT(ListFilterSalesModel filter)
         {
@@ -803,9 +668,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesAgentAreaDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesAgentArea(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesByAgentAreaReport, AccessTypes.UploadDownload);
@@ -845,9 +707,6 @@ namespace GMGInventory.Controllers
         #endregion Sales by Agent-Area
 
         #region Sales Report by Basis
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> SalesReportBasis()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReportByBasisReport, AccessTypes.View);
@@ -856,9 +715,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesReportBasis(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReportByBasisReport, AccessTypes.Print);
@@ -867,9 +723,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintSalesReportBasis(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetSalesReportBasisDT(ListFilterSalesModel filter)
         {
@@ -880,9 +733,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesReportBasisDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesReportBasis(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReportByBasisReport, AccessTypes.UploadDownload);
@@ -918,10 +768,6 @@ namespace GMGInventory.Controllers
         #endregion Sales Report by Basis
 
         #region Sales Return
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> SalesReturn()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
@@ -930,10 +776,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintSalesReturn(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Print);
@@ -942,10 +784,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintSalesReturn(filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetSalesReturnDT(ListFilterSalesModel filter)
         {
@@ -956,10 +794,6 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetSalesReturnDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadSalesReturn(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.UploadDownload);
@@ -1017,9 +851,6 @@ namespace GMGInventory.Controllers
         #endregion Sales Return
 
         #region Unserved Items
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> UnservedItem()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.View);
@@ -1028,9 +859,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> PrintUnservedItem(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.Print);
@@ -1039,9 +867,6 @@ namespace GMGInventory.Controllers
             return View(await reportSalesRepository.PrintUnservedItem(filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> GetUnservedItemDT(ListFilterSalesModel filter)
         {
@@ -1052,26 +877,23 @@ namespace GMGInventory.Controllers
             return Json(await reportSalesRepository.GetUnservedItemDT(dtForm, filter));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> DownloadUnservedItem(ListFilterSalesModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
-            DataTable dt = new DataTable("Unserved Item "
-                                       + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
-                                       + "-"
-                                       + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
-            dt.Columns.AddRange(new DataColumn[6] {
+            DataTable dt = new("Unserved Item "
+                             + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                             + "-"
+                             + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
+            dt.Columns.AddRange([
                 new DataColumn(chelper.DisplayName<UnservedItemRVM>("Brand")),
                 new DataColumn(chelper.DisplayName<UnservedItemRVM>("ItemCode")),
                 new DataColumn(chelper.DisplayName<UnservedItemRVM>("ItemName")),
                 new DataColumn(chelper.DisplayName<UnservedItemRVM>("Pending")),
                 new DataColumn(chelper.DisplayName<UnservedItemRVM>("Current")),
                 new DataColumn(chelper.DisplayName<UnservedItemRVM>("ReplenishDate"))
-            });
+            ]);
             var items = await reportSalesRepository.GetUnservedItem(filter);
             foreach (var item in items)
             {
@@ -1083,17 +905,13 @@ namespace GMGInventory.Controllers
                             item.ReplenishDate);
             }
 
-            using (XLWorkbook wb = new())
-            {
-                wb.Worksheets.Add(dt);
-                using (MemoryStream stream = new())
-                {
-                    wb.SaveAs(stream);
-                    return File(stream.ToArray(),
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        DateTime.Now.ToString("yyyyMMdd") + " Unserved Items.xlsx");
-                }
-            }
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                DateTime.Now.ToString("yyyyMMdd") + " Unserved Items.xlsx");
         }
         #endregion Unserved Items
     }

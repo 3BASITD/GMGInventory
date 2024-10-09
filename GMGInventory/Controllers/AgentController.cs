@@ -3,12 +3,14 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class AgentController(IAccessRepository accessRepository
                                , IAgentRepository agentRepository
                                , IAreaRepository areaRepository

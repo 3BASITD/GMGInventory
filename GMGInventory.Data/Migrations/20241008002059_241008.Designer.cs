@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GMGInventory.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240924070818_BusinessStyle2")]
-    partial class BusinessStyle2
+    [Migration("20241008002059_241008")]
+    partial class _241008
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -80,6 +80,716 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Accesses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9013),
+                            PageId = 1,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9024),
+                            PageId = 2,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9025),
+                            PageId = 3,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9026),
+                            PageId = 4,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9027),
+                            PageId = 5,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9029),
+                            PageId = 6,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9030),
+                            PageId = 7,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9031),
+                            PageId = 8,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9032),
+                            PageId = 9,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9033),
+                            PageId = 10,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9034),
+                            PageId = 11,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9035),
+                            PageId = 12,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9036),
+                            PageId = 13,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9078),
+                            PageId = 14,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9079),
+                            PageId = 15,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9080),
+                            PageId = 16,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9080),
+                            PageId = 17,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9098),
+                            PageId = 18,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9115),
+                            PageId = 19,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9116),
+                            PageId = 20,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9117),
+                            PageId = 21,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9118),
+                            PageId = 22,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9118),
+                            PageId = 23,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9119),
+                            PageId = 24,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9120),
+                            PageId = 25,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9121),
+                            PageId = 26,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9122),
+                            PageId = 27,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9123),
+                            PageId = 28,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9123),
+                            PageId = 29,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9133),
+                            PageId = 30,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9134),
+                            PageId = 31,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9134),
+                            PageId = 32,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9135),
+                            PageId = 33,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9137),
+                            PageId = 34,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9137),
+                            PageId = 35,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9138),
+                            PageId = 36,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 37,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9139),
+                            PageId = 37,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 38,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9140),
+                            PageId = 38,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 39,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9141),
+                            PageId = 39,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9141),
+                            PageId = 40,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9142),
+                            PageId = 41,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 42,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9143),
+                            PageId = 42,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 43,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9144),
+                            PageId = 43,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 44,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9145),
+                            PageId = 44,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 45,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9145),
+                            PageId = 45,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 46,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9146),
+                            PageId = 46,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 47,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9147),
+                            PageId = 47,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 48,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9148),
+                            PageId = 48,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 49,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9149),
+                            PageId = 49,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 50,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9149),
+                            PageId = 50,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 51,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9150),
+                            PageId = 51,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 52,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9151),
+                            PageId = 52,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 53,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9152),
+                            PageId = 53,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 54,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9153),
+                            PageId = 54,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 55,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9153),
+                            PageId = 55,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 56,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9154),
+                            PageId = 56,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 57,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9155),
+                            PageId = 57,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 58,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9156),
+                            PageId = 58,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 59,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 988, DateTimeKind.Local).AddTicks(9157),
+                            PageId = 59,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        });
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Agent", b =>
@@ -1387,10 +2097,10 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 1,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
+                            HasDelete = false,
+                            HasEdit = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -1464,7 +2174,7 @@ namespace GMGInventory.Data.Migrations
                             HasDelete = true,
                             HasEdit = true,
                             HasPrint = false,
-                            HasUploadDownload = false,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Item"
                         },
@@ -1656,7 +2366,7 @@ namespace GMGInventory.Data.Migrations
                             HasDelete = true,
                             HasEdit = true,
                             HasPrint = false,
-                            HasUploadDownload = false,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Agents"
                         },
@@ -1680,7 +2390,7 @@ namespace GMGInventory.Data.Migrations
                             HasDelete = true,
                             HasEdit = true,
                             HasPrint = false,
-                            HasUploadDownload = false,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Areas"
                         },
@@ -1692,7 +2402,7 @@ namespace GMGInventory.Data.Migrations
                             HasDelete = true,
                             HasEdit = true,
                             HasPrint = false,
-                            HasUploadDownload = false,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Brands"
                         },
@@ -1704,7 +2414,7 @@ namespace GMGInventory.Data.Migrations
                             HasDelete = true,
                             HasEdit = true,
                             HasPrint = false,
-                            HasUploadDownload = false,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Categories"
                         },
@@ -1716,7 +2426,7 @@ namespace GMGInventory.Data.Migrations
                             HasDelete = true,
                             HasEdit = true,
                             HasPrint = false,
-                            HasUploadDownload = false,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Forwarders"
                         },
@@ -1795,10 +2505,10 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 35,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
+                            HasDelete = false,
+                            HasEdit = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -1807,288 +2517,288 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 36,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Agent Sales per Item"
                         },
                         new
                         {
                             Id = 37,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Brand Sales Report"
                         },
                         new
                         {
                             Id = 38,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Best Selling Items"
                         },
                         new
                         {
                             Id = 39,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Commision Report"
                         },
                         new
                         {
                             Id = 40,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Customer Sales Ranking Report"
                         },
                         new
                         {
                             Id = 41,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Customer Sales Report"
                         },
                         new
                         {
                             Id = 42,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Daily Sales Report"
                         },
                         new
                         {
                             Id = 43,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Sales Invoice Listing Report"
                         },
                         new
                         {
                             Id = 44,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Sales by Agent/Area"
                         },
                         new
                         {
                             Id = 45,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Sales Report by Basis"
                         },
                         new
                         {
                             Id = 46,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Sales Return Listing Report"
                         },
                         new
                         {
                             Id = 47,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Unserved Item Report"
                         },
                         new
                         {
                             Id = 48,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Below Maintaining Items"
                         },
                         new
                         {
                             Id = 49,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Receiving Listing"
                         },
                         new
                         {
                             Id = 50,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Receiving Listing by Supplier"
                         },
                         new
                         {
                             Id = 51,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Receiving Summary"
                         },
                         new
                         {
                             Id = 52,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Stock Card"
                         },
                         new
                         {
                             Id = 53,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Stock Status Report"
                         },
                         new
                         {
                             Id = 54,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Supplier Purchase History"
                         },
                         new
                         {
                             Id = 55,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Credit Memo Listing Report"
                         },
                         new
                         {
                             Id = 56,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Debit Memo Listing Report"
                         },
                         new
                         {
                             Id = 57,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Purchase Order Report"
                         },
                         new
                         {
                             Id = 58,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Purchase Return Report"
                         },
                         new
                         {
                             Id = 59,
-                            HasAdd = true,
+                            HasAdd = false,
                             HasApproveDisapprove = false,
-                            HasDelete = true,
-                            HasEdit = true,
-                            HasPrint = false,
-                            HasUploadDownload = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = true,
+                            HasUploadDownload = true,
                             HasView = true,
                             Name = "Purchase Receiving Report"
                         });
@@ -2441,7 +3151,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "LUZ",
-                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 580, DateTimeKind.Local).AddTicks(9301),
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 814, DateTimeKind.Local).AddTicks(376),
                             IsActive = false,
                             Name = "Luzon",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -2450,7 +3160,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 2,
                             Code = "VIS",
-                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 580, DateTimeKind.Local).AddTicks(9319),
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 814, DateTimeKind.Local).AddTicks(392),
                             IsActive = false,
                             Name = "Visayas",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -2459,7 +3169,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 3,
                             Code = "MIN",
-                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 580, DateTimeKind.Local).AddTicks(9321),
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 814, DateTimeKind.Local).AddTicks(394),
                             IsActive = false,
                             Name = "Mindanao",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -2468,7 +3178,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 4,
                             Code = "MM",
-                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 580, DateTimeKind.Local).AddTicks(9323),
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 814, DateTimeKind.Local).AddTicks(396),
                             IsActive = false,
                             Name = "Metro Manila",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -3574,6 +4284,10 @@ namespace GMGInventory.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -3591,43 +4305,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.ToTable("AspNetRoles", (string)null);
 
-                    b.HasData(
-                        new
-                        {
-                            Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            Name = "Accounting",
-                            NormalizedName = "ACCOUNTING"
-                        },
-                        new
-                        {
-                            Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            Name = "Inventory Manager",
-                            NormalizedName = "INVENTORY MANAGER"
-                        },
-                        new
-                        {
-                            Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            Name = "Invoicing Clerk",
-                            NormalizedName = "INVOICING CLERK"
-                        },
-                        new
-                        {
-                            Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            Name = "Sales Director",
-                            NormalizedName = "SALES DIRECTOR"
-                        },
-                        new
-                        {
-                            Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            Name = "System Admin",
-                            NormalizedName = "SYSTEM ADMIN"
-                        },
-                        new
-                        {
-                            Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            Name = "Telemarketer",
-                            NormalizedName = "TELEMARKETER"
-                        });
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityRole");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -3823,6 +4501,85 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.Role", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasDiscriminator().HasValue("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
+                            Name = "Accounting",
+                            NormalizedName = "ACCOUNTING",
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 986, DateTimeKind.Local).AddTicks(9290),
+                            IsActive = true,
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
+                            Name = "Inventory Manager",
+                            NormalizedName = "INVENTORY MANAGER",
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 986, DateTimeKind.Local).AddTicks(9311),
+                            IsActive = true,
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
+                            Name = "Invoicing Clerk",
+                            NormalizedName = "INVOICING CLERK",
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 986, DateTimeKind.Local).AddTicks(9317),
+                            IsActive = true,
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
+                            Name = "Sales Director",
+                            NormalizedName = "SALES DIRECTOR",
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 986, DateTimeKind.Local).AddTicks(9334),
+                            IsActive = true,
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            Name = "System Admin",
+                            NormalizedName = "SYSTEM ADMIN",
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 986, DateTimeKind.Local).AddTicks(9339),
+                            IsActive = true,
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
+                            Name = "Telemarketer",
+                            NormalizedName = "TELEMARKETER",
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 986, DateTimeKind.Local).AddTicks(9344),
+                            IsActive = true,
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        });
+                });
+
             modelBuilder.Entity("GMGInventory.Data.User", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
@@ -3863,16 +4620,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d7139ee1-95ca-4120-be38-2cca2217509f",
+                            ConcurrencyStamp = "e88878db-fb1e-437f-8007-67399c09785c",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPApT+7R3SL506vYUrfYf7s1A+yjI7/tD12hAXQHN0n5nlPuJuL8K2uoM0MFgcQpxg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGKr1NRmIL93lucCilGqilZCaIwmFxBuukz6FAp6d7jVe7hOsibuWU/K1DOAAOvFYg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "728d4639-e6c2-4b26-989d-c0c42276293f",
+                            SecurityStamp = "b0595e8a-d5e6-4615-89f4-c894aa7c15b2",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 676, DateTimeKind.Local).AddTicks(9873),
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 898, DateTimeKind.Local).AddTicks(5217),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -3884,16 +4641,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "24dd9dd7-ff55-4710-a93e-f13847d787fd",
+                            ConcurrencyStamp = "716208ca-2be4-4ac3-8a5a-69fb038e41d2",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHBpGExfpyVcNH2CPSKtXR82NPqMmCrtU0YOKhuuYGZnhzNz/XtlAWy9AjrAJ0pnoA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEI0O7zTm2ENf3DZ9mqhhlVU6IyEaVT/iZ3e+htRRs//yDoyjuYfxnVggrAyWKu1+Hw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "87e9c421-5b82-4f11-b426-988b0c0eb16a",
+                            SecurityStamp = "4ded77ff-6a5b-4286-8b5c-075488aed677",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2024, 9, 24, 15, 8, 17, 808, DateTimeKind.Local).AddTicks(4654),
+                            DateCreated = new DateTime(2024, 10, 8, 8, 19, 41, 985, DateTimeKind.Local).AddTicks(1084),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,

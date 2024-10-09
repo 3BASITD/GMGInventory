@@ -1,17 +1,15 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-     public class SalesInvoiceController(IAccessRepository accessRepository
-                           , IInvoiceRepository invoiceRepository) : BaseController(accessRepository)
+    [Authorize]
+    public class SalesInvoiceController(IAccessRepository accessRepository
+                                      , IInvoiceRepository invoiceRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetInvoiceTypeOptions(int? IncludeId)
@@ -24,11 +22,6 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetInvoiceByCustomer(search, page, customer));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
@@ -38,11 +31,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> GetListJson(ListFilterCommonModel filter)
         {
@@ -53,11 +41,6 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetListDTAsync(form, filter));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> Details(int? Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
@@ -73,11 +56,6 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> GetItemsJson(int invoiceId)
         {
@@ -87,11 +65,6 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetItemsAsync(invoiceId));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<JsonResult> GetItemsDTJson(int invoiceId)
         {
@@ -99,10 +72,6 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetItemsDTAsync(form, invoiceId));
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> PrintReceipt(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Print);
@@ -114,9 +83,6 @@ namespace GMGInventory.Controllers
             return View(invoice);
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> Create(int? Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Add);
@@ -133,9 +99,6 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> SaveJson(InvoiceFormVM form)
         {
@@ -169,9 +132,6 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> UpdateJson(InvoiceFormVM form)
         {

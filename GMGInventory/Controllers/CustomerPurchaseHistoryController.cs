@@ -1,12 +1,12 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class CustomerPurchaseHistoryController(IAccessRepository accessRepository
                                                  , ICustomerPurchaseRepository customerPurchaseRepository) : BaseController(accessRepository)
     {

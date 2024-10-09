@@ -9,7 +9,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class RegionController(IAccessRepository accessRepository
-                         , IRegionRepository regionRepository) : BaseController(accessRepository)
+                                , IRegionRepository regionRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetOptions(int? IncludeId)

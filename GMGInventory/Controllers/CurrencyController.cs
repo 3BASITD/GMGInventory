@@ -5,15 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace GMGInventory.Controllers
 {
     [Authorize]
-    public class CurrencyController : Controller
+    public class CurrencyController(IAccessRepository accessRepository
+                                  , ICurrencyRepository currencyRepository) : BaseController(accessRepository)
     {
-        private readonly ICurrencyRepository currencyRepository;
-
-        public CurrencyController(ICurrencyRepository currencyRepository)
-        {
-            this.currencyRepository = currencyRepository;
-        }
-
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
             return Json(await currencyRepository.GetOptions(IncludeId));

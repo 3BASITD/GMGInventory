@@ -2,12 +2,14 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class ReasonsOfReturnController(IAccessRepository accessRepository
-                         , IReasonOfReturnRepository reasonOfReturnRepository) : BaseController(accessRepository)
+                                         , IReasonOfReturnRepository reasonOfReturnRepository) : BaseController(accessRepository)
     {
        
         public async Task<IActionResult> Index()

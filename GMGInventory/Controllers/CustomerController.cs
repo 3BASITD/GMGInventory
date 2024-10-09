@@ -11,13 +11,14 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-        public class CustomerController(IAccessRepository accessRepository
-                             , ICustomerRepository customerRepository
-                             , IAreaRepository areaRepository
-                             , IRegionRepository regionRepository
-                             , IAgentRepository agentRepository
-                             , ICustomerTypeRepository customertypeRepository
-                             , ICreditTermRepository credittermRepository) : BaseController(accessRepository)
+    [Authorize]
+    public class CustomerController(IAccessRepository accessRepository
+                                  , ICustomerRepository customerRepository
+                                  , IAreaRepository areaRepository
+                                  , IRegionRepository regionRepository
+                                  , IAgentRepository agentRepository
+                                  , ICustomerTypeRepository customertypeRepository
+                                  , ICreditTermRepository credittermRepository) : BaseController(accessRepository)
         {
         public async Task<IActionResult> GetOptions(string search, int page)
         {
@@ -143,10 +144,6 @@ namespace GMGInventory.Controllers
             return View(cust);
         }
 
-        [Authorize(Roles = Roles.Accounting + ","
-                         + Roles.InventoryManager + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.SystemAdmin)]
         public async Task<IActionResult> MoreDetails(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);

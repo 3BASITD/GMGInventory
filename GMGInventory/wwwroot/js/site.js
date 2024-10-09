@@ -18,7 +18,9 @@
 
     $.ajaxSetup({
         error: function (xhr, status, error) {
-            if (xhr.status === 400)
+            if (xhr.status === 0) {
+                toastr.error("Connection refused. Please check your server or network.", "Error");
+            } else if (xhr.status === 400)
                 toastr.error("The request was invalid. Please try again.", "400 Bad Request");
             else if (xhr.status === 401)
                 toastr.error("Please log in to access this action.", "401 Unauthorized");

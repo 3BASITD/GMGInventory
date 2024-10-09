@@ -1,19 +1,15 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using static ClosedXML.Excel.XLPredefinedFormat;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class SalesReturnController(IAccessRepository accessRepository
-                            , ISalesReturnRepository salesReturnRepository) : BaseController(accessRepository)
+                                     , ISalesReturnRepository salesReturnRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {
@@ -59,11 +55,6 @@ namespace GMGInventory.Controllers
             return Json(await salesReturnRepository.GetItemsAsync(salesReturnId));
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> Create()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Add);
@@ -74,11 +65,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InventoryManager + ","
-                         + Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.SalesDirector + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> SaveJson(SalesReturnFormVM form)
         {

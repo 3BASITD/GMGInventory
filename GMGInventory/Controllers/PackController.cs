@@ -1,15 +1,13 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
+    [Authorize]
     public class PackController(IAccessRepository accessRepository
                            , IPackRepository packRepository) : BaseController(accessRepository)
     {
@@ -24,9 +22,6 @@ namespace GMGInventory.Controllers
             return Json(await packRepository.GetOptions(search, page));
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.View);
@@ -38,9 +33,6 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> GetListJson(ListFilterCommonModel filter)
         {
@@ -51,9 +43,6 @@ namespace GMGInventory.Controllers
             return Json(await packRepository.GetListDTAsync(form, filter));
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> Details(int? Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.View);
@@ -69,9 +58,6 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> PrintDetails(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Print);
@@ -108,9 +94,6 @@ namespace GMGInventory.Controllers
             return Json(await packRepository.GetItemsDTAsync(form, packId));
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         public async Task<IActionResult> Create(int? Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Add);
@@ -127,9 +110,6 @@ namespace GMGInventory.Controllers
             return View(order);
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> SaveJson(PackFormVM form)
         {
@@ -152,9 +132,6 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [Authorize(Roles = Roles.InvoicingClerk + ","
-                         + Roles.SystemAdmin + ","
-                         + Roles.Telemarketer)]
         [HttpPost]
         public async Task<IActionResult> UpdateJson(PackFormVM form)
         {

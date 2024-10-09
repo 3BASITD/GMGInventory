@@ -12,9 +12,9 @@ namespace GMGInventory.Application.Contracts
         Task<bool> IsUserInUseAsync(string id);
         Task<bool?> IsUserIdExistAsync(string? id);
         Task<bool?> IsUsernameExistAsync(string? username);
-        Task AddAsync(UserInformationVM userInformationVM);
+        Task<int> AddAsync(UserInformationVM userInformationVM);
         Task UpdateThemeAsync(string id, bool isDarkMode);
-        Task UpdateUserAsync(UserInformationForUpdateVM userInformationVM);
+        Task<int> UpdateUserAsync(UserInformationForUpdateVM userInformationVM);
         Task DeactivateUserAsync(string id);
         Task ReactivateUserAsync(string id);
         Task DeleteAsync(string id);
