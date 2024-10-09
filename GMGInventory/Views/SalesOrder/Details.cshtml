@@ -273,11 +273,14 @@
                         <span class="card-title">Sales Order Item(s)</span>
                         @if (Model?.Status == "Submitted" && (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer)))
                         {
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                    <span class="fas fa-plus"></span> Add Item
-                                </button>
-                            </div>
+                            @if (userAccess.CanAdd)
+                            {
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                        <span class="fas fa-plus"></span> Add Item
+                                    </button>
+                                </div>
+                            }
                         }
                     </div>
                     <div class="card-body">
@@ -681,14 +684,16 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        if (user_access.canEdit) {
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        }
                         return actions;
                     },
                     className: "form-cell"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && validUser) {
+                        if ($("#po-status").val() == "Submitted" && validUser && user_access.canEdit) {
                             return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
                             return data.quantity
@@ -717,10 +722,10 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && validUser) {
+                        if ($("#po-status").val() == "Submitted" && validUser  && user_access.canEdit) {
                             return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
                         } else {
-                            return data.sellingPrice
+                            return Round2Decimal(data.sellingPriceD) 
                         }
                     },
                     name: "SellingPrice",
@@ -728,10 +733,10 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && validUser) {
+                        if ($("#po-status").val() == "Submitted" && validUser && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
                         } else {
-                            return data.discount1
+                            return  Round2Decimal(data.discount1)
                         }
                     },
                     name: "Discount1",
@@ -739,10 +744,10 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && validUser) {
+                        if ($("#po-status").val() == "Submitted" && validUser && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
                         } else {
-                            return data.discount2
+                            return Round2Decimal(data.discount2D)
                         }
                     },
                     name: "Discount2",

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Package Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -12,9 +13,12 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-                <span class="fas fa-print"></span> Print
-            </button>
+            @if (userAccess.CanPrint)
+            {
+                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
             @if (this.User.IsInRole(Roles.InvoicingClerk) || this.User.IsInRole(Roles.SystemAdmin))
             {
                 @if (Model.Status == "Posted")
@@ -280,10 +284,12 @@
                         var actions = '';
                         if (data.remainingQuantity > 0) {
                             //actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
-                            if ($("#add-partial").prop("checked")) {
-                                actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
-                            } else {
-                                actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
+                            if (user_access.canEdit) {
+                                if ($("#add-partial").prop("checked")) {
+                                    actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
+                                } else {
+                                    actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
+                                }
                             }
                         }
                         return actions;
@@ -422,7 +428,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if ($("#pack-status").val() == "Draft") {
+                        if ($("#pack-status").val() == "Draft" && user_access.canEdit) { 
                             actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-minus"></i></button>';
                         }
                         return actions;

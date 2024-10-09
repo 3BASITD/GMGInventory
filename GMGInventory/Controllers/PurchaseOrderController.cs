@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    public class AgentCPurchaseOrderControllerontroller(IAccessRepository accessRepository
+    public class PurchaseOrderController(IAccessRepository accessRepository
                             , IPurchaseOrderRepository purchaseOrderRepository) : BaseController(accessRepository)
     {
 
