@@ -5,6 +5,15 @@ namespace GMGInventory.Data
 {
     public class User : IdentityUser
     {
+        public User()
+        {
+            this.PurchaseOrderApprover = new HashSet<PurchaseOrderNew>();
+            this.PurchaseReceivingApprover = new HashSet<PurchaseReceiving>();
+            this.PurchaseRequestApprover1 = new HashSet<PurchaseRequest>();
+            this.PurchaseRequestApprover2 = new HashSet<PurchaseRequest>();
+            this.PurchaseReturnApprover = new HashSet<PurchaseReturnNew>();
+        }
+
         [Column(TypeName = "nvarchar(50)")]
         public string? FirstName { get; set; }
 
@@ -26,5 +35,15 @@ namespace GMGInventory.Data
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
 
+
+        public ICollection<PurchaseOrderNew> PurchaseOrderApprover { get; set; }
+        public ICollection<PurchaseReceiving> PurchaseReceivingApprover { get; set; }
+
+        [InverseProperty(nameof(PurchaseRequest.Approver1))]
+        public ICollection<PurchaseRequest> PurchaseRequestApprover1 { get; set; }
+
+        [InverseProperty(nameof(PurchaseRequest.Approver2))]
+        public ICollection<PurchaseRequest> PurchaseRequestApprover2 { get; set; }
+        public ICollection<PurchaseReturnNew> PurchaseReturnApprover { get; set; }
     }
 }

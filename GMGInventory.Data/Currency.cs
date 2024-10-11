@@ -7,6 +7,7 @@ namespace GMGInventory.Data
         public Currency()
         {
             this.PurchaseOrders = new HashSet<PurchaseOrder>();
+            this.PurchaseOrderNews = new HashSet<PurchaseOrderNew>();
             this.Suppliers = new HashSet<Supplier>();
         }
 
@@ -23,6 +24,7 @@ namespace GMGInventory.Data
 
         public DateTime EffectiveDate { get; set; }
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
+        public ICollection<PurchaseOrderNew> PurchaseOrderNews { get; set; }
         public ICollection<Supplier> Suppliers { get; set; }
     }
 }

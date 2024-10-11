@@ -8,7 +8,8 @@ namespace GMGInventory.Data
         {
             this.Agents = new HashSet<Agent>();
             this.Customers = new HashSet<Customer>();
-          //  this.Suppliers = new HashSet<Supplier>();
+            this.PurchaseRequests = new HashSet<PurchaseRequest>();
+            //  this.Suppliers = new HashSet<Supplier>();
         }
 
         [ForeignKey("RegionId")]
@@ -28,6 +29,7 @@ namespace GMGInventory.Data
 
         public ICollection<Agent> Agents { get; set; }
         public ICollection<Customer> Customers { get; set; }
-      //  public ICollection<Supplier> Suppliers { get; set; }
+        public ICollection<PurchaseRequest> PurchaseRequests { get; set; }
+        //  public ICollection<Supplier> Suppliers { get; set; }
     }
 }

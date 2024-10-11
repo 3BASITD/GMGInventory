@@ -8,6 +8,7 @@ namespace GMGInventory.Data
         {
             this.Invoices = new HashSet<Invoice>();
             this.Packs = new HashSet<Pack>();
+            this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
             this.SalesOrderDeliveryMonitorings = new HashSet<SalesOrderDeliveryMonitoring>();
             this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
         }
@@ -67,6 +68,7 @@ namespace GMGInventory.Data
 
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<Pack> Packs { get; set; }
+        public ICollection<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }
         public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
         public ICollection<SalesOrderLineItem> SalesOrderLineItems { get; set; }
     }

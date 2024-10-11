@@ -1,0 +1,32 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace GMGInventory.Data.Configurations.Entities
+{
+    internal class PurchaseStatusSeedConfiguration : IEntityTypeConfiguration<PurchaseStatus>
+    {
+        public void Configure(EntityTypeBuilder<PurchaseStatus> builder)
+        {
+            builder.HasData(
+                new PurchaseStatus
+                {
+                    Id = 1,
+                    Code = "Draft",
+                    Name = "Draft"
+                },
+                new PurchaseStatus
+                {
+                    Id = 2,
+                    Code = "Posted",
+                    Name = "Posted"
+                },
+                new PurchaseStatus
+                {
+                    Id = 3,
+                    Code = "Approved",
+                    Name = "Approved"
+                }
+            );
+        }
+    }
+}

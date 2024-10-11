@@ -29,6 +29,13 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new PageSeedConfiguration());
             builder.ApplyConfiguration(new AccessSeedConfiguration());
             builder.ApplyConfiguration(new UserRoleSeedConfiguration());
+
+
+            builder.ApplyConfiguration(new PurchaseOrderDeliveryModeSeedConfiguration());
+            builder.ApplyConfiguration(new PurchaseOrderTypeSeedConfiguration());
+            builder.ApplyConfiguration(new PurchaseRequestTypeSeedConfiguration());
+            builder.ApplyConfiguration(new PurchaseRequestPurposeSeedConfiguration());
+            builder.ApplyConfiguration(new PurchaseStatusSeedConfiguration());
         }
 
         public DbSet<AuditLog> AuditLogs { get; set; }
@@ -172,10 +179,24 @@ namespace GMGInventory.Data
         //public DbSet<PaymentDetail> PaymentDetails { get; set; }
         public DbSet<PhysicalCountHistory> PhysicalCountHistories { get; set; }
         public DbSet<PriceType> PriceTypes { get; set; }
+        public DbSet<PurchaseOrderDeliveryMode> PurchaseOrderDeliveryModes { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        public DbSet<PurchaseOrderNew> PurchaseOrderNews { get; set; }
         public DbSet<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
+        public DbSet<PurchaseOrderNewLineItem> PurchaseOrderNewLineItems { get; set; }
+        public DbSet<PurchaseOrderType> PurchaseOrderTypes { get; set; }
+        public DbSet<PurchasePaymentTerm> PurchasePaymentTerms { get; set; }
+        public DbSet<PurchaseReceiving> PurchaseReceivings { get; set; }
+        public DbSet<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }
+        public DbSet<PurchaseRequest> PurchaseRequests { get; set; }
+        public DbSet<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }
+        public DbSet<PurchaseRequestPurpose> PurchaseRequestPurposes { get; set; }
+        public DbSet<PurchaseRequestType> PurchaseRequestTypes { get; set; }
         public DbSet<PurchaseReturn> PurchaseReturns { get; set; }
         public DbSet<PurchaseReturnLineItem> PurchaseReturnLineItems { get; set; }
+        public DbSet<PurchaseReturnNew> PurchaseReturnNews { get; set; }
+        public DbSet<PurchaseReturnNewLineItem> PurchaseReturnNewLineItems { get; set; }
+        public DbSet<PurchaseStatus> PurchaseStatuses { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
         public DbSet<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }

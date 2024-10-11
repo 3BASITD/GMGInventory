@@ -7,8 +7,12 @@ namespace GMGInventory.Data
     {
         public Supplier()
         {
-            this.PurchaseOrder = new HashSet<PurchaseOrder>();
+            this.PurchaseOrders = new HashSet<PurchaseOrder>();
+            this.PurchaseOrderNews = new HashSet<PurchaseOrderNew>();
+            this.PurchaseReceivings = new HashSet<PurchaseReceiving>();
+            this.PurchaseReturns = new HashSet<PurchaseReturnNew>();
         }
+
         [Required]
         [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
@@ -100,6 +104,9 @@ namespace GMGInventory.Data
         //public bool IsForeign { get; set; }
         //public bool IsDeleted { get; set; }
 
-        public ICollection<PurchaseOrder> PurchaseOrder { get; set; }
+        public ICollection<PurchaseOrderNew> PurchaseOrderNews { get; set; }
+        public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
+        public ICollection<PurchaseReceiving> PurchaseReceivings { get; set; }
+        public ICollection<PurchaseReturnNew> PurchaseReturns { get; set; }
     }
 }
