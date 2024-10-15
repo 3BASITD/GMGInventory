@@ -1,0 +1,99 @@
+﻿@model IEnumerable<PurchaseOrderNewVM>
+
+@{
+    ViewData["Title"] = "Purchase Order";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanAdd)
+            {
+                <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                    <span class="fas fa-plus"></span> New Purchase Order
+                </a>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-order">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DocumentNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Type)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Supplier)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Term)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DeliveryMode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OrderDate)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListDTJson")",
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "documentNumber", name: "DocumentNumber" },
+                { data: "type", name: "Type" },
+                { data: "supplier", name: "Supplier" },
+                { data: "term", name: "Term" },
+                { data: "deliveryMode", name: "DeliveryMode" },
+                { data: "status", name: "Status" },
+                { data: "orderDate", name: "OrderDate" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        if (data.status == "Draft" && data.orderBy == $("#current-user-nickname").val()) {
+                            if (user_access.canDelete) {
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            }
+                        }
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[2, "desc"]]
+        });
+
+        orderDT.on("draw", function () {
+            hideLoader();
+        });
+    </script>
+}

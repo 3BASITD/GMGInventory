@@ -152,7 +152,7 @@ else
                             <a class="dropdown-item @(currentController == "PurchaseReturn" ? "active" : "")"
                                asp-area="" asp-controller="PurchaseReturn" asp-action="Index">
                                 <i class="nav-icon fas fa-shapes"></i>
-                                Purchase Return
+                                Purchase Return (Old)
                             </a>
                         </li>
                     }
@@ -209,7 +209,7 @@ else
 
             <li class="nav-item dropdown">
                 <a id="menuProcurement" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navProcurementActive ? "active" : "")">
-                    <i class="fas fa-coins"></i>
+                    <i class="fas fa-shopping-cart"></i>
                     PROCUREMENT
                 </a>
                 <ul aria-labelledby="menuProcurement" class="dropdown-menu mt-lg-3 border-0 shadow">
@@ -218,7 +218,7 @@ else
                         <li>
                             <a class="dropdown-item @(currentController == "PurchaseRequest" ? "active" : "")"
                                asp-area="" asp-controller="PurchaseRequest" asp-action="Index">
-                                <i class="nav-icon fas fa-shapes"></i>
+                                <i class="nav-icon fas fa-cart-plus"></i>
                                 Purchase Request
                             </a>
                         </li>
@@ -228,7 +228,7 @@ else
                         <li>
                             <a class="dropdown-item @(currentController == "PurchaseOrder" ? "active" : "")"
                                asp-area="" asp-controller="PurchaseOrder" asp-action="Index">
-                                <i class="nav-icon fas fa-shapes"></i>
+                                <i class="nav-icon fas fa-shopping-cart"></i>
                                 Purchase Order
                             </a>
                         </li>
@@ -236,10 +236,10 @@ else
                     @if (navPages.Contains(PageNames.PurchaseReceiving.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "PurchaseReceiving" ? "active" : "")"
-                               asp-area="" asp-controller="PurchaseReceiving" asp-action="Index">
-                                <i class="nav-icon fas fa-shapes"></i>
-                                Purchase Receiving
+                            <a class="dropdown-item @(currentController == "PurchaseReceive" ? "active" : "")"
+                               asp-area="" asp-controller="PurchaseReceive" asp-action="Index">
+                                <i class="nav-icon fas fa-cart-arrow-down"></i>
+                                Purchase Receive
                             </a>
                         </li>
                     }
@@ -248,8 +248,8 @@ else
                         <li>
                             <a class="dropdown-item @(currentController == "PurchaseReturnNew" ? "active" : "")"
                                asp-area="" asp-controller="PurchaseReturnNew" asp-action="Index">
-                                <i class="nav-icon fas fa-shapes"></i>
-                                Purchase Return (New)
+                                <i class="nav-icon fas fa-undo"></i>
+                                Purchase Return
                             </a>
                         </li>
                     }

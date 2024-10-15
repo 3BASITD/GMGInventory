@@ -68,9 +68,6 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> GetItemsJson(int purchaseOrderId)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReplenishInventory, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
-
             return Json(await purchaseOrderRepository.GetItemsAsync(purchaseOrderId));
         }
 

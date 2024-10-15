@@ -15,9 +15,9 @@ namespace GMGInventory.Data
         public int SupplierId { get; set; }
         public virtual Supplier Supplier { get; set; }
 
-        [ForeignKey("PurchasePaymentTermId")]
-        public int PurchasePaymentTermId { get; set; }
-        public virtual PurchasePaymentTerm PurchasePaymentTerm { get; set; }
+        [ForeignKey("TermId")]
+        public int TermId { get; set; }
+        public virtual PurchasePaymentTerm Term { get; set; }
 
         [ForeignKey("PurchaseOrderId")]
         public int PurchaseOrderId { get; set; }

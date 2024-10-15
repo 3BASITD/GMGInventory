@@ -14,11 +14,11 @@ namespace GMGInventory.Data
 
         [ForeignKey("TypeId")]
         public int TypeId { get; set; }
-        public virtual PurchaseRequestType PurchaseRequestType { get; set; }
+        public virtual PurchaseRequestType Type { get; set; }
 
         [ForeignKey("PurposeId")]
-        public int PurposeId { get; set; }
-        public virtual PurchaseRequestPurpose PurchaseRequestPurpose { get; set; }
+        public int? PurposeId { get; set; }
+        public virtual PurchaseRequestPurpose Purpose { get; set; }
 
         [ForeignKey("AreaId")]
         public int? AreaId { get; set; }
@@ -27,7 +27,7 @@ namespace GMGInventory.Data
         public DateTime RequestDate { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
-        public string Purpose { get; set; }
+        public string? PurposeDefinition { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string Remarks { get; set; }

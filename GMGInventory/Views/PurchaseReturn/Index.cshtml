@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Purchase Return";
+    ViewData["Title"] = "Purchase Return (Old)";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -151,7 +151,7 @@
             minimumInputLength: 3,
             placeholder: 'Select PO Number',
             ajax: {
-                url: "@Url.Action("GetOptions", "PurchaseOrder")",
+                url: "@Url.Action("GetOptions", "ReplenishInventory")",
                 dataType: 'json',
                 type: "POST",
                 data: function (params) {
@@ -184,7 +184,7 @@
             showLoader();
         }).DataTable({
             ajax: {
-                url: "@Url.Action("GetItemsJson", "PurchaseOrder")",
+                url: "@Url.Action("GetItemsJson", "ReplenishInventory")",
                 data: function (data) {
                     data.purchaseOrderId = $("#po-number").val()
                 },

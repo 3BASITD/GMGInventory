@@ -22,14 +22,14 @@ namespace GMGInventory.Data
         public virtual Supplier Supplier { get; set; }
 
 
-        [ForeignKey("PurchaseOrderTermId")]
-        public int PurchaseOrderTermId { get; set; }
-        public virtual PurchasePaymentTerm PurchaseOrderTerm { get; set; }
+        [ForeignKey("TermId")]
+        public int TermId { get; set; }
+        public virtual PurchasePaymentTerm Term { get; set; }
 
 
-        [ForeignKey("PurchaseOrderDeliveryModeId")]
-        public int PurchaseOrderDeliveryModeId { get; set; }
-        public virtual PurchaseOrderDeliveryMode PurchaseOrderDeliveryMode { get; set; }
+        [ForeignKey("DeliveryModeId")]
+        public int DeliveryModeId { get; set; }
+        public virtual PurchaseOrderDeliveryMode DeliveryMode { get; set; }
 
         public DateTime OrderDate { get; set; }
 
