@@ -307,4 +307,20 @@ namespace GMGInventory.Common.Models
         public DateTime ReturnDateD { get; set; }
         public string ReturnBy { get; set; }
     }
+
+    public class ItemDetailConversionVM
+    {
+        public int Id { get; set; }
+        public int ItemId { get; set; }
+        public int Quantity { get; set; }
+        public int? SubItemId { get; set; }
+        public string SubItemCode { get; set; }
+        public int? UnitId { get; set; }
+        public string UnitName { get; set; }
+        public int? EquivalentQuantity { get; set; }
+        public int? EquivalentUnitId { get; set; }
+        public string EquivalentUnitName { get; set; }
+
+        public int OrderNo { get; set; }
+    }
 }

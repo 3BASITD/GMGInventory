@@ -1702,6 +1702,55 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("Items");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.ItemConversion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("EquivalentQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EquivalentUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EquivalentUnitId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("SubItemId");
+
+                    b.HasIndex("UnitId");
+
+                    b.ToTable("ItemConversions");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.ItemInventory", b =>
                 {
                     b.Property<int>("Id")
@@ -5723,6 +5772,35 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("ItemType");
+
+                    b.Navigation("Unit");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ItemConversion", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Unit", "EquivalentUnit")
+                        .WithMany()
+                        .HasForeignKey("EquivalentUnitId");
+
+                    b.HasOne("GMGInventory.Data.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.Item", "SubItem")
+                        .WithMany()
+                        .HasForeignKey("SubItemId");
+
+                    b.HasOne("GMGInventory.Data.Unit", "Unit")
+                        .WithMany()
+                        .HasForeignKey("UnitId");
+
+                    b.Navigation("EquivalentUnit");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("SubItem");
 
                     b.Navigation("Unit");
                 });
