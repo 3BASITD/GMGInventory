@@ -1,0 +1,914 @@
+﻿@model PurchaseRequestDetailedVM
+
+@{
+    ViewData["Title"] = "Purchase Request Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="PurchaseRequest" asp-action="Index">Purchase Requests</a></li>
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title po-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanPrint)
+            {
+                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
+            @if (Model.Status == "Draft")
+            {
+                @if (userAccess.CanEdit)
+                {
+                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                }
+                @if (userAccess.CanAdd)
+                {
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
+                        <span class="fas fa-paper-plane"></span> Submit
+                    </button>
+                }
+            }
+            else if (Model.Status == "Submitted"
+                 && (string.IsNullOrWhiteSpace(Model.ApprovedBy1)
+                 || (string.IsNullOrWhiteSpace(Model.ApprovedBy2) && Model.Type == "Non-Automotive")))
+            {
+                @if (userAccess.CanApproveDisapprove)
+                {
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
+                        <span class="fas fa-check"></span> Approve
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
+                        <span class="fas fa-times"></span> Disapprove
+                    </button>
+                }
+            }
+            else if (Model.Status == "Disapproved")
+            {
+                if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model?.ResubmitId == null)
+                {
+                    @if (userAccess.CanAdd)
+                    {
+                        <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                            <span class="fas fa-edit"></span> Update to Resubmit
+                        </a>
+                    }
+                }
+            }
+            else
+            {
+                <a href="@Url.Action("Create", "Purchase Order")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-box-open"></span> Start Order
+                </a>
+            }
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model?.Status == "Disapproved")
+        {
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-sm" role="alert">
+                        <strong>Disapproved:</strong>
+                        @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                    </div>
+                </div>
+                @if (Model?.ResubmitId != null)
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-sm" role="alert">
+                            <strong>Resubmitted:</strong>
+                            This has been resubmitted. You can view the details <a href="@Url.Action("Details", "PurchaseRequest", new {Id = Model?.ResubmitId})">here</a>.
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DocumentNumber)
+                    </span>
+                    <b class="d-block">
+                        @Model?.DocumentNumber
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Type)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Type
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Purpose)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Purpose
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Area)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Area
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.RequestDate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.RequestDate
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Remarks
+                    </b>
+                </p>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy1))
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ApprovedBy1)
+                        </span>
+                        <b class="d-block">
+                            @Model?.ApprovedBy1
+                        </b>
+                    </p>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy2))
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ApprovedBy2)
+                        </span>
+                        <b class="d-block">
+                            @Model?.ApprovedBy2
+                        </b>
+                    </p>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy))
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DisapprovedBy)
+                        </span>
+                        <b class="d-block">
+                            @Model?.DisapprovedBy
+                        </b>
+                    </p>
+                </div>
+            }
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.PreparedBy)
+                    </span>
+                    <b class="d-block">
+                        @Model?.PreparedBy
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CheckedBy)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CheckedBy
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Status)
+                    </span>
+                    <b class="d-block" id="request-status">
+                        @Model?.Status
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Purchase Request Item(s)</span>
+                        @if (userAccess.CanAdd)
+                        {
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                    <span class="fas fa-plus"></span> Add Item
+                                </button>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-item">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>#</th>
+                                    <th>SO Number</th>
+                                    <th>Item Code</th>
+                                    <th>Part Number</th>
+                                    <th>Item Name</th>
+                                    <th>Stock on Hand</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-end" colspan="7">Total</th>
+                                    <th class="total-quantity">0</th>
+                                    <th colspan="2"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="po-status" value="@Model?.Status" />
+
+@if (userAccess.CanAdd)
+{
+    <!-- Purchase Request Item Modal -->
+    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Purchase Request Item</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form-item">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-so-number" class="form-label mb-0">SO Number</label>
+                                    <div>
+                                        <select id="add-so-number" name="Code" style="width: 100%;">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                    <span data-valmsg-for="add-so-number" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-code" class="form-label mb-0">Item Code</label>
+                                    <div>
+                                        <select id="add-code" name="Code" style="width: 100%;">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                    <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-name" class="form-label mb-0">Item Name</label>
+                                    <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                                    <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-quantity" class="form-label mb-0">Quantity</label>
+                                    <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-stock" class="form-label mb-0">Stock on Hand</label>
+                                    <input type="number" min="0" max="1999999" step="1" id="add-stock" name="Stock" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="add-stock" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-unit" class="form-label mb-0">Unit</label>
+                                    <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="add-purpose" class="form-label mb-0">Purpose</label>
+                                    <input type="text" id="add-purpose" name="Purpose" class="form-control form-control-sm" />
+                                    <span data-valmsg-for="add-purpose" data-valmsg-replace="true" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-add">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+@*
+@if (userAccess.CanApproveDisapprove)
+{
+    <form id="approve-form" asp-action="Approve">
+        <input type="hidden" id="approve-id" name="Id" value="@Model?.Id" />
+    </form>
+
+    <form id="disapprove-form" asp-action="Disapprove">
+        <input type="hidden" id="disapprove-id" name="Id" value="@Model?.Id" />
+        <input type="hidden" id="disapprove-reason" name="Reason" />
+    </form>
+} *@
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var request_type = "@Model?.Type";
+        var request_purpose = "@Model?.Purpose";
+
+        // Load item for select2
+        $("#add-code").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: "<empty>",
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Item")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#addModal")
+        });
+
+        $("#add-code").on("select2:select", function () {
+            $("#add-name").val($("#add-code").select2("data")[0].name);
+            $("#add-unit").val($("#add-code").select2("data")[0].unit);
+            $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
+            $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
+            $("#add-code-error").html("");
+        });
+
+        $("#add-code").on("select2:unselecting", function (e) {
+            $("#add-name").val("");
+            $("#add-unit").val("");
+            $("#add-unit").data("Id", "");
+            $(".add-stocks").text("0");
+            $("#add-gross-price").val("0.00");
+        });
+
+        // Load so for select2
+        $("#add-so-number").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: "<empty>",
+            templateResult: function (repo) {
+                return repo.text;
+            },
+            ajax: {
+                url: "@Url.Action("GetSalesOrderOptions", "SalesOrder")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#addModal")
+        });
+
+        function clearItemForm() {
+            $("#add-so-number").val("").trigger("change");
+            $("#add-code").val("").trigger("change");
+            $("#add-name").val("");
+            $("#add-quantity").val("0");
+            $("#add-stock").text("0");
+            $("#add-unit").val("");
+            $("#add-unit").data("Id", "");
+            $("#add-purpose").val("");
+        }
+
+        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemListJson")",
+                data: { purchaseRequestId: @Model?.Id },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                },
+                type: "POST",
+            },
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
+                        }
+                        return actions + '</div>';
+                    },
+                    className: "form-cell"
+                },
+                { data: "lineNumber", name: "LineNumber", className: "form-cell" },
+                { data: "salesOrderNumber", name: "SalesOrderNumber", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.itemId == null || data.itemCode == null) {
+                            return "-";
+                        } else {
+                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
+                        }
+                    },
+                    name: "ItemCode",
+                    className: "form-cell"
+                },
+                { data: "itemPartNumber", name: "ItemPartNumber", className: "form-cell" },
+                { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.stockOnHandD + '" class="form-control form-control-sm stock" style="width: 100%;" />';
+                        } else {
+                            return (data.stockOnHand == 0 ? "<span class='text-danger'>" : "")
+                                + data.stockOnHand
+                                + (data.stockOnHand == 0 ? "</span>" : "");
+                        }
+                    },
+                    name: "StockOnHand",
+                    className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        } else {
+                            return data.quantity
+                        }
+                    },
+                    name: "Quantity",
+                    className: "form-cell text-end"
+                },
+                { data: "unitCode", name: "UnitCode", className: "form-cell" },
+                { data: "purpose", name: "Purpose", className: "form-cell" },
+            ],
+            order: [[1, "asc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                columnDTTotalInteger(api, 7);
+            }
+        });
+
+        itemDT.on("draw", function () {
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var rowData = this.data();
+                if (rowData.lineNumber == 1)
+                    $(this.node()).find(".btn-up-item").hide();
+                else
+                    $(this.node()).find(".btn-up-item").show();
+
+                if (rowData.lineNumber == Math.max.apply(Math, itemDT.column(1).data().toArray()))
+                    $(this.node()).find(".btn-down-item").hide();
+                else
+                    $(this.node()).find(".btn-down-item").show();
+            });
+
+            var columnVisibilityMap = {
+                "Automotive_Rush Order": [true, false, true, true, true, true, true, false],
+                "Automotive_Stocking": [false, true, true, true, true, true, true, false],
+                "Non-automotive_Office Supplies": [false, true, false, true, true, true, true, false],
+                "Non-automotive_One-Time Purchase": [false, false, false, true, false, true, true, true],
+                "Maintenance and Repair": [false, false, false, true, false, true, true, true]
+            };
+
+            var key = request_type + "_" + request_purpose;
+
+            if (columnVisibilityMap[key]) {
+                columnVisibilityMap[key].forEach(function (visible, index) {
+                    itemDT.column(index + 2).visible(visible);
+                });
+            }
+            //itemDT.ajax.reload();
+
+            hideLoader();
+
+            $(".table-item thead th").removeClass("form-cell");
+            $(".table-item thead th").removeClass("text-end");
+
+            $(".btn-remove-item").off("click").on("click", function () {
+                itemDT.row($(this).parents('tr')).remove().draw();
+            });
+
+            $(".btn-up-item").off("click").on("click", function () {
+                var row = $(this).parents('tr');
+                var rowData = itemDT.row(row).data();
+
+                var currentLineNumber = rowData.lineNumber;
+                var newLineNumber = currentLineNumber - 1;
+
+                var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
+                    return itemDT.row(index).data().lineNumber === newLineNumber;
+                });
+
+                if (targetRowIndex != undefined) {
+                    var targetRowData = itemDT.row(targetRowIndex).data();
+                    targetRowData.lineNumber = currentLineNumber;
+                    itemDT.row(targetRowIndex).data(targetRowData);
+                }
+
+                rowData.lineNumber = newLineNumber;
+                itemDT.row(row).data(rowData);
+
+                itemDT.draw();
+            });
+
+
+            $(".btn-down-item").off("click").on("click", function () {
+                var row = $(this).parents('tr');
+                var rowData = itemDT.row(row).data();
+                var currentLineNumber = rowData.lineNumber;
+                var newLineNumber = currentLineNumber + 1;
+
+                var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
+                    return itemDT.row(index).data().lineNumber == newLineNumber;
+                });
+
+                if (targetRowIndex != undefined) {
+                    var targetRowData = itemDT.row(targetRowIndex).data();
+                    targetRowData.lineNumber = currentLineNumber;
+                    itemDT.row(targetRowIndex).data(targetRowData);
+                }
+
+                rowData.lineNumber = newLineNumber;
+                itemDT.row(row).data(rowData);
+
+                itemDT.draw();
+            });
+
+            ComputeTotalQuantity();
+            //ComputeTotalGrossPrice();
+            $(".quantity").on("input", function () {
+                ComputeTotalQuantity();
+            });
+
+            // if (user_access.canEdit) {
+            //     $(".btn-update-serve").on("click", function () {
+            //         var itemdata = itemDT.row($(this).parents('tr')).data();
+            //         $("#served-code").data("id", itemdata.id);
+            //         $("#served-code").val(itemdata.itemCode);
+            //         $("#served-name").val(itemdata.itemName);
+            //         $("#served-quantity").val(itemdata.quantity);
+            //         $("#served-toadd").val(0);
+            //         $("#served-toadd").attr("max", itemdata.unservedQuantity);
+            //         $("#served-inventory").val(itemdata.inventoryCount);
+            //         $("#served-inventory").data("prime", itemdata.inventoryCount);
+            //         $("#served-served").val(itemdata.servedQuantity);
+            //         $("#served-served").data("prime", itemdata.servedQuantity);
+            //         $("#served-unserved").val(itemdata.unservedQuantity);
+            //         $("#served-unserved").data("prime", itemdata.unservedQuantity);
+            //         $("#servedModal").modal("show");
+            //     });
+            // }
+        });
+
+        $(".createBtn").on("click", clearItemForm);
+
+        // Validation for Add Item Modal
+        var validateAdd = $("#form-item").validate({
+            errorClass: 'text-danger text-xs',
+            rules: {
+                Code: { required: true },
+                Quantity: { required: true, isNotZero: true },
+                // UnitPrice: { required: true }
+            },
+            messages: {
+                ItemName: { required: "Please select item to replenish." },
+                Quantity: { required: "Please enter a quantity", isNotZero: "Can not require an item with 0 quantity" },
+                //UnitPrice: { required: "Please enter the unit cost", isNotZero: "Can not sell for free" }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                AddItem();
+            },
+            showErrors: validateShowErrors
+        });
+
+        function AddItem() {
+            var rowIndexes = [];
+            itemDT.rows(function (idx, data, node) {
+                if (data.itemId == $("#add-code").select2("data")[0].id) {
+                    rowIndexes.push(idx);
+                }
+                return false;
+            });
+            if (rowIndexes.length > 0) {
+                toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
+            } else {
+                itemDT.row.add({
+                    itemCode: $("#add-code").select2("data")[0].text,
+                    itemDescription: $("#add-code").select2("data")[0].name,
+                    itemPartNumber: $("#add-code").select2("data")[0].partNumber,
+                    itemId: $("#add-code").select2("data")[0].id,
+                    lineNumber: Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1,
+                    purchaseRequestId: @Model!.Id,
+                    purpose: $("#add-purpose").val(),
+                    quantity: FormatStringInteger($("#add-quantity").val()),
+                    quantityD: $("#add-quantity").val() || 0,
+                    salesOrderId: $("#add-so-number").select2("data")[0].id,
+                    salesOrderNumber: $("#add-so-number").select2("data")[0].text,
+                    stockOnHand: FormatStringInteger($("#add-stock").val()),
+                    stockOnHandD: $("#add-stock").val() || 0,
+                    unitCode: $("#add-unit").val(),
+                    unitId: $("#add-unit").data("Id")
+                }).draw();
+                clearItemForm();
+
+                toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Purchase Request Item(s)", "Success");
+            }
+        }
+
+        // $("#served-toadd").on("input", function () {
+        //     var toadd = parseInt($(this).val());
+        //     var inventory = parseInt($("#served-inventory").data("prime"));
+        //     var served = parseInt($("#served-served").data("prime"));
+        //     var unserved = parseInt($("#served-unserved").data("prime"));
+        //     if (toadd > unserved) {
+        //         toadd = unserved;
+        //     }
+        //     if (toadd == 0) {
+        //         $("#served-inventory").val(inventory);
+        //         $("#served-served").val(served);
+        //         $("#served-unserved").val(unserved);
+        //     } else {
+        //         $("#served-inventory").val(inventory + " → " + (inventory - toadd));
+        //         $("#served-served").val(served + " → " + (served + toadd));
+        //         $("#served-unserved").val(unserved + " → " + (unserved - toadd));
+        //     }
+        // });
+
+        // if (user_access.canEdit) {
+        //     $(".btn-update-served").on("click", function () {
+        //         if (parseInt($("#served-toadd").val()) <= 0) {
+        //             toastr.warning("Nothing to add", "Served Quantity");
+        //         } else if (parseInt($("#served-inventory").data("prime")) <= 0) {
+        //             toastr.warning($("#served-code").val() + " needs replenishment.", "Inventory Count");
+        //         } else {
+        //             $.ajax({
+        //                 type: "POST",
+        //                 url: "@Url.Action("UpdateServedSOItem")",
+        //                 data: {
+        //                     salesOrderLineItemId: $("#served-code").data("id"),
+        //                     quantity: $("#served-toadd").val()
+        //                 },
+        //                 success: function (data, status, xhr) {
+        //                     if (data.status == "Error") {
+        //                         toastr.error(data.message, "Error");
+        //                     } else {
+        //                         $("#servedModal").modal("hide");
+        //                         itemDT.ajax.reload();
+        //                         toastr.success(data.message, "Success");
+        //                     }
+        //                 }
+        //             });
+        //         }
+        //     });
+        // }
+
+        function ComputeTotalQuantity() {
+            total_quantity = 0;
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_quantity += parseInt($(this.node()).find(".quantity").val());
+            });
+            $(".total-quantity").html(FormatStringInteger(total_quantity));
+        }
+
+        function GetItemsToRequest() {
+            var item_to_request = [];
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
+                row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
+                row_data.stockOnHandD = parseInt($(this.node()).find(".stock").val());
+                row_data.stockOnHand = FormatStringInteger(parseInt($(this.node()).find(".stock").val()));
+                item_to_request.push(row_data);
+            });
+            return item_to_request;
+        }
+
+        if (user_access.canAdd) {
+            $(".btn-details-save").on("click", function () {
+                SaveRequest("Draft");
+            });
+
+            $(".btn-details-submit").on("click", function () {
+                SaveRequest("Submitted");
+            });
+
+            function SaveRequest(status) {
+                var items = itemDT.data();
+                if (items.length == 0) {
+                    toastr.warning("No item to request. Add an item to the list to continue", "Warning");
+                } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                    toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveItemsJson")",
+                        data: {
+                            Id: @Model?.Id,
+                            status: status,
+                            items: GetItemsToRequest()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        if (user_access.canApproveDisapprove) {
+            $('.btn-details-approve').click(function (e) {
+                swal({
+                    title: "Approve Purchase Request",
+                    text: "Continue to approve this purchase request?",
+                    icon: "success",
+                    buttons: true,
+                    successMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("ApproveJson")",
+                            type: "POST",
+                            data: { Id: @Model!.Id },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    swal.close();
+                                    toastr.success(data.message, data.status);
+                                    toastr.info("Page will reload after this message", "Info", {
+                                        onHidden: function () {
+                                            window.location.reload();
+                                        }
+                                    });
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            $('.btn-details-disapprove').click(function (e) {
+                swal({
+                    title: "Disapprove Purchase Request",
+                    text: "Continue to disapprove this purchase request?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                    content: {
+                        element: "input",
+                        attributes: {
+                            placeholder: "Reason for Disapproving",
+                            type: "text"
+                        }
+                    }
+                }).then((confirm) => {
+                    if (confirm !== null) {
+                        $.ajax({
+                            url: "@Url.Action("DisapproveJson")",
+                            type: "POST",
+                            data: {
+                                Id: @Model!.Id,
+                                reason: confirm
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    swal.close();
+                                    toastr.success(data.message, data.status);
+                                    toastr.info("Page will reload after this message", "Info", {
+                                        onHidden: function () {
+                                            window.location.reload();
+                                        }
+                                    });
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        if (user_access.canPrint) {
+            $(".btn-details-print").on("click", function () {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("Print")/' + @Model?.Id, '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            });
+        }
+    </script>
+}

@@ -4,10 +4,8 @@
     {
         public PurchaseOrderType()
         {
-            this.PurchaseRequests = new HashSet<PurchaseRequest>();
-            this.PurchaseRequestPurposes = new HashSet<PurchaseRequestPurpose>();
+            this.PurchaseOrders = new HashSet<PurchaseOrderNew>();
         }
-        public ICollection<PurchaseRequest> PurchaseRequests { get; set; }
-        public ICollection<PurchaseRequestPurpose> PurchaseRequestPurposes { get; set; }
+        public ICollection<PurchaseOrderNew> PurchaseOrders { get; set; }
     }
 }

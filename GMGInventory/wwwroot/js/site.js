@@ -161,24 +161,24 @@
     }
     $(".col-report").removeClass("col-md-4 col-md-6 col-md-12");
     $(".col-report").addClass("col-md-" + col_report);
-    $('.modal').on('shown.bs.modal', function () {
-        checkFooterStickiness($(this));
+    //$('.modal').on('shown.bs.modal', function () {
+    //    checkFooterStickiness($(this));
 
-        $(this).off('scroll').on('scroll', function () {
-            checkFooterStickiness($(this));
-        });
-    });
+    //    $(this).off('scroll').on('scroll', function () {
+    //        checkFooterStickiness($(this));
+    //    });
+    //});
 });
-function checkFooterStickiness($modal) {
-    var $footer = $modal.find('.modal-footer');
-    var footerOffset = $footer.offset().top + $footer.outerHeight();
-    var windowHeight = $(window).height() + 15;
-    if (footerOffset >= windowHeight) {
-        $footer.addClass('sticky-active');
-    } else {
-        $footer.removeClass('sticky-active');
-    }
-}
+//function checkFooterStickiness($modal) {
+//    var $footer = $modal.find('.modal-footer');
+//    var footerOffset = $footer.offset().top + $footer.outerHeight();
+//    var windowHeight = $(window).height() + 15;
+//    if (footerOffset >= windowHeight) {
+//        $footer.addClass('sticky-active');
+//    } else {
+//        $footer.removeClass('sticky-active');
+//    }
+//}
 
 function removeCommaOfNumber(value) {
     return parseFloat(value.replace(/[\$,]/g, '') * 1);
@@ -380,19 +380,19 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 
 checkScroll();
 function checkScroll() {
-    if ($(window).width() > 992) {
-        var navHeight = $(".main-header").height();
-        if ($(window).scrollTop() > navHeight) {
-            $(".main-header").addClass("to-stick");
-            $("body").css("margin-top", navHeight + "px");
-        } else {
-            $(".main-header").removeClass("to-stick");
-            $("body").css("margin-top", "0");
-        }
-        if ($(window).scrollTop() > navHeight * 1.2) {
-            $(".main-header").addClass("nav-sticked");
-        } else {
-            $(".main-header").removeClass("nav-sticked");
-        }
-    }
+    //if ($(window).width() > 992) {
+    //var navHeight = $(".main-header").height();
+    //if ($(window).scrollTop() > navHeight) {
+    //    $(".main-header").addClass("to-stick");
+    //    $("body").css("margin-top", navHeight + "px");
+    //} else {
+    //    $(".main-header").removeClass("to-stick");
+    //    $("body").css("margin-top", "0");
+    //}
+    //if ($(window).scrollTop() > navHeight * 1.2) {
+    //    $(".main-header").addClass("nav-sticked");
+    //} else {
+    //    $(".main-header").removeClass("nav-sticked");
+    //}
+    //}
 }

@@ -1,18 +1,22 @@
 /*html { -moz-transform: scale(1.0, 1.0); zoom: 1.0; zoom: 100%; }*/
 body {
-    zoom: 100%;
+    -moz-transform: scale(1.0, 1.0);
+    zoom: 1.0;
+    zoom: 100%
 }
 
 @media only screen and (min-width: 992px) {
-    body {
-        zoom: 90%;
-    }
+    /*body {
+        -moz-transform: scale(0.9, 0.9);
+        zoom: 0.9;
+        zoom: 90%
+    }*/
 
     .text-sm, .input-group-sm > .btn, .input-group-sm > .form-control, .input-group-sm > .form-select, .input-group-sm > .input-group-text {
         font-size: .86rem !important;
     }
 
-  /*  .main-header.nav-sticked {
+    /*  .main-header.nav-sticked {
         position: sticky;
         top: 0;
     }*/
@@ -24,10 +28,11 @@ body {
         z-index: 1000;
     }
 
-    .main-header.to-stick {
-        position: fixed;
-        transform: translateY(-90px);
-    }
+        .main-header.to-stick {
+            position: sticky;
+            /*position: fixed;*/
+            /*transform: translateY(-90px);*/
+        }
 
         .main-header.nav-sticked {
             transform: translateY(0);
@@ -60,9 +65,9 @@ body {
             visibility: visible;
         }
 
-    nav .dropdown-menu a {
-        transition: all 0.5s ease-in-out;
-    }
+        nav .dropdown-menu a {
+            transition: all 0.5s ease-in-out;
+        }
 
     .main-header * {
         transition: all 0.2s ease-in-out;
@@ -101,38 +106,50 @@ body {
             font-size: 2em;
         }
 
-/*    .table.table-head-fixed thead tr:nth-child(1) th {
+    /*    .table.table-head-fixed thead tr:nth-child(1) th {
         top: 56px;
     }*/
     .table.table-head-fixed:not(.modal .table.table-head-fixed) thead tr:nth-child(1) th {
-        top: 56px;
+        top: 53px;
     }
+
     .modal .table.table.table-head-fixed thead tr:nth-child(1) th {
         top: -2px;
     }
 
-    .modal .modal-footer,
+/*    .modal .modal-footer,
     .modal .modal-footer .btn {
         position: sticky;
         bottom: -10px;
         transition: all 0.5s ease-in-out;
     }
 
-        .modal .modal-footer.sticky-active {
-            border-top: none;
-            background-color: rgba(255, 255, 255, 0.7);
+    body:not(.dark-mode) .modal .modal-footer.sticky-active {
+        background-color: rgba(255, 255, 255, 0.7);
+    }
+
+    body.dark-mode .modal .modal-footer.sticky-active {
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal .modal-footer.sticky-active {
+        border-top: none;
+    }
+
+        .modal .modal-footer.sticky-active .btn {
+            overflow: hidden;
+            width: 36px;
+            height: 32px;
         }
-            .modal .modal-footer.sticky-active .btn {
-                width: 36px;
-                height: 32px;
-            }
-        .modal .modal-footer:not(.sticky-active) {
-            border-top: 1px solid #e9ecef;
-        }
-            .modal .modal-footer:not(.sticky-active) .btn {
-                width: initial;
-                height: initial;
-            }
+
+    .modal .modal-footer:not(.sticky-active) {
+        border-top: 1px solid #e9ecef;
+    }
+
+        .modal .modal-footer:not(.sticky-active) .btn {
+            width: initial;
+            height: initial;
+        }*/
 }
 
 

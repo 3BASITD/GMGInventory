@@ -11,6 +11,7 @@ namespace GMGInventory.Data
             this.PurchaseReceivingApprover = new HashSet<PurchaseReceiving>();
             this.PurchaseRequestApprover1 = new HashSet<PurchaseRequest>();
             this.PurchaseRequestApprover2 = new HashSet<PurchaseRequest>();
+            this.PurchaseRequestDisapprover = new HashSet<PurchaseRequest>();
             this.PurchaseReturnApprover = new HashSet<PurchaseReturnNew>();
         }
 
@@ -44,6 +45,7 @@ namespace GMGInventory.Data
 
         [InverseProperty(nameof(PurchaseRequest.Approver2))]
         public ICollection<PurchaseRequest> PurchaseRequestApprover2 { get; set; }
+        public ICollection<PurchaseRequest> PurchaseRequestDisapprover { get; set; }
         public ICollection<PurchaseReturnNew> PurchaseReturnApprover { get; set; }
     }
 }
