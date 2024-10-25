@@ -65,10 +65,12 @@ namespace GMGInventory.Application.Repositories
                             InventoryCount = inventory,// + soli - inv,
                             Text = item.Code,
                             Name = item.Name,
+                            PartNumber = item.PartNumber,
                             NetPriceD = price.NetSellingPrice,
                             Quantity = 0,
                             RetailPriceD = price.RetailSellingPrice,
-                            Unit = item.Unit.Code,
+                            UnitId = item.Unit.Id,
+                            Unit = item.Unit.Code
                         };
             var itemsFiltered = await items.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonItemOptionsModel>

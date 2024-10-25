@@ -6,6 +6,7 @@ namespace GMGInventory.Data
     {
         public PurchaseRequest()
         {
+            this.PurchaseRequestResubmits = new HashSet<PurchaseRequest>();
             this.PurchaseOrderLineItems = new HashSet<PurchaseOrderNewLineItem>();
             this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
         }
@@ -51,6 +52,17 @@ namespace GMGInventory.Data
         public string? Approver2Id { get; set; }
         public virtual User Approver2 { get; set; }
 
+        [ForeignKey("DisapproverId")]
+        public string? DisapproverId { get; set; }
+        public virtual User Disapprover { get; set; }
+
+        public string? DisapprovedReason { get; set; }
+
+        [ForeignKey("ResubmitId")]
+        public int? ResubmitId { get; set; }
+        public PurchaseRequest Resubmit { get; set; }
+
+        public ICollection<PurchaseRequest> PurchaseRequestResubmits { get; set; }
         public ICollection<PurchaseOrderNewLineItem> PurchaseOrderLineItems { get; set; }
         public ICollection<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }
     }

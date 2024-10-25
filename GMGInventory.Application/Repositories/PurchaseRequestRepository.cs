@@ -1,9 +1,12 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
@@ -23,23 +26,50 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
+        public async Task<IList<JsonOptionsModel>> GetTypeOptions(int? SelectedId)
+        {
+            return await context.PurchaseRequestTypes
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Name,
+                                    Selected = SelectedId != null && s.Id == SelectedId
+                                })
+                                .OrderBy(s => s.Text)
+                                .ToListAsync();
+        }
+
+        public async Task<IList<JsonOptionsModel>> GetPurposeOptions(int TypeId, int? SelectedId)
+        {
+            return await context.PurchaseRequestPurposes
+                                .Where(s => s.TypeId == TypeId || s.Id == SelectedId)
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Name,
+                                    Selected = SelectedId != null && s.Id == SelectedId
+                                })
+                                .OrderBy(s => s.Text)
+                                .ToListAsync();
+        }
+
         private async Task<IList<PurchaseRequestVM>> GetListAsync()
         {
-            var requestVM = (from request in context.PurchaseRequests
-                                                .Include(s => s.Type)
-                                                .Include(s => s.Purpose)
-                                                .Include(s => s.Area)
-                                                .Include(s => s.Status)
-                           select new PurchaseRequestVM
-                           {
-                               Id = request.Id,
-                               DocumentNumber = request.DocumentNumber,
-                               Type = request.Type.Code,
-                               Purpose = request.Purpose.Code,
-                               Area = request.Area.Code,
-                               Status = request.Status.Code,
-                               RequestDateD = request.RequestDate
-                           });
+            var requestVM = from request in context.PurchaseRequests
+                                                   .Include(s => s.Type)
+                                                   .Include(s => s.Purpose)
+                                                   .Include(s => s.Area)
+                                                   .Include(s => s.Status)
+                            select new PurchaseRequestVM
+                            {
+                                Id = request.Id,
+                                DocumentNumber = request.DocumentNumber,
+                                Type = request.Type.Code,
+                                Purpose = request.Purpose.Code,
+                                Area = request.Area.Code,
+                                Status = request.Status.Code,
+                                RequestDateD = request.RequestDate
+                            };
             return await requestVM.ToListAsync();
         }
 
@@ -86,7 +116,8 @@ namespace GMGInventory.Application.Repositories
                             default: break;
                         }
                     }
-                } else
+                }
+                else
                 {
                     data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
                 }
@@ -100,6 +131,418 @@ namespace GMGInventory.Application.Repositories
                 RecordsFiltered = filterRecord,
                 Data = pageList
             };
+        }
+
+        public async Task<PurchaseRequestDetailedVM?> GetDetails(int requestId)
+        {
+            var details = from request in context.PurchaseRequests
+                                                 .Include(s => s.Type)
+                                                 .Include(s => s.Purpose)
+                                                 .Include(s => s.Area)
+                                                 .Include(s => s.Status)
+                          where request.Id == requestId
+                          select new PurchaseRequestDetailedVM
+                          {
+                              Id = request.Id,
+                              DocumentNumber = request.DocumentNumber,
+                              Type = request.Type.Name,
+                              Purpose = request.Purpose.Name,
+                              Area = request.Area.Code,
+                              Status = request.Status.Code,
+                              RequestDateD = request.RequestDate,
+                              Remarks = request.Remarks,
+                              PreparedBy = string.IsNullOrWhiteSpace(request.PreparedBy) ? "-" : request.PreparedBy,
+                              CheckedBy = string.IsNullOrWhiteSpace(request.CheckedBy) ? "-" : request.CheckedBy,
+                              ApprovedBy1 = request.Approver1Id == null ? null : request.Approver1.FirstName + " " + request.Approver1.LastName,
+                              ApprovedBy2 = request.Approver2Id == null ? null : request.Approver2.FirstName + " " + request.Approver2.LastName,
+                              DisapprovedBy = request.DisapproverId == null ? null : request.Disapprover.FirstName + " " + request.Disapprover.LastName,
+                              DisapprovedReason = request.DisapprovedReason,
+                              ResubmitId = request.ResubmitId
+                          };
+            return await details.FirstOrDefaultAsync();
+        }
+
+        public async Task<IList<PurchaseRequestLineItemVM>> GetItemListAsync(int purchaseRequestId)
+        {
+            var requestVM = from request in context.PurchaseRequestLineItems
+                                                   .Include(s => s.SalesOrder)
+                                                   .Include(s => s.Item)
+                                                   .Include(s => s.Unit)
+                            where request.PurchaseRequestId == purchaseRequestId
+                            select new PurchaseRequestLineItemVM
+                            {
+                                Id = request.Id,
+                                PurchaseRequestId = request.PurchaseRequestId,
+                                LineNumber = request.LineNumber,
+                                SalesOrderId = request.SalesOrderId,
+                                SalesOrderNumber = request.SalesOrder.SalesOrderNumber,
+                                ItemId = request.ItemId,
+                                ItemCode = request.Item.Code,
+                                ItemPartNumber = string.IsNullOrWhiteSpace(request.Item.PartNumber) ? "-" : request.Item.PartNumber,
+                                ItemDescription = request.ItemDescription,
+                                StockOnHandD = request.StockOnHand,
+                                QuantityD = request.Quantity,
+                                UnitId = request.UnitId,
+                                UnitCode = request.Unit.Code,
+                                Purpose = request.Purpose
+                            };
+            return await requestVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<PurchaseRequestLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseRequestId)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetItemListAsync(purchaseRequestId)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(s => new[]
+                {
+                    s.LineNumber + "",
+                    s.SalesOrderNumber,
+                    s.ItemCode,
+                    s.ItemPartNumber,
+                    s.ItemDescription,
+                    s.StockOnHand,
+                    s.Quantity,
+                    s.UnitCode,
+                    s.Purpose,
+                }.Any(a => a != null && a.Contains(form.SearchValue, StringComparison.CurrentCultureIgnoreCase)));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<PurchaseRequestLineItemVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+        public async Task<ResponseModel<int>> SaveAsync(PurchaseRequest form, List<PurchaseRequestLineItemVM> items)
+        {
+            var response = new ResponseModel<int>();
+
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var request = await context.PurchaseRequests.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+            if (request == null)
+            {
+                form.Id = 0;
+                await context.PurchaseRequests.AddAsync(form);
+                await context.SaveChangesAsync(currentUserId);
+                await SaveItemsAsync(items, form.Id);
+
+                response.Status = "Success";
+                response.Message = "Purchase request successully added.";
+                response.NewRow = form.Id;
+            }
+            else
+            {
+                request.TypeId = form.TypeId;
+                request.PurposeId = form.PurposeId;
+                request.AreaId = form.AreaId;
+                request.RequestDate = form.RequestDate;
+                request.Remarks = form.Remarks;
+                request.Status = form.Status;
+                request.PreparedBy = form.PreparedBy;
+                request.CheckedBy = form.CheckedBy;
+
+                context.PurchaseRequests.Update(request);
+                await context.SaveChangesAsync(currentUserId);
+                await SaveItemsAsync(items, request.Id);
+
+                response.Status = "Success";
+                response.Message = "Purchase request successully updated.";
+                response.NewRow = form.Id;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> SaveItemsAsync(IList<PurchaseRequestLineItemVM> Items, int requestId, string? status = null)
+        {
+            var response = new ResponseModel();
+
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            var request = await context.PurchaseRequests.Where(s => s.Id == requestId).FirstOrDefaultAsync();
+
+            if (request == null)
+            {
+                response.Status = "Error";
+                response.Message = "Invalid purchase request";
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    int statusId = context.PurchaseStatuses.Where(s => s.Name == status).Select(s => s.Id).First();
+                    request.StatusId = statusId;
+                }
+
+
+                //var existingItems = context.PurchaseRequestLineItems.Where(s => s.PurchaseRequestId == requestId);
+                //context.PurchaseRequestLineItems.RemoveRange(existingItems);
+
+                //var newItems = Items.Select(s => new PurchaseRequestLineItem
+                //{
+                //    PurchaseRequestId = requestId,
+                //    LineNumber = s.LineNumber,
+                //    SalesOrderId = s.SalesOrderId,
+                //    ItemId = s.ItemId,
+                //    ItemDescription = s.ItemDescription,
+                //    StockOnHand = s.StockOnHandD,
+                //    Quantity = s.QuantityD,
+                //    UnitId = s.UnitId,
+                //    Purpose = s.Purpose + ""
+                //});
+                //await context.PurchaseRequestLineItems.AddRangeAsync(newItems);
+                //await context.SaveChangesAsync(currentUserId);
+
+                try
+                {
+                    var citems = context.PurchaseRequestLineItems.Where(s => s.PurchaseRequestId == requestId);
+                    // add item
+                    // check items not in db
+                    var items = citems.Select(s => s.Id);
+                    // add excluding items already available
+                    var newitems = Items.Where(s => items.Contains(s.Id) == false)
+                                       .Select(s => new PurchaseRequestLineItem
+                                       {
+                                           PurchaseRequestId = requestId,
+                                           LineNumber = s.LineNumber,
+                                           SalesOrderId = s.SalesOrderId,
+                                           ItemId = s.ItemId,
+                                           ItemDescription = s.ItemDescription,
+                                           StockOnHand = s.StockOnHandD,
+                                           Quantity = s.QuantityD,
+                                           UnitId = s.UnitId,
+                                           Purpose = s.Purpose + ""
+                                       });
+                    context.PurchaseRequestLineItems.AddRange(newitems);
+
+                    // update item
+                    // get items available in db
+                    var existitems = Items.Where(s => items.Contains(s.Id));
+                    foreach (var ei in existitems)
+                    {
+                        // update all available in db
+                        var dbitem = await citems.Where(s => s.Id == ei.Id).FirstAsync();
+                        dbitem.LineNumber = ei.LineNumber;
+                        dbitem.StockOnHand = ei.StockOnHandD;
+                        dbitem.Quantity = ei.QuantityD;
+
+                        context.PurchaseRequestLineItems.Update(dbitem);
+                    }
+
+                    // delete item
+                    // get items not in form
+                    var fitems = Items.Select(s => s.Id);
+                    var ritems = citems.Where(s => fitems.Contains(s.Id) == false);
+                    // remove unavailable items
+                    context.PurchaseRequestLineItems.RemoveRange(ritems);
+
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Request item(s) successfully saved";
+                }
+                catch (Exception ex)
+                {
+                    response.Status = "Error";
+                    response.Message = ex.Message;
+                }
+            }
+            return response;
+        }
+
+        public async Task<ResponseModel> ApproveAsync(int requestId)
+        {
+            var response = new ResponseModel();
+
+            var request = context.PurchaseRequests.Where(s => s.Id == requestId).FirstOrDefault();
+            if (request == null)
+            {
+                response.Status = "Error";
+                response.Message = "Invalid purchase request";
+            }
+            else
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                int statusId = context.PurchaseStatuses.Where(s => s.Name == "Approved").Select(s => s.Id).First();
+
+                if (!string.IsNullOrWhiteSpace(request.Approver1Id) && !string.IsNullOrWhiteSpace(request.Approver2Id))
+                {
+                    response.Status = "Error";
+                    response.Message = "Purchase request already approved.";
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(request.Approver1Id))
+                        request.Approver1Id = currentUserId;
+                    else
+                        request.Approver2Id = currentUserId;
+
+                    request.StatusId = statusId;
+
+                    context.PurchaseRequests.Update(request);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Purchase request successfully approved.";
+                }
+            }
+            return response;
+        }
+
+        public async Task<ResponseModel> DisapproveAsync(int requestId, string? reason)
+        {
+            var response = new ResponseModel();
+
+
+            var request = context.PurchaseRequests.Where(s => s.Id == requestId).FirstOrDefault();
+            if (request == null)
+            {
+                response.Status = "Error";
+                response.Message = "Invalid purchase request";
+            }
+            else
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                int statusId = context.PurchaseStatuses.Where(s => s.Name == "Disapproved").Select(s => s.Id).First();
+
+                if (!string.IsNullOrWhiteSpace(request.DisapproverId))
+                {
+                    response.Status = "Error";
+                    response.Message = "Purchase request already disapproved.";
+                }
+                else
+                {
+                    request.DisapproverId = currentUserId;
+                    request.DisapprovedReason = reason;
+                    request.StatusId = statusId;
+
+                    context.PurchaseRequests.Update(request);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Purchase request successfully disapproved.";
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel<int>> AddAsync(PurchaseRequest request)
+        {
+            var response = new ResponseModel<int>();
+            try
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                request.Id = 0;
+                await context.PurchaseRequests.AddAsync(request);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Purchase request successfully added.";
+                response.NewRow = request.Id;
+            }
+            catch (Exception)
+            {
+                response.Status = "Error";
+                response.Message = "An error occurred while adding the purchase request.";
+                response.NewRow = 0;
+            }
+            return response;
+        }
+
+        public async Task<ResponseModel<int>> UpdateAsync(PurchaseRequest request)
+        {
+            var response = new ResponseModel<int>();
+            try
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                var existingRequest = await context.PurchaseRequests.FindAsync(request.Id);
+
+                if (existingRequest == null)
+                {
+                    response.Status = "Error";
+                    response.Message = "Purchase request not found.";
+                    response.NewRow = 0;
+
+                    return response;
+                }
+
+                existingRequest.DocumentNumber = request.DocumentNumber;
+                existingRequest.TypeId = request.TypeId;
+                existingRequest.PurposeId = request.PurposeId;
+                existingRequest.AreaId = request.AreaId;
+                existingRequest.RequestDate = request.RequestDate;
+                existingRequest.PurposeDefinition = request.PurposeDefinition;
+                existingRequest.Remarks = request.Remarks;
+                existingRequest.StatusId = request.StatusId;
+                existingRequest.PreparedBy = request.PreparedBy;
+                existingRequest.CheckedBy = request.CheckedBy;
+                existingRequest.Approver1Id = request.Approver1Id;
+                existingRequest.Approver2Id = request.Approver2Id;
+
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Purchase request successfully updated.";
+                response.NewRow = existingRequest.Id;
+            }
+            catch (Exception)
+            {
+                response.Status = "Error";
+                response.Message = "An error occurred while updating the purchase request.";
+                response.NewRow = 0;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> DeleteAsync(int requestId)
+        {
+            var response = new ResponseModel();
+            try
+            {
+                var existingRequest = await context.PurchaseRequests
+                    .FirstOrDefaultAsync(pr => pr.Id == requestId);
+
+                if (existingRequest == null)
+                {
+                    response.Status = "Error";
+                    response.Message = "Purchase request not found.";
+                    return response;
+                }
+
+                context.PurchaseRequests.Remove(existingRequest);
+                await context.SaveChangesAsync();
+
+                response.Status = "Success";
+                response.Message = "Purchase request successfully deleted.";
+            }
+            catch (Exception)
+            {
+                response.Status = "Error";
+                response.Message = "An error occurred while deleting the purchase request.";
+            }
+
+            return response;
         }
     }
 }
