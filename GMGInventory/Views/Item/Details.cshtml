@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Item Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var hasSubitem = (bool)ViewData["HasSubItem"]!;
 }
 
 @section Breadcrumb {
@@ -168,6 +169,13 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" id="nav-conversion-tab" role="tab"
+                                   data-bs-toggle="tab" data-bs-target="#nav-conversion"
+                                   aria-controls="nav-conversion" aria-selected="true">
+                                    @*<br />*@Conversion Details
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" id="nav-price-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-price"
                                    aria-controls="nav-price" aria-selected="true">
@@ -188,6 +196,7 @@
                                     Sales Return@*<br />*@ History
                                 </a>
                             </li>
+                           
                         </ul>
                     </div>
                     <div class="card-body">
@@ -259,6 +268,17 @@
                                     </thead>
                                 </table>
                             </div>
+                            <div class="tab-pane fade show" id="nav-conversion" role="tabpanel"
+                                 aria-labelledby="nav-conversion-tab">
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2 mb-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                        <span class="fas fa-plus"></span> Add Item
+                                    </button>
+                                </div>
+                                <table class="table table-head-fixed table-striped table-hover table-conversion">
+                         
+                                </table>
+                            </div>
                             <div class="tab-pane fade" id="nav-price" role="tabpanel" aria-labelledby="nav-price-tab">
                                 <table class="table table-head-fixed table-striped table-hover table-price">
                                     <thead>
@@ -308,6 +328,203 @@
         </div>
     </div>
 </div>
+
+@if (userAccess.CanAdd)
+{
+    <!-- Add Item Conversion Modal -->
+    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Item Conversion</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form-item">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-sm-12">
+                                <div class="form-group">
+                                    <input type="hidden" id="add-orderNo" />
+
+                                    <label for="add-option" class="form-label mb-0">Option</label>
+                                    <div>
+                                        <select class="form-control form-control-sm" id="add-option" name="Option" style="width: 100%;">
+                                            <option>Conversion</option>
+                                            <option>Item</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divConversion">
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="add-quantity" class="form-label mb-0">Quantity</label>
+                                        <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                        <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="add-unit" class="form-label mb-0">Unit</label>
+                                        <select name="Unit" id="add-unit" class="form-control" style="width: 100%">
+                                        </select>
+                                        <span data-valmsg-for="add-unit" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="add-equivalent-quantity" class="form-label mb-0">Equivalent Quantity per Unit</label>
+                                        <input type="number" min="0" max="1999999" id="add-equivalent-quantity" name="EquivalentQuantity" class="form-control form-control-sm" />
+                                        <span data-valmsg-for="add-equivalent-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="add-equivalent-unit" class="form-label mb-0">Equivalent Unit</label>
+                                        <select name="EquivalentUnit" id="add-equivalent-unit" class="form-control" style="width: 100%">
+                                        </select>
+                                        <span data-valmsg-for="add-equivalent-unit" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divItem">
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="add-item-quantity" class="form-label mb-0">Quantity</label>
+                                        <input type="number" min="0" max="1999999" id="add-item-quantity" name="Quantity" class="form-control form-control-sm" />
+                                        <span data-valmsg-for="add-item-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="add-item" class="form-label mb-0">Item</label>
+                                        <select id="add-item" name="Item" style="width:100%">
+                                            <option></option>
+                                        </select>
+
+                                        <span data-valmsg-for="add-item" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-add">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@if (userAccess.CanEdit)
+{
+    <!-- Edit Item Conversion Modal -->
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Item Conversion</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editForm">
+                    <div class="modal-body">
+                        <div class="divConversion">
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <input type="hidden" id="edit-id" />
+
+                                        <label for="edit-quantity" class="form-label mb-0">Quantity</label>
+                                        <input type="number" min="0" max="1999999" id="edit-quantity" name="Quantity" class="form-control form-control-sm" />
+                                        <span data-valmsg-for="edit-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="edit-unit" class="form-label mb-0">Unit</label>
+                                        <select name="Unit" id="edit-unit" class="form-control" style="width: 100%">
+                                        </select>
+                                        <span data-valmsg-for="edit-unit" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="edit-equivalent-quantity" class="form-label mb-0">Equivalent Quantity per Unit</label>
+                                        <input type="number" min="0" max="1999999" id="edit-equivalent-quantity" name="EquivalentQuantity" class="form-control form-control-sm" />
+                                        <span data-valmsg-for="edit-equivalent-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="edit-equivalent-unit" class="form-label mb-0">Equivalent Unit</label>
+                                        <select name="EquivalentUnit" id="edit-equivalent-unit" class="form-control" style="width: 100%">
+                                        </select>
+                                        <span data-valmsg-for="edit-equivalent-unit" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divItem">
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="edit-item-quantity" class="form-label mb-0">Quantity</label>
+                                        <input type="number" min="0" max="1999999" id="edit-item-quantity" name="Quantity" class="form-control form-control-sm" />
+                                        <span data-valmsg-for="edit-item-quantity" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="edit-item" class="form-label mb-0">Item</label>
+                                        <input type="hidden" id="edit-item-hidden" />
+                                        <select id="edit-item" name="SubItemId" style="width:100%">
+                                            <option></option>
+                                        </select>
+
+                                        <span data-valmsg-for="edit-item" data-valmsg-replace="true" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@if (userAccess.CanDelete)
+{
+    <form id="deleteConversionForm" asp-action="DeleteConversion">
+        <input type="hidden" id="deleteConversionId" name="Id" />
+    </form>
+}
 
 <!-- Edit Quantity Modal -->
 <div class="modal fade" id="quantityModal" role="dialog" aria-labelledby="quantityModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -367,6 +584,75 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
+        // Load Select2 Unit
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Unit")",
+            success: function (data, status, xhr) {
+                $("#add-unit").select2({
+                    data: data,
+                    dropdownParent: $("#addModal")
+                });
+                $("#edit-unit").select2({
+                    data: data,
+                    dropdownParent: $("#editModal")
+                });
+            }
+        });
+
+        // Load Select2 Equivalent Unit
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Unit")",
+            success: function (data, status, xhr) {
+                $("#add-equivalent-unit").select2({
+                    data: data,
+                    dropdownParent: $("#addModal")
+                });
+                $("#edit-equivalent-unit").select2({
+                    data: data,
+                    dropdownParent: $("#editModal")
+                });
+            }
+        });
+
+        // Load item for select2
+        $("#add-item").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: "<empty>",
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Item")",
+                dataType: 'json',
+                type: "POST",
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#addModal")
+        });
+
+      
+
         $("#item-code").select2({
             minimumInputLength: 1,
             placeholder: '@Model?.Code',
@@ -399,12 +685,97 @@
             }
         });
 
+        $("#edit-item").on("select2:select", function () {
+            //$("#edit-item-hidden").val($("#edit-item").select2("data")[0].id);
+
+            $("#edit-item-hidden").val($(this).select2("data")[0].id);
+            alert($("#edit-item").select2("data")[0].id);
+        });
+
+
         $("#item-code").on("select2:select", function () {
             window.location = window.location.href.replace("@Model?.Id", $("#item-code").val());
         });
 
+        $("#add-option").on("change", function () {
+            clearItemForm();
+            if ($(this).val() == "Item") {
+                $(".divItem").show();
+                $(".divConversion").hide();
+            }
+            else {
+                getLastConversion();
+
+                $(".divItem").hide();
+                $(".divConversion").show();
+            }
+        });
+
+        function clearItemForm() {
+            $("#add-quantity").val("0");
+            $("#add-equivalent-quantity").val("0");
+            $("#add-equivalent-unit").val("").trigger("change");
+            $("#add-unit").val("").trigger("change");
+
+            $("#add-item").val("").trigger("change");
+            $("#add-item-quantity").val("0");
+        }
+
+        function getLastConversion() { 
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetItemConversionVM", "Item")",
+                data: { itemId: @Model?.Id },
+                success: function (data) {
+                    if (data != null) {
+                        document.getElementById("add-option").setAttribute("disabled", "disabled");
+                        if (data.equivalentUnitId != null) {
+                            $(".divConversion").show();
+                            $(".divItem").hide();
+
+                            $("#add-unit").val(data.equivalentUnitId).trigger("change");
+                            $("#add-orderNo").val(data.orderNo);
+
+                            // Load Select2 EquivalentUnit on Add
+                            if ($("#add-unit").attr("data-select2-id")) {
+                                $("#add-unit").select2("destroy");
+                                $("#add-unit").empty();
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: "@Url.Action("GetOptions", "Unit")",
+                                data: { includeId: data.equivalentUnitId },
+                                success: function (data, status, xhr) {
+                                    $("#add-unit").select2({
+                                        data: data,
+                                        allowClear: true,
+                                        placeholder: {
+                                            id: "",
+                                            text: "<empty>"
+                                        },
+                                        dropdownParent: $('#editModal')
+                                    });
+                                }
+                            });
+                        }
+
+                        
+                        if(data.subItemId != null){
+                            $(".divItem").show();
+                            $(".divConversion").hide();
+                            $("#add-orderNo").val(1);
+                        }
+                    }
+                    else {
+                        $("#add-orderNo").val(1);
+                    }
+                }
+            });
+        }
+
         $('.nav-item a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             var selectedTab = e.currentTarget.dataset.bsTarget;
+            if (selectedTab == "#nav-conversion") conversionDT.ajax.reload();
             if (selectedTab == "#nav-warehouse") warehouseDT.ajax.reload();
             if (selectedTab == "#nav-purchase") purchaseDT.ajax.reload();
             if (selectedTab == "#nav-sales") salesDT.ajax.reload();
@@ -413,6 +784,328 @@
             if (selectedTab == "#nav-transfer") transferDT.ajax.reload();
             if (selectedTab == "#nav-return") returnDT.ajax.reload();
         });
+
+        //Conversion Details
+        var conversionDT = $('.table-conversion').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetConversionListJson")",
+                type: "POST",
+                data: function (data) {
+                    data.Id = @Model?.Id;
+                },
+            },
+            serverSide: true,
+            filter: false,
+            ordering: false,
+            searching: false,
+            responsive: true,
+            autoWidth: false,
+            paging: true,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "subItemCode", title: "Item" },
+                { data: "quantity", title: "Quantity" },
+                { data: "unitName", title: "Unit" },
+                { data: "equivalentQuantity", title: "Equivalent Quantity" },
+                { data: "equivalentUnitName", title: "Equivalent Unit" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        if (user_access.canEdit) {
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                        }
+                        if (user_access.canDelete) {
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        }
+
+                        actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        // Load functions upon DataTable load
+        conversionDT.on("draw", function () {
+            hideLoader();
+            var data = conversionDT.row(0).data();
+
+            if (data != null && data.subItemId != null) {
+                for (var i = 2; i < 5; i++) {
+                    conversionDT.column(i).visible(false, false);
+                }
+                conversionDT.column(0).visible(true, true);
+            } else {
+                var data = conversionDT.row(0).data();
+                if (data != null && data.subItemId == null) {
+                    conversionDT.column(0).visible(false, false);
+                }
+            }
+
+            if (user_access.canDelete) {
+                $('.deleteBtn').click(function (e) {
+                    swal({
+                        title: "Delete Conversion",
+                        text: data != null && data.subItemId != null ? "Are you sure you want to delete this record?" : "If there's succeeding conversions, all of it will be deleted as well. Are you sure you want to proceed?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#deleteConversionId').val(id);
+                            $('#deleteConversionForm').submit();
+                        }
+                    });
+                });
+            }
+          
+            if (user_access.canEdit) {
+                // Actions upon Display Edit Modal
+                $(".editBtn").click(function (e) {
+                    var data = conversionDT.row($(this).parents('tr')).data();
+                    $("#edit-id").val(data.id);
+                    $("#edit-quantity").val(data.quantity);
+                    $("#edit-equivalent-quantity").val(data.equivalentQuantity);
+                    $("#edit-unit").val(data.unitId);
+                    $("#edit-equivalent-unit").val(data.equivalentUnitId);
+
+                    if (data != null && data.subItemId != null) {
+                        $(".divItem").show();
+                        $(".divConversion").hide();
+
+                        // Load item for select2
+                        $("#edit-item").select2({
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            placeholder: data.subItemCode,
+                            templateResult: function (repo) {
+                                if (repo.loading) {
+                                    return repo.text;
+                                }
+                                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                            },
+                            ajax: {
+                                url: "@Url.Action("GetOptions", "Item")",
+                                dataType: 'json',
+                                type: "POST",
+                                data: function (params) {
+                                    return {
+                                        search: params.term,
+                                        page: params.page || 1
+                                    };
+                                },
+                                processResults: function (data, params) {
+                                    params.page = params.page || 1;
+                                    return {
+                                        results: data.items,
+                                        pagination: {
+                                            more: (params.page * 50) < data.total_count
+                                        }
+                                    };
+                                },
+                                cache: true
+                            },
+                            dropdownParent: $("#editModal")
+                        });
+
+                        // $("#edit-item").val(data.subItemId);
+                        //$("#edit-quantity").val(data.quantity);
+                        $("#edit-item-quantity").val(data.quantity);
+                        $("#edit-item-hidden").val(data.subItemId);
+                    }
+                    else {
+                        $(".divItem").hide();
+                        $(".divConversion").show();
+
+                        if ($("#edit-unit").attr("data-select2-id")) {
+                            $("#edit-unit").select2("destroy");
+                            $("#edit-unit").empty();
+                        }
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("GetOptions", "Unit")",
+                            data: { includeId: data.unitId },
+                            success: function (data, status, xhr) {
+                                $("#edit-unit").select2({
+                                    data: data,
+                                    allowClear: true,
+                                    placeholder: {
+                                        id: "",
+                                        text: "<empty>"
+                                    },
+                                    dropdownParent: $('#editModal')
+                                });
+                            }
+                        });
+
+                        // Load Select2 EquivalentUnit on Edit
+                        if ($("#edit-equivalent-unit").attr("data-select2-id")) {
+                            $("#edit-equivalent-unit").select2("destroy");
+                            $("#edit-equivalent-unit").empty();
+                        }
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("GetOptions", "Unit")",
+                            data: { includeId: data.equivalentUnitId },
+                            success: function (data, status, xhr) {
+                                $("#edit-equivalent-unit").select2({
+                                    data: data,
+                                    allowClear: true,
+                                    placeholder: {
+                                        id: "",
+                                        text: "<empty>"
+                                    },
+                                    dropdownParent: $('#editModal')
+                                });
+                            }
+                        });
+                    }
+                });
+
+                // Validation for Edit Modal
+                var validateEdit = $("#editForm").validate({
+                    errorClass: 'text-danger text-xs',
+                    rules: {
+                        Unit: { required: true },
+                        EquivalentUnit: { required: true },
+                        Quantity: { required: true, isNotZero: true },
+                        EquivalentQuantity: { required: true, isNotZero: true }
+                    },
+                    messages: {
+                        Quantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
+                        EquivalentQuantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
+                        Unit: { required: "Please select item to add." },
+                        EquivalentUnit: { required: "Please select item to add." }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoEdit();
+                    },
+                    showErrors: validateShowErrors
+                });
+
+
+                // Send Edit to Controller
+                function DoEdit() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("EditConversionJson")",
+                        data: {
+                            Id: $("#edit-id").val(),
+                            SubItemId: $("#edit-item-hidden").val(),
+                            ItemId: @Model?.Id,
+                            Quantity: $("#edit-item-quantity").val(),
+                            UnitId: $("#edit-unit").val(),
+                            EquivalentQuantity: $("#edit-equivalent-quantity").val(),
+                            EquivalentUnitId: $("#edit-equivalent-unit").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#editModal").modal("hide");
+                                conversionDT.ajax.reload();
+                                hideLoader()
+                            }
+                        }
+                    });
+                }
+            }
+
+            if (user_access.canAdd) {
+                $(".createBtn").on('click', function () {
+                    clearItemForm();
+                    if (data != null && data.subItemId != null) {
+                        $(".divItem").show();
+                        $(".divConversion").hide();
+
+                        $("#add-option").val('Item');
+                        document.getElementById("add-option").setAttribute("disabled", "disabled");
+                    }
+                    else {
+                        $(".divConversion").show();
+                        $(".divItem").hide();
+
+                        $("#add-option").val('Conversion');
+                        getLastConversion();
+                    }
+
+                });
+
+                // Validation for Add Item Modal
+                var validateAdd = $("#form-item").validate({
+                    errorClass: 'text-danger text-xs',
+                    rules: {
+                        Unit: { required: true },
+                        EquivalentUnit: { required: true },
+                        Quantity: { required: true, isNotZero: true },
+                        EquivalentQuantity: { required: true, isNotZero: true }
+                    },
+                    messages: {
+                        Quantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
+                        EquivalentQuantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
+                        Unit: { required: "Please select item to add." },
+                        EquivalentUnit: { required: "Please select item to add." }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoCreate();
+                    },
+                    showErrors: validateShowErrors
+                });
+                // Send Create to Controller
+                function DoCreate() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("CreateItemConversionJson")",
+                        data: {
+                            ItemId: @Model?.Id,
+                            Quantity: $("#add-item").val() == "" ? $("#add-quantity").val() : $("#add-item-quantity").val(),
+                            UnitId: $("#add-unit").val(),
+                            EquivalentQuantity: $("#add-item").val() == "" ? $("#add-equivalent-quantity").val() : null,
+                            EquivalentUnitId: $("#add-equivalent-unit").val(),
+                            OrderNo: $("#add-orderNo").val(),
+                            SubItemId: $("#add-item").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#addModal").modal("hide");
+
+                                if ($("#add-item").val() != "") { 
+                                    for (var i = 2; i < 5; i++) {
+                                        conversionDT.column(i).visible(false, false);
+                                    }
+                                    debugger;
+                                    conversionDT.column(0).visible(true, true);
+                                }
+                                else {  
+                                    conversionDT.column(0).visible(false, false);
+                                }
+
+                                conversionDT.ajax.reload();
+                                hideLoader();
+                            }
+                        },
+                        complete: function (xhr, status) {
+                            $(".save-overlay").hideOverlay();
+                        }
+                    });
+                }
+            }
+        });
+
 
         // Warehouse Details
         var warehouseDT = $('.table-warehouse').on('preXhr.dt', function (e, settings, data) {

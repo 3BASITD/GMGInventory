@@ -200,6 +200,6 @@ namespace GMGInventory.Data
         public DbSet<ReasonOfReturn> ReasonOfReturns { get; set; }
         public DbSet<LocationCode> LocationCodes { get; set; }
         public DbSet<BusinessStyle> BusinessStyles { get; set; }
-
+        public DbSet<ItemConversion> ItemConversions { get; set; }
     }
 }

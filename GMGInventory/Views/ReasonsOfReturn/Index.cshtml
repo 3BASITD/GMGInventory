@@ -386,24 +386,5 @@
         }
 
 
-        var json_of_excel;
-        var colnumber = 3; // number of columns required for upload
-        var done_upload_excel = 0;
-        var duplicate_upload = 0;
-
-        var opts = {
-            readAsDefault: 'ArrayBuffer',
-            dragClass: 'drag',
-            on: {
-                load: function (e, file) {
-                    var result = new Uint8Array(e.target.result);
-                    var xlsread = XLSX.read(result, { type: 'array' });
-                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
-                    json_of_excel = xlsjson;
-                }
-            }
-        }; 
-         
-
-    </script>
+   </script>
 }

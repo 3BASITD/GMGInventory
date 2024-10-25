@@ -1,5 +1,7 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -16,6 +18,7 @@ namespace GMGInventory.Controllers
                               , IItemRepository itemRepository
                               , ICategoryRepository categoryRepository
                               , IItemTypeRepository itemTypeRepository
+                              , IItemConversionRepository itemConversionRepository
                               , IBrandRepository brandRepository
                               , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
     {
@@ -91,6 +94,7 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+      
         [HttpPost]
         public async Task<IActionResult> EditJson(ItemCommonVM itemVM)
         {
@@ -132,6 +136,10 @@ namespace GMGInventory.Controllers
             {
                 return NotFound();
             }
+
+            var itemConversion = await itemConversionRepository.HasSubItem(item.Id);
+            ViewData["HasSubItem"] = itemConversion;
+
             return View(item);
         }
 
@@ -438,6 +446,101 @@ namespace GMGInventory.Controllers
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemReturnDTAsync(form, id));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateItemConversionJson(ItemDetailConversionVM itemConversionVM)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
+            if (await itemConversionRepository.IsConversionExistAsync(itemConversionVM.ItemId, itemConversionVM.SubItemId, itemConversionVM.UnitId, itemConversionVM.EquivalentUnitId))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Item conversion already exist";
+            }
+            else
+            {
+                await itemConversionRepository.AddAsync(itemConversionVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Item conversion successfully added";
+            }
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetConversionListJson(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
+            return Json(await itemConversionRepository.GetAllForDataTablesAsync(form, id));
+        }
+
+        [HttpPost]  
+        public async Task<IActionResult> EditConversionJson(ItemDetailConversionVM itemDetailConversionVM)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
+            try
+            {
+                await itemConversionRepository.UpdateAsync(itemDetailConversionVM);
+                responseModel.Status = "Success";
+                responseModel.Message = "Item successfully updated";
+            }
+            catch (Exception ex)
+            {
+                if (!await itemConversionRepository.IsIdExistAsync(itemDetailConversionVM.Id))
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Item conversion cannot be found";
+                }
+                else
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = ex.Message;
+                }
+            }
+            return Json(responseModel);
+        }
+
+       [HttpPost]
+        public async Task<IActionResult> GetItemConversionVM(int itemId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(itemConversionRepository.GetItemConversionVM(itemId));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConversion(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.LocationCodes, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var conversion = await itemConversionRepository.GetAsync(id);
+            if (conversion == null)
+            {
+                return NotFound();
+            }
+
+            if (conversion.SubItemId != null)
+            {
+                await itemConversionRepository.DeleteAsync(id);
+            }
+            else
+            { 
+              await itemConversionRepository.DeleteConversionAsync(conversion.ItemId, conversion.OrderNo);
+            }
+
+            TempData["SuccessMessage"] = "Item conversion successfully deleted";
+            return RedirectToAction("Details", new { Id = conversion.ItemId });
         }
     }
 }
