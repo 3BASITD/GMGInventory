@@ -466,10 +466,8 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<button class="btn btn-primary btn-xs viewBtn" onclick="ShowItemList(' + data.id + ')" data-microtip-title="View Item(s)" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
-                        if (userIsInRole("Inventory Manager") || userIsInRole("Invoicing Clerk") || userIsInRole("System Admin") || userIsInRole("Sales Director") || userIsInRole("Telemarketer")) {
-                            if (user_access.canEdit) {
-                                actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                            }
+                        if (user_access.canEdit) {
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                         }
                         actions += '<button class="btn btn-info btn-xs actionBtn" onclick="ShowAction(\'' + data.createdBy + '\', \'' + data.createdDate + '\', \'' + data.modifiedBy + '\', \'' + data.modifiedDate + '\')" data-microtip-title="History" data-microtip-position="top-left" role="tooltip"><i class="fas fa-history"></i></button>';
                         return actions + "</div>";

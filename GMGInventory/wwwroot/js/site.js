@@ -191,14 +191,14 @@ function validateShowErrors(m, l) {
     this.defaultShowErrors();
 }
 
-function userIsInRole(role) {
-    var isInRole = false;
-    $(".current-user-role").each(function () {
-        if ($(this).val() === role)
-            isInRole = true;
-    });
-    return isInRole;
-}
+//function userIsInRole(role) {
+//    var isInRole = false;
+//    $(".current-user-role").each(function () {
+//        if ($(this).val() === role)
+//            isInRole = true;
+//    });
+//    return isInRole;
+//}
 
 function reloadInputNumberRule() {
     $("input[step='0.01']").on("focusout", function () {

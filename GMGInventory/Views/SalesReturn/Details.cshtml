@@ -36,7 +36,7 @@
             <div class="row">
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (this.User.IsInRole(Roles.Accounting) == false)
+                        @if (userAccess.CanEdit)
                         {
                             <label for="return-number" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.SRNumber)</label>
                             <input type="text" id="return-number" name="ReturnNumber" class="form-control form-control-sm" value="@(Model?.SRNumber)" />
@@ -55,7 +55,7 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (this.User.IsInRole(Roles.Accounting) == false)
+                        @if (userAccess.CanEdit)
                         {
                             <label for="return-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.ReturnDate)</label>
                             <input type="date" id="return-date" name="ReturnDate" class="form-control form-control-sm" value="@(Model?.ReturnDate3)" />
@@ -76,7 +76,7 @@
             <div class="row">
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (this.User.IsInRole(Roles.Accounting) == false)
+                        @if (userAccess.CanEdit)
                         {
                             <label for="return-customer" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.CustomerCode)</label>
                             <select id="return-customer" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark" name="Customer" style="width: 100%;">
@@ -110,7 +110,7 @@
 
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (this.User.IsInRole(Roles.Accounting) == false)
+                        @if (userAccess.CanEdit)
                         {
                             <label for="return-customer-name" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.CustomerName)</label>
                             <input type="text" id="return-customer-name" class="form-control form-control-sm" value="@(Model?.CustomerName)" readonly="readonly" />
@@ -129,7 +129,7 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (this.User.IsInRole(Roles.Accounting) == false)
+                        @if (userAccess.CanEdit)
                         {
                             <label for="return-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
                             <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" value="@(Model?.Remarks)" />
