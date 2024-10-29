@@ -72,7 +72,7 @@ namespace GMGInventory.Controllers
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetAllForDataTablesAsync(form, filter));
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> CreateJson(ItemCommonVM itemVM)
         {
@@ -94,7 +94,7 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-      
+
         [HttpPost]
         public async Task<IActionResult> EditJson(ItemCommonVM itemVM)
         {
@@ -136,9 +136,6 @@ namespace GMGInventory.Controllers
             {
                 return NotFound();
             }
-
-            var itemConversion = await itemConversionRepository.HasSubItem(item.Id);
-            ViewData["HasSubItem"] = itemConversion;
 
             return View(item);
         }
@@ -351,7 +348,7 @@ namespace GMGInventory.Controllers
                 new DataColumn("Quantity on Hand")
             ]);
             //var items = await itemRepository.GetAllFileAsync();
-            var items = (await itemRepository.GetAllAsync(filter)).Where(s=>s.IsActive == true);
+            var items = (await itemRepository.GetAllAsync(filter)).Where(s => s.IsActive == true);
 
             foreach (var item in items)
             {
@@ -479,7 +476,7 @@ namespace GMGInventory.Controllers
             return Json(await itemConversionRepository.GetAllForDataTablesAsync(form, id));
         }
 
-        [HttpPost]  
+        [HttpPost]
         public async Task<IActionResult> EditConversionJson(ItemDetailConversionVM itemDetailConversionVM)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
@@ -508,7 +505,7 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-       [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> GetItemConversionVM(int itemId)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
@@ -530,7 +527,7 @@ namespace GMGInventory.Controllers
                 return NotFound();
             }
 
-            if (conversion.SubItemId != null)
+            if (conversion.SubItemId != null || conversion.EquivalentUnitId == null)
             {
                 await itemConversionRepository.DeleteAsync(id);
             }

@@ -43,7 +43,7 @@ namespace GMGInventory.Application.Repositories
                 Quantity = ItemDetailConversionVM.Quantity,
                 SubItemId = ItemDetailConversionVM.SubItemId,
                 UnitId = ItemDetailConversionVM.UnitId,
-                EquivalentQuantity = ItemDetailConversionVM.EquivalentQuantity,
+                EquivalentQuantity = ItemDetailConversionVM.EquivalentQuantity == 0 ? null : ItemDetailConversionVM.EquivalentQuantity,
                 EquivalentUnitId = ItemDetailConversionVM.EquivalentUnitId,
                 OrderNo = ItemDetailConversionVM.OrderNo
             };
@@ -105,7 +105,7 @@ namespace GMGInventory.Application.Repositories
             conversion.Quantity = itemDetailConversionVM.Quantity;
             conversion.UnitId = itemDetailConversionVM.UnitId;
             conversion.EquivalentUnitId = itemDetailConversionVM.EquivalentUnitId;
-            conversion.EquivalentQuantity = itemDetailConversionVM.EquivalentQuantity;
+            conversion.EquivalentQuantity = itemDetailConversionVM.EquivalentQuantity == 0 ? null : itemDetailConversionVM.EquivalentQuantity;
             //conversion.OrderNo = itemDetailConversionVM.OrderNo;
             conversion.SubItemId = itemDetailConversionVM.SubItemId;
 
