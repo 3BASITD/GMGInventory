@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Item Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
-    var hasSubitem = (bool)ViewData["HasSubItem"]!;
 }
 
 @section Breadcrumb {
@@ -595,6 +594,11 @@
                 });
                 $("#edit-unit").select2({
                     data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "<empty>"
+                    },
                     dropdownParent: $("#editModal")
                 });
             }
@@ -611,6 +615,11 @@
                 });
                 $("#edit-equivalent-unit").select2({
                     data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "<empty>"
+                    },
                     dropdownParent: $("#editModal")
                 });
             }
@@ -686,10 +695,7 @@
         });
 
         $("#edit-item").on("select2:select", function () {
-            //$("#edit-item-hidden").val($("#edit-item").select2("data")[0].id);
-
             $("#edit-item-hidden").val($(this).select2("data")[0].id);
-            alert($("#edit-item").select2("data")[0].id);
         });
 
 
@@ -916,57 +922,12 @@
                             dropdownParent: $("#editModal")
                         });
 
-                         $("#edit-item").val(data.subItemId);
-                        //$("#edit-quantity").val(data.quantity);
                         $("#edit-item-quantity").val(data.quantity);
-                        //$("#edit-item-hidden").val(data.subItemId);
+                        $("#edit-item-hidden").val(data.subItemId);
                     }
                     else {
                         $(".divItem").hide();
                         $(".divConversion").show();
-
-                        if ($("#edit-unit").attr("data-select2-id")) {
-                            $("#edit-unit").select2("destroy");
-                            $("#edit-unit").empty();
-                        }
-                        $.ajax({
-                            type: "POST",
-                            url: "@Url.Action("GetOptions", "Unit")",
-                            data: { includeId: data.unitId },
-                            success: function (data, status, xhr) {
-                                $("#edit-unit").select2({
-                                    data: data,
-                                    allowClear: true,
-                                    placeholder: {
-                                        id: "",
-                                        text: "<empty>"
-                                    },
-                                    dropdownParent: $('#editModal')
-                                });
-                            }
-                        });
-
-                        // Load Select2 EquivalentUnit on Edit
-                        if ($("#edit-equivalent-unit").attr("data-select2-id")) {
-                            $("#edit-equivalent-unit").select2("destroy");
-                            $("#edit-equivalent-unit").empty();
-                        }
-                        $.ajax({
-                            type: "POST",
-                            url: "@Url.Action("GetOptions", "Unit")",
-                            data: { includeId: data.equivalentUnitId },
-                            success: function (data, status, xhr) {
-                                $("#edit-equivalent-unit").select2({
-                                    data: data,
-                                    allowClear: true,
-                                    placeholder: {
-                                        id: "",
-                                        text: "<empty>"
-                                    },
-                                    dropdownParent: $('#editModal')
-                                });
-                            }
-                        });
                     }
                 });
 
@@ -975,15 +936,15 @@
                     errorClass: 'text-danger text-xs',
                     rules: {
                         Unit: { required: true },
-                        EquivalentUnit: { required: true },
+                      //  EquivalentUnit: { required: true },
                         Quantity: { required: true, isNotZero: true },
-                        EquivalentQuantity: { required: true, isNotZero: true }
+                       // EquivalentQuantity: { required: true, isNotZero: true }
                     },
                     messages: {
                         Quantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
-                        EquivalentQuantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
+                       // EquivalentQuantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
                         Unit: { required: "Please select item to add." },
-                        EquivalentUnit: { required: "Please select item to add." }
+                       // EquivalentUnit: { required: "Please select item to add." }
                     },
                     submitHandler: function (form, event) {
                         event.preventDefault();
@@ -1000,9 +961,9 @@
                         url: "@Url.Action("EditConversionJson")",
                         data: {
                             Id: $("#edit-id").val(),
-                            SubItemId: $("#edit-item-hidden").val(),
+                            SubItemId: $("#edit-item").val(), // $("#edit-item-hidden").val(),
                             ItemId: @Model?.Id,
-                            Quantity: $("#edit-item-quantity").val(),
+                            Quantity: $("#edit-item-hidden").val() != "" ? $("#edit-item-quantity").val() : $("#edit-quantity").val(),
                             UnitId: $("#edit-unit").val(),
                             EquivalentQuantity: $("#edit-equivalent-quantity").val(),
                             EquivalentUnitId: $("#edit-equivalent-unit").val()
@@ -1024,6 +985,8 @@
             if (user_access.canAdd) {
                 $(".createBtn").on('click', function () {
                     clearItemForm();
+                  //  document.getElementById("add-unit").removeAttribute("disabled", "disabled");
+
                     if (data != null && data.subItemId != null) {
                         $(".divItem").show();
                         $(".divConversion").hide();
@@ -1034,8 +997,13 @@
                     else {
                         $(".divConversion").show();
                         $(".divItem").hide();
-
                         $("#add-option").val('Conversion');
+
+                        // if (data.subItemId == null || data.equivalentUnitId != null) {
+                        //     debugger;
+                        //    // document.getElementById("add-unit").setAttribute("disabled", "disabled"); 
+                        // }
+
                         getLastConversion();
                     }
 
@@ -1046,15 +1014,15 @@
                     errorClass: 'text-danger text-xs',
                     rules: {
                         Unit: { required: true },
-                        EquivalentUnit: { required: true },
+                      //  EquivalentUnit: { required: true },
                         Quantity: { required: true, isNotZero: true },
-                        EquivalentQuantity: { required: true, isNotZero: true }
+                      //  EquivalentQuantity: { required: true, isNotZero: true }
                     },
                     messages: {
                         Quantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
-                        EquivalentQuantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
+                     //   EquivalentQuantity: { required: "Please enter a quantity", isNotZero: "Can not add an item with 0 quantity" },
                         Unit: { required: "Please select item to add." },
-                        EquivalentUnit: { required: "Please select item to add." }
+                      //  EquivalentUnit: { required: "Please select item to add." }
                     },
                     submitHandler: function (form, event) {
                         event.preventDefault();
@@ -1133,11 +1101,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if (userIsInRole("Inventory Manager") || userIsInRole("System Admin") || userIsInRole("Sales Director") || userIsInRole("Telemarketer")) {
                             if (user_access.canEdit) {
                                 actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="top-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
                             }
-                        }
                         return actions;
                     }
                 }

@@ -538,6 +538,16 @@ namespace GMGInventory.Application.Repositories
             };
             await context.ItemInventories.AddAsync(itemInventories);
             await context.SaveChangesAsync(currentUserId);
+
+            var itemConversion = new ItemConversion
+            {
+                ItemId = item.Id,
+                UnitId = itemVM.UnitId,
+                Quantity = 1,
+                OrderNo = 1
+            };
+            await context.ItemConversions.AddAsync(itemConversion);
+            await context.SaveChangesAsync(currentUserId);
         }
 
         public async Task UpdateAsync(ItemCommonVM itemVM)
@@ -557,7 +567,7 @@ namespace GMGInventory.Application.Repositories
             item.Name = itemVM.Name;
             item.PartNumber = itemVM.PartNumber + "";
             item.Size = itemVM.Size + "";
-            item.UnitId = itemVM.UnitId;
+           // item.UnitId = itemVM.UnitId;
 
             context.Items.Update(item);
             await context.SaveChangesAsync(currentUserId);

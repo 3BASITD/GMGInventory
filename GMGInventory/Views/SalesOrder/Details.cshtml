@@ -262,7 +262,7 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Sales Order Item(s)</span>
-                        @if (Model?.Status == "Submitted" && (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer)))
+                        @if (Model?.Status == "Submitted")
                         {
                             @if (userAccess.CanAdd)
                             {
@@ -654,8 +654,6 @@
             }
         }
 
-        var validUser = userIsInRole("Inventory Manager") || userIsInRole("Sales Director") || userIsInRole("System Admin") || userIsInRole("Telemarketer");
-
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
@@ -684,7 +682,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && validUser && user_access.canEdit) {
+                        if ($("#po-status").val() == "Submitted" && user_access.canEdit) {
                             return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
                             return data.quantity
@@ -713,7 +711,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && validUser && user_access.canEdit) {
+                        if ($("#po-status").val() == "Submitted" && user_access.canEdit) {
                             return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
                         } else {
                             return Round2Decimal(data.sellingPriceD)
@@ -724,7 +722,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && validUser && user_access.canEdit) {
+                        if ($("#po-status").val() == "Submitted" && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
                         } else {
                             return Round2Decimal(data.discount1)
@@ -735,7 +733,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && validUser && user_access.canEdit) {
+                        if ($("#po-status").val() == "Submitted" && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
                         } else {
                             return Round2Decimal(data.discount2D)
@@ -751,7 +749,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if ((data.quantityD != data.servedQuantityD + data.unservedQuantityD || data.unservedQuantityD != 0) && validUser) {
+                        if (data.quantityD != data.servedQuantityD + data.unservedQuantityD || data.unservedQuantityD != 0) {
                             if (user_access.canEdit) {
                                 actions += '<button type="button" class="btn btn-warning btn-xs btn-update-serve" data-microtip-title="Update Served Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                             }
@@ -774,7 +772,7 @@
 
         itemDT.on("draw", function () {
             if ($("#po-status").val() == "Submitted") {
-                itemDT.column(0).visible(validUser); // remove button
+                itemDT.column(0).visible(true); // remove button
                 itemDT.column(10).visible(false); // served quantity
                 itemDT.column(11).visible(false); // unserved quantity
                 itemDT.column(12).visible(false); // update served quantity button

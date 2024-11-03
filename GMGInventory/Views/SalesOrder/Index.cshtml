@@ -9,14 +9,11 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (User.IsInRole(Roles.InventoryManager) || User.IsInRole(Roles.SalesDirector) || User.IsInRole(Roles.SystemAdmin) || User.IsInRole(Roles.Telemarketer))
+            @if (userAccess.CanAdd)
             {
-                @if (userAccess.CanAdd)
-                {
-                    <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
-                        <span class="fas fa-plus"></span> New Sales Order
-                    </a>
-                }
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
+                    <span class="fas fa-plus"></span> New Sales Order
+                </a>
             }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
@@ -340,7 +337,7 @@
                         if (data.status == "Submitted" && data.orderBy == $("#current-user-nickname").val() && user_access.canDelete) {
                             actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button"  data-microtip-title="Delete Sales Order" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }
-                        if  (user_access.canAdd &&  data.status == "Approved" && (userIsInRole("Invoicing Clerk") || userIsInRole("System Admin")/* || userIsInRole("Telemarketer")*/)) {
+                        if  (user_access.canAdd &&  data.status == "Approved") {
                             //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></button>';
                             actions += '<a href="@Url.Action("Create","Pack")/' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></a>';
                         }
