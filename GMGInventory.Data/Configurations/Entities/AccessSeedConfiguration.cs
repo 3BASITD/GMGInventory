@@ -22,7 +22,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                     CanView = true,
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 });
             }
             builder.HasData(accesses);

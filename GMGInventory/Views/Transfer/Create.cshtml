@@ -258,7 +258,7 @@
                 event.preventDefault();
                 AddItem();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         function AddItem() {
@@ -312,7 +312,7 @@
                 event.preventDefault();
                 SaveTransfer();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         var destinationDT = $('.table-item-destination').DataTable({

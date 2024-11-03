@@ -160,6 +160,7 @@ namespace GMGInventory.Data
         public DbSet<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public DbSet<CustomerType> CustomerTypes { get; set; }
         public DbSet<Forwarder> Forwarders { get; set; }
+        public DbSet<HomeImage> HomeImages { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceLineItem> InvoiceLineItems { get; set; }
         //public DbSet<InvoicePayment> InvoicePayments { get; set; }

@@ -326,9 +326,10 @@ else
        || navPages.Contains(PageNames.Regions.ToEnumString())
        || navPages.Contains(PageNames.Suppliers.ToEnumString())
        || navPages.Contains(PageNames.Users.ToEnumString())
+       || navPages.Contains(PageNames.HomeImage.ToEnumString())
        || navPages.Contains(PageNames.AuditLogs.ToEnumString()))
         {
-            var navAdministrationActive = (new List<string> { "Agent", "Access", "Area", "Brand", "Category", "Forwarder", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "Supplier", "User", "AuditLog" }).Contains(currentController ?? "");
+            var navAdministrationActive = (new List<string> { "Agent", "Access", "Area", "Brand", "Category", "Forwarder", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "Supplier", "User", "HomeImage", "AuditLog" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuAdministration" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navAdministrationActive ? "active" : "")">
@@ -453,6 +454,16 @@ else
                                asp-area="" asp-controller="User" asp-action="Index">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 Users
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.HomeImage.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "HomeImage" ? "active" : "")"
+                               asp-area="" asp-controller="HomeImage" asp-action="Index">
+                                <i class="nav-icon fas fa-chalkboard"></i>
+                                Home Images
                             </a>
                         </li>
                     }

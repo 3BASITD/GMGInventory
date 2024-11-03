@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -57,6 +58,18 @@ namespace GMGInventory.Controllers
             return View(request);
         }
 
+        public async Task<IActionResult> DetailsJson(int? Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            var request = await requestRepository.GetDetails(Id ?? 0);
+            if (request == null)
+                return NotFound();
+
+            return Json(request);
+        }
+
         public async Task<IActionResult> Create(int? Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
@@ -107,12 +120,14 @@ namespace GMGInventory.Controllers
         //}
 
         [HttpPost]
-        public async Task<IActionResult> SaveJson(PurchaseRequest form, List<PurchaseRequestLineItemVM> items)
+        public async Task<IActionResult> AddJson(PurchaseRequestSaveVM form, List<PurchaseRequestLineItemVM> items)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await requestRepository.SaveAsync(form, items));
+            var response = await requestRepository.AddAsync(form, items);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
         }
 
         [HttpPost]
@@ -121,7 +136,10 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await requestRepository.SaveItemsAsync(items, Id, status));
+            var response = await requestRepository.SaveItemsAsync(items, Id, status);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+
+            return Json(response);
         }
 
         [HttpPost]
@@ -130,7 +148,9 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await requestRepository.ApproveAsync(Id));
+            var response = await requestRepository.ApproveAsync(Id);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
         }
 
         [HttpPost]
@@ -139,7 +159,9 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await requestRepository.DisapproveAsync(Id, reason));
+            var response = await requestRepository.DisapproveAsync(Id, reason);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
         }
     }
 }

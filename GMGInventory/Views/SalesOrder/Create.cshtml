@@ -505,7 +505,7 @@
                 event.preventDefault();
                 AddItem();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         function AddItem() {
@@ -749,7 +749,7 @@
                 event.preventDefault();
                 SaveOrder();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         function SaveOrder() {

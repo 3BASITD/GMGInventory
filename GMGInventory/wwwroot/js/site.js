@@ -184,11 +184,17 @@ function removeCommaOfNumber(value) {
     return parseFloat(value.replace(/[\$,]/g, '') * 1);
 }
 
-function validateShowErrors(m, l) {
-    $.each(l, function (i, v) {
-        toastr.warning(v.message, "Required field &lt;" + $(v.element.labels[0]).text() + "&gt;");
+function validateShowInvalids(event, validator) {
+    var errors = validator.errorList;
+    var msg = "";
+
+    $.each(errors, function (i, v) {
+        msg += "<strong>" + $(v.element.labels[0]).text() + "</strong>: " + v.message + "<br />";
     });
-    this.defaultShowErrors();
+
+    if (msg) {
+        toastr.warning(msg, "Form validation");
+    }
 }
 
 function userIsInRole(role) {

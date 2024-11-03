@@ -64,9 +64,11 @@ namespace GMGInventory.Application.Repositories
                             {
                                 Id = request.Id,
                                 DocumentNumber = request.DocumentNumber,
-                                Type = request.Type.Code,
-                                Purpose = request.Purpose.Code,
-                                Area = request.Area.Code,
+                                Type = request.Type.Name,
+                                Purpose = request.Purpose == null 
+                                        ? request.PurposeDefinition + "" 
+                                        : request.Purpose.Name,
+                                Area = request.Area.Name,
                                 Status = request.Status.Code,
                                 RequestDateD = request.RequestDate
                             };
@@ -146,8 +148,11 @@ namespace GMGInventory.Application.Repositories
                               Id = request.Id,
                               DocumentNumber = request.DocumentNumber,
                               Type = request.Type.Name,
-                              Purpose = request.Purpose.Name,
-                              Area = request.Area.Code,
+                              TypeId = request.Type.Id,
+                              Purpose = request.Purpose == null ? request.PurposeDefinition + "" : request.Purpose.Name,
+                              PurposeId = request.Purpose == null ? null : request.Purpose.Id,
+                              Area = request.Area == null ? "" : request.Area.Code,
+                              AreaId = request.Area == null ? (int?)null : request.Area.Id,
                               Status = request.Status.Code,
                               RequestDateD = request.RequestDate,
                               Remarks = request.Remarks,
@@ -230,41 +235,91 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<ResponseModel<int>> SaveAsync(PurchaseRequest form, List<PurchaseRequestLineItemVM> items)
+        public async Task<ResponseModel<int>> AddAsync(PurchaseRequestSaveVM form, List<PurchaseRequestLineItemVM> Items)
         {
             var response = new ResponseModel<int>();
 
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var request = await context.PurchaseRequests.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
-            if (request == null)
-            {
-                form.Id = 0;
-                await context.PurchaseRequests.AddAsync(form);
-                await context.SaveChangesAsync(currentUserId);
-                await SaveItemsAsync(items, form.Id);
 
-                response.Status = "Success";
-                response.Message = "Purchase request successully added.";
-                response.NewRow = form.Id;
+            var type = await context.PurchaseRequestTypes.Where(s => s.Id == form.TypeId).FirstOrDefaultAsync();
+            if (type == null)
+            {
+                response.Status = "Error";
+                response.Message = "Invalid type.";
+                response.NewRow = -1;
             }
             else
             {
-                request.TypeId = form.TypeId;
-                request.PurposeId = form.PurposeId;
-                request.AreaId = form.AreaId;
-                request.RequestDate = form.RequestDate;
-                request.Remarks = form.Remarks;
-                request.Status = form.Status;
-                request.PreparedBy = form.PreparedBy;
-                request.CheckedBy = form.CheckedBy;
 
-                context.PurchaseRequests.Update(request);
-                await context.SaveChangesAsync(currentUserId);
-                await SaveItemsAsync(items, request.Id);
+                var status = await context.PurchaseStatuses.Where(s => s.Name == form.Status).FirstOrDefaultAsync();
+                if (status == null)
+                {
+                    response.Status = "Error";
+                    response.Message = "Invalid status.";
+                    response.NewRow = -1;
+                }
+                else
+                {
+                    var previousRequest = await context.PurchaseRequests
+                                                       .Where(s => s.Id == form.ResubmitId)
+                                                       .FirstOrDefaultAsync();
 
-                response.Status = "Success";
-                response.Message = "Purchase request successully updated.";
-                response.NewRow = form.Id;
+                    var docNumber = "";
+                    if (previousRequest == null)
+                    {
+                        var docNumberPrefix = $"{type.Code}-PR{DateTime.Now.Year}-";
+                        var lastDocument = await context.PurchaseRequests
+                                                        .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
+                                                        .OrderByDescending(s => s.DocumentNumber)
+                                                        .Select(s => s.DocumentNumber)
+                                                        .FirstOrDefaultAsync();
+
+                        int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
+                        docNumber = $"{docNumberPrefix}{(docNumberLast + 1).ToString("D4")}";
+                    }
+                    else
+                    {
+                        docNumber = previousRequest.DocumentNumber;
+                    }
+
+
+                    var request = new PurchaseRequest
+                    {
+                        DocumentNumber = docNumber,
+                        TypeId = form.TypeId,
+                        PurposeId = form.PurposeId,
+                        PurposeDefinition = form.PurposeDefinition,
+                        AreaId = form.AreaId,
+                        RequestDate = form.DateRequested,
+                        Remarks = form.Remarks,
+                        PreparedBy = form.PreparedBy,
+                        CheckedBy = form.CheckedBy,
+                        StatusId = status.Id,
+                        ResubmitId = form.ResubmitId
+                    };
+                    await context.PurchaseRequests.AddAsync(request);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    if (previousRequest != null)
+                    {
+                        var statusResubmitted = await context.PurchaseStatuses
+                                                             .Where(s => s.Name == "Resubmitted")
+                                                             .FirstOrDefaultAsync();
+                        previousRequest.ResubmitId = request.Id;
+                        if (statusResubmitted != null)
+                        {
+                            previousRequest.StatusId = statusResubmitted.Id;
+                        }
+                        context.PurchaseRequests.Update(previousRequest);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+
+                    await SaveItemsAsync(Items, request.Id);
+
+                    response.Status = "Success";
+                    response.Message = form.Status == "Draft" ? "Purchase request saved as draft." : "Purchase request successfully submitted.";
+                    response.NewRow = request.Id;
+                }
             }
 
             return response;
@@ -439,77 +494,6 @@ namespace GMGInventory.Application.Repositories
                     response.Status = "Success";
                     response.Message = "Purchase request successfully disapproved.";
                 }
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseModel<int>> AddAsync(PurchaseRequest request)
-        {
-            var response = new ResponseModel<int>();
-            try
-            {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
-                request.Id = 0;
-                await context.PurchaseRequests.AddAsync(request);
-                await context.SaveChangesAsync(currentUserId);
-
-                response.Status = "Success";
-                response.Message = "Purchase request successfully added.";
-                response.NewRow = request.Id;
-            }
-            catch (Exception)
-            {
-                response.Status = "Error";
-                response.Message = "An error occurred while adding the purchase request.";
-                response.NewRow = 0;
-            }
-            return response;
-        }
-
-        public async Task<ResponseModel<int>> UpdateAsync(PurchaseRequest request)
-        {
-            var response = new ResponseModel<int>();
-            try
-            {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
-                var existingRequest = await context.PurchaseRequests.FindAsync(request.Id);
-
-                if (existingRequest == null)
-                {
-                    response.Status = "Error";
-                    response.Message = "Purchase request not found.";
-                    response.NewRow = 0;
-
-                    return response;
-                }
-
-                existingRequest.DocumentNumber = request.DocumentNumber;
-                existingRequest.TypeId = request.TypeId;
-                existingRequest.PurposeId = request.PurposeId;
-                existingRequest.AreaId = request.AreaId;
-                existingRequest.RequestDate = request.RequestDate;
-                existingRequest.PurposeDefinition = request.PurposeDefinition;
-                existingRequest.Remarks = request.Remarks;
-                existingRequest.StatusId = request.StatusId;
-                existingRequest.PreparedBy = request.PreparedBy;
-                existingRequest.CheckedBy = request.CheckedBy;
-                existingRequest.Approver1Id = request.Approver1Id;
-                existingRequest.Approver2Id = request.Approver2Id;
-
-                await context.SaveChangesAsync(currentUserId);
-
-                response.Status = "Success";
-                response.Message = "Purchase request successfully updated.";
-                response.NewRow = existingRequest.Id;
-            }
-            catch (Exception)
-            {
-                response.Status = "Error";
-                response.Message = "An error occurred while updating the purchase request.";
-                response.NewRow = 0;
             }
 
             return response;

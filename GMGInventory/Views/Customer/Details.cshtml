@@ -1024,7 +1024,7 @@
                 event.preventDefault();
                 DoEdit();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
 
@@ -1117,7 +1117,7 @@
                 event.preventDefault();
                 DoShipping();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         // Send Shipping to Controller
@@ -1176,7 +1176,7 @@
                 event.preventDefault();
                 DoForwarder();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         // Send Forwarder to Controller
