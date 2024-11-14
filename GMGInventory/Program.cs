@@ -74,7 +74,7 @@ builder.Services.AddScoped(typeof(ILocationCodeRepository), typeof(LocationCodeR
 builder.Services.AddScoped(typeof(IBusinessStyleRepository), typeof(BusinessStyleRepository));
 builder.Services.AddScoped(typeof(IItemConversionRepository), typeof(ItemConversionRepository));
 builder.Services.AddScoped(typeof(IUnitRepository), typeof(UnitRepository));
-
+builder.Services.AddScoped(typeof(IReportProcurementRepository), typeof(ReportProcurementRepository));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

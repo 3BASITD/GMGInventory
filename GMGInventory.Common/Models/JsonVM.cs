@@ -179,6 +179,21 @@ namespace GMGInventory.Common.Models
         public int? Customer { get; set; }
     }
 
+    public class ListFilterPurchaseOrderModel : ListFilterCommonModel
+    {
+        public int? Item { get; set; }
+        public string? ItemKeyword { get; set; }
+        public int? Supplier { get; set; }
+        public bool Unserved { get; set; }
+    }
+    public class ListFilterReturnReceivingModel : ListFilterCommonModel
+    {
+        public int? Item { get; set; }
+        public string? ItemKeyword { get; set; }
+        public int? Supplier { get; set; }
+        public int? PurchaseOrder { get; set; }
+    }
+
     public class ListFilterCommonModel
     {
         DateTime? _DateFrom = null, _DateTo = null;
@@ -186,12 +201,13 @@ namespace GMGInventory.Common.Models
         public int? Status { get; set; }
         public string? StatusCode { get; set; }
 
-        public DateTime? DateFrom {
+        public DateTime? DateFrom
+        {
             get
             {
                 SetDates();
                 return _DateFrom;
-            } 
+            }
             set
             {
                 _DateFrom = value;

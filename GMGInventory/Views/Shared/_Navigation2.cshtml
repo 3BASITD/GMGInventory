@@ -636,18 +636,18 @@ else
                                         <span class="dropdown-header">PROCUREMENT REPORT</span>
                                         @if (navPages.Contains(PageNames.PurchaseOrderReport.ToEnumString()))
                                         {
-                                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Order" ? "active" : "")"
-                                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Order Report</a>
+                                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "PurchaseOrder" ? "active" : "")"
+                                               asp-area="" asp-controller="ProcurementReport" asp-action="PurchaseOrder">Purchase Order Report</a>
                                         }
                                         @if (navPages.Contains(PageNames.PurchaseReturnReport.ToEnumString()))
                                         {
                                             <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Return" ? "active" : "")"
-                                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Return Report</a>
+                                               asp-area="" asp-controller="ProcurementReport" asp-action="PurchaseReturn">Purchase Return Report</a>
                                         }
                                         @if (navPages.Contains(PageNames.PurchaseReceivingReport.ToEnumString()))
                                         {
                                             <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Receiving" ? "active" : "")"
-                                               asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">Purchase Receiving Report</a>
+                                               asp-area="" asp-controller="ProcurementReport" asp-action="PurchaseReceiving">Purchase Receiving Report</a>
                                         }
                                     }
                                 </div>

@@ -1,0 +1,94 @@
+﻿@model PurchaseOrderPVM
+
+@{
+    Layout = "";
+    var title = "Purchase Order";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Period Covered: </strong>
+        <span>@Model.DateFrom - @Model.DateTo</span>
+        <br />
+        <strong>Doc No: </strong>
+        <span>@Model.DocNo</span>
+        <br />
+        <strong>Date Printed: </strong>
+        <span>@Model.DatePrinted</span>
+        <br />
+        <strong>@(Model.Unserved == true ? "Unserved" : "Served")</strong>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().OrderDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().DocumentNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Supplier)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Item)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Unit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().UnitCost)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().UnservedQuantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().UnservedAmount)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Contents)
+            {
+                <tr>
+                    <td><nobr>@item.OrderDate</nobr></td>
+                    <td>@item.DocumentNumber</td>
+                    <td>@item.Supplier</td>
+                    <td>@item.Item</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Unit</td>
+                    <td>@item.UnitCost</td>
+                    <td>@item.UnservedQuantity</td>
+                    <td>@item.UnservedAmount</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
+                <th></th>
+                <th class="right-text"><nobr>@Model.TotalAmount2</nobr></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>
+
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = window.close;
+</script>
