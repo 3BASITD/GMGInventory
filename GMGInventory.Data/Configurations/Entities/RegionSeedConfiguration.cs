@@ -14,7 +14,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     Code = "LUZ",
                     Name = "Luzon",
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 },
                 new Region
                 {
@@ -22,7 +22,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     Code = "VIS",
                     Name = "Visayas",
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 },
                 new Region
                 {
@@ -30,7 +30,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     Code = "MIN",
                     Name = "Mindanao",
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 },
                 new Region
                 {
@@ -38,7 +38,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     Code = "MM",
                     Name = "Metro Manila",
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 }
             );
         }

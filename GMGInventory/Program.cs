@@ -42,6 +42,7 @@ builder.Services.AddScoped(typeof(ICustomerRepository), typeof(CustomerRepositor
 builder.Services.AddScoped(typeof(ICustomerPurchaseRepository), typeof(CustomerPurchaseRepository));
 builder.Services.AddScoped(typeof(ICustomerTypeRepository), typeof(CustomerTypeRepository));
 builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
+builder.Services.AddScoped(typeof(IHomeImageRepository), typeof(HomeImageReporitory));
 builder.Services.AddScoped(typeof(IInvoiceRepository), typeof(InvoiceRepository));
 builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 builder.Services.AddScoped(typeof(IItemPriceRepository), typeof(ItemPriceRepository));
@@ -99,7 +100,6 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     //app.UseStatusCodePagesWithReExecute("/Home/Error", "?statuscode={0}");
-    app.UseStatusCodePagesWithReExecute("/Home/Error", "?statuscode={0}");
     app.UseMigrationsEndPoint();
 }
 else

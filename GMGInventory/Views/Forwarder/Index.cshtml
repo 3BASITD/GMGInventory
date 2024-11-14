@@ -395,7 +395,7 @@
                     event.preventDefault();
                     DoEdit();
                 },
-                showErrors: validateShowErrors
+                invalidHandler: validateShowInvalids
             });
 
             // Send Edit to Controller
@@ -453,7 +453,7 @@
                     event.preventDefault();
                     DoCreate();
                 },
-                showErrors: validateShowErrors
+                invalidHandler: validateShowInvalids
             });
 
             // Send Create to Controller

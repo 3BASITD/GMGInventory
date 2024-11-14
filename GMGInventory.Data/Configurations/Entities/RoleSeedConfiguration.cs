@@ -17,43 +17,43 @@ namespace GMGInventory.Data.Configurations.Entities
                     NormalizedName = "ACCOUNTING",
                     IsActive = true,
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 },
                 new Role
                 {
                     Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                    Name = "InventoryManager",
-                    NormalizedName = "INVENTORYMANAGER",
+                    Name = "Inventory Manager",
+                    NormalizedName = "INVENTORY MANAGER",
                     IsActive = true,
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 },
                 new Role
                 {
                     Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                    Name = "InvoicingClerk",
-                    NormalizedName = "INVOICINGCLERK",
+                    Name = "Invoicing Clerk",
+                    NormalizedName = "INVOICING CLERK",
                     IsActive = true,
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 },
                 new Role
                 {
                     Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                    Name = "SalesDirector",
-                    NormalizedName = "SALESDIRECTOR",
+                    Name = "Sales Director",
+                    NormalizedName = "SALES DIRECTOR",
                     IsActive = true,
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 },
                 new Role
                 {
                     Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                    Name = "SystemAdmin",
-                    NormalizedName = "SYSTEMADMIN",
+                    Name = "System Admin",
+                    NormalizedName = "SYSTEM ADMIN",
                     IsActive = true,
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 },
                 new Role
                 {
@@ -62,7 +62,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     NormalizedName = "TELEMARKETER",
                     IsActive = true,
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
-                    DateCreated = DateTime.Now
+                    DateCreated = new DateTime(2022, 1, 1)
                 }
             );
         }

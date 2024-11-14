@@ -1,15 +1,22 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
+using GMGInventory.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
     [Authorize]
-    public class HomeController(IAccessRepository accessRepository) : BaseController(accessRepository)
+    public class HomeController(IAccessRepository accessRepository
+                              , IHomeImageRepository homeImageRepository) : BaseController(accessRepository)
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var images = await homeImageRepository.GetListAsync();
+            var activeImages = images.Where(s => s.DisplayOrder > 0)
+                                     .OrderBy(s => s.DisplayOrder)
+                                     .AsEnumerable();
+            return View(activeImages);
         }
 
         public IActionResult Progress()

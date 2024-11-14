@@ -13,18 +13,22 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Type")]
         public string Type { get; set; }
+        public int TypeId { get; set; }
 
         [Display(Name = "Purpose")]
         public string Purpose { get; set; }
+        public int? PurposeId { get; set; }
 
         [Display(Name = "Area")]
         public string Area { get; set; }
+        public int? AreaId { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }
 
         [Display(Name = "Date Requested")]
-        public string RequestDate => RequestDateD.ToString(SystemFormat.StringDateTime);
+        public string RequestDate => RequestDateD.ToString(SystemFormat.StringDate);
+        public string RequestDate3 => RequestDateD.ToString(SystemFormat.StringDate3);
         public DateTime RequestDateD { get; set; }
     }
 
@@ -46,6 +50,21 @@ namespace GMGInventory.Common.Models
         public DateTime? DateModifiedD { get; set; }
 
         public IList<PurchaseRequestLineItemVM> LineItems { get; set; }
+    }
+
+    public class PurchaseRequestSaveVM
+    {
+        public int TypeId { get; set; }
+        public int? PurposeId { get; set; }
+        public string? PurposeDefinition { get; set; }
+        public int? AreaId { get; set; }
+        public DateTime DateRequested { get; set; }
+        public string Remarks { get; set; }
+        public string? PreparedBy { get; set; }
+        public string? CheckedBy { get; set; }
+        public string Status { get; set; }
+        public int? ResubmitId { get; set; }
+        public PurchaseRequestLineItemVM Items { get; set; }
     }
 
     public class PurchaseRequestLineItemVM

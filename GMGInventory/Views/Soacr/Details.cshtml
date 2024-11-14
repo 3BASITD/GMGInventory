@@ -747,7 +747,7 @@
                 event.preventDefault();
                 DoEdit();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         // Send Edit to Controller
@@ -928,7 +928,7 @@
                 event.preventDefault();
                 DoTBR();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         // Send TBR to Controller
@@ -1095,7 +1095,7 @@
                 event.preventDefault();
                 DoAddCheck();
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         // Send Add Check to Controller

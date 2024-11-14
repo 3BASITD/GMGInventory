@@ -25,6 +25,18 @@ namespace GMGInventory.Data.Configurations.Entities
                     Id = 3,
                     Code = "Approved",
                     Name = "Approved"
+                },
+                new PurchaseStatus
+                {
+                    Id = 4,
+                    Code = "Disapproved",
+                    Name = "Disapproved"
+                },
+                new PurchaseStatus
+                {
+                    Id = 5,
+                    Code = "Resubmitted",
+                    Name = "Resubmitted"
                 }
             );
         }

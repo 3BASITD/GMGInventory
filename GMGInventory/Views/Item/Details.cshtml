@@ -891,7 +891,7 @@
                         $("#edit-item").select2({
                             minimumInputLength: 1,
                             allowClear: true,
-                            placeholder: data.subItemCode,
+                            placeholder: '<empty>',
                             templateResult: function (repo) {
                                 if (repo.loading) {
                                     return repo.text;
@@ -950,7 +950,7 @@
                         event.preventDefault();
                         DoEdit();
                     },
-                    showErrors: validateShowErrors
+                    invalidHandler: validateShowInvalids
                 });
 
 
@@ -1028,7 +1028,7 @@
                         event.preventDefault();
                         DoCreate();
                     },
-                    showErrors: validateShowErrors
+                    invalidHandler: validateShowInvalids
                 });
                 // Send Create to Controller
                 function DoCreate() {
@@ -1144,7 +1144,7 @@
                         DoQuantity();
                         return false;
                     },
-                    showErrors: validateShowErrors
+                    invalidHandler: validateShowInvalids
                 });
 
                 // Send Quantity to Controller

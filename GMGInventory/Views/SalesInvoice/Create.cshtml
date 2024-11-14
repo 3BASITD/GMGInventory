@@ -447,7 +447,7 @@
                 event.preventDefault();
                 SaveInvoice($("#invoice-date").data("saving-as"));
             },
-            showErrors: validateShowErrors
+            invalidHandler: validateShowInvalids
         });
 
         function SaveInvoice(saving_as) {

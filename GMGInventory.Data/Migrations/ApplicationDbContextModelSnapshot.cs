@@ -87,7 +87,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2838),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 1,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -99,7 +99,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2851),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 2,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -111,7 +111,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2852),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 3,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -123,7 +123,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2853),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 4,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -135,7 +135,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2854),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 5,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -147,7 +147,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2867),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 6,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -159,7 +159,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2875),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 7,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -171,7 +171,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2876),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 8,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -183,7 +183,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2877),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 9,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -195,7 +195,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2879),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 10,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -207,7 +207,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2880),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 11,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -219,7 +219,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2881),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 12,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -231,7 +231,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2882),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 13,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -243,7 +243,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2883),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 14,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -255,7 +255,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2884),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 15,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -267,7 +267,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2885),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 16,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -279,7 +279,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2886),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 17,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -291,7 +291,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2887),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 18,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -303,7 +303,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2888),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 19,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -315,7 +315,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2889),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 20,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -327,7 +327,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2890),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 21,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -339,7 +339,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2891),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 22,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -351,7 +351,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2973),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 23,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -363,7 +363,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2974),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 24,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -375,7 +375,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2975),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 25,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -387,7 +387,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2976),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 26,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -399,7 +399,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2977),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 27,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -411,7 +411,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2978),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 28,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -423,7 +423,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2978),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 29,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -435,7 +435,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2991),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 30,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -447,7 +447,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2992),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 31,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -459,7 +459,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2993),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 32,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -471,7 +471,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2994),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 33,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -483,7 +483,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2996),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 34,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -495,7 +495,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2997),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 35,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -507,7 +507,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2998),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 36,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -519,7 +519,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(2999),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 37,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -531,7 +531,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3000),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 38,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -543,7 +543,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3001),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 39,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -555,7 +555,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3001),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 40,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -567,7 +567,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3002),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 41,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -579,7 +579,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3003),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 42,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -591,7 +591,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3004),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 43,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -603,7 +603,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3005),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 44,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -615,7 +615,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3006),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 45,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -627,7 +627,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3007),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 46,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -639,7 +639,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3008),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 47,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -651,7 +651,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3008),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 48,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -663,7 +663,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3009),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 49,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -675,7 +675,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3010),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 50,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -687,7 +687,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3011),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 51,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -699,7 +699,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3012),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 52,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -711,7 +711,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3013),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 53,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -723,7 +723,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3014),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 54,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -735,7 +735,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3015),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 55,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -747,7 +747,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3015),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 56,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -759,7 +759,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3016),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 57,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -771,7 +771,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3017),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 58,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -783,8 +783,20 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 62, DateTimeKind.Local).AddTicks(3018),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 59,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 60,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
@@ -1468,6 +1480,48 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Forwarders");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.HomeImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DisplayTime")
+                        .HasColumnType("int");
+
+                    b.Property<string>("File")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HomeImages");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
@@ -2552,6 +2606,18 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 35,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Home Image"
+                        },
+                        new
+                        {
+                            Id = 36,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2563,7 +2629,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 36,
+                            Id = 37,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2575,7 +2641,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 37,
+                            Id = 38,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2587,7 +2653,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 38,
+                            Id = 39,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2599,7 +2665,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 39,
+                            Id = 40,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2611,7 +2677,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 40,
+                            Id = 41,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2623,7 +2689,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 41,
+                            Id = 42,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2635,7 +2701,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 42,
+                            Id = 43,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2647,7 +2713,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 43,
+                            Id = 44,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2659,7 +2725,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 44,
+                            Id = 45,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2671,7 +2737,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 45,
+                            Id = 46,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2683,7 +2749,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 46,
+                            Id = 47,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2695,7 +2761,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 47,
+                            Id = 48,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2707,7 +2773,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 48,
+                            Id = 49,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2719,7 +2785,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 49,
+                            Id = 50,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2731,7 +2797,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 50,
+                            Id = 51,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2743,7 +2809,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 51,
+                            Id = 52,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2755,7 +2821,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 52,
+                            Id = 53,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2767,7 +2833,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 53,
+                            Id = 54,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2779,7 +2845,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 54,
+                            Id = 55,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2791,7 +2857,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 55,
+                            Id = 56,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2803,7 +2869,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 56,
+                            Id = 57,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2815,7 +2881,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 57,
+                            Id = 58,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2827,7 +2893,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 58,
+                            Id = 59,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2839,7 +2905,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 59,
+                            Id = 60,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -3942,6 +4008,18 @@ namespace GMGInventory.Data.Migrations
                             Id = 3,
                             Code = "Approved",
                             Name = "Approved"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "Disapproved",
+                            Name = "Disapproved"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Code = "Resubmitted",
+                            Name = "Resubmitted"
                         });
                 });
 
@@ -4023,7 +4101,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "LUZ",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 3, 877, DateTimeKind.Local).AddTicks(9871),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
                             Name = "Luzon",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -4032,7 +4110,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 2,
                             Code = "VIS",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 3, 877, DateTimeKind.Local).AddTicks(9889),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
                             Name = "Visayas",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -4041,7 +4119,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 3,
                             Code = "MIN",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 3, 877, DateTimeKind.Local).AddTicks(9932),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
                             Name = "Mindanao",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -4050,7 +4128,7 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 4,
                             Code = "MM",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 3, 877, DateTimeKind.Local).AddTicks(9935),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
                             Name = "Metro Manila",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -5401,7 +5479,7 @@ namespace GMGInventory.Data.Migrations
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
                             Name = "Accounting",
                             NormalizedName = "ACCOUNTING",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 61, DateTimeKind.Local).AddTicks(9155),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
@@ -5410,7 +5488,7 @@ namespace GMGInventory.Data.Migrations
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
                             Name = "Inventory Manager",
                             NormalizedName = "INVENTORY MANAGER",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 61, DateTimeKind.Local).AddTicks(9173),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
@@ -5419,7 +5497,7 @@ namespace GMGInventory.Data.Migrations
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
                             Name = "Invoicing Clerk",
                             NormalizedName = "INVOICING CLERK",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 61, DateTimeKind.Local).AddTicks(9177),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
@@ -5428,7 +5506,7 @@ namespace GMGInventory.Data.Migrations
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
                             Name = "Sales Director",
                             NormalizedName = "SALES DIRECTOR",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 61, DateTimeKind.Local).AddTicks(9181),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
@@ -5437,7 +5515,7 @@ namespace GMGInventory.Data.Migrations
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             Name = "System Admin",
                             NormalizedName = "SYSTEM ADMIN",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 61, DateTimeKind.Local).AddTicks(9186),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
@@ -5446,7 +5524,7 @@ namespace GMGInventory.Data.Migrations
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
                             Name = "Telemarketer",
                             NormalizedName = "TELEMARKETER",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 61, DateTimeKind.Local).AddTicks(9189),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
@@ -5492,16 +5570,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2f0b38e9-0c5c-4504-8037-3962605e98cd",
+                            ConcurrencyStamp = "a9403480-a9f7-4caa-9050-e7c87ce910f1",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDjsiZWOe+fxQzqwyg2k6ryyyySJ8LIBoj3yxuvqnGN4J2+ng5jwB1LFWoqX2Pywew==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFNqyhFGQ1cDbPeJRi8WvCirX+s1DbRPAwcNCDyudku1eJo98PLnPDnt8wfBm9pV+A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a7771d30-4a80-4cc4-83c5-ec0a48d33c0e",
+                            SecurityStamp = "84bf3e6f-fa22-4274-a7ea-7a0cb7a2b0a5",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 3, 967, DateTimeKind.Local).AddTicks(3136),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -5513,16 +5591,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "67145ff4-d3ef-4260-9d4d-810ff8baa7f1",
+                            ConcurrencyStamp = "fec082b6-206a-4aaf-b9a0-b32c75ce02f7",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAAhCQVjxUhwtR+CleSilccG56oZpvs87Ei7xMYWcP4Nh4gsIxFSQyPJ9HFoYB+DRw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB5sjBfA/lRKn0Pr5oqIX1gVCYIdB10aeT7HKGMs5Yv0Jmw8IGcyS3YbRCaQklnIlg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e7a5a3ab-aca1-4613-9cea-0f012e93bb85",
+                            SecurityStamp = "dd6a8002-cec1-4c1c-91dd-097a67547195",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2024, 10, 22, 11, 11, 4, 60, DateTimeKind.Local).AddTicks(864),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,

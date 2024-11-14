@@ -370,6 +370,17 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasPrint = false
                 },
                 new() {
+                    Id = (int)PageNames.HomeImage,
+                    Name = PageNames.HomeImage.ToEnumString(),
+                    HasView = true,
+                    HasAdd = true,
+                    HasEdit = true,
+                    HasDelete = true,
+                    HasApproveDisapprove = false,
+                    HasUploadDownload = false,
+                    HasPrint = false
+                },
+                new() {
                     Id = (int)PageNames.AuditLogs,
                     Name = PageNames.AuditLogs.ToEnumString(),
                     HasView = true

@@ -38,6 +38,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Regions")] Regions,
         [PageNamesString("Suppliers")] Suppliers,
         [PageNamesString("Users")] Users,
+        [PageNamesString("Home Image")] HomeImage,
         [PageNamesString("Audit Logs")] AuditLogs,
         [PageNamesString("Agent Sales per Item")] AgentSalesPerItemReport,
         [PageNamesString("Brand Sales Report")] BrandSalesReport,

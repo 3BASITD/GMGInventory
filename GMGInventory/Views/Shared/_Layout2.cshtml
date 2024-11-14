@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="~/lib/chart.js/Chart.min.css" />
     <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
     <link rel="stylesheet" href="~/lib/microtip/microtip.css" />
+    <link rel="stylesheet" href="~/lib/swiper-11.1.14/package/swiper-bundle.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -54,7 +55,7 @@
                     }
                     else
                     {
-                    <partial name="_Navigation2" />
+                        <partial name="_Navigation2" />
                     }
                 </div>
 
@@ -170,41 +171,58 @@
     <script src="~/lib/print-this/printThis.js"></script>
     <script src="~/lib/jquery-mask/jquery.mask.js"></script>
     <script src="~/lib/jquery-number-2.1.6/jquery.number.min.js"></script>
+    <script src="~/lib/swiper-11.1.14/package/swiper-bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
         $(document).ready(function () {
-        @if (activeUser.IsDarkMode)
-        {
-            <text>
-                    $(".table").each(function () {
-                        $(this).addClass("table-dark");
-                    });
-            </text>
-        }
-                                                        });
+            var layout_is_dark_mode = @Json.Serialize(activeUser.IsDarkMode);
+            var layout_success_message = @Json.Serialize(TempData["SuccessMessage"]);
+            var layout_warning_message = @Json.Serialize(TempData["WarningMessage"]);
+            var layout_error_message = @Json.Serialize(TempData["ErrorMessage"]);
 
-        @if (TempData["SuccessMessage"] != null || TempData["WarningMessage"] != null || TempData["ErrorMessage"] != null)
-        {
-            if (TempData["SuccessMessage"] != null)
+            if (layout_is_dark_mode)
             {
-                <text>
-                    toastr.success("@TempData["SuccessMessage"]", "Success");
-                </text>
+                $(".table").each(function () {
+                    $(this).addClass("table-dark");
+                });
             }
-            else if (TempData["WarningMessage"] != null)
+
+            const progressCircle = document.querySelector(".autoplay-progress svg");
+            const progressContent = document.querySelector(".autoplay-progress span");
+            var swiper = new Swiper(".swiper-container", {
+                spaceBetween: 30,
+                centeredSlides: true,
+                autoplay: {
+                    delay: 2500,
+                    disableOnInteraction: false
+                },
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev"
+                },
+                on: {
+                    autoplayTimeLeft(s, time, progress) {
+                        progressCircle.style.setProperty("--progress", 1 - progress);
+                        progressContent.textContent = `${Math.ceil(time / 1000)}s`;
+                    }
+                }
+            });
+
+            if (layout_success_message != null || layout_warning_message != null || layout_error_message != null)
             {
-                <text>
-                    toastr.warning("@TempData["WarningMessage"]", "Warning");
-                </text>
+                if (layout_success_message != null)
+                        toastr.success(layout_success_message, "Success");
+                else if (layout_warning_message != null)
+                        toastr.warning(layout_warning_message, "Warning");
+                else if (layout_error_message != null)
+                        toastr.error(layout_error_message, "Error");
             }
-            else if (TempData["ErrorMessage"] != null)
-            {
-                <text>
-                    toastr.error("@TempData["ErrorMessage"]", "Error");
-                </text>
-            }
-        }
+        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
