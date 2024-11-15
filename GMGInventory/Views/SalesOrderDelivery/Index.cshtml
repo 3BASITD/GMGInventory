@@ -146,12 +146,10 @@
                         <div class="form-group">
                             <label for="delivery-pickup-date" class="form-label mb-0">Pick-up Date</label>
                             <input type="date" id="delivery-pickup-date" name="PickupDate" class="form-control form-control-sm" />
-                            <span data-valmsg-for="delivery-pickup-date" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="delivery-date" class="form-label mb-0">Delivery Date</label>
                             <input type="date" id="delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
-                            <span data-valmsg-for="delivery-date" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="delivery-forwarder" class="form-label mb-0">Forwarder</label>
@@ -160,12 +158,10 @@
                                     <option></option>
                                 </select>
                             </div>
-                            <span data-valmsg-for="delivery-forwarder" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="delivery-waybill" class="form-label mb-0">Waybill Number</label>
                             <input type="text" id="delivery-waybill" name="Waybill" class="form-control form-control-sm" />
-                            <span data-valmsg-for="delivery-waybill" data-valmsg-replace="true" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="delivery-remarks" class="form-label mb-0">Remarks</label>
@@ -521,7 +517,6 @@
 
                 // Validation for Edit Modal
                 var validateEdit = $("#editForm").validate({
-                    errorClass: 'text-danger text-xs',
                     rules: {
                         Forwarder: { required: true },
                         Waybill: { required: true, maxlength: 150 },
@@ -535,8 +530,7 @@
                     submitHandler: function (form, event) {
                         event.preventDefault();
                         DoEdit();
-                    },
-                    invalidHandler: validateShowInvalids
+                    }
                 });
 
                 // Send Edit to Controller

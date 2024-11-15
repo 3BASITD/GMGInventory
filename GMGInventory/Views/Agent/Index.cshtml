@@ -101,28 +101,23 @@
                                 <div class="form-group">
                                     <label for="create-code" class="control-label mb-0 d-block">Code</label>
                                     <input name="code" id="create-code" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="create-code" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="create-firstname" class="control-label mb-0 d-block">First Name</label>
                                     <input name="firstname" id="create-firstname" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="create-firstname" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="create-middlename" class="control-label mb-0 d-block">Middle Name</label>
                                     <input name="middlename" id="create-middlename" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="create-middlename" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="create-lastname" class="control-label mb-0 d-block">Last Name</label>
                                     <input name="lastname" id="create-lastname" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="create-lastname" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="create-area" class="control-label mb-0 d-block">Area</label>
                                     <select name="area" id="create-area" class="form-control" style="width: 100%">
                                     </select>
-                                    <span data-valmsg-for="create-area" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -160,28 +155,23 @@
                                 <div class="form-group">
                                     <label for="edit-code" class="control-label mb-0 d-block">Code</label>
                                     <input name="code" id="edit-code" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-code" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-firstname" class="control-label mb-0 d-block">First Name</label>
                                     <input name="firstname" id="edit-firstname" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-firstname" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-middlename" class="control-label mb-0 d-block">Middle Name</label>
                                     <input name="middlename" id="edit-middlename" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-middlename" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-lastname" class="control-label mb-0 d-block">Last Name</label>
                                     <input name="lastname" id="edit-lastname" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-lastname" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-area" class="control-label mb-0 d-block">Area</label>
                                     <select name="area" id="edit-area" class="form-control" style="width: 100%">
                                     </select>
-                                    <span data-valmsg-for="edit-area" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <input type="hidden" id="edit-id" />
                             </div>
@@ -401,7 +391,6 @@
 
                 // Validation for Edit Modal
                 var validateEdit = $("#editForm").validate({
-                    errorClass: 'text-danger text-xs',
                     rules: {
                         code: { required: true, maxlength: 10 },
                         firstName: { required: true, maxlength: 100 },
@@ -415,8 +404,7 @@
                     submitHandler: function (form, event) {
                         event.preventDefault();
                         DoEdit();
-                    },
-                    invalidHandler: validateShowInvalids
+                    }
                 });
 
                 // Send Edit to Controller
@@ -492,7 +480,6 @@
 
             // Validation for Create Modal
             var validateCreate = $("#createForm").validate({
-                errorClass: 'text-danger text-xs',
                 rules: {
                     code: { required: true, maxlength: 10 },
                     firstName: { required: true, maxlength: 100 },
@@ -506,8 +493,7 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     DoCreate();
-                },
-                invalidHandler: validateShowInvalids
+                }
             });
 
             // Send Create to Controller

@@ -26,30 +26,32 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<IList<JsonOptionsModel>> GetTypeOptions(int? SelectedId)
+        public async Task<IList<JsonCodeOptionsModel>> GetTypeOptions(int? SelectedId)
         {
             return await context.PurchaseRequestTypes
-                                .Select(s => new JsonOptionsModel
+                                .Select(s => new JsonCodeOptionsModel
                                 {
                                     Id = s.Id.ToString(),
                                     Text = s.Name,
+                                    Code = s.Code,
                                     Selected = SelectedId != null && s.Id == SelectedId
                                 })
-                                .OrderBy(s => s.Text)
+                                .OrderBy(s => s.Id)
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonOptionsModel>> GetPurposeOptions(int TypeId, int? SelectedId)
+        public async Task<IList<JsonCodeOptionsModel>> GetPurposeOptions(int TypeId, int? SelectedId)
         {
             return await context.PurchaseRequestPurposes
                                 .Where(s => s.TypeId == TypeId || s.Id == SelectedId)
-                                .Select(s => new JsonOptionsModel
+                                .Select(s => new JsonCodeOptionsModel
                                 {
                                     Id = s.Id.ToString(),
                                     Text = s.Name,
+                                    Code = s.Code,
                                     Selected = SelectedId != null && s.Id == SelectedId
                                 })
-                                .OrderBy(s => s.Text)
+                                .OrderBy(s => s.Id)
                                 .ToListAsync();
         }
 
@@ -58,17 +60,17 @@ namespace GMGInventory.Application.Repositories
             var requestVM = from request in context.PurchaseRequests
                                                    .Include(s => s.Type)
                                                    .Include(s => s.Purpose)
-                                                   .Include(s => s.Area)
+                                                   .Include(s => s.Region)
                                                    .Include(s => s.Status)
                             select new PurchaseRequestVM
                             {
                                 Id = request.Id,
                                 DocumentNumber = request.DocumentNumber,
                                 Type = request.Type.Name,
-                                Purpose = request.Purpose == null 
-                                        ? request.PurposeDefinition + "" 
+                                Purpose = request.Purpose == null
+                                        ? request.PurposeDefinition + ""
                                         : request.Purpose.Name,
-                                Area = request.Area.Name,
+                                Region = request.Region.Name,
                                 Status = request.Status.Code,
                                 RequestDateD = request.RequestDate
                             };
@@ -90,7 +92,7 @@ namespace GMGInventory.Application.Repositories
                     s.DocumentNumber,
                     s.Type,
                     s.Purpose,
-                    s.Area,
+                    s.Region,
                     s.Status,
                     s.RequestDate
                 }.Any(a => a != null && a.Contains(form.SearchValue, StringComparison.CurrentCultureIgnoreCase)));
@@ -140,8 +142,15 @@ namespace GMGInventory.Application.Repositories
             var details = from request in context.PurchaseRequests
                                                  .Include(s => s.Type)
                                                  .Include(s => s.Purpose)
-                                                 .Include(s => s.Area)
+                                                 .Include(s => s.Region)
                                                  .Include(s => s.Status)
+                          let resubmitfrom = context.PurchaseRequests
+                                                    .Where(s => s.ResubmitId == request.Id)
+                                                    .FirstOrDefault()
+                          join userc in userManager.Users on request.UserCreated equals userc.Id into c
+                          from userc in c.DefaultIfEmpty()
+                          join userm in userManager.Users on request.UserModified equals userm.Id into m
+                          from userm in m.DefaultIfEmpty()
                           where request.Id == requestId
                           select new PurchaseRequestDetailedVM
                           {
@@ -151,18 +160,21 @@ namespace GMGInventory.Application.Repositories
                               TypeId = request.Type.Id,
                               Purpose = request.Purpose == null ? request.PurposeDefinition + "" : request.Purpose.Name,
                               PurposeId = request.Purpose == null ? null : request.Purpose.Id,
-                              Area = request.Area == null ? "" : request.Area.Code,
-                              AreaId = request.Area == null ? (int?)null : request.Area.Id,
+                              Region = request.Region == null ? "" : request.Region.Name,
+                              RegionId = request.Region == null ? (int?)null : request.Region.Id,
                               Status = request.Status.Code,
                               RequestDateD = request.RequestDate,
                               Remarks = request.Remarks,
-                              PreparedBy = string.IsNullOrWhiteSpace(request.PreparedBy) ? "-" : request.PreparedBy,
-                              CheckedBy = string.IsNullOrWhiteSpace(request.CheckedBy) ? "-" : request.CheckedBy,
                               ApprovedBy1 = request.Approver1Id == null ? null : request.Approver1.FirstName + " " + request.Approver1.LastName,
                               ApprovedBy2 = request.Approver2Id == null ? null : request.Approver2.FirstName + " " + request.Approver2.LastName,
                               DisapprovedBy = request.DisapproverId == null ? null : request.Disapprover.FirstName + " " + request.Disapprover.LastName,
                               DisapprovedReason = request.DisapprovedReason,
-                              ResubmitId = request.ResubmitId
+                              ResubmitId = request.ResubmitId,
+                              ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
+                              UserCreated = userc.FirstName + " " + userc.LastName,
+                              DateCreatedD = request.DateCreated,
+                              UserModified = userm.FirstName + " " + userm.LastName,
+                              DateModifiedD = request.DateModified
                           };
             return await details.FirstOrDefaultAsync();
         }
@@ -289,11 +301,9 @@ namespace GMGInventory.Application.Repositories
                         TypeId = form.TypeId,
                         PurposeId = form.PurposeId,
                         PurposeDefinition = form.PurposeDefinition,
-                        AreaId = form.AreaId,
+                        RegionId = form.RegionId,
                         RequestDate = form.DateRequested,
                         Remarks = form.Remarks,
-                        PreparedBy = form.PreparedBy,
-                        CheckedBy = form.CheckedBy,
                         StatusId = status.Id,
                         ResubmitId = form.ResubmitId
                     };

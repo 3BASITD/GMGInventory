@@ -89,14 +89,12 @@
                             <div class="form-group">
                                 <label for="soa-from" class="control-label mb-0 d-block">Date From</label>
                                 <input type="date" name="DateFrom" id="soa-from" class="form-control form-control-sm" />
-                                <span data-valmsg-for="soa-from" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="soa-to" class="control-label mb-0 d-block">Date To</label>
                                 <input type="date" name="DateTo" id="soa-to" class="form-control form-control-sm" />
-                                <span data-valmsg-for="soa-to" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -107,7 +105,6 @@
                                 <select id="soa-customer" name="Customer" style="width:100%">
                                     <option></option>
                                 </select>
-                                <span data-valmsg-for="soa-customer" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -124,7 +121,6 @@
                                 <select id="soa-agent" name="Agent" style="width:100%">
                                     <option></option>
                                 </select>
-                                <span data-valmsg-for="soa-agent" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -325,7 +321,6 @@
 
         // Validation for Generate SOA Modal
         var validateSOA = $("#generateSOAForm").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 Customer: { required: true },
                 Agent: { required: true },
@@ -341,8 +336,7 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoGenerateSOA();
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
 

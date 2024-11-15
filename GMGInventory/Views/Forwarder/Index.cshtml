@@ -9,11 +9,11 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-             @if (userAccess.CanAdd)
+            @if (userAccess.CanAdd)
             {
                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
                     <span class="fas fa-plus"></span> New Forwarder
-               </button>
+                </button>
             }
             @if (userAccess.CanUploadDownload)
             {
@@ -22,7 +22,7 @@
                 </button>
                 <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
                     <span class="fas fa-download"></span> Download
-              </button>
+                </button>
             }
         </div>
     </div>
@@ -58,8 +58,8 @@
     </div>
 </div>
 
- @if (userAccess.CanDelete)
- {
+@if (userAccess.CanDelete)
+{
     <form id="deleteForwarderForm" asp-action="Delete">
         <input type="hidden" id="deleteForwarderId" name="Id" />
     </form>
@@ -90,22 +90,18 @@
                                 <div class="form-group">
                                     <label for="create-name" class="control-label mb-0 d-block">Name</label>
                                     <input name="name" id="create-name" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="create-name" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="create-address" class="control-label mb-0 d-block">Address</label>
                                     <input type="text" name="address" id="create-address" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="create-address" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="create-phone" class="control-label mb-0 d-block">Phone Number</label>
                                     <input type="text" name="phone" id="create-phone" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="create-phone" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="create-fax" class="control-label mb-0 d-block">Fax Number</label>
                                     <input type="text" name="fax" id="create-fax" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="create-fax" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
 
                             </div>
@@ -144,22 +140,18 @@
                                 <div class="form-group">
                                     <label for="edit-name" class="control-label mb-0 d-block">Name</label>
                                     <input name="name" id="edit-name" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-name" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-address" class="control-label mb-0 d-block">Address</label>
                                     <input type="text" name="address" id="edit-address" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-address" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-phone" class="control-label mb-0 d-block">Phone Number</label>
                                     <input type="text" name="phone" id="edit-phone" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-phone" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-fax" class="control-label mb-0 d-block">Fax Number</label>
                                     <input type="text" name="fax" id="edit-fax" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-fax" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                                 <input type="hidden" id="edit-id" />
                             </div>
@@ -232,8 +224,8 @@
                     <div class="form-group">
                         <label class="form-label mb-0" for="upload-file">Excel File</label>
                         <input type="file" id="upload-file" name="file"
-                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                        class="form-control form-control-sm" />
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
                     </div>
                     <table class="table table-striped" id="upload-table">
                         <thead>
@@ -293,14 +285,14 @@
                         actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
                             if (user_access.canEdit) {
-                                  actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                             }
                             if (user_access.canDelete) {
-                              actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Forwarder" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Forwarder" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                             }
                         } else {
                             if (user_access.canAdd || user_access.canEdit) {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Forwarder" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Forwarder" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
                             }
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
@@ -376,52 +368,50 @@
                     $("#edit-phone").val(data.phoneNumber);
                     $("#edit-fax").val(data.faxNumber);
                 });
-            // Validation for Edit Modal
-            var validateEdit = $("#editForm").validate({
-                errorClass: 'text-danger text-xs',
-                rules: {
-                    name: { required: true, maxlength: 10 },
-                    address: { required: true, maxlength: 100 },
-                    phone: { required: true, maxlength: 20 },
-                    fax: { maxlength: 20 }
-                },
-                messages: {
-                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
-                    address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
-                    phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
-                    fax: { maxlength: "Fax number must not exceed 20 characters." }
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    DoEdit();
-                },
-                invalidHandler: validateShowInvalids
-            });
-
-            // Send Edit to Controller
-            function DoEdit() {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("EditJson")",
-                    data: {
-                        Id: $("#edit-id").val(),
-                        Name: $("#edit-name").val(),
-                        Address: $("#edit-address").val(),
-                        PhoneNumber: $("#edit-phone").val(),
-                        FaxNumber: $("#edit-fax").val()
+                // Validation for Edit Modal
+                var validateEdit = $("#editForm").validate({
+                    rules: {
+                        name: { required: true, maxlength: 10 },
+                        address: { required: true, maxlength: 100 },
+                        phone: { required: true, maxlength: 20 },
+                        fax: { maxlength: 20 }
                     },
-                    success: function (data, status, xhr) {
-                        if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
-                        } else {
-                            toastr.success(data.message, "Success");
-                            $("#editModal").modal("hide");
-                            dataTable.ajax.reload();
-                            hideLoader()
-                        }
+                    messages: {
+                        name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
+                        address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
+                        phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
+                        fax: { maxlength: "Fax number must not exceed 20 characters." }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoEdit();
                     }
                 });
-            }
+
+                // Send Edit to Controller
+                function DoEdit() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("EditJson")",
+                        data: {
+                            Id: $("#edit-id").val(),
+                            Name: $("#edit-name").val(),
+                            Address: $("#edit-address").val(),
+                            PhoneNumber: $("#edit-phone").val(),
+                            FaxNumber: $("#edit-fax").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#editModal").modal("hide");
+                                dataTable.ajax.reload();
+                                hideLoader()
+                            }
+                        }
+                    });
+                }
             }
         });
         if (user_access.canAdd) {
@@ -436,7 +426,6 @@
 
             // Validation for Create Modal
             var validateCreate = $("#createForm").validate({
-                errorClass: 'text-danger text-xs',
                 rules: {
                     name: { required: true, maxlength: 10 },
                     address: { required: true, maxlength: 100 },
@@ -452,8 +441,7 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     DoCreate();
-                },
-                invalidHandler: validateShowInvalids
+                }
             });
 
             // Send Create to Controller

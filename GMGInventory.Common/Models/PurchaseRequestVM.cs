@@ -19,9 +19,9 @@ namespace GMGInventory.Common.Models
         public string Purpose { get; set; }
         public int? PurposeId { get; set; }
 
-        [Display(Name = "Area")]
-        public string Area { get; set; }
-        public int? AreaId { get; set; }
+        [Display(Name = "Region")]
+        public string Region { get; set; }
+        public int? RegionId { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }
@@ -35,18 +35,33 @@ namespace GMGInventory.Common.Models
     public class PurchaseRequestDetailedVM : PurchaseRequestVM
     {
         public string Remarks { get; set; }
-        public string PreparedBy { get; set; }
-        public string CheckedBy { get; set; }
+
+        [Display(Name = "Approved By")]
         public string? ApprovedBy1 { get; set; }
+
+        [Display(Name = "Approved By #2")]
         public string? ApprovedBy2 { get; set; }
+
+        [Display(Name = "Disapproved By")]
         public string? DisapprovedBy { get; set; }
+
+        [Display(Name = "Disapproved Reason")]
         public string? DisapprovedReason { get; set; }
         public int? ResubmitId { get; set; }
+        public int? ResubmitFromId { get; set; }
+
+        [Display(Name = "Created By")]
         public string UserCreated { get; set; }
+
+        [Display(Name = "Date Created")]
         public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
         public DateTime DateCreatedD { get; set; }
+
+        [Display(Name = "Modified By")]
         public string? UserModified { get; set; }
-        public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
+
+        [Display(Name = "Date Modified")]
+        public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
 
         public IList<PurchaseRequestLineItemVM> LineItems { get; set; }
@@ -57,11 +72,9 @@ namespace GMGInventory.Common.Models
         public int TypeId { get; set; }
         public int? PurposeId { get; set; }
         public string? PurposeDefinition { get; set; }
-        public int? AreaId { get; set; }
+        public int? RegionId { get; set; }
         public DateTime DateRequested { get; set; }
         public string Remarks { get; set; }
-        public string? PreparedBy { get; set; }
-        public string? CheckedBy { get; set; }
         public string Status { get; set; }
         public int? ResubmitId { get; set; }
         public PurchaseRequestLineItemVM Items { get; set; }
@@ -86,19 +99,19 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Part Number")]
         public string ItemPartNumber { get; set; }
 
-        [Display(Name = "Item Description")]
+        [Display(Name = "Item Name")]
         public string ItemDescription { get; set; }
 
-        [Display(Name = "Stock on Hand")]
-        public int StockOnHandD { get; set; }
+        [Display(Name = "Stock")]
         public string StockOnHand => string.Format("{0:#,##0}", StockOnHandD);
+        public int StockOnHandD { get; set; }
 
         [Display(Name = "Quantity")]
-        public int QuantityD { get; set; }
         public string Quantity => string.Format("{0:#,##0}", QuantityD);
+        public int QuantityD { get; set; }
         public int UnitId { get; set; }
 
-        [Display(Name = "Unit of Measurement")]
+        [Display(Name = "UOM")]
         public string UnitCode { get; set; }
 
         [Display(Name = "Purpose")]

@@ -21,9 +21,9 @@ namespace GMGInventory.Data
         public int? PurposeId { get; set; }
         public virtual PurchaseRequestPurpose Purpose { get; set; }
 
-        [ForeignKey("AreaId")]
-        public int? AreaId { get; set; }
-        public virtual Area Area { get; set; }
+        [ForeignKey("RegionId")]
+        public int? RegionId { get; set; }
+        public virtual Region Region { get; set; }
 
         public DateTime RequestDate { get; set; }
 
@@ -36,13 +36,6 @@ namespace GMGInventory.Data
         [ForeignKey("StatusId")]
         public int? StatusId { get; set; }
         public virtual PurchaseStatus Status { get; set; }
-
-
-        [Column(TypeName = "nvarchar(100)")]
-        public string? PreparedBy { get; set; }
-
-        [Column(TypeName = "nvarchar(100)")]
-        public string? CheckedBy { get; set; }
 
         [ForeignKey("Approver1Id")]
         public string? Approver1Id { get; set; }

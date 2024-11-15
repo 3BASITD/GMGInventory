@@ -12,19 +12,29 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 1,
                     Code = "NA",
-                    Name = "Not applicable"
+                    Name = "Non-Automotive",
+                    RequestTypeId = 1
                 },
                 new PurchaseOrderType
                 {
                     Id = 2,
                     Code = "LPO",
-                    Name = "Local Purchase Order"
+                    Name = "Local Purchase Order",
+                    RequestTypeId = 2
                 },
                 new PurchaseOrderType
                 {
                     Id = 3,
                     Code = "IPO",
-                    Name = "International Purchase Order"
+                    Name = "International Purchase Order",
+                    RequestTypeId = 2
+                },
+                new PurchaseOrderType
+                {
+                    Id = 4,
+                    Code = "MR",
+                    Name = "Maintenance & Repair",
+                    RequestTypeId = 3
                 }
             );
         }

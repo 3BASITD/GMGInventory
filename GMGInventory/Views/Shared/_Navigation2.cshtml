@@ -103,12 +103,12 @@ else
        || navPages.Contains(PageNames.PriceList.ToEnumString())
        || navPages.Contains(PageNames.PriceUpdate.ToEnumString())
        || navPages.Contains(PageNames.PurchaseReturn.ToEnumString())
-       || navPages.Contains(PageNames.PurchaseOrder.ToEnumString())
+       || navPages.Contains(PageNames.ReplenishInventory.ToEnumString())
        || navPages.Contains(PageNames.Warehouse.ToEnumString())
        || navPages.Contains(PageNames.WarehouseTransfer.ToEnumString())
        || navPages.Contains(PageNames.UnservedItem.ToEnumString()))
         {
-            var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "PurchaseOrder", "Warehouse", "Transfer", "UnservedItem" }).Contains(currentController ?? "");
+            var navInventoryActive = (new List<string> { "Item", "PriceList", "PriceUpdate", "PurchaseReturn", "ReplenishInventory", "Warehouse", "Transfer", "UnservedItem" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuInventory" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navInventoryActive ? "active" : "")">

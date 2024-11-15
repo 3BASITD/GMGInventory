@@ -1,13 +1,9 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
@@ -25,6 +21,11 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetOptions(string search, int page)
         {
             return Json(await itemRepository.GetOptions(search, page));
+        }
+
+        public async Task<IActionResult> GetUnservedOptions(string search, int page, int SalesOrderId)
+        {
+            return Json(await itemRepository.GetUnservedOptions(search, page, SalesOrderId));
         }
 
         public async Task<IActionResult> GetModelNumberOptions(string search, int page)

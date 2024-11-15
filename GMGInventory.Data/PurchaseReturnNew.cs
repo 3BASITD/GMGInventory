@@ -6,6 +6,7 @@ namespace GMGInventory.Data
     {
         public PurchaseReturnNew()
         {
+            this.PurchaseReturnResubmits = new HashSet<PurchaseReturnNew>();
             this.PurchasReturnLineItem = new HashSet<PurchaseReturnNewLineItem>();
         }
 
@@ -42,12 +43,24 @@ namespace GMGInventory.Data
         public int? StatusId { get; set; }
         public virtual PurchaseStatus Status { get; set; }
 
-        public string? PreparedBy { get; set; }
-        public string? CheckedBy { get; set; }
+        //public string? PreparedBy { get; set; }
+        //public string? CheckedBy { get; set; }
 
         [ForeignKey("ApproverId")]
         public string? ApproverId { get; set; }
         public virtual User Approver { get; set; }
+
+        [ForeignKey("DisapproverId")]
+        public string? DisapproverId { get; set; }
+        public virtual User Disapprover { get; set; }
+
+        public string? DisapprovedReason { get; set; }
+
+        [ForeignKey("ResubmitId")]
+        public int? ResubmitId { get; set; }
+        public PurchaseReturnNew Resubmit { get; set; }
+
+        public ICollection<PurchaseReturnNew> PurchaseReturnResubmits { get; set; }
 
         public ICollection<PurchaseReturnNewLineItem> PurchasReturnLineItem { get; set; }
     }

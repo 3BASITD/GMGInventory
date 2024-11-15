@@ -179,7 +179,6 @@
                                     <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
                                     @*<input type="number" step="0.01" min="0" max="1999999.99" name="Debit" id="edit-debit" class="form-control form-control-sm" />*@
                                     <input type="text" name="Debit" id="edit-debit" class="form-control form-control-sm mask-decimal" />
-                                    <span data-valmsg-for="edit-debit" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -187,7 +186,6 @@
                                     <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
                                     @*<input type="number" step="0.01" min="0" max="1999999.99" name="Credit" id="edit-credit" class="form-control form-control-sm" />*@
                                     <input type="text" name="Credit" id="edit-credit" class="form-control form-control-sm mask-decimal" />
-                                    <span data-valmsg-for="edit-credit" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -195,14 +193,12 @@
                                     <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
                                     @*<input type="number" step="0.01" min="0" max="1999999.99" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />*@
                                     <input type="text" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm mask-decimal" />
-                                    <span data-valmsg-for="edit-freight-cost" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="edit-freight-waybill" class="control-label mb-0 d-block">Freight's Waybill</label>
                                     <input type="text" name="FreightWaybill" id="edit-freight-waybill" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="edit-freight-waybill" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -243,7 +239,6 @@
                             <div class="form-group">
                                 <label for="tbr-invoice" class="control-label mb-0 d-block">Sales Return Invoice Number</label>
                                 <select id="tbr-invoice" name="InvoiceNumber" style="width: 100%"></select>
-                                <span data-valmsg-for="tbr-invoice" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12">
@@ -253,7 +248,6 @@
                                 *@
                                 <input type="text" name="Amount" id="tbr-amount" class="form-control form-control-sm mask-decimal" />
                                 <input type="hidden" id="tbr-amount-max" class="form-control form-control-sm" />
-                                <span data-valmsg-for="tbr-amount" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -440,14 +434,12 @@
                                                 <div class="form-group">
                                                     <label for="check-bankname" class="control-label mb-0 d-block">Bank Name</label>
                                                     <input type="text" name="BankName" id="check-bankname" class="form-control form-control-sm" />
-                                                    <span data-valmsg-for="check-bankname" data-valmsg-replace="true" class="text-danger"></span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="check-checkdate" class="control-label mb-0 d-block">Check Date</label>
                                                     <input type="date" name="CheckDate" id="check-checkdate" class="form-control form-control-sm" />
-                                                    <span data-valmsg-for="check-checkdate" data-valmsg-replace="true" class="text-danger"></span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -455,7 +447,6 @@
                                                     <label for="check-checkamount" class="control-label mb-0 d-block">Check Amount</label>
                                                     @*<input type="number" step="0.01" min="0" max="1999999.99" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm" />*@
                                                     <input type="text" name="CheckAmount" id="check-checkamount" class="form-control form-control-sm mask-decimal" />
-                                                    <span data-valmsg-for="check-checkamount" data-valmsg-replace="true" class="text-danger"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -464,7 +455,6 @@
                                                 <div class="form-group">
                                                     <label for="check-bankbranch" class="control-label mb-0 d-block">Bank Branch</label>
                                                     <input type="text" name="BankBranch" id="check-bankbranch" class="form-control form-control-sm" />
-                                                    <span data-valmsg-for="check-bankbranch" data-valmsg-replace="true" class="text-danger"></span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -729,7 +719,6 @@
 
         // Validation for Edit Modal
         var validateEdit = $("#editForm").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 Debit: { rangeForMasked: [0, 1999999.99] },
                 Credit: { rangeForMasked: [0, 1999999.99] },
@@ -746,8 +735,7 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoEdit();
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
         // Send Edit to Controller
@@ -913,7 +901,6 @@
 
         // Validation for TBR Modal
         var validateTBR = $("#tbrForm").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 InvoiceNumber: { required: true },
                 Amount: {
@@ -927,8 +914,7 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoTBR();
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
         // Send TBR to Controller
@@ -1076,7 +1062,6 @@
 
         // Validation for Check Modal
         var validateCheck = $("#checkForm").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 BankName: { required: true, maxlength: 100 },
                 CheckDate: { required: true },
@@ -1094,8 +1079,7 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 DoAddCheck();
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
         // Send Add Check to Controller

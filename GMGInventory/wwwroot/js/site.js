@@ -169,6 +169,34 @@
     //    });
     //});
 });
+$.validator.setDefaults({
+    errorClass: 'text-danger text-xs fw-lighter fst-italic m-0', // Set a global error class
+    highlight: function (element) {      // Optionally highlight the invalid field
+        $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element) {    // Optionally remove the highlight
+        $(element).removeClass('is-invalid');
+    },
+    errorPlacement: function (error, element) {
+        if (element.hasClass("select2-hidden-accessible")) { // Custom handling for select2 fields
+            error.insertAfter(element.siblings(".select2"));
+        } else {
+            error.insertAfter(element); // Default placement after element
+        }
+    },
+    invalidHandler: function (event, validator) { // Custom handling for invalid submissions
+        var errors = validator.errorList;
+        var msg = "";
+
+        $.each(errors, function (i, v) {
+            msg += "<strong>" + $(v.element).attr("name") + "</strong>: " + v.message + "<br />";
+        });
+
+        if (msg) {
+            toastr.warning(msg, "Form Validation"); // Example using Toastr for warnings
+        }
+    }
+});
 //function checkFooterStickiness($modal) {
 //    var $footer = $modal.find('.modal-footer');
 //    var footerOffset = $footer.offset().top + $footer.outerHeight();
@@ -183,28 +211,6 @@
 function removeCommaOfNumber(value) {
     return parseFloat(value.replace(/[\$,]/g, '') * 1);
 }
-
-function validateShowInvalids(event, validator) {
-    var errors = validator.errorList;
-    var msg = "";
-
-    $.each(errors, function (i, v) {
-        msg += "<strong>" + $(v.element.labels[0]).text() + "</strong>: " + v.message + "<br />";
-    });
-
-    if (msg) {
-        toastr.warning(msg, "Form validation");
-    }
-}
-
-//function userIsInRole(role) {
-//    var isInRole = false;
-//    $(".current-user-role").each(function () {
-//        if ($(this).val() === role)
-//            isInRole = true;
-//    });
-//    return isInRole;
-//}
 
 function reloadInputNumberRule() {
     $("input[step='0.01']").on("focusout", function () {

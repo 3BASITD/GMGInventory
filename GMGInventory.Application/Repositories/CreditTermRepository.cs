@@ -76,15 +76,21 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
-            return await context.CreditTerms
-                .Select(s => new JsonOptionsModel
+            var creditTerms = await context.CreditTerms.ToListAsync();
+            return creditTerms.Select(s => new JsonOptionsModel
                 {
                     Id = s.Id.ToString(),
                     Text = s.Name,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
-                .OrderBy(s => s.Text)
-                .ToListAsync();
+                .OrderBy(s => s.Text == "CASH" ? 0 : 1)
+                .ThenBy(s =>
+                {
+                    if (s.Text == "CASH") return 0;
+                    int.TryParse(new string(s.Text.Where(char.IsDigit).ToArray()), out int numberPart);
+                    return numberPart;
+                })
+                .ToList();
         }
     }
 }

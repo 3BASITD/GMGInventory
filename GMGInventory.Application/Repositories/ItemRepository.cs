@@ -65,9 +65,57 @@ namespace GMGInventory.Application.Repositories
                             InventoryCount = inventory,// + soli - inv,
                             Text = item.Code,
                             Name = item.Name,
-                            PartNumber = item.PartNumber,
+                            PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
                             Quantity = 0,
+                            RetailPriceD = price.RetailSellingPrice,
+                            UnitId = item.Unit.Id,
+                            Unit = item.Unit.Code
+                        };
+            var itemsFiltered = await items.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonItemOptionsModel>
+            {
+                //incomplete_results = false,
+                items = itemsFiltered,
+                total_count = items.Count()
+            };
+        }
+
+        public async Task<Select2Model<JsonItemOptionsModel>> GetUnservedOptions(string search, int page, int SalesOrderId)
+        {
+            var items = from soitem in context.SalesOrderLineItems
+                        join item in context.Items on soitem.ItemId equals item.Id
+                        from price in context.ItemPrices
+                                             .Where(s => s.ItemId == item.Id
+                                                      && s.DateCreated <= DateTime.Now)
+                                             .OrderByDescending(s => s.DateCreated)
+                                             .Take(1)
+                                             .DefaultIfEmpty()
+                        let inventory = context.ItemInventories
+                                               .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
+                                               .Sum(s => s.Quantity)
+                        let soli = context.SalesOrderLineItems
+                                          .Where(s => s.ItemId == item.Id)
+                                          .Sum(s => s.ServedQuantity)
+                        let inv = context.InvoiceLineItems
+                                          .Where(s => s.ItemId == item.Id)
+                                          .Sum(s => s.Quantity)
+                        where item.IsActive == true
+                           && soitem.SalesOrderId == SalesOrderId
+                           //&& soitem.UnservedQuantity > 0
+                           && (string.IsNullOrWhiteSpace(search)
+                           || item.Code.ToLower().Contains(search.ToLower())
+                           || item.Name.ToLower().Contains(search.ToLower()))
+                        orderby item.Code ascending
+                        select new JsonItemOptionsModel
+                        {
+                            Id = item.Id.ToString(),
+                            InventoryCount = inventory,// + soli - inv,
+                            Text = item.Code,
+                            Name = item.Name,
+                            PartNumber = item.PartNumber + "",
+                            NetPriceD = price.NetSellingPrice,
+                            Quantity = soitem.UnservedQuantity,
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code

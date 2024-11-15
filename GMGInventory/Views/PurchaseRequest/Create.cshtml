@@ -37,56 +37,36 @@
                     <div class="form-group">
                         <label for="request-type" class="form-label mb-0">Type</label>
                         <select id="request-type" name="Type" style="width: 100%"></select>
-                        <span data-valmsg-for="request-type" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6 request-purpose-container">
                     <div class="form-group">
                         <label for="request-purpose" class="form-label mb-0">Purpose</label>
                         <select id="request-purpose" name="Purpose" style="width: 100%"></select>
-                        <span data-valmsg-for="request-purpose" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6 request-purpose-definition-container">
                     <div class="form-group">
                         <label for="request-purpose-definition" class="form-label mb-0">Purpose</label>
                         <input type="text" id="request-purpose-definition" name="PurposeDefinition" class="form-control form-control-sm" />
-                        <span data-valmsg-for="request-purpose-definition" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="col-12 col-md-4 col-sm-6 request-area-container">
+                <div class="col-12 col-md-4 col-sm-6 request-region-container">
                     <div class="form-group">
-                        <label for="request-area" class="form-label mb-0">Area</label>
-                        <select id="request-area" name="Area" style="width: 100%"></select>
-                        <span data-valmsg-for="request-area" data-valmsg-replace="true" class="text-danger"></span>
+                        <label for="request-region" class="form-label mb-0">Region</label>
+                        <select id="request-region" name="Region" style="width: 100%"></select>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="request-date-requested" class="form-label mb-0">Date Requested</label>
                         <input type="date" id="request-date-requested" name="DateRequested" class="form-control form-control-sm" />
-                        <span data-valmsg-for="request-date-requested" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="request-remarks" class="form-label mb-0">Remarks</label>
                         <input type="text" id="request-remarks" name="Remarks" class="form-control form-control-sm" />
-                        <span data-valmsg-for="request-remarks" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <div class="form-group">
-                        <label for="request-prepared-by" class="form-label mb-0">Prepared By</label>
-                        <input type="text" id="request-prepared-by" name="PreparedBy" class="form-control form-control-sm" />
-                        <span data-valmsg-for="request-prepared-by" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <div class="form-group">
-                        <label for="request-checked-by" class="form-label mb-0">Checked By</label>
-                        <input type="text" id="request-checked-by" name="CheckedBy" class="form-control form-control-sm" />
-                        <span data-valmsg-for="request-checked-by" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
             </div>
@@ -156,51 +136,41 @@
                         <div class="col-12 col-sm-6 add-so-number-container">
                             <div class="form-group">
                                 <label for="add-so-number" class="form-label mb-0">SO Number</label>
-                                <div>
-                                    <select id="add-so-number" name="SONumber" style="width: 100%;">
-                                        <option></option>
-                                    </select>
-                                </div>
-                                <span data-valmsg-for="add-so-number" data-valmsg-replace="true" class="text-danger"></span>
+                                <select id="add-so-number" name="SONumber" style="width: 100%;">
+                                    <option></option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-code-container">
                             <div class="form-group">
                                 <label for="add-code" class="form-label mb-0">Item Code</label>
-                                <div>
-                                    <select id="add-code" name="Code" style="width: 100%;">
-                                        <option></option>
-                                    </select>
-                                </div>
-                                <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
+                                <select id="add-code" name="Code" style="width: 100%;">
+                                    <option></option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-part-container">
                             <div class="form-group">
                                 <label for="add-part" class="form-label mb-0">Part Number</label>
                                 <input type="text" id="add-part" name="PartNumber" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="add-part" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-name-container">
                             <div class="form-group">
                                 <label for="add-name" class="form-label mb-0">Item Name</label>
                                 <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-stock-container">
                             <div class="form-group">
                                 <label for="add-stock" class="form-label mb-0">Stock on Hand</label>
                                 <input type="number" min="0" max="1999999" step="1" id="add-stock" name="Stock" class="form-control form-control-sm" />
-                                <span data-valmsg-for="add-stock" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-quantity-container">
                             <div class="form-group">
                                 <label for="add-quantity" class="form-label mb-0">Quantity</label>
                                 <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
-                                <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-unit-container">
@@ -223,7 +193,6 @@
                             <div class="form-group">
                                 <label for="add-purpose" class="form-label mb-0">Purpose</label>
                                 <input type="text" id="add-purpose" name="Purpose" class="form-control form-control-sm" />
-                                <span data-valmsg-for="add-purpose" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -263,11 +232,9 @@
                     currentPurpose = data.purposeId;
                     loadTypeOptions(currentType, currentPurpose);
                     $("#request-purpose-definition").val(data.purposeId == null ? data.purpose : "");
-                    $("#request-area").val(data.areaId).trigger("change");
+                    $("#request-region").val(data.regionId).trigger("change");
                     $("#request-date-requested").val(data.requestDate3);
                     $("#request-remarks").val(data.remarks);
-                    $("#request-prepared-by").val(data.preparedBy);
-                    $("#request-checked-by").val(data.checkedBy);
                 },
                 complete: function (xhr, status) {
                     $.ajax({
@@ -501,15 +468,16 @@
             var purposeText = $("#request-purpose").select2("data")[0]?.text || "";
             $(".request-purpose-container").toggle(typeText != "Maintenance & Repair");
             $(".request-purpose-definition-container").toggle(typeText == "Maintenance & Repair");
-            if(typeText == "Automotive") {
-                $(".request-area-container").toggle(true);
-                $("#request-area").val(null);
+            if (typeText == "Automotive") {
+                $(".request-region-container").toggle(true);
+                $("#request-region").val(null).trigger("change");
             } else {
-                $(".request-area-container").toggle(false);
-                var firstOptionValue = $("#request-area option:first").val();
-                $("#request-area").val(firstOptionValue).trigger("change"); 
+                $(".request-region-container").toggle(false);
+                var firstOptionValue = $("#request-region option:first").val();
+                $("#request-region").val(firstOptionValue).trigger("change");
             }
             updateColumnVisibility();
+            loadAllItemsOptions();
         }
 
         var columnVisibilityMap = {
@@ -565,73 +533,142 @@
             else return false;
         }
 
-        // Load area for select2
+        // Load region for select2
         $.ajax({
             type: "POST",
-            url: "@Url.Action("GetOptions", "Area")",
+            url: "@Url.Action("GetOptions", "Region")",
             success: function (data, status, xhr) {
-                $("#request-area").select2({
+                $("#request-region").select2({
+                    minimumInputLength: -1,
+                    allowClear: true,
+                    placeholder: "<empty>",
                     data: data
                 });
             }
         });
 
-        // Load item for select2
-        $("#add-code").select2({
-            minimumInputLength: 1,
-            allowClear: true,
-            placeholder: "<empty>",
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-            },
-            ajax: {
-                url: "@Url.Action("GetOptions", "Item")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
+        loadAllItemsOptions();
+        function loadAllItemsOptions() {
+            if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
+                $("#add-code").select2("destroy");
+            }
+            // Load item for select2
+            $("#add-code").select2({
+                minimumInputLength: 1,
+                allowClear: true,
+                placeholder: "<empty>",
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                 },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
+                ajax: {
+                    url: "@Url.Action("GetOptions", "Item")",
+                    dataType: 'json',
+                    type: "POST",
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true,
+                    complete: AssignItemEvent
                 },
-                cache: true
-            },
-            dropdownParent: $("#addModal")
-        });
+                dropdownParent: $("#addModal")
+            });
+        }
 
-        $("#add-code").on("select2:select", function () {
-            $("#add-part").val($("#add-code").select2("data")[0].partNumber);
-            $("#add-name").val($("#add-code").select2("data")[0].name);
-            $("#add-unit").val($("#add-code").select2("data")[0].unit);
-            $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
-            $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
-            $("#add-code-error").html("");
-        });
-
-        $("#add-code").on("select2:unselecting", function (e) {
+        function loadSOItemsOptions() {
+            $("#add-code").val(null).trigger("change");
             $("#add-part").val("");
             $("#add-name").val("");
+            $("#add-stock").val(0);
+            $("#add-quantity").val(0);
             $("#add-unit").val("");
-            $("#add-unit").data("Id", "");
-            $(".add-stocks").text("0");
-            $("#add-gross-price").val("0.00");
-        });
+
+            if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
+                $("#add-code").select2("destroy");
+            }
+            // Load item for select2
+            $("#add-code").select2({
+                minimumInputLength: -1,
+                allowClear: true,
+                placeholder: "<empty>",
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    console.log(repo);
+                    if (repo.quantity == 0) {
+                        return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
+                            (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                            "</span>");
+                    } else {
+                        return $("<strong>" + repo.text + "</strong> " +
+                            (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                    }
+                },
+                ajax: {
+                    url: "@Url.Action("GetUnservedOptions", "Item")",
+                    dataType: 'json',
+                    type: "POST",
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1,
+                            SalesOrderId: $("#add-so-number").val()
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true,
+                    complete: AssignItemEvent
+                },
+                dropdownParent: $("#addModal")
+            });
+        }
+
+        function AssignItemEvent(jqXHR, textStatus) {
+            $("#add-code").off("select2:select").on("select2:select", function () {
+                $("#add-part").val($("#add-code").select2("data")[0].partNumber);
+                $("#add-name").val($("#add-code").select2("data")[0].name);
+                $("#add-unit").val($("#add-code").select2("data")[0].unit);
+                $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
+                $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
+                $("#add-code-error").html("");
+            });
+
+            $("#add-code").off("select2:unselecting").on("select2:unselecting", function (e) {
+                $("#add-part").val("");
+                $("#add-name").val("");
+                $("#add-unit").val("");
+                $("#add-unit").data("Id", "");
+                $(".add-stocks").text("0");
+                $("#add-gross-price").val("0.00");
+            });
+        }
 
         // Load so for select2
         $("#add-so-number").select2({
-            minimumInputLength: 1,
+            minimumInputLength: -1,
             allowClear: true,
             placeholder: "<empty>",
             templateResult: function (repo) {
@@ -661,7 +698,9 @@
             dropdownParent: $("#addModal")
         });
 
-        // Load area for select2
+        $("#add-so-number").on("select2:select", loadSOItemsOptions);
+
+        // Load unit for select2
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetOptions", "Unit")",
@@ -702,7 +741,6 @@
 
         // Validation for Add Item Modal
         var validateAdd = $("#form-item").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 SONumber: {
                     required: function () { return checkIfRequired("SONumber"); }
@@ -754,8 +792,7 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 AddItem();
-            },
-            invalidHandler: validateShowInvalids,
+            }
         });
 
         function AddItem() {
@@ -811,34 +848,32 @@
 
         // Validation for Create
         var validateCreate = $("#form-request").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 Type: {
                     required: true
                 },
                 Purpose: {
                     required: function () {
-                        return $("#request-type").select2("data")[0].text != "Maintenance & Repair";
+                        return $("#request-type").select2("data")[0]?.text != "Maintenance & Repair";
                     }
                 },
                 PurposeDefinition: {
                     required: function () {
-                        return $("#request-type").select2("data")[0].text == "Maintenance & Repair";
+                        return $("#request-type").select2("data")[0]?.text == "Maintenance & Repair";
                     },
                     maxlength: 250
                 },
-                Area: {},
+                Region: {
+                    required: function () {
+                        return $("#request-type").select2("data")[0]?.text == "Automotive"
+                            && $("#request-purpose").select2("data")[0]?.text == "Rush Order";
+                    }
+                },
                 DateRequested: {
                     required: true
                 },
                 Remarks: {
                     required: true,
-                    maxlength: 100
-                },
-                PreparedBy: {
-                    maxlength: 100
-                },
-                CheckedBy: {
                     maxlength: 100
                 }
             },
@@ -853,26 +888,21 @@
                     required: "Please enter a purpose.",
                     maxlength: "Purpose can not exceed 250 characters."
                 },
-                Area: {},
+                Region: {
+                    required: "Please select a region."
+                },
                 DateRequested: {
                     required: "Please enter the date of request."
                 },
                 Remarks: {
                     required: "Please enter a remarks",
                     maxlength: "Remarks can not exceed 100 characters."
-                },
-                PreparedBy: {
-                    maxlength: "Prepared By can not exceed 100 characters."
-                },
-                CheckedBy: {
-                    maxlength: "Checked By can not exceed 100 characters."
                 }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
                 SaveRequest();
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
         function GetItemsToRequest() {
@@ -902,11 +932,9 @@
                         TypeId: $("#request-type").val(),
                         PurposeId: $("#request-purpose").val(),
                         PurposeDefinition: $("#request-purpose-definition").val(),
-                        AreaId: $("#request-area").val(),
+                        RegionId: $("#request-region").val(),
                         DateRequested: $("#request-date-requested").val(),
                         Remarks: $("#request-remarks").val(),
-                        PreparedBy: $("#request-prepared-by").val(),
-                        CheckedBy: $("#request-checked-by").val(),
                         Status: $("#action-type").val(),
                         ResubmitId: $("#resubmitPRId").val(),
                         Items: GetItemsToRequest()

@@ -61,7 +61,8 @@ namespace GMGInventory.Application.Repositories
                                 .Select(s => new JsonSupplierOptionsModel
                                 {
                                     Id = s.Id.ToString(),
-                                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
+                                    Text = s.Code.Trim(),
+                                    Name = s.Name.Trim(),
                                     Selected = IncludeId != null && IncludeId == s.Id,
                                     Address1 = s.AddressLine1,
                                     Address2 = s.AddressLine2

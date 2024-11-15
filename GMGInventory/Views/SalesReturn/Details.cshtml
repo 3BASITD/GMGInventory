@@ -40,7 +40,6 @@
                         {
                             <label for="return-number" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.SRNumber)</label>
                             <input type="text" id="return-number" name="ReturnNumber" class="form-control form-control-sm" value="@(Model?.SRNumber)" />
-                            <span data-valmsg-for="return-number" data-valmsg-replace="true" class="text-danger"></span>
                         }
                         else
                         {
@@ -59,7 +58,6 @@
                         {
                             <label for="return-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.ReturnDate)</label>
                             <input type="date" id="return-date" name="ReturnDate" class="form-control form-control-sm" value="@(Model?.ReturnDate3)" />
-                            <span data-valmsg-for="return-date" data-valmsg-replace="true" class="text-danger"></span>
                         }
                         else
                         {
@@ -82,7 +80,6 @@
                             <select id="return-customer" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark" name="Customer" style="width: 100%;">
                                 <option></option>
                             </select>
-                            <span data-valmsg-for="return-customer" data-valmsg-replace="true" class="text-danger"></span>
                         }
                         else
                         {
@@ -114,7 +111,6 @@
                         {
                             <label for="return-customer-name" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.CustomerName)</label>
                             <input type="text" id="return-customer-name" class="form-control form-control-sm" value="@(Model?.CustomerName)" readonly="readonly" />
-                            <span data-valmsg-for="return-customer-name" data-valmsg-replace="true" class="text-danger"></span>
                         }
                         else
                         {
@@ -133,7 +129,6 @@
                         {
                             <label for="return-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
                             <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" value="@(Model?.Remarks)" />
-                            <span data-valmsg-for="return-remarks" data-valmsg-replace="true" class="text-danger"></span>
                         }
                         else
                         {
@@ -147,60 +142,60 @@
                     </p>
                 </div>
             </div>
-@*
+            @*
             <div class="row">
-                <div class="col-4">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.SRNumber)
-                        </span>
-                        <b class="d-block">
-                            @Model?.SRNumber
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.CustomerCode)
-                        </span>
-                        <b class="d-block">
-                            @Model?.CustomerCode
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.CustomerName)
-                        </span>
-                        <b class="d-block">
-                            @Model?.CustomerName
-                        </b>
-                    </p>
-                </div>
-                <div class="col-4">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ReturnDate)
-                        </span>
-                        <b class="d-block">
-                            @Model?.ReturnDate
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ReturnBy)
-                        </span>
-                        <b class="d-block">
-                            @Model?.ReturnBy
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Remarks)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrEmpty(Model?.Remarks?.Trim()) ? "-" : Model.Remarks)
-                        </b>
-                    </p>
-                </div>
+            <div class="col-4">
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.SRNumber)
+            </span>
+            <b class="d-block">
+            @Model?.SRNumber
+            </b>
+            </p>
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.CustomerCode)
+            </span>
+            <b class="d-block">
+            @Model?.CustomerCode
+            </b>
+            </p>
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.CustomerName)
+            </span>
+            <b class="d-block">
+            @Model?.CustomerName
+            </b>
+            </p>
+            </div>
+            <div class="col-4">
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.ReturnDate)
+            </span>
+            <b class="d-block">
+            @Model?.ReturnDate
+            </b>
+            </p>
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.ReturnBy)
+            </span>
+            <b class="d-block">
+            @Model?.ReturnBy
+            </b>
+            </p>
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.Remarks)
+            </span>
+            <b class="d-block">
+            @(string.IsNullOrEmpty(Model?.Remarks?.Trim()) ? "-" : Model.Remarks)
+            </b>
+            </p>
+            </div>
             </div>*@
             <div class="row">
                 <div class="col-12">
@@ -342,7 +337,6 @@
 
         // Validation for Save
         var validateCreate = $("#form-return").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 ReturnNumber: { required: true, maxlength: 50 },
                 ReturnDate: { required: true },
@@ -357,8 +351,7 @@
                 event.preventDefault();
 
                 SaveReturn();
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
         function SaveReturn() {
@@ -381,7 +374,7 @@
                 }
             });
         }
-       
+
         if (user_access.canPrint) {
             $(".btn-details-print").on("click", function () {
                 if ($("#return-number").val() != '@Model?.SRNumber'

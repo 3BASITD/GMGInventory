@@ -49,8 +49,8 @@
                 }
             }
             else if (Model.Status == "Disapproved"
-                  && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy) 
-                  && Model?.ResubmitId == null)
+            && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy)
+            && Model?.ResubmitId == null)
             {
                 @if (userAccess.CanAdd)
                 {
@@ -61,7 +61,7 @@
             }
             else if (Model.Status == "Approved")
             {
-                <a href="@Url.Action("Create", "Purchase Order")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                <a href="@Url.Action("Create", "PurchaseOrder")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
                     <span class="fas fa-box-open"></span> Start Order
                 </a>
             }
@@ -71,21 +71,31 @@
         </div>
     </div>
     <div class="card-body">
-        @if (Model?.Status == "Disapproved")
+        @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) || Model?.ResubmitFromId != null)
         {
             <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-danger text-sm" role="alert">
-                        <strong>Disapproved:</strong>
-                        @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy))
+                {
+                    <div class="col-12">
+                        <div class="alert alert-danger text-sm" role="alert">
+                            <strong>Reason of Disapproval:</strong>
+                            @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                        </div>
                     </div>
-                </div>
-                @if (Model?.ResubmitId != null)
+                }
+                @if (Model?.ResubmitId != null || Model?.ResubmitFromId != null)
                 {
                     <div class="col-12">
                         <div class="alert alert-info text-sm" role="alert">
-                            <strong>Resubmitted:</strong>
-                            This has been resubmitted. You can view the details <a href="@Url.Action("Details", "PurchaseRequest", new {Id = Model?.ResubmitId})">here</a>.
+                            <strong>Resubmit Details:</strong>
+                            @if (Model?.ResubmitId != null)
+                            {
+                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseRequest", new {Id = Model?.ResubmitId})" class="alert-link">here</a>.</div>
+                            }
+                            @if (Model?.ResubmitFromId != null)
+                            {
+                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseRequest", new {Id = Model?.ResubmitFromId})" class="alert-link">here</a>.</div>
+                            }
                         </div>
                     </div>
                 }
@@ -127,10 +137,10 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Area)
+                            @Html.DisplayNameFor(model => model.Region)
                         </span>
                         <b class="d-block">
-                            @Model?.Area
+                            @Model?.Region
                         </b>
                     </p>
                 </div>
@@ -197,26 +207,6 @@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.PreparedBy)
-                    </span>
-                    <b class="d-block">
-                        @Model?.PreparedBy
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CheckedBy)
-                    </span>
-                    <b class="d-block">
-                        @Model?.CheckedBy
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Status)
                     </span>
                     <b class="d-block" id="request-status">
@@ -224,13 +214,59 @@
                     </b>
                 </p>
             </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.UserCreated)
+                    </span>
+                    <b class="d-block" id="request-status">
+                        @Model?.UserCreated
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </span>
+                    <b class="d-block" id="request-status">
+                        @Model?.DateCreated
+                    </b>
+                </p>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model?.UserModified))
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UserModified)
+                        </span>
+                        <b class="d-block">
+                            @Model?.UserModified
+                        </b>
+                    </p>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model?.DateModified))
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateModified)
+                        </span>
+                        <b class="d-block">
+                            @Model?.DateModified
+                        </b>
+                    </p>
+                </div>
+            }
         </div>
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Purchase Request Item(s)</span>
-                        @if (userAccess.CanAdd)
+                        @if (Model!.Status == "Draft" && userAccess.CanAdd)
                         {
                             <div class="card-tools">
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -296,51 +332,41 @@
                             <div class="col-12 col-sm-6 add-so-number-container">
                                 <div class="form-group">
                                     <label for="add-so-number" class="form-label mb-0">SO Number</label>
-                                    <div>
                                         <select id="add-so-number" name="SONumber" style="width: 100%;">
                                             <option></option>
                                         </select>
-                                    </div>
-                                    <span data-valmsg-for="add-so-number" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-code-container">
                                 <div class="form-group">
                                     <label for="add-code" class="form-label mb-0">Item Code</label>
-                                    <div>
                                         <select id="add-code" name="Code" style="width: 100%;">
                                             <option></option>
                                         </select>
-                                    </div>
-                                    <span data-valmsg-for="add-code" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-part-container">
                                 <div class="form-group">
                                     <label for="add-part" class="form-label mb-0">Part Number</label>
                                     <input type="text" id="add-part" name="PartNumber" class="form-control form-control-sm" readonly="readonly" />
-                                    <span data-valmsg-for="add-part" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-name-container">
                                 <div class="form-group">
                                     <label for="add-name" class="form-label mb-0">Item Name</label>
                                     <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
-                                    <span data-valmsg-for="add-name" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-stock-container">
                                 <div class="form-group">
                                     <label for="add-stock" class="form-label mb-0">Stock on Hand</label>
                                     <input type="number" min="0" max="1999999" step="1" id="add-stock" name="Stock" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="add-stock" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-quantity-container">
                                 <div class="form-group">
                                     <label for="add-quantity" class="form-label mb-0">Quantity</label>
                                     <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-unit-container">
@@ -363,7 +389,6 @@
                                 <div class="form-group">
                                     <label for="add-purpose" class="form-label mb-0">Purpose</label>
                                     <input type="text" id="add-purpose" name="Purpose" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="add-purpose" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -386,7 +411,7 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var request_type = @Json.Serialize(Model?.Type);
-        var request_purpose = @(Json.Serialize(Model?.Purpose ?? ""));
+        var request_purpose = request_type == "Maintenance & Repair" ? "" : @(Json.Serialize(Model?.Purpose ?? ""));
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -592,62 +617,128 @@
         }
 
         if (user_access.canAdd) {
-            // Load item for select2
-            $("#add-code").select2({
-                minimumInputLength: 1,
-                allowClear: true,
-                placeholder: "<empty>",
-                templateResult: function (repo) {
-                    if (repo.loading) {
-                        return repo.text;
-                    }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-                },
-                ajax: {
-                    url: "@Url.Action("GetOptions", "Item")",
-                    dataType: 'json',
-                    type: "POST",
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
+            loadAllItemsOptions();
+            function loadAllItemsOptions() {
+                if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
+                    $("#add-code").select2("destroy");
+                }
+                // Load item for select2
+                $("#add-code").select2({
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    placeholder: "<empty>",
+                    templateResult: function (repo) {
+                        if (repo.loading) {
+                            return repo.text;
+                        }
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                     },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
+                    ajax: {
+                        url: "@Url.Action("GetOptions", "Item")",
+                        dataType: 'json',
+                        type: "POST",
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                                page: params.page || 1
+                            };
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+                            return {
+                                results: data.items,
+                                pagination: {
+                                    more: (params.page * 50) < data.total_count
+                                }
+                            };
+                        },
+                        cache: true,
+                        complete: AssignItemEvent
                     },
-                    cache: true
-                },
-                dropdownParent: $("#addModal")
-            });
+                    dropdownParent: $("#addModal")
+                });
+            }
 
-            $("#add-code").on("select2:select", function () {
-                $("#add-name").val($("#add-code").select2("data")[0].name);
-                $("#add-part").val($("#add-code").select2("data")[0].partNumber);
-                $("#add-unit").val($("#add-code").select2("data")[0].unit);
-                $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
-                $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
-                $("#add-code-error").html("");
-            });
-
-            $("#add-code").on("select2:unselecting", function (e) {
-                $("#add-name").val("");
+            function loadSOItemsOptions() {
+                $("#add-code").val(null).trigger("change");
                 $("#add-part").val("");
+                $("#add-name").val("");
+                $("#add-stock").val(0);
+                $("#add-quantity").val(0);
                 $("#add-unit").val("");
-                $("#add-unit").data("Id", "");
-                $(".add-stocks").text("0");
-                $("#add-gross-price").val("0.00");
-            });
+
+                if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
+                    $("#add-code").select2("destroy");
+                }
+                // Load item for select2
+                $("#add-code").select2({
+                    minimumInputLength: -1,
+                    allowClear: true,
+                    placeholder: "<empty>",
+                    templateResult: function (repo) {
+                        if (repo.loading) {
+                            return repo.text;
+                        }
+                        console.log(repo);
+                        if (repo.quantity == 0) {
+                            return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
+                                (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                                "</span>");
+                        } else {
+                            return $("<strong>" + repo.text + "</strong> " +
+                                (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                        }
+                    },
+                    ajax: {
+                        url: "@Url.Action("GetUnservedOptions", "Item")",
+                        dataType: 'json',
+                        type: "POST",
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                                page: params.page || 1,
+                                SalesOrderId: $("#add-so-number").val()
+                            };
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+                            return {
+                                results: data.items,
+                                pagination: {
+                                    more: (params.page * 50) < data.total_count
+                                }
+                            };
+                        },
+                        cache: true,
+                        complete: AssignItemEvent
+                    },
+                    dropdownParent: $("#addModal")
+                });
+            }
+
+            function AssignItemEvent(jqXHR, textStatus) {
+                $("#add-code").off("select2:select").on("select2:select", function () {
+                    $("#add-part").val($("#add-code").select2("data")[0].partNumber);
+                    $("#add-name").val($("#add-code").select2("data")[0].name);
+                    $("#add-unit").val($("#add-code").select2("data")[0].unit);
+                    $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
+                    $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
+                    $("#add-code-error").html("");
+                });
+
+                $("#add-code").off("select2:unselecting").on("select2:unselecting", function (e) {
+                    $("#add-part").val("");
+                    $("#add-name").val("");
+                    $("#add-unit").val("");
+                    $("#add-unit").data("Id", "");
+                    $(".add-stocks").text("0");
+                    $("#add-gross-price").val("0.00");
+                });
+            }
 
             // Load so for select2
             $("#add-so-number").select2({
-                minimumInputLength: 1,
+                minimumInputLength: -1,
                 allowClear: true,
                 placeholder: "<empty>",
                 templateResult: function (repo) {
@@ -677,7 +768,9 @@
                 dropdownParent: $("#addModal")
             });
 
-            // Load area for select2
+            $("#add-so-number").on("select2:select", loadSOItemsOptions);
+
+            // Load unit for select2
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetOptions", "Unit")",
@@ -711,8 +804,12 @@
             function ComputeTotalQuantity() {
                 total_quantity = 0;
                 itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    total_quantity += parseInt($(this.node()).find(".quantity").val());
-                });
+                    if ($("#request-status").text().trim() == "Draft") {
+                        total_quantity += parseInt($(this.node()).find(".quantity").val());
+                    } else {
+                        total_quantity += this.data().quantityD;
+                    }
+                    });
                 $(".total-quantity").html(FormatStringInteger(total_quantity));
             }
 
@@ -731,7 +828,6 @@
 
             // Validation for Add Item Modal
             var validateAdd = $("#form-item").validate({
-                errorClass: 'text-danger text-xs',
                 rules: {
                     SONumber: {
                         required: function () { return checkIfRequired("SONumber"); }
@@ -783,8 +879,7 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     AddItem();
-                },
-                invalidHandler: validateShowInvalids,
+                }
             });
 
             function AddItem() {
@@ -846,7 +941,7 @@
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Success") {
-                                        window.location.reload();
+                                window.location.reload();
                             } else {
                                 toastr.error(data.message, data.status);
                             }
@@ -872,7 +967,7 @@
                             data: { Id: @Model!.Id },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
-                                            window.location.reload();
+                                    window.location.reload();
                                 } else {
                                     toastr.error(data.message, data.status);
                                 }
@@ -907,7 +1002,7 @@
                             },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
-                                            window.location.reload();
+                                    window.location.reload();
                                 } else {
                                     toastr.error(data.message, data.status);
                                 }
@@ -925,7 +1020,7 @@
                     fontawesome: "fas fa-print"
                 });
                 setTimeout(function () {
-                    let win = window.open('@Url.Action("Print")/' + @Model?.Id, '');
+                    let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id, '');
                     var wintimer = setInterval(function () {
                         if (win.closed) {
                             clearInterval(wintimer);

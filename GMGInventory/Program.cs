@@ -99,7 +99,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //app.UseStatusCodePagesWithReExecute("/Home/Error", "?statuscode={0}");
+    app.UseStatusCodePagesWithReExecute("/Home/Error", "?statuscode={0}");
     app.UseMigrationsEndPoint();
 }
 else

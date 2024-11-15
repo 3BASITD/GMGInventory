@@ -5,8 +5,8 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IPurchaseRequestRepository
     {
-        Task<IList<JsonOptionsModel>> GetTypeOptions(int? SelectedId);
-        Task<IList<JsonOptionsModel>> GetPurposeOptions(int TypeId, int? SelectedId);
+        Task<IList<JsonCodeOptionsModel>> GetTypeOptions(int? SelectedId);
+        Task<IList<JsonCodeOptionsModel>> GetPurposeOptions(int TypeId, int? SelectedId);
         Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form);
         Task<PurchaseRequestDetailedVM?> GetDetails(int requestId);
         Task<IList<PurchaseRequestLineItemVM>> GetItemListAsync(int purchaseRequestId);

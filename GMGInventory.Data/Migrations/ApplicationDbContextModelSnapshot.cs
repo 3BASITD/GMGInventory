@@ -2211,10 +2211,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 2,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Packing Listing"
@@ -2223,10 +2223,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 3,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Sales Invoice"
@@ -2235,10 +2235,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 4,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Sales Order"
@@ -2247,10 +2247,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 5,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Sales Order Delivery"
@@ -2367,10 +2367,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 15,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Purchase Request"
@@ -2379,10 +2379,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 16,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Purchase Order"
@@ -2391,10 +2391,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 17,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Purchase Receiving"
@@ -2403,10 +2403,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 18,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Purchase Return (New)"
@@ -3163,9 +3163,6 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("CheckedBy")
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<int>("CurrencyId")
                         .HasColumnType("int");
 
@@ -3199,9 +3196,6 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<decimal>("OtherCharges")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("PreparedBy")
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Remarks")
                         .IsRequired()
@@ -3322,7 +3316,12 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("RequestTypeId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("RequestTypeId");
 
                     b.ToTable("PurchaseOrderTypes");
 
@@ -3331,19 +3330,29 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "NA",
-                            Name = "Not applicable"
+                            Name = "Non-Automotive",
+                            RequestTypeId = 1
                         },
                         new
                         {
                             Id = 2,
                             Code = "LPO",
-                            Name = "Local Purchase Order"
+                            Name = "Local Purchase Order",
+                            RequestTypeId = 2
                         },
                         new
                         {
                             Id = 3,
                             Code = "IPO",
-                            Name = "International Purchase Order"
+                            Name = "International Purchase Order",
+                            RequestTypeId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "MR",
+                            Name = "Maintenance & Repair",
+                            RequestTypeId = 3
                         });
                 });
 
@@ -3382,9 +3391,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("ApproverId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CheckedBy")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -3406,9 +3412,6 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PreparedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PurchaseOrderId")
@@ -3526,12 +3529,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("Approver2Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("AreaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CheckedBy")
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -3548,13 +3545,13 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PreparedBy")
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("PurposeDefinition")
                         .HasColumnType("nvarchar(250)");
 
                     b.Property<int?>("PurposeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RegionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Remarks")
@@ -3586,11 +3583,11 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("Approver2Id");
 
-                    b.HasIndex("AreaId");
-
                     b.HasIndex("DisapproverId");
 
                     b.HasIndex("PurposeId");
+
+                    b.HasIndex("RegionId");
 
                     b.HasIndex("ResubmitId");
 
@@ -3845,9 +3842,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("ApproverId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CheckedBy")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -3866,9 +3860,6 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PreparedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PurchaseOrderId")
@@ -4000,8 +3991,8 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 2,
-                            Code = "Posted",
-                            Name = "Posted"
+                            Code = "Submitted",
+                            Name = "Submitted"
                         },
                         new
                         {
@@ -5570,13 +5561,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a9403480-a9f7-4caa-9050-e7c87ce910f1",
+                            ConcurrencyStamp = "ac9d3545-6ca0-4d5f-9036-b65c24b0bdef",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFNqyhFGQ1cDbPeJRi8WvCirX+s1DbRPAwcNCDyudku1eJo98PLnPDnt8wfBm9pV+A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGIOWxw4Cn8M74nOBh1Kf3k+n00wnPlyGRJk19HOfTUOaUmdq7rupio6sWAAErnfLw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "84bf3e6f-fa22-4274-a7ea-7a0cb7a2b0a5",
+                            SecurityStamp = "ce944142-55e5-42a0-b27c-343b736138de",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5591,13 +5582,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fec082b6-206a-4aaf-b9a0-b32c75ce02f7",
+                            ConcurrencyStamp = "9c313561-5375-40cc-8ec4-665cba8b4ff0",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEB5sjBfA/lRKn0Pr5oqIX1gVCYIdB10aeT7HKGMs5Yv0Jmw8IGcyS3YbRCaQklnIlg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG2Evwy6lugPJKIAUFGJDOn34+tR9zk2ptD/CMh/JbVLrYslIqmARyJyMKVPm2cJ8A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "dd6a8002-cec1-4c1c-91dd-097a67547195",
+                            SecurityStamp = "0720e2e4-b040-4f5b-8620-0c9a0b34e57b",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6171,6 +6162,17 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Unit");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderType", b =>
+                {
+                    b.HasOne("GMGInventory.Data.PurchaseRequestType", "RequestType")
+                        .WithMany("PurchaseOrderTypes")
+                        .HasForeignKey("RequestTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RequestType");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.PurchaseReceiving", b =>
                 {
                     b.HasOne("GMGInventory.Data.User", "Approver")
@@ -6253,10 +6255,6 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseRequestApprover2")
                         .HasForeignKey("Approver2Id");
 
-                    b.HasOne("GMGInventory.Data.Area", "Area")
-                        .WithMany("PurchaseRequests")
-                        .HasForeignKey("AreaId");
-
                     b.HasOne("GMGInventory.Data.User", "Disapprover")
                         .WithMany("PurchaseRequestDisapprover")
                         .HasForeignKey("DisapproverId");
@@ -6264,6 +6262,10 @@ namespace GMGInventory.Data.Migrations
                     b.HasOne("GMGInventory.Data.PurchaseRequestPurpose", "Purpose")
                         .WithMany("PurchaseRequests")
                         .HasForeignKey("PurposeId");
+
+                    b.HasOne("GMGInventory.Data.Region", "Region")
+                        .WithMany("PurchaseRequests")
+                        .HasForeignKey("RegionId");
 
                     b.HasOne("GMGInventory.Data.PurchaseRequest", "Resubmit")
                         .WithMany("PurchaseRequestResubmits")
@@ -6283,11 +6285,11 @@ namespace GMGInventory.Data.Migrations
 
                     b.Navigation("Approver2");
 
-                    b.Navigation("Area");
-
                     b.Navigation("Disapprover");
 
                     b.Navigation("Purpose");
+
+                    b.Navigation("Region");
 
                     b.Navigation("Resubmit");
 
@@ -6773,8 +6775,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Agents");
 
                     b.Navigation("Customers");
-
-                    b.Navigation("PurchaseRequests");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
@@ -6991,6 +6991,8 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseRequestType", b =>
                 {
+                    b.Navigation("PurchaseOrderTypes");
+
                     b.Navigation("PurchaseRequestPurposes");
 
                     b.Navigation("PurchaseRequests");
@@ -7020,6 +7022,8 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Region", b =>
                 {
                     b.Navigation("Areas");
+
+                    b.Navigation("PurchaseRequests");
 
                     b.Navigation("Suppliers");
                 });

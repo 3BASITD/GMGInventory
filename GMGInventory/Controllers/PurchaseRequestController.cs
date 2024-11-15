@@ -44,30 +44,40 @@ namespace GMGInventory.Controllers
             return Json(await requestRepository.GetListDTAsync(form));
         }
 
-        public async Task<IActionResult> Details(int? Id)
+        public async Task<IActionResult> Details(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseRequest)).Convert();
 
-            var request = await requestRepository.GetDetails(Id ?? 0);
+            var request = await requestRepository.GetDetails(Id);
             if (request == null)
                 return RedirectToAction(nameof(Index));
 
             return View(request);
         }
 
-        public async Task<IActionResult> DetailsJson(int? Id)
+        public async Task<IActionResult> DetailsJson(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
-            var request = await requestRepository.GetDetails(Id ?? 0);
+            var request = await requestRepository.GetDetails(Id);
             if (request == null)
                 return NotFound();
 
             return Json(request);
+        }
+
+        public async Task<IActionResult> PrintDetails(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["Items"] = await requestRepository.GetItemListAsync(Id);
+
+            return View(await requestRepository.GetDetails(Id));
         }
 
         public async Task<IActionResult> Create(int? Id)
@@ -102,22 +112,6 @@ namespace GMGInventory.Controllers
             var form = new DataTablesRequestForm(Request.Form);
             return Json(await requestRepository.GetItemListDTAsync(form, purchaseRequestId));
         }
-
-        //public async Task<IActionResult> Create(int? Id)
-        //{
-        //    var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Add);
-        //    if (redirectResult != null) return redirectResult;
-
-        //    ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
-
-        //    var order = await salesOrderRepository.GetDetailsAsync(Id);
-        //    if (Id != null && (order == null || order.DisapprovedBy == null || order.DisapprovedDateD == null))
-        //    {
-        //        return RedirectToAction("Details", new { Id = Id });
-        //    }
-        //    TempData["SalesOrderId"] = Id;
-        //    return View();
-        //}
 
         [HttpPost]
         public async Task<IActionResult> AddJson(PurchaseRequestSaveVM form, List<PurchaseRequestLineItemVM> items)

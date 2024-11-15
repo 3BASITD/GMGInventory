@@ -363,7 +363,6 @@
                                     <div class="form-group">
                                         <label for="add-quantity" class="form-label mb-0">Quantity</label>
                                         <input type="number" min="0" max="1999999" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
-                                        <span data-valmsg-for="add-quantity" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6">
@@ -371,7 +370,6 @@
                                         <label for="add-unit" class="form-label mb-0">Unit</label>
                                         <select name="Unit" id="add-unit" class="form-control" style="width: 100%">
                                         </select>
-                                        <span data-valmsg-for="add-unit" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -380,7 +378,6 @@
                                     <div class="form-group">
                                         <label for="add-equivalent-quantity" class="form-label mb-0">Equivalent Quantity per Unit</label>
                                         <input type="number" min="0" max="1999999" id="add-equivalent-quantity" name="EquivalentQuantity" class="form-control form-control-sm" />
-                                        <span data-valmsg-for="add-equivalent-quantity" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6">
@@ -388,7 +385,6 @@
                                         <label for="add-equivalent-unit" class="form-label mb-0">Equivalent Unit</label>
                                         <select name="EquivalentUnit" id="add-equivalent-unit" class="form-control" style="width: 100%">
                                         </select>
-                                        <span data-valmsg-for="add-equivalent-unit" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -399,7 +395,6 @@
                                     <div class="form-group">
                                         <label for="add-item-quantity" class="form-label mb-0">Quantity</label>
                                         <input type="number" min="0" max="1999999" id="add-item-quantity" name="Quantity" class="form-control form-control-sm" />
-                                        <span data-valmsg-for="add-item-quantity" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6">
@@ -408,8 +403,6 @@
                                         <select id="add-item" name="Item" style="width:100%">
                                             <option></option>
                                         </select>
-
-                                        <span data-valmsg-for="add-item" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -451,7 +444,6 @@
 
                                         <label for="edit-quantity" class="form-label mb-0">Quantity</label>
                                         <input type="number" min="0" max="1999999" id="edit-quantity" name="Quantity" class="form-control form-control-sm" />
-                                        <span data-valmsg-for="edit-quantity" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6">
@@ -459,7 +451,6 @@
                                         <label for="edit-unit" class="form-label mb-0">Unit</label>
                                         <select name="Unit" id="edit-unit" class="form-control" style="width: 100%">
                                         </select>
-                                        <span data-valmsg-for="edit-unit" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -468,7 +459,6 @@
                                     <div class="form-group">
                                         <label for="edit-equivalent-quantity" class="form-label mb-0">Equivalent Quantity per Unit</label>
                                         <input type="number" min="0" max="1999999" id="edit-equivalent-quantity" name="EquivalentQuantity" class="form-control form-control-sm" />
-                                        <span data-valmsg-for="edit-equivalent-quantity" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6">
@@ -476,7 +466,6 @@
                                         <label for="edit-equivalent-unit" class="form-label mb-0">Equivalent Unit</label>
                                         <select name="EquivalentUnit" id="edit-equivalent-unit" class="form-control" style="width: 100%">
                                         </select>
-                                        <span data-valmsg-for="edit-equivalent-unit" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -487,7 +476,6 @@
                                     <div class="form-group">
                                         <label for="edit-item-quantity" class="form-label mb-0">Quantity</label>
                                         <input type="number" min="0" max="1999999" id="edit-item-quantity" name="Quantity" class="form-control form-control-sm" />
-                                        <span data-valmsg-for="edit-item-quantity" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6">
@@ -497,8 +485,6 @@
                                         <select id="edit-item" name="SubItemId" style="width:100%">
                                             <option></option>
                                         </select>
-
-                                        <span data-valmsg-for="edit-item" data-valmsg-replace="true" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -542,24 +528,19 @@
                             <div class="form-group">
                                 <label for="quantity-warehouse" class="control-label mb-0 d-block">Warehouse</label>
                                 <input type="text" name="Warehouse" id="quantity-warehouse" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="quantity-warehouse" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label for="quantity-current" class="control-label mb-0 d-block">Current Quantity</label>
                                 <input type="number" step="1" min="0" max="1999999" name="Current" id="quantity-current" class="form-control form-control-sm" readonly="readonly" />
-                                <span data-valmsg-for="quantity-current" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label for="quantity-new" class="control-label mb-0 d-block">New Quantity</label>
                                 <input type="number" step="1" min="0" max="1999999" name="New" id="quantity-new" class="form-control form-control-sm" />
-                                <span data-valmsg-for="quantity-new" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label for="quantity-remarks" class="control-label mb-0 d-block">Remarks</label>
                                 <textarea rows="2" name="Remarks" id="quantity-remarks" class="form-control form-control-sm">
-
                                 </textarea>
-                                <span data-valmsg-for="quantity-remarks" data-valmsg-replace="true" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -933,7 +914,6 @@
 
                 // Validation for Edit Modal
                 var validateEdit = $("#editForm").validate({
-                    errorClass: 'text-danger text-xs',
                     rules: {
                         Unit: { required: true },
                       //  EquivalentUnit: { required: true },
@@ -949,8 +929,7 @@
                     submitHandler: function (form, event) {
                         event.preventDefault();
                         DoEdit();
-                    },
-                    invalidHandler: validateShowInvalids
+                    }
                 });
 
 
@@ -1011,7 +990,6 @@
 
                 // Validation for Add Item Modal
                 var validateAdd = $("#form-item").validate({
-                    errorClass: 'text-danger text-xs',
                     rules: {
                         Unit: { required: true },
                       //  EquivalentUnit: { required: true },
@@ -1027,8 +1005,7 @@
                     submitHandler: function (form, event) {
                         event.preventDefault();
                         DoCreate();
-                    },
-                    invalidHandler: validateShowInvalids
+                    }
                 });
                 // Send Create to Controller
                 function DoCreate() {
@@ -1127,7 +1104,6 @@
 
                 // Validation for Edit Quantity Modal
                 var validateEdit = $("#quantityForm").validate({
-                    errorClass: 'text-danger text-xs',
                     rules: {
                         New: {
                             required: true,
@@ -1143,8 +1119,7 @@
                     submitHandler: function (form) {
                         DoQuantity();
                         return false;
-                    },
-                    invalidHandler: validateShowInvalids
+                    }
                 });
 
                 // Send Quantity to Controller

@@ -88,7 +88,6 @@
                                             <label class="custom-file-label" for="home-image">Choose image</label>
                                         </div>
                                     </div>
-                                    <span data-valmsg-for="home-image" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -97,7 +96,6 @@
                                 <div class="form-group">
                                     <label for="add-title" class="form-label mb-0">Title</label>
                                     <input type="text" id="add-title" name="Title" class="form-control form-control-sm" placeholder="none" />
-                                    <span data-valmsg-for="add-title" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -106,7 +104,6 @@
                                 <div class="form-group">
                                     <label for="add-description" class="form-label mb-0">Description</label>
                                     <input type="text" id="add-description" name="Description" class="form-control form-control-sm" placeholder="none" />
-                                    <span data-valmsg-for="add-description" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -115,7 +112,6 @@
                                 <div class="form-group">
                                     <label for="add-time" class="form-label mb-0">Display Time</label>
                                     <input type="number" min="5" max="3600" step="1" id="add-time" name="Time" class="form-control form-control-sm" placeholder="How long to display before sliding to next image (in seconds)" />
-                                    <span data-valmsg-for="add-time" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -357,7 +353,6 @@
 
             // Validation for Add Modal
             var validateEdit = $("#formImage").validate({
-                errorClass: 'text-danger text-xs',
                 rules: {
                     FileImage: { required: true },
                     Title: { maxlength: 25 },
@@ -373,8 +368,7 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     DoSubmit();
-                },
-                invalidHandler: validateShowInvalids
+                }
             });
 
             function DoSubmit() {

@@ -11,27 +11,39 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 :root {
-    --blue: #007bff;
+    /*--blue: #007bff;*/
     --indigo: #6610f2;
     --purple: #6f42c1;
-    --pink: #e83e8c;
+    /*--pink: #e83e8c;*/
     --red: #dc3545;
     --orange: #fd7e14;
     --yellow: #ffc107;
-    --green: #28a745;
+    /*--green: #28a745;*/
     --teal: #20c997;
-    --cyan: #17a2b8;
+    /*--cyan: #17a2b8;*/
     --white: #fff;
     --gray: #6c757d;
     --gray-dark: #343a40;
-    --primary: #007bff;
+    /*--primary: #007bff;*/
     --secondary: #6c757d;
-    --success: #28a745;
-    --info: #17a2b8;
+    /*--success: #28a745;*/
+    /*--info: #17a2b8;*/
     --warning: #ffc107;
     --danger: #dc3545;
     --light: #f8f9fa;
-    --dark: #343a40;
+    /*--dark: #343a40;*/
+
+    /* from bootstrap 5 */
+    --blue: #0d6efd;
+    --pink: #d63384;
+    --green: #198754;
+    --cyan: #0dcaf0;
+    --primary: #0d6efd;
+    --success: #198754;
+    --info: #0dcaf0;
+    --dark: #212529;
+    /* from bootstrap 5 */
+
     --breakpoint-xs: 0;
     --breakpoint-sm: 576px;
     --breakpoint-md: 768px;
@@ -5627,7 +5639,7 @@ a.badge-dark:focus, a.badge-dark.focus {
         color: inherit;
     }
 
-.alert-primary {
+/*.alert-primary {
     color: #004085;
     background-color: #cce5ff;
     border-color: #b8daff;
@@ -5639,9 +5651,19 @@ a.badge-dark:focus, a.badge-dark.focus {
 
     .alert-primary .alert-link {
         color: #002752;
+    }*/
+
+.alert-primary {
+    color: #084298;
+    background-color: #cfe2ff;
+    border-color: #b6d4fe;
+}
+
+    .alert-primary .alert-link {
+        color: #06357a;
     }
 
-.alert-secondary {
+/*.alert-secondary {
     color: #383d41;
     background-color: #e2e3e5;
     border-color: #d6d8db;
@@ -5653,9 +5675,19 @@ a.badge-dark:focus, a.badge-dark.focus {
 
     .alert-secondary .alert-link {
         color: #202326;
+    }*/
+
+.alert-secondary {
+    color: #41464b;
+    background-color: #e2e3e5;
+    border-color: #d3d6d8;
+}
+
+    .alert-secondary .alert-link {
+        color: #34383c;
     }
 
-.alert-success {
+/*.alert-success {
     color: #155724;
     background-color: #d4edda;
     border-color: #c3e6cb;
@@ -5667,9 +5699,18 @@ a.badge-dark:focus, a.badge-dark.focus {
 
     .alert-success .alert-link {
         color: #0b2e13;
+    }*/
+.alert-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+}
+
+    .alert-success .alert-link {
+        color: #0c4128;
     }
 
-.alert-info {
+/*.alert-info {
     color: #0c5460;
     background-color: #d1ecf1;
     border-color: #bee5eb;
@@ -5681,9 +5722,19 @@ a.badge-dark:focus, a.badge-dark.focus {
 
     .alert-info .alert-link {
         color: #062c33;
+    }*/
+
+.alert-info {
+    color: #055160;
+    background-color: #cff4fc;
+    border-color: #b6effb;
+}
+
+    .alert-info .alert-link {
+        color: #04414d;
     }
 
-.alert-warning {
+/*.alert-warning {
     color: #856404;
     background-color: #fff3cd;
     border-color: #ffeeba;
@@ -5695,9 +5746,19 @@ a.badge-dark:focus, a.badge-dark.focus {
 
     .alert-warning .alert-link {
         color: #533f03;
+    }*/
+
+.alert-warning {
+    color: #664d03;
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+}
+
+    .alert-warning .alert-link {
+        color: #523e02;
     }
 
-.alert-danger {
+/*.alert-danger {
     color: #721c24;
     background-color: #f8d7da;
     border-color: #f5c6cb;
@@ -5709,9 +5770,19 @@ a.badge-dark:focus, a.badge-dark.focus {
 
     .alert-danger .alert-link {
         color: #491217;
+    }*/
+
+.alert-danger {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+
+    .alert-danger .alert-link {
+        color: #6a1a21;
     }
 
-.alert-light {
+/*.alert-light {
     color: #818182;
     background-color: #fefefe;
     border-color: #fdfdfe;
@@ -5723,9 +5794,19 @@ a.badge-dark:focus, a.badge-dark.focus {
 
     .alert-light .alert-link {
         color: #686868;
+    }*/
+
+.alert-light {
+    color: #636464;
+    background-color: #fefefe;
+    border-color: #fdfdfe;
+}
+
+    .alert-light .alert-link {
+        color: #4f5050;
     }
 
-.alert-dark {
+/*.alert-dark {
     color: #1b1e21;
     background-color: #d6d8d9;
     border-color: #c6c8ca;
@@ -5737,6 +5818,16 @@ a.badge-dark:focus, a.badge-dark.focus {
 
     .alert-dark .alert-link {
         color: #040505;
+    }*/
+
+.alert-dark {
+    color: #141619;
+    background-color: #d3d3d4;
+    border-color: #bcbebf;
+}
+
+    .alert-dark .alert-link {
+        color: #101214;
     }
 
 @-webkit-keyframes progress-bar-stripes {
@@ -33830,7 +33921,7 @@ html.maximized-card {
     color: #fff;
     text-decoration: underline;
 }
-
+/*
 .alert-primary {
     color: #fff;
     background-color: #007bff;
@@ -33989,7 +34080,7 @@ html.maximized-card {
 
     .alert-default-dark .alert-link {
         color: #040505;
-    }
+    }*/
 
 .dark-mode .alert-primary {
     color: #fff;

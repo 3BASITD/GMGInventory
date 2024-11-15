@@ -34,14 +34,12 @@
                     <div class="form-group">
                         <label for="invoice-pack-number" class="form-label fw-normal mb-0">Pack Number</label>
                         <select id="invoice-pack-number" class="s2-bold s2ph-bold s2ph-dark" name="PackNumber" style="width: 100%"></select>
-                        <span data-valmsg-for="invoice-pack-number" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                 <label for="invoice-date" class="form-label fw-normal mb-0">Invoice Date</label>
                         <input type="date" id="invoice-date" class="form-control form-control-sm" name="InvoiceDate" value="" />
-                        <span data-valmsg-for="invoice-date" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
             </div>
@@ -50,7 +48,6 @@
                     <div class="form-group">
                         <label for="invoice-control-number" class="form-label fw-normal mb-0">BIR Invoice Number</label>
                         <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" />
-                        <span data-valmsg-for="invoice-control-number" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -63,7 +60,6 @@
                     <div class="form-group">
                         <label for="invoice-remarks" class="form-label fw-normal mb-0">Remarks</label>
                         <input type="text" id="invoice-remarks" class="form-control form-control-sm" />
-                        <span data-valmsg-for="invoice-remarks" data-valmsg-replace="true" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -432,7 +428,6 @@
 
         // Validation for Create
         var validateCreate = $("#form-invoice").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 ControlNumber: { required: true, maxlength: 50 },
                 InvoiceDate: { required: true },
@@ -446,8 +441,7 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 SaveInvoice($("#invoice-date").data("saving-as"));
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
         function SaveInvoice(saving_as) {

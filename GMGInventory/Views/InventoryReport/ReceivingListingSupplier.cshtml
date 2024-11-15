@@ -148,6 +148,12 @@
                         id: "",
                         text: "All"
                     },
+                    templateResult: function (repo) {
+                        if (repo.loading) {
+                            return repo.text;
+                        }
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                    },
                     dropdownParent: $('#filterModal')
                 });
             }

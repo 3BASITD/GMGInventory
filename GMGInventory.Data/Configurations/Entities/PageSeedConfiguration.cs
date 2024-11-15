@@ -42,7 +42,9 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasView = true,
                     HasAdd = true,
                     HasEdit = true,
-                    HasDelete = true
+                    HasDelete = true,
+                    HasApproveDisapprove = true,
+                    HasPrint = true
                 },
                 new() {
                     Id = (int)PageNames.SalesInvoice,
@@ -50,7 +52,9 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasView = true,
                     HasAdd = true,
                     HasEdit = true,
-                    HasDelete = true
+                    HasDelete = true,
+                    HasApproveDisapprove = true,
+                    HasPrint = true
                 },
                 new() {
                     Id = (int)PageNames.SalesOrder,
@@ -58,7 +62,9 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasView = true,
                     HasAdd = true,
                     HasEdit = true,
-                    HasDelete = true
+                    HasDelete = true,
+                    HasApproveDisapprove = true,
+                    HasPrint = true
                 },
                 new() {
                     Id = (int)PageNames.SalesOrderDelivery,
@@ -66,7 +72,9 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasView = true,
                     HasAdd = true,
                     HasEdit = true,
-                    HasDelete = true
+                    HasDelete = true,
+                    HasApproveDisapprove = true,
+                    HasPrint = true
                 },
                 new() {
                     Id = (int)PageNames.SalesReturn,
@@ -166,9 +174,9 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasAdd = true,
                     HasEdit = true,
                     HasDelete = true,
-                    HasApproveDisapprove = false,
+                    HasApproveDisapprove = true,
                     HasUploadDownload = false,
-                    HasPrint = false
+                    HasPrint = true
                 },
                 new() {
                     Id = (int)PageNames.PurchaseOrder,
@@ -177,9 +185,9 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasAdd = true,
                     HasEdit = true,
                     HasDelete = true,
-                    HasApproveDisapprove = false,
+                    HasApproveDisapprove = true,
                     HasUploadDownload = false,
-                    HasPrint = false
+                    HasPrint = true
                 },
                 new() {
                     Id = (int)PageNames.PurchaseReceiving,
@@ -188,9 +196,9 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasAdd = true,
                     HasEdit = true,
                     HasDelete = true,
-                    HasApproveDisapprove = false,
+                    HasApproveDisapprove = true,
                     HasUploadDownload = false,
-                    HasPrint = false
+                    HasPrint = true
                 },
                 new() {
                     Id = (int)PageNames.PurchaseReturnNew,
@@ -199,9 +207,9 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasAdd = true,
                     HasEdit = true,
                     HasDelete = true,
-                    HasApproveDisapprove = false,
+                    HasApproveDisapprove = true,
                     HasUploadDownload = false,
-                    HasPrint = false
+                    HasPrint = true
                 },
                 new() {
                     Id = (int)PageNames.Customer,

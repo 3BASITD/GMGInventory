@@ -17,8 +17,8 @@ namespace GMGInventory.Data.Configurations.Entities
                 new PurchaseStatus
                 {
                     Id = 2,
-                    Code = "Posted",
-                    Name = "Posted"
+                    Code = "Submitted",
+                    Name = "Submitted"
                 },
                 new PurchaseStatus
                 {

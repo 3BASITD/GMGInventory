@@ -66,6 +66,10 @@
 </body>
 <script type="text/javascript">
     window.print();
-    window.onafterprint = window.close;
+    window.onafterprint = function () {
+        setTimeout(function () {
+            window.close();
+        }, 100); 
+    };
 </script>
 </html>

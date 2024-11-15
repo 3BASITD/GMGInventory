@@ -28,14 +28,15 @@ namespace GMGInventory.Application.Repositories
             this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
-        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Warehouses
                                 .Where(s => s.IsActive || s.Id == IncludeId)
-                                .Select(s => new JsonOptionsModel
+                                .Select(s => new JsonNameOptionsModel
                                 {
                                     Id = s.Id.ToString(),
-                                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
+                                    Text = s.Code.Trim(),
+                                    Name = s.Name.Trim(),
                                     Selected = IncludeId != null && IncludeId == s.Id
                                 })
                                 .OrderBy(s => s.Text)

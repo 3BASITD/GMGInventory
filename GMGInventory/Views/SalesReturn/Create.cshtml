@@ -168,7 +168,6 @@
                                     <select id="item-code" name="Code" style="width: 100%;">
                                         <option></option>
                                     </select>
-                                    <span data-valmsg-for="item-code" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -183,14 +182,12 @@
                                 <div class="form-group">
                                     <label for="item-unit-price" class="control-label mb-0 d-block">Unit Price</label>
                                     <input type="number" min="0" max="1999999.99" step="0.01" id="item-unit-price" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="item-unit-price" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="item-quantity" class="control-label mb-0 d-block">Quantity</label>
                                     <input type="number" min="0" max="1999999" step="1" name="Quantity" id="item-quantity" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="item-quantity" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -199,14 +196,12 @@
                                 <div class="form-group">
                                     <label for="item-discount1" class="control-label mb-0 d-block">Discount 1</label>
                                     <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount1" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="item-discount1" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="item-discount2" class="control-label mb-0 d-block">Discount 2</label>
                                     <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount2" class="form-control form-control-sm" />
-                                    <span data-valmsg-for="item-discount2" data-valmsg-replace="true" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -404,7 +399,6 @@
 
         // Validation for Item
         var validateCreate = $("#form-item").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 Code: { required: true },
                 Quantity: { required: true }
@@ -416,8 +410,7 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 AddItem();
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
         function AddItem() {
@@ -606,7 +599,6 @@
 
         // Validation for Save
         var validateCreate = $("#form-return").validate({
-            errorClass: 'text-danger text-xs',
             rules: {
                 Customer: { required: true },
                 Remarks: { maxlength: 250 }
@@ -618,8 +610,7 @@
             submitHandler: function (form, event) {
                 event.preventDefault();
                 SaveReturn();
-            },
-            invalidHandler: validateShowInvalids
+            }
         });
 
         function SaveReturn() {
