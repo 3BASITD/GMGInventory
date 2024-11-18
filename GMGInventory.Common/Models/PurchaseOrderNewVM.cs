@@ -12,15 +12,19 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Type")]
         public string Type { get; set; }
+        public int TypeId { get; set; }
 
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
+        public int SupplierId { get; set; }
 
         [Display(Name = "Term")]
         public string Term { get; set; }
+        public int TemId { get; set; }
 
         [Display(Name = "Delivery Mode")]
         public string DeliveryMode { get; set; }
+        public int DeliveryModeId { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }
@@ -33,6 +37,24 @@ namespace GMGInventory.Common.Models
     public class PurchaseOrderNewDetailedVM : PurchaseOrderNewVM
     {
 
+        [Display(Name = "Delivery Address")]
+        public string DeliveryAddress { get; set; }
+        public int DeliveryAddressId { get; set; }
+
+        [Display(Name = "Remarks")]
+        public string Remarks { get; set; }
+
+        [Display(Name = "Approved By")]
+        public string? ApprovedBy { get; set; }
+
+        [Display(Name = "Disapproved By")]
+        public string? DisapprovedBy { get; set; }
+
+        [Display(Name = "Disapproved Reason")]
+        public string? DisapprovedReason { get; set; }
+        public int? ResubmitId { get; set; }
+        public int? ResubmitFromId { get; set; }
+
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }
 
@@ -44,8 +66,10 @@ namespace GMGInventory.Common.Models
         public string? UserModified { get; set; }
 
         [Display(Name = "Date Modified")]
-        public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
+        public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
+
+        public IList<PurchaseOrderLineItemVM> LineItems { get; set; }
     }
 
     public class PurchaseOrderSaveVM
@@ -58,6 +82,7 @@ namespace GMGInventory.Common.Models
         public int DeliveryModeId { get; set; }
         public int DeliveryAddressId { get; set; }
         public DateTime DateOrdered { get; set; }
+        public string Reference { get; set; }
         public string Remarks { get; set; }
         public string Status { get; set; }
         public int? ResubmitId { get; set; }

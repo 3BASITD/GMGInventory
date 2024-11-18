@@ -36,7 +36,7 @@ namespace GMGInventory.Application.Repositories
                                Id = request.Id,
                                DocumentNumber = request.DocumentNumber,
                                Supplier = request.Supplier.Code,
-                               Term = request.Term.Code,
+                               Term = request.Term.Name,
                                PONumber = request.PurchaseOrder.DocumentNumber,
                                DeliveryAddress = request.DeliveryAddress.Code,
                                Status = request.Status.Code,

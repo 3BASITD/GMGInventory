@@ -73,6 +73,7 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.PurchaseRequestLineItems
                                 .Include(s => s.Item)
+                                .Include(s => s.Unit)
                                 .Where(s => s.PurchaseRequestId == RequestId)
                                 .Select(s => new JsonRequestItemOptionsModel
                                 {
@@ -82,6 +83,8 @@ namespace GMGInventory.Application.Repositories
                                     ItemCode = s.Item.Code,
                                     PartNumber = s.Item.PartNumber,
                                     Quantity = s.Quantity,
+                                    Unit = s.Unit.Name,
+                                    UnitId = s.Unit.Id,
                                     Served = context.PurchaseOrderNewLineItems
                                                     .Where(a => a.ItemId == s.ItemId
                                                              && a.ItemDescription == s.ItemDescription
@@ -127,7 +130,7 @@ namespace GMGInventory.Application.Repositories
                                DocumentNumber = order.DocumentNumber,
                                Type = order.Type.Code,
                                Supplier = order.Supplier.Code,
-                               Term = order.Term.Code,
+                               Term = order.Term.Name,
                                DeliveryMode = order.DeliveryMode.Code,
                                Status = order.Status.Code,
                                OrderDateD = order.OrderDate
@@ -196,29 +199,76 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
+        {
+            var details = from order in context.PurchaseOrderNews
+                                               .Include(s => s.Type)
+                                               .Include(s => s.Supplier)
+                                               .Include(s => s.Term)
+                                               .Include(s => s.DeliveryMode)
+                                               .Include(s => s.DeliveryAddress)
+                                               .Include(s => s.Status)
+                          let resubmitfrom = context.PurchaseOrderNews
+                                                    .Where(s => s.ResubmitId == order.Id)
+                                                    .FirstOrDefault()
+                          join userc in userManager.Users on order.UserCreated equals userc.Id into c
+                          from userc in c.DefaultIfEmpty()
+                          join userm in userManager.Users on order.UserModified equals userm.Id into m
+                          from userm in m.DefaultIfEmpty()
+                          where order.Id == orderId
+                          select new PurchaseOrderNewDetailedVM
+                          {
+                              Id = order.Id,
+                              DocumentNumber = order.DocumentNumber,
+                              Type = order.Type.Name,
+                              TypeId = order.Type.Id,
+                              Supplier = order.Supplier.Name,
+                              SupplierId = order.Supplier.Id,
+                              Term = order.Term.Name,
+                              TemId = order.Term.Id,
+                              DeliveryMode = order.DeliveryMode.Name,
+                              DeliveryModeId = order.DeliveryMode.Id,
+                              DeliveryAddress = order.DeliveryAddress.Name,
+                              DeliveryAddressId = order.DeliveryAddress.Id,
+                              Status = order.Status.Code,
+                              OrderDateD = order.OrderDate,
+                              Remarks = order.Remarks,
+                              ApprovedBy = order.ApproverId == null ? null : order.Approver.FirstName + " " + order.Approver.LastName,
+                              DisapprovedBy = order.DisapproverId == null ? null : order.Disapprover.FirstName + " " + order.Disapprover.LastName,
+                              DisapprovedReason = order.DisapprovedReason,
+                              ResubmitId = order.ResubmitId,
+                              ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
+                              UserCreated = userc.FirstName + " " + userc.LastName,
+                              DateCreatedD = order.DateCreated,
+                              UserModified = userm.FirstName + " " + userm.LastName,
+                              DateModifiedD = order.DateModified
+                          };
+            return await details.FirstOrDefaultAsync();
+        }
+
         public async Task<IList<PurchaseOrderLineItemVM>> GetItemListAsync(int purchaseOrderId)
         {
             var orderVM = from order in context.PurchaseOrderNewLineItems
                                                .Include(s => s.PurchaseRequest)
                                                .Include(s => s.Item)
                                                .Include(s => s.Unit)
-                            where order.PurchaseOrderId == purchaseOrderId
-                            select new PurchaseOrderLineItemVM
-                            {
-                                Id = order.Id,
-                                PurchaseOrderId = order.PurchaseOrderId,
-                                LineNumber = order.LineNumber,
-                                PurchaseRequestId = order.PurchaseRequest.Id,
-                                PurchaseRequestNumber = order.PurchaseRequest.DocumentNumber,
-                                ItemId = order.Item.Id,
-                                ItemCode = order.Item.Code,
-                                ItemPartNumber = string.IsNullOrWhiteSpace(order.Item.PartNumber) ? "-" : order.Item.PartNumber,
-                                ItemDescription = order.ItemDescription,
-                                QuantityD = order.Quantity,
-                                UnitId = order.Unit.Id,
-                                UnitCode = order.Unit.Code,
-                                UnitCostD = order.UnitCost
-                            };
+                          where order.PurchaseOrderId == purchaseOrderId
+                          select new PurchaseOrderLineItemVM
+                          {
+                              Id = order.Id,
+                              PurchaseOrderId = order.PurchaseOrderId,
+                              LineNumber = order.LineNumber,
+                              PurchaseRequestId = order.PurchaseRequest.Id,
+                              PurchaseRequestNumber = order.PurchaseRequest.DocumentNumber,
+                              ItemId = order.Item.Id,
+                              ItemCode = order.Item.Code,
+                              ItemPartNumber = string.IsNullOrWhiteSpace(order.Item.PartNumber) ? "-" : order.Item.PartNumber,
+                              ItemDescription = order.ItemDescription,
+                              QuantityD = order.Quantity,
+                              UnitId = order.Unit.Id,
+                              UnitCode = order.Unit.Code,
+                              UnitCostD = order.UnitCost
+                          };
             return await orderVM.ToListAsync();
         }
 
@@ -333,6 +383,7 @@ namespace GMGInventory.Application.Repositories
                         DeliveryModeId = form.DeliveryModeId,
                         DeliveryAddressId = form.DeliveryAddressId,
                         OrderDate = form.DateOrdered,
+                        CanvasSummaryReference = form.Reference + "",
                         Remarks = form.Remarks,
                         StatusId = status.Id,
                         ResubmitId = form.ResubmitId
@@ -521,20 +572,37 @@ namespace GMGInventory.Application.Repositories
             try
             {
                 var existingRequest = await context.PurchaseRequests
-                    .FirstOrDefaultAsync(pr => pr.Id == requestId);
+                                                   .Include(s => s.Status)
+                                                   .FirstOrDefaultAsync(pr => pr.Id == requestId);
 
                 if (existingRequest == null)
                 {
                     response.Status = "Error";
                     response.Message = "Purchase request not found.";
-                    return response;
                 }
+                else if (existingRequest.Status.Name != "Draft")
+                {
+                    response.Status = "Error";
+                    response.Message = "Only draft can be deleted.";
+                }
+                else
+                {
+                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                    var resubmittedOrder = await context.PurchaseRequests
+                                                        .Where(s => s.ResubmitId == existingRequest.Id)
+                                                        .FirstOrDefaultAsync();
+                    if (resubmittedOrder != null)
+                    {
+                        resubmittedOrder.ResubmitId = null;
+                        await context.SaveChangesAsync(currentUserId);
+                    }
 
-                context.PurchaseRequests.Remove(existingRequest);
-                await context.SaveChangesAsync();
+                    context.PurchaseRequests.Remove(existingRequest);
+                    await context.SaveChangesAsync(currentUserId);
 
-                response.Status = "Success";
-                response.Message = "Purchase request successfully deleted.";
+                    response.Status = "Success";
+                    response.Message = "Purchase request successfully deleted.";
+                }
             }
             catch (Exception)
             {
