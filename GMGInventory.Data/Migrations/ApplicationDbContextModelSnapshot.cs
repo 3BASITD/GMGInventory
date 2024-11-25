@@ -5581,13 +5581,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "11392424-9e75-4247-9adb-50b235ffcddb",
+                            ConcurrencyStamp = "ac9d3545-6ca0-4d5f-9036-b65c24b0bdef",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEF6+7DrDGqB9d//WmjOl+Cz6seEtgYs6bJKWk3H5yiQ7s2/GNW45eiedpgqXdgV0Uw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGIOWxw4Cn8M74nOBh1Kf3k+n00wnPlyGRJk19HOfTUOaUmdq7rupio6sWAAErnfLw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5da6e235-d269-4ca1-a656-bb387cc70f55",
+                            SecurityStamp = "ce944142-55e5-42a0-b27c-343b736138de",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5602,13 +5602,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7d1f6e7b-895e-402d-9d46-8b2abe8795af",
+                            ConcurrencyStamp = "9c313561-5375-40cc-8ec4-665cba8b4ff0",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEG//kJXwbIrz89Xx7jfboAwebh3YWW3fq0T5EZWIs53zsYaVFsiazuDQPyS3U74aEg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG2Evwy6lugPJKIAUFGJDOn34+tR9zk2ptD/CMh/JbVLrYslIqmARyJyMKVPm2cJ8A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "58342ad5-5331-4fc0-aa1f-33a8fa8a85a9",
+                            SecurityStamp = "0720e2e4-b040-4f5b-8620-0c9a0b34e57b",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6247,9 +6247,15 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.Warehouse", "Warehouse")
+                        .WithMany("PurchaseReceivings")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Approver");
 
-                    b.Navigation("DeliveryAddress");
+                    b.Navigation("Disapprover");
 
                     b.Navigation("Disapprover");
 
@@ -6262,6 +6268,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Supplier");
 
                     b.Navigation("Term");
+
+                    b.Navigation("Warehouse");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReceivingLineItem", b =>

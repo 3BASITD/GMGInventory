@@ -26,9 +26,9 @@ namespace GMGInventory.Data
         public virtual PurchaseOrderNew PurchaseOrder { get; set; }
         public DateTime ReceiveDate { get; set; }
 
-        [ForeignKey("DeliveryAddressId")]
-        public int DeliveryAddressId { get; set; }
-        public virtual Warehouse DeliveryAddress { get; set; }
+        [ForeignKey("WarehouseId")]
+        public int WarehouseId { get; set; }
+        public virtual Warehouse Warehouse { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string DeliveryReceiptNumber { get; set; }

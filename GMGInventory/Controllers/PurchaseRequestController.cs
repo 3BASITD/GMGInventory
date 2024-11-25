@@ -70,6 +70,17 @@ namespace GMGInventory.Controllers
             return Json(request);
         }
 
+        public async Task<IActionResult> GetPurchaseRequestType(int PurchaseOrderId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            var requestType = await requestRepository.GetPurchaseRequestType(PurchaseOrderId);
+            if (requestType == null)
+                return NotFound();
+
+            return Json(requestType);
+        }
         public async Task<IActionResult> PrintDetails(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Print);

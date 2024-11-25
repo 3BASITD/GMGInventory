@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using AutoMapper;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +16,7 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly IMapper mapper;
 
         public PurchaseOrderNewReporitory(ApplicationDbContext context
                                         , IHttpContextAccessor httpContextAccessor
@@ -25,14 +27,17 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<IList<JsonCodeOptionsModel>> GetTypeOptions(int? SelectedId)
+      
+
+        public async Task<IList<JsonOrderTypeOptionsModel>> GetTypeOptions(int? SelectedId)
         {
             return await context.PurchaseOrderTypes
-                                .Select(s => new JsonCodeOptionsModel
+                                .Select(s => new JsonOrderTypeOptionsModel
                                 {
                                     Id = s.Id.ToString(),
                                     Text = s.Name,
                                     Code = s.Code,
+                                    RequestTypeId = s.RequestTypeId,
                                     Selected = SelectedId != null && s.Id == SelectedId
                                 })
                                 .OrderBy(s => s.Id)
@@ -52,15 +57,11 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int OrderTypeId, int? SelectedId)
+        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? SelectedId)
         {
-            var purchaseType = await context.PurchaseOrderTypes
-                                            .Where(s => s.Id == OrderTypeId)
-                                            .FirstOrDefaultAsync();
             return await context.PurchaseRequests
                                 .Include(s => s.Status)
-                                .Where(s => purchaseType != null
-                                         && s.TypeId == purchaseType.RequestTypeId
+                                .Where(s => s.TypeId == RequestTypeId
                                          && s.Status.Name == "Approved")
                                 .Select(s => new JsonOptionsModel
                                 {
@@ -72,37 +73,34 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
+        public async Task<IList<JsonRequestItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
         {
             return await context.PurchaseRequestLineItems
                                 .Include(s => s.Item)
                                 .Include(s => s.Unit)
                                 .Where(s => s.PurchaseRequestId == RequestId)
-                                .Select(s => new JsonPurchaseItemOptionsModel
+                                .Select(s => new JsonRequestItemOptionsModel
                                 {
                                     Id = s.Id.ToString(),
                                     Text = s.ItemDescription,
-                                    LineNumber = s.LineNumber,
                                     ItemId = s.Item.Id,
                                     ItemCode = s.Item.Code,
                                     PartNumber = s.Item.PartNumber,
                                     Quantity = s.Quantity,
                                     Unit = s.Unit.Name,
                                     UnitId = s.Unit.Id,
-                                    UnorderedQuantity = s.Quantity
-                                                      - context.PurchaseOrderNewLineItems
-                                                               .Where(a => a.ItemId == s.ItemId
-                                                                        && a.ItemDescription == s.ItemDescription
-                                                                        && a.PurchaseRequestId == s.PurchaseRequestId
-                                                                      /*&& a.PurchaseOrder.Status.Name == "Approved"*/)
-                                                               .Select(a => a.Quantity)
-                                                               .Sum(),
+                                    Served = context.PurchaseOrderNewLineItems
+                                                    .Where(a => a.ItemId == s.ItemId
+                                                             && a.ItemDescription == s.ItemDescription
+                                                             && a.PurchaseOrder.Status.Name == "Approved")
+                                                    .Select(a => a.Quantity)
+                                                    .Sum(),
                                     Selected = SelectedId != null && s.Id == SelectedId
                                 })
-                                .Where(s => s.UnorderedQuantity > 0)
-                                .OrderBy(s => s.LineNumber)
+                                .OrderBy(s => s.Served)
                                 .ToListAsync();
         }
+
 
         public async Task<string> GetNewDocumentNumber(int? TypeId)
         {
@@ -135,8 +133,8 @@ namespace GMGInventory.Application.Repositories
                            {
                                Id = order.Id,
                                DocumentNumber = order.DocumentNumber,
-                               Type = order.Type.Name,
-                               Supplier = order.Supplier.Name,
+                               Type = order.Type.Code,
+                               Supplier = order.Supplier.Code,
                                Term = order.Term.Name,
                                DeliveryMode = order.DeliveryMode.Code,
                                Status = order.Status.Code,
@@ -232,17 +230,13 @@ namespace GMGInventory.Application.Repositories
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
                               Term = order.Term.Name,
-                              TermId = order.Term.Id,
-                              Currency = order.Currency.Name,
-                              CurrencyId = order.Currency.Id,
-                              CurrencyRateD = order.CurrencyRate,
+                              TemId = order.Term.Id,
                               DeliveryMode = order.DeliveryMode.Name,
                               DeliveryModeId = order.DeliveryMode.Id,
                               DeliveryAddress = order.DeliveryAddress.Name,
                               DeliveryAddressId = order.DeliveryAddress.Id,
                               Status = order.Status.Code,
                               OrderDateD = order.OrderDate,
-                              Reference = order.CanvasSummaryReference,
                               Remarks = order.Remarks,
                               ApprovedBy = order.ApproverId == null ? null : order.Approver.FirstName + " " + order.Approver.LastName,
                               DisapprovedBy = order.DisapproverId == null ? null : order.Disapprover.FirstName + " " + order.Disapprover.LastName,
@@ -273,20 +267,12 @@ namespace GMGInventory.Application.Repositories
                               PurchaseRequestNumber = order.PurchaseRequest.DocumentNumber,
                               ItemId = order.Item.Id,
                               ItemCode = order.Item.Code,
-                              ItemPartNumber = string.IsNullOrWhiteSpace(order.Item.PartNumber) ? "" : order.Item.PartNumber,
+                              ItemPartNumber = string.IsNullOrWhiteSpace(order.Item.PartNumber) ? "-" : order.Item.PartNumber,
                               ItemDescription = order.ItemDescription,
                               QuantityD = order.Quantity,
                               UnitId = order.Unit.Id,
                               UnitCode = order.Unit.Code,
-                              UnitCostD = order.UnitCost,
-                              UnorderedQuantityD = order.Quantity
-                                                 - context.PurchaseOrderNewLineItems
-                                                          .Where(a => a.ItemId == order.Item.Id
-                                                                   && a.ItemDescription == order.ItemDescription
-                                                                   && a.PurchaseRequestId == order.PurchaseRequestId
-                                                                   /*&& a.PurchaseOrder.Status.Name == "Approved"*/)
-                                                          .Select(a => a.Quantity)
-                                                          .Sum(),
+                              UnitCostD = order.UnitCost
                           };
             return await orderVM.ToListAsync();
         }
@@ -404,7 +390,8 @@ namespace GMGInventory.Application.Repositories
                         OrderDate = form.DateOrdered,
                         CanvasSummaryReference = form.Reference + "",
                         Remarks = form.Remarks,
-                        StatusId = status.Id
+                        StatusId = status.Id,
+                        ResubmitId = form.ResubmitId
                     };
                     await context.PurchaseOrderNews.AddAsync(order);
                     await context.SaveChangesAsync(currentUserId);
