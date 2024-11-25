@@ -99,7 +99,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> AddJson(PurchaseReceiveSaveVM form, List<PurchaseReceiveLineItemVM> items)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
             var response = await receiveRepository.AddAsync(form, items);
@@ -109,7 +109,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> ApproveJson(int Id)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
             var response = await receiveRepository.ApproveAsync(Id);
@@ -120,7 +120,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> DisapproveJson(int Id, string? reason)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
             var response = await receiveRepository.DisapproveAsync(Id, reason);
