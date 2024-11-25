@@ -119,6 +119,7 @@ namespace GMGInventory.Common.Models
         public int UnitId { get; set; }
         public string Unit { get; set; }
         public int UnorderedQuantity { get; set; }
+        public int Served { get; set; }
         public bool Selected { get; set; } = false;
     }
 

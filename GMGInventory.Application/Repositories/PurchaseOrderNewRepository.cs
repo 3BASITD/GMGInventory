@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -16,7 +15,6 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
 
         public PurchaseOrderNewReporitory(ApplicationDbContext context
                                         , IHttpContextAccessor httpContextAccessor
@@ -73,13 +71,13 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonRequestItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
+        public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
         {
             return await context.PurchaseRequestLineItems
                                 .Include(s => s.Item)
                                 .Include(s => s.Unit)
                                 .Where(s => s.PurchaseRequestId == RequestId)
-                                .Select(s => new JsonRequestItemOptionsModel
+                                .Select(s => new JsonPurchaseItemOptionsModel
                                 {
                                     Id = s.Id.ToString(),
                                     Text = s.ItemDescription,
@@ -230,7 +228,7 @@ namespace GMGInventory.Application.Repositories
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
                               Term = order.Term.Name,
-                              TemId = order.Term.Id,
+                              TermId = order.Term.Id,
                               DeliveryMode = order.DeliveryMode.Name,
                               DeliveryModeId = order.DeliveryMode.Id,
                               DeliveryAddress = order.DeliveryAddress.Name,
