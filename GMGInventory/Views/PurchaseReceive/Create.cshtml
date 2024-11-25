@@ -400,11 +400,24 @@
 
         function loadTermOptions() {
             // Load Select2 Credit Term
+            // $.ajax({
+            //     type: "POST",
+            //     url: "@Url.Action("GetOptions", "PurchasePaymentTerm")",
+            //     success: function (data, status, xhr) {
+            //         $("#receive-term").select2({
+            //             data: data
+            //         });
+            //     }
+            // });
+
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetOptions", "PurchasePaymentTerm")",
+                url: "@Url.Action("GetOptions", "CreditTerm")",
                 success: function (data, status, xhr) {
+                    console.log(data);
                     $("#receive-term").select2({
+                        minimumResultsForSearch: -1,
+                        placeholder: "<empty>",
                         data: data
                     });
                 }

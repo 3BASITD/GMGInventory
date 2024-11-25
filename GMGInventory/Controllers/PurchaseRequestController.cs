@@ -76,7 +76,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
-            var requestType = await requestRepository.GetTypeOptions(PurchaseOrderId);// .GetPurchaseRequestType(PurchaseOrderId);
+            var requestType = await requestRepository.GetPurchaseRequestType(PurchaseOrderId);
             if (requestType == null)
                 return NotFound();
 

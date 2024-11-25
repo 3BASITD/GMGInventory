@@ -76,7 +76,6 @@ builder.Services.AddScoped(typeof(IBusinessStyleRepository), typeof(BusinessStyl
 builder.Services.AddScoped(typeof(IItemConversionRepository), typeof(ItemConversionRepository));
 builder.Services.AddScoped(typeof(IUnitRepository), typeof(UnitRepository));
 builder.Services.AddScoped(typeof(IReportProcurementRepository), typeof(ReportProcurementRepository));
-builder.Services.AddScoped(typeof(IPurchasePaymentTermRepository), typeof(PurchasePaymentTermRepository));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

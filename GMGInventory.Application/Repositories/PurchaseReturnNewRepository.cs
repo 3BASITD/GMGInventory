@@ -86,15 +86,23 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<PurchaseOrderLineItemVM>> GetPurchaseReceiveItemList(int ReceiveId)
+        public async Task<IList<PurchaseReturnNewLineItemVM>> GetPurchaseReceiveItemList(int ReceiveId)
         {
             var receiveVM = from receive in context.PurchaseOrderNewLineItems
                                                    .Include(s => s.Item)
                                                    .Include(s => s.Unit)
                             where receive.PurchaseOrderId == ReceiveId
-                            select new PurchaseOrderLineItemVM
+                            select new PurchaseReturnNewLineItemVM
                             {
-                                //
+                                LineNumber = receive.LineNumber,
+                                ItemId = receive.Item.Id,
+                                ItemCode = receive.Item.Code,
+                                ItemPartNumber = receive.Item.PartNumber,
+                                ItemDescription = receive.ItemDescription,
+                                QuantityD = receive.Quantity,
+                                UnitId = receive.Unit.Id,
+                                UnitCode = receive.Unit.Code,
+                                UnitCostD = receive.UnitCost
                             };
 
             return await receiveVM.ToListAsync();
