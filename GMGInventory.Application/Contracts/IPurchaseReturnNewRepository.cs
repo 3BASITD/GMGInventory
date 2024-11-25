@@ -4,9 +4,9 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IPurchaseReturnNewRepository
     {
-        Task<IList<JsonOptionsModel>> GetPurchaseReceivingOptions(int? OrderId, int? SelectedId);
-        Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? ReceiveId, int? SelectedId);
+        Task<IList<JsonOptionsModel>> GetPurchaseReceivingOptions(int? SelectedId);
         Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseReceiveItemOptions(int ReceiveId, int? SelectedId);
+        Task<IList<PurchaseReturnNewLineItemVM>> GetPurchaseReceiveItemList(int ReceiveId);
         Task<string> GetNewDocumentNumber();
         Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form);
         Task<PurchaseReturnNewDetailedVM?> GetDetails(int returnId);

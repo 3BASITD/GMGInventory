@@ -11,15 +11,19 @@ namespace GMGInventory.Controllers
     public class PurchaseReturnNewController(IAccessRepository accessRepository
                                            , IPurchaseReturnNewRepository returnRepository) : BaseController(accessRepository)
     {
-
-        public async Task<IActionResult> GetPurchaseReceivingOptions(int? OrderId, int? SelectedId)
+        public async Task<IActionResult> GetPurchaseReceivingOptions(int? SelectedId)
         {
-            return Json(await returnRepository.GetPurchaseReceivingOptions(OrderId, SelectedId));
+            return Json(await returnRepository.GetPurchaseReceivingOptions(SelectedId));
         }
 
-        public async Task<IActionResult> GetPurchaseOrderOptions(int? ReceiveId, int? SelectedId)
+        public async Task<IActionResult> GetPurchaseReceiveItemOptions(int ReceiveId, int? SelectedId)
         {
-            return Json(await returnRepository.GetPurchaseOrderOptions(ReceiveId, SelectedId));
+            return Json(await returnRepository.GetPurchaseReceiveItemOptions(ReceiveId, SelectedId));
+        }
+
+        public async Task<IActionResult> GetPurchaseReceiveItemList(int ReceiveId)
+        {
+            return Json(await returnRepository.GetPurchaseReceiveItemList(ReceiveId));
         }
 
         public async Task<IActionResult> GetNewDocumentNumber()

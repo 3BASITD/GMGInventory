@@ -36,6 +36,7 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new PurchaseRequestTypeSeedConfiguration());
             builder.ApplyConfiguration(new PurchaseRequestPurposeSeedConfiguration());
             builder.ApplyConfiguration(new PurchaseStatusSeedConfiguration());
+
         }
 
         public DbSet<AuditLog> AuditLogs { get; set; }

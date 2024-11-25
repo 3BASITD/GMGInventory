@@ -3,6 +3,7 @@ using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
@@ -50,12 +51,18 @@ namespace GMGInventory.Controllers
             return View(receive);
         }
 
+        public async Task<IActionResult> DetailsJson(int Id)
+        {
+            var receive = await receiveRepository.GetDetails(Id);
+            if (receive == null)
+                return NotFound();
+
+            return Json(receive);
+        }
+
         [HttpPost]
         public async Task<IActionResult> GetItemListJson(int purchaseReceiveId)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
-
             return Json(await receiveRepository.GetItemListAsync(purchaseReceiveId));
         }
    

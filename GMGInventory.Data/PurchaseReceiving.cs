@@ -36,6 +36,13 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string SalesInvoiceNumber { get; set; }
 
+        [ForeignKey("CurrencyId")]
+        public int CurrencyId { get; set; }
+        public virtual Currency Currency { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal CurrencyRate { get; set; }
+
         public string Remarks { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
