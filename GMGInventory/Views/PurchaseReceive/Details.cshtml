@@ -101,8 +101,19 @@
                     </b>
                 </p>
             </div>
-          
-          
+
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.PONumber)
+                    </span>
+                    <b class="d-block">
+                        @Model?.PONumber
+                    </b>
+                </p>
+            </div>
+
+
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -302,16 +313,19 @@
                                     <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 add-unit2-container">
-                                <div class="form-group">
-                                    <label for="add-unit2" class="form-label mb-0">Unit</label>
-                                    <div>
-                                        <select id="add-unit2" style="width: 100%;">
-                                            <option></option>
-                                        </select>
+                             @if (Model!.PurchaseRequestType == "MR")
+                            {
+                                <div class="col-12 col-sm-6 add-unit2-container">
+                                    <div class="form-group">
+                                        <label for="add-unit2" class="form-label mb-0">Unit</label>
+                                        <div>
+                                            <select id="add-unit2" style="width: 100%;">
+                                                <option></option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                             <div class="col-12 col-sm-6 add-cost">
                                 <div class="form-group">
                                     <label for="add-cost" class="form-label mb-0">Unit Cost</label>

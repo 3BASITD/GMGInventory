@@ -33,10 +33,17 @@
         </div>
         <div class="card-body">
             <div class="row">
+                  <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="receive-docNumber" class="form-label mb-0">Document Number</label>
+                        <input type="text" id="receive-docNumber" name="DocumentNumber" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                </div>
+
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
-                        <label for="receive-documentNumber" class="form-label mb-0">Document Number</label>
-                        <select id="receive-documentNumber" name="DocumentNumber" style="width: 100%"></select>
+                        <label for="receive-poNumber" class="form-label mb-0">Purchase Order</label>
+                        <select id="receive-poNumber" name="PurchaseOrder" style="width: 100%"></select>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -95,13 +102,14 @@
                         <input type="date" id="date-received" name="DateReceived" class="form-control form-control-sm" />
                     </div>
                 </div>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <div class="form-group">
-                    <label for="receive-remarks" class="form-label mb-0">Remarks</label>
-                    <input type="text" id="receive-remarks" name="Remarks" class="form-control form-control-sm" />
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="receive-remarks" class="form-label mb-0">Remarks</label>
+                        <input type="text" id="receive-remarks" name="Remarks" class="form-control form-control-sm" />
+                    </div>
                 </div>
             </div>
+         
 
             <div class="row">
                 <div class="col-12">
@@ -181,12 +189,6 @@
                                 <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 add-unit-container">
-                            <div class="form-group">
-                                <label for="add-unit" class="form-label mb-0">Unit</label>
-                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                        </div>
                         <div class="col-12 col-sm-6 add-unit2-container">
                             <div class="form-group">
                                 <label for="add-unit2" class="form-label mb-0">Unit</label>
@@ -195,6 +197,12 @@
                                         <option></option>
                                     </select>
                                 </div>
+                            </div>
+                        </div>
+                          <div class="col-12 col-sm-6 add-unit-container">
+                            <div class="form-group">
+                                <label for="add-unit" class="form-label mb-0">Unit</label>
+                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-cost">
@@ -231,7 +239,8 @@
         if ($("#resubmitPRId").length) {
 
         } else {
-            loadDocumentNumberOptions();
+            loadDocumentNumber();
+            loadPONumberOptions();
             loadTermOptions();
             loadSupplierOptions();
             loadWarehouseOptions();
@@ -371,14 +380,29 @@
             });
         });
 
-        function loadDocumentNumberOptions() {
-            // Load Select2 Document Number
+        function loadDocumentNumber() {
+            if ($("#resubmitPOId").length == 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetNewDocumentNumber")",
+                   // data: { },
+                    success: function (data, status, xhr) {
+                        $("#receive-docNumber").val(data);
+                    }
+                });
+            }
+        }
+
+        function loadPONumberOptions() {
+            // Load Select2 Purchase Order
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetPurchaseOrderOptions", "PurchaseReceive")",
                 success: function (data, status, xhr) {
-                    $("#receive-documentNumber").select2({
-                        data: data
+                    $("#receive-poNumber").select2({
+                        data: data,
+                        minimumResultsForSearch: -1,
+                        placeholder: "<empty>",
                     }).on("change", function () {
                         $.ajax({
                             type: "POST",
@@ -387,9 +411,11 @@
                             success: function (data, status, xhr) {
                                 if (data == "MR") {
                                     $(".add-code-container").toggle(false);
+                                    $(".add-unit2-container").toggle(true);
                                 }
                                 else {
                                     $(".add-code-container").toggle(true);
+                                    $(".add-unit2-container").toggle(false);
                                 }
                             }
                         });
@@ -400,16 +426,6 @@
 
         function loadTermOptions() {
             // Load Select2 Credit Term
-            // $.ajax({
-            //     type: "POST",
-            //     url: "@Url.Action("GetOptions", "PurchasePaymentTerm")",
-            //     success: function (data, status, xhr) {
-            //         $("#receive-term").select2({
-            //             data: data
-            //         });
-            //     }
-            // });
-
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetOptions", "CreditTerm")",
@@ -792,7 +808,7 @@
                     type: "POST",
                     url: "@Url.Action("AddJson")",
                     data: {
-                        DocumentNumber: $("#receive-documentNumber").val(),
+                        DocumentNumber: $("#receive-poNumber").val(),
                         SupplierId: $("#receive-supplier").val(),
                         TermId: $("#receive-term").val(),
                         WarehouseId: $("#receive-warehouse").val(),

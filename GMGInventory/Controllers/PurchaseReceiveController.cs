@@ -128,5 +128,9 @@ namespace GMGInventory.Controllers
             return Json(response);
         }
 
+        public async Task<IActionResult> GetNewDocumentNumber()
+        {
+            return Json(await receiveRepository.GetNewDocumentNumber());
+        }
     }
 }

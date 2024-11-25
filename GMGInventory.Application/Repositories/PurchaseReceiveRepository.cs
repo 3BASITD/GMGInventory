@@ -25,7 +25,7 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<PurchaseReceiveVM>> GetListAsync()
         {
-            var requestVM = (from request in context.PurchaseReceivings
+            var receiveVM = (from receive in context.PurchaseReceivings
                                                 .Include(s => s.Supplier)
                                                 .Include(s => s.Term)
                                                 .Include(s => s.PurchaseOrder)
@@ -33,16 +33,16 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.Status)
                            select new PurchaseReceiveVM
                            {
-                               Id = request.Id,
-                               DocumentNumber = request.DocumentNumber,
-                               Supplier = request.Supplier.Code,
-                               Term = request.Term.Name,
-                               PONumber = request.PurchaseOrder.DocumentNumber,
-                               Warehouse = request.Warehouse.Code,
-                               Status = request.Status.Code,
-                               ReceiveDateD = request.ReceiveDate
+                               Id = receive.Id,
+                               DocumentNumber = receive.DocumentNumber,
+                               Supplier = receive.Supplier.Code,
+                               Term = receive.Term.Name,
+                               PONumber = receive.PurchaseOrder.DocumentNumber,
+                               Warehouse = receive.Warehouse.Code,
+                               Status = receive.Status.Code,
+                               ReceiveDateD = receive.ReceiveDate
                            });
-            return await requestVM.ToListAsync();
+            return await receiveVM.ToListAsync();
         }
 
         public async Task<ForDataTables<PurchaseReceiveVM>> GetListDTAsync(DataTablesRequestForm form)
@@ -128,6 +128,7 @@ namespace GMGInventory.Application.Repositories
                           {
                               Id = receive.Id,
                               DocumentNumber = receive.DocumentNumber,
+                              PONumber = receive.PurchaseOrder.DocumentNumber,
                               PurchaseRequestType = po.PurchaseRequest.Type.Code,
                               Warehouse = receive.Warehouse.Code,
                               Status = receive.Status.Code,
@@ -438,6 +439,22 @@ namespace GMGInventory.Application.Repositories
             }
 
             return response;
+        }
+
+        public async Task<string> GetNewDocumentNumber()
+        {
+            //var purchaseType = await context.PurchaseOrderTypes.Where(s => s.Id == TypeId).FirstOrDefaultAsync();
+
+            //var typeCode = purchaseType == null ? "" : $"{purchaseType.Code}-";
+            var docNumberPrefix = $"RR{DateTime.Now.Year}-";
+            var lastDocument = await context.PurchaseReceivings
+                                            .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
+                                            .OrderByDescending(s => s.DocumentNumber)
+                                            .Select(s => s.DocumentNumber)
+                                            .FirstOrDefaultAsync();
+
+            int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
+            return $"{docNumberPrefix}{docNumberLast + 1:D4}";
         }
     }
 }
