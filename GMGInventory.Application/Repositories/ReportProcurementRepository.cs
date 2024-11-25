@@ -141,7 +141,7 @@ namespace GMGInventory.Application.Repositories
             var preturnVM = from preturn in context.PurchaseReturnNewLineItems.Include(s => s.PurchaseReturn) 
                             join poItems in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder) on preturn.PurchaseReturn.PurchaseOrder.Id equals poItems.PurchaseOrderId
 
-                            where filter.DateFrom <= preturn.PurchaseReturn.ReceiveDate.Date && preturn.PurchaseReturn.ReceiveDate.Date <= filter.DateTo
+                            where filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
                             && (filter.Item == null || preturn.Item.Id == filter.Item || (filter.Item == 0 && preturn.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                             && (filter.Supplier == null || preturn.PurchaseReturn.Supplier.Id == filter.Supplier)
 
@@ -155,7 +155,7 @@ namespace GMGInventory.Application.Repositories
                                 TotalAmount = poItems.Quantity * poItems.UnitCost,
                                 DocumentNumber = preturn.PurchaseReturn.DocumentNumber,
                                 Supplier = preturn.PurchaseReturn.Supplier.Code,
-                                ReturnDateD = preturn.PurchaseReturn.ReceiveDate, // change to return
+                                ReturnDateD = preturn.PurchaseReturn.ReturnDate, // change to return
 
                                 ReturnQuantity = preturn.Quantity,
                                 ReturnTotalAmount = preturn.UnitCost * preturn.Quantity

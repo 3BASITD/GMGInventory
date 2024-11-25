@@ -20,7 +20,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Term")]
         public string Term { get; set; }
-        public int TemId { get; set; }
+        public int TermId { get; set; }
 
         [Display(Name = "Delivery Mode")]
         public string DeliveryMode { get; set; }
@@ -30,12 +30,20 @@ namespace GMGInventory.Common.Models
         public string Status { get; set; }
 
         [Display(Name = "Date Ordered")]
-        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
+        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
+        public string OrderDate3 => OrderDateD.ToString(SystemFormat.StringDate3);
         public DateTime OrderDateD { get; set; }
     }
 
     public class PurchaseOrderNewDetailedVM : PurchaseOrderNewVM
     {
+        [Display(Name = "Currency")]
+        public string Currency { get; set; }
+        public int CurrencyId { get; set; }
+
+        [Display(Name = "Currency Rate")]
+        public string CurrencyRate=> string.Format(SystemFormat.StringDecimalComma, CurrencyRateD);
+        public decimal CurrencyRateD { get; set; }
 
         [Display(Name = "Delivery Address")]
         public string DeliveryAddress { get; set; }
@@ -43,6 +51,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
+
+        [Display(Name = "Canvas Summary Reference")]
+        public string Reference { get; set; }
 
         [Display(Name = "Approved By")]
         public string? ApprovedBy { get; set; }
@@ -114,10 +125,14 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Quantity")]
         public string Quantity => string.Format("{0:#,##0}", QuantityD);
         public int QuantityD { get; set; }
-        public int UnitId { get; set; }
+
+        [Display(Name = "Unordered Quantity")]
+        public string UnorderedQuantity => string.Format("{0:#,##0}", UnorderedQuantityD);
+        public int UnorderedQuantityD { get; set; }
 
         [Display(Name = "UOM")]
         public string UnitCode { get; set; }
+        public int UnitId { get; set; }
 
         [Display(Name = "Unit Cost")]
         public string UnitCost => string.Format("{0:#,##0.00}", UnitCostD);

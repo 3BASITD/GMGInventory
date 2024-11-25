@@ -28,13 +28,33 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Status")]
         public string Status { get; set; }
 
-        [Display(Name = "Date Received")]
-        public string ReceiveDate => ReceiveDateD.ToString(SystemFormat.StringDateTime);
-        public DateTime ReceiveDateD { get; set; }
+        [Display(Name = "Date Returned")]
+        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDateTime);
+        public DateTime ReturnDateD { get; set; }
     }
 
     public class PurchaseReturnNewDetailedVM :PurchaseReturnNewVM
     {
+
+        [Display(Name = "Receiving #")]
+        public string ReceivingNumber { get; set; }
+
+        [Display(Name = "Remarks")]
+        public string Remarks { get; set; }
+
+        [Display(Name = "Canvas Summary Reference")]
+        public string Reference { get; set; }
+
+        [Display(Name = "Approved By")]
+        public string? ApprovedBy { get; set; }
+
+        [Display(Name = "Disapproved By")]
+        public string? DisapprovedBy { get; set; }
+
+        [Display(Name = "Disapproved Reason")]
+        public string? DisapprovedReason { get; set; }
+        public int? ResubmitId { get; set; }
+        public int? ResubmitFromId { get; set; }
 
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }
@@ -47,7 +67,61 @@ namespace GMGInventory.Common.Models
         public string? UserModified { get; set; }
 
         [Display(Name = "Date Modified")]
-        public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
+        public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
+
+        public IList<PurchaseReturnNewSaveVM> LineItems { get; set; }
+    }
+
+    public class PurchaseReturnNewSaveVM
+    {
+        public int TypeId { get; set; }
+        public int SupplierId { get; set; }
+        public int TermsId { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal CurrencyRate { get; set; }
+        public int DeliveryModeId { get; set; }
+        public int DeliveryAddressId { get; set; }
+        public DateTime DateOrdered { get; set; }
+        public string Reference { get; set; }
+        public string Remarks { get; set; }
+        public string Status { get; set; }
+        public int? ResubmitId { get; set; }
+        public PurchaseReturnNewLineItemVM Items { get; set; }
+    }
+
+    public class PurchaseReturnNewLineItemVM
+    {
+        public int Id { get; set; }
+        public int PurchaseReturnId { get; set; }
+
+        [Display(Name = "Line Number")]
+        public int LineNumber { get; set; }
+        public int? ItemId { get; set; }
+
+        [Display(Name = "Item Code")]
+        public string? ItemCode { get; set; }
+
+        [Display(Name = "Part Number")]
+        public string ItemPartNumber { get; set; }
+
+        [Display(Name = "Item Name")]
+        public string ItemDescription { get; set; }
+
+        [Display(Name = "Quantity")]
+        public string Quantity => string.Format("{0:#,##0}", QuantityD);
+        public int QuantityD { get; set; }
+
+        [Display(Name = "UOM")]
+        public string UnitCode { get; set; }
+        public int UnitId { get; set; }
+
+        [Display(Name = "Unit Cost")]
+        public string UnitCost => string.Format("{0:#,##0.00}", UnitCostD);
+        public decimal UnitCostD { get; set; }
+
+        [Display(Name = "Total Amount")]
+        public string TotalAmount => string.Format("{0:#,##0.00}", TotalAmountD);
+        public decimal TotalAmountD => QuantityD * UnitCostD;
     }
 }

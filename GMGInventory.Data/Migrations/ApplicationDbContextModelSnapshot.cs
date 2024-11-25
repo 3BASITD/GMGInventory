@@ -3386,6 +3386,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DeliveryAddressId")
+                        .HasColumnType("int");
+
                     b.Property<string>("DeliveryReceiptNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
@@ -3439,14 +3442,11 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("WarehouseId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ApproverId");
 
-                    b.HasIndex("DisapproverId");
+                    b.HasIndex("DeliveryAddressId");
 
                     b.HasIndex("DisapproverId");
 
@@ -3459,8 +3459,6 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("SupplierId");
 
                     b.HasIndex("TermId");
-
-                    b.HasIndex("WarehouseId");
 
                     b.ToTable("PurchaseReceivings");
                 });
@@ -3875,8 +3873,8 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("PurchaseOrderId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ReceiveDate")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("PurchaseReceiveId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Remarks")
                         .IsRequired()
@@ -3884,6 +3882,9 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<int?>("ResubmitId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("ReturnDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SalesInvoiceNumber")
                         .IsRequired()
@@ -3912,6 +3913,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("DisapproverId");
 
                     b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("PurchaseReceiveId");
 
                     b.HasIndex("ResubmitId");
 
@@ -6208,9 +6211,11 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseReceivingApprover")
                         .HasForeignKey("ApproverId");
 
-                    b.HasOne("GMGInventory.Data.User", "Disapprover")
-                        .WithMany("PurchaseReceivingDisapprover")
-                        .HasForeignKey("DisapproverId");
+                    b.HasOne("GMGInventory.Data.Warehouse", "DeliveryAddress")
+                        .WithMany("PurchaseReceivings")
+                        .HasForeignKey("DeliveryAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("GMGInventory.Data.User", "Disapprover")
                         .WithMany("PurchaseReceivingDisapprover")
@@ -6433,6 +6438,12 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.PurchaseReceiving", "PurchaseReceive")
+                        .WithMany("PurchaseReturns")
+                        .HasForeignKey("PurchaseReceiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.PurchaseReturnNew", "Resubmit")
                         .WithMany("PurchaseReturnResubmits")
                         .HasForeignKey("ResubmitId");
@@ -6458,6 +6469,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Disapprover");
 
                     b.Navigation("PurchaseOrder");
+
+                    b.Navigation("PurchaseReceive");
 
                     b.Navigation("Resubmit");
 
@@ -7033,6 +7046,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseReceivingLineItems");
 
                     b.Navigation("PurchaseReceivingResubmits");
+
+                    b.Navigation("PurchaseReturns");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseRequest", b =>
