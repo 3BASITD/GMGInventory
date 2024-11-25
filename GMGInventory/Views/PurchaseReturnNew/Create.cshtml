@@ -296,6 +296,19 @@
                         data: data
                     }).off("select2:select").on("select2:select", function () {
                         loadRRDetails();
+                    }).off("select2:unselecting").on("select2:unselecting", function () {
+                        $("#return-ponumber").val("");
+                        $("#return-ponumber").removeData("Id");
+                        $("#return-supplier").val("");
+                        $("#return-supplier").removeData("Id");
+                        $("#return-currency").val("");
+                        $("#return-currency").removeData("Id");
+                        $("#return-currency-rate").val("");
+                        $("#return-warehouse").val("");
+                        $("#return-warehouse").removeData("Id");
+                        $("#return-drnumber").val("");
+                        $("#return-sinumber").val("");
+                        itemDT.clear().draw();
                     }).val(null).trigger('change');
                 }
             });
