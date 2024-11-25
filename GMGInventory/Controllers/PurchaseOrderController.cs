@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -23,9 +24,9 @@ namespace GMGInventory.Controllers
             return Json(await orderRepository.GetDeliveryModeOptions(SelectedId));
         }
 
-        public async Task<IActionResult> GetPurchaseRequestOptions(int RequestTypeId, int? SelectedId)
+        public async Task<IActionResult> GetPurchaseRequestOptions(int OrderTypeId, int? SelectedId)
         {
-            return Json(await orderRepository.GetPurchaseRequestOptions(RequestTypeId, SelectedId));
+            return Json(await orderRepository.GetPurchaseRequestOptions(OrderTypeId, SelectedId));
         }
 
         public async Task<IActionResult> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
@@ -94,11 +95,17 @@ namespace GMGInventory.Controllers
             return View(await orderRepository.GetDetails(Id));
         }
 
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
+            var request = await orderRepository.GetDetails(Id ?? 0);
+            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status != "Disapproved"))
+            {
+                return RedirectToAction("Details", new { Id });
+            }
+            TempData["PurchaseOrderId"] = Id;
             return View();
         }
 

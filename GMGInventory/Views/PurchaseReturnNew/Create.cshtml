@@ -1,0 +1,853 @@
+﻿@{
+    if (TempData["PurchaseReturnId"] != null)
+    {
+        ViewData["Title"] = "Resubmit Purchase Return";
+    }
+    else
+    {
+
+        ViewData["Title"] = "New Purchase Return";
+    }
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="PurchaseReturn" asp-action="Index">Purchase Returns</a></li>
+}
+
+<div class="card card-default">
+    <form id="form-return">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" data-action="Draft">
+                    <span class="fas fa-save"></span> Save as Draft
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submitted">
+                    <span class="fas fa-paper-plane"></span> @(TempData["PurchaseReturnId"] != null ? "Resubmit" : "Submit")
+                </button>
+                <input type="hidden" id="action-type" name="ActionType" value="">
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-document-number" class="form-label mb-0">Document Number</label>
+                        <input type="text" id="return-document-number" name="DocumentNumber" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-supplier" class="form-label mb-0">Supplier</label>
+                        <select id="return-supplier" name="Supplier" style="width: 100%"></select>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-ponumber" class="form-label mb-0">Purchase Order Number</label>
+                        <select id="return-ponumber" name="PONumber" style="width: 100%"></select>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-rrnumber" class="form-label mb-0">Purchase Receiving Number</label>
+                        <select id="return-rrnumber" name="RRNumber" style="width: 100%"></select>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-date-returned" class="form-label mb-0">Date Returned</label>
+                        <input type="date" id="return-date-returned" name="DateReturned" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-currency" class="form-label mb-0">Currency</label>
+                        <select id="return-currency" name="Currency" style="width: 100%"></select>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-currency-rate" class="form-label mb-0">Currency Rate</label>
+                        <input type="number" step="0.001" id="return-currency-rate" name="CurrencyRate" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-warehouse" class="form-label mb-0">Warehouse</label>
+                        <select id="return-warehouse" name="Warehouse" style="width: 100%"></select>
+                    </div>  
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-drnumber" class="form-label mb-0">Delivery Receipt Number</label>
+                        <input type="text" id="return-drnumber" name="DRNumber" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-sinumber" class="form-label mb-0">Sales Invoice Number</label>
+                        <input type="text" id="return-sinumber" name="SINumber" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-remarks" class="form-label mb-0">Remarks</label>
+                        <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Purchase Return Item(s)</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                    <span class="fas fa-plus"></span> Add Item
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>#</th>
+                                        <th>Item Code</th>
+                                        <th>Part Number</th>
+                                        <th>Item Description</th>
+                                        <th>Quantity</th>
+                                        <th>Unit</th>
+                                        <th>Unit Cost</th>
+                                        <th>Total Amount</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th>Total</th>
+                                        <th class="total-quantity">0</th>
+                                        <th></th>
+                                        <th></th>
+                                        <th class="total-amount">0.00</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Purchase Return Item Modal -->
+<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Purchase Return Item</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form-item">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 add-code-container">
+                            <div class="form-group">
+                                <label for="add-code" class="form-label mb-0">Item Code</label>
+                                <input type="text" id="add-code" name="Code" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 add-part-container">
+                            <div class="form-group">
+                                <label for="add-part" class="form-label mb-0">Part Number</label>
+                                <input type="text" id="add-part" name="PartNumber" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 add-name-container">
+                            <div class="form-group">
+                                <label for="add-name" class="form-label mb-0">Item Name</label>
+                                <select id="add-name" name="Name" style="width: 100%;">
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 add-quantity-container">
+                            <div class="form-group">
+                                <label for="add-quantity" class="form-label mb-0">Quantity</label>
+                                <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 add-unit-container">
+                            <div class="form-group">
+                                <label for="add-unit" class="form-label mb-0">Unit</label>
+                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 add-unit-cost-container">
+                            <div class="form-group">
+                                <label for="add-unit-cost" class="form-label mb-0">Unit Cost</label>
+                                <input type="number" step="0.01" id="add-unit-cost" name="UnitCost" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 add-total-amount-container">
+                            <div class="form-group">
+                                <label for="add-total-amount" class="form-label mb-0">Total Amount</label>
+                                <input type="text" id="add-total-amount" name="TotalAmount" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-add">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (TempData["PurchaseReturnId"] != null)
+{
+    <input type="hidden" id="resubmitROId" value="@TempData["PurchaseReturnId"]" />
+}
+
+@section Scripts {
+    <script>
+        var currentType = -1;
+        var currentPurpose = -1;
+        if ($("#resubmitROId").length) {
+            // for resubmitting a disapproved sales order
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("DetailsJson")",
+                data: {
+                    id: $("#resubmitROId").val()
+                },
+                success: function (data, status, xhr) {
+                    $("#return-document-number").val(data.documentNumber);
+
+                    $("#return-date-returned").val(data.returnDate3);
+                    $("#return-currency-rate").val(data.currencyRate);
+                    $("#return-drnumber").val(data.dRNumber);
+                    $("#return-sinumber").val(data.sINumber);
+                    $("#return-remarks").val(data.remarks);
+                    loadSupplier(data.supplierId);
+                    loadPONumber(-1, -1);
+                    loadRRNumber(-1, -1);
+                    loadCurrency(-1);
+                },
+                complete: function (xhr, status) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetItemListJson")",
+                        data: {
+                            purchaseReturnId: $("#resubmitROId").val()
+                        },
+                        success: function (data, status, xhr) {
+                            $.each(data, function (i, v) {
+                                itemDT.row.add(v).draw();
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetNewDocumentNumber")",
+                success: function (data, status, xhr) {
+                    $("#return-document-number").val(data);
+                }
+            });
+            loadSupplier(-1); 
+            loadPONumber(-1, -1);
+            loadRRNumber(-1, -1);
+            loadCurrency(-1);
+            loadWarehouse(-1);
+        }
+
+        var itemDT = $('.table-item').DataTable({
+            data: [],
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
+                        actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
+                        actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
+                        return actions + '</div>';
+                    },
+                    className: "form-cell"
+                },
+                { data: "lineNumber", name: "LineNumber", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.itemId == null || data.itemCode == null) {
+                            return "-";
+                        } else {
+                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
+                        }
+                    },
+                    name: "ItemCode",
+                    className: "form-cell"
+                },
+                { data: "itemPartNumber", name: "ItemPartNumber", className: "form-cell" },
+                { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                    },
+                    name: "Quantity",
+                    className: "form-cell text-end"
+                },
+                { data: "unitCode", name: "UnitCode", className: "form-cell" },
+                { data: "unitCost", name: "UnitCost", className: "form-cell" },
+                { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
+            ],
+            order: [[1, "asc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                columnDTTotalInteger(api, 5);
+                columnDTTotalDecimal(api, 8);
+            }
+        });
+
+        itemDT.on("draw", function () {
+            hideLoader();
+
+            $(".table-item thead th").removeClass("form-cell");
+            $(".table-item thead th").removeClass("text-end");
+
+            $(".btn-remove-item").on("click", function () {
+                itemDT.row($(this).parents('tr')).remove().draw();
+            });
+
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var rowData = this.data();
+                if (rowData.lineNumber == 1)
+                    $(this.node()).find(".btn-up-item").hide();
+                else
+                    $(this.node()).find(".btn-up-item").show();
+
+                if (rowData.lineNumber == Math.max.apply(Math, itemDT.column(1).data().toArray()))
+                    $(this.node()).find(".btn-down-item").hide();
+                else
+                    $(this.node()).find(".btn-down-item").show();
+            });
+
+            $(".btn-up-item").off("click").on("click", function () {
+                var row = $(this).parents('tr');
+                var rowData = itemDT.row(row).data();
+
+                var currentLineNumber = rowData.lineNumber;
+                var newLineNumber = currentLineNumber - 1;
+
+                var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
+                    return itemDT.row(index).data().lineNumber === newLineNumber;
+                });
+
+                if (targetRowIndex != undefined) {
+                    var targetRowData = itemDT.row(targetRowIndex).data();
+                    targetRowData.lineNumber = currentLineNumber;
+                    itemDT.row(targetRowIndex).data(targetRowData);
+                }
+
+                rowData.lineNumber = newLineNumber;
+                itemDT.row(row).data(rowData);
+
+                itemDT.draw();
+            });
+
+            $(".btn-down-item").off("click").on("click", function () {
+                var row = $(this).parents('tr');
+                var rowData = itemDT.row(row).data();
+                var currentLineNumber = rowData.lineNumber;
+                var newLineNumber = currentLineNumber + 1;
+
+                var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
+                    return itemDT.row(index).data().lineNumber == newLineNumber;
+                });
+
+                if (targetRowIndex != undefined) {
+                    var targetRowData = itemDT.row(targetRowIndex).data();
+                    targetRowData.lineNumber = currentLineNumber;
+                    itemDT.row(targetRowIndex).data(targetRowData);
+                }
+
+                rowData.lineNumber = newLineNumber;
+                itemDT.row(row).data(rowData);
+
+                itemDT.draw();
+            });
+
+            $(".quantity").off("change").on("change", function () {
+                var row = itemDT.row($(this).closest('tr'));
+                var rowData = row.data();
+
+                var lineNumber = rowData.lineNumber;
+
+                var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
+
+                var totalValue = quantityValue * rowData.unitCostD;
+
+                rowData.quantity = FormatStringInteger(quantityValue);
+                rowData.quantityD = quantityValue;
+                rowData.totalAmount = FormatStringDecimal(totalValue);
+                rowData.totalAmountD = totalValue;
+
+                row.data(rowData).draw(false);
+
+                setTimeout(function () {
+                    var restoredRow = $(itemDT.row(function (idx, data) {
+                        return data.lineNumber === lineNumber;
+                    }).node());
+                    if (restoredRow) {
+                        var restoredInput = $(restoredRow).find(".quantity");
+
+                        if (restoredInput.length)
+                            restoredInput.focus();
+                    }
+                }, 0);
+            });
+        });
+
+        // Load purchase number for select2
+        function loadPONumber(selectedReceiving, selectedOrder) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetPurchaseOrderOptions")",
+                data: {
+                    ReceiveId: selectedReceiving,
+                    SelectedId: selectedOrder
+                },
+                success: function (data, status, xhr) {
+                    $("#return-ponumber").select2({
+                        minimumInputLength: -1,
+                        placeholder: "<empty>",
+                        allowClear: true,
+                        data: data
+                    }).off("select2:select").on("select2:select", function() {
+                        loadRRNumber($("#return-ponumber").val(), -1);
+                    }).val(null).trigger('change');
+                }
+            });
+        }
+
+        // Load purchase receiving for select2
+        function loadRRNumber(selectedOrder, selectedReceiving) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetPurchaseReceivingOptions")",
+                data: {
+                    OrderId: selectedOrder,
+                    SelectedId: selectedReceiving
+                },
+                success: function (data, status, xhr) {
+                    $("#return-rrnumber").select2({
+                        minimumInputLength: -1,
+                        placeholder: "<empty>",
+                        allowClear: true,
+                        data: data
+                    }).off("select2:select").on("select2:select", function () {
+                        loadPONumber($("#return-rrnumber").val(), -1);
+                    }).val(null).trigger('change');
+                }
+            });
+        }
+
+        // Load supplier for select2
+        function loadSupplier(selectedSupplier) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Supplier")",
+                data: {
+                    IncludeId: selectedSupplier
+                },
+                success: function (data, status, xhr) {
+                    $("#return-supplier").select2({
+                        minimumInputLength: -1,
+                        placeholder: "<empty>",
+                        templateResult: function (repo) {
+                            if (repo.loading) {
+                                return repo.text;
+                            }
+                            return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                        },
+                        data: data
+                    }).val(null).trigger('change');
+                }
+            });
+        }
+
+        // Load currency for select2
+        function loadCurrency(selectedCurrency) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetCurrencyOptions", "ReplenishInventory")",
+                data: {
+                    IncludeId: selectedCurrency
+                },
+                success: function (data, status, xhr) {
+                    $("#return-currency").select2({
+                        minimumResultsForSearch: -1,
+                        placeholder: "<empty>",
+                        data: data
+                    }).val(null).trigger('change');
+                    $("#return-currency-rate").val($("#return-currency").select2("data")[0].rate);
+                    $("#return-currency").on("select2:select", function () {
+                        $("#return-currency-rate").val($("#return-currency").select2("data")[0].rate);
+                    });
+                }
+            });
+        }
+
+        // Load warehouse data for select2
+        function loadWarehouse(selectedWarehouse) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Warehouse")",
+                data: {
+                    IncludeId: selectedWarehouse
+                },
+                success: function (data, status, xhr) {
+                    $("#return-warehouse").select2({
+                        data: data,
+                        minimumResultsForSearch: -1,
+                        placeholder: "<empty>",
+                        templateResult: function (repo) {
+                            if (repo.loading) {
+                                return repo.text;
+                            }
+                            return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                        },
+                    }).val(null).trigger('change');
+                }
+            });
+        }
+
+        loadAllItemsOptions();
+        function loadAllItemsOptions() {
+            if ($.fn.select2 && $("#add-name").hasClass("select2-hidden-accessible")) {
+                $("#add-name").select2("destroy");
+            }
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetPurchaseRequestItemOptions")",
+                data: {
+                    RequestId: function () {
+                        return $("#add-pr-number").val();
+                    }
+                },
+                success: function (data, status, xhr) {
+                    $("#add-name").select2({
+                        data: data,
+                        minimumResultsForSearch: -1,
+                        placeholder: "<empty>",
+                        allowClear: true,
+                        language: {
+                            noResults: function () {
+                                return "No unserved items found";
+                            }
+                        },
+                        templateResult: function (repo) {
+                            if (repo.loading) {
+                                return repo.text;
+                            }
+                            return $(
+                                "<strong>" + repo.text + "</strong><br />" +
+                                "<small>" +
+                                "Requested Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
+                                "Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit +
+                                "</small>"
+                            );
+                        },
+                        dropdownParent: $("#addModal")
+                    }).off("select2:select").on("select2:select", function () {
+                        var selected = $(this).select2("data")[0];
+                        $("#add-code").val(selected.itemCode);
+                        $("#add-part").val(selected.partNumber);
+                        $("#add-quantity").val(selected.unorderedQuantity);
+                        $("#add-quantity").data("max", selected.unorderedQuantity);
+                        $("#add-unit").val(selected.unit);
+                        $("#add-unit").data("Id", selected.unitId);
+                        $("#add-unit-cost").val(0);
+                        $("#add-total-amount").val("0.00");
+                    }).off("select2:unselecting").on("select2:unselecting", function () {
+                        $("#add-code").val("");
+                        $("#add-part").val("");
+                        $("#add-quantity").val(0);
+                        $("#add-quantity").data("max", 0);
+                        $("#add-unit").val("");
+                        $("#add-unit").data("Id", -1);
+                        $("#add-unit-cost").val("0.00");
+                        $("#add-total-amount").val("0.00");
+                    });
+                },
+                complete: function (xhr, status) {
+                    $("#add-name").val("").trigger("change");
+                }
+            });
+        }
+
+        $("#add-quantity").on("change keyup", recomputeAddForm);
+        $("#add-unit-cost").on("change keyup", recomputeAddForm);
+        function recomputeAddForm() {
+            var quantity = $("#add-quantity").val() || 0;
+            var cost = $("#add-unit-cost").val() || 0;
+
+            $("#add-total-amount").val(FormatStringDecimal(quantity * cost));
+        }
+
+        $(".createBtn").on("click", clearItemForm);
+
+        function clearItemForm() {
+            $("#add-so-number").val("").trigger("change");
+            $("#add-code").val("").trigger("change");
+            $("#add-part").val("");
+            $("#add-name").val("");
+            $("#add-quantity").val("0");
+            $("#add-stock").val("0");
+            $("#add-unit").val("");
+            $("#add-unit").data("Id", "");
+            $("#add-purpose").val("");
+        }
+
+        function ComputeTotalQuantity() {
+            total_quantity = 0;
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_quantity += parseInt($(this.node()).find(".quantity").val());
+            });
+            $(".total-quantity").html(FormatStringInteger(total_quantity));
+        }
+
+        // Validation for Add Item Modal
+        var validateAdd = $("#form-item").validate({
+            rules: {
+                SONumber: {
+                    required: function () { return checkIfRequired("SONumber"); }
+                },
+                Code: {
+                    required: function () { return checkIfRequired("Code"); }
+                },
+                Name: {
+                    required: function () { return checkIfRequired("Name"); },
+                    maxlength: 100
+                },
+                Stock: {
+                    number: true
+                },
+                Quantity: {
+                    required: function () { return checkIfRequired("Quantity"); },
+                    number: true,
+                    isNotZero: true
+                },
+                Purpose: {
+                    required: function () { return checkIfRequired("Purpose"); },
+                    maxlength: 100
+                }
+            },
+            messages: {
+                SONumber: {
+                    required: "Please select a SO Number."
+                },
+                Code: {
+                    required: "Please select an Item."
+                },
+                Name: {
+                    required: "Please enter the name of item.",
+                    maxlength: "Name must not exceed 100 characters."
+                },
+                Stock: {
+                    number: "Please enter a valid number."
+                },
+                Quantity: {
+                    required: "Please enter a quantity.",
+                    number: "Please enter a valid number.",
+                    isNotZero: "Can not request an item with 0 quantity."
+                },
+                Purpose: {
+                    required: "Please enter the purpose.",
+                    maxlength: "Purpose must not exceed 100 characters."
+                }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                AddItem();
+            }
+        });
+
+        function AddItem() {
+            var rowIndexes = [];
+            itemDT.rows(function (idx, data, node) {
+                if (data.itemDescription == $("#add-name").val()) {
+                    rowIndexes.push(idx);
+                }
+                return false;
+            });
+            if (rowIndexes.length > 0) {
+                toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
+            } else {
+                itemDT.row.add({
+                    itemCode: $("#add-code").select2("data")[0].text,
+                    itemDescription: $("#add-name").val(),
+                    itemPartNumber: $("#add-part").val(),
+                    itemId: $("#add-code").select2("data")[0].id,
+                    lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
+                    purchaseRequestId: 0,
+                    purpose: $("#add-purpose").val(),
+                    quantity: FormatStringInteger($("#add-quantity").val()),
+                    quantityD: $("#add-quantity").val() || 0,
+                    salesOrderId: $("#add-so-number").select2("data")[0].id,
+                    salesOrderNumber: $("#add-so-number").select2("data")[0].text,
+                    stockOnHand: FormatStringInteger($("#add-stock").val()),
+                    stockOnHandD: $("#add-stock").val() || 0,
+                    unitCode: $("#add-unit").val(),
+                    unitId: $("#add-unit").data("Id")
+                }).draw();
+                clearItemForm();
+
+                toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Purchase Request Item(s)", "Success");
+            }
+        }
+
+        function GetItemsToRequest() {
+            var item_to_request = [];
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
+                row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
+                row_data.stockOnHandD = parseInt($(this.node()).find(".stock").val());
+                row_data.stockOnHand = FormatStringInteger(parseInt($(this.node()).find(".stock").val()));
+                item_to_request.push(row_data);
+            });
+            return item_to_request;
+        }
+
+        $("#form-request button[type=submit]").on("click", function () {
+            $("#action-type").val($(this).data("action"));
+        });
+
+        // Validation for Create
+        var validateCreate = $("#form-request").validate({
+            rules: {
+                Type: {
+                    required: true
+                },
+                Purpose: {
+                    required: function () {
+                        return $("#request-type").select2("data")[0]?.text != "Maintenance & Repair";
+                    }
+                },
+                PurposeDefinition: {
+                    required: function () {
+                        return $("#request-type").select2("data")[0]?.text == "Maintenance & Repair";
+                    },
+                    maxlength: 250
+                },
+                Region: {
+                    required: function () {
+                        return $("#request-type").select2("data")[0]?.text == "Automotive"
+                            && $("#request-purpose").select2("data")[0]?.text == "Rush Order";
+                    }
+                },
+                DateRequested: {
+                    required: true
+                },
+                Remarks: {
+                    required: true,
+                    maxlength: 100
+                }
+            },
+            messages: {
+                Type: {
+                    required: "Please select a type."
+                },
+                Purpose: {
+                    required: "Please select a purpose."
+                },
+                PurposeDefinition: {
+                    required: "Please enter a purpose.",
+                    maxlength: "Purpose can not exceed 250 characters."
+                },
+                Region: {
+                    required: "Please select a region."
+                },
+                DateRequested: {
+                    required: "Please enter the date of request."
+                },
+                Remarks: {
+                    required: "Please enter a remarks",
+                    maxlength: "Remarks can not exceed 100 characters."
+                }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                SaveRequest();
+            }
+        });
+
+        function GetItemsToRequest() {
+            var item_to_request = [];
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
+                row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
+                row_data.stockOnHandD = parseInt($(this.node()).find(".stock").val());
+                row_data.stockOnHand = FormatStringInteger(parseInt($(this.node()).find(".stock").val()));
+                item_to_request.push(row_data);
+            });
+            return item_to_request;
+        }
+
+        function SaveRequest() {
+            var items = itemDT.data();
+            if (items.length == 0) {
+                toastr.warning("No item to request. Add an item to the list to continue", "Warning");
+            } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("AddJson")",
+                    data: {
+                        TypeId: $("#request-type").val(),
+                        PurposeId: $("#request-purpose").val(),
+                        PurposeDefinition: $("#request-purpose-definition").val(),
+                        RegionId: $("#request-region").val(),
+                        DateRequested: $("#request-date-requested").val(),
+                        Remarks: $("#request-remarks").val(),
+                        Status: $("#action-type").val(),
+                        ResubmitId: $("#resubmitPRId").val(),
+                        Items: GetItemsToRequest()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            window.location = "@Url.Action("Details")/" + data.newRow;
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

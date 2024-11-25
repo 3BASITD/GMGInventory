@@ -107,17 +107,18 @@ namespace GMGInventory.Common.Models
         public bool Selected { get; set; } = false;
     }
 
-    public class JsonRequestItemOptionsModel
+    public class JsonPurchaseItemOptionsModel
     {
         public string Id { get; set; }
         public string Text { get; set; }
+        public int LineNumber { get; set; }
         public int? ItemId { get; set; }
         public string? ItemCode { get; set; }
         public string? PartNumber { get; set; }
         public int Quantity { get; set; }
         public int UnitId { get; set; }
         public string Unit { get; set; }
-        public int Served { get; set; }
+        public int UnorderedQuantity { get; set; }
         public bool Selected { get; set; } = false;
     }
 

@@ -304,8 +304,7 @@ namespace GMGInventory.Application.Repositories
                         RegionId = form.RegionId,
                         RequestDate = form.DateRequested,
                         Remarks = form.Remarks,
-                        StatusId = status.Id,
-                        ResubmitId = form.ResubmitId
+                        StatusId = status.Id
                     };
                     await context.PurchaseRequests.AddAsync(request);
                     await context.SaveChangesAsync(currentUserId);

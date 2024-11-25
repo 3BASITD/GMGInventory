@@ -8,6 +8,7 @@ namespace GMGInventory.Data
         {
             this.PurchaseReceivingResubmits = new HashSet<PurchaseReceiving>();
             this.PurchaseReceivingLineItems = new HashSet<PurchaseReceivingLineItem>();
+            this.PurchaseReturns = new HashSet<PurchaseReturnNew>();
         }
 
         public string DocumentNumber { get; set; }
@@ -65,7 +66,7 @@ namespace GMGInventory.Data
         public PurchaseReceiving Resubmit { get; set; }
 
         public ICollection<PurchaseReceiving> PurchaseReceivingResubmits { get; set; }
-
         public ICollection<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }
+        public ICollection<PurchaseReturnNew> PurchaseReturns { get; set; }
     }
 }

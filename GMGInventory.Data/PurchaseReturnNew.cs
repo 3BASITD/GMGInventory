@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using GMGInventory.Common.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
@@ -19,7 +20,11 @@ namespace GMGInventory.Data
         [ForeignKey("PurchaseOrderId")]
         public int PurchaseOrderId { get; set; }
         public virtual PurchaseOrderNew PurchaseOrder { get; set; }
-        public DateTime ReceiveDate { get; set; }
+
+        [ForeignKey("PurchaseReceiveId")]
+        public int PurchaseReceiveId { get; set; }
+        public virtual PurchaseReceiving PurchaseReceive { get; set; }
+        public DateTime ReturnDate { get; set; }
 
         [ForeignKey("WarehouseId")]
         public int WarehouseId { get; set; }
@@ -30,6 +35,13 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(100)")]
         public string SalesInvoiceNumber { get; set; }
+
+        [ForeignKey("CurrencyId")]
+        public int CurrencyId { get; set; }
+        public virtual Currency Currency { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal CurrencyRate { get; set; }
 
         public string Remarks { get; set; }
 
