@@ -14,6 +14,7 @@ namespace GMGInventory.Controllers
     public class PurchaseRequestController(IAccessRepository accessRepository
                                          , IPurchaseRequestRepository requestRepository) : BaseController(accessRepository)
     {
+
         public async Task<IActionResult> GetTypeOptions(int? SelectedId)
         {
             return Json(await requestRepository.GetTypeOptions(SelectedId));

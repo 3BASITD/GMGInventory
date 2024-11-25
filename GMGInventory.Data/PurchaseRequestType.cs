@@ -12,4 +12,5 @@
         public ICollection<PurchaseRequest> PurchaseRequests { get; set; }
         public ICollection<PurchaseRequestPurpose> PurchaseRequestPurposes { get; set; }
     }
+
 }
