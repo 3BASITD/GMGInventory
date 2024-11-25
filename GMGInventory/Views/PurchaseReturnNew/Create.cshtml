@@ -348,8 +348,10 @@
                 data: {
                     purchaseReceiveId: $("#return-rrnumber").val()
                 },
-                success: function (data, status, xhr) {
+                beforeSend: function (xhr, settings) {
                     itemDT.clear();
+                },
+                success: function (data, status, xhr) {
                     $.each(data, function (i, v) {
                         itemDT.row.add({
                             itemCode: v.itemCode,
@@ -367,6 +369,8 @@
                             totalAmountD: v.quantityD * v.unitCost
                         });
                     });
+                },
+                complete: function (xhr, status) {
                     itemDT.draw();
                 }
             });

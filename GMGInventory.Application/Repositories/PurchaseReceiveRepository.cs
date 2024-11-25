@@ -315,7 +315,7 @@ namespace GMGInventory.Application.Repositories
                     PurchaseOrderId = purchaseOrder.Id,
                     SupplierId = form.SupplierId,
                     TermId = form.TermId,
-                    //WarehouseId = form.WarehouseId,
+                    WarehouseId = form.WarehouseId,
                     DeliveryReceiptNumber = form.DeliveryReceiptNumber,
                     SalesInvoiceNumber = form.SalesInvoiceNumber,
 
@@ -324,7 +324,10 @@ namespace GMGInventory.Application.Repositories
                     StatusId = status.Id,
                     ResubmitId = form.ResubmitId,
                     Discount1 = form.Discount1,
-                    Discount2 = form.Discount2
+                    Discount2 = form.Discount2,
+
+                    CurrencyId = purchaseOrder.CurrencyId,
+                    CurrencyRate = purchaseOrder.CurrencyRate
                 };
                 await context.PurchaseReceivings.AddAsync(receive);
                 try
