@@ -30,6 +30,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Date Returned")]
         public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDateTime);
+        public string ReturnDate3 => ReturnDateD.ToString(SystemFormat.StringDate3);
         public DateTime ReturnDateD { get; set; }
     }
 

@@ -39,13 +39,13 @@ namespace GMGInventory.Data.Migrations
                 table: "PurchaseReturnNews",
                 column: "PurchaseReceiveId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_PurchaseReturnNews_PurchaseReceivings_PurchaseReceiveId",
-                table: "PurchaseReturnNews",
-                column: "PurchaseReceiveId",
-                principalTable: "PurchaseReceivings",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_PurchaseReturnNews_PurchaseReceivings_PurchaseReceiveId",
+            //    table: "PurchaseReturnNews",
+            //    column: "PurchaseReceiveId",
+            //    principalTable: "PurchaseReceivings",
+            //    principalColumn: "Id",
+            //    onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

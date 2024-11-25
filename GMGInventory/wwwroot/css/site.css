@@ -299,6 +299,15 @@ input[readonly=readonly] {
     cursor: default;
 }
 
+.select2-selection[aria-disabled=true] {
+    background-color: #E9ECEF !important;
+}
+
+.dark-mode input[readonly=readonly],
+.dark-mode .select2-selection[aria-disabled=true] {
+    background-color: #4A4D50 !important;
+}
+
 input[type="date"] {
     cursor: text;
 }

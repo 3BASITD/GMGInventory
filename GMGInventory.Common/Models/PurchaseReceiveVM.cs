@@ -12,14 +12,19 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "PO Number")]
         public string PONumber { get; set; }
+        public int POId { get; set; }
 
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
+        public int SupplierId { get; set; }
 
         [Display(Name = "Term")]
         public string Term { get; set; }
+        public int TermId { get; set; }
 
+        [Display(Name = "Warehouse")]
         public string Warehouse { get; set; }
+        public int WarehouseId { get; set; }
 
         [Display(Name = "DR Number")]
         public string DRNumber { get; set; }
@@ -42,6 +47,14 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseReceiveDetailsVM :PurchaseReceiveVM
     {
+        [Display(Name = "Currency")]
+        public string Currency { get; set; }
+        public int CurrencyId { get; set; }
+
+        [Display(Name = "Currency Rate")]
+        public string CurrencyRate => string.Format("{0:#,##0.00}", CurrencyRateD);
+        public decimal CurrencyRateD { get; set; }
+
         public string PurchaseRequestType { get; set; }
 
         public string Remarks { get; set; }
@@ -79,6 +92,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Code")]
         public string? ItemCode { get; set; }
+
+        [Display(Name = "Item Part Number")]
+        public string? ItemPartNumber { get; set; }
 
         [Display(Name = "Item Description")]
         public string? ItemDescription { get; set; }

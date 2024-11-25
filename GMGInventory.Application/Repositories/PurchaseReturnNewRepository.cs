@@ -23,35 +23,12 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<IList<JsonOptionsModel>> GetPurchaseReceivingOptions(int? OrderId, int? SelectedId)
+        public async Task<IList<JsonOptionsModel>> GetPurchaseReceivingOptions(int? SelectedId)
         {
             return await context.PurchaseReceivings
                                 .Include(s => s.Status)
                                 .Include(s => s.PurchaseOrder)
-                                .Where(s => s.Status.Name == "Approved"
-                                         && (OrderId == null 
-                                          || OrderId == -1 
-                                          || s.PurchaseOrder.Id == OrderId))
-                                .Select(s => new JsonOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.DocumentNumber,
-                                    Selected = SelectedId != null && s.Id == SelectedId
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
-        }
-
-
-        public async Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? ReceiveId, int? SelectedId)
-        {
-            return await context.PurchaseOrderNews
-                                .Include(s => s.Status)
-                                .Include(s => s.PurchaseReceivings)
-                                .Where(s => s.Status.Name == "Approved"
-                                         && (ReceiveId == null
-                                          || ReceiveId == -1
-                                          || s.PurchaseReceivings.Any(a => a.Id == ReceiveId)))
+                                .Where(s => s.Status.Name == "Approved")
                                 .Select(s => new JsonOptionsModel
                                 {
                                     Id = s.Id.ToString(),

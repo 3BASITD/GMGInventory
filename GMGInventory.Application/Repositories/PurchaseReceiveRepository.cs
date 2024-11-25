@@ -31,17 +31,17 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.PurchaseOrder)
                                                 .Include(s => s.Warehouse)
                                                 .Include(s => s.Status)
-                           select new PurchaseReceiveVM
-                           {
-                               Id = request.Id,
-                               DocumentNumber = request.DocumentNumber,
-                               Supplier = request.Supplier.Code,
-                               Term = request.Term.Name,
-                               PONumber = request.PurchaseOrder.DocumentNumber,
-                               Warehouse = request.Warehouse.Code,
-                               Status = request.Status.Code,
-                               ReceiveDateD = request.ReceiveDate
-                           });
+                             select new PurchaseReceiveVM
+                             {
+                                 Id = request.Id,
+                                 DocumentNumber = request.DocumentNumber,
+                                 Supplier = request.Supplier.Code,
+                                 Term = request.Term.Name,
+                                 PONumber = request.PurchaseOrder.DocumentNumber,
+                                 Warehouse = request.Warehouse.Code,
+                                 Status = request.Status.Code,
+                                 ReceiveDateD = request.ReceiveDate
+                             });
             return await requestVM.ToListAsync();
         }
 
@@ -89,7 +89,8 @@ namespace GMGInventory.Application.Repositories
                             default: break;
                         }
                     }
-                } else
+                }
+                else
                 {
                     data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
                 }
@@ -108,8 +109,11 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseReceiveDetailsVM?> GetDetails(int requestId)
         {
             var details = from receive in context.PurchaseReceivings
-                                                 .Include(s => s.PurchaseOrder)                                   
+                                                 .Include(s => s.PurchaseOrder)
+                                                 .Include(s => s.Supplier)
+                                                 .Include(s => s.Term)
                                                  .Include(s => s.Warehouse)
+                                                 .Include(s => s.Currency)
                                                  .Include(s => s.Status)
                           let resubmitfrom = context.PurchaseReceivings
                                                     .Where(s => s.ResubmitId == receive.Id)
@@ -128,12 +132,22 @@ namespace GMGInventory.Application.Repositories
                           {
                               Id = receive.Id,
                               DocumentNumber = receive.DocumentNumber,
+                              PONumber = receive.PurchaseOrder.DocumentNumber,
+                              POId = receive.PurchaseOrder.Id,
+                              Supplier = receive.Supplier.Name,
+                              SupplierId = receive.Supplier.Id,
+                              Term = receive.Term.Name,
+                              TermId = receive.Term.Id,
                               PurchaseRequestType = po.PurchaseRequest.Type.Code,
                               Warehouse = receive.Warehouse.Code,
+                              WarehouseId = receive.Warehouse.Id,
                               Status = receive.Status.Code,
                               ReceiveDateD = receive.ReceiveDate,
                               Remarks = receive.Remarks,
-                              ApprovedBy  = receive.ApproverId == null ? null : receive.Approver.FirstName + " " + receive.Approver.LastName,
+                              Currency = receive.Currency.Code,
+                              CurrencyId = receive.Currency.Id,
+                              CurrencyRateD = receive.CurrencyRate,
+                              ApprovedBy = receive.ApproverId == null ? null : receive.Approver.FirstName + " " + receive.Approver.LastName,
                               DisapprovedBy = receive.DisapproverId == null ? null : receive.Disapprover.FirstName + " " + receive.Disapprover.LastName,
                               DisapprovedReason = receive.DisapprovedReason,
                               ResubmitId = receive.ResubmitId,
@@ -159,6 +173,7 @@ namespace GMGInventory.Application.Repositories
                                 LineNumber = receive.LineNumber,
                                 ItemId = receive.ItemId,
                                 ItemCode = receive.Item.Code,
+                                ItemPartNumber = receive.Item.PartNumber,
                                 ItemDescription = receive.ItemDescription,
                                 QuantityD = receive.Quantity,
                                 UnitId = receive.UnitId,
@@ -283,7 +298,7 @@ namespace GMGInventory.Application.Repositories
         {
             var response = new ResponseModel<int>();
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-           
+
             var status = await context.PurchaseStatuses.Where(s => s.Name == form.Status).FirstOrDefaultAsync();
             if (status == null)
             {
@@ -306,7 +321,7 @@ namespace GMGInventory.Application.Repositories
                     PurchaseOrderId = purchaseOrder.Id,
                     SupplierId = form.SupplierId,
                     TermId = form.TermId,
-                    WarehouseId = form.WarehouseId,
+                    //WarehouseId = form.WarehouseId,
                     DeliveryReceiptNumber = form.DeliveryReceiptNumber,
                     SalesInvoiceNumber = form.SalesInvoiceNumber,
 
@@ -318,7 +333,8 @@ namespace GMGInventory.Application.Repositories
                     Discount2 = form.Discount2
                 };
                 await context.PurchaseReceivings.AddAsync(receive);
-                try { 
+                try
+                {
                     await context.SaveChangesAsync(currentUserId);
                 }
                 catch (Exception ex)

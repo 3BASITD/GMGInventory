@@ -8,59 +8,59 @@ namespace GMGInventory.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "DisapprovedReason",
-                table: "PurchaseReturnNews",
-                type: "nvarchar(max)",
-                nullable: true);
+            //migrationBuilder.AddColumn<string>(
+            //    name: "DisapprovedReason",
+            //    table: "PurchaseReturnNews",
+            //    type: "nvarchar(max)",
+            //    nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "DisapproverId",
-                table: "PurchaseReturnNews",
-                type: "nvarchar(450)",
-                nullable: true);
+            //migrationBuilder.AddColumn<string>(
+            //    name: "DisapproverId",
+            //    table: "PurchaseReturnNews",
+            //    type: "nvarchar(450)",
+            //    nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "ResubmitId",
-                table: "PurchaseReturnNews",
-                type: "int",
-                nullable: true);
+            //migrationBuilder.AddColumn<int>(
+            //    name: "ResubmitId",
+            //    table: "PurchaseReturnNews",
+            //    type: "int",
+            //    nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "DisapprovedReason",
-                table: "PurchaseReceivings",
-                type: "nvarchar(max)",
-                nullable: true);
+            //migrationBuilder.AddColumn<string>(
+            //    name: "DisapprovedReason",
+            //    table: "PurchaseReceivings",
+            //    type: "nvarchar(max)",
+            //    nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "DisapproverId",
-                table: "PurchaseReceivings",
-                type: "nvarchar(450)",
-                nullable: true);
+            //migrationBuilder.AddColumn<string>(
+            //    name: "DisapproverId",
+            //    table: "PurchaseReceivings",
+            //    type: "nvarchar(450)",
+            //    nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "ResubmitId",
-                table: "PurchaseReceivings",
-                type: "int",
-                nullable: true);
+            //migrationBuilder.AddColumn<int>(
+            //    name: "ResubmitId",
+            //    table: "PurchaseReceivings",
+            //    type: "int",
+            //    nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "DisapprovedReason",
-                table: "PurchaseOrderNews",
-                type: "nvarchar(max)",
-                nullable: true);
+            //migrationBuilder.AddColumn<string>(
+            //    name: "DisapprovedReason",
+            //    table: "PurchaseOrderNews",
+            //    type: "nvarchar(max)",
+            //    nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "DisapproverId",
-                table: "PurchaseOrderNews",
-                type: "nvarchar(450)",
-                nullable: true);
+            //migrationBuilder.AddColumn<string>(
+            //    name: "DisapproverId",
+            //    table: "PurchaseOrderNews",
+            //    type: "nvarchar(450)",
+            //    nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "ResubmitId",
-                table: "PurchaseOrderNews",
-                type: "int",
-                nullable: true);
+            //migrationBuilder.AddColumn<int>(
+            //    name: "ResubmitId",
+            //    table: "PurchaseOrderNews",
+            //    type: "int",
+            //    nullable: true);
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
@@ -76,77 +76,77 @@ namespace GMGInventory.Data.Migrations
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
                 values: new object[] { "c0b41d38-7e6b-41ce-99a4-a43c1ee2d111", "AQAAAAIAAYagAAAAEIsnJKirh87OtGbS6MwwSRIao92+q9lBwdQNpYGJtgAnt35fWBo1tcdjCVR+KAdlyg==", "8428a7e6-0b77-4558-bebe-130e91f325b9" });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchaseReturnNews_DisapproverId",
-                table: "PurchaseReturnNews",
-                column: "DisapproverId");
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_PurchaseReturnNews_DisapproverId",
+            //    table: "PurchaseReturnNews",
+            //    column: "DisapproverId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchaseReturnNews_ResubmitId",
-                table: "PurchaseReturnNews",
-                column: "ResubmitId");
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_PurchaseReturnNews_ResubmitId",
+            //    table: "PurchaseReturnNews",
+            //    column: "ResubmitId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchaseReceivings_DisapproverId",
-                table: "PurchaseReceivings",
-                column: "DisapproverId");
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_PurchaseReceivings_DisapproverId",
+            //    table: "PurchaseReceivings",
+            //    column: "DisapproverId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchaseReceivings_ResubmitId",
-                table: "PurchaseReceivings",
-                column: "ResubmitId");
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_PurchaseReceivings_ResubmitId",
+            //    table: "PurchaseReceivings",
+            //    column: "ResubmitId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrderNews_DisapproverId",
-                table: "PurchaseOrderNews",
-                column: "DisapproverId");
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_PurchaseOrderNews_DisapproverId",
+            //    table: "PurchaseOrderNews",
+            //    column: "DisapproverId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrderNews_ResubmitId",
-                table: "PurchaseOrderNews",
-                column: "ResubmitId");
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_PurchaseOrderNews_ResubmitId",
+            //    table: "PurchaseOrderNews",
+            //    column: "ResubmitId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_PurchaseOrderNews_AspNetUsers_DisapproverId",
-                table: "PurchaseOrderNews",
-                column: "DisapproverId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id");
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_PurchaseOrderNews_AspNetUsers_DisapproverId",
+            //    table: "PurchaseOrderNews",
+            //    column: "DisapproverId",
+            //    principalTable: "AspNetUsers",
+            //    principalColumn: "Id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_PurchaseOrderNews_PurchaseOrderNews_ResubmitId",
-                table: "PurchaseOrderNews",
-                column: "ResubmitId",
-                principalTable: "PurchaseOrderNews",
-                principalColumn: "Id");
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_PurchaseOrderNews_PurchaseOrderNews_ResubmitId",
+            //    table: "PurchaseOrderNews",
+            //    column: "ResubmitId",
+            //    principalTable: "PurchaseOrderNews",
+            //    principalColumn: "Id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_PurchaseReceivings_AspNetUsers_DisapproverId",
-                table: "PurchaseReceivings",
-                column: "DisapproverId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id");
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_PurchaseReceivings_AspNetUsers_DisapproverId",
+            //    table: "PurchaseReceivings",
+            //    column: "DisapproverId",
+            //    principalTable: "AspNetUsers",
+            //    principalColumn: "Id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_PurchaseReceivings_PurchaseReceivings_ResubmitId",
-                table: "PurchaseReceivings",
-                column: "ResubmitId",
-                principalTable: "PurchaseReceivings",
-                principalColumn: "Id");
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_PurchaseReceivings_PurchaseReceivings_ResubmitId",
+            //    table: "PurchaseReceivings",
+            //    column: "ResubmitId",
+            //    principalTable: "PurchaseReceivings",
+            //    principalColumn: "Id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_PurchaseReturnNews_AspNetUsers_DisapproverId",
-                table: "PurchaseReturnNews",
-                column: "DisapproverId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id");
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_PurchaseReturnNews_AspNetUsers_DisapproverId",
+            //    table: "PurchaseReturnNews",
+            //    column: "DisapproverId",
+            //    principalTable: "AspNetUsers",
+            //    principalColumn: "Id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_PurchaseReturnNews_PurchaseReturnNews_ResubmitId",
-                table: "PurchaseReturnNews",
-                column: "ResubmitId",
-                principalTable: "PurchaseReturnNews",
-                principalColumn: "Id");
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_PurchaseReturnNews_PurchaseReturnNews_ResubmitId",
+            //    table: "PurchaseReturnNews",
+            //    column: "ResubmitId",
+            //    principalTable: "PurchaseReturnNews",
+            //    principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
