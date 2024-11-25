@@ -115,6 +115,8 @@ namespace GMGInventory.Common.Models
         public string? ItemCode { get; set; }
         public string? PartNumber { get; set; }
         public int Quantity { get; set; }
+        public int UnitId { get; set; }
+        public string Unit { get; set; }
         public int Served { get; set; }
         public bool Selected { get; set; } = false;
     }

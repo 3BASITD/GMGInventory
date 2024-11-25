@@ -3369,30 +3369,6 @@ namespace GMGInventory.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.PurchasePaymentTerm", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("DaysToPay")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PurchasePaymentTerms");
-                });
-
             modelBuilder.Entity("GMGInventory.Data.PurchaseReceiving", b =>
                 {
                     b.Property<int>("Id")
@@ -3469,6 +3445,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApproverId");
+
+                    b.HasIndex("DisapproverId");
 
                     b.HasIndex("DisapproverId");
 
@@ -5600,13 +5578,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3c95f5d1-d400-4775-aae6-33aa3972d298",
+                            ConcurrencyStamp = "ac9d3545-6ca0-4d5f-9036-b65c24b0bdef",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMPS/hsKP5eJQ1qnmZ29G3SrWttntAm26h82FxtfKXnRXFwbQkATfuGrts8QWryrCA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGIOWxw4Cn8M74nOBh1Kf3k+n00wnPlyGRJk19HOfTUOaUmdq7rupio6sWAAErnfLw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "cc97930d-9367-40b6-a27e-45dc825e7676",
+                            SecurityStamp = "ce944142-55e5-42a0-b27c-343b736138de",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5621,13 +5599,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "df9c9980-e06f-452f-9775-e0bc095c347f",
+                            ConcurrencyStamp = "9c313561-5375-40cc-8ec4-665cba8b4ff0",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFm7Ubo8ePBOVOBy+YAd3ffwKfIWqkE+xV5b9JTf5nekA/jkjfafyyqYi2aORJusCA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG2Evwy6lugPJKIAUFGJDOn34+tR9zk2ptD/CMh/JbVLrYslIqmARyJyMKVPm2cJ8A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7463ae77-f93c-4355-96ac-4fd2b38a041c",
+                            SecurityStamp = "0720e2e4-b040-4f5b-8620-0c9a0b34e57b",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6149,7 +6127,7 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.PurchasePaymentTerm", "Term")
+                    b.HasOne("GMGInventory.Data.CreditTerm", "Term")
                         .WithMany("PurchaseOrderNews")
                         .HasForeignKey("TermId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -6234,6 +6212,10 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseReceivingDisapprover")
                         .HasForeignKey("DisapproverId");
 
+                    b.HasOne("GMGInventory.Data.User", "Disapprover")
+                        .WithMany("PurchaseReceivingDisapprover")
+                        .HasForeignKey("DisapproverId");
+
                     b.HasOne("GMGInventory.Data.PurchaseOrderNew", "PurchaseOrder")
                         .WithMany("PurchaseReceivings")
                         .HasForeignKey("PurchaseOrderId")
@@ -6254,7 +6236,7 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.PurchasePaymentTerm", "Term")
+                    b.HasOne("GMGInventory.Data.CreditTerm", "Term")
                         .WithMany("PurchaseReceivings")
                         .HasForeignKey("TermId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -6267,6 +6249,8 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Approver");
+
+                    b.Navigation("Disapprover");
 
                     b.Navigation("Disapprover");
 
@@ -6872,6 +6856,10 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.CreditTerm", b =>
                 {
                     b.Navigation("Customers");
+
+                    b.Navigation("PurchaseOrderNews");
+
+                    b.Navigation("PurchaseReceivings");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Currency", b =>
@@ -7038,13 +7026,6 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderType", b =>
                 {
                     b.Navigation("PurchaseOrders");
-                });
-
-            modelBuilder.Entity("GMGInventory.Data.PurchasePaymentTerm", b =>
-                {
-                    b.Navigation("PurchaseOrderNews");
-
-                    b.Navigation("PurchaseReceivings");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReceiving", b =>

@@ -138,7 +138,7 @@
                                         <th class="total-quantity">0</th>
                                         <th></th>
                                         <th></th>
-                                        <th class="total-total">0</th>
+                                        <th class="total-amount">0</th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -206,7 +206,7 @@
                         <div class="col-12 col-sm-6 add-unit-cost-container">
                             <div class="form-group">
                                 <label for="add-unit-cost" class="form-label mb-0">Unit Cost</label>
-                                <input type="text" id="add-unit-cost" name="UnitCost" class="form-control form-control-sm" readonly="readonly" />
+                                <input type="number" step="0.01" id="add-unit-cost" name="UnitCost" class="form-control form-control-sm" />
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-total-amount-container">
@@ -291,7 +291,7 @@
                     className: "form-cell"
                 },
                 { data: "lineNumber", name: "LineNumber", className: "form-cell" },
-                { data: "salesOrderNumber", name: "SalesOrderNumber", className: "form-cell" },
+                { data: "purchaseRequestNumber", name: "PurchaseRequestNumber", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.itemId == null || data.itemCode == null) {
@@ -307,26 +307,27 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" step="1" value="' + data.stockOnHandD + '" class="form-control form-control-sm stock" style="width: 100%;" />';
-                    },
-                    name: "StockOnHand",
-                    className: "form-cell text-end"
-                },
-                {
-                    data: function (data, type, dataToSet) {
                         return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                     },
                     name: "Quantity",
                     className: "form-cell text-end"
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
-                { data: "purpose", name: "Purpose", className: "form-cell" }
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="number" min="0" max="1999999" step="0.01" value="' + data.unitCostD + '" class="form-control form-control-sm cost" style="width: 100%;" />';
+                    },
+                    name: "UnitCost",
+                    className: "form-cell text-end"
+                },
+                { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
             ],
             order: [[1, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
-                columnDTTotalInteger(api, 7);
+                columnDTTotalInteger(api, 6);
+                columnDTTotalDecimal(api, 9);
             }
         });
 
@@ -398,9 +399,22 @@
                 itemDT.draw();
             });
 
-            ComputeTotalQuantity();
-            $(".quantity").on("input", function () {
-                ComputeTotalQuantity();
+            $(".quantity, .cost").on("input", function () {
+                var row = itemDT.row($(this).closest('tr'));
+                var rowData = row.data();
+
+                var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
+                var costValue = parseFloat($(row.node()).find(".cost").val()) || 0;
+
+                var totalValue = quantityValue * costValue;
+
+                rowData.quantity = quantityValue;
+                rowData.cost = costValue;
+                rowData.total = totalValue;
+
+                row.data(rowData);
+
+                itemDT.draw(false);
             });
         });
 
@@ -493,7 +507,7 @@
                 itemDT.column(4).visible(false);
                 itemDT.column(5).visible(false);
             }
-            updateColumnVisibility();
+            //updateColumnVisibility();
             loadAllItemsOptions();
 
             loadPurchaseRequestOptions();
@@ -635,7 +649,7 @@
                 type: "POST",
                 url: "@Url.Action("GetPurchaseRequestOptions")",
                 data: {
-                    RequestTypeId: function() {
+                    RequestTypeId: function () {
                         return $("#order-type").select2("data")[0].requestTypeId;
                     }//,
                     //SelectedId: ???
@@ -658,7 +672,6 @@
             });
         }
 
-        loadAllItemsOptions();
         function loadAllItemsOptions() {
             if ($.fn.select2 && $("#add-name").hasClass("select2-hidden-accessible")) {
                 $("#add-name").select2("destroy");
@@ -676,6 +689,7 @@
                         data: data,
                         minimumResultsForSearch: -1,
                         placeholder: "<empty>",
+                        allowClear: true,
                         language: {
                             noResults: function () {
                                 return "No unserved items found";
@@ -688,130 +702,155 @@
                             return $(
                                 "<strong>" + repo.text + "</strong><br />" +
                                 "<small class='text-muted'>" +
-                                "Request Quantity: " + repo.quantity + "<br />" +
-                                "Served Quantity: " + repo.served + "<br />" +
-                                "Unserved Quantity: " + (repo.quantity - repo.served) +
+                                "Request Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
+                                "Served Quantity: " + repo.served + " " + repo.unit + "<br />" +
+                                "Unserved Quantity: " + (repo.quantity - repo.served) + " " + repo.unit +
                                 "</small>"
                             );
                         },
                         dropdownParent: $("#addModal")
-                    }).on("select2:select", function() {
-                        $("#add-code").val($(this).select2("data")[0].itemCode);
-                        $("#add-part").val($(this).select2("data")[0].partNumber);
+                    }).on("select2:select", function () {
+                        var selected = $(this).select2("data")[0];
+                        $("#add-code").val(selected.itemCode);
+                        $("#add-part").val(selected.partNumber);
+                        $("#add-quantity").val(selected.quantity - selected.served);
+                        $("#add-unit").val(selected.unit);
+                        $("#add-unit").data("Id", selected.unitId);
+                        $("#add-unit-cost").val(0);
+                        $("#add-total-amount").val("0.00");
+                    }).on("select2:unselecting", function () {
+                        $("#add-code").val("");
+                        $("#add-part").val("");
+                        $("#add-quantity").val(0);
+                        $("#add-unit").val("");
+                        $("#add-unit").data("Id", -1);
+                        $("#add-unit-cost").val("0.00");
+                        $("#add-total-amount").val("0.00");
                     });
+                },
+                complete: function (xhr, status) {
+                    $("#add-name").val("").trigger("change");
                 }
             });
         }
 
-        function loadSOItemsOptions() {
-            $("#add-code").val(null).trigger("change");
-            $("#add-part").val("");
-            $("#add-name").val("");
-            $("#add-stock").val(0);
-            $("#add-quantity").val(0);
-            $("#add-unit").val("");
+        $("#add-quantity").on("change keyup", recomputeAddForm);
+        $("#add-unit-cost").on("change keyup", recomputeAddForm);
+        function recomputeAddForm() {
+            var quantity = $("#add-quantity").val() || 0;
+            var cost = $("#add-unit-cost").val() || 0;
 
-            if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
-                $("#add-code").select2("destroy");
-            }
-            // Load item for select2
-            $("#add-code").select2({
-                minimumInputLength: -1,
-                allowClear: true,
-                placeholder: "<empty>",
-                templateResult: function (repo) {
-                    if (repo.loading) {
-                        return repo.text;
-                    }
-                    if (repo.quantity == 0) {
-                        return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
-                            (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
-                            "</span>");
-                    } else {
-                        return $("<strong>" + repo.text + "</strong> " +
-                            (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-                    }
-                },
-                ajax: {
-                    url: "@Url.Action("GetUnservedOptions", "Item")",
-                    dataType: 'json',
-                    type: "POST",
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1,
-                            SalesOrderId: $("#add-so-number").val()
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true,
-                    complete: AssignItemEvent
-                },
-                dropdownParent: $("#addModal")
-            });
+            $("#add-total-amount").val(FormatStringDecimal(quantity * cost));
         }
 
-        function AssignItemEvent(jqXHR, textStatus) {
-            $("#add-code").off("select2:select").on("select2:select", function () {
-                $("#add-part").val($("#add-code").select2("data")[0].partNumber);
-                $("#add-name").val($("#add-code").select2("data")[0].name);
-                $("#add-unit").val($("#add-code").select2("data")[0].unit);
-                $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
-                $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
-                $("#add-code-error").html("");
-            });
+        // function loadSOItemsOptions() {
+        //     $("#add-code").val(null).trigger("change");
+        //     $("#add-part").val("");
+        //     $("#add-name").val("");
+        //     $("#add-stock").val(0);
+        //     $("#add-quantity").val(0);
+        //     $("#add-unit").val("");
 
-            $("#add-code").off("select2:unselecting").on("select2:unselecting", function (e) {
-                $("#add-part").val("");
-                $("#add-name").val("");
-                $("#add-unit").val("");
-                $("#add-unit").data("Id", "");
-                $(".add-stocks").text("0");
-                $("#add-gross-price").val("0.00");
-            });
-        }
+        //     if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
+        //         $("#add-code").select2("destroy");
+        //     }
+        //     // Load item for select2
+        //     $("#add-code").select2({
+        //         minimumInputLength: -1,
+        //         allowClear: true,
+        //         placeholder: "<empty>",
+        //         templateResult: function (repo) {
+        //             if (repo.loading) {
+        //                 return repo.text;
+        //             }
+        //             if (repo.quantity == 0) {
+        //                 return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
+        //                     (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+        //                     "</span>");
+        //             } else {
+        //                 return $("<strong>" + repo.text + "</strong> " +
+        //                     (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+        //             }
+        //         },
+        //         ajax: {
+        //             url: "@Url.Action("GetUnservedOptions", "Item")",
+        //             dataType: 'json',
+        //             type: "POST",
+        //             data: function (params) {
+        //                 return {
+        //                     search: params.term,
+        //                     page: params.page || 1,
+        //                     SalesOrderId: $("#add-so-number").val()
+        //                 };
+        //             },
+        //             processResults: function (data, params) {
+        //                 params.page = params.page || 1;
+        //                 return {
+        //                     results: data.items,
+        //                     pagination: {
+        //                         more: (params.page * 50) < data.total_count
+        //                     }
+        //                 };
+        //             },
+        //             cache: true,
+        //             complete: AssignItemEvent
+        //         },
+        //         dropdownParent: $("#addModal")
+        //     });
+        // }
+
+        // function AssignItemEvent(jqXHR, textStatus) {
+        //     $("#add-code").off("select2:select").on("select2:select", function () {
+        //         $("#add-part").val($("#add-code").select2("data")[0].partNumber);
+        //         $("#add-name").val($("#add-code").select2("data")[0].name);
+        //         $("#add-unit").val($("#add-code").select2("data")[0].unit);
+        //         $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
+        //         $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
+        //         $("#add-code-error").html("");
+        //     });
+
+        //     $("#add-code").off("select2:unselecting").on("select2:unselecting", function (e) {
+        //         $("#add-part").val("");
+        //         $("#add-name").val("");
+        //         $("#add-unit").val("");
+        //         $("#add-unit").data("Id", "");
+        //         $(".add-stocks").text("0");
+        //         $("#add-gross-price").val("0.00");
+        //     });
+        // }
 
         // Load so for select2
-        $("#add-so-number").select2({
-            minimumInputLength: -1,
-            allowClear: true,
-            placeholder: "<empty>",
-            templateResult: function (repo) {
-                return repo.text;
-            },
-            ajax: {
-                url: "@Url.Action("GetSalesOrderOptions", "SalesOrder")",
-                dataType: 'json',
-                type: "POST",
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
-            },
-            dropdownParent: $("#addModal")
-        });
+        // $("#add-so-number").select2({
+        //     minimumInputLength: -1,
+        //     allowClear: true,
+        //     placeholder: "<empty>",
+        //     templateResult: function (repo) {
+        //         return repo.text;
+        //     },
+        //     ajax: {
+        //         url: "@Url.Action("GetSalesOrderOptions", "SalesOrder")",
+        //         dataType: 'json',
+        //         type: "POST",
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //                 page: params.page || 1
+        //             };
+        //         },
+        //         processResults: function (data, params) {
+        //             params.page = params.page || 1;
+        //             return {
+        //                 results: data.items,
+        //                 pagination: {
+        //                     more: (params.page * 50) < data.total_count
+        //                 }
+        //             };
+        //         }
+        //     },
+        //     dropdownParent: $("#addModal")
+        // });
 
-        $("#add-so-number").on("select2:select", loadSOItemsOptions);
+        //$("#add-so-number").on("select2:select", loadSOItemsOptions);
 
         // Load unit for select2
         $.ajax({
@@ -833,73 +872,53 @@
         $(".createBtn").on("click", clearItemForm);
 
         function clearItemForm() {
-            $("#add-so-number").val("").trigger("change");
-            $("#add-code").val("").trigger("change");
+            $("#add-pr-number").val(null).trigger("change");
+            $("#add-code").val("");
             $("#add-part").val("");
-            $("#add-name").val("");
+            $("#add-name").html("");
             $("#add-quantity").val("0");
-            $("#add-stock").val("0");
             $("#add-unit").val("");
             $("#add-unit").data("Id", "");
-            $("#add-purpose").val("");
-        }
-
-        function ComputeTotalQuantity() {
-            total_quantity = 0;
-            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                total_quantity += parseInt($(this.node()).find(".quantity").val());
-            });
-            $(".total-quantity").html(FormatStringInteger(total_quantity));
+            $("#add-unit-cost").val("0.00");
+            $("#add-total-amount").val("0.00");
         }
 
         // Validation for Add Item Modal
         var validateAdd = $("#form-item").validate({
             rules: {
-                SONumber: {
+                PRNumber: {
                     required: true// function () { return checkIfRequired("SONumber"); }
-                },
-                Code: {
-                    required: true// function () { return checkIfRequired("Code"); }
                 },
                 Name: {
                     required: true,// function () { return checkIfRequired("Name"); },
                     maxlength: 100
-                },
-                Stock: {
-                    number: true
                 },
                 Quantity: {
                     required: true,// function () { return checkIfRequired("Quantity"); },
                     number: true,
                     isNotZero: true
                 },
-                Purpose: {
+                UnitCost: {
                     required: true,// function () { return checkIfRequired("Purpose"); },
-                    maxlength: 100
+                    number: true
                 }
             },
             messages: {
-                SONumber: {
-                    required: "Please select a SO Number."
-                },
-                Code: {
-                    required: "Please select an Item."
+                PRNumber: {
+                    required: "Please select a Purchase Request Reference Number."
                 },
                 Name: {
-                    required: "Please enter the name of item.",
+                    required: "Please select an Item.",
                     maxlength: "Name must not exceed 100 characters."
-                },
-                Stock: {
-                    number: "Please enter a valid number."
                 },
                 Quantity: {
                     required: "Please enter a quantity.",
                     number: "Please enter a valid number.",
                     isNotZero: "Can not request an item with 0 quantity."
                 },
-                Purpose: {
-                    required: "Please enter the purpose.",
-                    maxlength: "Purpose must not exceed 100 characters."
+                UnitCost: {
+                    required: "Please enter the unit cost.",
+                    number: "Please enter a valid number."
                 }
             },
             submitHandler: function (form, event) {
@@ -911,34 +930,35 @@
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
-                if (data.itemDescription == $("#add-name").val()) {
+                if (data.itemDescription == $("#add-name").select2("data")[0].text) {
                     rowIndexes.push(idx);
                 }
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
+                toastr.warning($("#add-name").select2("data")[0].text + " has already been added", "Duplicate");
             } else {
                 itemDT.row.add({
-                    itemCode: $("#add-code").select2("data")[0].text,
-                    itemDescription: $("#add-name").val(),
-                    itemPartNumber: $("#add-part").val(),
-                    itemId: $("#add-code").select2("data")[0].id,
+                    purchaseOrderId: 0,
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
-                    purchaseRequestId: 0,
-                    purpose: $("#add-purpose").val(),
+                    purchaseRequestId: $("#add-pr-number").select2("data")[0].id,
+                    purchaseRequestNumber: $("#add-pr-number").select2("data")[0].text,
+                    itemId: $("#add-name").select2("data")[0].itemId,
+                    itemCode: $("#add-name").select2("data")[0].itemCode,
+                    itemPartNumber: $("#add-name").select2("data")[0].partNumber,
+                    itemDescription: $("#add-name").select2("data")[0].text,
                     quantity: FormatStringInteger($("#add-quantity").val()),
                     quantityD: $("#add-quantity").val() || 0,
-                    salesOrderId: $("#add-so-number").select2("data")[0].id,
-                    salesOrderNumber: $("#add-so-number").select2("data")[0].text,
-                    stockOnHand: FormatStringInteger($("#add-stock").val()),
-                    stockOnHandD: $("#add-stock").val() || 0,
+                    unitId: $("#add-unit").data("Id"),
                     unitCode: $("#add-unit").val(),
-                    unitId: $("#add-unit").data("Id")
+                    unitCost: FormatStringDecimal($("#add-unit-cost").val()),
+                    unitCostD: $("#add-unit-cost").val() || 0,
+                    totalAmount: FormatStringDecimal($("#add-total-amount").val()),
+                    totalAmountD: $("#add-total-amount").val() || 0
                 }).draw();
-                clearItemForm();
 
-                toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Purchase Request Item(s)", "Success");
+                toastr.success("Added " + $("#add-name").select2("data")[0].text + " on Purchase Order Item(s)", "Success");
+                clearItemForm();
             }
         }
 
@@ -955,102 +975,115 @@
             return item_to_request;
         }
 
-        $("#form-request button[type=submit]").on("click", function () {
+        $("#form-order button[type=submit]").on("click", function () {
             $("#action-type").val($(this).data("action"));
         });
 
         // Validation for Create
-        var validateCreate = $("#form-request").validate({
+        var validateCreate = $("#form-order").validate({
             rules: {
                 Type: {
                     required: true
                 },
-                Purpose: {
-                    required: function () {
-                        return $("#request-type").select2("data")[0]?.text != "Maintenance & Repair";
-                    }
-                },
-                PurposeDefinition: {
-                    required: function () {
-                        return $("#request-type").select2("data")[0]?.text == "Maintenance & Repair";
-                    },
-                    maxlength: 250
-                },
-                Region: {
-                    required: function () {
-                        return $("#request-type").select2("data")[0]?.text == "Automotive"
-                            && $("#request-purpose").select2("data")[0]?.text == "Rush Order";
-                    }
-                },
-                DateRequested: {
+                Supplier: {
                     required: true
+                },
+                Terms: {
+                    required: true
+                },
+                Currency: {
+                    required: true
+                },
+                CurrencyRate: {
+                    required: true
+                },
+                DeliveryMode: {
+                    required: function () {
+                        return $("#order-type").select2("data")[0]?.text != "Maintenance & Repair";
+                    }
+                },
+                DeliveryAddress: {
+                    required: true
+                },
+                OrderDate: {
+                    required: true
+                },
+                Reference: {
+                    required: function () {
+                        return $("#order-type").select2("data")[0]?.text == "Local Purchase Order"
+                            || $("#order-type").select2("data")[0]?.text == "International Purchase Order";
+                    },
+                    maxlength: 50
                 },
                 Remarks: {
                     required: true,
-                    maxlength: 100
+                    maxlength: 250
                 }
             },
             messages: {
                 Type: {
                     required: "Please select a type."
                 },
-                Purpose: {
-                    required: "Please select a purpose."
+                Supplier: {
+                    required: "Please select the supplier."
                 },
-                PurposeDefinition: {
-                    required: "Please enter a purpose.",
-                    maxlength: "Purpose can not exceed 250 characters."
+                Terms: {
+                    required: "Please select the term."
                 },
-                Region: {
-                    required: "Please select a region."
+                Currency: {
+                    required: "Please select a currency."
                 },
-                DateRequested: {
-                    required: "Please enter the date of request."
+                CurrencyRate: {
+                    required: "Please enter the currency rate."
+                },
+                DeliveryMode: {
+                    required: "Please select the delivery mode."
+                },
+                DeliveryAddress: {
+                    required: "Please select the delivery address."
+                },
+                OrderDate: {
+                    required: "Please enter the date of order."
+                },
+                Reference: {
+                    required: "Please enter the canvas summary reference.",
+                    maxlength: "Canvas summary reference can not exceed 50 characters."
                 },
                 Remarks: {
                     required: "Please enter a remarks",
-                    maxlength: "Remarks can not exceed 100 characters."
+                    maxlength: "Remarks can not exceed 250 characters."
                 }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
-                SaveRequest();
+                SaveOrder();
             }
         });
 
-        function GetItemsToRequest() {
-            var item_to_request = [];
-            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var row_data = this.data();
-                row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
-                row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
-                row_data.stockOnHandD = parseInt($(this.node()).find(".stock").val());
-                row_data.stockOnHand = FormatStringInteger(parseInt($(this.node()).find(".stock").val()));
-                item_to_request.push(row_data);
-            });
-            return item_to_request;
-        }
-
-        function SaveRequest() {
+        function SaveOrder() {
             var items = itemDT.data();
             if (items.length == 0) {
-                toastr.warning("No item to request. Add an item to the list to continue", "Warning");
+                toastr.warning("No item to order. Add an item to the list to continue", "Warning");
             } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
+                toastr.warning("Some items have 0 quantity. Can't order an item with 0 quantity", "Warning");
             } else {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("AddJson")",
                     data: {
-                        TypeId: $("#request-type").val(),
-                        PurposeId: $("#request-purpose").val(),
-                        PurposeDefinition: $("#request-purpose-definition").val(),
-                        RegionId: $("#request-region").val(),
-                        DateRequested: $("#request-date-requested").val(),
-                        Remarks: $("#request-remarks").val(),
+                        TypeId: $("#order-type").val(),
+                        SupplierId: $("#order-supplier").val(),
+                        TermsId: $("#order-terms").val(),
+                        CurrencyId: $("#order-currency").val(),
+                        CurrencyRate: $("#order-currency-rate").val(),
+                        DeliveryModeId: $("#order-mode").val(),
+                        DeliveryAddressId: $("#order-delivery-address").val(),
+                        DateOrdered: $("#order-date-ordered").val(),
+                        Reference: $("#order-reference").val(),
+                        Remarks: $("#order-remarks").val(),
                         Status: $("#action-type").val(),
-                        ResubmitId: $("#resubmitPRId").val(),
-                        Items: GetItemsToRequest()
+                        ResubmitId: $("#resubmitPOId").val(),
+                        Items: itemDT.rows().data().toArray()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {

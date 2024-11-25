@@ -170,21 +170,21 @@
     //});
 });
 $.validator.setDefaults({
-    errorClass: 'text-danger text-xs fw-lighter fst-italic m-0', // Set a global error class
-    highlight: function (element) {      // Optionally highlight the invalid field
+    errorClass: 'text-danger text-xs fw-lighter fst-italic m-0',
+    highlight: function (element) {
         $(element).addClass('is-invalid');
     },
-    unhighlight: function (element) {    // Optionally remove the highlight
+    unhighlight: function (element) {
         $(element).removeClass('is-invalid');
     },
     errorPlacement: function (error, element) {
-        if (element.hasClass("select2-hidden-accessible")) { // Custom handling for select2 fields
+        if (element.hasClass("select2-hidden-accessible")) {
             error.insertAfter(element.siblings(".select2"));
         } else {
-            error.insertAfter(element); // Default placement after element
+            error.insertAfter(element);
         }
     },
-    invalidHandler: function (event, validator) { // Custom handling for invalid submissions
+    invalidHandler: function (event, validator) {
         var errors = validator.errorList;
         var msg = "";
 
@@ -193,7 +193,7 @@ $.validator.setDefaults({
         });
 
         if (msg) {
-            toastr.warning(msg, "Form Validation"); // Example using Toastr for warnings
+            toastr.warning(msg, "Form Validation");
         }
     }
 });

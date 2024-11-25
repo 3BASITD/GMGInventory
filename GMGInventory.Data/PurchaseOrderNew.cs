@@ -25,7 +25,7 @@ namespace GMGInventory.Data
 
         [ForeignKey("TermId")]
         public int TermId { get; set; }
-        public virtual PurchasePaymentTerm Term { get; set; }
+        public virtual CreditTerm Term { get; set; }
 
 
         [ForeignKey("DeliveryModeId")]
@@ -76,7 +76,7 @@ namespace GMGInventory.Data
 
         [ForeignKey("ResubmitId")]
         public int? ResubmitId { get; set; }
-        public PurchaseOrderNew Resubmit { get; set; }
+        public virtual PurchaseOrderNew Resubmit { get; set; }
 
         public ICollection<PurchaseOrderNew> PurchaseOrderResubmits { get; set; }
         public ICollection<PurchaseOrderNewLineItem> PurchaseOrderLineItems { get; set; }
