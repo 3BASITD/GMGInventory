@@ -26,6 +26,13 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
+        public async Task<string?> GetPurchaseRequestType(int? Id)
+        {
+            var poRequestId = context.PurchaseOrderNewLineItems.Where(s => s.PurchaseOrderId == Id).Select(s => s.PurchaseRequestId).FirstOrDefault();
+
+            return await context.PurchaseRequests.Where(s => s.Id == poRequestId).Select(s => s.Type.Code).FirstOrDefaultAsync();
+        }
+
         public async Task<IList<JsonCodeOptionsModel>> GetTypeOptions(int? SelectedId)
         {
             return await context.PurchaseRequestTypes

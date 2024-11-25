@@ -34,7 +34,7 @@
                         @Html.DisplayNameFor(model => model.PONumber)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.DeliveryAddress)
+                        @Html.DisplayNameFor(model => model.Warehouse)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Status)
@@ -71,8 +71,8 @@
                 { data: "documentNumber", name: "DocumentNumber" },
                 { data: "supplier", name: "Supplier" },
                 { data: "term", name: "Term" },
-                { data: "pONumber", name: "PONumber" },
-                { data: "deliveryAddress", name: "DeliveryAddress" },
+                { data: "poNumber", name: "PONumber" },
+                { data: "warehouse", name: "Warehouse" },
                 { data: "status", name: "Status" },
                 { data: "receiveDate", name: "ReceiveDate" },
                 {
@@ -89,7 +89,7 @@
                     }
                 }
             ],
-            order: [[2, "desc"]]
+            order: [[1, "desc"]]
         });
 
         receiveDT.on("draw", function () {

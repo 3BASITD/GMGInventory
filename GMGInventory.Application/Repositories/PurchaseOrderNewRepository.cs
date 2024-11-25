@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using AutoMapper;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +16,7 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly IMapper mapper;
 
         public PurchaseOrderNewReporitory(ApplicationDbContext context
                                         , IHttpContextAccessor httpContextAccessor
@@ -24,6 +26,8 @@ namespace GMGInventory.Application.Repositories
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
         }
+
+      
 
         public async Task<IList<JsonOrderTypeOptionsModel>> GetTypeOptions(int? SelectedId)
         {
@@ -93,6 +97,7 @@ namespace GMGInventory.Application.Repositories
                                 .OrderBy(s => s.Served)
                                 .ToListAsync();
         }
+
 
         public async Task<string> GetNewDocumentNumber(int? TypeId)
         {

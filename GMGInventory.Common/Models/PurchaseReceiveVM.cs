@@ -19,8 +19,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Term")]
         public string Term { get; set; }
 
-        [Display(Name = "Delivery Address")]
-        public string DeliveryAddress { get; set; }
+        public string Warehouse { get; set; }
 
         [Display(Name = "DR Number")]
         public string DRNumber { get; set; }
@@ -34,10 +33,24 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Date Received")]
         public string ReceiveDate => ReceiveDateD.ToString(SystemFormat.StringDateTime);
         public DateTime ReceiveDateD { get; set; }
+        public int? ResubmitId { get; set; }
+        public int? ResubmitFromId { get; set; }
+
+        public string? DisapprovedReason { get; set; }
+
     }
 
     public class PurchaseReceiveDetailsVM :PurchaseReceiveVM
     {
+        public string PurchaseRequestType { get; set; }
+
+        public string Remarks { get; set; }
+
+        [Display(Name = "Approved By")]
+        public string? ApprovedBy { get; set; }
+
+        [Display(Name = "Disapproved By")]
+        public string? DisapprovedBy { get; set; }
 
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }
@@ -53,4 +66,57 @@ namespace GMGInventory.Common.Models
         public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
     }
+
+    public class PurchaseReceiveLineItemVM
+    {
+        public int Id { get; set; }
+        public int PurchaseReceivingId { get; set; }
+
+        [Display(Name = "Line Number")]
+        public int LineNumber { get; set; }
+
+        public int? ItemId { get; set; }
+
+        [Display(Name = "Item Code")]
+        public string? ItemCode { get; set; }
+
+        [Display(Name = "Item Description")]
+        public string? ItemDescription { get; set; }
+
+        public int UnitId { get; set; }
+
+        [Display(Name = "UOM")]
+        public string UnitCode { get; set; }
+
+        [Display(Name = "Unit Cost")]
+        public decimal UnitCost { get; set; }
+
+
+        [Display(Name = "Quantity")]
+        public string Quantity => string.Format("{0:#,##0}", QuantityD);
+        public int QuantityD { get; set; }
+
+    }
+
+    public class PurchaseReceiveSaveVM
+    {
+        public int DocumentNumber { get; set; }
+        public int PurchaseOrderId { get; set; }
+        public int SupplierId { get; set; }
+        public int TermId { get; set; }
+        public int WarehouseId { get; set; }
+        public string DeliveryReceiptNumber { get; set; }
+        public string SalesInvoiceNumber { get; set; }
+
+        public decimal Discount1 { get; set; }
+        public decimal Discount2 { get; set; }
+
+        public DateTime DateReceived { get; set; }
+        public string Remarks { get; set; }
+        public string Status { get; set; }
+        public int? ResubmitId { get; set; }
+
+        public PurchaseReceiveLineItemVM Items { get; set; }
+    }
+
 }

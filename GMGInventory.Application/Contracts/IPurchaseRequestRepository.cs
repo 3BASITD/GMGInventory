@@ -16,5 +16,6 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> ApproveAsync(int requestId);
         Task<ResponseModel> DisapproveAsync(int requestId, string? reason);
         Task<ResponseModel> DeleteAsync(int requestId);
+        Task<string?> GetPurchaseRequestType(int? Id);
     }
 }
