@@ -464,10 +464,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<string> GetNewDocumentNumber()
         {
-            //var purchaseType = await context.PurchaseOrderTypes.Where(s => s.Id == TypeId).FirstOrDefaultAsync();
-
-            //var typeCode = purchaseType == null ? "" : $"{purchaseType.Code}-";
-            var docNumberPrefix = $"RR{DateTime.Now.Year}-";
+            var docNumberPrefix = $"RR{DateTime.Now.Year.ToString().Substring(2)}-";
             var lastDocument = await context.PurchaseReceivings
                                             .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
                                             .OrderByDescending(s => s.DocumentNumber)
@@ -475,7 +472,7 @@ namespace GMGInventory.Application.Repositories
                                             .FirstOrDefaultAsync();
 
             int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
-            return $"{docNumberPrefix}{docNumberLast + 1:D4}";
+            return $"{docNumberPrefix}{docNumberLast + 1:D6}";
         }
     }
 }

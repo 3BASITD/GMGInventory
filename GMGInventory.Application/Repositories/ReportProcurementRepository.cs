@@ -19,18 +19,30 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PurchaseOrderRVM>> GetPurchaseOrder(ListFilterPurchaseOrderModel filter)
         {
             var porderVM = from porder in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder).Include(x => x.PurchaseRequest)
-                           join poItems in context.PurchaseOrderNewLineItems on porder.PurchaseOrderId equals poItems.PurchaseOrderId
-                           join pRequest in context.PurchaseRequestLineItems.Include(s => s.PurchaseRequest) on poItems.PurchaseRequestId equals pRequest.PurchaseRequestId
+                           let poItems = context.PurchaseOrderNewLineItems
+                                              .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
+                                              .FirstOrDefault()
 
-                           join preceiving in context.PurchaseReceivings.Include(s => s.PurchaseOrder) on  porder.PurchaseOrderId equals preceiving.PurchaseOrderId
-                           into pr  from p in pr.DefaultIfEmpty()
+                           let pRequest = context.PurchaseRequestLineItems
+                                          .Where(s => s.PurchaseRequestId == poItems.PurchaseRequestId)
+                                          .FirstOrDefault()
+
+                           let preceiving = context.PurchaseReceivings
+                                           .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
+                                           .FirstOrDefault()
+
+                           // join poItems in context.PurchaseOrderNewLineItems on porder.PurchaseOrderId equals poItems.PurchaseOrderId
+                           // join pRequest in context.PurchaseRequestLineItems.Include(s => s.PurchaseRequest) on poItems.PurchaseRequestId equals pRequest.PurchaseRequestId
+
+                          // join preceiving in context.PurchaseReceivings.Include(s => s.PurchaseOrder) on  porder.PurchaseOrderId equals preceiving.PurchaseOrderId
+                         //  into pr  from p in pr.DefaultIfEmpty()
 
 
                           where filter.DateFrom <= (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date
                           && (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date <= filter.DateTo
                           && (filter.Item == null || porder.Item.Id == filter.Item || (filter.Item == 0 && porder.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                           && (filter.Supplier == null || porder.PurchaseOrder.Supplier.Id == filter.Supplier)                      
-                         && (filter.Unserved == true? p.PurchaseReceivingLineItems != null : p.PurchaseReceivingLineItems == null)
+                         && (filter.Unserved == true? preceiving.PurchaseReceivingLineItems != null : preceiving.PurchaseReceivingLineItems == null)
 
                           select new PurchaseOrderRVM
                           {
@@ -139,7 +151,11 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PurchaseReturnRVM>> GetPurchaseReturn(ListFilterReturnReceivingModel filter)
         {
             var preturnVM = from preturn in context.PurchaseReturnNewLineItems.Include(s => s.PurchaseReturn) 
-                            join poItems in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder) on preturn.PurchaseReturn.PurchaseOrder.Id equals poItems.PurchaseOrderId
+                           // join poItems in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder) on preturn.PurchaseReturn.PurchaseOrder.Id equals poItems.PurchaseOrderId
+
+                            let poItems = context.PurchaseOrderNewLineItems
+                                              .Where(s => s.PurchaseOrderId == preturn.PurchaseReturn.PurchaseOrder.Id)
+                                              .FirstOrDefault()
 
                             where filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
                             && (filter.Item == null || preturn.Item.Id == filter.Item || (filter.Item == 0 && preturn.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
@@ -256,8 +272,17 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PurchaseReceivingRVM>> GetPurchaseReceiving(ListFilterReturnReceivingModel filter)
         {
             var preceiveVM = from preceive in context.PurchaseReceivingLineItems.Include(s => s.PurchaseReceiving)
-                             join poItems in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder) on preceive.PurchaseReceiving.PurchaseOrder.Id equals poItems.PurchaseOrderId
-                             join pRequest in context.PurchaseRequestLineItems.Include(s => s.PurchaseRequest) on poItems.PurchaseRequestId equals pRequest.PurchaseRequestId
+                            // join poItems in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder) on preceive.PurchaseReceiving.PurchaseOrder.Id equals poItems.PurchaseOrderId
+                            // join pRequest in context.PurchaseRequestLineItems.Include(s => s.PurchaseRequest) on poItems.PurchaseRequestId equals pRequest.PurchaseRequestId
+
+
+                             let poItems = context.PurchaseOrderNewLineItems
+                                                .Where(s => s.PurchaseOrderId == preceive.PurchaseReceiving.PurchaseOrder.Id)
+                                                .FirstOrDefault()
+
+                             let pRequest = context.PurchaseRequestLineItems
+                                                .Where(s => s.PurchaseRequestId == poItems.PurchaseRequestId)
+                                                .FirstOrDefault()
 
                              where filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
                             && (filter.Item == null || preceive.Item.Id == filter.Item || (filter.Item == 0 && preceive.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
