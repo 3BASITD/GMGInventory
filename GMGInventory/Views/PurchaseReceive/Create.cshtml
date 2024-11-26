@@ -385,7 +385,6 @@
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("GetNewDocumentNumber")",
-                   // data: { },
                     success: function (data, status, xhr) {
                         $("#receive-docNumber").val(data);
                     }
@@ -808,7 +807,8 @@
                     type: "POST",
                     url: "@Url.Action("AddJson")",
                     data: {
-                        DocumentNumber: $("#receive-poNumber").val(),
+                        DocumentNumber: $("#receive-docNumber").val(),
+                        PurchaseOrderId: $("#receive-poNumber").val(),
                         SupplierId: $("#receive-supplier").val(),
                         TermId: $("#receive-term").val(),
                         WarehouseId: $("#receive-warehouse").val(),

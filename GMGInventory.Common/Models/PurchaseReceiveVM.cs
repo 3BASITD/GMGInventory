@@ -36,7 +36,7 @@ namespace GMGInventory.Common.Models
         public string Status { get; set; }
 
         [Display(Name = "Date Received")]
-        public string ReceiveDate => ReceiveDateD.ToString(SystemFormat.StringDateTime);
+        public string ReceiveDate => ReceiveDateD.ToString(SystemFormat.StringDate2);
         public DateTime ReceiveDateD { get; set; }
         public int? ResubmitId { get; set; }
         public int? ResubmitFromId { get; set; }
@@ -116,7 +116,7 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseReceiveSaveVM
     {
-        public int DocumentNumber { get; set; }
+        public string DocumentNumber { get; set; }
         public int PurchaseOrderId { get; set; }
         public int SupplierId { get; set; }
         public int TermId { get; set; }

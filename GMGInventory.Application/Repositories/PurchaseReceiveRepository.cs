@@ -132,6 +132,7 @@ namespace GMGInventory.Application.Repositories
                           {
                               Id = receive.Id,
                               DocumentNumber = receive.DocumentNumber,
+                              PONumber = receive.PurchaseOrder.DocumentNumber,
                               PurchaseRequestType = po.PurchaseRequest.Type.Code,
                               Warehouse = receive.Warehouse.Code,
                               WarehouseId = receive.Warehouse.Id,
@@ -303,7 +304,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 var purchaseOrder = await context.PurchaseOrderNews
-                                                   .Where(s => s.Id == form.DocumentNumber)
+                                                   .Where(s => s.Id == form.PurchaseOrderId)
                                                    .FirstOrDefaultAsync();
                 var previousReceive = await context.PurchaseReceivings
                                                       .Where(s => s.Id == form.ResubmitId)
@@ -311,8 +312,11 @@ namespace GMGInventory.Application.Repositories
 
                 var receive = new PurchaseReceiving
                 {
-                    DocumentNumber = purchaseOrder.DocumentNumber,
-                    PurchaseOrderId = purchaseOrder.Id,
+                    DocumentNumber = form.DocumentNumber,
+                    PurchaseOrderId = form.PurchaseOrderId,
+
+                    //DocumentNumber = purchaseOrder.DocumentNumber,
+                    //PurchaseOrderId = purchaseOrder.Id,
                     SupplierId = form.SupplierId,
                     TermId = form.TermId,
                     WarehouseId = form.WarehouseId,
@@ -326,7 +330,7 @@ namespace GMGInventory.Application.Repositories
                     Discount1 = form.Discount1,
                     Discount2 = form.Discount2,
 
-                    CurrencyId = purchaseOrder.CurrencyId,
+                    CurrencyId = purchaseOrder!.CurrencyId,
                     CurrencyRate = purchaseOrder.CurrencyRate
                 };
                 await context.PurchaseReceivings.AddAsync(receive);
