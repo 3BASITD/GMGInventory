@@ -58,12 +58,6 @@
                     </a>
                 }
             }
-            else if (Model.Status == "Approved")
-            {
-                <a href="@Url.Action("Create", "PurchaseReturn")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
-                    <span class="fas fa-box-open"></span> Start Return
-                </a>
-            }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
@@ -134,10 +128,10 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ReceivingNumber)
+                            @Html.DisplayNameFor(model => model.RRNumber)
                         </span>
                         <b class="d-block">
-                        @Model?.ReceivingNumber
+                        @Model?.RRNumber
                         </b>
                     </p>
                 </div>
@@ -393,13 +387,14 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var ro_status = @Json.Serialize(Model?.Status);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemListJson")",
-                data: { purchaseRequestId: @Model?.Id },
+                data: { purchaseReturnId: @Model?.Id },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -412,18 +407,15 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        var actions = '<div class="btn-group" role="group">';
-                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
+                        var actions = '';
+                        if (user_access.canEdit && $("#rr-status").text().trim() == "Draft") {
+                            actions += '<input type="checkbox" />';
                         }
-                        return actions + '</div>';
+                        return actions;
                     },
                     className: "form-cell"
                 },
                 { data: "lineNumber", name: "LineNumber", className: "form-cell" },
-                { data: "salesOrderNumber", name: "SalesOrderNumber", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.itemId == null || data.itemCode == null) {
@@ -439,169 +431,73 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
-                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.stockOnHandD + '" class="form-control form-control-sm stock" style="width: 100%;" />';
-                        } else {
-                            return (data.stockOnHand == 0 ? "<span class='text-danger'>" : "")
-                                + data.stockOnHand
-                                + (data.stockOnHand == 0 ? "</span>" : "");
-                        }
-                    },
-                    name: "StockOnHand",
-                    className: "form-cell text-end"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
+                        if (ro_status == "Draft") {
                             return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
-                            return data.quantity
+                            return data.quantity;
                         }
                     },
                     name: "Quantity",
                     className: "form-cell text-end"
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
-                { data: "purpose", name: "Purpose", className: "form-cell" }
+                { data: "unitCost", name: "UnitCost", className: "form-cell" },
+                { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
             ],
             order: [[1, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
-                columnDTTotalInteger(api, 7);
+                columnDTTotalInteger(api, 5);
+                columnDTTotalDecimal(api, 8);
             }
         });
 
         itemDT.on("draw", function () {
-            updateColumnVisibility();
-
             hideLoader();
 
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
 
             if (user_access.canAdd) {
-                $(".btn-remove-item").off("click").on("click", function () {
-                    itemDT.row($(this).parents('tr')).remove().draw();
-                });
+                $(".quantity").off("change").on("change", function () {
+                    var row = itemDT.row($(this).closest('tr'));
+                    var rowData = row.data();
 
-                itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    var rowData = this.data();
-                    if (rowData.lineNumber == 1)
-                        $(this.node()).find(".btn-up-item").hide();
-                    else
-                        $(this.node()).find(".btn-up-item").show();
+                    var lineNumber = rowData.lineNumber;
 
-                    if (rowData.lineNumber == Math.max.apply(Math, itemDT.column(1).data().toArray()))
-                        $(this.node()).find(".btn-down-item").hide();
-                    else
-                        $(this.node()).find(".btn-down-item").show();
-                });
+                    var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
 
-                $(".btn-up-item").off("click").on("click", function () {
-                    var row = $(this).parents('tr');
-                    var rowData = itemDT.row(row).data();
+                    var totalValue = quantityValue * rowData.unitCostD;
 
-                    var currentLineNumber = rowData.lineNumber;
-                    var newLineNumber = currentLineNumber - 1;
+                    rowData.quantity = FormatStringInteger(quantityValue);
+                    rowData.quantityD = quantityValue;
+                    rowData.totalAmount = FormatStringDecimal(totalValue);
+                    rowData.totalAmountD = totalValue;
 
-                    var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
-                        return itemDT.row(index).data().lineNumber === newLineNumber;
-                    });
+                    row.data(rowData).draw(false);
 
-                    if (targetRowIndex != undefined) {
-                        var targetRowData = itemDT.row(targetRowIndex).data();
-                        targetRowData.lineNumber = currentLineNumber;
-                        itemDT.row(targetRowIndex).data(targetRowData);
-                    }
+                    setTimeout(function () {
+                        var restoredRow = $(itemDT.row(function (idx, data) {
+                            return data.lineNumber === lineNumber;
+                        }).node());
+                        if (restoredRow) {
+                            var restoredInput = $(restoredRow).find(".quantity");
 
-                    rowData.lineNumber = newLineNumber;
-                    itemDT.row(row).data(rowData);
-
-                    itemDT.draw();
-                });
-
-                $(".btn-down-item").off("click").on("click", function () {
-                    var row = $(this).parents('tr');
-                    var rowData = itemDT.row(row).data();
-                    var currentLineNumber = rowData.lineNumber;
-                    var newLineNumber = currentLineNumber + 1;
-
-                    var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
-                        return itemDT.row(index).data().lineNumber == newLineNumber;
-                    });
-
-                    if (targetRowIndex != undefined) {
-                        var targetRowData = itemDT.row(targetRowIndex).data();
-                        targetRowData.lineNumber = currentLineNumber;
-                        itemDT.row(targetRowIndex).data(targetRowData);
-                    }
-
-                    rowData.lineNumber = newLineNumber;
-                    itemDT.row(row).data(rowData);
-
-                    itemDT.draw();
-                });
-
-                ComputeTotalQuantity();
-                $(".quantity").on("input", function () {
-                    ComputeTotalQuantity();
+                            if (restoredInput.length)
+                                restoredInput.focus();
+                        }
+                    }, 0);
                 });
             }
         });
-
-        var columnVisibilityMap = {
-            "Automotive_Rush Order": [true, true, true, true, true, true, true, false],
-            "Automotive_Stocking": [false, true, true, true, true, true, true, false],
-            "Non-Automotive_Office Supplies": [false, true, false, true, true, true, true, false],
-            "Non-Automotive_One-Time Purchase": [false, false, false, true, false, true, true, true],
-            "Maintenance & Repair_": [false, false, false, true, false, true, true, true]
-        };
-
-        function updateColumnVisibility() {
-            var key = request_type + "_" + request_purpose;
-
-            if (columnVisibilityMap[key]) {
-                columnVisibilityMap[key].forEach(function (visible, index) {
-                    itemDT.column(index + 2).visible(visible);
-                });
-
-                $(".add-so-number-container").toggle(columnVisibilityMap[key][0]);
-                if (columnVisibilityMap[key][1]) {
-                    $(".add-code-container").toggle(true);
-                    $("#add-name").prop("readonly", true);
-                    $(".add-unit-container").toggle(true);
-                    $(".add-unit2-container").toggle(false);
-                } else {
-                    $(".add-code-container").toggle(false);
-                    $("#add-name").prop("readonly", false);
-                    $(".add-unit-container").toggle(false);
-                    $(".add-unit2-container").toggle(true);
-                }
-                $(".add-part-container").toggle(columnVisibilityMap[key][2]);
-                $(".add-name-container").toggle(columnVisibilityMap[key][3]);
-                $(".add-stock-container").toggle(columnVisibilityMap[key][4]);
-                // $(".add-quantity-container").toggle(columnVisibilityMap[key][5]);
-                // $(".add-unit-container").toggle(columnVisibilityMap[key][6]);
-                $(".add-purpose-container").toggle(columnVisibilityMap[key][7]);
-            }
-        }
-
-        function checkIfRequired(name) {
-            var key = request_type + "_" + request_purpose;
-            if (name == "SONumber") return columnVisibilityMap[key][0];
-            else if (name == "Code") return columnVisibilityMap[key][1];
-            else if (name == "Name") return columnVisibilityMap[key][3];
-            else if (name == "Quantity") return columnVisibilityMap[key][5];
-            else if (name == "Purpose") return columnVisibilityMap[key][6];
-            else return false;
-        }
 
         if (user_access.canAdd) {
             loadAllItemsOptions();
             function loadAllItemsOptions() {
                 if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
                     $("#add-code").select2("destroy");
+                    $("#add-code").empty();
                 }
                 // Load item for select2
                 $("#add-code").select2({
@@ -650,6 +546,7 @@
 
                 if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
                     $("#add-code").select2("destroy");
+                    $("#add-code").empty();
                 }
                 // Load item for select2
                 $("#add-code").select2({

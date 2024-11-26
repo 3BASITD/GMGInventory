@@ -641,6 +641,7 @@
             function loadAllItemsOptions() {
                 if ($.fn.select2 && $("#add-name").hasClass("select2-hidden-accessible")) {
                     $("#add-name").select2("destroy");
+                    $("#add-name").empty();
                 }
                 $.ajax({
                     type: "POST",
@@ -678,7 +679,7 @@
                             var selected = $(this).select2("data")[0];
                             $("#add-code").val(selected.itemCode);
                             $("#add-part").val(selected.partNumber);
-                            $("#add-quantity").val(selected.quantity - selected.served);
+                            $("#add-quantity").val(selected.unorderedQuantity);
                             $("#add-quantity").data("max", selected.unorderedQuantity);
                             $("#add-unit").val(selected.unit);
                             $("#add-unit").data("Id", selected.unitId);
@@ -752,7 +753,10 @@
                     Quantity: {
                         required: true,// function () { return checkIfRequired("Quantity"); },
                         number: true,
-                        isNotZero: true
+                        isNotZero: true,
+                        max: function () {
+                            return $("#add-quantity").data("max");
+                        }
                     },
                     UnitCost: {
                         required: true,// function () { return checkIfRequired("Purpose"); },

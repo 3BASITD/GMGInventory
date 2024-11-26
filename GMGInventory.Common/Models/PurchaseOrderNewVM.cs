@@ -127,8 +127,16 @@ namespace GMGInventory.Common.Models
         public int QuantityD { get; set; }
 
         [Display(Name = "Unordered Quantity")]
+        public string RequestQuantity => string.Format("{0:#,##0}", RequestQuantityD);
+        public int RequestQuantityD { get; set; }
+
+        [Display(Name = "Unordered Quantity")]
+        public string ServedQuantity => string.Format("{0:#,##0}", ServedQuantityD);
+        public int ServedQuantityD { get; set; }
+
+        [Display(Name = "Unordered Quantity")]
         public string UnorderedQuantity => string.Format("{0:#,##0}", UnorderedQuantityD);
-        public int UnorderedQuantityD { get; set; }
+        public int UnorderedQuantityD => RequestQuantityD - ServedQuantityD;
 
         [Display(Name = "UOM")]
         public string UnitCode { get; set; }

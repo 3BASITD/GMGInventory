@@ -25,10 +25,13 @@
                         @Html.DisplayNameFor(model => model.DocumentNumber)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Supplier)
+                        @Html.DisplayNameFor(model => model.PONumber)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.PONumber)
+                        @Html.DisplayNameFor(model => model.RRNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Supplier)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Warehouse)
@@ -72,11 +75,12 @@
             },
             columns: [
                 { data: "documentNumber", name: "DocumentNumber" },
+                { data: "poNumber", name: "PONumber" },
+                { data: "rrNumber", name: "RRNumber" },
                 { data: "supplier", name: "Supplier" },
-                { data: "pONumber", name: "PONumber" },
                 { data: "warehouse", name: "Warehouse" },
-                { data: "dRNumber", name: "DRNumber" },
-                { data: "sINumber", name: "SINumber" },
+                { data: "drNumber", name: "DRNumber" },
+                { data: "siNumber", name: "SINumber" },
                 { data: "status", name: "Status" },
                 { data: "returnDate", name: "ReturnDate" },
                 {
@@ -93,7 +97,17 @@
                     }
                 }
             ],
-            order: [[2, "desc"]]
+            order: [[2, "desc"]],
+            createdRow: function (row, data, dataIndex) {
+                if (data.status == 'Resubmitted') {
+                    $(row).addClass('text-muted');
+                }
+                if (data.status == 'Disapproved') {
+                    $(row).find('td:eq(7)').addClass('text-danger');
+                } else if (data.status == 'Approved') {
+                    $(row).find('td:eq(7)').addClass('text-success');
+                }
+            }
         });
 
         returnDT.on("draw", function () {

@@ -205,7 +205,7 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        return '<input type="checkbox" />';
+                        return '<input type="checkbox" class="to-return" ' + (data.toReturn == true ? 'checked="checked"' : '') + ' />';
                     },
                     className: "form-cell"
                 },
@@ -225,7 +225,11 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        if (data.toReturn == true) {
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        } else {
+                            return data.quantity;
+                        }
                     },
                     name: "Quantity",
                     className: "form-cell text-end"
@@ -235,6 +239,11 @@
                 { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
             ],
             order: [[1, "asc"]],
+            createdRow: function (row, data, dataIndex) {
+                if (data.toReturn == false) {
+                    $(row).addClass('text-muted');
+                }
+            },
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
@@ -277,6 +286,23 @@
                             restoredInput.focus();
                     }
                 }, 0);
+            });
+
+            $(".to-return").off("change").on("change", function () {
+                var tr = $(this).closest('tr');
+                var row = itemDT.row(tr);
+                var rowData = row.data();
+
+                rowData.quantity = FormatStringInteger(0);
+                rowData.quantityD = 0;
+                if ($(this).prop("checked")) {
+                    rowData.toReturn = true;
+                    tr.removeClass("text-muted");
+                } else {
+                    rowData.toReturn = false;
+                    tr.addClass("text-muted");
+                }
+                row.data(rowData).draw(false);
             });
         });
 
@@ -354,13 +380,14 @@
                 success: function (data, status, xhr) {
                     $.each(data, function (i, v) {
                         itemDT.row.add({
+                            toReturn: false,
                             itemCode: v.itemCode,
                             itemDescription: v.itemDescription,
                             itemPartNumber: v.itemPartNumber,
                             itemId: v.itemId,
                             lineNumber: v.lineNumber,
-                            quantity: FormatStringInteger(v.quantity),
-                            quantityD: v.quantityD,
+                            quantity: FormatStringInteger(0),
+                            quantityD: 0,
                             unitCode: v.unitCode,
                             unitId: v.unitId,
                             unitCost: FormatStringDecimal(v.unitCost),

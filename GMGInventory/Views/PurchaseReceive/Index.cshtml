@@ -89,7 +89,17 @@
                     }
                 }
             ],
-            order: [[1, "desc"]]
+            order: [[1, "desc"]],
+            createdRow: function (row, data, dataIndex) {
+                if (data.status == 'Resubmitted') {
+                    $(row).addClass('text-muted');
+                }
+                if (data.status == 'Disapproved') {
+                    $(row).find('td:eq(5)').addClass('text-danger');
+                } else if (data.status == 'Approved') {
+                    $(row).find('td:eq(5)').addClass('text-success');
+                }
+            }
         });
 
         receiveDT.on("draw", function () {

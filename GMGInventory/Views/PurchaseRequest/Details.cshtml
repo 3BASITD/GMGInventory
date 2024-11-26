@@ -621,6 +621,7 @@
             function loadAllItemsOptions() {
                 if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
                     $("#add-code").select2("destroy");
+                    $("#add-code").empty();
                 }
                 // Load item for select2
                 $("#add-code").select2({
@@ -669,6 +670,7 @@
 
                 if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
                     $("#add-code").select2("destroy");
+                    $("#add-code").empty();
                 }
                 // Load item for select2
                 $("#add-code").select2({

@@ -270,7 +270,20 @@ namespace GMGInventory.Application.Repositories
                               QuantityD = order.Quantity,
                               UnitId = order.Unit.Id,
                               UnitCode = order.Unit.Code,
-                              UnitCostD = order.UnitCost
+                              UnitCostD = order.UnitCost,
+                              ServedQuantityD = context.PurchaseOrderNewLineItems
+                                                       .Where(a => a.ItemId == order.ItemId
+                                                                && a.ItemDescription == order.ItemDescription
+                                                                && a.PurchaseOrder.Status.Name == "Approved")
+                                                       .Select(a => a.Quantity)
+                                                       .Sum(),
+                              RequestQuantityD = context.PurchaseRequestLineItems
+                                                        .Where(a => a.ItemId == order.ItemId
+                                                                 && a.ItemDescription == order.ItemDescription
+                                                                 && a.PurchaseRequest.Status.Name == "Approved"
+                                                                 && a.PurchaseRequest.Id == order.PurchaseRequest.Id)
+                                                        .Select(a => a.Quantity)
+                                                        .Sum(),
                           };
             return await orderVM.ToListAsync();
         }

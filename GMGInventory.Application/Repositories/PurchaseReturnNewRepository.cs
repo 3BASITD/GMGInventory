@@ -102,6 +102,7 @@ namespace GMGInventory.Application.Repositories
         {
             var returnVM = from retrn in context.PurchaseReturnNews
                                                 .Include(s => s.Supplier)
+                                                .Include(s => s.PurchaseReceive)
                                                 .Include(s => s.PurchaseOrder)
                                                 .Include(s => s.Warehouse)
                                                 .Include(s => s.Status)
@@ -110,6 +111,7 @@ namespace GMGInventory.Application.Repositories
                                Id = retrn.Id,
                                DocumentNumber = retrn.DocumentNumber,
                                Supplier = retrn.Supplier.Code,
+                               RRNumber = retrn.PurchaseReceive.DocumentNumber,
                                PONumber = retrn.PurchaseOrder.DocumentNumber,
                                Warehouse = retrn.Warehouse.Code,
                                DRNumber = retrn.DeliveryReceiptNumber,
@@ -187,6 +189,7 @@ namespace GMGInventory.Application.Repositories
             var details = from retrn in context.PurchaseReturnNews
                                                .Include(s => s.Supplier)
                                                .Include(s => s.Warehouse)
+                                               .Include(s => s.PurchaseReceive)
                                                .Include(s => s.PurchaseOrder)
                                                .Include(s => s.Status)
                           let resubmitfrom = context.PurchaseReturnNews
@@ -201,6 +204,7 @@ namespace GMGInventory.Application.Repositories
                           {
                               Id = retrn.Id,
                               DocumentNumber = retrn.DocumentNumber,
+                              RRNumber = retrn.PurchaseReceive.DocumentNumber,
                               PONumber = retrn.PurchaseOrder.DocumentNumber,
                               Supplier = retrn.Supplier.Name,
                               Warehouse = retrn.Warehouse.Name,

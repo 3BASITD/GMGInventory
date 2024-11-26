@@ -132,6 +132,12 @@ namespace GMGInventory.Application.Repositories
                           {
                               Id = receive.Id,
                               DocumentNumber = receive.DocumentNumber,
+                              PONumber = receive.PurchaseOrder.DocumentNumber,
+                              POId = receive.PurchaseOrder.Id,
+                              Supplier = receive.Supplier.Name,
+                              SupplierId = receive.Supplier.Id,
+                              DRNumber = receive.DeliveryReceiptNumber,
+                              SINumber = receive.SalesInvoiceNumber,
                               PurchaseRequestType = po.PurchaseRequest.Type.Code,
                               Warehouse = receive.Warehouse.Code,
                               WarehouseId = receive.Warehouse.Id,

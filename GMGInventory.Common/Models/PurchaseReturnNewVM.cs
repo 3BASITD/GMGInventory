@@ -13,6 +13,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "PO Number")]
         public string PONumber { get; set; }
 
+        [Display(Name = "RR Number")]
+        public string RRNumber { get; set; }
+
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
 
@@ -29,7 +32,7 @@ namespace GMGInventory.Common.Models
         public string Status { get; set; }
 
         [Display(Name = "Date Returned")]
-        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDateTime);
+        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDate);
         public string ReturnDate3 => ReturnDateD.ToString(SystemFormat.StringDate3);
         public DateTime ReturnDateD { get; set; }
     }
@@ -37,8 +40,6 @@ namespace GMGInventory.Common.Models
     public class PurchaseReturnNewDetailedVM :PurchaseReturnNewVM
     {
 
-        [Display(Name = "Receiving #")]
-        public string ReceivingNumber { get; set; }
 
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }

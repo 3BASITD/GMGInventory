@@ -656,6 +656,7 @@
         function loadPurchaseRequestOptions() {
             if ($.fn.select2 && $("#add-pr-number").hasClass("select2-hidden-accessible")) {
                 $("#add-pr-number").select2("destroy");
+                $("#add-pr-number").empty();
             }
             $.ajax({
                 type: "POST",
@@ -687,6 +688,7 @@
         function loadAllItemsOptions() {
             if ($.fn.select2 && $("#add-name").hasClass("select2-hidden-accessible")) {
                 $("#add-name").select2("destroy");
+                $("#add-name").empty();
             }
             $.ajax({
                 type: "POST",
