@@ -40,7 +40,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-md-4 col-sm-6">
+                <div class="col-12 col-md-4 col-sm-6 ">
                     <div class="form-group">
                         <label for="receive-poNumber" class="form-label mb-0">Purchase Order</label>
                         <select id="receive-poNumber" name="PurchaseOrder" style="width: 100%"></select>
@@ -62,27 +62,39 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="receive-supplier" class="form-label mb-0">Supplier</label>
-                        <select id="receive-supplier" name="Supplier" style="width: 100%"></select>
+                        <input type="text" id="receive-supplier" name="Supplier" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
 
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="receive-warehouse" class="form-label mb-0">Warehouse</label>
-                        <select id="receive-warehouse" name="Warehouse" style="width: 100%"></select>
+                        <input type="text" id="receive-warehouse" name="Warehouse" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="receive-term" class="form-label mb-0">Term</label>
-                        <select id="receive-term" name="Term" style="width: 100%"></select>
+                        <input type="text" id="receive-term" name="Term" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="receive-term" class="form-label mb-0">Currency</label>
+                        <input type="text" id="receive-currency" name="Currency" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="receive-currencyRate" class="form-label mb-0">Currency Rate</label>
+                        <input type="text" id="receive-currencyRate" name="Term" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="receive-discount1" class="form-label mb-0">Discount 1</label>
                         <div class="input-group input-group-sm">
-                            <input type="number" step="0.01" min="0" max="100" id="receive-discount1" name="Discount1" class="form-control form-control-sm" />
+                            <input type="number" step="0.01" min="0" max="100" id="receive-discount1" name="Discount1" class="form-control form-control-sm" readonly="readonly" />
                             <span class="input-group-text">%</span>
                         </div>
                     </div>
@@ -91,7 +103,7 @@
                     <div class="form-group">
                         <label for="receive-discount2" class="form-label mb-0">Discount 2</label>
                         <div class="input-group input-group-sm">
-                            <input type="number" step="0.01" min="0" max="100" id="receive-discount2" name="Discount2" class="form-control form-control-sm" />
+                            <input type="number" step="0.01" min="0" max="100" id="receive-discount2" name="Discount2" class="form-control form-control-sm" readonly="readonly" />
                             <span class="input-group-text">%</span>
                         </div>
                     </div>
@@ -170,7 +182,7 @@
                     <div class="row">
                         <div class="col-12 col-sm-6 add-code-container">
                             <div class="form-group">
-                                <label for="add-code" class="form-label mb-0">Item Code</label>
+                                <label for="add-code" class="form-label mb-0">Item</label>
                                 <select id="add-code" name="Code" style="width: 100%;">
                                     <option></option>
                                 </select>
@@ -226,24 +238,63 @@
     </div>
 </div>
 
-@if (TempData["PurchaseReceiveId"] != null)
+@if (TempData["PurchaseReceivingId"] != null)
 {
-    <input type="hidden" id="resubmitPRId" value="@TempData["PurchaseReceiveId"]" />
+    <input type="hidden" id="resubmitPRId" value="@TempData["PurchaseReceivingId"]" />
 }
 
 @section Scripts {
     <script>
-        // var currentTerm = -1;
-        // var currentSupplier = -1;
-
+       
         if ($("#resubmitPRId").length) {
+            $("#receive-poNumber").prop('disabled', true);
 
+            // for resubmitting a disapproved sales order
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("DetailsJson")",
+                data: {
+                    id: $("#resubmitPRId").val()
+                },
+                success: function (data, status, xhr) {
+                    $("#receive-docNumber").val(data.documentNumber);
+                    $("#receive-poNumber").val(data.poNumber);
+                    $("#receive-supplier").val(data.supplier);
+                    $("#receive-warehouse").val(data.warehouse);
+                    $("#receive-term").val(data.term);
+
+                    $("#receive-currency").val(data.currency);
+                    $("#receive-currencyRate").val(data.currencyRate);
+
+                    //  $("#receive-supplier").data("Id", data.supplierId);
+                    // $("#receive-term").data("Id", data.termId);
+                    //   $("#receive-warehouse").data("Id", data.warehouseId);
+
+
+                    $("#receive-discount1").val(data.discount1);
+                    $("#receive-discount2").val(data.discount2);
+
+                    loadPONumberOptions(data.poId);
+                },
+                complete: function (xhr, status) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetItemListJson")",
+                        data: {
+                            purchaseReceiveId: $("#resubmitPRId").val()
+                        },
+                        success: function (data, status, xhr) {
+                            $.each(data, function (i, v) {
+                                itemDT.row.add(v).draw();
+                            });
+                        }
+                    });
+                }
+            });
         } else {
+            $("#receive-poNumber").prop('disabled', false);
             loadDocumentNumber();
-            loadPONumberOptions();
-            loadTermOptions();
-            loadSupplierOptions();
-            loadWarehouseOptions();
+            loadPONumberOptions(-1);
         }
 
         var itemDT = $('.table-item').DataTable({
@@ -287,7 +338,7 @@
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                  {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" step="1" value="' + data.unitCostD + '" class="form-control form-control-sm unitCost" style="width: 100%;" />';
+                        return '<input type="number" min="0" max="1999999" step="1" value="' + data.unitCost + '" class="form-control form-control-sm unitCost" style="width: 100%;" />';
                     },
                     name: "UnitCost",
                     className: "form-cell text-end"
@@ -392,239 +443,146 @@
             }
         }
 
-        function loadPONumberOptions() {
+        function loadPONumberOptions(selectedOrder) {
             // Load Select2 Purchase Order
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetPurchaseOrderOptions", "PurchaseReceive")",
+                data: {
+                    SelectedId:  selectedOrder
+                },
                 success: function (data, status, xhr) {
                     $("#receive-poNumber").select2({
                         data: data,
-                        minimumResultsForSearch: -1,
-                        placeholder: "<empty>",
-                    }).on("change", function () {
-                        $.ajax({
-                            type: "POST",
-                            url: "@Url.Action("GetPurchaseRequestType", "PurchaseRequest")",
-                            data: { PurchaseOrderId: $(this).val() },
-                            success: function (data, status, xhr) {
-                                if (data == "MR") {
-                                    $(".add-code-container").toggle(false);
-                                    $(".add-unit2-container").toggle(true);
-                                }
-                                else {
-                                    $(".add-code-container").toggle(true);
-                                    $(".add-unit2-container").toggle(false);
-                                }
-                            }
-                        });
-                    });
+                        minimumInputLength: -1,
+                        placeholder: "<empty>"
+                    }).off("select2:select").on("select2:select", function () {
+                        GetPurchaseRequestType();
+                        loadPODetails();
+                        loadAllItemsOptions(selectedOrder);
+                    }).off("select2:unselecting").on("select2:unselecting", function () {
+                        $("#receive-supplier").val("");
+                        $("#receive-warehouse").val("");
+                        $("#receive-term").val("");
+                        $("#receive-currency").val("");
+                        $("#receive-currencyRate").val("0");
+                        $("#receive-discount1").val("0");
+                        $("#receive-discount2").val("0");
+
+                        //  $("#receive-supplier").removeData("Id");
+                        //   $("#receive-warehouse").removeData("Id");
+                        //$("#receive-term").removeData("Id");
+
+                        $("#add-code").val("").trigger("change");
+                        itemDT.clear().draw();
+                    }).val(selectedOrder).trigger('change');
                 } 
             });
         }
 
-        function loadTermOptions() {
-            // Load Select2 Credit Term
+        function GetPurchaseRequestType() {
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetOptions", "CreditTerm")",
+                url: "@Url.Action("GetPurchaseRequestType", "PurchaseRequest")",
+                data: { PurchaseOrderId: $("#receive-poNumber").val() },
                 success: function (data, status, xhr) {
-                    console.log(data);
-                    $("#receive-term").select2({
-                        minimumResultsForSearch: -1,
-                        placeholder: "<empty>",
-                        data: data
-                    });
+                    if (data == "MR") {
+                        $(".add-code-container").toggle(false);
+                        $(".add-unit2-container").toggle(true);
+                    }
+                    else {
+                        $(".add-code-container").toggle(true);
+                        $(".add-unit2-container").toggle(false);
+                    }
                 }
             });
         }
 
-        function loadSupplierOptions() {
-            // Load Select2 for Supplier
+        // Load purchase receiving for select2
+        function loadPODetails() {
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetOptions", "Supplier")",
+                url: "@Url.Action("DetailsJson", "PurchaseOrder")",
+                data: {
+                    Id: $("#receive-poNumber").val()
+                },
                 success: function (data, status, xhr) {
-                    $("#receive-supplier").select2({
-                        data: data,
-                        allowClear: false,
-                        placeholder: {
-                            id: "",
-                            text: "All"
-                        }
-                    });
+                    $("#receive-supplier").val(data.supplier);
+                    $("#receive-warehouse").val(data.deliveryAddress);
+                    $("#receive-term").val(data.term);
+                    $("#receive-currency").val(data.currency);
+                    $("#receive-currencyRate").val(data.currencyRate);
+
+                    $("#receive-discount1").val(data.discount1);
+                    $("#receive-discount2").val(data.discount2);
+                    // $("#receive-supplier").data("Id", data.supplierId);
+                    //  $("#receive-warehouse").data("Id", data.deliveryAddressId);
+                    //  $("#receive-term").data("Id", data.termId);
+
+                },
+                complete: function (xhr, status) {
+                   // loadRRItems();
                 }
             });
         }
 
-        function loadWarehouseOptions() {
-            // Load Select2 for Warehouse
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Warehouse")",
-                success: function (data, status, xhr) {
-                    $("#receive-warehouse").select2({
-                        data: data,
-                        allowClear: false,
-                        placeholder: {
-                            id: "",
-                            text: "All"
-                        }
-                    });
-                }
-            });
-        }
-        // var columnVisibilityMap = {
-        //     "Automotive_Rush Order": [true, true, true, true, true, true, true, false],
-        //     "Automotive_Stocking": [false, true, true, true, true, true, true, false],
-        //     "Non-Automotive_Office Supplies": [false, true, false, true, true, true, true, false],
-        //     "Non-Automotive_One-Time Purchase": [false, false, false, true, false, true, true, true],
-        //     "Maintenance & Repair_": [false, false, false, true, false, true, true, true]
-        // };
-
-        // function updateColumnVisibility() {
-        //     var typeText = $("#request-type").select2("data")[0]?.text || "";
-        //     var purposeText = $("#request-purpose").select2("data")[0]?.text || "";
-
-        //     var key = typeText + "_" + purposeText;
-
-        //     if (columnVisibilityMap[key]) {
-        //         columnVisibilityMap[key].forEach(function (visible, index) {
-        //             itemDT.column(index + 2).visible(visible);
-        //         });
-
-        //         $(".add-so-number-container").toggle(columnVisibilityMap[key][0]);
-        //         if (columnVisibilityMap[key][1]) {
-        //             $(".add-code-container").toggle(true);
-        //             $("#add-name").prop("readonly", true);
-        //             $(".add-unit-container").toggle(true);
-        //             $(".add-unit2-container").toggle(false);
-        //         } else {
-        //             $(".add-code-container").toggle(false);
-        //             $("#add-name").prop("readonly", false);
-        //             $(".add-unit-container").toggle(false);
-        //             $(".add-unit2-container").toggle(true);
-        //         }
-        //         $(".add-part-container").toggle(columnVisibilityMap[key][2]);
-        //         $(".add-name-container").toggle(columnVisibilityMap[key][3]);
-        //         $(".add-stock-container").toggle(columnVisibilityMap[key][4]);
-        //         // $(".add-quantity-container").toggle(columnVisibilityMap[key][5]);
-        //         // $(".add-unit-container").toggle(columnVisibilityMap[key][6]);
-        //         $(".add-purpose-container").toggle(columnVisibilityMap[key][7]);
-        //     }
-        // }
-
-        // function checkIfRequired(name) {
-        //     var typeText = $("#request-type").select2("data")[0]?.text || "";
-        //     var purposeText = $("#request-purpose").select2("data")[0]?.text || "";
-
-        //     var key = typeText + "_" + purposeText;
-        //     if (name == "SONumber") return columnVisibilityMap[key][0];
-        //     else if (name == "Code") return columnVisibilityMap[key][1];
-        //     else if (name == "Name") return columnVisibilityMap[key][3];
-        //     else if (name == "Quantity") return columnVisibilityMap[key][5];
-        //     else if (name == "Purpose") return columnVisibilityMap[key][6];
-        //     else return false;
-        // }
-
-        loadAllItemsOptions();
-        function loadAllItemsOptions() {
+       // loadAllItemsOptions();
+        function loadAllItemsOptions(selectedOrder) {
             if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
                 $("#add-code").select2("destroy");
                 $("#add-code").empty();
-            }
-            // Load item for select2
-            $("#add-code").select2({
-                minimumInputLength: 1,
-                allowClear: true,
-                placeholder: "<empty>",
-                templateResult: function (repo) {
-                    if (repo.loading) {
-                        return repo.text;
+            } 
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetPurchaseOrderItemOptions")", 
+                data: {
+                    SelectedId: function () {
+                        return $("#receive-poNumber").val(); 
                     }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                 },
-                ajax: {
-                    url: "@Url.Action("GetOptions", "Item")",
-                    dataType: 'json',
-                    type: "POST",
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
+                success: function (data, status, xhr) {
+                    $("#add-code").select2({
+                        data: data,
+                        minimumResultsForSearch: -1,
+                        placeholder: "<empty>",
+                        allowClear: true,
+                        language: {
+                            noResults: function () {
+                                return "No items found";
                             }
-                        };
-                    },
-                    cache: true,
-                    complete: AssignItemEvent
+                        },
+                        templateResult: function (repo) {
+                            if (repo.loading) {
+                                return repo.text;
+                            }
+                            return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                        },
+                        dropdownParent: $("#addModal")
+                    }).on("select2:select", function () {
+                        var selected = $(this).select2("data")[0];
+                        // $("#add-code").val(selected.itemCode);
+                        // $("#add-part").val(selected.partNumber);
+                        // $("#add-quantity").val(selected.unorderedQuantity);
+                        // $("#add-quantity").data("max", selected.unorderedQuantity);
+                        // $("#add-unit").val(selected.unit);
+                        // $("#add-unit").data("Id", selected.unitId);
+                        // $("#add-unit-cost").val(0);
+                        // $("#add-total-amount").val("0.00");
+                    }).on("select2:unselecting", function () {
+                        // $("#add-code").val("");
+                        // $("#add-quantity").val(0);
+                        // $("#add-quantity").data("max", 0);
+                        // $("#add-unit").val("");
+                        // $("#add-unit").data("Id", -1);
+                        // $("#add-unit-cost").val("0.00");
+                        // $("#add-total-amount").val("0.00");
+                    });
                 },
-                dropdownParent: $("#addModal")
+                complete: AssignItemEvent
+
             });
-        }
 
-        // function loadSOItemsOptions() {
-        //     $("#add-code").val(null).trigger("change");
-        //     $("#add-name").val("");
-        //     $("#add-quantity").val(0);
-        //     $("#add-unit").val("");
-
-        //     if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
-        //         $("#add-code").select2("destroy");
-        //         $("#add-code").empty();
-        //     }
-        //     // Load item for select2
-        //     $("#add-code").select2({
-        //         minimumInputLength: -1,
-        //         allowClear: true,
-        //         placeholder: "<empty>",
-        //         templateResult: function (repo) {
-        //             if (repo.loading) {
-        //                 return repo.text;
-        //             }
-        //             console.log(repo);
-        //             if (repo.quantity == 0) {
-        //                 return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
-        //                     (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
-        //                     "</span>");
-        //             } else {
-        //                 return $("<strong>" + repo.text + "</strong> " +
-        //                     (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-        //             }
-        //         },
-        //         ajax: {
-        //             url: "@Url.Action("GetUnservedOptions", "Item")",
-        //             dataType: 'json',
-        //             type: "POST",
-        //             data: function (params) {
-        //                 return {
-        //                     search: params.term,
-        //                     page: params.page || 1,
-        //                     SalesOrderId: $("#add-so-number").val()
-        //                 };
-        //             },
-        //             processResults: function (data, params) {
-        //                 params.page = params.page || 1;
-        //                 return {
-        //                     results: data.items,
-        //                     pagination: {
-        //                         more: (params.page * 50) < data.total_count
-        //                     }
-        //                 };
-        //             },
-        //             cache: true,
-        //             complete: AssignItemEvent
-        //         },
-        //         dropdownParent: $("#addModal")
-        //     });
-        // }
+        } 
 
         function AssignItemEvent(jqXHR, textStatus) {
             $("#add-code").off("select2:select").on("select2:select", function () {
@@ -775,6 +733,14 @@
         // Validation for Create
         var validateCreate = $("#form-receive").validate({
             rules: {
+                DeliveryReceiptNumber: {
+                    required: true,
+                    maxlength: 100
+                },
+                SalesInvoiceNumber: {
+                    required: true,
+                    maxlength: 100
+                },
                 DateReceived: {
                     required: true
                 },
@@ -784,6 +750,14 @@
                 }
             },
             messages: {
+                DeliveryReceiptNumber: {
+                    required: "Please enter Delivery Receipt Number.",
+                    maxlength: "Delivery Receipt Number can not exceed 100 characters."
+                }, 
+                SalesInvoiceNumber: {
+                    required: "Please enter Sales Invoice Number.",
+                    maxlength: "Sales Invoice Number can not exceed 100 characters."
+                },
                 DateReceived: {
                     required: "Please enter the date of receive."
                 },
@@ -811,17 +785,19 @@
                     data: {
                         DocumentNumber: $("#receive-docNumber").val(),
                         PurchaseOrderId: $("#receive-poNumber").val(),
-                        SupplierId: $("#receive-supplier").val(),
-                        TermId: $("#receive-term").val(),
-                        WarehouseId: $("#receive-warehouse").val(),
                         DeliveryReceiptNumber: $("#receive-dRNumber").val(),
                         SalesInvoiceNumber: $("#receive-sINumber").val(),
                         DateReceived: $("#date-received").val(),
                         Status: $("#action-type").val(),
-                        Items: GetItemsToReceive(),
                         Remarks: $("#receive-remarks").val(),
-                        Discount1: $("#receive-discount1").val(),
-                        Discount2: $("#receive-discount2").val()
+                        ResubmitId: $("#resubmitPRId").val(),
+                        Items: GetItemsToReceive()
+
+                        //  SupplierId: $("#receive-supplier").val(),
+                        //  TermId: $("#receive-term").val(),
+                        //  WarehouseId: $("#receive-warehouse").val(),
+                        //  Discount1: $("#receive-discount1").val(),
+                        //  Discount2: $("#receive-discount2").val(),
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {

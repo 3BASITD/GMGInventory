@@ -79,11 +79,11 @@
                             <strong>Resubmit Details:</strong>
                             @if (Model?.ResubmitId != null)
                             {
-                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseReceiving", new {Id = Model?.ResubmitId})" class="alert-link">here</a>.</div>
+                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseReceive", new {Id = Model?.ResubmitId})" class="alert-link">here</a>.</div>
                             }
                             @if (Model?.ResubmitFromId != null)
                             {
-                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseReceiving", new {Id = Model?.ResubmitFromId})" class="alert-link">here</a>.</div>
+                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseReceive", new {Id = Model?.ResubmitFromId})" class="alert-link">here</a>.</div>
                             }
                         </div>
                     </div>
@@ -107,7 +107,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.PONumber)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block" id="receive-poNumber">
                         @Model?.PONumber
                     </b>
                 </p>
@@ -171,6 +171,46 @@
                     </p>
                 </div>
             }
+             <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Currency)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Currency
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CurrencyRate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CurrencyRate
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Discount1)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Discount1
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Discount2)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Discount2
+                    </b>
+                </p>
+            </div>
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -294,14 +334,14 @@
                             {
                                 <div class="col-12 col-sm-6">
                                     <div class="form-group">
-                                        <label for="add-code" class="form-label mb-0">Item Code</label>
+                                        <label for="add-code" class="form-label mb-0">Item</label>
                                         <select id="add-code" name="Code" style="width: 100%;">
                                             <option></option>
                                         </select>
                                     </div>
                                 </div>
                             }
-                                <div class="col-12 col-sm-6 add-name-container">
+                             <div class="col-12 col-sm-6 add-name-container">
                                 <div class="form-group">
                                     <label for="add-name" class="form-label mb-0">Item Description</label>
                                     <input type="text" id="add-name" name="Name" class="form-control form-control-sm"  />
@@ -326,19 +366,22 @@
                                     </div>
                                 </div>
                             }
+                          
+                            @if (Model!.PurchaseRequestType != "MR")
+                            {
+                                <div class="col-12 col-sm-6 add-unit-container">
+                                    <div class="form-group">
+                                        <label for="add-unit" class="form-label mb-0">Unit</label>
+                                        <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                                    </div>
+                                </div>
+                            }
                             <div class="col-12 col-sm-6 add-cost">
                                 <div class="form-group">
                                     <label for="add-cost" class="form-label mb-0">Unit Cost</label>
-                                    <input type="number" min="0" max="1999999" step="1" id="add-cost" name="UnitCost" class="form-control form-control-sm" />
+                                    <input type="number" min="0" max="1999999" step="1" id="add-cost" name="UnitCost" class="form-control form-control-sm " />
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 add-unit-container" hidden>
-                                <div class="form-group">
-                                    <label for="add-unit" class="form-label mb-0">Unit</label>
-                                    <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm"  />
-                                </div>
-                            </div>
-                         
 
                         </div>
                     </div>
@@ -491,39 +534,26 @@
 
         if (user_access.canAdd) {
             // Load item for select2
-            $("#add-code").select2({
-                minimumInputLength: 1,
-                allowClear: true,
-                placeholder: "<empty>",
-                templateResult: function (repo) {
-                    if (repo.loading) {
-                        return repo.text;
-                    }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetPurchaseOrderItemOptions")",
+                data: {
+                    SelectedId: @Model?.POId,
                 },
-                ajax: {
-                    url: "@Url.Action("GetOptions", "Item")",
-                    dataType: 'json',
-                    type: "POST",
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true,
-                    complete: AssignItemEvent
-                },
-                dropdownParent: $("#addModal")
+                success: function (data, status, xhr) {
+                    $("#add-code").select2({
+                        data: data,
+                        placeholder: "<empty>",
+                        processResults: function (data, params) {
+                            return {
+                                results: data.items
+                            };
+                        },
+                        cache: true,
+                        complete: AssignItemEvent,
+                        dropdownParent: $("#addModal")
+                    });
+                }
             });
 
             // Load unit for select2
@@ -550,7 +580,6 @@
                     $("#add-name").val($("#add-code").select2("data")[0].name);
                     $("#add-unit").val($("#add-code").select2("data")[0].unit);
                     $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
-                    // $("#add-code-error").html("");
                 });
 
                 $("#add-code").off("select2:unselecting").on("select2:unselecting", function (e) {
@@ -569,7 +598,7 @@
                 $("#add-cost").val("0");
             }
 
-              function ComputeTotalQuantity() {
+            function ComputeTotalQuantity() {
                 total_quantity = 0;
                 itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     if ($("#receive-status").text().trim() == "Draft") {
@@ -584,32 +613,31 @@
             // Validation for Add Item Modal
             var validateAdd = $("#form-item").validate({
                 rules: {
-                    Code: {
-                        required: true
-                    },
-                    Name: {
-                        required: true,
-                        maxlength: 100
-                    },
                     Quantity: {
                         required: true,
                         number: true,
                         isNotZero: true
+                    },
+                    Unit: {
+                        required: true
+                    },
+                    UnitCost: {
+                        required: true,
+                        number: true
                     }
                 },
                 messages: {
-                    Code: {
-                        required: "Please select an Item."
-                    },
-                    Name: {
-                        required: "Please enter the name of item.",
-                        maxlength: "Name must not exceed 100 characters."
-                    },
-                  
                     Quantity: {
                         required: "Please enter a quantity.",
                         number: "Please enter a valid number.",
-                        isNotZero: "Can not request an item with 0 quantity."
+                        isNotZero: "Can not receive an item with 0 quantity."
+                    },
+                    Unit: {
+                        required: "Please enter a unit."
+                    },
+                    UnitCost: {
+                        required: "Please enter a unit cost.",
+                        number: "Please enter a valid number."
                     }
                 },
                 submitHandler: function (form, event) {
@@ -626,7 +654,10 @@
                     }
                     return false;
                 });
-                if (rowIndexes.length > 0) {
+                if ($("#add-code").val() == "" && $("#add-name").val() == "") {
+                    toastr.warning("Must choose item code or input item description", "Required");
+                }
+                else if (rowIndexes.length > 0) {
                     toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
                 } else {
                     itemDT.row.add({

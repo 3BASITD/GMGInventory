@@ -136,6 +136,8 @@ namespace GMGInventory.Application.Repositories
                               POId = receive.PurchaseOrder.Id,
                               Supplier = receive.Supplier.Name,
                               SupplierId = receive.Supplier.Id,
+                              Term = receive.Term.Name,
+                              TermId = receive.Term.Id,
                               DRNumber = receive.DeliveryReceiptNumber,
                               SINumber = receive.SalesInvoiceNumber,
                               PurchaseRequestType = po.PurchaseRequest.Type.Code,
@@ -253,7 +255,7 @@ namespace GMGInventory.Application.Repositories
                                            PurchaseReceivingId = receiveId,
                                            LineNumber = s.LineNumber,
                                            ItemId = s.ItemId,
-                                           ItemDescription = s.ItemDescription,
+                                           ItemDescription = s.ItemDescription ?? "",
                                            Quantity = s.QuantityD,
                                            UnitId = s.UnitId,
                                            UnitCost = s.UnitCost
@@ -269,6 +271,7 @@ namespace GMGInventory.Application.Repositories
                         var dbitem = await citems.Where(s => s.Id == ei.Id).FirstAsync();
                         dbitem.LineNumber = ei.LineNumber;
                         dbitem.Quantity = ei.QuantityD;
+                        dbitem.ItemDescription = ei.ItemDescription ?? "";
 
                         context.PurchaseReceivingLineItems.Update(dbitem);
                     }
@@ -318,35 +321,24 @@ namespace GMGInventory.Application.Repositories
                 var receive = new PurchaseReceiving
                 {
                     DocumentNumber = form.DocumentNumber,
-                    PurchaseOrderId = form.PurchaseOrderId,
-
-                    //DocumentNumber = purchaseOrder.DocumentNumber,
-                    //PurchaseOrderId = purchaseOrder.Id,
-                    SupplierId = form.SupplierId,
-                    TermId = form.TermId,
-                    WarehouseId = form.WarehouseId,
                     DeliveryReceiptNumber = form.DeliveryReceiptNumber,
                     SalesInvoiceNumber = form.SalesInvoiceNumber,
-
                     ReceiveDate = form.DateReceived,
                     Remarks = form.Remarks,
                     StatusId = status.Id,
                     ResubmitId = form.ResubmitId,
-                    Discount1 = form.Discount1,
-                    Discount2 = form.Discount2,
 
+                    PurchaseOrderId = purchaseOrder!.Id,
+                    SupplierId = purchaseOrder!.SupplierId,
+                    TermId = purchaseOrder!.TermId,
+                    WarehouseId = purchaseOrder!.DeliveryAddressId,
+                    Discount1 = purchaseOrder!.Discount1,
+                    Discount2 = purchaseOrder!.Discount2,
                     CurrencyId = purchaseOrder!.CurrencyId,
                     CurrencyRate = purchaseOrder.CurrencyRate
                 };
                 await context.PurchaseReceivings.AddAsync(receive);
-                try
-                {
-                    await context.SaveChangesAsync(currentUserId);
-                }
-                catch (Exception ex)
-                {
-
-                }
+                await context.SaveChangesAsync(currentUserId);
 
                 if (previousReceive != null)
                 {
@@ -473,6 +465,34 @@ namespace GMGInventory.Application.Repositories
 
             int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
             return $"{docNumberPrefix}{docNumberLast + 1:D6}";
+        }
+
+        public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseOrderItemOptions(int PurchaseOrderId)
+        {
+            return await context.PurchaseOrderNewLineItems
+                                .Include(s => s.Item)
+                                .Include(s => s.Unit)
+                                .Where(s => s.PurchaseOrderId == PurchaseOrderId)
+                                .Select(s => new JsonPurchaseItemOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.ItemDescription,
+                                    ItemId = s.Item.Id,
+                                    ItemCode = s.Item.Code,
+                                    PartNumber = s.Item.PartNumber,
+                                    Quantity = s.Quantity,
+                                    Unit = s.Unit.Name,
+                                    UnitId = s.Unit.Id,
+                                    Served = context.PurchaseOrderNewLineItems
+                                                    .Where(a => a.ItemId == s.ItemId
+                                                             && a.ItemDescription == s.ItemDescription
+                                                             && a.PurchaseOrder.Status.Name == "Approved")
+                                                    .Select(a => a.Quantity)
+                                                    .Sum()
+                                  //  Selected = SelectedId != null && s.Id == SelectedId
+                                })
+                                .OrderBy(s => s.Served)
+                                .ToListAsync();
         }
     }
 }

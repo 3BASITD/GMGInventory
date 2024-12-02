@@ -32,6 +32,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "SI Number")]
         public string SINumber { get; set; }
 
+        public decimal Discount1 { get; set; }
+        public decimal Discount2 { get; set; }
+
         [Display(Name = "Status")]
         public string Status { get; set; }
 

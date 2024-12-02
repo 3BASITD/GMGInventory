@@ -53,6 +53,9 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DetailsJson(int Id)
         {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
             var receive = await receiveRepository.GetDetails(Id);
             if (receive == null)
                 return NotFound();
@@ -138,6 +141,10 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetNewDocumentNumber()
         {
             return Json(await receiveRepository.GetNewDocumentNumber());
+        }
+        public async Task<IActionResult> GetPurchaseOrderItemOptions(int SelectedId)
+        {
+            return Json(await receiveRepository.GetPurchaseOrderItemOptions(SelectedId));
         }
     }
 }
