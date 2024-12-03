@@ -6,10 +6,9 @@ namespace GMGInventory.Data
     {
         public PurchaseOrderNew()
         {
-            this.PurchaseOrderResubmits = new HashSet<PurchaseOrderNew>();
-            this.PurchaseOrderLineItems = new HashSet<PurchaseOrderNewLineItem>();
-            this.PurchaseReceivings = new HashSet<PurchaseReceiving>();
-            this.PurchaseReturns = new HashSet<PurchaseReturnNew>();
+            PurchaseOrderResubmits = new HashSet<PurchaseOrderNew>();
+            PurchaseOrderLineItems = new HashSet<PurchaseOrderNewLineItem>();
+            PurchaseReceivings = new HashSet<PurchaseReceiving>();
         }
 
         public string DocumentNumber { get; set; }
@@ -22,11 +21,9 @@ namespace GMGInventory.Data
         public int SupplierId { get; set; }
         public virtual Supplier Supplier { get; set; }
 
-
         [ForeignKey("TermId")]
         public int TermId { get; set; }
         public virtual CreditTerm Term { get; set; }
-
 
         [ForeignKey("DeliveryModeId")]
         public int DeliveryModeId { get; set; }
@@ -81,6 +78,5 @@ namespace GMGInventory.Data
         public ICollection<PurchaseOrderNew> PurchaseOrderResubmits { get; set; }
         public ICollection<PurchaseOrderNewLineItem> PurchaseOrderLineItems { get; set; }
         public ICollection<PurchaseReceiving> PurchaseReceivings { get; set; }
-        public ICollection<PurchaseReturnNew> PurchaseReturns { get; set; }
     }
 }

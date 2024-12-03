@@ -6,24 +6,17 @@ namespace GMGInventory.Data
     {
         public PurchaseReceiving()
         {
-            this.PurchaseReceivingResubmits = new HashSet<PurchaseReceiving>();
-            this.PurchaseReceivingLineItems = new HashSet<PurchaseReceivingLineItem>();
-            this.PurchaseReturns = new HashSet<PurchaseReturnNew>();
+            PurchaseReceivingResubmits = new HashSet<PurchaseReceiving>();
+            PurchaseReceivingLineItems = new HashSet<PurchaseReceivingLineItem>();
+            PurchaseReturns = new HashSet<PurchaseReturnNew>();
         }
 
         public string DocumentNumber { get; set; }
 
-        [ForeignKey("SupplierId")]
-        public int SupplierId { get; set; }
-        public virtual Supplier Supplier { get; set; }
-
-        [ForeignKey("TermId")]
-        public int TermId { get; set; }
-        public virtual CreditTerm Term { get; set; }
-
         [ForeignKey("PurchaseOrderId")]
         public int PurchaseOrderId { get; set; }
         public virtual PurchaseOrderNew PurchaseOrder { get; set; }
+
         public DateTime ReceiveDate { get; set; }
 
         [ForeignKey("WarehouseId")]
@@ -36,27 +29,11 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string SalesInvoiceNumber { get; set; }
 
-        [ForeignKey("CurrencyId")]
-        public int CurrencyId { get; set; }
-        public virtual Currency Currency { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal CurrencyRate { get; set; }
-
         public string Remarks { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal Discount1 { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal Discount2 { get; set; }
 
         [ForeignKey("StatusId")]
         public int? StatusId { get; set; }
         public virtual PurchaseStatus Status { get; set; }
-
-        //public string? PreparedBy { get; set; }
-        //public string? CheckedBy { get; set; }
 
         [ForeignKey("ApproverId")]
         public string? ApproverId { get; set; }
@@ -70,7 +47,7 @@ namespace GMGInventory.Data
 
         [ForeignKey("ResubmitId")]
         public int? ResubmitId { get; set; }
-        public PurchaseReceiving Resubmit { get; set; }
+        public virtual PurchaseReceiving Resubmit { get; set; }
 
         public ICollection<PurchaseReceiving> PurchaseReceivingResubmits { get; set; }
         public ICollection<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }

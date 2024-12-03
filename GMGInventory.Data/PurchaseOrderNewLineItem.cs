@@ -4,28 +4,26 @@ namespace GMGInventory.Data
 {
     public class PurchaseOrderNewLineItem : BaseEntity
     {
+        public PurchaseOrderNewLineItem()
+        {
+            PurchaseReceivingLineItems = new HashSet<PurchaseReceivingLineItem>();
+        }
+
         [ForeignKey("PurchaseOrderId")]
         public int PurchaseOrderId { get; set; }
         public virtual PurchaseOrderNew PurchaseOrder { get; set; }
+
         public int LineNumber { get; set; }
 
-        [ForeignKey("PurchaseRequestId")]
-        public int? PurchaseRequestId { get; set; }
-        public virtual PurchaseRequest PurchaseRequest { get; set; }
-
         [ForeignKey("ItemId")]
-        public int? ItemId { get; set; }
-        public virtual Item Item { get; set; }
+        public int? RequestItemId { get; set; }
+        public virtual PurchaseRequestLineItem RequestItem { get; set; }
 
-        [Column(TypeName = "nvarchar(100)")]
-        public string ItemDescription { get; set; }
         public int Quantity { get; set; }
-
-        [ForeignKey("UnitId")]
-        public int UnitId { get; set; }
-        public virtual Unit Unit { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal UnitCost { get; set; }
+
+        public ICollection<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }
     }
 }

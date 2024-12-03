@@ -87,12 +87,12 @@ namespace GMGInventory.Application.Repositories
                                     Quantity = s.Quantity,
                                     Unit = s.Unit.Name,
                                     UnitId = s.Unit.Id,
-                                    Served = context.PurchaseOrderNewLineItems
-                                                    .Where(a => a.ItemId == s.ItemId
-                                                             && a.ItemDescription == s.ItemDescription
-                                                             && a.PurchaseOrder.Status.Name == "Approved")
-                                                    .Select(a => a.Quantity)
-                                                    .Sum(),
+                                    //Served = context.PurchaseOrderNewLineItems
+                                    //                .Where(a => a.ItemId == s.ItemId
+                                    //                         && a.ItemDescription == s.ItemDescription
+                                    //                         && a.PurchaseOrder.Status.Name == "Approved")
+                                    //                .Select(a => a.Quantity)
+                                    //                .Sum(),
                                     Selected = SelectedId != null && s.Id == SelectedId
                                 })
                                 .OrderBy(s => s.Served)
@@ -252,36 +252,36 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PurchaseOrderLineItemVM>> GetItemListAsync(int purchaseOrderId)
         {
             var orderVM = from order in context.PurchaseOrderNewLineItems
-                                               .Include(s => s.PurchaseRequest)
-                                               .Include(s => s.Item)
-                                               .Include(s => s.Unit)
+                                               //.Include(s => s.PurchaseRequest)
+                                               //.Include(s => s.Item)
+                                               //.Include(s => s.Unit)
                           where order.PurchaseOrderId == purchaseOrderId
                           select new PurchaseOrderLineItemVM
                           {
                               Id = order.Id,
                               PurchaseOrderId = order.PurchaseOrderId,
                               LineNumber = order.LineNumber,
-                              PurchaseRequestId = order.PurchaseRequest.Id,
-                              PurchaseRequestNumber = order.PurchaseRequest.DocumentNumber,
-                              ItemId = order.Item.Id,
-                              ItemCode = order.Item.Code,
-                              ItemPartNumber = string.IsNullOrWhiteSpace(order.Item.PartNumber) ? "-" : order.Item.PartNumber,
-                              ItemDescription = order.ItemDescription,
+                              PurchaseRequestId = order.RequestItem.PurchaseRequest.Id,
+                              PurchaseRequestNumber = order.RequestItem.PurchaseRequest.DocumentNumber,
+                              ItemId = order.RequestItem.Item.Id,
+                              ItemCode = order.RequestItem.Item.Code,
+                              ItemPartNumber = string.IsNullOrWhiteSpace(order.RequestItem.Item.PartNumber) ? "-" : order.RequestItem.Item.PartNumber,
+                              ItemDescription = order.RequestItem.ItemDescription,
                               QuantityD = order.Quantity,
-                              UnitId = order.Unit.Id,
-                              UnitCode = order.Unit.Code,
+                              UnitId = order.RequestItem.Unit.Id,
+                              UnitCode = order.RequestItem.Unit.Code,
                               UnitCostD = order.UnitCost,
                               ServedQuantityD = context.PurchaseOrderNewLineItems
-                                                       .Where(a => a.ItemId == order.ItemId
-                                                                && a.ItemDescription == order.ItemDescription
+                                                       .Where(a => a.RequestItem.ItemId == order.RequestItem.ItemId
+                                                                && a.RequestItem.ItemDescription == order.RequestItem.ItemDescription
                                                                 && a.PurchaseOrder.Status.Name == "Approved")
                                                        .Select(a => a.Quantity)
                                                        .Sum(),
                               RequestQuantityD = context.PurchaseRequestLineItems
-                                                        .Where(a => a.ItemId == order.ItemId
-                                                                 && a.ItemDescription == order.ItemDescription
+                                                        .Where(a => a.ItemId == order.RequestItem.ItemId
+                                                                 && a.ItemDescription == order.RequestItem.ItemDescription
                                                                  && a.PurchaseRequest.Status.Name == "Approved"
-                                                                 && a.PurchaseRequest.Id == order.PurchaseRequest.Id)
+                                                                 && a.PurchaseRequest.Id == order.RequestItem.PurchaseRequest.Id)
                                                         .Select(a => a.Quantity)
                                                         .Sum(),
                           };
@@ -465,11 +465,11 @@ namespace GMGInventory.Application.Repositories
                                        {
                                            PurchaseOrderId = orderId,
                                            LineNumber = s.LineNumber,
-                                           PurchaseRequestId = s.PurchaseRequestId,
-                                           ItemId = s.ItemId,
-                                           ItemDescription = s.ItemDescription,
+                                           //PurchaseRequestId = s.PurchaseRequestId,
+                                           //ItemId = s.ItemId,
+                                           //ItemDescription = s.ItemDescription,
                                            Quantity = s.QuantityD,
-                                           UnitId = s.UnitId,
+                                           //UnitId = s.UnitId,
                                            UnitCost = s.UnitCostD
                                        });
                     context.PurchaseOrderNewLineItems.AddRange(newitems);

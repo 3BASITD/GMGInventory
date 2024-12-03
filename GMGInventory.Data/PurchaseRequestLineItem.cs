@@ -4,10 +4,11 @@ namespace GMGInventory.Data
 {
     public class PurchaseRequestLineItem : BaseEntity
     {
-
         [ForeignKey("PurchaseRequestId")]
         public int PurchaseRequestId { get; set; }
+
         public virtual PurchaseRequest PurchaseRequest { get; set; }
+
         public int LineNumber { get; set; }
 
         [ForeignKey("SalesOrderId")]
@@ -22,6 +23,7 @@ namespace GMGInventory.Data
         public string ItemDescription { get; set; }
 
         public int StockOnHand { get; set; }
+
         public int Quantity { get; set; }
 
         [ForeignKey("UnitId")]

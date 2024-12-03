@@ -41,45 +41,41 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseReceiveItemOptions(int ReceiveId, int? SelectedId)
         {
-            return await context.PurchaseOrderNewLineItems // palitan ng purchase receiving pag meron na
-                                .Include(s => s.Item)
-                                .Include(s => s.Unit)
-                                .Where(s => s.PurchaseOrderId == ReceiveId)
-                                .Select(s => new JsonPurchaseItemOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.ItemDescription,
-                                    LineNumber = s.LineNumber,
-                                    ItemId = s.Item.Id,
-                                    ItemCode = s.Item.Code,
-                                    PartNumber = s.Item.PartNumber,
-                                    Quantity = s.Quantity,
-                                    Unit = s.Unit.Name,
-                                    UnitId = s.Unit.Id,
-                                    Selected = SelectedId != null && s.Id == SelectedId
-                                })
-                                .Where(s => s.UnorderedQuantity > 0)
-                                .OrderBy(s => s.LineNumber)
-                                .ToListAsync();
+            var receiveVM = from receive in context.PurchaseReceivingLineItems
+                            where receive.PurchaseReceivingId == ReceiveId
+                            orderby receive.OrderItem.LineNumber ascending
+                            select new JsonPurchaseItemOptionsModel
+                            {
+                                Id = receive.Id.ToString(),
+                                Text = receive.OrderItem.RequestItem.ItemDescription,
+                                LineNumber = receive.OrderItem.RequestItem.LineNumber,
+                                ItemId = receive.OrderItem.RequestItem.Item.Id,
+                                ItemCode = receive.OrderItem.RequestItem.Item.Code,
+                                PartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
+                                Quantity = receive.Quantity,
+                                Unit = receive.OrderItem.RequestItem.Unit.Name,
+                                UnitId = receive.OrderItem.RequestItem.Unit.Id,
+                                Selected = SelectedId != null && receive.Id == SelectedId
+                            };
+            return await receiveVM.Where(s=>s.UnorderedQuantity > 0).ToListAsync();
         }
 
         public async Task<IList<PurchaseReturnNewLineItemVM>> GetPurchaseReceiveItemList(int ReceiveId)
         {
-            var receiveVM = from receive in context.PurchaseOrderNewLineItems
-                                                   .Include(s => s.Item)
-                                                   .Include(s => s.Unit)
-                            where receive.PurchaseOrderId == ReceiveId
+            var receiveVM = from receive in context.PurchaseReceivingLineItems
+                            where receive.PurchaseReceivingId == ReceiveId
+                            orderby receive.OrderItem.LineNumber ascending
                             select new PurchaseReturnNewLineItemVM
                             {
-                                LineNumber = receive.LineNumber,
-                                ItemId = receive.Item.Id,
-                                ItemCode = receive.Item.Code,
-                                ItemPartNumber = receive.Item.PartNumber,
-                                ItemDescription = receive.ItemDescription,
+                                LineNumber = receive.OrderItem.LineNumber,
+                                ItemId = receive.OrderItem.RequestItem.Item.Id,
+                                ItemCode = receive.OrderItem.RequestItem.Item.Code,
+                                ItemPartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
+                                ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
                                 QuantityD = receive.Quantity,
-                                UnitId = receive.Unit.Id,
-                                UnitCode = receive.Unit.Code,
-                                UnitCostD = receive.UnitCost
+                                UnitId = receive.OrderItem.RequestItem.Unit.Id,
+                                UnitCode = receive.OrderItem.RequestItem.Unit.Code,
+                                UnitCostD = receive.OrderItem.UnitCost
                             };
 
             return await receiveVM.ToListAsync();
@@ -101,21 +97,16 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<PurchaseReturnNewVM>> GetListAsync()
         {
             var returnVM = from retrn in context.PurchaseReturnNews
-                                                .Include(s => s.Supplier)
-                                                .Include(s => s.PurchaseReceive)
-                                                .Include(s => s.PurchaseOrder)
-                                                .Include(s => s.Warehouse)
-                                                .Include(s => s.Status)
                            select new PurchaseReturnNewVM
                            {
                                Id = retrn.Id,
                                DocumentNumber = retrn.DocumentNumber,
-                               Supplier = retrn.Supplier.Code,
+                               Supplier = retrn.PurchaseReceive.PurchaseOrder.Supplier.Code,
                                RRNumber = retrn.PurchaseReceive.DocumentNumber,
-                               PONumber = retrn.PurchaseOrder.DocumentNumber,
-                               Warehouse = retrn.Warehouse.Code,
-                               DRNumber = retrn.DeliveryReceiptNumber,
-                               SINumber = retrn.SalesInvoiceNumber,
+                               PONumber = retrn.PurchaseReceive.PurchaseOrder.DocumentNumber,
+                               Warehouse = retrn.PurchaseReceive.Warehouse.Code,
+                               DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,
+                               SINumber = retrn.PurchaseReceive.SalesInvoiceNumber,
                                Status = retrn.Status.Code,
                                ReturnDateD = retrn.ReturnDate
                            };
@@ -187,11 +178,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseReturnNewDetailedVM?> GetDetails(int returnId)
         {
             var details = from retrn in context.PurchaseReturnNews
-                                               .Include(s => s.Supplier)
-                                               .Include(s => s.Warehouse)
-                                               .Include(s => s.PurchaseReceive)
-                                               .Include(s => s.PurchaseOrder)
-                                               .Include(s => s.Status)
                           let resubmitfrom = context.PurchaseReturnNews
                                                     .Where(s => s.ResubmitId == retrn.Id)
                                                     .FirstOrDefault()
@@ -205,11 +191,11 @@ namespace GMGInventory.Application.Repositories
                               Id = retrn.Id,
                               DocumentNumber = retrn.DocumentNumber,
                               RRNumber = retrn.PurchaseReceive.DocumentNumber,
-                              PONumber = retrn.PurchaseOrder.DocumentNumber,
-                              Supplier = retrn.Supplier.Name,
-                              Warehouse = retrn.Warehouse.Name,
-                              DRNumber = retrn.DeliveryReceiptNumber,
-                              SINumber = retrn.SalesInvoiceNumber,
+                              PONumber = retrn.PurchaseReceive.PurchaseOrder.DocumentNumber,
+                              Supplier = retrn.PurchaseReceive.PurchaseOrder.Supplier.Name,
+                              Warehouse = retrn.PurchaseReceive.Warehouse.Name,
+                              DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,
+                              SINumber = retrn.PurchaseReceive.SalesInvoiceNumber,
                               Status = retrn.Status.Code,
                               ReturnDateD = retrn.ReturnDate,
                               Remarks = retrn.Remarks,
@@ -228,26 +214,23 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<PurchaseReturnNewLineItemVM>> GetItemListAsync(int purchaseReturnId)
         {
-            var orderVM = from retrn in context.PurchaseReturnNewLineItems
-                                               .Include(s => s.Item)
-                                               .Include(s => s.PurchaseReturn)
-                                               .Include(s => s.Unit)
+            var returnVM = from retrn in context.PurchaseReturnNewLineItems
                           where retrn.PurchaseReturnId == purchaseReturnId
                           select new PurchaseReturnNewLineItemVM
                           {
                               Id = retrn.Id,
                               PurchaseReturnId = retrn.PurchaseReturnId,
-                              LineNumber = retrn.LineNumber,
-                              ItemId = retrn.Item.Id,
-                              ItemCode = retrn.Item.Code,
-                              ItemPartNumber = string.IsNullOrWhiteSpace(retrn.Item.PartNumber) ? "" : retrn.Item.PartNumber,
-                              ItemDescription = retrn.ItemDescription,
+                              LineNumber = retrn.ReceivingItem.OrderItem.LineNumber,
+                              ItemId = retrn.ReceivingItem.OrderItem.RequestItem.Id,
+                              ItemCode = retrn.ReceivingItem.OrderItem.RequestItem.Item.Code,
+                              ItemPartNumber = string.IsNullOrWhiteSpace(retrn.ReceivingItem.OrderItem.RequestItem.Item.PartNumber) ? "" : retrn.ReceivingItem.OrderItem.RequestItem.Item.PartNumber,
+                              ItemDescription = retrn.ReceivingItem.OrderItem.RequestItem.ItemDescription,
                               QuantityD = retrn.Quantity,
-                              UnitId = retrn.Unit.Id,
-                              UnitCode = retrn.Unit.Code,
-                              UnitCostD = retrn.UnitCost
+                              UnitId = retrn.ReceivingItem.OrderItem.RequestItem.Unit.Id,
+                              UnitCode = retrn.ReceivingItem.OrderItem.RequestItem.Unit.Code,
+                              UnitCostD = retrn.ReceivingItem.OrderItem.UnitCost
                           };
-            return await orderVM.ToListAsync();
+            return await returnVM.ToListAsync();
         }
 
         public async Task<ForDataTables<PurchaseReturnNewLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseReturnId)
@@ -425,10 +408,8 @@ namespace GMGInventory.Application.Repositories
                                        {
                                            PurchaseOrderId = returnId,
                                            LineNumber = s.LineNumber,
-                                           ItemId = s.ItemId,
-                                           ItemDescription = s.ItemDescription,
+                                           RequestItem = new PurchaseRequestLineItem(),
                                            Quantity = s.QuantityD,
-                                           UnitId = s.UnitId,
                                            UnitCost = s.UnitCostD
                                        });
                     context.PurchaseOrderNewLineItems.AddRange(newitems);

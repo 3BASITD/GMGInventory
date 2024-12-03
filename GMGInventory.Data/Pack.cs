@@ -6,9 +6,9 @@ namespace GMGInventory.Data
     {
         public Pack()
         {
-            this.Invoices = new HashSet<Invoice>();
-            this.PackLineItems = new HashSet<PackLineItem>();
-            this.PackReturns = new HashSet<PackReturn>();
+            Invoices = new HashSet<Invoice>();
+            PackLineItems = new HashSet<PackLineItem>();
+            PackReturns = new HashSet<PackReturn>();
         }
 
         [ForeignKey("SalesOrderId")]
@@ -25,6 +25,7 @@ namespace GMGInventory.Data
         public int TotalQuantity { get; set; }
         public int QuantityInvoiced { get; set; }
 
+        public DateTime PackDate { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? ApprovedBy { get; set; }
