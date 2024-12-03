@@ -26,6 +26,14 @@ namespace GMGInventory.Common.Models
         public string DeliveryMode { get; set; }
         public int DeliveryModeId { get; set; }
 
+        [Display(Name = "Discount 1")]
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
+        public decimal Discount1D { get; set; }
+
+        [Display(Name = "Discount 2")]
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
+        public decimal Discount2D { get; set; }
+
         [Display(Name = "Status")]
         public string Status { get; set; }
 

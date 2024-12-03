@@ -81,6 +81,29 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<Select2Model<JsonItemOptionsModel>> GetPOItemOptions(int id, string search)
+        {
+            var items = await context.PurchaseOrderLineItems.Include(s => s.Item)
+                                .Where(s => s.PurchaseOrderId == id &&
+                                            string.IsNullOrWhiteSpace(search)
+                                         || (s.Item.Code.ToLower().Contains(search.ToLower())))
+                                .Select(s => new JsonItemOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Item.Code,
+                                    Name = s.Item.Name,
+                                    Quantity = 0,
+                                    Unit = s.Item.Unit.Code
+                                })
+                                .ToListAsync();
+
+            return new Select2Model<JsonItemOptionsModel>
+            {
+                items = items,
+                total_count = items.Count()
+            };
+        }
+
         public async Task<Select2Model<JsonItemOptionsModel>> GetUnservedOptions(string search, int page, int SalesOrderId)
         {
             var items = from soitem in context.SalesOrderLineItems
