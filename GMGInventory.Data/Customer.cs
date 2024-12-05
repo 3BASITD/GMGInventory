@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using GMGInventory.Data.Migrations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
@@ -14,6 +15,7 @@ namespace GMGInventory.Data
             //this.SalesReturnTotalReturnAmounts = new HashSet<SalesReturnTotalReturnAmount>();
             this.ShippingAddresses = new HashSet<ShippingAddress>();
             this.SOACRs = new HashSet<SOACR>();
+            this.Cheques = new HashSet<Cheque>();
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -80,5 +82,7 @@ namespace GMGInventory.Data
         //public ICollection<SalesReturnTotalReturnAmount> SalesReturnTotalReturnAmounts { get; set; }
         public ICollection<ShippingAddress> ShippingAddresses { get; set; }
         public ICollection<SOACR> SOACRs { get; set; }
+        public ICollection<Cheque> Cheques { get; set; }
+
     }
 }

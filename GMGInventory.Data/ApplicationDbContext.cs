@@ -223,5 +223,6 @@ namespace GMGInventory.Data
         public DbSet<LocationCode> LocationCodes { get; set; }
         public DbSet<BusinessStyle> BusinessStyles { get; set; }
         public DbSet<ItemConversion> ItemConversions { get; set; }
+        public DbSet<Cheque> Cheques { get; set; }
     }
 }

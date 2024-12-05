@@ -260,9 +260,9 @@ else
         @if (navPages.Contains(PageNames.Customer.ToEnumString())
        || navPages.Contains(PageNames.Payment.ToEnumString())
        || navPages.Contains(PageNames.SOACR.ToEnumString())
-       || navPages.Contains(PageNames.Check.ToEnumString()))
+       || navPages.Contains(PageNames.Cheque.ToEnumString()))
         {
-            var navCreditsCollectionActive = (new List<string> { "Customer", "Payment", "Soacr", "Check" }).Contains(currentController ?? "");
+            var navCreditsCollectionActive = (new List<string> { "Customer", "Payment", "Soacr", "Cheque" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuCC" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navCreditsCollectionActive ? "active" : "")">
@@ -270,6 +270,16 @@ else
                     CREDITS &amp; COLLECTION
                 </a>
                 <ul aria-labelledby="menuCC" class="dropdown-menu mt-lg-3 border-0 shadow">
+                    @if (navPages.Contains(PageNames.Cheque.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Cheque" ? "active" : "")"
+                               asp-area="" asp-controller="Cheque" asp-action="Index">
+                                <i class="nav-icon fas fa-money-check"></i>
+                                Cheque
+                            </a>
+                        </li>
+                    }
                     @if (navPages.Contains(PageNames.Customer.ToEnumString()))
                     {
                         <li class="nav-item">
@@ -300,16 +310,7 @@ else
                             </a>
                         </li>
                     }
-                    @if (navPages.Contains(PageNames.Check.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Check" ? "active" : "")"
-                               asp-area="" asp-controller="Check" asp-action="Index">
-                                <i class="nav-icon fas fa-money-check"></i>
-                                Check / Cheque
-                            </a>
-                        </li>
-                    }
+                  
                 </ul>
             </li>
         }
@@ -427,6 +428,7 @@ else
                             </a>
                         </li>
                     }
+
                     @if (navPages.Contains(PageNames.Regions.ToEnumString()))
                     {
                         <li>

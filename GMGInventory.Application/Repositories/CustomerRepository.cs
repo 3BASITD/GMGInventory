@@ -132,6 +132,11 @@ namespace GMGInventory.Application.Repositories
             return customers?.Id;
         }
 
+        public async Task<int?> GetIdByCodeAsync(string? Code)
+        {
+            var customers = await context.Customers.Where(s => s.Code == Code).FirstOrDefaultAsync();
+            return customers?.Id;
+        }
         public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers

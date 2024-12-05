@@ -1,0 +1,92 @@
+﻿@model ChequeVM
+
+@{
+    Layout = "";
+    var title = "Cheques";
+    var items = ViewData["Cheques"] as List<ChequeVM> ?? new List<ChequeVM>();
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3 class="center-text">@title</h3>
+    <table class="table-items no-border">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(_ => items[0].CollectDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(_ => items[0].RefNo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(_ => items[0].CustomerCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(_ => items[0].CheckDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(_ => items[0].Check)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(_ => items[0].Branch)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(_ => items[0].CheckNo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(_ => items[0].Amount)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                decimal totalamount = 0;
+                foreach (var item in items)
+                {
+                    <tr>
+                        <td>@item.CollectDate</td>
+                        <td>@item.RefNo</td>
+                        <td>@item.CustomerCode</td>
+                        <td>@item.CheckDate</td>
+                        <td>@item.Check</td>
+                        <td>@item.Branch</td>
+                        <td>@item.CheckNo</td>
+                        <td class="right-text">@item.Amount</td>
+                    </tr>
+                    totalamount += item.AmountD;
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th class="left-text">Total</th>
+                <th class="right-text"><nobr>@totalamount</nobr></th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = function () {
+        setTimeout(function () {
+            window.close();
+        }, 100); 
+    };
+</script>
+</html>

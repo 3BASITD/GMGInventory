@@ -1,0 +1,666 @@
+﻿@model IEnumerable<ChequeVM>
+
+@{
+    ViewData["Title"] = "Cheque";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanPrint)
+            {
+                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
+
+            @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                    <span class="fas fa-plus"></span> New Cheque
+                </button>
+            }
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                    <span class="fas fa-upload"></span> Upload
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-cheque">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CollectDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RefNo)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CustomerCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CheckDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Check)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Branch)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CheckNo)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Amount)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+        </table>
+    </div>
+</div>
+
+<form id="deleteChequeForm" asp-action="Delete">
+    <input type="hidden" id="deleteChequeId" name="Id" />
+</form>
+
+@if (userAccess.CanAdd)
+{
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Cheque</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="createForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-collectDate" class="control-label mb-0 d-block">Collect Date</label>
+                                    <input type="date" id="create-collectDate" name="CollectDate" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-refNo" class="control-label mb-0 d-block">Ref No</label>
+                                    <input name="RefNo" id="create-refNo" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-customer" class="form-label mb-0">Customer Code</label>
+                                    <select id="create-customer" name="Customer" style="width:100%">
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-amount" class="control-label mb-0 d-block">Amount</label>
+                                    <input type="number" step="0.01" min="0" id="create-amount" name="Amount" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="create-checkDate" class="control-label mb-0 d-block">Check Date</label>
+                                    <input type="date" id="create-checkDate" name="CheckDate" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-check" class="control-label mb-0 d-block">Check</label>
+                                    <input name="Check" id="create-check" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-branch" class="control-label mb-0 d-block">Branch</label>
+                                    <input name="Branch" id="create-branch" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-checkNo" class="control-label mb-0 d-block">Check No</label>
+                                    <input name="CheckNo" id="create-checkNo" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+@if (userAccess.CanEdit)
+{
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Cheque</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-collectDate" class="control-label mb-0 d-block">Collect Date</label>
+                                    <input type="date" id="edit-collectDate" name="CollectDate" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-refNo" class="control-label mb-0 d-block">Ref No</label>
+                                    <input name="RefNo" id="edit-refNo" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-customer" class="form-label mb-0">Customer Code</label>
+                                    <select id="edit-customer" name="Customer" style="width:100%">
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-amount" class="control-label mb-0 d-block">Amount</label>
+                                    <input type="number" step="0.01" min="0" id="edit-amount" name="Amount" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-checkDate" class="control-label mb-0 d-block">Check Date</label>
+                                    <input type="date" id="edit-checkDate" name="CheckDate" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-check" class="control-label mb-0 d-block">Check</label>
+                                    <input name="Check" id="edit-check" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-branch" class="control-label mb-0 d-block">Branch</label>
+                                    <input name="Branch" id="edit-branch" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-checkNo" class="control-label mb-0 d-block">Check No</label>
+                                    <input name="CheckNo" id="edit-checkNo" class="form-control form-control-sm" />
+                                </div>
+                                <input type="hidden" id="edit-id" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+@if (userAccess.CanUploadDownload)
+{
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload Item</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label mb-0" for="upload-file">Excel File</label>
+                        <input type="file" id="upload-file" name="file"
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
+                    </div>
+                    <table class="table table-striped" id="upload-table">
+                        <thead>
+                            <tr>
+                                <th>Row #</th>
+                                <th>Collect Date</th>
+                                <th>Ref No</th>
+                                <th>Customer Code</th>
+                                <th>Check Date</th>
+                                <th>Check</th>
+                                <th>Branch</th>
+                                <th>Check No</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cheque Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Collect Date</dt>
+                    <dd class="col-sm-8 modal-detail-collectDate"></dd>
+                    <dt class="col-sm-4">Ref No</dt>
+                    <dd class="col-sm-8 modal-detail-refNo"></dd>
+                    <dt class="col-sm-4">Customer Code</dt>
+                    <dd class="col-sm-8 modal-detail-customerCode"></dd>
+                    <dt class="col-sm-4">Check Date</dt>
+                    <dd class="col-sm-8 modal-detail-checkDate"></dd>
+                    <dt class="col-sm-4">Check</dt>
+                    <dd class="col-sm-8 modal-detail-check"></dd>
+                    <dt class="col-sm-4">Branch</dt>
+                    <dd class="col-sm-8 modal-detail-branch"></dd>
+                    <dt class="col-sm-4">Check No</dt>
+                    <dd class="col-sm-8 modal-detail-checkNo"></dd>
+                    <dt class="col-sm-4">Amount</dt>
+                    <dd class="col-sm-8 modal-detail-amount"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        // Load Select2 Customer
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions2", "Customer")",
+            success: function (data, status, xhr) {
+                if (user_access.canAdd) {
+                    $("#create-customer").select2({
+                        data: data,
+                        dropdownParent: $("#createModal")
+                    });
+                }
+                if (user_access.canEdit) {
+                    $("#edit-customer").select2({
+                        data: data,
+                        dropdownParent: $("#editModal")
+                    });
+                }
+            }
+        });
+
+        // Load List on DataTable
+        var dataTable = $('.table-cheque').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetListJson")",
+                type: "POST",
+                data: function (data) {
+                    
+                },
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "collectDate", name: "collectDate" },
+                { data: "refNo", name: "RefNo" },
+                { data: "customerCode", name: "CustomerCode" },
+                { data: "checkDate", name: "CheckDate" },
+                { data: "check", name: "Check" },
+                { data: "branch", name: "Branch" },
+                { data: "checkNo", name: "CheckNo" },
+                { data: "amount", name: "Amount" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Cheque" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        // Load functions upon DataTable load
+        dataTable.on("draw", function () {
+            hideLoader();
+         
+            $('.detailsBtn').click(function (e) {
+                var data = dataTable.row($(this).parents('tr')).data();
+                $(".modal-detail-collectDate").html(data.collectDate);
+                $(".modal-detail-refNo").html(data.refNo);
+                $(".modal-detail-customerCode").html(data.customerCode);
+                $(".modal-detail-checkDate").html(data.checkDate);
+                $(".modal-detail-check").html(data.check);
+                $(".modal-detail-branch").html(data.branch);
+                $(".modal-detail-checkNo").html(data.checkNo);
+                $(".modal-detail-amount").html(data.amount);
+            });
+
+            if (user_access.canDelete) {
+                $('.deleteBtn').click(function (e) {
+                    swal({
+                        title: "Delete Cheque",
+                        text: "Are you sure you want to delete this record?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#deleteChequeId').val(id);
+                            $('#deleteChequeForm').submit();
+                        }
+                    });
+                });
+            }
+
+            if (user_access.canEdit) {
+                // Actions upon Display Edit Modal
+                $(".editBtn").click(function (e) {
+                    var data = dataTable.row($(this).parents('tr')).data();
+                    $("#edit-id").val(data.id);
+                    $("#edit-collectDate").val(data.collectDate);
+                    $("#edit-refNo").val(data.refNo);
+                    $("#edit-customer").val(data.customerId).trigger("change");
+                    $("#edit-checkDate").val(data.checkDate);
+                    $("#edit-check").val(data.check);
+                    $("#edit-branch").val(data.branch);
+                    $("#edit-checkNo").val(data.checkNo);
+                    $("#edit-amount").val(data.amount);
+                });
+
+                // Validation for Edit Modal
+                var validateEdit = $("#editForm").validate({
+                    rules: {
+                        CollectDate: { required: true },
+                        Customer: { required: true },
+                        RefNo: { required: true },
+                        Check: { required: true },
+                        Amount: { required: true }
+                    },
+                    messages: {
+                        CollectDate: { required: "Please enter Collect Date" },
+                        Customer: { required: "Please choose Customer" },
+                        RefNo: { required: "Please enter Ref No." },
+                        Check: { required: "Please enter Check" },
+                        Amount: { required: "Please enter Amount" }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoEdit();
+                    }
+                });
+
+                // Send Edit to Controller
+                function DoEdit() {
+                    debugger;
+
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("EditJson")",
+                        data: {
+                            Id: $("#edit-id").val(),
+                            CollectDateD: $("#edit-collectDate").val(),
+                            RefNo: $("#edit-refNo").val(),
+                            CustomerId: $("#edit-customer").val(),
+                            CheckDateD: $("#edit-checkDate").val(),
+                            Check: $("#edit-check").val(),
+                            Branch: $("#edit-branch").val(),
+                            CheckNo: $("#edit-checkNo").val(),
+                            AmountD: $("#edit-amount").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#editModal").modal("hide");
+                                dataTable.ajax.reload();
+                                hideLoader();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        if (user_access.canAdd) {
+             // Actions upon Display Create Modal
+            $(".createBtn").click(function (e) {
+                $("#create-collectDate").val("");
+                $("#create-refNo").val("");
+                $("#create-customer").prop("selectedIndex", 0).trigger("change");
+                $("#create-checkDate").val("");
+                $("#create-check").val("");
+                $("#create-branch").val("");
+                $("#create-checkNo").val("");
+                $("#create-amount").val("0");
+            });
+
+            // Validation for Create Modal
+            var validateCreate = $("#createForm").validate({
+                rules: {
+                    CollectDate: { required: true },
+                    Customer: { required: true },
+                    RefNo: { required: true },
+                    Check: { required: true },
+                    Amount: { required: true }
+                },
+                messages: {
+                    CollectDate: { required: "Please enter Collect Date" },
+                    Customer: { required: "Please choose Customer" },
+                    RefNo: { required: "Please enter Ref No." },
+                    Check: { required: "Please enter Check" },
+                    Amount: { required: "Please enter Amount" }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoCreate();
+                }
+            });
+
+            // Send Create to Controller
+            function DoCreate() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("CreateJson")",
+                    data: {
+                        CollectDateD: $("#create-collectDate").val(),
+                        RefNo: $("#create-refNo").val(),
+                        CustomerId: $("#create-customer").val(),
+                        CheckDateD: $("#create-checkDate").val(),
+                        Check: $("#create-check").val(),
+                        Branch: $("#create-branch").val(),
+                        CheckNo: $("#create-checkNo").val(),
+                        AmountD: $("#create-amount").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#createModal").modal("hide");
+                            dataTable.ajax.reload();
+                            hideLoader()
+                        }
+                    }
+                });
+            }
+        }
+
+        if (user_access.canUploadDownload) {
+            $(".downloadBtn").click(function (e) {
+                window.location = "@Url.Action("DownloadFile")";
+            });
+
+            var json_of_excel;
+            var colnumber = 8; // number of columns required for upload
+            var done_upload_excel = 0;
+            var duplicate_upload = 0;
+
+            var opts = {
+                readAsDefault: 'ArrayBuffer',
+                dragClass: 'drag',
+                on: {
+                    load: function (e, file) {
+                        var result = new Uint8Array(e.target.result);
+                        var xlsread = XLSX.read(result, { type: 'array' });
+                        var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                        json_of_excel = xlsjson;
+                    }
+                }
+            };
+            $("#upload-file").fileReaderJS(opts);
+
+            // Actions upon file selection
+            $("#upload-file").on("change", function () {
+                done_upload_excel = 0;
+                $("#upload-table tbody").html("");
+                $("#upload-table").hide();
+            });
+
+            // Actions upon Display Upload Modal
+            $(".uploadBtn").click(function (e) {
+                done_upload_excel = 0;
+                $("#upload-file").val("");
+                $("#upload-table tbody").html("");
+                $("#upload-table").hide();
+            });
+
+            function DoUpload() {
+                if (!$("#upload-file").val()) {
+                    toastr.warning("Please select a file first", "Warning");
+                } if (json_of_excel.length == 0) {
+                    toastr.warning("The excel file is empty", "Warning");
+                } else {
+                    var columns = Object.keys(json_of_excel[0]);
+                    $("#upload-table tbody").html("");
+                    $("#upload-table").show();
+                    duplicate_upload = 0;
+                    for (var i = 0; i < json_of_excel.length; i++) {
+                        var rowNum = json_of_excel[i].__rowNum__;
+                        var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                        row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                        for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                            var cellValue = json_of_excel[i][columns[colIndex]];
+                            if (cellValue == null)
+                                cellValue = "";
+                            row$.append($('<td/>').html(cellValue));
+                        }
+                        if (columns.includes("CollectDate") == false
+                            || columns.includes("RefNo") == false
+                            || columns.includes("CustomerCode") == false
+                            || columns.includes("CheckDate") == false
+                            || columns.includes("Check") == false
+                            || columns.includes("Branch") == false
+                            || columns.includes("CheckNo") == false
+                            || columns.includes("Amount") == false) {
+                            row$.append($('<td/>').html("Unexpected columns"));
+                            UploadRowDone();
+                        } else {
+                            SaveXLSX(json_of_excel[i]["CollectDate"], json_of_excel[i]["RefNo"], json_of_excel[i]["CustomerCode"], json_of_excel[i]["CheckDate"], json_of_excel[i]["Check"], json_of_excel[i]["Branch"], json_of_excel[i]["CheckNo"], json_of_excel[i]["Amount"], rowNum);
+                            row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                        }
+                        $("#upload-table").append(row$);
+                    }
+                }
+            }
+
+            function SaveXLSX(collectDate, refNo, customerCode, checkDate, check, branch, checkNo, amount, rownum) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadJson")",
+                    data: {
+                        CollectDateD: collectDate,
+                        RefNo: refNo,
+                        CustomerCode: customerCode,
+                        CheckDateD: checkDate,
+                        Check: check,
+                        Branch: branch,
+                        CheckNo: checkNo,
+                        AmountD: amount
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.message == "Already exist") {
+                            $("#upload-row" + rownum + "tr").remove();
+                            duplicate_upload++;
+                        } else {
+                            $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                        }
+
+                    },
+                    complete: function (xhr, status) {
+                        UploadRowDone();
+                    }
+                });
+            }
+
+            function UploadRowDone() {
+                done_upload_excel++;
+                if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                    $("#upload-table").append('<tr><td>*</td><td colspan="9">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                    $("#upload-file").val("");
+                }
+            }
+
+        }
+
+        if (user_access.canPrint) {
+            $(".btn-details-print").on("click", function () {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("PrintDetails")', '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            });
+        }
+    </script>
+}
