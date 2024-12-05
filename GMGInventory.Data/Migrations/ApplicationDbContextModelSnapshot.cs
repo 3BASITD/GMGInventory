@@ -1063,6 +1063,62 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.Cheque", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Branch")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Check")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("CheckDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CheckNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("CollectDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Cheques");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
                 {
                     b.Property<int>("Id")
@@ -5713,6 +5769,17 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ItemType");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Cheque", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>

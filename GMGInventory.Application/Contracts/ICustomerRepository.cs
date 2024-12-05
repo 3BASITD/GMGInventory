@@ -33,6 +33,8 @@ namespace GMGInventory.Application.Contracts
         Task<bool> UploadCombinationExistAsync(CustomerVM customerVM);
         CustomerVM? GetCustomerDtlVM(int? id);
         Task<int?> GetIdAsync(string? Name);
+        Task<int?> GetIdByCodeAsync(string? Code);
+
         Task<ForDataTables<CustomerVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id);
         //Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerPaymentDTAsync(DataTablesRequestForm form, int id);
