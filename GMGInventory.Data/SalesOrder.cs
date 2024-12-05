@@ -49,6 +49,7 @@ namespace GMGInventory.Data
         public int QuantityPacked { get; set; }
         public int QuantityInvoiced { get; set; }
         public int QuantityOrdered { get; set; }
+        public DateTime SalesOrderDate { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? ApprovedBy { get; set; }
