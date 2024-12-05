@@ -12,13 +12,13 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 1,
                     Code = "PICK-UP",
-                    Name = "Pick-up"
+                    Name = "PICK-UP"
                 },
                 new PurchaseOrderDeliveryMode
                 {
                     Id = 2,
                     Code = "DELIVERY",
-                    Name = "Delivery"
+                    Name = "DELIVERY"
                 }
             );
         }

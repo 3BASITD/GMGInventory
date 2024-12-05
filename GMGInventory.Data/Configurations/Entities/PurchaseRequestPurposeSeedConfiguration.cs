@@ -11,29 +11,29 @@ namespace GMGInventory.Data.Configurations.Entities
                 new PurchaseRequestPurpose
                 {
                     Id = 1,
-                    Code = "Rush",
-                    Name = "Rush Order",
+                    Code = "RUSH",
+                    Name = "RUSH ORDER",
                     TypeId = 1,
                 },
                 new PurchaseRequestPurpose
                 {
                     Id = 2,
-                    Code = "Stock",
-                    Name = "Stocking",
+                    Code = "STOCK",
+                    Name = "STOCKING",
                     TypeId = 1
                 },
                 new PurchaseRequestPurpose
                 {
                     Id = 3,
-                    Code = "Office",
-                    Name = "Office Supplies",
+                    Code = "OFFICE",
+                    Name = "OFFICE SUPPLIES",
                     TypeId = 2
                 },
                 new PurchaseRequestPurpose
                 {
                     Id = 4,
-                    Code = "One-Time",
-                    Name = "One-Time Purchase",
+                    Code = "ONE-TIME",
+                    Name = "ONE-TIME PURCHASE",
                     TypeId = 2
                 }
             );

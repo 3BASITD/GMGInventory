@@ -10,9 +10,9 @@
         <span class="card-title">@ViewData["Title"]</span>
         @if (userAccess.CanAdd)
         {
-                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                    <span class="fas fa-plus"></span> New Customer
-                </button>
+            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                <span class="fas fa-plus"></span> New Customer
+            </button>
         }
         @if (userAccess.CanUploadDownload)
         {
@@ -202,9 +202,30 @@
                                     <input type="number" name="CreditLimit" id="create-credit-limit" class="form-control form-control-sm" />
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="create-account-status" class="control-label mb-0 d-block">Customer Account Status</label>
+                                    <select name="CustomerAccountStatus" id="create-account-status" class="form-control" style="width: 100%">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="create-commodity-quantity" class="control-label mb-0 d-block">Commodity Quantity</label>
+                                    <input type="number" name="CommodityQuantity" id="create-commodity-quantity" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="create-rdd" class="control-label mb-0 d-block">Required Delivery Date</label>
+                                    <input type="date" name="RequiredDeliveryDate" id="create-rdd" class="form-control form-control-sm" />
+                                </div>
+                            </div>
                             <div class="col-md-8">
                                 <div class="form-group">
-                                    <label for="create-remarks" class="control-label mb-0 d-block">Customer Status</label>
+                                    <label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
                                     <input name="Remarks" id="create-remarks" class="form-control form-control-sm" />
                                 </div>
                             </div>
@@ -251,8 +272,6 @@
                                     <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
                                 </div>
                             </div>
-
-
                         </div>
                         <div class="row">
                             <div class="col-md-4">
@@ -272,7 +291,6 @@
                                 <select name="CustomerType" id="edit-customer-type" class="form-control" style="width: 100%">
                                 </select>
                             </div>
-
                         </div>
                         <div class="row">
                             <div class="col-md-4">
@@ -293,7 +311,6 @@
                                     <input type="text" name="Address" id="edit-address" class="form-control form-control-sm" />
                                 </div>
                             </div>
-
                         </div>
                         <div class="row">
                             <div class="col-md-4">
@@ -315,7 +332,6 @@
                                     <input type="text" name="FaxNumber" id="edit-fax-number" class="form-control form-control-sm" />
                                 </div>
                             </div>
-
                         </div>
                         <div class="row">
                             <div class="col-md-4">
@@ -345,16 +361,35 @@
                                     <input type="number" name="CreditLimit" id="edit-credit-limit" class="form-control form-control-sm" />
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="edit-account-status" class="control-label mb-0 d-block">Customer Account Status</label>
+                                    <select name="CustomerAccountStatus" id="edit-account-status" class="form-control" style="width: 100%">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="edit-commodity-quantity" class="control-label mb-0 d-block">Commodity Quantity</label>
+                                    <input type="number" name="CommodityQuantity" id="edit-commodity-quantity" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="edit-rdd" class="control-label mb-0 d-block">Required Delivery Date</label>
+                                    <input type="date" name="RequiredDeliveryDate" id="edit-rdd" class="form-control form-control-sm" />
+                                </div>
+                            </div>
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label for="edit-remarks" class="control-label mb-0 d-block">Remarks</label>
                                     <input name="Remarks" id="edit-remarks" class="form-control form-control-sm" />
                                 </div>
                             </div>
-
                         </div>
                         <input type="hidden" id="edit-id" />
-
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">
@@ -386,8 +421,8 @@
                     <div class="form-group">
                         <label class="form-label mb-0" for="upload-file">Excel File</label>
                         <input type="file" id="upload-file" name="file"
-                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                        class="form-control form-control-sm" />
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
                     </div>
                     <table class="table table-striped" id="upload-table">
                         <thead>
@@ -419,11 +454,13 @@
             success: function (data, status, xhr) {
                 $("#create-region").select2({
                     data: data,
-                    dropdownParent: $("#createModal")
+                    dropdownParent: $("#createModal"),
+                    minimumResultsForSearch: -1
                 });
                 $("#edit-region").select2({
                     data: data,
-                    dropdownParent: $("#editModal")
+                    dropdownParent: $("#editModal"),
+                    minimumResultsForSearch: -1
                 });
             }
         });
@@ -445,7 +482,7 @@
                         search: params.term,
                         page: params.page || 1,
                         region: $("#create-region").val()
-                            };
+                    };
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
@@ -469,12 +506,14 @@
                 $("#create-customer-type").select2({
                     data: data,
                     //theme: "bootstrap-5",
-                    dropdownParent: $("#createModal")
+                    dropdownParent: $("#createModal"),
+                    minimumResultsForSearch: -1
                 });
                 $("#edit-customer-type").select2({
                     data: data,
                     //theme: "bootstrap-5",
-                    dropdownParent: $("#editModal")
+                    dropdownParent: $("#editModal"),
+                    minimumResultsForSearch: -1
                 });
             }
         });
@@ -503,11 +542,32 @@
             success: function (data, status, xhr) {
                 $("#create-credit-term").select2({
                     data: data,
-                    dropdownParent: $("#createModal")
+                    dropdownParent: $("#createModal"),
+                    minimumResultsForSearch: -1
                 });
                 $("#edit-credit-term").select2({
                     data: data,
-                    dropdownParent: $("#editModal")
+                    dropdownParent: $("#editModal"),
+                    minimumResultsForSearch: -1
+                });
+            }
+        });
+
+
+        // Load Select2 Customer Account Status
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "CustomerAccountStatus")",
+            success: function (data, status, xhr) {
+                $("#create-account-status").select2({
+                    data: data,
+                    dropdownParent: $("#createModal"),
+                    minimumResultsForSearch: -1
+                });
+                $("#edit-account-status").select2({
+                    data: data,
+                    dropdownParent: $("#editModal"),
+                    minimumResultsForSearch: -1
                 });
             }
         });
@@ -551,11 +611,11 @@
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.isActive) {
                             if (user_access.canDelete) {
-                                  actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Deactivate Customer" data-microtip-position="top-left" role="tooltip"><i class="fas fa-exclamation-triangle"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Deactivate Customer" data-microtip-position="top-left" role="tooltip"><i class="fas fa-exclamation-triangle"></i></button>';
                             }
                         } else {
                             if (user_access.canAdd || user_access.canEdit) {
-                                   actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Customer" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Customer" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
                             }
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
@@ -602,6 +662,8 @@
                 $("#create-commission").val("");
                 $("#create-usearearate").val("");
                 $("#create-credit-limit").val("");
+                $("#create-account-status").prop("selectedIndex", 0).trigger("change");
+                $("#create-commodity-quantity").val("");
                 $("#create-remarks").val("");
             });
         }
@@ -610,20 +672,26 @@
             rules: {
                 Code: { required: true, maxlength: 10 },
                 Name: { required: true, maxlength: 100 },
+                CommissionRate: { required: function () { return $("#create-usearearate").prop("checked") == false; }, range: [0, 1999999.99] },
                 ContactPerson: { maxlength: 50 },
                 ContactNumber: { maxlength: 50 },
                 Email: { maxlength: 50 },
                 Address: { required: true },
-                CreditLimit: { required: true, range: [0, 1999999.99] }
+                CreditLimit: { required: true, range: [0, 1999999.99] },
+                CommodityQuantity: { required: true, range: [0, 1999999.99] },
+                RequiredDeliveryDate: { required: true }
             },
             messages: {
                 Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
                 Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
+                CommissionRate: { required: "", range: "0-1999999.99." },
                 ContactPerson: { maxlength: "Contact Person must not exceed 50 characters." },
                 ContactNumber: { maxlength: "Contact Number number must not exceed 50 characters." },
                 Email: { maxlength: "Email number must not exceed 50 characters." },
                 Address: { required: "Please enter address." },
-                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
+                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
+                CommodityQuantity: { required: "Please enter commodity quantity.", range: "Commodity Quantity must be between 0-1999999.99." },
+                RequiredDeliveryDate: { required: "Please enter RDD." }
 
             },
             submitHandler: function (form, event) {
@@ -653,7 +721,10 @@
                     CommissionRateD: $("#create-commission").val(),
                     UseAreaRate: $("#create-usearearate").prop("checked"),
                     CreditTermId: $("#create-credit-term").val(),
-                    CreditLimit: $("#create-credit-limit").val(),
+                    CreditLimitD: $("#create-credit-limit").val(),
+                    CustomerAccountStatusId: $("#create-account-status").val(),
+                    CommodityQuantityD: $("#create-commodity-quantity").val(),
+                    RequiredDeliveryDateD: $("#create-rdd").val(),
                     Remarks: $("#create-remarks").val()
                 },
                 success: function (data, status, xhr) {
@@ -732,6 +803,8 @@
                     $("#edit-tin").val(data.tin);
                     $("#edit-vat").val(data.vat);
                     $("#edit-credit-limit").val(data.creditLimit);
+                    $("#edit-account-status").val(data.customerAccountStatusId).trigger("change");
+                    $("#edit-commodity-quantity").val(data.commodityQuantity);
                     $("#edit-remarks").val(data.remarks);
 
                 });
@@ -743,21 +816,26 @@
                 rules: {
                     Code: { required: true, maxlength: 10 },
                     Name: { required: true, maxlength: 100 },
+                    CommissionRate: { required: function () { return $("#edit-usearearate").prop("checked") == false; }, range: [0, 1999999.99] },
                     ContactPerson: { maxlength: 50 },
                     ContactNumber: { maxlength: 50 },
                     Email: { maxlength: 50 },
                     Address: { required: true },
-                    CreditLimit: { required: true, range: [0, 1999999.99] }
+                    CreditLimit: { required: true, range: [0, 1999999.99] },
+                    CommodityQuantity: { required: true, range: [0, 1999999.99] },
+                    RequiredDeliveryDate: { required: true }
                 },
                 messages: {
                     Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
                     Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
+                    CommissionRate: { required: "", range: "0-1999999.99." },
                     ContactPerson: { maxlength: "Contact Person must not exceed 50 characters." },
                     ContactNumber: { maxlength: "Contact Number number must not exceed 50 characters." },
                     Email: { maxlength: "Email number must not exceed 50 characters." },
                     Address: { required: "Please enter address." },
-                    CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
-
+                    CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
+                    CommodityQuantity: { required: "Please enter commodity quantity.", range: "Commodity Quantity must be between 0-1999999.99." },
+                    RequiredDeliveryDate: { required: "Please enter RDD." }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -785,7 +863,11 @@
                         TIN: $("#edit-tin").val(),
                         VAT: $("#edit-vat").val(),
                         CreditTermId: $("#edit-credit-term").val(),
-                        CreditLimit: $("#edit-credit-limit").val(),
+                        CreditLimitD: $("#edit-credit-limit").val(),
+                        Remarks: $("#edit-remarks").val(),
+                        CustomerAccountStatusId: $("#edit-account-status").val(),
+                        CommodityQuantityD: $("#edit-commodity-quantity").val(),
+                        RequiredDeliveryDateD: $("#edit-rdd").val(),
                         Remarks: $("#edit-remarks").val()
                     },
                     success: function (data, status, xhr) {
@@ -844,54 +926,54 @@
         }
 
         function DoUpload() {
-                if (!$("#upload-file").val()) {
-                    toastr.warning("Please select a file first", "Warning");
-                } if (json_of_excel.length == 0) {
-                    toastr.warning("The excel file is empty", "Warning");
-                } else {
-                    var columns = Object.keys(json_of_excel[0]);
-                    $("#upload-table tbody").html("");
-                    $("#upload-table").show();
-                    duplicate_upload = 0;
-                    for (var i = 0; i < json_of_excel.length; i++) {
-                        var rowNum = json_of_excel[i].__rowNum__;
-                        var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
-                        row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
-                        for (var colIndex = 0; colIndex < colnumber; colIndex++) {
-                            var cellValue = json_of_excel[i][columns[colIndex]];
-                            if (cellValue == null)
-                                cellValue = "";
-                            row$.append($('<td/>').html(cellValue));
-                        }
-                        if (columns.includes("Code") == false
-                            || columns.includes("Name") == false
-                            || columns.includes("Commission Rate") == false
-                            || columns.includes("Region") == false
-                            || columns.includes("Area") == false
-                            || columns.includes("Customer Type") == false
-                            || columns.includes("Contact Person") == false
-                            || columns.includes("Contact Number") == false
-                            || columns.includes("Address") == false
-                            || columns.includes("Email") == false
-                            || columns.includes("Agent") == false
-                            || columns.includes("Fax Number") == false
-                            || columns.includes("TIN") == false
-                            || columns.includes("VAT") == false
-                            || columns.includes("Credit Term") == false
-                            || columns.includes("Credit Limit") == false
-                            || columns.includes("Remarks") == false) {
-                            row$.append($('<td/>').html("Unexpected columns"));
-                            UploadRowDone();
-                        } else {
-                            SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Commission Rate"], json_of_excel[i]["Region"], json_of_excel[i]["Area"], json_of_excel[i]["Customer Type"], json_of_excel[i]["Contact Person"], json_of_excel[i]["Contact Number"], json_of_excel[i]["Address"], json_of_excel[i]["Email"], json_of_excel[i]["Agent"], json_of_excel[i]["Fax Number"], json_of_excel[i]["TIN"], json_of_excel[i]["VAT"], json_of_excel[i]["Credit Term"], json_of_excel[i]["Credit Limit"], json_of_excel[i]["Remarks"], rowNum);
-                            row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
-                        }
-                        $("#upload-table").append(row$);
+            if (!$("#upload-file").val()) {
+                toastr.warning("Please select a file first", "Warning");
+            } if (json_of_excel.length == 0) {
+                toastr.warning("The excel file is empty", "Warning");
+            } else {
+                var columns = Object.keys(json_of_excel[0]);
+                $("#upload-table tbody").html("");
+                $("#upload-table").show();
+                duplicate_upload = 0;
+                for (var i = 0; i < json_of_excel.length; i++) {
+                    var rowNum = json_of_excel[i].__rowNum__;
+                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                        var cellValue = json_of_excel[i][columns[colIndex]];
+                        if (cellValue == null)
+                            cellValue = "";
+                        row$.append($('<td/>').html(cellValue));
                     }
+                    if (columns.includes("Code") == false
+                        || columns.includes("Name") == false
+                        || columns.includes("Commission Rate") == false
+                        || columns.includes("Region") == false
+                        || columns.includes("Area") == false
+                        || columns.includes("Customer Type") == false
+                        || columns.includes("Contact Person") == false
+                        || columns.includes("Contact Number") == false
+                        || columns.includes("Address") == false
+                        || columns.includes("Email") == false
+                        || columns.includes("Agent") == false
+                        || columns.includes("Fax Number") == false
+                        || columns.includes("TIN") == false
+                        || columns.includes("VAT") == false
+                        || columns.includes("Credit Term") == false
+                        || columns.includes("Credit Limit") == false
+                        || columns.includes("Remarks") == false) {
+                        row$.append($('<td/>').html("Unexpected columns"));
+                        UploadRowDone();
+                    } else {
+                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Commission Rate"], json_of_excel[i]["Region"], json_of_excel[i]["Area"], json_of_excel[i]["Customer Type"], json_of_excel[i]["Contact Person"], json_of_excel[i]["Contact Number"], json_of_excel[i]["Address"], json_of_excel[i]["Email"], json_of_excel[i]["Agent"], json_of_excel[i]["Fax Number"], json_of_excel[i]["TIN"], json_of_excel[i]["VAT"], json_of_excel[i]["Credit Term"], json_of_excel[i]["Credit Limit"], json_of_excel[i]["Remarks"], rowNum);
+                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                    }
+                    $("#upload-table").append(row$);
                 }
             }
-        
-        function SaveXLSX(code, name, commissionRateD, regionName, areaName, customerTypeName, contactPerson, contactNumber, address, email, agentName, faxNumber, tIN, vAT, creditTermName, creditLimitD, remarks, rownum) {
+        }
+
+        function SaveXLSX(code, name, commissionRateD, regionName, areaName, customerTypeName, contactPerson, contactNumber, address, email, agentName, faxNumber, tIN, vAT, creditTermName, creditLimitD, customerAccountStatus, commodityQuantity, remarks, rownum) {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("UploadJson")",
@@ -912,6 +994,8 @@
                     VAT: vAT,
                     CreditTermName: creditTermName,
                     CreditLimitD: creditLimitD,
+                    CustomerAccountStatusName: customerAccountStatus,
+                    CommodityQuantity: commodityQuantity,
                     Remarks: remarks
 
                 },
@@ -939,4 +1023,4 @@
 
 
     </script>
- }
+}

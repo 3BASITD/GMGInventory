@@ -1226,6 +1226,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<decimal?>("CommissionRate")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("CommodityQuantity")
+                        .HasColumnType("int");
+
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(100)");
 
@@ -1236,6 +1239,9 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("CreditTermId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerAccountStatusId")
                         .HasColumnType("int");
 
                     b.Property<int>("CustomerTypeId")
@@ -1266,6 +1272,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<DateTime>("RequiredDeliveryDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("TIN")
                         .HasColumnType("nvarchar(50)");
 
@@ -1287,9 +1296,58 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CreditTermId");
 
+                    b.HasIndex("CustomerAccountStatusId");
+
                     b.HasIndex("CustomerTypeId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CustomerAccountStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerAccountStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "RED FLAG",
+                            Name = "RED FLAG"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "HOLD",
+                            Name = "HOLD"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "WATCH LIST",
+                            Name = "WATCH LIST"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "GOOD",
+                            Name = "GOOD"
+                        });
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
@@ -2989,14 +3047,14 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "Gross",
-                            Name = "Gross Payment"
+                            Code = "GROSS",
+                            Name = "GROSS PAYMENT"
                         },
                         new
                         {
                             Id = 2,
-                            Code = "Net",
-                            Name = "Net Payment"
+                            Code = "NET",
+                            Name = "NET PAYMENT"
                         });
                 });
 
@@ -3090,13 +3148,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "PICK-UP",
-                            Name = "Pick-up"
+                            Name = "PICK-UP"
                         },
                         new
                         {
                             Id = 2,
                             Code = "DELIVERY",
-                            Name = "Delivery"
+                            Name = "DELIVERY"
                         });
                 });
 
@@ -3337,28 +3395,28 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "NA",
-                            Name = "Non-Automotive",
+                            Name = "NON-AUTOMOTIVE",
                             RequestTypeId = 1
                         },
                         new
                         {
                             Id = 2,
                             Code = "LPO",
-                            Name = "Local Purchase Order",
+                            Name = "LOCAL PURCHASE ORDER",
                             RequestTypeId = 2
                         },
                         new
                         {
                             Id = 3,
                             Code = "IPO",
-                            Name = "International Purchase Order",
+                            Name = "INTERNATIONAL PURCHASE ORDER",
                             RequestTypeId = 2
                         },
                         new
                         {
                             Id = 4,
                             Code = "MR",
-                            Name = "Maintenance & Repair",
+                            Name = "MAINTENANCE & REPAIR",
                             RequestTypeId = 3
                         });
                 });
@@ -3675,29 +3733,29 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "Rush",
-                            Name = "Rush Order",
+                            Code = "RUSH",
+                            Name = "RUSH ORDER",
                             TypeId = 1
                         },
                         new
                         {
                             Id = 2,
-                            Code = "Stock",
-                            Name = "Stocking",
+                            Code = "STOCK",
+                            Name = "STOCKING",
                             TypeId = 1
                         },
                         new
                         {
                             Id = 3,
-                            Code = "Office",
-                            Name = "Office Supplies",
+                            Code = "OFFICE",
+                            Name = "OFFICE SUPPLIES",
                             TypeId = 2
                         },
                         new
                         {
                             Id = 4,
-                            Code = "One-Time",
-                            Name = "One-Time Purchase",
+                            Code = "ONE-TIME",
+                            Name = "ONE-TIME PURCHASE",
                             TypeId = 2
                         });
                 });
@@ -3727,19 +3785,19 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "AM",
-                            Name = "Automotive"
+                            Name = "AUTOMOTIVE"
                         },
                         new
                         {
                             Id = 2,
                             Code = "NA",
-                            Name = "Non-Automotive"
+                            Name = "NON-AUTOMOTIVE"
                         },
                         new
                         {
                             Id = 3,
                             Code = "MR",
-                            Name = "Maintenance & Repair"
+                            Name = "MAINTENANCE & REPAIR"
                         });
                 });
 
@@ -3975,32 +4033,32 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "Draft",
-                            Name = "Draft"
+                            Code = "DRAFT",
+                            Name = "DRAFT"
                         },
                         new
                         {
                             Id = 2,
-                            Code = "Submitted",
-                            Name = "Submitted"
+                            Code = "SUBMITTED",
+                            Name = "SUBMITTED"
                         },
                         new
                         {
                             Id = 3,
-                            Code = "Approved",
-                            Name = "Approved"
+                            Code = "APPROVED",
+                            Name = "APPROVED"
                         },
                         new
                         {
                             Id = 4,
-                            Code = "Disapproved",
-                            Name = "Disapproved"
+                            Code = "DISAPPROVED",
+                            Name = "DISAPPROVED"
                         },
                         new
                         {
                             Id = 5,
-                            Code = "Resubmitted",
-                            Name = "Resubmitted"
+                            Code = "RESUBMITTED",
+                            Name = "RESUBMITTED"
                         });
                 });
 
@@ -4084,7 +4142,7 @@ namespace GMGInventory.Data.Migrations
                             Code = "LUZ",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
-                            Name = "Luzon",
+                            Name = "LUZON",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
@@ -4093,7 +4151,7 @@ namespace GMGInventory.Data.Migrations
                             Code = "VIS",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
-                            Name = "Visayas",
+                            Name = "VISAYAS",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
@@ -4102,7 +4160,7 @@ namespace GMGInventory.Data.Migrations
                             Code = "MIN",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
-                            Name = "Mindanao",
+                            Name = "MINDANAO",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
@@ -4111,7 +4169,7 @@ namespace GMGInventory.Data.Migrations
                             Code = "MM",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
-                            Name = "Metro Manila",
+                            Name = "METRO MANILA",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
@@ -4685,13 +4743,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "SOA",
-                            Name = "Statement of Account"
+                            Name = "STATEMENT OF ACCOUNT"
                         },
                         new
                         {
                             Id = 2,
                             Code = "CR",
-                            Name = "Counter Receipt"
+                            Name = "COUNTER RECEIPT"
                         });
                 });
 
@@ -4719,122 +4777,122 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "Draft",
-                            Name = "Sales Order Draft"
+                            Code = "DRAFT",
+                            Name = "SALES ORDER DRAFT"
                         },
                         new
                         {
                             Id = 2,
-                            Code = "Submitted",
-                            Name = "Sales Order Submitted"
+                            Code = "SUBMITTED",
+                            Name = "SALES ORDER SUBMITTED"
                         },
                         new
                         {
                             Id = 3,
-                            Code = "Approved",
-                            Name = "Sales Order Approved"
+                            Code = "APPROVED",
+                            Name = "SALES ORDER APPROVED"
                         },
                         new
                         {
                             Id = 4,
-                            Code = "Denied",
-                            Name = "Sales Order Denied"
+                            Code = "DENIED",
+                            Name = "SALES ORDER DENIED"
                         },
                         new
                         {
                             Id = 5,
-                            Code = "Draft",
-                            Name = "Packing Draft"
+                            Code = "DRAFT",
+                            Name = "PACKING DRAFT"
                         },
                         new
                         {
                             Id = 6,
-                            Code = "Posted",
-                            Name = "Packing Submitted"
+                            Code = "POSTED",
+                            Name = "PACKING SUBMITTED"
                         },
                         new
                         {
                             Id = 7,
-                            Code = "Draft",
-                            Name = "Invoice Draft"
+                            Code = "DRAFT",
+                            Name = "INVOICE DRAFT"
                         },
                         new
                         {
                             Id = 8,
-                            Code = "Invoiced",
-                            Name = "Invoice Submitted"
+                            Code = "INVOICED",
+                            Name = "INVOICED SUBMITTED"
                         },
                         new
                         {
                             Id = 9,
-                            Code = "Packed",
-                            Name = "Fully Packed"
+                            Code = "PACKED",
+                            Name = "FULLY PACKED"
                         },
                         new
                         {
                             Id = 10,
-                            Code = "Invoiced",
-                            Name = "Fully Invoiced"
+                            Code = "INVOICED",
+                            Name = "FULLY INVOICED"
                         },
                         new
                         {
                             Id = 11,
-                            Code = "Printed",
-                            Name = "Invoice Printed"
+                            Code = "PRINTED",
+                            Name = "INVOICE PRINTED"
                         },
                         new
                         {
                             Id = 12,
-                            Code = "Paid",
-                            Name = "Invoice Paid"
+                            Code = "PAID",
+                            Name = "INVOICE PAID"
                         },
                         new
                         {
                             Id = 13,
-                            Code = "Not Paid",
-                            Name = "Invoice Not Paid"
+                            Code = "NOT PAID",
+                            Name = "INVOICE NOT PAID"
                         },
                         new
                         {
                             Id = 14,
-                            Code = "Cleared",
-                            Name = "Check Cleared"
+                            Code = "CLEARED",
+                            Name = "CHECK CLEARED"
                         },
                         new
                         {
                             Id = 15,
-                            Code = "Bounced",
-                            Name = "Check Bounced"
+                            Code = "BOUNCED",
+                            Name = "CHECK BOUNCED"
                         },
                         new
                         {
                             Id = 16,
-                            Code = "Replaced",
-                            Name = "Check Replaced"
+                            Code = "REPLACED",
+                            Name = "CHECK REPLACED"
                         },
                         new
                         {
                             Id = 17,
-                            Code = "Deposit",
-                            Name = "Deposit"
+                            Code = "DEPOSIT",
+                            Name = "DEPOSIT"
                         },
                         new
                         {
                             Id = 18,
-                            Code = "Redeposited",
-                            Name = "Redeposited"
+                            Code = "REDEPOSITED",
+                            Name = "REDEPOSITED"
                         },
                         new
                         {
                             Id = 19,
-                            Code = "Deposited",
-                            Name = "Deposited"
+                            Code = "DEPOSITED",
+                            Name = "DEPOSITED"
                         },
                         new
                         {
                             Id = 20,
-                            Code = "Cancelled",
-                            Name = "Cancelled Invoice"
+                            Code = "CANCELLED",
+                            Name = "CANCELLED INVOICE"
                         });
                 });
 
@@ -5075,85 +5133,85 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "BOT",
-                            Name = "Bottle"
+                            Name = "BOTTLE"
                         },
                         new
                         {
                             Id = 2,
                             Code = "BOX",
-                            Name = "Box"
+                            Name = "BOX"
                         },
                         new
                         {
                             Id = 3,
                             Code = "FT",
-                            Name = "Feet"
+                            Name = "FEET"
                         },
                         new
                         {
                             Id = 4,
                             Code = "GAL",
-                            Name = "Gallon"
+                            Name = "GALLON"
                         },
                         new
                         {
                             Id = 5,
                             Code = "JAR",
-                            Name = "Jar"
+                            Name = "JAR"
                         },
                         new
                         {
                             Id = 6,
                             Code = "L",
-                            Name = "Liter"
+                            Name = "LITER"
                         },
                         new
                         {
                             Id = 7,
                             Code = "M",
-                            Name = "Meter"
+                            Name = "METER"
                         },
                         new
                         {
                             Id = 8,
                             Code = "MM",
-                            Name = "Millimeter"
+                            Name = "MILLILITER"
                         },
                         new
                         {
                             Id = 9,
                             Code = "PACK",
-                            Name = "Pack"
+                            Name = "PACK"
                         },
                         new
                         {
                             Id = 10,
                             Code = "PAIL",
-                            Name = "Pail"
+                            Name = "PAIL"
                         },
                         new
                         {
                             Id = 11,
                             Code = "PC",
-                            Name = "Piece"
+                            Name = "PIECE"
                         },
                         new
                         {
                             Id = 12,
                             Code = "QT",
-                            Name = "Quart"
+                            Name = "QUART"
                         },
                         new
                         {
                             Id = 13,
                             Code = "ROLL",
-                            Name = "Roll"
+                            Name = "ROLL"
                         },
                         new
                         {
                             Id = 14,
                             Code = "SET",
-                            Name = "Set"
+                            Name = "SET"
                         });
                 });
 
@@ -5461,7 +5519,7 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            Name = "Accounting",
+                            Name = "ACCOUNTING",
                             NormalizedName = "ACCOUNTING",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
@@ -5470,7 +5528,7 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            Name = "Inventory Manager",
+                            Name = "INVENTORY MANAGER",
                             NormalizedName = "INVENTORY MANAGER",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
@@ -5479,7 +5537,7 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            Name = "Invoicing Clerk",
+                            Name = "INVOICING CLERK",
                             NormalizedName = "INVOICING CLERK",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
@@ -5488,7 +5546,7 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            Name = "Sales Director",
+                            Name = "SALES DIRECTOR",
                             NormalizedName = "SALES DIRECTOR",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
@@ -5497,7 +5555,7 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            Name = "System Admin",
+                            Name = "SYSTEM ADMIN",
                             NormalizedName = "SYSTEM ADMIN",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
@@ -5506,7 +5564,7 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            Name = "Telemarketer",
+                            Name = "TELEMARKETER",
                             NormalizedName = "TELEMARKETER",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
@@ -5554,13 +5612,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7d7ebd5d-7dc2-447f-980b-af19acdbce2d",
+                            ConcurrencyStamp = "f6281f70-03b2-4fa8-b39f-2d8a704f7818",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAj0pw/f5RXSZGOYecwyIwA8utqtkx3fFmhmX8tIaRiLnTZKGT6C7JOhRy/m5yEXYQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL+6MoF47JC+NepPTzxjTzuuBALBVGhVR6tRpgtzMvqqus6mQ03i5od494SfVRDSKA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9fb71b2c-2d85-4baf-bc4b-92e23969a5ae",
+                            SecurityStamp = "75ddedc4-a53a-41f7-8c3c-58473d139147",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5575,13 +5633,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f09c29fa-aa82-4d13-9997-262cb4065296",
+                            ConcurrencyStamp = "b3f5a4d9-fc0d-444c-a489-21b7f65b7c01",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFKnUThPL59RyOFlz5ALji03ZjnFnE2ab7cCTiqvJs+WeTGZcRqxKCpL2gwNwWdGXA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP4DtRE9fWdG+c11ZPmY8Zr58ajscxQmR0cq5XU7BGzqFQkd3urWbQ7OfQjrb//KIQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e3595460-0a04-49c9-bbe6-581d62c154bd",
+                            SecurityStamp = "33f35f42-c5d3-4595-846b-da4c5bd80691",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5696,6 +5754,12 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.CustomerAccountStatus", "CustomerAccountStatus")
+                        .WithMany("Customers")
+                        .HasForeignKey("CustomerAccountStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.CustomerType", "CustomerType")
                         .WithMany("Customers")
                         .HasForeignKey("CustomerTypeId")
@@ -5707,6 +5771,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Area");
 
                     b.Navigation("CreditTerm");
+
+                    b.Navigation("CustomerAccountStatus");
 
                     b.Navigation("CustomerType");
                 });
@@ -6834,6 +6900,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesReturns");
 
                     b.Navigation("ShippingAddresses");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CustomerAccountStatus", b =>
+                {
+                    b.Navigation("Customers");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>

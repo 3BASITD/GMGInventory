@@ -12,85 +12,85 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 1,
                     Code = "BOT",
-                    Name = "Bottle"
+                    Name = "BOTTLE"
                 },
                 new Unit
                 {
                     Id = 2,
                     Code = "BOX",
-                    Name = "Box"
+                    Name = "BOX"
                 },
                 new Unit
                 {
                     Id = 3,
                     Code = "FT",
-                    Name = "Feet"
+                    Name = "FEET"
                 },
                 new Unit
                 {
                     Id = 4,
                     Code = "GAL",
-                    Name = "Gallon"
+                    Name = "GALLON"
                 },
                 new Unit
                 {
                     Id = 5,
                     Code = "JAR",
-                    Name = "Jar"
+                    Name = "JAR"
                 },
                 new Unit
                 {
                     Id = 6,
                     Code = "L",
-                    Name = "Liter"
+                    Name = "LITER"
                 },
                 new Unit
                 {
                     Id = 7,
                     Code = "M",
-                    Name = "Meter"
+                    Name = "METER"
                 },
                 new Unit
                 {
                     Id = 8,
                     Code = "MM",
-                    Name = "Millimeter"
+                    Name = "MILLILITER"
                 },
                 new Unit
                 {
                     Id = 9,
                     Code = "PACK",
-                    Name = "Pack"
+                    Name = "PACK"
                 },
                 new Unit
                 {
                     Id = 10,
                     Code = "PAIL",
-                    Name = "Pail"
+                    Name = "PAIL"
                 },
                 new Unit
                 {
                     Id = 11,
                     Code = "PC",
-                    Name = "Piece"
+                    Name = "PIECE"
                 },
                 new Unit
                 {
                     Id = 12,
                     Code = "QT",
-                    Name = "Quart"
+                    Name = "QUART"
                 },
                 new Unit
                 {
                     Id = 13,
                     Code = "ROLL",
-                    Name = "Roll"
+                    Name = "ROLL"
                 },
                 new Unit
                 {
                     Id = 14,
                     Code = "SET",
-                    Name = "Set"
+                    Name = "SET"
                 }
             );
         }

@@ -12,7 +12,7 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 1,
                     Code = "LUZ",
-                    Name = "Luzon",
+                    Name = "LUZON",
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                     DateCreated = new DateTime(2022, 1, 1)
                 },
@@ -20,7 +20,7 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 2,
                     Code = "VIS",
-                    Name = "Visayas",
+                    Name = "VISAYAS",
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                     DateCreated = new DateTime(2022, 1, 1)
                 },
@@ -28,7 +28,7 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 3,
                     Code = "MIN",
-                    Name = "Mindanao",
+                    Name = "MINDANAO",
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                     DateCreated = new DateTime(2022, 1, 1)
                 },
@@ -36,7 +36,7 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 4,
                     Code = "MM",
-                    Name = "Metro Manila",
+                    Name = "METRO MANILA",
                     UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                     DateCreated = new DateTime(2022, 1, 1)
                 }

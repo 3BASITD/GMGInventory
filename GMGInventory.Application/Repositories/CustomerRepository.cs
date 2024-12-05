@@ -35,7 +35,7 @@ namespace GMGInventory.Application.Repositories
                                              Name = s.Name,
                                              Address = s.Address,
                                              CreditTerm = s.CreditTerm.Name,
-                                             Agent = s.Agent.FirstName +' '+ s.Agent.MiddleName +' '+ s.Agent.LastName,
+                                             Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
                                              OutstandingBalanceD = s.OutstandingBalance
                                          })
                                          .OrderBy(s => s.Text)
@@ -135,78 +135,97 @@ namespace GMGInventory.Application.Repositories
         public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers
-                                    .Include(s => s.Area)
-                                    .Include(s => s.CustomerType)
-                                    .Include(s => s.Agent)
-                                    .Include(s => s.CreditTerm)
-
+                                  //.Include(s => s.Area)
+                                  //.Include(s => s.CustomerType)
+                                  //.Include(s => s.Agent)
+                                  //.Include(s => s.CreditTerm)
+                              join userc in userManager.Users on cust.UserCreated equals userc.Id
+                              join userm in userManager.Users on cust.UserModified equals userm.Id
                               where cust.Id == id
                               select new CustomerVM
                               {
                                   Id = cust.Id,
                                   Code = cust.Code,
                                   Name = cust.Name,
-                                  AreaId = cust.Area.Id,
-                                  CustomerTypeId = cust.CustomerType.Id,
-                                  ContactPerson = cust.ContactPerson,
-                                  ContactNumber = cust.ContactNumber,
                                   Address = cust.Address,
-                                  Email = cust.Email,
                                   AgentId = cust.Agent.Id,
                                   AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
+                                  AreaId = cust.Area.Id,
                                   AreaName = cust.Area.Name,
-                                  CreditTermName = cust.CreditTerm.Name,
-                                  RegionName = cust.Area.Region.Name,
+                                  ContactNumber = cust.ContactNumber,
+                                  ContactPerson = cust.ContactPerson,
+                                  CommissionRateD = cust.CommissionRate == null ? cust.Area.CommissionRate : cust.CommissionRate,
+                                  CommissionRateIsArea = cust.CommissionRate == null,
+                                  CommodityQuantityD = cust.CommodityQuantity,
+                                  CustomerAccountStatusId = cust.CustomerAccountStatus.Id,
+                                  CustomerAccountStatusName = cust.CustomerAccountStatus.Name,
+                                  CustomerTypeId = cust.CustomerType.Id,
                                   CustomerTypeName = cust.CustomerType.Name,
-                                  CommissionRateD = cust.CommissionRate,
+                                  CreditLimitD = cust.CreditLimit,
+                                  CreditTermId = cust.CreditTerm.Id,
+                                  CreditTermName = cust.CreditTerm.Name,
+                                  Email = cust.Email,
                                   FaxNumber = cust.FaxNumber,
+                                  RegionId = cust.Area.RegionId,
+                                  RegionName = cust.Area.Region.Name,
+                                  RequiredDeliveryDateD = cust.RequiredDeliveryDate,
                                   TIN = cust.TIN,
                                   VAT = cust.VAT,
-                                  RegionId = cust.Area.RegionId,
-                                  CreditTermId = cust.CreditTerm.Id,
-                                  CreditLimitD = cust.CreditLimit,
                                   Remarks = cust.Remarks,
-                                  IsActive = cust.IsActive
+                                  IsActive = cust.IsActive,
+                                  CreatedBy = userc.FirstName + " " + userc.LastName,
+                                  DateCreatedD = cust.DateCreated,
+                                  ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                                  DateModifiedD = cust.DateModified
                               }).FirstOrDefault();
             return customerVM;
         }
 
         public async Task<IList<CustomerVM>> GetAllCustomerAsync()
         {
-            var customers =  from cust in context.Customers
-                                    .Include(s => s.Area)
-                                    .Include(s => s.CustomerType)
-                                    .Include(s => s.Agent)
-                                    .Include(s => s.CreditTerm)
-
-                   select new CustomerVM
-                   {
-                       Id = cust.Id,
-                       Code = cust.Code,
-                       Name = cust.Name,
-                       CommissionRateD = cust.CommissionRate,
-                       RegionId = cust.Area.RegionId,
-                       RegionName = cust.Area.Region.Name,
-                       AreaId = cust.AreaId,
-                       AreaName = cust.Area.Name,
-                       CustomerTypeId = cust.CustomerTypeId,
-                       CustomerTypeName = cust.CustomerType.Name,
-                       ContactNumber = cust.ContactNumber,
-                       ContactPerson = cust.ContactPerson,
-                       Address = cust.Address,
-                       Email = cust.Email,
-                       AgentId = cust.AgentId,
-                       AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
-                       FaxNumber = cust.FaxNumber,
-                       TIN = cust.TIN,
-                       VAT = cust.VAT,
-                       CreditTermId = cust.CreditTermId,
-                       CreditTermName = cust.CreditTerm.Name,
-                       CreditLimitD = cust.CreditLimit,
-                       OutstandingBalanceD = cust.OutstandingBalance,
-                       Remarks = cust.Remarks,
-                       IsActive = cust.IsActive
-                   };
+            var customers = from cust in context.Customers
+                                //.Include(s => s.Area)
+                                //.Include(s => s.CustomerType)
+                                //.Include(s => s.Agent)
+                                //.Include(s => s.CreditTerm)
+                            join userc in userManager.Users on cust.UserCreated equals userc.Id
+                            join userm in userManager.Users on cust.UserCreated equals userm.Id
+                            select new CustomerVM
+                            {
+                                Id = cust.Id,
+                                Code = cust.Code,
+                                Name = cust.Name,
+                                Address = cust.Address,
+                                AgentId = cust.AgentId,
+                                AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
+                                AreaId = cust.AreaId,
+                                AreaName = cust.Area.Name,
+                                ContactNumber = cust.ContactNumber,
+                                ContactPerson = cust.ContactPerson,
+                                CommissionRateD = cust.CommissionRate == null ? cust.Area.CommissionRate : cust.CommissionRate,
+                                CommissionRateIsArea = cust.CommissionRate == null,
+                                CommodityQuantityD = cust.CommodityQuantity,
+                                CustomerAccountStatusId = cust.CustomerAccountStatusId,
+                                CustomerAccountStatusName = cust.CustomerAccountStatus.Name,
+                                CustomerTypeId = cust.CustomerTypeId,
+                                CustomerTypeName = cust.CustomerType.Name,
+                                CreditLimitD = cust.CreditLimit,
+                                CreditTermId = cust.CreditTermId,
+                                CreditTermName = cust.CreditTerm.Name,
+                                Email = cust.Email,
+                                FaxNumber = cust.FaxNumber,
+                                OutstandingBalanceD = cust.OutstandingBalance,
+                                RegionId = cust.Area.RegionId,
+                                RegionName = cust.Area.Region.Name,
+                                TIN = cust.TIN,
+                                VAT = cust.VAT,
+                                Remarks = cust.Remarks,
+                                IsActive = cust.IsActive,
+                                CreatedBy = userc.FirstName + " " + userc.LastName,
+                                DateCreatedD = cust.DateCreated,
+                                ModifiedBy = userm.FirstName + " " + userm.LastName,
+                                DateModifiedD = cust.DateModified
+                            };
             return await customers.ToListAsync();
         }
 
@@ -315,30 +334,33 @@ namespace GMGInventory.Application.Repositories
         public async Task UpdateAsync(CustomerVM custVM)
         {
             var cust = context.Customers.Where(s => s.Code == custVM.Code).FirstOrDefault();
-            if (cust == null)
-            {
-                throw new DbUpdateConcurrencyException();
-            }
+            var area = context.Areas.Where(s => s.Id == custVM.RegionId).FirstOrDefault();
+
+            if (cust == null || area == null) throw new DbUpdateConcurrencyException();
 
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             cust.Code = custVM.Code;
             cust.Name = custVM.Name;
-            cust.CommissionRate = custVM.CommissionRateD;
-            cust.AreaId = custVM.AreaId;
-            cust.CustomerTypeId = custVM.CustomerTypeId;
-            cust.ContactPerson = custVM.ContactPerson;
-            cust.ContactNumber = custVM.ContactNumber;
+            cust.IsActive = true;
+
             cust.Address = custVM.Address;
-            cust.Email = custVM.Email;
             cust.AgentId = custVM.AgentId;
+            cust.AreaId = custVM.AreaId;
+            cust.CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null;
+            cust.CommodityQuantity = custVM.CommodityQuantityD;
+            cust.ContactNumber = custVM.ContactNumber;
+            cust.ContactPerson = custVM.ContactPerson;
+            cust.CreditLimit = custVM.CreditLimitD;
+            cust.CreditTermId = custVM.CreditTermId;
+            cust.CustomerAccountStatusId = custVM.CustomerAccountStatusId;
+            cust.CustomerTypeId = custVM.CustomerTypeId;
+            cust.Email = custVM.Email;
             cust.FaxNumber = custVM.FaxNumber;
+            cust.Remarks = custVM.Remarks;
+            cust.RequiredDeliveryDate = custVM.RequiredDeliveryDateD;
             cust.TIN = custVM.TIN;
             cust.VAT = custVM.VAT;
-            cust.CreditTermId = custVM.CreditTermId;
-            cust.CreditLimit = custVM.CreditLimitD;
-            cust.Remarks = custVM.Remarks;
-            cust.IsActive = true;
-            cust.CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null;
+
             context.Customers.Update(cust);
             await context.SaveChangesAsync(currentUserId);
         }
@@ -357,22 +379,25 @@ namespace GMGInventory.Application.Repositories
             {
                 Code = custVM.Code,
                 Name = custVM.Name,
-                AreaId = custVM.AreaId,
-                CustomerTypeId = custVM.CustomerTypeId,
-                ContactPerson = custVM.ContactPerson,
-                ContactNumber = custVM.ContactNumber,
-                Address = custVM.Address,
-                Email = custVM.Email,
-                AgentId = custVM.AgentId,
-                FaxNumber = custVM.FaxNumber,
-                TIN = custVM.TIN,
-                VAT = custVM.VAT,
-                CreditTermId = custVM.CreditTermId,
-                CreditLimit = custVM.CreditLimitD,
-                Remarks = custVM.Remarks,
-                CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null,
+                IsActive = true,
 
-                IsActive = true
+                Address = custVM.Address,
+                AgentId = custVM.AgentId,
+                AreaId = custVM.AreaId,
+                CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null,
+                CommodityQuantity = custVM.CommodityQuantityD,
+                ContactNumber = custVM.ContactNumber,
+                ContactPerson = custVM.ContactPerson,
+                CreditLimit = custVM.CreditLimitD,
+                CreditTermId = custVM.CreditTermId,
+                CustomerAccountStatusId = custVM.CustomerAccountStatusId,
+                CustomerTypeId = custVM.CustomerTypeId,
+                Email = custVM.Email,
+                FaxNumber = custVM.FaxNumber,
+                Remarks = custVM.Remarks,
+                RequiredDeliveryDate = custVM.RequiredDeliveryDateD,
+                TIN = custVM.TIN,
+                VAT = custVM.VAT
             };
             await context.Customers.AddAsync(cust);
             await context.SaveChangesAsync(currentUserId);
@@ -411,28 +436,30 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<CustomerVM>> GetCustomerDetailsAsync(int id)
         {
             var customerVM = from cust in context.Customers
-                                    .Include(s => s.Area)
-                                    .Include(s => s.CustomerType)
-                                    .Include(s => s.Agent)
-                                    .Include(s => s.CreditTerm)
+                                 //.Include(s => s.Area)
+                                 //.Include(s => s.CustomerType)
+                                 //.Include(s => s.Agent)
+                                 //.Include(s => s.CreditTerm)
                              select new CustomerVM
                              {
                                  Code = cust.Code,
                                  Name = cust.Name,
-                                 AreaId = cust.AreaId,
-                                 CustomerTypeId = cust.CustomerTypeId,
-                                 ContactPerson = cust.ContactPerson,
-                                 ContactNumber = cust.ContactNumber,
+                                 IsActive = true,
+
                                  Address = cust.Address,
-                                 Email = cust.Email,
                                  AgentId = cust.AgentId,
-                                 FaxNumber = cust.FaxNumber,
-                                 TIN = cust.TIN,
-                                 VAT = cust.VAT,
-                                 CreditTermId = cust.CreditTermId,
+                                 AreaId = cust.AreaId,
+                                 ContactNumber = cust.ContactNumber,
+                                 ContactPerson = cust.ContactPerson,
                                  CreditLimitD = cust.CreditLimit,
+                                 CreditTermId = cust.CreditTermId,
+                                 CustomerAccountStatusId = cust.CustomerAccountStatusId,
+                                 CustomerTypeId = cust.CustomerTypeId,
+                                 Email = cust.Email,
+                                 FaxNumber = cust.FaxNumber,
                                  Remarks = cust.Remarks,
-                                 IsActive = true
+                                 TIN = cust.TIN,
+                                 VAT = cust.VAT
                              };
             return await customerVM.ToListAsync();
         }
@@ -447,9 +474,9 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
-                                   || x.Name.ToLower().Contains(form.SearchValue)
-                                   || x.AgentName.ToLower().Contains(form.SearchValue));
+                data = data.Where(x => x.AgentName.ToLower().Contains(form.SearchValue)
+                                   || x.Code.ToLower().Contains(form.SearchValue)
+                                   || x.Name.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -460,10 +487,10 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Code": data = data.OrderBy(s => s.Code); break;
-                        case "Name": data = data.OrderBy(s => s.Name); break;
                         case "AgentName": data = data.OrderBy(s => s.AgentName); break;
+                        case "Code": data = data.OrderBy(s => s.Code); break;
                         case "CreditLimit": data = data.OrderBy(s => s.CreditLimit); break;
+                        case "Name": data = data.OrderBy(s => s.Name); break;
                         case "OutstandingBalance": data = data.OrderBy(s => s.OutstandingBalance); break;
                         default: break;
                     }
@@ -472,10 +499,10 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Code": data = data.OrderByDescending(s => s.Code); break;
-                        case "Name": data = data.OrderByDescending(s => s.Name); break;
                         case "AgentName": data = data.OrderByDescending(s => s.AgentName); break;
+                        case "Code": data = data.OrderByDescending(s => s.Code); break;
                         case "CreditLimit": data = data.OrderByDescending(s => s.CreditLimit); break;
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
                         case "OutstandingBalance": data = data.OrderByDescending(s => s.OutstandingBalance); break;
                         default: break;
                     }
@@ -637,19 +664,21 @@ namespace GMGInventory.Application.Repositories
             var customerVM = from customer in context.Customers
                              join cp in context.CustomerPayments
                                       on customer.Id equals cp.CustomerId
-                             join user in userManager.Users on cp.UserCreated equals user.Id
-
+                             join userc in userManager.Users on cp.UserCreated equals userc.Id
+                             join userm in userManager.Users on cp.UserCreated equals userm.Id
                              where cp.CustomerId == id
                              select new CustomerVM
                              {
+                                 AmountPaidD = cp.TotalAmountPaid,
                                  CRNo = cp.CRNumber,
+                                 PaymentRemarks = cp.Remarks,
+                                 OverPaymentD = cp.OverPayment,
                                  SOANo = cp.SOACRId,
                                  TotalInvoiceAmountD = cp.TotalInvoiceAmount,
-                                 AmountPaidD = cp.TotalAmountPaid,
-                                 OverPaymentD = cp.OverPayment,
-                                 TransactionDateD = cp.DateCreated,
-                                 CreatedBy = user.Nickname,
-                                 PaymentRemarks = cp.Remarks
+                                 CreatedBy = userc.FirstName + " " + userc.LastName,
+                                 DateCreatedD = cp.DateCreated,
+                                 ModifiedBy = userm.FirstName + " " + userm.LastName,
+                                 DateModifiedD = cp.DateCreated
                              };
             return await customerVM.ToListAsync();
         }
@@ -664,14 +693,16 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.CRNo.ToString().Contains(form.SearchValue)
+                data = data.Where(x => x.AmountPaid.ToString().Contains(form.SearchValue)
+                                    || x.CRNo.ToString().Contains(form.SearchValue)
+                                    || x.OverPayment.ToString().Contains(form.SearchValue)
+                                    || x.PaymentRemarks.ToString().Contains(form.SearchValue)
                                     || x.SOANo.ToString().Contains(form.SearchValue)
                                     || x.TotalInvoiceAmount.ToString().Contains(form.SearchValue)
-                                    || x.AmountPaid.ToString().Contains(form.SearchValue)
-                                    || x.OverPayment.ToString().Contains(form.SearchValue)
-                                    || x.TransactionDate.ToString().Contains(form.SearchValue)
                                     || x.CreatedBy.ToString().Contains(form.SearchValue)
-                                    || x.PaymentRemarks.ToString().Contains(form.SearchValue));
+                                    || x.DateCreated.ToString().Contains(form.SearchValue)
+                                    || (x.ModifiedBy != null && x.ModifiedBy.ToString().Contains(form.SearchValue))
+                                    || (x.DateModified != null && x.DateModified.ToString().Contains(form.SearchValue)));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -682,14 +713,16 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "CRNo": data = data.OrderBy(s => s.CRNo); break;
-                        case "SOANo": data = data.OrderBy(s => s.SOANo); break;
-                        case "TotalInvoiceAmount": data = data.OrderBy(s => s.TotalInvoiceAmount); break;
                         case "AmountPaid": data = data.OrderBy(s => s.AmountPaid); break;
+                        case "CRNo": data = data.OrderBy(s => s.CRNo); break;
                         case "OverPayment": data = data.OrderBy(s => s.OverPayment); break;
-                        case "TransactionDate": data = data.OrderBy(s => s.TransactionDate); break;
-                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "PaymentRemarks": data = data.OrderBy(s => s.PaymentRemarks); break;
+                        case "SOANo": data = data.OrderBy(s => s.SOANo); break;
+                        case "TotalInvoiceAmount": data = data.OrderBy(s => s.TotalInvoiceAmountD); break;
+                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
+                        case "ModifiedBy": data = data.OrderBy(s => s.ModifiedBy); break;
+                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
                         default: break;
                     }
                 }
@@ -697,14 +730,16 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
+                        case "AmountPaid": data = data.OrderByDescending(s => s.AmountPaid); break;
                         case "CRNo": data = data.OrderByDescending(s => s.CRNo); break;
+                        case "OverPayment": data = data.OrderByDescending(s => s.OverPayment); break;
+                        case "PaymentRemarks": data = data.OrderByDescending(s => s.PaymentRemarks); break;
                         case "SOANo": data = data.OrderByDescending(s => s.SOANo); break;
                         case "TotalInvoiceAmount": data = data.OrderByDescending(s => s.TotalInvoiceAmount); break;
-                        case "AmountPaid": data = data.OrderByDescending(s => s.AmountPaid); break;
-                        case "OverPayment": data = data.OrderByDescending(s => s.OverPayment); break;
-                        case "TransactionDate": data = data.OrderByDescending(s => s.TransactionDate); break;
                         case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
-                        case "PaymentRemarks": data = data.OrderByDescending(s => s.PaymentRemarks); break;
+                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreated); break;
+                        case "ModifiedBy": data = data.OrderByDescending(s => s.ModifiedBy); break;
+                        case "DateModified": data = data.OrderByDescending(s => s.DateModified); break;
                         default: break;
                     }
                 }
@@ -813,7 +848,7 @@ namespace GMGInventory.Application.Repositories
             s.Address == customerVM.Address && s.Email == customerVM.Email &&
             s.AgentName == customerVM.AgentName && s.FaxNumber == customerVM.FaxNumber &&
             s.TIN == customerVM.TIN && s.VAT == customerVM.VAT && s.CreditTermName == customerVM.CreditTermName &&
-            s.CreditLimit == customerVM.CreditLimit && s.Remarks == customerVM.Remarks) ;
+            s.CreditLimit == customerVM.CreditLimit && s.Remarks == customerVM.Remarks);
         }
     }
 }

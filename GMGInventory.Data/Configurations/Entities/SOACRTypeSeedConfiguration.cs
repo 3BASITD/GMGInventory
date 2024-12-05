@@ -12,13 +12,13 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 1,
                     Code = "SOA",
-                    Name = "Statement of Account"
+                    Name = "STATEMENT OF ACCOUNT"
                 },
                 new SOACRType
                 {
                     Id = 2,
                     Code = "CR",
-                    Name = "Counter Receipt"
+                    Name = "COUNTER RECEIPT"
                 }
             );
         }

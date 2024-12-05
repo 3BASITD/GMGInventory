@@ -11,32 +11,32 @@ namespace GMGInventory.Data.Configurations.Entities
                 new PurchaseStatus
                 {
                     Id = 1,
-                    Code = "Draft",
-                    Name = "Draft"
+                    Code = "DRAFT",
+                    Name = "DRAFT"
                 },
                 new PurchaseStatus
                 {
                     Id = 2,
-                    Code = "Submitted",
-                    Name = "Submitted"
+                    Code = "SUBMITTED",
+                    Name = "SUBMITTED"
                 },
                 new PurchaseStatus
                 {
                     Id = 3,
-                    Code = "Approved",
-                    Name = "Approved"
+                    Code = "APPROVED",
+                    Name = "APPROVED"
                 },
                 new PurchaseStatus
                 {
                     Id = 4,
-                    Code = "Disapproved",
-                    Name = "Disapproved"
+                    Code = "DISAPPROVED",
+                    Name = "DISAPPROVED"
                 },
                 new PurchaseStatus
                 {
                     Id = 5,
-                    Code = "Resubmitted",
-                    Name = "Resubmitted"
+                    Code = "RESUBMITTED",
+                    Name = "RESUBMITTED"
                 }
             );
         }

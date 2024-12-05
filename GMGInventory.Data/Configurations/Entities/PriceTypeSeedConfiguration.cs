@@ -11,14 +11,14 @@ namespace GMGInventory.Data.Configurations.Entities
                 new PriceType
                 {
                     Id = 1,
-                    Code = "Gross",
-                    Name = "Gross Payment"
+                    Code = "GROSS",
+                    Name = "GROSS PAYMENT"
                 },
                 new PriceType
                 {
                     Id = 2,
-                    Code = "Net",
-                    Name = "Net Payment"
+                    Code = "NET",
+                    Name = "NET PAYMENT"
                 }
             );
         }

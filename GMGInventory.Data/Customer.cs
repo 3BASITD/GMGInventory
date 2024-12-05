@@ -21,56 +21,64 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(100)")]
         public string Name { get; set; }
+
         public bool IsActive { get; set; }
 
         [Column(TypeName = "nvarchar(MAX)")]
         public string Address { get; set; }
 
+        [ForeignKey("AgentId")]
+        public int AgentId { get; set; }
+        public Agent Agent { get; set; }
+
+        [ForeignKey("AreaId")]
+        public int AreaId { get; set; }
+        public Area Area { get; set; }
+
         [Column(TypeName = "nvarchar(100)")]
         public string? Email { get; set; }
 
-        [ForeignKey("CustomerTypeId")]
-        public int CustomerTypeId { get; set; }
-        public CustomerType CustomerType { get; set; }
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal? CommissionRate { get; set; }
+
+        public int CommodityQuantity { get; set; }
+
+        [Column(TypeName = "nvarchar(100)")]
+        public string? ContactNumber { get; set; }
+
+        [Column(TypeName = "nvarchar(150)")]
+        public string? ContactPerson { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal CreditLimit { get; set; }
 
         [ForeignKey("CreditTermId")]
         public int CreditTermId { get; set; }
         public CreditTerm CreditTerm { get; set; }
 
-        [ForeignKey("AgentId")]
-        public int AgentId { get; set; }
-        public Agent Agent { get; set; }
+        [ForeignKey("CustomerAccountStatusId")]
+        public int CustomerAccountStatusId { get; set; }
+        public CustomerAccountStatus CustomerAccountStatus { get; set; }
 
-        [Column(TypeName = "nvarchar(150)")]
-        public string? ContactPerson { get; set; }
-
-        [Column(TypeName = "nvarchar(100)")]
-        public string? ContactNumber { get; set; }
+        [ForeignKey("CustomerTypeId")]
+        public int CustomerTypeId { get; set; }
+        public CustomerType CustomerType { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string? FaxNumber { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal OutstandingBalance { get; set; }
+
+        [Column(TypeName = "nvarchar(250)")]
+        public string? Remarks { get; set; }
+        public DateTime RequiredDeliveryDate { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? TIN { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? VAT { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal CreditLimit { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal? CommissionRate { get; set; }
-
-        [ForeignKey("AreaId")]
-        public int AreaId { get; set; }
-        public Area Area { get; set; }
-
-        [Column(TypeName = "nvarchar(250)")]
-        public string? Remarks { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal OutstandingBalance { get; set; }
 
         public ICollection<CustomerPayment> CustomerPayments { get; set; }
         //public ICollection<Forwarder> Forwarders { get; set; }

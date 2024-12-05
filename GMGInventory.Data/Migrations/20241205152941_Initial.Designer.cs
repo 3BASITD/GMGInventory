@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GMGInventory.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241025030616_ItemConversion3")]
-    partial class ItemConversion3
+    [Migration("20241205152941_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -89,7 +89,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(733),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 1,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -101,7 +101,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(755),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 2,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -113,7 +113,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(756),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 3,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -125,7 +125,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(757),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 4,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -137,7 +137,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(758),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 5,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -149,7 +149,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(760),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 6,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -161,7 +161,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(760),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 7,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -173,7 +173,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(761),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 8,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -185,7 +185,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(762),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 9,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -197,7 +197,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(764),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 10,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -209,7 +209,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(805),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 11,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -221,7 +221,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(806),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 12,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -233,7 +233,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(807),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 13,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -245,7 +245,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(808),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 14,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -257,7 +257,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(809),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 15,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -269,7 +269,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(810),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 16,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -281,7 +281,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(810),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 17,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -293,7 +293,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(824),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 18,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -305,7 +305,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(835),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 19,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -317,7 +317,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(837),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 20,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -329,7 +329,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(838),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 21,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -341,7 +341,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(838),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 22,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -353,7 +353,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(839),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 23,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -365,7 +365,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(840),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 24,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -377,7 +377,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(841),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 25,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -389,7 +389,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(842),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 26,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -401,7 +401,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(843),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 27,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -413,7 +413,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(843),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 28,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -425,7 +425,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(844),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 29,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -437,7 +437,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(850),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 30,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -449,7 +449,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(851),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 31,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -461,7 +461,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(852),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 32,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -473,7 +473,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(853),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 33,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -485,7 +485,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(854),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 34,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -497,7 +497,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(855),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 35,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -509,7 +509,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(856),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 36,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -521,7 +521,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(857),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 37,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -533,7 +533,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(858),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 38,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -545,7 +545,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(858),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 39,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -557,7 +557,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(859),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 40,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -569,7 +569,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(860),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 41,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -581,7 +581,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(861),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 42,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -593,7 +593,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(862),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 43,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -605,7 +605,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(862),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 44,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -617,7 +617,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(863),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 45,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -629,7 +629,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(864),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 46,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -641,7 +641,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(865),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 47,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -653,7 +653,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(866),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 48,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -665,7 +665,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(866),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 49,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -677,7 +677,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(867),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 50,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -689,7 +689,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(868),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 51,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -701,7 +701,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(869),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 52,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -713,7 +713,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(870),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 53,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -725,7 +725,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(870),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 54,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -737,7 +737,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(871),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 55,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -749,7 +749,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(872),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 56,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -761,7 +761,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(873),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 57,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -773,7 +773,7 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(874),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 58,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
@@ -785,8 +785,20 @@ namespace GMGInventory.Data.Migrations
                             CanDelete = false,
                             CanEdit = false,
                             CanView = true,
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 134, DateTimeKind.Local).AddTicks(875),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 59,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 60,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
@@ -1216,6 +1228,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<decimal?>("CommissionRate")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("CommodityQuantity")
+                        .HasColumnType("int");
+
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(100)");
 
@@ -1226,6 +1241,9 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("CreditTermId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerAccountStatusId")
                         .HasColumnType("int");
 
                     b.Property<int>("CustomerTypeId")
@@ -1256,6 +1274,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<DateTime>("RequiredDeliveryDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("TIN")
                         .HasColumnType("nvarchar(50)");
 
@@ -1277,9 +1298,58 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CreditTermId");
 
+                    b.HasIndex("CustomerAccountStatusId");
+
                     b.HasIndex("CustomerTypeId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CustomerAccountStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerAccountStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "RED FLAG",
+                            Name = "RED FLAG"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "HOLD",
+                            Name = "HOLD"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "WATCH LIST",
+                            Name = "WATCH LIST"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "GOOD",
+                            Name = "GOOD"
+                        });
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
@@ -1470,6 +1540,48 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Forwarders");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.HomeImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DisplayTime")
+                        .HasColumnType("int");
+
+                    b.Property<string>("File")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HomeImages");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
@@ -1928,6 +2040,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DisapprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("PackDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("PackTypeId")
                         .HasColumnType("int");
 
@@ -2159,10 +2274,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 2,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Packing Listing"
@@ -2171,10 +2286,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 3,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Sales Invoice"
@@ -2183,10 +2298,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 4,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Sales Order"
@@ -2195,10 +2310,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 5,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Sales Order Delivery"
@@ -2315,10 +2430,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 15,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Purchase Request"
@@ -2327,10 +2442,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 16,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Purchase Order"
@@ -2339,10 +2454,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 17,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Purchase Receiving"
@@ -2351,10 +2466,10 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 18,
                             HasAdd = true,
-                            HasApproveDisapprove = false,
+                            HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
-                            HasPrint = false,
+                            HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
                             Name = "Purchase Return (New)"
@@ -2554,6 +2669,18 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 35,
+                            HasAdd = true,
+                            HasApproveDisapprove = false,
+                            HasDelete = true,
+                            HasEdit = true,
+                            HasPrint = false,
+                            HasUploadDownload = false,
+                            HasView = true,
+                            Name = "Home Image"
+                        },
+                        new
+                        {
+                            Id = 36,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2565,7 +2692,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 36,
+                            Id = 37,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2577,7 +2704,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 37,
+                            Id = 38,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2589,7 +2716,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 38,
+                            Id = 39,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2601,7 +2728,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 39,
+                            Id = 40,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2613,7 +2740,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 40,
+                            Id = 41,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2625,7 +2752,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 41,
+                            Id = 42,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2637,7 +2764,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 42,
+                            Id = 43,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2649,7 +2776,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 43,
+                            Id = 44,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2661,7 +2788,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 44,
+                            Id = 45,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2673,7 +2800,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 45,
+                            Id = 46,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2685,7 +2812,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 46,
+                            Id = 47,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2697,7 +2824,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 47,
+                            Id = 48,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2709,7 +2836,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 48,
+                            Id = 49,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2721,7 +2848,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 49,
+                            Id = 50,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2733,7 +2860,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 50,
+                            Id = 51,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2745,7 +2872,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 51,
+                            Id = 52,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2757,7 +2884,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 52,
+                            Id = 53,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2769,7 +2896,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 53,
+                            Id = 54,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2781,7 +2908,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 54,
+                            Id = 55,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2793,7 +2920,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 55,
+                            Id = 56,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2805,7 +2932,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 56,
+                            Id = 57,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2817,7 +2944,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 57,
+                            Id = 58,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2829,7 +2956,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 58,
+                            Id = 59,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2841,7 +2968,7 @@ namespace GMGInventory.Data.Migrations
                         },
                         new
                         {
-                            Id = 59,
+                            Id = 60,
                             HasAdd = false,
                             HasApproveDisapprove = false,
                             HasDelete = false,
@@ -2922,14 +3049,14 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "Gross",
-                            Name = "Gross Payment"
+                            Code = "GROSS",
+                            Name = "GROSS PAYMENT"
                         },
                         new
                         {
                             Id = 2,
-                            Code = "Net",
-                            Name = "Net Payment"
+                            Code = "NET",
+                            Name = "NET PAYMENT"
                         });
                 });
 
@@ -2998,6 +3125,41 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("PurchaseOrders");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderDeliveryMode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PurchaseOrderDeliveryModes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "PICK-UP",
+                            Name = "PICK-UP"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "DELIVERY",
+                            Name = "DELIVERY"
+                        });
+                });
+
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderLineItem", b =>
                 {
                     b.Property<int>("Id")
@@ -3047,6 +3209,598 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("PurchaseOrderId");
 
                     b.ToTable("PurchaseOrderLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNew", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ApproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CanvasSummaryReference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CurrencyRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DeliveryAddressId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DeliveryModeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DisapprovedReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisapproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Discount1")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Discount2")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("OtherCharges")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("ResubmitId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TermId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApproverId");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("DeliveryAddressId");
+
+                    b.HasIndex("DeliveryModeId");
+
+                    b.HasIndex("DisapproverId");
+
+                    b.HasIndex("ResubmitId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("TermId");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("PurchaseOrderNews");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNewLineItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LineNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RequestItemId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("RequestItemId");
+
+                    b.ToTable("PurchaseOrderNewLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("RequestTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestTypeId");
+
+                    b.ToTable("PurchaseOrderTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "NA",
+                            Name = "NON-AUTOMOTIVE",
+                            RequestTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "LPO",
+                            Name = "LOCAL PURCHASE ORDER",
+                            RequestTypeId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "IPO",
+                            Name = "INTERNATIONAL PURCHASE ORDER",
+                            RequestTypeId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "MR",
+                            Name = "MAINTENANCE & REPAIR",
+                            RequestTypeId = 3
+                        });
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReceiving", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ApproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("CreditTermId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeliveryReceiptNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DisapprovedReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisapproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReceiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ResubmitId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SalesInvoiceNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApproverId");
+
+                    b.HasIndex("CreditTermId");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("DisapproverId");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("ResubmitId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("PurchaseReceivings");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReceivingLineItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseReceivingId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("OrderItemId");
+
+                    b.HasIndex("PurchaseReceivingId");
+
+                    b.ToTable("PurchaseReceivingLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Approver1Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Approver2Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisapprovedReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisapproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PurposeDefinition")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("PurposeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RegionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ResubmitId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Approver1Id");
+
+                    b.HasIndex("Approver2Id");
+
+                    b.HasIndex("DisapproverId");
+
+                    b.HasIndex("PurposeId");
+
+                    b.HasIndex("RegionId");
+
+                    b.HasIndex("ResubmitId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("PurchaseRequests");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequestLineItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ItemDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LineNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SalesOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockOnHand")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("PurchaseRequestId");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.HasIndex("UnitId");
+
+                    b.ToTable("PurchaseRequestLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequestPurpose", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("PurchaseRequestPurposes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "RUSH",
+                            Name = "RUSH ORDER",
+                            TypeId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "STOCK",
+                            Name = "STOCKING",
+                            TypeId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "OFFICE",
+                            Name = "OFFICE SUPPLIES",
+                            TypeId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "ONE-TIME",
+                            Name = "ONE-TIME PURCHASE",
+                            TypeId = 2
+                        });
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequestType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PurchaseRequestTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "AM",
+                            Name = "AUTOMOTIVE"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "NA",
+                            Name = "NON-AUTOMOTIVE"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "MR",
+                            Name = "MAINTENANCE & REPAIR"
+                        });
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturn", b =>
@@ -3100,6 +3854,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("PurchaseOrderLineItemId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PurchaseReceivingLineItemId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PurchaseReturnId")
                         .HasColumnType("int");
 
@@ -3117,9 +3874,194 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("PurchaseOrderLineItemId");
 
+                    b.HasIndex("PurchaseReceivingLineItemId");
+
                     b.HasIndex("PurchaseReturnId");
 
                     b.ToTable("PurchaseReturnLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReturnNew", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ApproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("CurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisapprovedReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisapproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Discount1")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Discount2")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PurchaseReceiveId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ResubmitId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReturnDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApproverId");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("DisapproverId");
+
+                    b.HasIndex("PurchaseReceiveId");
+
+                    b.HasIndex("ResubmitId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("PurchaseReturnNews");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReturnNewLineItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseReturnId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReceivingItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("PurchaseReturnId");
+
+                    b.HasIndex("ReceivingItemId");
+
+                    b.ToTable("PurchaseReturnNewLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PurchaseStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "DRAFT",
+                            Name = "DRAFT"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "SUBMITTED",
+                            Name = "SUBMITTED"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "APPROVED",
+                            Name = "APPROVED"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "DISAPPROVED",
+                            Name = "DISAPPROVED"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Code = "RESUBMITTED",
+                            Name = "RESUBMITTED"
+                        });
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ReasonOfReturn", b =>
@@ -3200,36 +4142,36 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "LUZ",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 44, 915, DateTimeKind.Local).AddTicks(2976),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
-                            Name = "Luzon",
+                            Name = "LUZON",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = 2,
                             Code = "VIS",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 44, 915, DateTimeKind.Local).AddTicks(2999),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
-                            Name = "Visayas",
+                            Name = "VISAYAS",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = 3,
                             Code = "MIN",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 44, 915, DateTimeKind.Local).AddTicks(3002),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
-                            Name = "Mindanao",
+                            Name = "MINDANAO",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = 4,
                             Code = "MM",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 44, 915, DateTimeKind.Local).AddTicks(3004),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = false,
-                            Name = "Metro Manila",
+                            Name = "METRO MANILA",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
@@ -3295,6 +4237,9 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<int?>("ResubmittedSalesOrderId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("SalesOrderDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SalesOrderNumber")
                         .IsRequired()
@@ -3800,13 +4745,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "SOA",
-                            Name = "Statement of Account"
+                            Name = "STATEMENT OF ACCOUNT"
                         },
                         new
                         {
                             Id = 2,
                             Code = "CR",
-                            Name = "Counter Receipt"
+                            Name = "COUNTER RECEIPT"
                         });
                 });
 
@@ -3834,122 +4779,122 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "Draft",
-                            Name = "Sales Order Draft"
+                            Code = "DRAFT",
+                            Name = "SALES ORDER DRAFT"
                         },
                         new
                         {
                             Id = 2,
-                            Code = "Submitted",
-                            Name = "Sales Order Submitted"
+                            Code = "SUBMITTED",
+                            Name = "SALES ORDER SUBMITTED"
                         },
                         new
                         {
                             Id = 3,
-                            Code = "Approved",
-                            Name = "Sales Order Approved"
+                            Code = "APPROVED",
+                            Name = "SALES ORDER APPROVED"
                         },
                         new
                         {
                             Id = 4,
-                            Code = "Denied",
-                            Name = "Sales Order Denied"
+                            Code = "DENIED",
+                            Name = "SALES ORDER DENIED"
                         },
                         new
                         {
                             Id = 5,
-                            Code = "Draft",
-                            Name = "Packing Draft"
+                            Code = "DRAFT",
+                            Name = "PACKING DRAFT"
                         },
                         new
                         {
                             Id = 6,
-                            Code = "Posted",
-                            Name = "Packing Submitted"
+                            Code = "POSTED",
+                            Name = "PACKING SUBMITTED"
                         },
                         new
                         {
                             Id = 7,
-                            Code = "Draft",
-                            Name = "Invoice Draft"
+                            Code = "DRAFT",
+                            Name = "INVOICE DRAFT"
                         },
                         new
                         {
                             Id = 8,
-                            Code = "Invoiced",
-                            Name = "Invoice Submitted"
+                            Code = "INVOICED",
+                            Name = "INVOICED SUBMITTED"
                         },
                         new
                         {
                             Id = 9,
-                            Code = "Packed",
-                            Name = "Fully Packed"
+                            Code = "PACKED",
+                            Name = "FULLY PACKED"
                         },
                         new
                         {
                             Id = 10,
-                            Code = "Invoiced",
-                            Name = "Fully Invoiced"
+                            Code = "INVOICED",
+                            Name = "FULLY INVOICED"
                         },
                         new
                         {
                             Id = 11,
-                            Code = "Printed",
-                            Name = "Invoice Printed"
+                            Code = "PRINTED",
+                            Name = "INVOICE PRINTED"
                         },
                         new
                         {
                             Id = 12,
-                            Code = "Paid",
-                            Name = "Invoice Paid"
+                            Code = "PAID",
+                            Name = "INVOICE PAID"
                         },
                         new
                         {
                             Id = 13,
-                            Code = "Not Paid",
-                            Name = "Invoice Not Paid"
+                            Code = "NOT PAID",
+                            Name = "INVOICE NOT PAID"
                         },
                         new
                         {
                             Id = 14,
-                            Code = "Cleared",
-                            Name = "Check Cleared"
+                            Code = "CLEARED",
+                            Name = "CHECK CLEARED"
                         },
                         new
                         {
                             Id = 15,
-                            Code = "Bounced",
-                            Name = "Check Bounced"
+                            Code = "BOUNCED",
+                            Name = "CHECK BOUNCED"
                         },
                         new
                         {
                             Id = 16,
-                            Code = "Replaced",
-                            Name = "Check Replaced"
+                            Code = "REPLACED",
+                            Name = "CHECK REPLACED"
                         },
                         new
                         {
                             Id = 17,
-                            Code = "Deposit",
-                            Name = "Deposit"
+                            Code = "DEPOSIT",
+                            Name = "DEPOSIT"
                         },
                         new
                         {
                             Id = 18,
-                            Code = "Redeposited",
-                            Name = "Redeposited"
+                            Code = "REDEPOSITED",
+                            Name = "REDEPOSITED"
                         },
                         new
                         {
                             Id = 19,
-                            Code = "Deposited",
-                            Name = "Deposited"
+                            Code = "DEPOSITED",
+                            Name = "DEPOSITED"
                         },
                         new
                         {
                             Id = 20,
-                            Code = "Cancelled",
-                            Name = "Cancelled Invoice"
+                            Code = "CANCELLED",
+                            Name = "CANCELLED INVOICE"
                         });
                 });
 
@@ -4190,85 +5135,85 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 1,
                             Code = "BOT",
-                            Name = "Bottle"
+                            Name = "BOTTLE"
                         },
                         new
                         {
                             Id = 2,
                             Code = "BOX",
-                            Name = "Box"
+                            Name = "BOX"
                         },
                         new
                         {
                             Id = 3,
                             Code = "FT",
-                            Name = "Feet"
+                            Name = "FEET"
                         },
                         new
                         {
                             Id = 4,
                             Code = "GAL",
-                            Name = "Gallon"
+                            Name = "GALLON"
                         },
                         new
                         {
                             Id = 5,
                             Code = "JAR",
-                            Name = "Jar"
+                            Name = "JAR"
                         },
                         new
                         {
                             Id = 6,
                             Code = "L",
-                            Name = "Liter"
+                            Name = "LITER"
                         },
                         new
                         {
                             Id = 7,
                             Code = "M",
-                            Name = "Meter"
+                            Name = "METER"
                         },
                         new
                         {
                             Id = 8,
                             Code = "MM",
-                            Name = "Millimeter"
+                            Name = "MILLILITER"
                         },
                         new
                         {
                             Id = 9,
                             Code = "PACK",
-                            Name = "Pack"
+                            Name = "PACK"
                         },
                         new
                         {
                             Id = 10,
                             Code = "PAIL",
-                            Name = "Pail"
+                            Name = "PAIL"
                         },
                         new
                         {
                             Id = 11,
                             Code = "PC",
-                            Name = "Piece"
+                            Name = "PIECE"
                         },
                         new
                         {
                             Id = 12,
                             Code = "QT",
-                            Name = "Quart"
+                            Name = "QUART"
                         },
                         new
                         {
                             Id = 13,
                             Code = "ROLL",
-                            Name = "Roll"
+                            Name = "ROLL"
                         },
                         new
                         {
                             Id = 14,
                             Code = "SET",
-                            Name = "Set"
+                            Name = "SET"
                         });
                 });
 
@@ -4576,54 +5521,54 @@ namespace GMGInventory.Data.Migrations
                         new
                         {
                             Id = "0BFA2C03-A5D4-43A6-A797-8CFF1A282080",
-                            Name = "Accounting",
+                            Name = "ACCOUNTING",
                             NormalizedName = "ACCOUNTING",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 132, DateTimeKind.Local).AddTicks(4655),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = "1E0DA252-5984-43F4-B23C-F755B0E739B5",
-                            Name = "Inventory Manager",
+                            Name = "INVENTORY MANAGER",
                             NormalizedName = "INVENTORY MANAGER",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 132, DateTimeKind.Local).AddTicks(4680),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = "3C76B2D8-55D9-4BF6-9A6E-E1F498E73337",
-                            Name = "Invoicing Clerk",
+                            Name = "INVOICING CLERK",
                             NormalizedName = "INVOICING CLERK",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 132, DateTimeKind.Local).AddTicks(4687),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = "826FC15C-21E5-4BC5-A580-5F52E054299B",
-                            Name = "Sales Director",
+                            Name = "SALES DIRECTOR",
                             NormalizedName = "SALES DIRECTOR",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 132, DateTimeKind.Local).AddTicks(4694),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            Name = "System Admin",
+                            Name = "SYSTEM ADMIN",
                             NormalizedName = "SYSTEM ADMIN",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 132, DateTimeKind.Local).AddTicks(4700),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         },
                         new
                         {
                             Id = "851E0BE3-8728-48EB-BD65-89DC38DB4E01",
-                            Name = "Telemarketer",
+                            Name = "TELEMARKETER",
                             NormalizedName = "TELEMARKETER",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 132, DateTimeKind.Local).AddTicks(4706),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
@@ -4669,16 +5614,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a57b1282-4316-4537-bad0-19fdcef33cfb",
+                            ConcurrencyStamp = "f6281f70-03b2-4fa8-b39f-2d8a704f7818",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDY+AfB+us9bTXkTzY7hIUt8I1N4E5/UwXlT17BZWbSSU2Vfna4VNsfF2PQ2KKuAcA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL+6MoF47JC+NepPTzxjTzuuBALBVGhVR6tRpgtzMvqqus6mQ03i5od494SfVRDSKA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8b90d83f-a0e7-49e0-b97d-53b205314d1b",
+                            SecurityStamp = "75ddedc4-a53a-41f7-8c3c-58473d139147",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 29, DateTimeKind.Local).AddTicks(3414),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "MISNet",
                             IsActive = true,
                             IsDarkMode = false,
@@ -4690,16 +5635,16 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7b809c16-7a9f-4687-89a4-7e4cd1420747",
+                            ConcurrencyStamp = "b3f5a4d9-fc0d-444c-a489-21b7f65b7c01",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBiUPgk5F7roSEnShsOrYOR2RawgMbtFLRcvSEY4Pq1lVAkrOq1f0pnl+OdQNo3tuQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP4DtRE9fWdG+c11ZPmY8Zr58ajscxQmR0cq5XU7BGzqFQkd3urWbQ7OfQjrb//KIQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9622fd91-566c-490e-af95-0d03bd552260",
+                            SecurityStamp = "33f35f42-c5d3-4595-846b-da4c5bd80691",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
-                            DateCreated = new DateTime(2024, 10, 25, 11, 4, 45, 129, DateTimeKind.Local).AddTicks(3869),
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "GMG",
                             IsActive = true,
                             IsDarkMode = false,
@@ -4811,6 +5756,12 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.CustomerAccountStatus", "CustomerAccountStatus")
+                        .WithMany("Customers")
+                        .HasForeignKey("CustomerAccountStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.CustomerType", "CustomerType")
                         .WithMany("Customers")
                         .HasForeignKey("CustomerTypeId")
@@ -4822,6 +5773,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Area");
 
                     b.Navigation("CreditTerm");
+
+                    b.Navigation("CustomerAccountStatus");
 
                     b.Navigation("CustomerType");
                 });
@@ -5137,13 +6090,13 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Status", "Status")
-                        .WithMany("PurchaseOrders")
+                        .WithMany()
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GMGInventory.Data.Supplier", "Supplier")
-                        .WithMany("PurchaseOrder")
+                        .WithMany("PurchaseOrders")
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -5176,6 +6129,284 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseOrder");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNew", b =>
+                {
+                    b.HasOne("GMGInventory.Data.User", "Approver")
+                        .WithMany("PurchaseOrderApprover")
+                        .HasForeignKey("ApproverId");
+
+                    b.HasOne("GMGInventory.Data.Currency", "Currency")
+                        .WithMany("PurchaseOrderNews")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.Warehouse", "DeliveryAddress")
+                        .WithMany("PurchaseOrderNews")
+                        .HasForeignKey("DeliveryAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.PurchaseOrderDeliveryMode", "DeliveryMode")
+                        .WithMany("PurchaseOrderNews")
+                        .HasForeignKey("DeliveryModeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.User", "Disapprover")
+                        .WithMany("PurchaseOrderDisapprover")
+                        .HasForeignKey("DisapproverId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseOrderNew", "Resubmit")
+                        .WithMany("PurchaseOrderResubmits")
+                        .HasForeignKey("ResubmitId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseStatus", "Status")
+                        .WithMany("PurchaseOrders")
+                        .HasForeignKey("StatusId");
+
+                    b.HasOne("GMGInventory.Data.Supplier", "Supplier")
+                        .WithMany("PurchaseOrderNews")
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.CreditTerm", "Term")
+                        .WithMany("PurchaseOrderNews")
+                        .HasForeignKey("TermId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.PurchaseOrderType", "Type")
+                        .WithMany("PurchaseOrders")
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Approver");
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("DeliveryAddress");
+
+                    b.Navigation("DeliveryMode");
+
+                    b.Navigation("Disapprover");
+
+                    b.Navigation("Resubmit");
+
+                    b.Navigation("Status");
+
+                    b.Navigation("Supplier");
+
+                    b.Navigation("Term");
+
+                    b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNewLineItem", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Item", null)
+                        .WithMany("PurchaseOrderNewLineItems")
+                        .HasForeignKey("ItemId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseOrderNew", "PurchaseOrder")
+                        .WithMany("PurchaseOrderLineItems")
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.PurchaseRequestLineItem", "RequestItem")
+                        .WithMany()
+                        .HasForeignKey("RequestItemId");
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("RequestItem");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderType", b =>
+                {
+                    b.HasOne("GMGInventory.Data.PurchaseRequestType", "RequestType")
+                        .WithMany("PurchaseOrderTypes")
+                        .HasForeignKey("RequestTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RequestType");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReceiving", b =>
+                {
+                    b.HasOne("GMGInventory.Data.User", "Approver")
+                        .WithMany("PurchaseReceivingApprover")
+                        .HasForeignKey("ApproverId");
+
+                    b.HasOne("GMGInventory.Data.CreditTerm", null)
+                        .WithMany("PurchaseReceivings")
+                        .HasForeignKey("CreditTermId");
+
+                    b.HasOne("GMGInventory.Data.Currency", null)
+                        .WithMany("PurchaseReceivings")
+                        .HasForeignKey("CurrencyId");
+
+                    b.HasOne("GMGInventory.Data.User", "Disapprover")
+                        .WithMany("PurchaseReceivingDisapprover")
+                        .HasForeignKey("DisapproverId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseOrderNew", "PurchaseOrder")
+                        .WithMany("PurchaseReceivings")
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.PurchaseReceiving", "Resubmit")
+                        .WithMany("PurchaseReceivingResubmits")
+                        .HasForeignKey("ResubmitId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseStatus", "Status")
+                        .WithMany("PurchaseReceivings")
+                        .HasForeignKey("StatusId");
+
+                    b.HasOne("GMGInventory.Data.Supplier", null)
+                        .WithMany("PurchaseReceivings")
+                        .HasForeignKey("SupplierId");
+
+                    b.HasOne("GMGInventory.Data.Warehouse", "Warehouse")
+                        .WithMany("PurchaseReceivings")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Approver");
+
+                    b.Navigation("Disapprover");
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("Resubmit");
+
+                    b.Navigation("Status");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReceivingLineItem", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Item", null)
+                        .WithMany("PurchaseReceivingLineItems")
+                        .HasForeignKey("ItemId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseOrderNewLineItem", "OrderItem")
+                        .WithMany("PurchaseReceivingLineItems")
+                        .HasForeignKey("OrderItemId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseReceiving", "PurchaseReceiving")
+                        .WithMany("PurchaseReceivingLineItems")
+                        .HasForeignKey("PurchaseReceivingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderItem");
+
+                    b.Navigation("PurchaseReceiving");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequest", b =>
+                {
+                    b.HasOne("GMGInventory.Data.User", "Approver1")
+                        .WithMany("PurchaseRequestApprover1")
+                        .HasForeignKey("Approver1Id");
+
+                    b.HasOne("GMGInventory.Data.User", "Approver2")
+                        .WithMany("PurchaseRequestApprover2")
+                        .HasForeignKey("Approver2Id");
+
+                    b.HasOne("GMGInventory.Data.User", "Disapprover")
+                        .WithMany("PurchaseRequestDisapprover")
+                        .HasForeignKey("DisapproverId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseRequestPurpose", "Purpose")
+                        .WithMany("PurchaseRequests")
+                        .HasForeignKey("PurposeId");
+
+                    b.HasOne("GMGInventory.Data.Region", "Region")
+                        .WithMany("PurchaseRequests")
+                        .HasForeignKey("RegionId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseRequest", "Resubmit")
+                        .WithMany("PurchaseRequestResubmits")
+                        .HasForeignKey("ResubmitId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseStatus", "Status")
+                        .WithMany("PurchaseRequests")
+                        .HasForeignKey("StatusId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseRequestType", "Type")
+                        .WithMany("PurchaseRequests")
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Approver1");
+
+                    b.Navigation("Approver2");
+
+                    b.Navigation("Disapprover");
+
+                    b.Navigation("Purpose");
+
+                    b.Navigation("Region");
+
+                    b.Navigation("Resubmit");
+
+                    b.Navigation("Status");
+
+                    b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequestLineItem", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Item", "Item")
+                        .WithMany("PurchaseRequestLineItems")
+                        .HasForeignKey("ItemId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseRequest", "PurchaseRequest")
+                        .WithMany("PurchaseRequestLineItems")
+                        .HasForeignKey("PurchaseRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
+                        .WithMany("PurchaseRequestLineItems")
+                        .HasForeignKey("SalesOrderId");
+
+                    b.HasOne("GMGInventory.Data.Unit", "Unit")
+                        .WithMany("PurchaseRequestLineItems")
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("PurchaseRequest");
+
+                    b.Navigation("SalesOrder");
+
+                    b.Navigation("Unit");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequestPurpose", b =>
+                {
+                    b.HasOne("GMGInventory.Data.PurchaseRequestType", "Type")
+                        .WithMany("PurchaseRequestPurposes")
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Type");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturn", b =>
                 {
                     b.HasOne("GMGInventory.Data.PurchaseOrder", "PurchaseOrder")
@@ -5195,6 +6426,10 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.PurchaseReceivingLineItem", null)
+                        .WithMany("PurchaseReturnLineItems")
+                        .HasForeignKey("PurchaseReceivingLineItemId");
+
                     b.HasOne("GMGInventory.Data.PurchaseReturn", "PurchaseReturn")
                         .WithMany("PurchaseReturnLineItems")
                         .HasForeignKey("PurchaseReturnId")
@@ -5204,6 +6439,74 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseOrderLineItem");
 
                     b.Navigation("PurchaseReturn");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReturnNew", b =>
+                {
+                    b.HasOne("GMGInventory.Data.User", "Approver")
+                        .WithMany("PurchaseReturnApprover")
+                        .HasForeignKey("ApproverId");
+
+                    b.HasOne("GMGInventory.Data.Currency", null)
+                        .WithMany("PurchaseReturnNews")
+                        .HasForeignKey("CurrencyId");
+
+                    b.HasOne("GMGInventory.Data.User", "Disapprover")
+                        .WithMany("PurchaseReturnDisapprover")
+                        .HasForeignKey("DisapproverId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseReceiving", "PurchaseReceive")
+                        .WithMany("PurchaseReturns")
+                        .HasForeignKey("PurchaseReceiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.PurchaseReturnNew", "Resubmit")
+                        .WithMany("PurchaseReturnResubmits")
+                        .HasForeignKey("ResubmitId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseStatus", "Status")
+                        .WithMany("PurchaseReturns")
+                        .HasForeignKey("StatusId");
+
+                    b.HasOne("GMGInventory.Data.Supplier", null)
+                        .WithMany("PurchaseReturns")
+                        .HasForeignKey("SupplierId");
+
+                    b.HasOne("GMGInventory.Data.Warehouse", null)
+                        .WithMany("PurchaseReturns")
+                        .HasForeignKey("WarehouseId");
+
+                    b.Navigation("Approver");
+
+                    b.Navigation("Disapprover");
+
+                    b.Navigation("PurchaseReceive");
+
+                    b.Navigation("Resubmit");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReturnNewLineItem", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Item", null)
+                        .WithMany("PurchaseReturnLineItems")
+                        .HasForeignKey("ItemId");
+
+                    b.HasOne("GMGInventory.Data.PurchaseReturnNew", "PurchaseReturn")
+                        .WithMany("PurchasReturnLineItem")
+                        .HasForeignKey("PurchaseReturnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.PurchaseReceivingLineItem", "ReceivingItem")
+                        .WithMany()
+                        .HasForeignKey("ReceivingItemId");
+
+                    b.Navigation("PurchaseReturn");
+
+                    b.Navigation("ReceivingItem");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrder", b =>
@@ -5569,11 +6872,21 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.CreditTerm", b =>
                 {
                     b.Navigation("Customers");
+
+                    b.Navigation("PurchaseOrderNews");
+
+                    b.Navigation("PurchaseReceivings");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Currency", b =>
                 {
+                    b.Navigation("PurchaseOrderNews");
+
                     b.Navigation("PurchaseOrders");
+
+                    b.Navigation("PurchaseReceivings");
+
+                    b.Navigation("PurchaseReturnNews");
 
                     b.Navigation("Suppliers");
                 });
@@ -5589,6 +6902,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesReturns");
 
                     b.Navigation("ShippingAddresses");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CustomerAccountStatus", b =>
+                {
+                    b.Navigation("Customers");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
@@ -5647,6 +6965,14 @@ namespace GMGInventory.Data.Migrations
 
                     b.Navigation("PurchaseOrderLineItems");
 
+                    b.Navigation("PurchaseOrderNewLineItems");
+
+                    b.Navigation("PurchaseReceivingLineItems");
+
+                    b.Navigation("PurchaseRequestLineItems");
+
+                    b.Navigation("PurchaseReturnLineItems");
+
                     b.Navigation("SalesOrderLineItems");
 
                     b.Navigation("SalesReturnLineItems");
@@ -5701,9 +7027,68 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesOrders");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderDeliveryMode", b =>
+                {
+                    b.Navigation("PurchaseOrderNews");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderLineItem", b =>
                 {
                     b.Navigation("PurchaseReturnLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNew", b =>
+                {
+                    b.Navigation("PurchaseOrderLineItems");
+
+                    b.Navigation("PurchaseOrderResubmits");
+
+                    b.Navigation("PurchaseReceivings");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNewLineItem", b =>
+                {
+                    b.Navigation("PurchaseReceivingLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseOrderType", b =>
+                {
+                    b.Navigation("PurchaseOrders");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReceiving", b =>
+                {
+                    b.Navigation("PurchaseReceivingLineItems");
+
+                    b.Navigation("PurchaseReceivingResubmits");
+
+                    b.Navigation("PurchaseReturns");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReceivingLineItem", b =>
+                {
+                    b.Navigation("PurchaseReturnLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequest", b =>
+                {
+                    b.Navigation("PurchaseRequestLineItems");
+
+                    b.Navigation("PurchaseRequestResubmits");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequestPurpose", b =>
+                {
+                    b.Navigation("PurchaseRequests");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequestType", b =>
+                {
+                    b.Navigation("PurchaseOrderTypes");
+
+                    b.Navigation("PurchaseRequestPurposes");
+
+                    b.Navigation("PurchaseRequests");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturn", b =>
@@ -5711,9 +7096,29 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseReturnLineItems");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.PurchaseReturnNew", b =>
+                {
+                    b.Navigation("PurchasReturnLineItem");
+
+                    b.Navigation("PurchaseReturnResubmits");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseStatus", b =>
+                {
+                    b.Navigation("PurchaseOrders");
+
+                    b.Navigation("PurchaseReceivings");
+
+                    b.Navigation("PurchaseRequests");
+
+                    b.Navigation("PurchaseReturns");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Region", b =>
                 {
                     b.Navigation("Areas");
+
+                    b.Navigation("PurchaseRequests");
 
                     b.Navigation("Suppliers");
                 });
@@ -5723,6 +7128,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Invoices");
 
                     b.Navigation("Packs");
+
+                    b.Navigation("PurchaseRequestLineItems");
 
                     b.Navigation("SalesOrderDeliveryMonitorings");
 
@@ -5752,14 +7159,18 @@ namespace GMGInventory.Data.Migrations
 
                     b.Navigation("Packs");
 
-                    b.Navigation("PurchaseOrders");
-
                     b.Navigation("SalesOrders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Supplier", b =>
                 {
-                    b.Navigation("PurchaseOrder");
+                    b.Navigation("PurchaseOrderNews");
+
+                    b.Navigation("PurchaseOrders");
+
+                    b.Navigation("PurchaseReceivings");
+
+                    b.Navigation("PurchaseReturns");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItem", b =>
@@ -5770,6 +7181,8 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Unit", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("PurchaseRequestLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Warehouse", b =>
@@ -5780,9 +7193,36 @@ namespace GMGInventory.Data.Migrations
 
                     b.Navigation("PhysicalCountHistories");
 
+                    b.Navigation("PurchaseOrderNews");
+
                     b.Navigation("PurchaseOrders");
 
+                    b.Navigation("PurchaseReceivings");
+
+                    b.Navigation("PurchaseReturns");
+
                     b.Navigation("SourceWarehouse");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.User", b =>
+                {
+                    b.Navigation("PurchaseOrderApprover");
+
+                    b.Navigation("PurchaseOrderDisapprover");
+
+                    b.Navigation("PurchaseReceivingApprover");
+
+                    b.Navigation("PurchaseReceivingDisapprover");
+
+                    b.Navigation("PurchaseRequestApprover1");
+
+                    b.Navigation("PurchaseRequestApprover2");
+
+                    b.Navigation("PurchaseRequestDisapprover");
+
+                    b.Navigation("PurchaseReturnApprover");
+
+                    b.Navigation("PurchaseReturnDisapprover");
                 });
 #pragma warning restore 612, 618
         }

@@ -11,122 +11,122 @@ namespace GMGInventory.Data.Configurations.Entities
                 new Status
                 {
                     Id = 1,
-                    Code = "Draft",
-                    Name = "Sales Order Draft"
+                    Code = "DRAFT",
+                    Name = "SALES ORDER DRAFT"
                 },
                 new Status
                 {
                     Id = 2,
-                    Code = "Submitted",
-                    Name = "Sales Order Submitted"
+                    Code = "SUBMITTED",
+                    Name = "SALES ORDER SUBMITTED"
                 },
                 new Status
                 {
                     Id = 3,
-                    Code = "Approved",
-                    Name = "Sales Order Approved"
+                    Code = "APPROVED",
+                    Name = "SALES ORDER APPROVED"
                 },
                 new Status
                 {
                     Id = 4,
-                    Code = "Denied",
-                    Name = "Sales Order Denied"
+                    Code = "DENIED",
+                    Name = "SALES ORDER DENIED"
                 },
                 new Status
                 {
                     Id = 5,
-                    Code = "Draft",
-                    Name = "Packing Draft"
+                    Code = "DRAFT",
+                    Name = "PACKING DRAFT"
                 },
                 new Status
                 {
                     Id = 6,
-                    Code = "Posted",
-                    Name = "Packing Submitted"
+                    Code = "POSTED",
+                    Name = "PACKING SUBMITTED"
                 },
                 new Status
                 {
                     Id = 7,
-                    Code = "Draft",
-                    Name = "Invoice Draft"
+                    Code = "DRAFT",
+                    Name = "INVOICE DRAFT"
                 },
                 new Status
                 {
                     Id = 8,
-                    Code = "Invoiced",
-                    Name = "Invoice Submitted"
+                    Code = "INVOICED",
+                    Name = "INVOICED SUBMITTED"
                 },
                 new Status
                 {
                     Id = 9,
-                    Code = "Packed",
-                    Name = "Fully Packed"
+                    Code = "PACKED",
+                    Name = "FULLY PACKED"
                 },
                 new Status
                 {
                     Id = 10,
-                    Code = "Invoiced",
-                    Name = "Fully Invoiced"
+                    Code = "INVOICED",
+                    Name = "FULLY INVOICED"
                 },
                 new Status
                 {
                     Id = 11,
-                    Code = "Printed",
-                    Name = "Invoice Printed"
+                    Code = "PRINTED",
+                    Name = "INVOICE PRINTED"
                 },
                 new Status
                 {
                     Id = 12,
-                    Code = "Paid",
-                    Name = "Invoice Paid"
+                    Code = "PAID",
+                    Name = "INVOICE PAID"
                 },
                 new Status
                 {
                     Id = 13,
-                    Code = "Not Paid",
-                    Name = "Invoice Not Paid"
+                    Code = "NOT PAID",
+                    Name = "INVOICE NOT PAID"
                 },
                 new Status
                 {
                     Id = 14,
-                    Code = "Cleared",
-                    Name = "Check Cleared"
+                    Code = "CLEARED",
+                    Name = "CHECK CLEARED"
                 },
                 new Status
                 {
                     Id = 15,
-                    Code = "Bounced",
-                    Name = "Check Bounced"
+                    Code = "BOUNCED",
+                    Name = "CHECK BOUNCED"
                 },
                 new Status
                 {
                     Id = 16,
-                    Code = "Replaced",
-                    Name = "Check Replaced"
+                    Code = "REPLACED",
+                    Name = "CHECK REPLACED"
                 },
                 new Status
                 {
                     Id = 17,
-                    Code = "Deposit",
-                    Name = "Deposit"
+                    Code = "DEPOSIT",
+                    Name = "DEPOSIT"
                 },
                 new Status
                 {
                     Id = 18,
-                    Code = "Redeposited",
-                    Name = "Redeposited"
+                    Code = "REDEPOSITED",
+                    Name = "REDEPOSITED"
                 },
                 new Status
                 {
                     Id = 19,
-                    Code = "Deposited",
-                    Name = "Deposited"
+                    Code = "DEPOSITED",
+                    Name = "DEPOSITED"
                 },
                 new Status
                 {
                     Id = 20,
-                    Code = "Cancelled",
-                    Name = "Cancelled Invoice"
+                    Code = "CANCELLED",
+                    Name = "CANCELLED INVOICE"
                 }
             );
         }

@@ -45,6 +45,16 @@ else
                             </a>
                         </li>
                     }
+                    @if (navPages.Contains(PageNames.SalesOrder.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "SalesOrder" ? "active" : "")"
+                               asp-area="" asp-controller="SalesOrder" asp-action="Index">
+                                <i class="nav-icon fas fa-file-invoice"></i>
+                                Sales Order
+                            </a>
+                        </li>
+                    }
                     @if (navPages.Contains(PageNames.PackingListing.ToEnumString()))
                     {
                         <li>
@@ -62,16 +72,6 @@ else
                                asp-area="" asp-controller="SalesInvoice" asp-action="Index">
                                 <i class="nav-icon fas fa-file-invoice-dollar"></i>
                                 Sales Invoice
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.SalesOrder.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "SalesOrder" ? "active" : "")"
-                               asp-area="" asp-controller="SalesOrder" asp-action="Index">
-                                <i class="nav-icon fas fa-file-invoice"></i>
-                                Sales Order
                             </a>
                         </li>
                     }

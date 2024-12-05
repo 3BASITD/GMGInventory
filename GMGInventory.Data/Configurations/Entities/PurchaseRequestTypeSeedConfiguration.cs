@@ -12,19 +12,19 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 1,
                     Code = "AM",
-                    Name = "Automotive"
+                    Name = "AUTOMOTIVE"
                 },
                 new PurchaseRequestType
                 {
                     Id = 2,
                     Code = "NA",
-                    Name = "Non-Automotive"
+                    Name = "NON-AUTOMOTIVE"
                 },
                 new PurchaseRequestType
                 {
                     Id = 3,
                     Code = "MR",
-                    Name = "Maintenance & Repair"
+                    Name = "MAINTENANCE & REPAIR"
                 }
             );
         }

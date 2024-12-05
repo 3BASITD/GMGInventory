@@ -16,23 +16,23 @@
             <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
-             @if (userAccess.CanAdd)
-        {
-            <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
-                <span class="fas fa-plus"></span> Add Shipping Details
-            </button>
-        }
-             @if (userAccess.CanEdit)
-        {
-            <button type="button" class="btn btn-primary btn-sm float-right editBtn ml-2" data-bs-toggle="modal" data-bs-target="#editModal">
-                <span class="fas fa-edit"></span> Edit Customer
-            </button>
-        }
+            @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
+                    <span class="fas fa-plus"></span> Add Shipping Details
+                </button>
+            }
+            @if (userAccess.CanEdit)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right editBtn ml-2" data-bs-toggle="modal" data-bs-target="#editModal">
+                    <span class="fas fa-edit"></span> Edit Customer
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-4">
+            <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Code)
@@ -41,48 +41,8 @@
                         @Model?.Code
                     </b>
                 </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.RegionName)
-                    </span>
-                    <b class="d-block details-region">
-                        @Model?.RegionName
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ContactPerson)
-                    </span>
-                    <b class="d-block details-contact-person">
-                        @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Email)
-                    </span>
-                    <b class="d-block details-email">
-                        @(string.IsNullOrWhiteSpace(Model?.Email) ? "-" : Model?.Email)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.TIN)
-                    </span>
-                    <b class="d-block details-tin">
-                        @(string.IsNullOrWhiteSpace(Model?.TIN) ? "-" : Model?.TIN)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CreditLimit)
-                    </span>
-                    <b class="d-block details-credit-limit">
-                        @Model?.CreditLimit
-                    </b>
-                </p>
             </div>
-            <div class="col-4">
+            <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Name)
@@ -91,48 +51,8 @@
                         @Model?.Name
                     </b>
                 </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AreaName)
-                    </span>
-                    <b class="d-block details-area">
-                        @Model?.AreaName
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ContactNumber)
-                    </span>
-                    <b class="d-block details-contact-number">
-                        @(string.IsNullOrWhiteSpace(Model?.ContactNumber) ? "-" : Model?.ContactNumber)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AgentName)
-                    </span>
-                    <b class="d-block details-agent">
-                        @(string.IsNullOrWhiteSpace(Model?.AgentName) ? "-" : Model?.AgentName)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.VAT)
-                    </span>
-                    <b class="d-block details-vat">
-                        @(string.IsNullOrWhiteSpace(Model?.VAT) ? "-" : Model?.VAT)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Remarks)
-                    </span>
-                    <b class="d-block details-remarks">
-                        @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model?.Remarks)
-                    </b>
-                </p>
             </div>
-            <div class="col-4">
+            <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.IsActive)
@@ -150,6 +70,28 @@
                         }
                     </b>
                 </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.RegionName)
+                    </span>
+                    <b class="d-block details-region">
+                        @Model?.RegionName
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.AreaName)
+                    </span>
+                    <b class="d-block details-area">
+                        @Model?.AreaName
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CustomerTypeName)
@@ -158,6 +100,28 @@
                         @Model?.CustomerTypeName
                     </b>
                 </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ContactPerson)
+                    </span>
+                    <b class="d-block details-contact-person">
+                        @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ContactNumber)
+                    </span>
+                    <b class="d-block details-contact-number">
+                        @(string.IsNullOrWhiteSpace(Model?.ContactNumber) ? "-" : Model?.ContactNumber)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Address)
@@ -166,6 +130,28 @@
                         @(string.IsNullOrWhiteSpace(Model?.Address) ? "-" : Model?.Address)
                     </b>
                 </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Email)
+                    </span>
+                    <b class="d-block details-email">
+                        @(string.IsNullOrWhiteSpace(Model?.Email) ? "-" : Model?.Email)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.AgentName)
+                    </span>
+                    <b class="d-block details-agent">
+                        @(string.IsNullOrWhiteSpace(Model?.AgentName) ? "-" : Model?.AgentName)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.FaxNumber)
@@ -174,6 +160,28 @@
                         @(string.IsNullOrWhiteSpace(Model?.FaxNumber) ? "-" : Model?.FaxNumber)
                     </b>
                 </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.TIN)
+                    </span>
+                    <b class="d-block details-tin">
+                        @(string.IsNullOrWhiteSpace(Model?.TIN) ? "-" : Model?.TIN)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.VAT)
+                    </span>
+                    <b class="d-block details-vat">
+                        @(string.IsNullOrWhiteSpace(Model?.VAT) ? "-" : Model?.VAT)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CreditTermName)
@@ -182,15 +190,113 @@
                         @Model?.CreditTermName
                     </b>
                 </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CreditLimit)
+                    </span>
+                    <b class="d-block details-credit-limit">
+                        @Model?.CreditLimit
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CommissionRate)
                     </span>
                     <b class="d-block details-commission-rate">
-                        @(string.IsNullOrWhiteSpace(Model?.CommissionRate) ? "-" : Model?.CommissionRate)
+                        @Model?.CommissionRate
                     </b>
                 </p>
             </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CommodityQuantity)
+                    </span>
+                    <b class="d-block details-commission-rate">
+                        @Model?.CommodityQuantity
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                    </span>
+                    <b class="d-block details-commission-rate">
+                        @Model?.RequiredDeliveryDate
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CustomerAccountStatusName)
+                    </span>
+                    <b class="d-block details-commission-rate">
+                        @Model?.CustomerAccountStatusName
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </span>
+                    <b class="d-block details-remarks">
+                        @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model?.Remarks)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </span>
+                    <b class="d-block">
+                        @Model?.DateCreated
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CreatedBy)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CreatedBy
+                    </b>
+                </p>
+            </div>
+            @if (Model?.ModifiedBy != null)
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ModifiedBy)
+                        </span>
+                        <b class="d-block">
+                            @Model?.ModifiedBy
+                        </b>
+                    </p>
+                </div>
+            }
+            @if (Model?.DateModified != null)
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateModified)
+                        </span>
+                        <b class="d-block">
+                            @Model?.DateModified
+                        </b>
+                    </p>
+                </div>
+            }
         </div>
         @*<div class="row">
         <div class="col-12">
@@ -715,7 +821,7 @@
                         page: params.page || 1,
                         region: $("#edit-region").val(),
                         includeId: @Model?.AreaId
-                    };
+                            };
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
@@ -946,7 +1052,13 @@
                     $("#edit-code").val(data.code);
                     $("#edit-area").val(data.areaId);
                     $("#edit-name").val(data.name);
-                    $("#edit-commission").val(data.commissionRateD);
+                    if (data.commissionRateIsArea) {
+                        $("#edit-commission").val("");
+                        $("#edit-usearearate").prop("checked", true);
+                    } else {
+                        $("#edit-commission").val(data.commissionRateD);
+                        $("#edit-usearearate").prop("checked", false);
+                    }
                     $("#edit-customer-type").val(data.customerTypeId);
                     $("#edit-contact-person").val(data.contactPerson);
                     $("#edit-contact-number").val(data.contactNumber);
@@ -1039,8 +1151,8 @@
                         $(".details-tin").text($("#edit-tin").val() || "-");
                         $(".details-credit-limit").text(FormatStringDecimal($("#edit-credit-limit").val()));
                         $(".details-name").text($("#edit-name").val());
-                        if($("#edit-area").val() != null) {
-                        $(".details-area").text($("#edit-area").select2("data")[0].text);
+                        if ($("#edit-area").val() != null) {
+                            $(".details-area").text($("#edit-area").select2("data")[0].text);
                         }
                         $(".details-contact-number").text($("#edit-contact-number").val() || "-");
                         $(".details-agent").text($("#edit-agent").select2("data")[0].text || "-");
