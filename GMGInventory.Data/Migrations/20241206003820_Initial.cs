@@ -1500,6 +1500,36 @@ namespace GMGInventory.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cheques",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CollectDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RefNo = table.Column<string>(type: "nvarchar(10)", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    CheckDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Check = table.Column<string>(type: "nvarchar(10)", nullable: false),
+                    Branch = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    CheckNo = table.Column<string>(type: "nvarchar(10)", nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UserCreated = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserModified = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cheques", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cheques_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SalesOrders",
                 columns: table => new
                 {
@@ -2479,8 +2509,8 @@ namespace GMGInventory.Data.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "DateCreated", "DateModified", "Discriminator", "Email", "EmailConfirmed", "FirstName", "IsActive", "IsDarkMode", "LastName", "LockoutEnabled", "LockoutEnd", "Nickname", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserCreated", "UserModified", "UserName" },
                 values: new object[,]
                 {
-                    { "66A86BDE-9D0F-48F8-9CCF-DDF33673862C", 0, "b3f5a4d9-fc0d-444c-a489-21b7f65b7c01", new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "User", null, false, "GMG", true, false, "Administrator", false, null, "GMG", null, "admin-gmg", "AQAAAAIAAYagAAAAEP4DtRE9fWdG+c11ZPmY8Zr58ajscxQmR0cq5XU7BGzqFQkd3urWbQ7OfQjrb//KIQ==", null, false, "33f35f42-c5d3-4595-846b-da4c5bd80691", false, "CDE19596-2C9E-4ECE-837C-85950E9E907D", null, "admin-gmg" },
-                    { "CDE19596-2C9E-4ECE-837C-85950E9E907D", 0, "f6281f70-03b2-4fa8-b39f-2d8a704f7818", new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "User", null, false, "MISNet", true, false, "Administrator", false, null, "MISNet", null, "admin-misnet", "AQAAAAIAAYagAAAAEL+6MoF47JC+NepPTzxjTzuuBALBVGhVR6tRpgtzMvqqus6mQ03i5od494SfVRDSKA==", null, false, "75ddedc4-a53a-41f7-8c3c-58473d139147", false, "CDE19596-2C9E-4ECE-837C-85950E9E907D", null, "admin-misnet" }
+                    { "66A86BDE-9D0F-48F8-9CCF-DDF33673862C", 0, "02c6ad64-5aa8-4110-8d05-9f859437e0b8", new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "User", null, false, "GMG", true, false, "Administrator", false, null, "GMG", null, "admin-gmg", "AQAAAAIAAYagAAAAEIxNudJwdxheutc4JN9KfMSpGSt8hhuEygRhiXxDVlq5q7HamL+O/iOYg/qDOUslqQ==", null, false, "25d1f9a3-a646-4b1c-a8f9-c17892d9dfb3", false, "CDE19596-2C9E-4ECE-837C-85950E9E907D", null, "admin-gmg" },
+                    { "CDE19596-2C9E-4ECE-837C-85950E9E907D", 0, "a0168a97-f8b9-407a-9f4c-ce0de55f1732", new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "User", null, false, "MISNet", true, false, "Administrator", false, null, "MISNet", null, "admin-misnet", "AQAAAAIAAYagAAAAECK0GcOeThN2oM6TpnnU3+9xCJpbBMbp2NYO3wy6KMO8vwNm5PcqhXDYWPmXfBV71Q==", null, false, "177d6ff9-ba7d-45dd-ab36-bdd08fca958a", false, "CDE19596-2C9E-4ECE-837C-85950E9E907D", null, "admin-misnet" }
                 });
 
             migrationBuilder.InsertData(
@@ -2887,6 +2917,11 @@ namespace GMGInventory.Data.Migrations
                 name: "IX_Brands_ItemTypeId",
                 table: "Brands",
                 column: "ItemTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cheques_CustomerId",
+                table: "Cheques",
+                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CreditDebitMemos_CreditDebitMemoTypeId",
@@ -3561,6 +3596,9 @@ namespace GMGInventory.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AuditLogs");
+
+            migrationBuilder.DropTable(
+                name: "Cheques");
 
             migrationBuilder.DropTable(
                 name: "CreditDebitMemos");

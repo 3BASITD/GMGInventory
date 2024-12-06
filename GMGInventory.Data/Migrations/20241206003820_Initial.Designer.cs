@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GMGInventory.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241205152941_Initial")]
+    [Migration("20241206003820_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1063,6 +1063,60 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Cheque", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Branch")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Check")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime?>("CheckDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CheckNo")
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("CollectDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Cheques");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
@@ -5614,13 +5668,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f6281f70-03b2-4fa8-b39f-2d8a704f7818",
+                            ConcurrencyStamp = "a0168a97-f8b9-407a-9f4c-ce0de55f1732",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL+6MoF47JC+NepPTzxjTzuuBALBVGhVR6tRpgtzMvqqus6mQ03i5od494SfVRDSKA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECK0GcOeThN2oM6TpnnU3+9xCJpbBMbp2NYO3wy6KMO8vwNm5PcqhXDYWPmXfBV71Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "75ddedc4-a53a-41f7-8c3c-58473d139147",
+                            SecurityStamp = "177d6ff9-ba7d-45dd-ab36-bdd08fca958a",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5635,13 +5689,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b3f5a4d9-fc0d-444c-a489-21b7f65b7c01",
+                            ConcurrencyStamp = "02c6ad64-5aa8-4110-8d05-9f859437e0b8",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP4DtRE9fWdG+c11ZPmY8Zr58ajscxQmR0cq5XU7BGzqFQkd3urWbQ7OfQjrb//KIQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIxNudJwdxheutc4JN9KfMSpGSt8hhuEygRhiXxDVlq5q7HamL+O/iOYg/qDOUslqQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "33f35f42-c5d3-4595-846b-da4c5bd80691",
+                            SecurityStamp = "25d1f9a3-a646-4b1c-a8f9-c17892d9dfb3",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5715,6 +5769,17 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ItemType");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Cheque", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Customer", "Customer")
+                        .WithMany("Cheques")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
@@ -6893,6 +6958,8 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Customer", b =>
                 {
+                    b.Navigation("Cheques");
+
                     b.Navigation("CustomerPayments");
 
                     b.Navigation("SOACRs");

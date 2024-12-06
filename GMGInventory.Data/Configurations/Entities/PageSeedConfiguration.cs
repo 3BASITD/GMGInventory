@@ -244,17 +244,17 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasUploadDownload = false,
                     HasPrint = false
                 },
-                //new() {
-                //    Id = (int)PageNames.Check,
-                //    Name = PageNames.Check.ToEnumString(),
-                //    HasView = true,
-                //    HasAdd = true,
-                //    HasEdit = true,
-                //    HasDelete = true,
-                //    HasApproveDisapprove = false,
-                //    HasUploadDownload = false,
-                //    HasPrint = false
-                //},
+                new() {
+                    Id = (int)PageNames.Cheque,
+                    Name = PageNames.Cheque.ToEnumString(),
+                    HasView = true,
+                    HasAdd = true,
+                    HasEdit = true,
+                    HasDelete = true,
+                    HasApproveDisapprove = false,
+                    HasUploadDownload = false,
+                    HasPrint = false
+                },
                 new() {
                     Id = (int)PageNames.Agents,
                     Name = PageNames.Agents.ToEnumString(),

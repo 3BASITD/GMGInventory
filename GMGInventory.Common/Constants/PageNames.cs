@@ -25,7 +25,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Customer")] Customer,
         [PageNamesString("Payment")] Payment,
         [PageNamesString("SOA / Counter Receipt")] SOACR,
-    //    [PageNamesString("Check / Cheque")] Check,
+        [PageNamesString("Check / Cheque")] Cheque,
         [PageNamesString("Agents")] Agents,
         [PageNamesString("Accesses")] Accesses,
         [PageNamesString("Areas")] Areas,
@@ -63,8 +63,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Debit Memo Listing Report")] DebitMemoListingReport,
         [PageNamesString("Purchase Order Report")] PurchaseOrderReport,
         [PageNamesString("Purchase Return Report")] PurchaseReturnReport,
-        [PageNamesString("Purchase Receiving Report")] PurchaseReceivingReport,
-        [PageNamesString("Cheque")] Cheque        
+        [PageNamesString("Purchase Receiving Report")] PurchaseReceivingReport
     }
 
     public static class PageNameExtensions
