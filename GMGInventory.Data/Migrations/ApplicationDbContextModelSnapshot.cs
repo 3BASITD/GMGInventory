@@ -3383,9 +3383,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ItemId")
-                        .HasColumnType("int");
-
                     b.Property<int>("LineNumber")
                         .HasColumnType("int");
 
@@ -3409,8 +3406,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
 
                     b.HasIndex("PurchaseOrderId");
 
@@ -3582,9 +3577,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ItemId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("OrderItemId")
                         .HasColumnType("int");
 
@@ -3602,8 +3594,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
 
                     b.HasIndex("OrderItemId");
 
@@ -4033,9 +4023,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ItemId")
-                        .HasColumnType("int");
-
                     b.Property<int>("PurchaseReturnId")
                         .HasColumnType("int");
 
@@ -4053,8 +4040,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
 
                     b.HasIndex("PurchaseReturnId");
 
@@ -5666,13 +5651,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a0168a97-f8b9-407a-9f4c-ce0de55f1732",
+                            ConcurrencyStamp = "4a3a068f-f1e7-44cf-bf74-1f595e55ea07",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAECK0GcOeThN2oM6TpnnU3+9xCJpbBMbp2NYO3wy6KMO8vwNm5PcqhXDYWPmXfBV71Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENv1ZIvmVUofyr71wRQpnUthXg9iIE251GOMMr3Q3xTBYmvfTvJguUz5pxBEf47Vvw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "177d6ff9-ba7d-45dd-ab36-bdd08fca958a",
+                            SecurityStamp = "3c71fc65-84fc-45b8-83c5-9c18285d0eb0",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5687,13 +5672,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "02c6ad64-5aa8-4110-8d05-9f859437e0b8",
+                            ConcurrencyStamp = "8e7f56b2-6f5f-4e01-a08d-403304ff078a",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIxNudJwdxheutc4JN9KfMSpGSt8hhuEygRhiXxDVlq5q7HamL+O/iOYg/qDOUslqQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENdxSYsgHJzBRev8cmzS5Q9HcrHOWYZCH/eaXsjPhAeeBvpeXutns85yxhRa1Ldxpg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "25d1f9a3-a646-4b1c-a8f9-c17892d9dfb3",
+                            SecurityStamp = "153fabec-f818-4f45-ad6b-1686d60b1f12",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6269,10 +6254,6 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNewLineItem", b =>
                 {
-                    b.HasOne("GMGInventory.Data.Item", null)
-                        .WithMany("PurchaseOrderNewLineItems")
-                        .HasForeignKey("ItemId");
-
                     b.HasOne("GMGInventory.Data.PurchaseOrderNew", "PurchaseOrder")
                         .WithMany("PurchaseOrderLineItems")
                         .HasForeignKey("PurchaseOrderId")
@@ -6356,10 +6337,6 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReceivingLineItem", b =>
                 {
-                    b.HasOne("GMGInventory.Data.Item", null)
-                        .WithMany("PurchaseReceivingLineItems")
-                        .HasForeignKey("ItemId");
-
                     b.HasOne("GMGInventory.Data.PurchaseOrderNewLineItem", "OrderItem")
                         .WithMany("PurchaseReceivingLineItems")
                         .HasForeignKey("OrderItemId");
@@ -6553,10 +6530,6 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturnNewLineItem", b =>
                 {
-                    b.HasOne("GMGInventory.Data.Item", null)
-                        .WithMany("PurchaseReturnLineItems")
-                        .HasForeignKey("ItemId");
-
                     b.HasOne("GMGInventory.Data.PurchaseReturnNew", "PurchaseReturn")
                         .WithMany("PurchasReturnLineItem")
                         .HasForeignKey("PurchaseReturnId")
@@ -7030,13 +7003,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.Navigation("PurchaseOrderLineItems");
 
-                    b.Navigation("PurchaseOrderNewLineItems");
-
-                    b.Navigation("PurchaseReceivingLineItems");
-
                     b.Navigation("PurchaseRequestLineItems");
-
-                    b.Navigation("PurchaseReturnLineItems");
 
                     b.Navigation("SalesOrderLineItems");
 

@@ -71,14 +71,15 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {
             return await context.Regions
-                .Select(s => new JsonOptionsModel
-                {
-                    Id = s.Id.ToString(),
-                    Text = s.Name,
-                    Selected = IncludeId != null && IncludeId == s.Id
-                })
-                .OrderBy(s => s.Text)
-                .ToListAsync();
+                                .Where(s => s.IsActive || s.Id == IncludeId)
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Name,
+                                    Selected = IncludeId != null && IncludeId == s.Id
+                                })
+                                .OrderBy(s => s.Text)
+                                .ToListAsync();
         }
 
         public async Task<int?> GetIdAsync(string? Name)
@@ -154,21 +155,21 @@ namespace GMGInventory.Application.Repositories
 
             var regions = from region in context.Regions
 
-                            join userc in userManager.Users on region.UserCreated equals userc.Id
-                            join userm in userManager.Users on region.UserModified equals userm.Id into m
-                            from um in m.DefaultIfEmpty()
+                          join userc in userManager.Users on region.UserCreated equals userc.Id
+                          join userm in userManager.Users on region.UserModified equals userm.Id into m
+                          from um in m.DefaultIfEmpty()
 
-                            select new RegionVM
-                            {
-                                Id = region.Id,
-                                Name = region.Name,
-                                Code = region.Code,
-                                IsActive = region.IsActive,
-                                DateCreatedD = region.DateCreated,
-                                DateModifiedD = region.DateModified == null ? null : region.DateModified.Value,
-                                UserCreated = userc.Nickname,
-                                UserModified = um == null ? "-" : um.Nickname
-                            };
+                          select new RegionVM
+                          {
+                              Id = region.Id,
+                              Name = region.Name,
+                              Code = region.Code,
+                              IsActive = region.IsActive,
+                              DateCreatedD = region.DateCreated,
+                              DateModifiedD = region.DateModified == null ? null : region.DateModified.Value,
+                              UserCreated = userc.Nickname,
+                              UserModified = um == null ? "-" : um.Nickname
+                          };
             return await regions.ToListAsync();
         }
 
