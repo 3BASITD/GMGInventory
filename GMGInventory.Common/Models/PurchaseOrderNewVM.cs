@@ -119,6 +119,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Purchase Request Ref #")]
         public string? PurchaseRequestNumber { get; set; }
+        public int RequestItemId { get; set; }
         public int? ItemId { get; set; }
 
         [Display(Name = "Item Code")]

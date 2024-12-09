@@ -145,7 +145,8 @@ namespace GMGInventory.Application.Repositories
                                   //.Include(s => s.Agent)
                                   //.Include(s => s.CreditTerm)
                               join userc in userManager.Users on cust.UserCreated equals userc.Id
-                              join userm in userManager.Users on cust.UserModified equals userm.Id
+                              join userm in userManager.Users on cust.UserModified equals userm.Id into um
+                              from userm in um.DefaultIfEmpty()
                               where cust.Id == id
                               select new CustomerVM
                               {
@@ -194,7 +195,8 @@ namespace GMGInventory.Application.Repositories
                                 //.Include(s => s.Agent)
                                 //.Include(s => s.CreditTerm)
                             join userc in userManager.Users on cust.UserCreated equals userc.Id
-                            join userm in userManager.Users on cust.UserCreated equals userm.Id
+                            join userm in userManager.Users on cust.UserModified equals userm.Id into um
+                            from userm in um.DefaultIfEmpty()
                             select new CustomerVM
                             {
                                 Id = cust.Id,
@@ -228,7 +230,7 @@ namespace GMGInventory.Application.Repositories
                                 IsActive = cust.IsActive,
                                 CreatedBy = userc.FirstName + " " + userc.LastName,
                                 DateCreatedD = cust.DateCreated,
-                                ModifiedBy = userm.FirstName + " " + userm.LastName,
+                                ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
                                 DateModifiedD = cust.DateModified
                             };
             return await customers.ToListAsync();
@@ -670,7 +672,8 @@ namespace GMGInventory.Application.Repositories
                              join cp in context.CustomerPayments
                                       on customer.Id equals cp.CustomerId
                              join userc in userManager.Users on cp.UserCreated equals userc.Id
-                             join userm in userManager.Users on cp.UserCreated equals userm.Id
+                             join userm in userManager.Users on cp.UserModified equals userm.Id into um
+                             from userm in um.DefaultIfEmpty()
                              where cp.CustomerId == id
                              select new CustomerVM
                              {
@@ -682,7 +685,7 @@ namespace GMGInventory.Application.Repositories
                                  TotalInvoiceAmountD = cp.TotalInvoiceAmount,
                                  CreatedBy = userc.FirstName + " " + userc.LastName,
                                  DateCreatedD = cp.DateCreated,
-                                 ModifiedBy = userm.FirstName + " " + userm.LastName,
+                                 ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
                                  DateModifiedD = cp.DateCreated
                              };
             return await customerVM.ToListAsync();

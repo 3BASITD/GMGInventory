@@ -76,7 +76,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-                        if (data.status == "Draft" && data.orderBy == $("#current-user-nickname").val()) {
+                        if (data.status.toLowerCase() == "draft" && data.orderBy == $("#current-user-nickname").val()) {
                             if (user_access.canDelete) {
                                 actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                             }
@@ -87,12 +87,12 @@
             ],
             order: [[2, "desc"]],
             createdRow: function (row, data, dataIndex) {
-                if (data.status == 'Resubmitted') {
+                if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('text-muted');
                 }
-                if (data.status == 'Disapproved') {
+                if (data.status.toLowerCase() == 'disapproved') {
                     $(row).find('td:eq(4)').addClass('text-danger');
-                } else if (data.status == 'Approved') {
+                } else if (data.status.toLowerCase() == 'approved') {
                     $(row).find('td:eq(4)').addClass('text-success');
                 }
             }

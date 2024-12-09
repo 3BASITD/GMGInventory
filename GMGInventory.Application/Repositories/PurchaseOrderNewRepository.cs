@@ -25,7 +25,7 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-      
+
 
         public async Task<IList<JsonOrderTypeOptionsModel>> GetTypeOptions(int? SelectedId)
         {
@@ -60,7 +60,7 @@ namespace GMGInventory.Application.Repositories
             return await context.PurchaseRequests
                                 .Include(s => s.Status)
                                 .Where(s => s.TypeId == RequestTypeId
-                                         && s.Status.Name == "Approved")
+                                         && s.Status.Name.ToLower() == "approved")
                                 .Select(s => new JsonOptionsModel
                                 {
                                     Id = s.Id.ToString(),
@@ -87,12 +87,12 @@ namespace GMGInventory.Application.Repositories
                                     Quantity = s.Quantity,
                                     Unit = s.Unit.Name,
                                     UnitId = s.Unit.Id,
-                                    //Served = context.PurchaseOrderNewLineItems
-                                    //                .Where(a => a.ItemId == s.ItemId
-                                    //                         && a.ItemDescription == s.ItemDescription
-                                    //                         && a.PurchaseOrder.Status.Name == "Approved")
-                                    //                .Select(a => a.Quantity)
-                                    //                .Sum(),
+                                    Served = context.PurchaseOrderNewLineItems
+                                                    .Include(s => s.PurchaseOrder).ThenInclude(s => s.Status)
+                                                    .Where(a => a.RequestItemId == s.Id
+                                                             && a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                                    .Select(a => a.Quantity)
+                                                    .Sum(),
                                     Selected = SelectedId != null && s.Id == SelectedId
                                 })
                                 .OrderBy(s => s.Served)
@@ -257,9 +257,9 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PurchaseOrderLineItemVM>> GetItemListAsync(int purchaseOrderId)
         {
             var orderVM = from order in context.PurchaseOrderNewLineItems
-                                               //.Include(s => s.PurchaseRequest)
-                                               //.Include(s => s.Item)
-                                               //.Include(s => s.Unit)
+                              //.Include(s => s.PurchaseRequest)
+                              //.Include(s => s.Item)
+                              //.Include(s => s.Unit)
                           where order.PurchaseOrderId == purchaseOrderId
                           select new PurchaseOrderLineItemVM
                           {

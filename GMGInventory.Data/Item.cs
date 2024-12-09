@@ -13,10 +13,7 @@ namespace GMGInventory.Data
             this.PackReturnLineItems = new HashSet<PackReturnLineItem>();
             this.PhysicalCountHistories = new HashSet<PhysicalCountHistory>();
             this.PurchaseOrderLineItems = new HashSet<PurchaseOrderLineItem>();
-            this.PurchaseOrderNewLineItems = new HashSet<PurchaseOrderNewLineItem>();
             this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
-            this.PurchaseReceivingLineItems = new HashSet<PurchaseReceivingLineItem>();
-            this.PurchaseReturnLineItems = new HashSet<PurchaseReturnNewLineItem>();
             this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
             this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>(); 
             this.StockCards = new HashSet<StockCard>();
@@ -70,10 +67,7 @@ namespace GMGInventory.Data
         public ICollection<PackReturnLineItem> PackReturnLineItems { get; set; }
         public ICollection<PhysicalCountHistory> PhysicalCountHistories { get; set; }
         public ICollection<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
-        public ICollection<PurchaseOrderNewLineItem> PurchaseOrderNewLineItems { get; set; }
         public ICollection<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }
-        public ICollection<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }
-        public ICollection<PurchaseReturnNewLineItem> PurchaseReturnLineItems { get; set; }
         public ICollection<SalesOrderLineItem> SalesOrderLineItems { get; set; }
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
         public ICollection<StockCard> StockCards { get; set; }
