@@ -94,7 +94,7 @@ namespace GMGInventory.Application.Repositories
                              ContactPerson = supplier.ContactPerson,
                              RegionName = region.Name,
                              RegionId = supplier.RegionId,
-                             Terms = supplier.Terms,
+                             Terms = supplier.Term.Name,
                              PriceList = supplier.PriceList,
                              CurrencyId = supplier.CurrencyId,
                              CurrencyName = supplier.Currency.Name,
@@ -273,7 +273,7 @@ namespace GMGInventory.Application.Repositories
                 OfficeTelNo = supplierVM.OfficeTelNo + "",
                 ContactPerson = supplierVM.ContactPerson + "",
                 RegionId = supplierVM.RegionId,
-                Terms = supplierVM.Terms + "",
+                TermId = 0,// supplierVM.Terms + "",
                 PriceList = supplierVM.PriceList,
                 CurrencyId = supplierVM.CurrencyId,
                 BusinessStyleId  = supplierVM.BusinessStyleId,
@@ -303,7 +303,7 @@ namespace GMGInventory.Application.Repositories
             supplier.OfficeTelNo = supplierVM.OfficeTelNo + "";
             supplier.ContactPerson = supplierVM.ContactPerson + "";
             supplier.RegionId = supplierVM.RegionId;
-            supplier.Terms = supplierVM.Terms + "";
+            supplier.TermId = 0;// supplierVM.Terms;
             supplier.PriceList = supplierVM.PriceList;
             supplier.CurrencyId = supplierVM.CurrencyId;
             supplier.BusinessStyleId  = supplierVM.BusinessStyleId;

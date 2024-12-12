@@ -19,7 +19,7 @@
                     <span class="fas fa-print"></span> Print
                 </button>
             }
-            @if (Model.Status == "Draft")
+            @if (Model.Status.ToLower() == "draft")
             {
                 @if (userAccess.CanEdit)
                 {
@@ -34,7 +34,7 @@
                     </button>
                 }
             }
-            else if (Model.Status == "Submitted"
+            else if (Model.Status.ToLower() == "submitted"
             && string.IsNullOrWhiteSpace(Model.ApprovedBy))
             {
                 @if (userAccess.CanApproveDisapprove)
@@ -47,7 +47,7 @@
                     </button>
                 }
             }
-            else if (Model.Status == "Disapproved"
+            else if (Model.Status.ToLower() == "disapproved"
             && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy)
             && Model?.ResubmitId == null)
             {
@@ -155,7 +155,11 @@
                     </b>
                 </p>
             </div>
-            @if (Model?.Type == "Non-Automotive" || Model?.Type == "Local Purchase Order" || Model?.Type == "International Purchase Order")
+            @if (new[] {
+            "non-automotive",
+            "local purchase order",
+            "international purchase order"
+            }.Contains(Model?.Type?.ToLower()))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -188,7 +192,10 @@
                     </b>
                 </p>
             </div>
-            @if (Model?.Type == "Local Purchase Order" || Model?.Type == "International Purchase Order")
+            @if (new[] {
+            "local purchase order",
+            "international purchase order"
+            }.Contains(Model?.Type?.ToLower()))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -299,7 +306,7 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Purchase Request Item(s)</span>
-                        @if (Model!.Status == "Draft" && userAccess.CanAdd)
+                        @if (Model!.Status.ToLower() == "draft" && userAccess.CanAdd)
                         {
                             <div class="card-tools">
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -433,8 +440,7 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var po_status = @Json.Serialize(Model?.Status);
-        var order_type = @Json.Serialize(Model?.Type);
-        var order_type_id = @Json.Serialize(Model?.TypeId);
+        var request_type_id = @Json.Serialize(Model?.RequestTypeId);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -455,7 +461,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        if (po_status == "Draft") {
+                        if (po_status.toLowerCase() == "draft") {
                             actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
                             actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
                             actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
@@ -487,7 +493,7 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (po_status == "Draft") {
+                        if (po_status.toLowerCase() == "draft") {
                             if (data.quantityD > data.unorderedQuantityD) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.unorderedQuantity + ' unordered quantity.</label>';
                             } else {
@@ -503,7 +509,7 @@
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (po_status == "Draft") {
+                        if (po_status.toLowerCase() == "draft") {
                             return '<input type="number" min="0" max="1999999" step="0.01" value="' + data.unitCostD + '" class="form-control form-control-sm cost" style="width: 100%;" />';
                         } else {
                             return data.unitCost;
@@ -555,7 +561,7 @@
                     var newLineNumber = currentLineNumber - 1;
 
                     var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
-                        return itemDT.row(index).data().lineNumber === newLineNumber;
+                        return itemDT.row(index).data().lineNumber == newLineNumber;
                     });
 
                     if (targetRowIndex != undefined) {
@@ -618,7 +624,7 @@
                 type: "POST",
                 url: "@Url.Action("GetPurchaseRequestOptions")",
                 data: {
-                    OrderTypeId: order_type_id
+                    RequestTypeId: request_type_id
                 },
                 success: function (data, status, xhr) {
                     $("#add-pr-number").select2({
@@ -836,7 +842,7 @@
                 var items = itemDT.data();
                 if (items.length == 0) {
                     toastr.warning("No item to request. Add an item to the list to continue", "Warning");
-                } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
                 } else {
                     $.ajax({
@@ -900,7 +906,7 @@
                         }
                     }
                 }).then((confirm) => {
-                    if (confirm !== null) {
+                    if (confirm != null) {
                         $.ajax({
                             url: "@Url.Action("DisapproveJson")",
                             type: "POST",

@@ -85,14 +85,15 @@
                     }
                 }
             ],
-            order: [[2, "desc"]],
+            order: [[5, "desc"]],
             createdRow: function (row, data, dataIndex) {
                 if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('text-muted');
-                }
-                if (data.status.toLowerCase() == 'disapproved') {
+                } else if (data.status.toLowerCase() == 'disapproved') {
+                    $(row).addClass('table-danger');
                     $(row).find('td:eq(4)').addClass('text-danger');
                 } else if (data.status.toLowerCase() == 'approved') {
+                    $(row).addClass('table-success');
                     $(row).find('td:eq(4)').addClass('text-success');
                 }
             }

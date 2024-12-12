@@ -15,5 +15,13 @@
                  ? Nickname
                  : (FirstName + " " + LastName);
         }
+        public static string GetInnermostExceptionMessage(Exception ex)
+        {
+            while (ex.InnerException != null)
+            {
+                ex = ex.InnerException;
+            }
+            return ex.Message;
+        }
     }
 }

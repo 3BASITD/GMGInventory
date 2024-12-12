@@ -91,12 +91,13 @@
             ],
             order: [[2, "desc"]],
             createdRow: function (row, data, dataIndex) {
-                if (data.status == 'Resubmitted') {
+                if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('text-muted');
-                }
-                if (data.status == 'Disapproved') {
+                } else if (data.status.toLowerCase() == 'disapproved') {
+                    $(row).addClass('table-danger');
                     $(row).find('td:eq(5)').addClass('text-danger');
-                } else if (data.status == 'Approved') {
+                } else if (data.status.toLowerCase() == 'approved') {
+                    $(row).addClass('table-success');
                     $(row).find('td:eq(5)').addClass('text-success');
                 }
             }

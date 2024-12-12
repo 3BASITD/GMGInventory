@@ -45,8 +45,9 @@ namespace GMGInventory.Data
         public int BusinessStyleId { get; set; }
         public BusinessStyle BusinessStyle { get; set; }
 
-        [Column(TypeName = "nvarchar(100)")]
-        public string Terms { get; set; }
+        [ForeignKey("TermId")]
+        public int TermId { get; set; }
+        public CreditTerm Term { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string PriceList { get; set; }

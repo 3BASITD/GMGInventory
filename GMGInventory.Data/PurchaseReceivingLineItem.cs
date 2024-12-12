@@ -14,7 +14,7 @@ namespace GMGInventory.Data
         public virtual PurchaseReceiving PurchaseReceiving { get; set; }
 
         [ForeignKey("OrderItemId")]
-        public int? OrderItemId { get; set; }
+        public int OrderItemId { get; set; }
         public virtual PurchaseOrderNewLineItem OrderItem { get; set; }
 
         public int Quantity { get; set; }

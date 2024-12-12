@@ -24,9 +24,9 @@ namespace GMGInventory.Controllers
             return Json(await orderRepository.GetDeliveryModeOptions(SelectedId));
         }
 
-        public async Task<IActionResult> GetPurchaseRequestOptions(int OrderTypeId, int? SelectedId)
+        public async Task<IActionResult> GetPurchaseRequestOptions(int RequestTypeId, int? SelectedId)
         {
-            return Json(await orderRepository.GetPurchaseRequestOptions(OrderTypeId, SelectedId));
+            return Json(await orderRepository.GetPurchaseRequestOptions(RequestTypeId, SelectedId));
         }
 
         public async Task<IActionResult> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
@@ -101,7 +101,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var request = await orderRepository.GetDetails(Id ?? 0);
-            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status != "Disapproved"))
+            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status.ToLower() != "disapproved"))
             {
                 return RedirectToAction("Details", new { Id });
             }
