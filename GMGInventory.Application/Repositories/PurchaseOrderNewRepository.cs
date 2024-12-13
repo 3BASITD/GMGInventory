@@ -1,11 +1,10 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
@@ -118,12 +117,7 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<PurchaseOrderNewVM>> GetListAsync()
         {
-            var orderVM = (from order in context.PurchaseOrderNews
-                                                .Include(s => s.Type)
-                                                .Include(s => s.Supplier)
-                                                .Include(s => s.Term)
-                                                .Include(s => s.DeliveryMode)
-                                                .Include(s => s.Status)
+            var orderVM = from order in context.PurchaseOrderNews
                                //join userc in userManager.Users on order.UserCreated equals userc.Id
                                //join userm in userManager.Users on order.UserModified equals userm.Id into m
                                //from um in m.DefaultIfEmpty()
@@ -137,7 +131,7 @@ namespace GMGInventory.Application.Repositories
                                DeliveryMode = order.DeliveryMode.Code,
                                Status = order.Status.Code,
                                OrderDateD = order.OrderDate
-                           });
+                           };
             return await orderVM.ToListAsync();
         }
 
@@ -205,17 +199,16 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
         {
             var details = from order in context.PurchaseOrderNews
-                                               .Include(s => s.Type)
-                                               .Include(s => s.Supplier)
-                                               .Include(s => s.Term)
-                                               .Include(s => s.DeliveryMode)
-                                               .Include(s => s.DeliveryAddress)
-                                               .Include(s => s.Status)
+                                               //.Include(s => s.Type)
+                                               //.Include(s => s.Supplier)
+                                               //.Include(s => s.Term)
+                                               //.Include(s => s.DeliveryMode)
+                                               //.Include(s => s.DeliveryAddress)
+                                               //.Include(s => s.Status)
                           let resubmitfrom = context.PurchaseOrderNews
                                                     .Where(s => s.ResubmitId == order.Id)
                                                     .FirstOrDefault()
-                          join userc in userManager.Users on order.UserCreated equals userc.Id into c
-                          from userc in c.DefaultIfEmpty()
+                          join userc in userManager.Users on order.UserCreated equals userc.Id
                           join userm in userManager.Users on order.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
                           where order.Id == orderId
@@ -225,6 +218,8 @@ namespace GMGInventory.Application.Repositories
                               DocumentNumber = order.DocumentNumber,
                               Type = order.Type.Name,
                               TypeId = order.Type.Id,
+                              RequestType = order.Type.RequestType.Name,
+                              RequestTypeId = order.Type.RequestType.Id,
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
                               Term = order.Term.Name,
@@ -248,7 +243,7 @@ namespace GMGInventory.Application.Repositories
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
                               UserCreated = userc.FirstName + " " + userc.LastName,
                               DateCreatedD = order.DateCreated,
-                              UserModified = userm.FirstName + " " + userm.LastName,
+                              UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
                               DateModifiedD = order.DateModified
                           };
             return await details.FirstOrDefaultAsync();
@@ -268,6 +263,7 @@ namespace GMGInventory.Application.Repositories
                               LineNumber = order.LineNumber,
                               PurchaseRequestId = order.RequestItem.PurchaseRequest.Id,
                               PurchaseRequestNumber = order.RequestItem.PurchaseRequest.DocumentNumber,
+                              RequestItemId = order.RequestItem.Id,
                               ItemId = order.RequestItem.Item.Id,
                               ItemCode = order.RequestItem.Item.Code,
                               ItemPartNumber = string.IsNullOrWhiteSpace(order.RequestItem.Item.PartNumber) ? "-" : order.RequestItem.Item.PartNumber,
@@ -279,13 +275,13 @@ namespace GMGInventory.Application.Repositories
                               ServedQuantityD = context.PurchaseOrderNewLineItems
                                                        .Where(a => a.RequestItem.ItemId == order.RequestItem.ItemId
                                                                 && a.RequestItem.ItemDescription == order.RequestItem.ItemDescription
-                                                                && a.PurchaseOrder.Status.Name == "Approved")
+                                                                && a.PurchaseOrder.Status.Name.ToLower() == "approved")
                                                        .Select(a => a.Quantity)
                                                        .Sum(),
                               RequestQuantityD = context.PurchaseRequestLineItems
                                                         .Where(a => a.ItemId == order.RequestItem.ItemId
                                                                  && a.ItemDescription == order.RequestItem.ItemDescription
-                                                                 && a.PurchaseRequest.Status.Name == "Approved"
+                                                                 && a.PurchaseRequest.Status.Name.ToLower() == "approved"
                                                                  && a.PurchaseRequest.Id == order.RequestItem.PurchaseRequest.Id)
                                                         .Select(a => a.Quantity)
                                                         .Sum(),
@@ -406,8 +402,7 @@ namespace GMGInventory.Application.Repositories
                         OrderDate = form.DateOrdered,
                         CanvasSummaryReference = form.Reference + "",
                         Remarks = form.Remarks,
-                        StatusId = status.Id,
-                        ResubmitId = form.ResubmitId
+                        StatusId = status.Id
                     };
                     await context.PurchaseOrderNews.AddAsync(order);
                     await context.SaveChangesAsync(currentUserId);
@@ -415,7 +410,7 @@ namespace GMGInventory.Application.Repositories
                     if (previousOrder != null)
                     {
                         var statusResubmitted = await context.PurchaseStatuses
-                                                             .Where(s => s.Name == "Resubmitted")
+                                                             .Where(s => s.Name.ToLower() == "resubmitted")
                                                              .FirstOrDefaultAsync();
                         previousOrder.ResubmitId = order.Id;
                         if (statusResubmitted != null)
@@ -429,7 +424,7 @@ namespace GMGInventory.Application.Repositories
                     await SaveItemsAsync(Items, order.Id);
 
                     response.Status = "Success";
-                    response.Message = form.Status == "Draft" ? "Purchase order saved as draft." : "Purchase order successfully submitted.";
+                    response.Message = form.Status.ToLower() == "draft" ? "Purchase order saved as draft." : "Purchase order successfully submitted.";
                     response.NewRow = order.Id;
                 }
             }
@@ -454,7 +449,7 @@ namespace GMGInventory.Application.Repositories
             {
                 if (!string.IsNullOrWhiteSpace(status))
                 {
-                    int statusId = context.PurchaseStatuses.Where(s => s.Name == status).Select(s => s.Id).First();
+                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).First();
                     order.StatusId = statusId;
                 }
 
@@ -469,12 +464,9 @@ namespace GMGInventory.Application.Repositories
                                        .Select(s => new PurchaseOrderNewLineItem
                                        {
                                            PurchaseOrderId = orderId,
+                                           RequestItemId = s.RequestItemId,
                                            LineNumber = s.LineNumber,
-                                           //PurchaseRequestId = s.PurchaseRequestId,
-                                           //ItemId = s.ItemId,
-                                           //ItemDescription = s.ItemDescription,
                                            Quantity = s.QuantityD,
-                                           //UnitId = s.UnitId,
                                            UnitCost = s.UnitCostD
                                        });
                     context.PurchaseOrderNewLineItems.AddRange(newitems);
@@ -486,6 +478,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         // update all available in db
                         var dbitem = await citems.Where(s => s.Id == ei.Id).FirstAsync();
+                        dbitem.RequestItemId = ei.RequestItemId;
                         dbitem.LineNumber = ei.LineNumber;
                         dbitem.Quantity = ei.QuantityD;
                         dbitem.UnitCost = ei.UnitCostD;
@@ -508,7 +501,7 @@ namespace GMGInventory.Application.Repositories
                 catch (Exception ex)
                 {
                     response.Status = "Error";
-                    response.Message = ex.Message;
+                    response.Message = SystemFormat.GetInnermostExceptionMessage(ex);
                 }
             }
             return response;
@@ -527,7 +520,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.PurchaseStatuses.Where(s => s.Name == "Approved").Select(s => s.Id).First();
+                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
 
                 if (!string.IsNullOrWhiteSpace(order.ApproverId))
                 {
@@ -563,7 +556,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.PurchaseStatuses.Where(s => s.Name == "Disapproved").Select(s => s.Id).First();
+                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
                 if (!string.IsNullOrWhiteSpace(order.DisapproverId))
                 {
@@ -601,7 +594,7 @@ namespace GMGInventory.Application.Repositories
                     response.Status = "Error";
                     response.Message = "Purchase request not found.";
                 }
-                else if (existingRequest.Status.Name != "Draft")
+                else if (existingRequest.Status.Name.ToLower() != "draft")
                 {
                     response.Status = "Error";
                     response.Message = "Only draft can be deleted.";

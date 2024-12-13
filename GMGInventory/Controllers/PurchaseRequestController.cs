@@ -1,9 +1,6 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -99,7 +96,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var request = await requestRepository.GetDetails(Id ?? 0);
-            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status != "Disapproved"))
+            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status.ToLower() != "disapproved"))
             {
                 return RedirectToAction("Details", new { Id });
             }

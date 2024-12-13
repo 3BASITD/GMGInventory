@@ -343,7 +343,7 @@
                 var newLineNumber = currentLineNumber - 1;
 
                 var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
-                    return itemDT.row(index).data().lineNumber === newLineNumber;
+                    return itemDT.row(index).data().lineNumber == newLineNumber;
                 });
 
                 if (targetRowIndex != undefined) {
@@ -464,35 +464,30 @@
                 currentType = selectedType;
                 currentPurpose = selectedPurpose;
             }
-            var typeText = $("#request-type").select2("data")[0]?.text || "";
-            var purposeText = $("#request-purpose").select2("data")[0]?.text || "";
-            $(".request-purpose-container").toggle(typeText != "Maintenance & Repair");
-            $(".request-purpose-definition-container").toggle(typeText == "Maintenance & Repair");
-            if (typeText == "Automotive") {
-                $(".request-region-container").toggle(true);
-                $("#request-region").val(null).trigger("change");
-            } else {
-                $(".request-region-container").toggle(false);
-                var firstOptionValue = $("#request-region option:first").val();
-                $("#request-region").val(firstOptionValue).trigger("change");
-            }
+            var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
+            var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
+            $(".request-purpose-container").toggle(typeText != "maintenance & repair");
+            $(".request-purpose-definition-container").toggle(typeText == "maintenance & repair");
+            $("#request-region").val(null).trigger("change");
+            $(".request-region-container").toggle(typeText == "automotive" && purposeText == "rush order");
+
             updateColumnVisibility();
             loadAllItemsOptions();
         }
 
         var columnVisibilityMap = {
-            "Automotive_Rush Order": [true, true, true, true, true, true, true, false],
-            "Automotive_Stocking": [false, true, true, true, true, true, true, false],
-            "Non-Automotive_Office Supplies": [false, true, false, true, true, true, true, false],
-            "Non-Automotive_One-Time Purchase": [false, false, false, true, false, true, true, true],
-            "Maintenance & Repair_": [false, false, false, true, false, true, true, true]
+            "automotive_rush order": [true, true, true, true, true, true, true, false],
+            "automotive_stocking": [false, true, true, true, true, true, true, false],
+            "non-automotive_office supplies": [false, true, false, true, true, true, true, false],
+            "non-automotive_one-time purchase": [false, false, false, true, false, true, true, true],
+            "maintenance & repair_": [false, false, false, true, false, true, true, true]
         };
 
         function updateColumnVisibility() {
             var typeText = $("#request-type").select2("data")[0]?.text || "";
             var purposeText = $("#request-purpose").select2("data")[0]?.text || "";
 
-            var key = typeText + "_" + purposeText;
+            var key = (typeText + "_" + purposeText).toLowerCase();
 
             if (columnVisibilityMap[key]) {
                 columnVisibilityMap[key].forEach(function (visible, index) {
@@ -524,7 +519,7 @@
             var typeText = $("#request-type").select2("data")[0]?.text || "";
             var purposeText = $("#request-purpose").select2("data")[0]?.text || "";
 
-            var key = typeText + "_" + purposeText;
+            var key = (typeText + "_" + purposeText).toLowerCase();
             if (name == "SONumber") return columnVisibilityMap[key][0];
             else if (name == "Code") return columnVisibilityMap[key][1];
             else if (name == "Name") return columnVisibilityMap[key][3];
@@ -562,12 +557,13 @@
                     if (repo.loading) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Item")",
                     dataType: 'json',
                     type: "POST",
+                    delay: 500,
                     data: function (params) {
                         return {
                             search: params.term,
@@ -611,20 +607,20 @@
                     if (repo.loading) {
                         return repo.text;
                     }
-                    console.log(repo);
                     if (repo.quantity == 0) {
                         return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
-                            (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                            (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
                             "</span>");
                     } else {
                         return $("<strong>" + repo.text + "</strong> " +
-                            (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                            (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                     }
                 },
                 ajax: {
                     url: "@Url.Action("GetUnservedOptions", "Item")",
                     dataType: 'json',
                     type: "POST",
+                    delay: 500,
                     data: function (params) {
                         return {
                             search: params.term,
@@ -680,6 +676,7 @@
                 url: "@Url.Action("GetSalesOrderOptions", "SalesOrder")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,
@@ -729,6 +726,7 @@
             $("#add-quantity").val("0");
             $("#add-stock").val("0");
             $("#add-unit").val("");
+            $("#add-unit2").val("").trigger("change");
             $("#add-unit").data("Id", "");
             $("#add-purpose").val("");
         }
@@ -806,13 +804,14 @@
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
+                toastr.warning($("#add-name").val() + " has already been added", "Duplicate");
             } else {
+                var is_for_maintenance_repair = $("#request-type").select2("data")[0]?.text.toLowerCase() == "maintenance & repair";
                 itemDT.row.add({
-                    itemCode: $("#add-code").select2("data")[0].text,
+                    itemCode: is_for_maintenance_repair ? "" : $("#add-code").select2("data")[0].text,
                     itemDescription: $("#add-name").val(),
                     itemPartNumber: $("#add-part").val(),
-                    itemId: $("#add-code").select2("data")[0].id,
+                    itemId: is_for_maintenance_repair ? undefined : $("#add-code").select2("data")[0].id,
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
                     purchaseRequestId: 0,
                     purpose: $("#add-purpose").val(),
@@ -856,19 +855,19 @@
                 },
                 Purpose: {
                     required: function () {
-                        return $("#request-type").select2("data")[0]?.text != "Maintenance & Repair";
+                        return $("#request-type").select2("data")[0]?.text.toLowerCase() != "maintenance & repair";
                     }
                 },
                 PurposeDefinition: {
                     required: function () {
-                        return $("#request-type").select2("data")[0]?.text == "Maintenance & Repair";
+                        return $("#request-type").select2("data")[0]?.text.toLowerCase() == "maintenance & repair";
                     },
                     maxlength: 250
                 },
                 Region: {
                     required: function () {
-                        return $("#request-type").select2("data")[0]?.text == "Automotive"
-                            && $("#request-purpose").select2("data")[0]?.text == "Rush Order";
+                        return $("#request-type").select2("data")[0]?.text.toLowerCase() == "automotive"
+                            && $("#request-purpose").select2("data")[0]?.text.toLowerCase() == "rush order";
                     }
                 },
                 DateRequested: {
@@ -924,7 +923,7 @@
             var items = itemDT.data();
             if (items.length == 0) {
                 toastr.warning("No item to request. Add an item to the list to continue", "Warning");
-            } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
+            } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
             } else {
                 $.ajax({

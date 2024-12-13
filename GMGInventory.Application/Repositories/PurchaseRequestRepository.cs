@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -332,11 +333,21 @@ namespace GMGInventory.Application.Repositories
                         await context.SaveChangesAsync(currentUserId);
                     }
 
-                    await SaveItemsAsync(Items, request.Id);
+                    ResponseModel itemsResponse = await SaveItemsAsync(Items, request.Id);
+                    if (itemsResponse.Status == "Error")
+                    {
+                        context.PurchaseRequests.Remove(request);
+                        await context.SaveChangesAsync();
 
-                    response.Status = "Success";
-                    response.Message = form.Status == "Draft" ? "Purchase request saved as draft." : "Purchase request successfully submitted.";
-                    response.NewRow = request.Id;
+                        response.Status = itemsResponse.Status;
+                        response.Message = itemsResponse.Message;
+                    }
+                    else
+                    {
+                        response.Status = "Success";
+                        response.Message = form.Status == "Draft" ? "Purchase request saved as draft." : "Purchase request successfully submitted.";
+                        response.NewRow = request.Id;
+                    }
                 }
             }
 
@@ -434,7 +445,7 @@ namespace GMGInventory.Application.Repositories
                 catch (Exception ex)
                 {
                     response.Status = "Error";
-                    response.Message = ex.Message;
+                    response.Message = SystemFormat.GetInnermostExceptionMessage(ex);
                 }
             }
             return response;

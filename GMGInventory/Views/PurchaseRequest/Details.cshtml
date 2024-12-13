@@ -19,7 +19,7 @@
                     <span class="fas fa-print"></span> Print
                 </button>
             }
-            @if (Model.Status == "Draft")
+            @if (Model.Status.ToLower() == "draft")
             {
                 @if (userAccess.CanEdit)
                 {
@@ -34,9 +34,9 @@
                     </button>
                 }
             }
-            else if (Model.Status == "Submitted"
+            else if (Model.Status.ToLower() == "submitted"
             && (string.IsNullOrWhiteSpace(Model.ApprovedBy1)
-            || (string.IsNullOrWhiteSpace(Model.ApprovedBy2) && Model.Type == "Non-Automotive")))
+            || (string.IsNullOrWhiteSpace(Model.ApprovedBy2) && Model.Type.ToLower() == "non-automotive")))
             {
                 @if (userAccess.CanApproveDisapprove)
                 {
@@ -48,7 +48,7 @@
                     </button>
                 }
             }
-            else if (Model.Status == "Disapproved"
+            else if (Model.Status.ToLower() == "disapproved"
             && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy)
             && Model?.ResubmitId == null)
             {
@@ -59,7 +59,7 @@
                     </a>
                 }
             }
-            else if (Model.Status == "Approved")
+            else if (Model.Status.ToLower() == "approved")
             {
                 <a href="@Url.Action("Create", "PurchaseOrder")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
                     <span class="fas fa-box-open"></span> Start Order
@@ -132,7 +132,7 @@
                     </b>
                 </p>
             </div>
-            @if (Model?.Type == "Automotive")
+            @if (Model?.Type.ToLower() == "automotive" && Model?.Purpose.ToLower() == "rush order")
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -266,7 +266,7 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Purchase Request Item(s)</span>
-                        @if (Model!.Status == "Draft" && userAccess.CanAdd)
+                        @if (Model!.Status.ToLower() == "draft" && userAccess.CanAdd)
                         {
                             <div class="card-tools">
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -411,7 +411,7 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var request_type = @Json.Serialize(Model?.Type);
-        var request_purpose = request_type == "Maintenance & Repair" ? "" : @(Json.Serialize(Model?.Purpose ?? ""));
+        var request_purpose = request_type.toLowerCase() == "maintenance & repair" ? "" : @(Json.Serialize(Model?.Purpose ?? ""));
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -432,7 +432,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
+                        if (user_access.canEdit && $("#request-status").text().trim().toLowerCase() == "draft") {
                             actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
                             actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
                             actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
@@ -458,7 +458,7 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
+                        if (user_access.canEdit && $("#request-status").text().trim().toLowerCase() == "draft") {
                             return '<input type="number" min="0" max="1999999" step="1" value="' + data.stockOnHandD + '" class="form-control form-control-sm stock" style="width: 100%;" />';
                         } else {
                             return (data.stockOnHand == 0 ? "<span class='text-danger'>" : "")
@@ -471,7 +471,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if (user_access.canEdit && $("#request-status").text().trim() == "Draft") {
+                        if (user_access.canEdit && $("#request-status").text().trim().toLowerCase() == "draft") {
                             return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
                             return data.quantity
@@ -525,7 +525,7 @@
                     var newLineNumber = currentLineNumber - 1;
 
                     var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
-                        return itemDT.row(index).data().lineNumber === newLineNumber;
+                        return itemDT.row(index).data().lineNumber == newLineNumber;
                     });
 
                     if (targetRowIndex != undefined) {
@@ -570,15 +570,15 @@
         });
 
         var columnVisibilityMap = {
-            "Automotive_Rush Order": [true, true, true, true, true, true, true, false],
-            "Automotive_Stocking": [false, true, true, true, true, true, true, false],
-            "Non-Automotive_Office Supplies": [false, true, false, true, true, true, true, false],
-            "Non-Automotive_One-Time Purchase": [false, false, false, true, false, true, true, true],
-            "Maintenance & Repair_": [false, false, false, true, false, true, true, true]
+            "automotive_rush order": [true, true, true, true, true, true, true, false],
+            "automotive_stocking": [false, true, true, true, true, true, true, false],
+            "non-automotive_office supplies": [false, true, false, true, true, true, true, false],
+            "non-automotive_one-time purchase": [false, false, false, true, false, true, true, true],
+            "maintenance & repair_": [false, false, false, true, false, true, true, true]
         };
 
         function updateColumnVisibility() {
-            var key = request_type + "_" + request_purpose;
+            var key = (request_type + "_" + request_purpose).toLowerCase();
 
             if (columnVisibilityMap[key]) {
                 columnVisibilityMap[key].forEach(function (visible, index) {
@@ -607,7 +607,7 @@
         }
 
         function checkIfRequired(name) {
-            var key = request_type + "_" + request_purpose;
+            var key = (request_type + "_" + request_purpose).toLowerCase();
             if (name == "SONumber") return columnVisibilityMap[key][0];
             else if (name == "Code") return columnVisibilityMap[key][1];
             else if (name == "Name") return columnVisibilityMap[key][3];
@@ -632,7 +632,7 @@
                         if (repo.loading) {
                             return repo.text;
                         }
-                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                     },
                     ajax: {
                         url: "@Url.Action("GetOptions", "Item")",
@@ -684,11 +684,11 @@
                         console.log(repo);
                         if (repo.quantity == 0) {
                             return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
-                                (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                                (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
                                 "</span>");
                         } else {
                             return $("<strong>" + repo.text + "</strong> " +
-                                (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                                (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                         }
                     },
                     ajax: {
@@ -799,6 +799,7 @@
                 $("#add-quantity").val("0");
                 $("#add-stock").text("0");
                 $("#add-unit").val("");
+                $("#add-unit2").val("").trigger("change");
                 $("#add-unit").data("Id", "");
                 $("#add-purpose").val("");
             }
@@ -806,7 +807,7 @@
             function ComputeTotalQuantity() {
                 total_quantity = 0;
                 itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    if ($("#request-status").text().trim() == "Draft") {
+                    if ($("#request-status").text().trim().toLowerCase() == "draft") {
                         total_quantity += parseInt($(this.node()).find(".quantity").val());
                     } else {
                         total_quantity += this.data().quantityD;
@@ -930,7 +931,7 @@
                 var items = itemDT.data();
                 if (items.length == 0) {
                     toastr.warning("No item to request. Add an item to the list to continue", "Warning");
-                } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
                 } else {
                     $.ajax({
@@ -994,7 +995,7 @@
                         }
                     }
                 }).then((confirm) => {
-                    if (confirm !== null) {
+                    if (confirm != null) {
                         $.ajax({
                             url: "@Url.Action("DisapproveJson")",
                             type: "POST",

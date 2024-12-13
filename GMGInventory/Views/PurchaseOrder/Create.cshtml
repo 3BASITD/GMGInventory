@@ -379,7 +379,7 @@
                 var newLineNumber = currentLineNumber - 1;
 
                 var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
-                    return itemDT.row(index).data().lineNumber === newLineNumber;
+                    return itemDT.row(index).data().lineNumber == newLineNumber;
                 });
 
                 if (targetRowIndex != undefined) {
@@ -439,7 +439,7 @@
 
                 setTimeout(function () {
                     var restoredRow = $(itemDT.row(function (idx, data) {
-                        return data.lineNumber === lineNumber;
+                        return data.lineNumber == lineNumber;
                     }).node());
                     if (restoredRow) {
                         var restoredInput = $(restoredRow).find("." + columnClass);
@@ -518,20 +518,20 @@
             $("#order-mode").val(defaultOption).trigger('change');
             $("#order-reference").val("");
 
-            var typeText = $("#order-type").select2("data")[0]?.text || "";
-            if (typeText == "Non-Automotive") {
+            var typeText = $("#order-type").select2("data")[0]?.text.toLowerCase() || "";
+            if (typeText == "non-automotive") {
                 $(".order-mode-container").toggle(true);
                 $(".order-reference-container").toggle(false);
+                itemDT.column(3).visible(true);
                 itemDT.column(4).visible(false);
-                itemDT.column(5).visible(true);
-            } else if (typeText == "Local Purchase Order" || typeText == "International Purchase Order") {
+            } else if (typeText == "local purchase order" || typeText == "international purchase order") {
                 $(".order-mode-container").toggle(true);
                 $(".order-reference-container").toggle(true);
+                itemDT.column(3).visible(false);
                 itemDT.column(4).visible(true);
-                itemDT.column(5).visible(false);
-            } else if (typeText == "Maintenance & Repair") {
+            } else if (typeText == "maintenance & repair") {
                 var deliveryOption = $("#order-mode").find('option').filter(function () {
-                    return $(this).text().toUpperCase() === "DELIVERY";
+                    return $(this).text().toLowerCase() == "delivery";
                 }).first();
 
                 if (deliveryOption.length) {
@@ -539,10 +539,9 @@
                 }
                 $(".order-mode-container").toggle(false);
                 $(".order-reference-container").toggle(false);
+                itemDT.column(3).visible(false);
                 itemDT.column(4).visible(false);
-                itemDT.column(5).visible(false);
             }
-            loadAllItemsOptions();
 
             loadPurchaseRequestOptions();
         }
@@ -563,7 +562,7 @@
                             if (repo.loading) {
                                 return repo.text;
                             }
-                            return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                            return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                         },
                         data: data
                     });
@@ -646,7 +645,7 @@
                             if (repo.loading) {
                                 return repo.text;
                             }
-                            return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                            return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                         },
                     });
                 }
@@ -662,8 +661,8 @@
                 type: "POST",
                 url: "@Url.Action("GetPurchaseRequestOptions")",
                 data: {
-                    OrderTypeId: function () {
-                        return $("#order-type").select2("data")[0].id;
+                    RequestTypeId: function () {
+                        return $("#order-type").select2("data")[0].requestTypeId;
                     }//,
                     //SelectedId: ???
                 },
@@ -681,6 +680,7 @@
                     }).on("select2:select", function () {
                         loadAllItemsOptions();
                     });
+                    loadAllItemsOptions();
                 }
             });
         }
@@ -779,13 +779,12 @@
         $(".createBtn").on("click", clearItemForm);
 
         function clearItemForm() {
-            //$("#add-pr-number").val(null).trigger("change");
             $("#add-code").val("");
             $("#add-part").val("");
-            //$("#add-name").html("");
             $("#add-name").val("").trigger("change");
             $("#add-quantity").val("0");
             $("#add-unit").val("");
+            $("#add-unit2").val("").trigger("change");
             $("#add-unit").data("Id", "");
             $("#add-unit-cost").val("0.00");
             $("#add-total-amount").val("0.00");
@@ -795,14 +794,14 @@
         var validateAdd = $("#form-item").validate({
             rules: {
                 PRNumber: {
-                    required: true// function () { return checkIfRequired("SONumber"); }
+                    required: true
                 },
                 Name: {
-                    required: true,// function () { return checkIfRequired("Name"); },
+                    required: true,
                     maxlength: 100
                 },
                 Quantity: {
-                    required: true,// function () { return checkIfRequired("Quantity"); },
+                    required: true,
                     number: true,
                     isNotZero: true,
                     max: function () {
@@ -810,7 +809,7 @@
                     }
                 },
                 UnitCost: {
-                    required: true,// function () { return checkIfRequired("Purpose"); },
+                    required: true,
                     number: true
                 }
             },
@@ -842,7 +841,6 @@
         });
 
         function AddItem() {
-            console.log("AddItem");
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
                 if (data.itemDescription == $("#add-name").select2("data")[0].text) {
@@ -858,6 +856,7 @@
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
                     purchaseRequestId: $("#add-pr-number").select2("data")[0].id,
                     purchaseRequestNumber: $("#add-pr-number").select2("data")[0].text,
+                    requestItemId: $("#add-name").select2("data")[0].id,
                     itemId: $("#add-name").select2("data")[0].itemId,
                     itemCode: $("#add-name").select2("data")[0].itemCode,
                     itemPartNumber: $("#add-name").select2("data")[0].partNumber,
@@ -903,7 +902,7 @@
                 },
                 DeliveryMode: {
                     required: function () {
-                        return $("#order-type").select2("data")[0]?.text != "Maintenance & Repair";
+                        return $("#order-type").select2("data")[0]?.text.toLowerCase() != "maintenance & repair";
                     }
                 },
                 DeliveryAddress: {
@@ -914,8 +913,8 @@
                 },
                 Reference: {
                     required: function () {
-                        return $("#order-type").select2("data")[0]?.text == "Local Purchase Order"
-                            || $("#order-type").select2("data")[0]?.text == "International Purchase Order";
+                        return $("#order-type").select2("data")[0]?.text.toLowerCase() == "local purchase order"
+                            || $("#order-type").select2("data")[0]?.text.toLowerCase() == "international purchase order";
                     },
                     maxlength: 50
                 },
@@ -968,7 +967,7 @@
             var items = itemDT.data();
             if (items.length == 0) {
                 toastr.warning("No item to order. Add an item to the list to continue", "Warning");
-            } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
+            } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't order an item with 0 quantity", "Warning");
             } else {
                 $.ajax({

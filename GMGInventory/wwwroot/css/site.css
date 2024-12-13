@@ -1,17 +1,5 @@
-/*html { -moz-transform: scale(1.0, 1.0); zoom: 1.0; zoom: 100%; }*/
-body {
-    -moz-transform: scale(1.0, 1.0);
-    zoom: 1.0;
-    zoom: 100%
-}
 
 @media only screen and (min-width: 992px) {
-    /*body {
-        -moz-transform: scale(0.9, 0.9);
-        zoom: 0.9;
-        zoom: 90%
-    }*/
-
     /*.text-sm, .input-group-sm > .btn, .input-group-sm > .form-control, .input-group-sm > .form-select, .input-group-sm > .input-group-text {
         font-size: .86rem !important;
     }*/
@@ -155,18 +143,6 @@ body {
 
 .main-header .sticked-hide {
     display: none;
-}
-
-.zoom-ignore {
-    zoom: 111%;
-    position: relative;
-    left: -5.5%;
-}
-
-.zoom-ignore-modal {
-    zoom: 111%;
-    position: relative;
-    padding-bottom: 50px;
 }
 
 .modal-backdrop {

@@ -16,7 +16,7 @@ namespace GMGInventory.Data
         public int LineNumber { get; set; }
 
         [ForeignKey("ItemId")]
-        public int? RequestItemId { get; set; }
+        public int RequestItemId { get; set; }
         public virtual PurchaseRequestLineItem RequestItem { get; set; }
 
         public int Quantity { get; set; }

@@ -8,6 +8,7 @@ namespace GMGInventory.Data
         {
             this.Customers = new HashSet<Customer>();
             this.PurchaseOrderNews = new HashSet<PurchaseOrderNew>();
+            this.Suppliers = new HashSet<Supplier>();
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -17,5 +18,6 @@ namespace GMGInventory.Data
 
         public ICollection<Customer> Customers { get; set; }
         public ICollection<PurchaseOrderNew> PurchaseOrderNews { get; set; }
+        public ICollection<Supplier> Suppliers { get; set; }
     }
 }

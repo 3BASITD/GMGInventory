@@ -45,6 +45,9 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseOrderNewDetailedVM : PurchaseOrderNewVM
     {
+        public string RequestType { get; set; }
+        public int RequestTypeId { get; set; }
+
         [Display(Name = "Currency")]
         public string Currency { get; set; }
         public int CurrencyId { get; set; }
