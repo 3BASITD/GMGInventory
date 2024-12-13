@@ -362,17 +362,21 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId)
         {
-            return await context.PurchaseOrderNews
-                                .Include(s => s.Status)
-                                .Where(s => s.Status.Name == "Approved")
-                                .Select(s => new JsonOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.DocumentNumber,
-                                    Selected = SelectedId != null && s.Id == SelectedId
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
+            var pos = from porder in context.PurchaseOrderNews
+
+                      let receiving = context.PurchaseReceivings
+                                            .Where(s => s.PurchaseOrderId == porder.Id)
+                                            .Select(s => s.Status.Name).FirstOrDefault()
+
+                      where porder.Status.Name == "Approved" && receiving != "Approved"
+                      select new JsonOptionsModel
+                      {
+                          Id = porder.Id.ToString(),
+                          Text = porder.DocumentNumber,
+                          Selected = SelectedId != null && porder.Id == SelectedId
+                      };
+                        
+            return await pos.OrderBy(s => s.Text).ToListAsync();
         }
 
         public async Task<ResponseModel> ApproveAsync(int receivingId)
