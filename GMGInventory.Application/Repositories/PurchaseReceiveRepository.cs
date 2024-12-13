@@ -64,14 +64,14 @@ namespace GMGInventory.Application.Repositories
                     s.Warehouse,
                     s.Status,
                     s.ReceiveDate
-                }.Any(a => a != null && a.Contains(form.SearchValue, StringComparison.CurrentCultureIgnoreCase)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumn.Contains("date", StringComparison.CurrentCultureIgnoreCase))
+                if (form.SortColumn.ToLower().Contains("date"))
                 {
                     if (form.SortColumnDirection == "asc")
                     {
@@ -202,7 +202,7 @@ namespace GMGInventory.Application.Repositories
                     s.ItemDescription,
                     s.Quantity,
                     s.UnitCode,
-                }.Any(a => a != null && a.Contains(form.SearchValue, StringComparison.CurrentCultureIgnoreCase)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
             }
             // get total count of records after search
             filterRecord = data.Count();

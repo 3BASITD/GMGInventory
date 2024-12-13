@@ -194,6 +194,7 @@
                 url: "@Url.Action("GetOptions", "Pack")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,

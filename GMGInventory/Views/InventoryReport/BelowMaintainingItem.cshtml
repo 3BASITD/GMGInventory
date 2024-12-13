@@ -128,6 +128,7 @@
                 url: "@Url.Action("GetOptions", "Item")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,

@@ -226,7 +226,13 @@
                 {
                     data: function (data, type, dataToSet) {
                         if (data.toReturn == true) {
-                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            if (data.quantityD > data.receivedQuantityD) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.receivedQuantity + ' received quantity.</label>';
+                            } else if (data.quantityD == 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to return.</label>';
+                            } else {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            }
                         } else {
                             return data.quantity;
                         }
@@ -295,6 +301,8 @@
 
                 rowData.quantity = FormatStringInteger(0);
                 rowData.quantityD = 0;
+                rowData.totalAmount = FormatStringDecimal(0);
+                rowData.totalAmountD = 0;
                 if ($(this).prop("checked")) {
                     rowData.toReturn = true;
                     tr.removeClass("text-muted");
@@ -388,12 +396,14 @@
                             lineNumber: v.lineNumber,
                             quantity: FormatStringInteger(0),
                             quantityD: 0,
+                            receivedQuantity: v.quantity,
+                            receivedQuantityD: v.quantityD,
                             unitCode: v.unitCode,
                             unitId: v.unitId,
                             unitCost: FormatStringDecimal(v.unitCost),
                             unitCostD: v.unitCost,
-                            totalAmount: FormatStringDecimal(v.quantityD * v.unitCost),
-                            totalAmountD: v.quantityD * v.unitCost
+                            totalAmount: FormatStringDecimal(0),
+                            totalAmountD: 0
                         });
                     });
                 },

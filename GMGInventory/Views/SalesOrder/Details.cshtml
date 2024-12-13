@@ -13,7 +13,7 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (Model.Status == "Submitted")
+            @if (Model.Status.ToLower() == "submitted")
             {
                 @if (userAccess.CanEdit)
                 {
@@ -38,7 +38,7 @@
             {
                 if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
                 {
-                    if (Model?.Status == "Approved")
+                    if (Model?.Status.ToLower() == "approved")
                     {
                         <a href="@Url.Action("Create", "Pack")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
                             <span class="fas fa-box-open"></span> Start Packing
@@ -127,10 +127,10 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CustomerStatus)
+                        @Html.DisplayNameFor(model => model.AccountStatus)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrEmpty(Model?.CustomerStatus.Trim()) ? "-" : Model.CustomerStatus)
+                        @Model!.AccountStatus
                     </b>
                 </p>
                 <p class="text-sm">
@@ -151,14 +151,14 @@
                         @Model?.OutstandingBalance
                     </b>
                 </p>
-                <p class="text-sm">
+                @* <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.GrossNetPrice)
                     </span>
                     <b class="d-block">
                         @Model?.GrossNetPrice
                     </b>
-                </p>
+                </p> *@
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CreditTerms)
@@ -167,20 +167,36 @@
                         @Model?.CreditTerms
                     </b>
                 </p>
-                <p class="text-sm">
+                @* <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.DeclaredValue)
                     </span>
                     <b class="d-block">
                         @Model?.DeclaredValue
                     </b>
-                </p>
+                </p> *@
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.PONumber)
                     </span>
                     <b class="d-block">
                         @(string.IsNullOrEmpty(Model?.PONumber?.Trim()) ? "-" : Model.PONumber)
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Region)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Region
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CommodityQuantity)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CommodityQuantity
                     </b>
                 </p>
             </div>
@@ -203,10 +219,10 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.SalesOrderBy)
+                        @Html.DisplayNameFor(model => model.Status)
                     </span>
                     <b class="d-block">
-                        @Model?.SalesOrderBy
+                        @Model?.Status
                     </b>
                 </p>
                 <p class="text-sm">
@@ -217,6 +233,52 @@
                         @Model?.OrderDate
                     </b>
                 </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.RequiredDeliveryDate
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.UserCreated)
+                    </span>
+                    <b class="d-block">
+                        @Model?.UserCreated
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </span>
+                    <b class="d-block">
+                        @Model?.DateCreated
+                    </b>
+                </p>
+                @if (Model?.UserModified != null)
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UserModified)
+                        </span>
+                        <b class="d-block">
+                            @Model?.UserModified
+                        </b>
+                    </p>
+                }
+                @if (Model?.DateModified != null)
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateModified)
+                        </span>
+                        <b class="d-block">
+                            @Model?.DateModified
+                        </b>
+                    </p>
+                }
                 @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
                 {
                     <p class="text-sm">
@@ -262,7 +324,7 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Sales Order Item(s)</span>
-                        @if (Model?.Status == "Submitted")
+                        @if (Model?.Status.ToLower() == "submitted")
                         {
                             @if (userAccess.CanAdd)
                             {
@@ -517,6 +579,7 @@
                 url: "@Url.Action("GetOptions", "Item")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,
@@ -671,7 +734,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "submitted" && user_access.canEdit) {
                             return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
                             return data.quantity
@@ -700,7 +763,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "submitted" && user_access.canEdit) {
                             return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
                         } else {
                             return Round2Decimal(data.sellingPriceD)
@@ -711,7 +774,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "submitted" && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
                         } else {
                             return Round2Decimal(data.discount1)
@@ -722,7 +785,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val() == "Submitted" && user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "submitted" && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
                         } else {
                             return Round2Decimal(data.discount2D)
@@ -760,12 +823,12 @@
         });
 
         itemDT.on("draw", function () {
-            if ($("#po-status").val() == "Submitted") {
+            if ($("#po-status").val().toLowerCase() == "submitted") {
                 itemDT.column(0).visible(true); // remove button
                 itemDT.column(10).visible(false); // served quantity
                 itemDT.column(11).visible(false); // unserved quantity
                 itemDT.column(12).visible(false); // update served quantity button
-            } else if ($("#po-status").val() == "Approved") {
+            } else if ($("#po-status").val().toLowerCase() == "approved") {
                 itemDT.column(0).visible(false);
                 itemDT.column(10).visible(true);
                 itemDT.column(11).visible(true);

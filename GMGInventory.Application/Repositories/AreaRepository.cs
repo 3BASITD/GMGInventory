@@ -41,14 +41,14 @@ namespace GMGInventory.Application.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Select2Model<JsonAddressOptionsModel>> GetOptions2(string search, int page)
+        public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptions2(string search, int page)
         {
             var areas = await context.Areas
                                      .Include(s => s.Region)
                                      .Where(s => string.IsNullOrWhiteSpace(search)
                                               || (s.Code.ToLower().Contains(search.ToLower()))
                                               || (s.Name.ToLower().Contains(search.ToLower())))
-                                     .Select(s => new JsonAddressOptionsModel
+                                     .Select(s => new JsonCustomerOptionsModel
                                      {
                                          Id = s.Id.ToString(),
                                          Text = s.Code,
@@ -58,7 +58,7 @@ namespace GMGInventory.Application.Repositories
                                      .OrderBy(s => s.Text)
                                      .ToListAsync();
             var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
-            return new Select2Model<JsonAddressOptionsModel>
+            return new Select2Model<JsonCustomerOptionsModel>
             {
                 //incomplete_results = false,
                 items = areasFiltered,
@@ -66,14 +66,14 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonAddressOptionsModel>> GetByRegionOptions(string search, int page, int? region)
+        public async Task<Select2Model<JsonCustomerOptionsModel>> GetByRegionOptions(string search, int page, int? region)
         {
             var areas = await context.Areas
                                      .Where(s => (string.IsNullOrWhiteSpace(search)
                                               || (s.Code.ToLower().Contains(search.ToLower()))
                                               || (s.Name.ToLower().Contains(search.ToLower())))
                                               && s.RegionId == region)
-                                     .Select(s => new JsonAddressOptionsModel
+                                     .Select(s => new JsonCustomerOptionsModel
                                      {
                                          Id = s.Id.ToString(),
                                          Text = s.Code,
@@ -82,7 +82,7 @@ namespace GMGInventory.Application.Repositories
                                      .OrderBy(s => s.Text)
                                      .ToListAsync();
             var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
-            return new Select2Model<JsonAddressOptionsModel>
+            return new Select2Model<JsonCustomerOptionsModel>
             {
                 //incomplete_results = false,
                 items = areasFiltered,

@@ -6,8 +6,8 @@ namespace GMGInventory.Application.Contracts
     public interface IAreaRepository : IGenericRepository<Area>
     {
         Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
-        Task<Select2Model<JsonAddressOptionsModel>> GetOptions2(string search, int page);
-        Task<Select2Model<JsonAddressOptionsModel>> GetByRegionOptions(string search, int page, int? region);
+        Task<Select2Model<JsonCustomerOptionsModel>> GetOptions2(string search, int page);
+        Task<Select2Model<JsonCustomerOptionsModel>> GetByRegionOptions(string search, int page, int? region);
         Task<IList<AreaViewVM>> GetAllAreaAsync();
         Task<ForDataTables<AreaViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
         Task<IList<AreaViewVM>> GetAllAreaVMAsync();
