@@ -114,10 +114,12 @@ namespace GMGInventory.Common.Models
         public int LineNumber { get; set; }
         public int? ItemId { get; set; }
         public string? ItemCode { get; set; }
+        public string? ItemDescription { get; set; }
         public string? PartNumber { get; set; }
         public int Quantity { get; set; }
         public int UnitId { get; set; }
         public string Unit { get; set; }
+        public decimal UnitCost { get; set; }
         public int Served { get; set; }
         public int UnorderedQuantity => Quantity - Served;
         public bool Selected { get; set; } = false;

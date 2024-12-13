@@ -98,7 +98,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var request = await receiveRepository.GetDetails(Id ?? 0);
-            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status != "Disapproved"))
+            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status != "DISAPPROVED"))
             {
                 return RedirectToAction("Details", new { Id });
             }
