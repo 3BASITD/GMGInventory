@@ -109,12 +109,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseReceiveDetailsVM?> GetDetails(int requestId)
         {
             var details = from receive in context.PurchaseReceivings
-                                                 //.Include(s => s.PurchaseOrder)
-                                                 //.Include(s => s.Supplier)
-                                                 //.Include(s => s.Term)
-                                                 //.Include(s => s.Warehouse)
-                                                 //.Include(s => s.Currency)
-                                                 //.Include(s => s.Status)
+                                                
                           let resubmitfrom = context.PurchaseReceivings
                                                     .Where(s => s.ResubmitId == receive.Id)
                                                     .FirstOrDefault()
@@ -173,7 +168,7 @@ namespace GMGInventory.Application.Repositories
                                 Id = receive.Id,
                                 PurchaseReceivingId = receive.PurchaseReceivingId,
                                 LineNumber = receive.OrderItem.LineNumber,
-                                ItemId = receive.OrderItem.RequestItem.ItemId,
+                                OrderItemId = receive.OrderItem.RequestItem.ItemId ?? 0,
                                 ItemCode = receive.OrderItem.RequestItem.Item.Code,
                                 ItemPartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
                                 ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
@@ -253,6 +248,7 @@ namespace GMGInventory.Application.Repositories
                                        .Select(s => new PurchaseReceivingLineItem
                                        {
                                            PurchaseReceivingId = receiveId,
+                                           OrderItemId = s.OrderItemId,
                                            //LineNumber = s.LineNumber,
                                            //ItemId = s.ItemId,
                                            //ItemDescription = s.ItemDescription ?? "",
@@ -366,17 +362,21 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId)
         {
-            return await context.PurchaseOrderNews
-                                .Include(s => s.Status)
-                                .Where(s => s.Status.Name == "Approved")
-                                .Select(s => new JsonOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.DocumentNumber,
-                                    Selected = SelectedId != null && s.Id == SelectedId
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
+            var pos = from porder in context.PurchaseOrderNews
+
+                      let receiving = context.PurchaseReceivings
+                                            .Where(s => s.PurchaseOrderId == porder.Id)
+                                            .Select(s => s.Status.Name).FirstOrDefault()
+
+                      where porder.Status.Name == "Approved" && receiving != "Approved"
+                      select new JsonOptionsModel
+                      {
+                          Id = porder.Id.ToString(),
+                          Text = porder.DocumentNumber,
+                          Selected = SelectedId != null && porder.Id == SelectedId
+                      };
+                        
+            return await pos.OrderBy(s => s.Text).ToListAsync();
         }
 
         public async Task<ResponseModel> ApproveAsync(int receivingId)
@@ -470,7 +470,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseOrderItemOptions(int PurchaseOrderId)
         {
             return await context.PurchaseOrderNewLineItems
-                                //.Include(s => s.Item)
+                                  .Include(s => s.RequestItem)
+                                //
                                 //.Include(s => s.Unit)
                                 .Where(s => s.PurchaseOrderId == PurchaseOrderId)
                                 .Select(s => new JsonPurchaseItemOptionsModel
@@ -479,10 +480,13 @@ namespace GMGInventory.Application.Repositories
                                     Text = s.RequestItem.ItemDescription,
                                     ItemId = s.RequestItem.Item.Id,
                                     ItemCode = s.RequestItem.Item.Code,
+                                    ItemDescription = s.RequestItem.ItemDescription,
                                     PartNumber = s.RequestItem.Item.PartNumber,
                                     Quantity = s.Quantity,
                                     Unit = s.RequestItem.Unit.Name,
                                     UnitId = s.RequestItem.Unit.Id,
+                                    UnitCost = s.UnitCost,
+                                    LineNumber = s.LineNumber
                                     //Served = context.PurchaseOrderNewLineItems
                                     //                .Where(a => a.ItemId == s.ItemId
                                     //                         && a.ItemDescription == s.ItemDescription
@@ -491,7 +495,7 @@ namespace GMGInventory.Application.Repositories
                                     //                .Sum()
                                   //  Selected = SelectedId != null && s.Id == SelectedId
                                 })
-                                .OrderBy(s => s.Served)
+                                .OrderBy(s => s.LineNumber)
                                 .ToListAsync();
         }
     }

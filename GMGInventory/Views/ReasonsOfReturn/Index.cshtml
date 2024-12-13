@@ -2,15 +2,19 @@
 
 @{
     ViewData["Title"] = "Reasons Of Return";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                <span class="fas fa-plus"></span> New Reason Of Return
+             @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                    <span class="fas fa-plus"></span> New Reason Of Return
             </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -53,7 +57,8 @@
 <form id="reactivateReasonOfReturnForm" asp-action="Reactivate">
     <input type="hidden" id="reactivateReasonOfReturnId" name="Id" />
 </form>
-
+@if (userAccess.CanAdd)
+{
 <!-- Create Modal -->
 <div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog modal-sm" role="document">
@@ -91,48 +96,49 @@
             </form>
         </div>
     </div>
-</div>
-
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit ReasonOfReturn</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form autocomplete="off" id="editForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="edit-code" class="control-label mb-0 d-block">Code</label>
-                                <input name="code" id="edit-code" class="form-control form-control-sm" />
+    </div>
+}
+@if (userAccess.CanEdit)
+{
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit ReasonOfReturn</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="edit-code" class="control-label mb-0 d-block">Code</label>
+                                    <input name="code" id="edit-code" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-name" class="control-label mb-0 d-block">Name</label>
+                                    <input name="name" id="edit-name" class="form-control form-control-sm" />
+                                </div>
+                                <input type="hidden" id="edit-id" />
                             </div>
-                            <div class="form-group">
-                                <label for="edit-name" class="control-label mb-0 d-block">Name</label>
-                                <input name="name" id="edit-name" class="form-control form-control-sm" />
-                            </div>
-                            <input type="hidden" id="edit-id" />
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-edit"></span> Update
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-
+}
 <!-- Details Modal -->
 <div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog" role="document">
@@ -169,6 +175,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         // Load List on DataTable
         var dataTable = $('.table-reasonOfReturn').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -210,10 +218,16 @@
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Reason Of Return" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            if (user_access.canEdit) {
+                                actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            }
+                            if (user_access.canDelete) {
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Reason Of Return" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            }
                         } else {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Reason Of Return" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            if (user_access.canAdd || user_access.canEdit) {
+                                actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Reason Of Return" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            }
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
@@ -230,40 +244,43 @@
         // Load functions upon DataTable load
         dataTable.on("draw", function () {
             hideLoader();
-
-            $('.deleteBtn').click(function (e) {
-                swal({
-                    title: "Delete / Deactivate Reason Of Return",
-                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#deleteReasonOfReturnId').val(id);
-                        $('#deleteReasonOfReturnForm').submit();
-                    }
+            if (user_access.canDelete) {
+                $('.deleteBtn').click(function (e) {
+                    swal({
+                        title: "Delete / Deactivate Reason Of Return",
+                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#deleteReasonOfReturnId').val(id);
+                            $('#deleteReasonOfReturnForm').submit();
+                        }
+                    });
                 });
-            });
+            }
 
-            $('.reactivateBtn').click(function (e) {
-                swal({
-                    title: "Reactivate Reason Of Return",
-                    text: "Are you sure you want to reactivate this record?",
-                    icon: "info",
-                    buttons: true,
-                    infoMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#reactivateReasonOfReturnId').val(id);
-                        $('#reactivateReasonOfReturnForm').submit();
-                    }
+            if (user_access.canAdd || user_access.canEdit) {
+                $('.reactivateBtn').click(function (e) {
+                    swal({
+                        title: "Reactivate Reason Of Return",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#reactivateReasonOfReturnId').val(id);
+                            $('#reactivateReasonOfReturnForm').submit();
+                        }
+                    });
                 });
-            });
+            }
 
             $('.detailsBtn').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
@@ -277,18 +294,67 @@
                 $(".modal-detail-datemodified").html(data.dateModified);
             });
 
+            if (user_access.canEdit) {
+                // Actions upon Display Edit Modal
+                $(".editBtn").click(function (e) {
+                    var data = dataTable.row($(this).parents('tr')).data();
 
-            // Actions upon Display Edit Modal
-            $(".editBtn").click(function (e) {
-                var data = dataTable.row($(this).parents('tr')).data();
+                    $("#edit-id").val(data.id);
+                    $("#edit-code").val(data.reasonOfReturnCode);
+                    $("#edit-name").val(data.reasonOfReturnName);
+                });
 
-                $("#edit-id").val(data.id);
-                $("#edit-code").val(data.reasonOfReturnCode);
-                $("#edit-name").val(data.reasonOfReturnName);
+                // Validation for Edit Modal
+                var validateEdit = $("#editForm").validate({
+                    rules: {
+                        code: { required: true, maxlength: 10 },
+                        name: { required: true, maxlength: 100 }
+                    },
+                    messages: {
+                        code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                        name: { required: "Please enter Name.", maxlength: "Name must not exceed 100 characters." }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoEdit();
+                    }
+                });
+
+                // Send Edit to Controller
+                function DoEdit() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("EditJson")",
+                        data: {
+                            Id: $("#edit-id").val(),
+                            Code: $("#edit-code").val(),
+                            Name: $("#edit-name").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#editModal").modal("hide");
+                                dataTable.ajax.reload();
+                                hideLoader()
+                            }
+                        }
+                    });
+                }
+            }
+
+        });
+
+        if (user_access.canAdd) {
+            // Actions upon Display Create Modal
+            $(".createBtn").click(function (e) {
+                $("#create-code").val("");
+                $("#create-name").val("");
             });
 
-            // Validation for Edit Modal
-            var validateEdit = $("#editForm").validate({
+            // Validation for Create Modal
+            var validateCreate = $("#createForm").validate({
                 rules: {
                     code: { required: true, maxlength: 10 },
                     name: { required: true, maxlength: 100 }
@@ -299,84 +365,35 @@
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
-                    DoEdit();
+                    DoCreate();
                 }
             });
 
-            // Send Edit to Controller
-            function DoEdit() {
+            // Send Create to Controller
+            function DoCreate() {
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("EditJson")",
+                    url: "@Url.Action("CreateJson")",
                     data: {
-                        Id: $("#edit-id").val(),
-                        Code: $("#edit-code").val(),
-                        Name: $("#edit-name").val()
+                        Code: $("#create-code").val(),
+                        Name: $("#create-name").val(),
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
                             toastr.success(data.message, "Success");
-                            $("#editModal").modal("hide");
+                            $("#createModal").modal("hide");
                             dataTable.ajax.reload();
                             hideLoader()
                         }
+                    },
+                    complete: function (xhr, status) {
+                        //$(".save-overlay").hideOverlay();
                     }
                 });
             }
-
-
-        });
-
-
-        // Actions upon Display Create Modal
-        $(".createBtn").click(function (e) {
-            $("#create-code").val("");
-            $("#create-name").val("");
-        });
-
-        // Validation for Create Modal
-        var validateCreate = $("#createForm").validate({
-            rules: {
-                code: { required: true, maxlength: 10 },
-                name: { required: true, maxlength: 100 }
-            },
-            messages: {
-                code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
-                name: { required: "Please enter Name.", maxlength: "Name must not exceed 100 characters." }
-            },
-            submitHandler: function (form, event) {
-                event.preventDefault();
-                DoCreate();
-            }
-        });
-
-        // Send Create to Controller
-        function DoCreate() {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("CreateJson")",
-                data: {
-                    Code: $("#create-code").val(),
-                    Name: $("#create-name").val(),
-                },
-                success: function (data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastr.error(data.message, "Error");
-                    } else {
-                        toastr.success(data.message, "Success");
-                        $("#createModal").modal("hide");
-                        dataTable.ajax.reload();
-                        hideLoader()
-                    }
-                },
-                complete: function (xhr, status) {
-                    //$(".save-overlay").hideOverlay();
-                }
-            });
         }
-
 
    </script>
 }
