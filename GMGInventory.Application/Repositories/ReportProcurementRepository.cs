@@ -19,69 +19,64 @@ namespace GMGInventory.Application.Repositories
         #region Purchase Order
         public async Task<IList<PurchaseOrderRVM>> GetPurchaseOrder(ListFilterPurchaseOrderModel filter)
         {
-            //var porderVM = from porder in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder).Include(x => x.PurchaseRequest)
-            //               let poItems = context.PurchaseOrderNewLineItems
-            //                                  .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
-            //                                  .FirstOrDefault()
+            var porderVM = from porder in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder)
+                           let poItems = context.PurchaseOrderNewLineItems
+                                              .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
+                                              .FirstOrDefault()
 
-            //               let pRequest = context.PurchaseRequestLineItems
-            //                              .Where(s => s.PurchaseRequestId == poItems.PurchaseRequestId)
-            //                              .FirstOrDefault()
+                           let pRequest = context.PurchaseRequestLineItems
+                                          .Where(s => s.Id == porder.RequestItemId)
+                                          .FirstOrDefault()
 
-            //               let preceiving = context.PurchaseReceivings
-            //                               .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
-            //                               .FirstOrDefault()
+                           let preceiving = context.PurchaseReceivings
+                                           .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
+                                           .FirstOrDefault()
 
-            //               // join poItems in context.PurchaseOrderNewLineItems on porder.PurchaseOrderId equals poItems.PurchaseOrderId
-            //               // join pRequest in context.PurchaseRequestLineItems.Include(s => s.PurchaseRequest) on poItems.PurchaseRequestId equals pRequest.PurchaseRequestId
-
-            //              // join preceiving in context.PurchaseReceivings.Include(s => s.PurchaseOrder) on  porder.PurchaseOrderId equals preceiving.PurchaseOrderId
-            //             //  into pr  from p in pr.DefaultIfEmpty()
-
-
-            //              where filter.DateFrom <= (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date
-            //              && (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date <= filter.DateTo
-            //              && (filter.Item == null || porder.Item.Id == filter.Item || (filter.Item == 0 && porder.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
-            //              && (filter.Supplier == null || porder.PurchaseOrder.Supplier.Id == filter.Supplier)                      
-            //             && (filter.Unserved == true? preceiving.PurchaseReceivingLineItems != null : preceiving.PurchaseReceivingLineItems == null)
-
-            //              select new PurchaseOrderRVM
-            //              {
-            //                  Item = porder.Item.Code,
-            //                  Quantity = porder.Quantity,
-            //                  Unit = porder.Unit.Code,
-            //                  UnitCost = porder.UnitCost,
-            //                  DocumentNumber = porder.PurchaseOrder.DocumentNumber,
-            //                  Supplier = porder.PurchaseOrder.Supplier.Code,
-            //                  OrderDateD = porder.PurchaseOrder.OrderDate,
-            //                  UnservedQuantity = pRequest.Quantity - poItems.Quantity,
-            //                  UnservedAmount = (pRequest.Quantity - poItems.Quantity) * porder.UnitCost
-            //              };
-
-            var porderVM = from porder in context.PurchaseOrderNewLineItems
-                           let allorder = context.PurchaseOrderNewLineItems
-                                                 .Where(s => s.RequestItemId == porder.RequestItemId)
-                                                 .Sum(s => s.Quantity)
-                           let allrequest = context.PurchaseRequestLineItems
-                                                   .Where(s => s.Id == porder.RequestItemId)
-                                                   .Sum(s => s.Quantity)
-                           where filter.DateFrom <= porder.PurchaseOrder.OrderDate.Date
-                           && porder.PurchaseOrder.OrderDate.Date <= filter.DateTo
-                           && (filter.Item == null || porder.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && porder.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                           where filter.DateFrom <= (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date
+                           && (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date <= filter.DateTo
+                           && (filter.Item == null || pRequest.Item.Id == filter.Item || (filter.Item == 0 && pRequest.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                            && (filter.Supplier == null || porder.PurchaseOrder.Supplier.Id == filter.Supplier)
-                           && (filter.Unserved == true ? porder.PurchaseReceivingLineItems != null : porder.PurchaseReceivingLineItems == null)
+                          && (filter.Unserved == true ? preceiving.PurchaseReceivingLineItems != null : preceiving.PurchaseReceivingLineItems == null)
+
                            select new PurchaseOrderRVM
                            {
-                               Item = porder.RequestItem.Item.Code,
+                               Item = pRequest.Item.Code,
                                Quantity = porder.Quantity,
-                               Unit = porder.RequestItem.Unit.Code,
+                               Unit = pRequest.Unit.Code,
                                UnitCost = porder.UnitCost,
                                DocumentNumber = porder.PurchaseOrder.DocumentNumber,
                                Supplier = porder.PurchaseOrder.Supplier.Code,
                                OrderDateD = porder.PurchaseOrder.OrderDate,
-                               UnservedQuantity = allrequest - allorder,
-                               UnservedAmount = (allrequest - allorder) * porder.UnitCost
+                               UnservedQuantity = pRequest.Quantity - poItems.Quantity,
+                               UnservedAmount = (pRequest.Quantity - poItems.Quantity) * porder.UnitCost
                            };
+
+            //var porderVM = from porder in context.PurchaseOrderNewLineItems
+            //               let allorder = context.PurchaseOrderNewLineItems
+            //                                     .Where(s => s.RequestItemId == porder.RequestItemId)
+            //                                     .Sum(s => s.Quantity)
+            //               let allrequest = context.PurchaseRequestLineItems
+            //                                       .Where(s => s.Id == porder.RequestItemId)
+            //                                       .Sum(s => s.Quantity)
+            //            where filter.DateFrom <= porder.PurchaseOrder.OrderDate.Date
+            //                    && porder.PurchaseOrder.OrderDate.Date <= filter.DateTo
+            //               && (filter.Item == null || porder.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && porder.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+            //               && (filter.Supplier == null || porder.PurchaseOrder.Supplier.Id == filter.Supplier)
+            //                   && (filter.Unserved == true? porder.PurchaseReceivingLineItems != null : porder.PurchaseReceivingLineItems == null)
+
+            //               //&& (filter.Unserved == true ? porder.PurchaseReceivingLineItems != null : porder.PurchaseReceivingLineItems == null)
+            //               select new PurchaseOrderRVM
+            //               {
+            //                   Item = porder.RequestItem.Item.Code,
+            //                   Quantity = porder.Quantity,
+            //                   Unit = porder.RequestItem.Unit.Code,
+            //                   UnitCost = porder.UnitCost,
+            //                   DocumentNumber = porder.PurchaseOrder.DocumentNumber,
+            //                   Supplier = porder.PurchaseOrder.Supplier.Code,
+            //                   OrderDateD = porder.PurchaseOrder.OrderDate,
+            //                   UnservedQuantity = allrequest - allorder,
+            //                   UnservedAmount = (allrequest - allorder) * porder.UnitCost
+            //               };
             return await porderVM.ToListAsync();
         }
         public async Task<ForDataTables<PurchaseOrderRVM>> GetPurchaseOrderDT(DataTablesRequestForm form, ListFilterPurchaseOrderModel filter)
@@ -176,52 +171,55 @@ namespace GMGInventory.Application.Repositories
         #region Purchase Return
         public async Task<IList<PurchaseReturnRVM>> GetPurchaseReturn(ListFilterReturnReceivingModel filter)
         {
-            //var preturnVM = from preturn in context.PurchaseReturnNewLineItems.Include(s => s.PurchaseReturn)
-            //                    // join poItems in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder) on preturn.PurchaseReturn.PurchaseOrder.Id equals poItems.PurchaseOrderId
+            var preturnVM = from preturn in context.PurchaseReturnNewLineItems.Include(s => s.PurchaseReturn)
 
-            //                let poItems = context.PurchaseOrderNewLineItems
-            //                                  .Where(s => s.PurchaseOrderId == preturn.PurchaseReturn.PurchaseOrder.Id)
-            //                                  .FirstOrDefault()
+                            let poItems = context.PurchaseOrderNewLineItems
+                                              .Where(s => s.PurchaseOrderId == preturn.PurchaseReturn.PurchaseReceive.PurchaseOrderId)
+                                              .FirstOrDefault()
 
-            //                where filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
-            //                && (filter.Item == null || preturn.Item.Id == filter.Item || (filter.Item == 0 && preturn.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
-            //                && (filter.Supplier == null || preturn.PurchaseReturn.Supplier.Id == filter.Supplier)
+                            let preceiving = context.PurchaseReceivingLineItems
+                                                .Where(s => s.OrderItemId == poItems.Id)
+                                                .FirstOrDefault()
 
-            //                select new PurchaseReturnRVM
-            //                {
-            //                    Item = preturn.Item.Code,
-            //                    ItemDescription = preturn.ItemDescription,
-            //                    Quantity = poItems.Quantity,
-            //                    Unit = poItems.Unit.Code,
-            //                    UnitCost = poItems.UnitCost,
-            //                    TotalAmount = poItems.Quantity * poItems.UnitCost,
-            //                    DocumentNumber = preturn.PurchaseReturn.DocumentNumber,
-            //                    Supplier = preturn.PurchaseReturn.Supplier.Code,
-            //                    ReturnDateD = preturn.PurchaseReturn.ReturnDate, // change to return
+                           where filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
+                            && (filter.Item == null || preceiving.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceiving.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                            && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
 
-            //                    ReturnQuantity = preturn.Quantity,
-            //                    ReturnTotalAmount = preturn.UnitCost * preturn.Quantity
-            //                };
-
-            var preturnVM = from preturn in context.PurchaseReturnNewLineItems
-                            where filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date 
-                            && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
-                            && (filter.Item == null || preturn.ReceivingItem.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preturn.ReceivingItem.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
-                            && (filter.Supplier == null || preturn.PurchaseReturn.PurchaseReceive.PurchaseOrder.Supplier.Id == filter.Supplier)
                             select new PurchaseReturnRVM
                             {
-                                Item = preturn.ReceivingItem.OrderItem.RequestItem.Item.Code,
-                                ItemDescription = preturn.ReceivingItem.OrderItem.RequestItem.ItemDescription,
-                                Quantity = preturn.ReceivingItem.OrderItem.RequestItem.Quantity,
-                                Unit = preturn.ReceivingItem.OrderItem.RequestItem.Unit.Code,
-                                UnitCost = preturn.ReceivingItem.OrderItem.UnitCost,
-                                TotalAmount = preturn.Quantity * preturn.ReceivingItem.OrderItem.UnitCost,
+                                Item = preceiving.OrderItem.RequestItem.Item.Code,
+                                ItemDescription = preceiving.OrderItem.RequestItem.ItemDescription,
+                                Quantity = poItems.Quantity,
+                                Unit = preceiving.OrderItem.RequestItem.Unit.Code,
+                                UnitCost = poItems.UnitCost,
+                                TotalAmount = poItems.Quantity * poItems.UnitCost,
                                 DocumentNumber = preturn.PurchaseReturn.DocumentNumber,
-                                Supplier = preturn.PurchaseReturn.PurchaseReceive.PurchaseOrder.Supplier.Code,
+                                Supplier = poItems.PurchaseOrder.Supplier.Code,
                                 ReturnDateD = preturn.PurchaseReturn.ReturnDate, // change to return
+
                                 ReturnQuantity = preturn.Quantity,
-                                ReturnTotalAmount = preturn.ReceivingItem.OrderItem.UnitCost * preturn.Quantity
+                                ReturnTotalAmount = poItems.UnitCost * preturn.Quantity
                             };
+
+            //var preturnVM = from preturn in context.PurchaseReturnNewLineItems
+            //                where filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date 
+            //                && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
+            //                && (filter.Item == null || preturn.ReceivingItem.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preturn.ReceivingItem.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+            //                && (filter.Supplier == null || preturn.PurchaseReturn.PurchaseReceive.PurchaseOrder.Supplier.Id == filter.Supplier)
+            //                select new PurchaseReturnRVM
+            //                {
+            //                    Item = preturn.ReceivingItem.OrderItem.RequestItem.Item.Code,
+            //                    ItemDescription = preturn.ReceivingItem.OrderItem.RequestItem.ItemDescription,
+            //                    Quantity = preturn.ReceivingItem.OrderItem.RequestItem.Quantity,
+            //                    Unit = preturn.ReceivingItem.OrderItem.RequestItem.Unit.Code,
+            //                    UnitCost = preturn.ReceivingItem.OrderItem.UnitCost,
+            //                    TotalAmount = preturn.Quantity * preturn.ReceivingItem.OrderItem.UnitCost,
+            //                    DocumentNumber = preturn.PurchaseReturn.DocumentNumber,
+            //                    Supplier = preturn.PurchaseReturn.PurchaseReceive.PurchaseOrder.Supplier.Code,
+            //                    ReturnDateD = preturn.PurchaseReturn.ReturnDate, // change to return
+            //                    ReturnQuantity = preturn.Quantity,
+            //                    ReturnTotalAmount = preturn.ReceivingItem.OrderItem.UnitCost * preturn.Quantity
+            //                };
             return await preturnVM.ToListAsync();
         }
         public async Task<ForDataTables<PurchaseReturnRVM>> GetPurchaseReturnDT(DataTablesRequestForm form, ListFilterReturnReceivingModel filter)
@@ -317,50 +315,19 @@ namespace GMGInventory.Application.Repositories
         #region Purchase Receiving
         public async Task<IList<PurchaseReceivingRVM>> GetPurchaseReceiving(ListFilterReturnReceivingModel filter)
         {
-            //var preceiveVM = from preceive in context.PurchaseReceivingLineItems.Include(s => s.PurchaseReceiving)
-            //                     // join poItems in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder) on preceive.PurchaseReceiving.PurchaseOrder.Id equals poItems.PurchaseOrderId
-            //                     // join pRequest in context.PurchaseRequestLineItems.Include(s => s.PurchaseRequest) on poItems.PurchaseRequestId equals pRequest.PurchaseRequestId
+            var preceiveVM = from preceive in context.PurchaseReceivingLineItems.Include(s => s.PurchaseReceiving)
+                             let poItems = context.PurchaseOrderNewLineItems
+                                                .Where(s => s.PurchaseOrderId == preceive.PurchaseReceiving.PurchaseOrder.Id)
+                                                .FirstOrDefault()
 
+                             let pRequest = context.PurchaseRequestLineItems
+                                                .Where(s => s.PurchaseRequestId == poItems.RequestItemId)
+                                                .FirstOrDefault()
 
-            //                 let poItems = context.PurchaseOrderNewLineItems
-            //                                    .Where(s => s.PurchaseOrderId == preceive.PurchaseReceiving.PurchaseOrder.Id)
-            //                                    .FirstOrDefault()
+                             where filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
+                            && (filter.Item == null || preceive.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceive.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                            && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
 
-            //                 let pRequest = context.PurchaseRequestLineItems
-            //                                    .Where(s => s.PurchaseRequestId == poItems.PurchaseRequestId)
-            //                                    .FirstOrDefault()
-
-            //                 where filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
-            //                && (filter.Item == null || preceive.Item.Id == filter.Item || (filter.Item == 0 && preceive.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
-            //                && (filter.Supplier == null || preceive.PurchaseReceiving.Supplier.Id == filter.Supplier)
-
-            //                 select new PurchaseReceivingRVM
-            //                 {
-            //                     Item = preceive.Item.Code,
-            //                     ItemDescription = preceive.ItemDescription,
-            //                     Quantity = preceive.Quantity,
-            //                     Unit = preceive.Unit.Code,
-            //                     UnitCost = preceive.UnitCost,
-            //                     TotalAmount = preceive.Quantity * preceive.UnitCost,
-
-            //                     DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
-            //                     Supplier = preceive.PurchaseReceiving.Supplier.Code,
-            //                     ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
-
-            //                     UnservedQuantity = pRequest.Quantity - poItems.Quantity,
-            //                     UnservedAmount = (pRequest.Quantity - poItems.Quantity) * preceive.UnitCost
-            //                 };
-
-            var preceiveVM = from preceive in context.PurchaseReceivingLineItems
-                             let allorder = context.PurchaseOrderNewLineItems
-                                                   .Where(s => s.RequestItemId == preceive.OrderItem.RequestItemId)
-                                                   .Sum(s => s.Quantity)
-                             let allrequest = context.PurchaseRequestLineItems
-                                                     .Where(s => s.Id == preceive.OrderItem.RequestItemId)
-                                                     .Sum(s => s.Quantity)
-                             // where filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
-                             //&& (filter.Item == null || preceive.Item.Id == filter.Item || (filter.Item == 0 && preceive.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
-                             //&& (filter.Supplier == null || preceive.PurchaseReceiving.Supplier.Id == filter.Supplier)
                              select new PurchaseReceivingRVM
                              {
                                  Item = preceive.OrderItem.RequestItem.Item.Code,
@@ -371,12 +338,39 @@ namespace GMGInventory.Application.Repositories
                                  TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
 
                                  DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
-                                 Supplier = preceive.PurchaseReceiving.PurchaseOrder.Supplier.Code,
+                                 Supplier = poItems.PurchaseOrder.Supplier.Code,
                                  ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
 
-                                 UnservedQuantity = allrequest - allorder,
-                                 UnservedAmount = (allrequest - allorder) * preceive.OrderItem.UnitCost
+                                 UnservedQuantity = preceive.Quantity - poItems.Quantity,
+                                 UnservedAmount = (preceive.Quantity - poItems.Quantity) * preceive.OrderItem.UnitCost
                              };
+
+            //var preceiveVM = from preceive in context.PurchaseReceivingLineItems
+            //                 let allorder = context.PurchaseOrderNewLineItems
+            //                                       .Where(s => s.RequestItemId == preceive.OrderItem.RequestItemId)
+            //                                       .Sum(s => s.Quantity)
+            //                 let allrequest = context.PurchaseRequestLineItems
+            //                                         .Where(s => s.Id == preceive.OrderItem.RequestItemId)
+            //                                         .Sum(s => s.Quantity)
+            //                 // where filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
+            //                 //&& (filter.Item == null || preceive.Item.Id == filter.Item || (filter.Item == 0 && preceive.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+            //                 //&& (filter.Supplier == null || preceive.PurchaseReceiving.Supplier.Id == filter.Supplier)
+            //                 select new PurchaseReceivingRVM
+            //                 {
+            //                     Item = preceive.OrderItem.RequestItem.Item.Code,
+            //                     ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
+            //                     Quantity = preceive.Quantity,
+            //                     Unit = preceive.OrderItem.RequestItem.Unit.Code,
+            //                     UnitCost = preceive.OrderItem.UnitCost,
+            //                     TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
+
+            //                     DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
+            //                     Supplier = preceive.PurchaseReceiving.PurchaseOrder.Supplier.Code,
+            //                     ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
+
+            //                     UnservedQuantity = allrequest - allorder,
+            //                     UnservedAmount = (allrequest - allorder) * preceive.OrderItem.UnitCost
+            //                 };
             return await preceiveVM.ToListAsync();
         }
         public async Task<ForDataTables<PurchaseReceivingRVM>> GetPurchaseReceivingDT(DataTablesRequestForm form, ListFilterReturnReceivingModel filter)
