@@ -54,6 +54,9 @@
                     @Html.DisplayNameFor(model => model.Contents.First().UnitCost)
                 </th>
                 <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().TotalAmount)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.Contents.First().UnservedQuantity)
                 </th>
                 <th>
@@ -73,6 +76,7 @@
                     <td>@item.Quantity</td>
                     <td>@item.Unit</td>
                     <td>@item.UnitCost</td>
+                    <td>@item.TotalAmount</td>
                     <td>@item.UnservedQuantity</td>
                     <td>@item.UnservedAmount</td>
                 </tr>
@@ -80,7 +84,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="7" class="right-text">Total</th>
+                <th colspan="8" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
                 <th></th>
                 <th class="right-text"><nobr>@Model.TotalAmount2</nobr></th>

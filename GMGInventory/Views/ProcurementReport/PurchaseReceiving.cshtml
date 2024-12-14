@@ -55,6 +55,9 @@
                     <th>
                         @Html.DisplayNameFor(model => model.UnitCost)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TotalAmount)
+                    </th>
                       <th>
                         @Html.DisplayNameFor(model => model.UnservedQuantity)
                     </th>
@@ -65,7 +68,7 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="7" class="text-end">Total</th>
+                    <th colspan="8" class="text-end">Total</th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -260,6 +263,7 @@
                 { data: "quantity", name: "Quantity" },
                 { data: "unit", name: "Unit" },
                 { data: "unitCost", name: "UnitCost", className: "text-end" },
+                { data: "totalAmount", name: "TotalAmount", className: "text-end" },
                 { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end" },
                 { data: "unservedAmount", name: "UnservedAmount", className: "text-end" }
 
@@ -271,9 +275,9 @@
                 var json = purchaseReceivingDT.ajax.json();
                 var api = this.api(), data;
 
-                 $(api.column(7).footer()).html(FormatStringDecimal(json.totalAmount));
+                 $(api.column(8).footer()).html(FormatStringDecimal(json.totalAmount));
 
-                $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount2));
+                $(api.column(10).footer()).html(FormatStringDecimal(json.totalAmount2));
             }
         });
 

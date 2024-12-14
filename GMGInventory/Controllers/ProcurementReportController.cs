@@ -203,7 +203,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new DataTable("Purchase Receiving");
-            dt.Columns.AddRange(new DataColumn[10] {
+            dt.Columns.AddRange(new DataColumn[11] {
                 new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("ReceivedDate")),
                 new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("DocumentNumber")),
                 new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("Supplier")),
@@ -212,6 +212,7 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("Quantity")),
                 new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("Unit")),
                 new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("UnitCost")),
+                new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("TotalAmount")),
                 new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("Unserved Qty")),
                 new DataColumn(chelper.DisplayName<PurchaseReceivingRVM>("Amount"))
 
@@ -227,6 +228,7 @@ namespace GMGInventory.Controllers
                             preceive.Quantity,
                             preceive.Unit,
                             preceive.UnitCost,
+                            preceive.TotalAmount,
                             preceive.UnservedQuantity,
                             preceive.UnservedAmount);
             }

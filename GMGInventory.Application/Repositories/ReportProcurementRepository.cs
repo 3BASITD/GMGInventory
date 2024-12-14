@@ -386,7 +386,7 @@ namespace GMGInventory.Application.Repositories
             totalRecord = data.Count();
 
             //get total amount of data in table
-            totalAmount = data.Sum(s => s.UnitCost);
+            totalAmount = data.Sum(s => s.TotalAmount);
             totalUnservedAmount = data.Sum(u => u.UnservedAmount);
 
             // search data when search value found
@@ -454,7 +454,7 @@ namespace GMGInventory.Application.Repositories
                 DateToD = filter.DateTo.GetValueOrDefault(),
                 Supplier = filter.Supplier == null || supplier == null ? "All" : supplier.Name,
                 Item = filter.Item == null || item == null ? "All" : item.Name,
-                TotalAmountD = items.Sum(s => s.UnitCost),
+                TotalAmountD = items.Sum(s => s.TotalAmount),
                 TotalAmount2D = items.Sum(s => s.UnservedAmount),
                 DocNo = items.Any() ? items.OrderBy(x => x.DocumentNumber).FirstOrDefault().DocumentNumber + " - " +
                                       items.OrderBy(x => x.DocumentNumber).LastOrDefault().DocumentNumber : ""
