@@ -101,7 +101,9 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.Forwarder)
                                                 .Include(s => s.PriceType)
                                                 .Include(s => s.PurchaseOrder)
-                           join user in userManager.Users on order.UserCreated equals user.Id
+                           join userc in userManager.Users on order.UserCreated equals userc.Id
+                           join userm in userManager.Users on order.UserCreated equals userm.Id into um
+                           from userm in um.DefaultIfEmpty()
                            from approve in userManager.Users.Where(s => s.Id == order.ApprovedBy).DefaultIfEmpty()
                            from disapprove in userManager.Users.Where(s => s.Id == order.DisapprovedBy).DefaultIfEmpty()
                            where order.Id == Id
@@ -118,7 +120,6 @@ namespace GMGInventory.Application.Repositories
                                CustomerCode = order.Customer.Code,
                                CustomerId = order.Customer.Id,
                                CustomerName = order.Customer.Name,
-                               CustomerStatus = order.Customer.Remarks + "",
                                DeclaredValueD = order.DeclaredValue,
                                DisapprovedBy = disapprove.Nickname,
                                DisapprovedDateD = order.DisapprovedDate,
@@ -128,16 +129,23 @@ namespace GMGInventory.Application.Repositories
                                GrossNetPrice = order.PriceType.Name,
                                GrossNetPriceId = order.PriceType.Id,
                                Id = order.Id,
-                               OrderDateD = order.DateCreated,
+                               OrderDateD = order.SalesOrderDate,
                                OutstandingBalanceD = order.Customer.OutstandingBalance,
                                POId = order.PurchaseOrder == null ? null : order.PurchaseOrder.Id,
                                PONumber = order.PurchaseOrder == null ? "-" : order.PurchaseOrder.PONumber,
                                Remarks = order.Remarks + "",
                                ResubmitId = order.ResubmittedSalesOrderId,
-                               SalesOrderBy = user.Nickname,
                                ShippingAddress = "",
                                SONumber = order.SalesOrderNumber,
-                               Status = order.Status.Code
+                               Status = order.Status.Code,
+                               AccountStatus = order.Customer.CustomerAccountStatus.Name,
+                               Region = order.Customer.Area.Region.Name,
+                               CommodityQuantityD = order.Customer.CommodityQuantity,
+                               RequiredDeliveryDateD = order.Customer.RequiredDeliveryDate,
+                               UserCreated = userc.FirstName + " " + userc.LastName,
+                               DateCreatedD = order.DateCreated,
+                               UserModified = userm == null ? null : userm.Nickname + " " + userm.LastName,
+                               DateModifiedD = order.DateModified == null ? null : order.DateModified.Value
                            });
 
             return await orderVM.FirstOrDefaultAsync();
@@ -421,12 +429,13 @@ namespace GMGInventory.Application.Repositories
                     CustomerId = form.Customer,
                     DeclaredValue = form.DeclaredValue,
                     ForwarderId = form.Forwarder,
-                    PriceTypeId = form.GrossNet,
+                    PriceTypeId = 1,//form.GrossNet,
                     PurchaseOrderId = form.PurchaseOrder,
                     QuantityInvoiced = 0,
                     QuantityOrdered = form.Items.Sum(s => s.Quantity),
                     QuantityPacked = 0,
                     Remarks = form.Remarks,
+                    SalesOrderDate = form.OrderDate,
                     SalesOrderNumber = soNumber,
                     StatusId = statusId,
                     TotalAmount = form.Items.Sum(s => s.GrossPrice)

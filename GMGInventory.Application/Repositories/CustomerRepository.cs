@@ -22,13 +22,13 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<Select2Model<JsonAddressOptionsModel>> GetOptions(string search, int page)
+        public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptions(string search, int page)
         {
             var customers = await context.Customers
                                          .Where(s => string.IsNullOrWhiteSpace(search)
                                                  || (s.Code.ToLower().Contains(search.ToLower()))
                                                  || (s.Name.ToLower().Contains(search.ToLower())))
-                                         .Select(s => new JsonAddressOptionsModel
+                                         .Select(s => new JsonCustomerOptionsModel
                                          {
                                              Id = s.Id.ToString(),
                                              Text = s.Code,
@@ -41,7 +41,7 @@ namespace GMGInventory.Application.Repositories
                                          .OrderBy(s => s.Text)
                                          .ToListAsync();
             var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
-            return new Select2Model<JsonAddressOptionsModel>
+            return new Select2Model<JsonCustomerOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,
@@ -49,14 +49,14 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonAddressOptionsModel>> GetByAgentOptions(string search, int page, int? agent)
+        public async Task<Select2Model<JsonCustomerOptionsModel>> GetByAgentOptions(string search, int page, int? agent)
         {
             var customers = await context.Customers
                                          .Where(s => (string.IsNullOrWhiteSpace(search)
                                                  || (s.Code.ToLower().Contains(search.ToLower()))
                                                  || (s.Name.ToLower().Contains(search.ToLower())))
                                                  && (agent == null || s.AgentId == agent))
-                                         .Select(s => new JsonAddressOptionsModel
+                                         .Select(s => new JsonCustomerOptionsModel
                                          {
                                              Id = s.Id.ToString(),
                                              Text = s.Code,
@@ -65,12 +65,15 @@ namespace GMGInventory.Application.Repositories
                                              CreditTerm = s.CreditTerm.Name,
                                              Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
                                              OutstandingBalanceD = s.OutstandingBalance,
-                                             CustomerStatus = s.Remarks + ""
+                                             CustomerStatus = s.CustomerAccountStatus.Name,
+                                             Region = s.Area.Region.Name,
+                                             RequiredDeliveryDateD = s.RequiredDeliveryDate,
+                                             CommodityQuantityD = s.CommodityQuantity
                                          })
                                          .OrderBy(s => s.Text)
                                          .ToListAsync();
             var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
-            return new Select2Model<JsonAddressOptionsModel>
+            return new Select2Model<JsonCustomerOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,
@@ -78,7 +81,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonAddressOptionsModel>> GetOptionsWithOrder(string search, int page)
+        public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptionsWithOrder(string search, int page)
         {
             var customers = await (from c in context.Customers
                                    where (string.IsNullOrWhiteSpace(search)
@@ -88,7 +91,7 @@ namespace GMGInventory.Application.Repositories
                                              .Any(s => s.Status.Name != "Sales Order Submitted"
                                                     && s.Status.Name != "Sales Order Disapproved"
                                                     && s.CustomerId == c.Id)
-                                   select new JsonAddressOptionsModel
+                                   select new JsonCustomerOptionsModel
                                    {
                                        Id = c.Id.ToString(),
                                        Text = c.Code,
@@ -103,7 +106,7 @@ namespace GMGInventory.Application.Repositories
 
 
             var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
-            return new Select2Model<JsonAddressOptionsModel>
+            return new Select2Model<JsonCustomerOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,

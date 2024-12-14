@@ -69,14 +69,14 @@ namespace GMGInventory.Application.Repositories
                     s.DateCreated,
                     s.UserModified,
                     s.DateModified
-                }.Any(a => a != null && a.Contains(form.SearchValue, StringComparison.CurrentCultureIgnoreCase)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumn.Contains("date", StringComparison.CurrentCultureIgnoreCase))
+                if (form.SortColumn.ToLower().Contains("date"))
                 {
                     if (form.SortColumnDirection == "asc")
                     {
@@ -97,7 +97,7 @@ namespace GMGInventory.Application.Repositories
                         }
                     }
                 }
-                else if (form.SortColumn.Contains("displayOrder", StringComparison.CurrentCultureIgnoreCase))
+                else if (form.SortColumn.ToLower().Contains("displayOrder"))
                 {
                     if (form.SortColumnDirection == "asc")
                         data = data.OrderBy(s => s.DisplayOrder == 0 ? int.MaxValue : s.DisplayOrder);

@@ -89,14 +89,13 @@
                     }
                 }
             ],
-            order: [[1, "desc"]],
+            order: [[6, "desc"]],
             createdRow: function (row, data, dataIndex) {
-                if (data.status == 'Resubmitted') {
+                if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('text-muted');
-                }
-                if (data.status == 'Disapproved') {
+                } else if (data.status.toLowerCase() == 'disapproved') {
                     $(row).find('td:eq(5)').addClass('text-danger');
-                } else if (data.status == 'Approved') {
+                } else if (data.status.toLowerCase() == 'approved') {
                     $(row).find('td:eq(5)').addClass('text-success');
                 }
             }

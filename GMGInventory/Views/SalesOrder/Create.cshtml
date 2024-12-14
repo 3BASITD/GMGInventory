@@ -56,21 +56,29 @@
                         <label for="order-customer-balance" class="form-label mb-0">Outstanding Balance</label>
                         <input type="text" id="order-customer-balance" class="form-control form-control-sm" readonly="readonly" />
                     </div>
-                    <div class="form-group">
+                    @* <div class="form-group">
                         <label for="order-gross-net" class="form-label mb-0">Gross / Net Price</label>
                         <select id="order-gross-net" class="form-control form-control-sm"></select>
-                    </div>
+                    </div> *@
                     <div class="form-group">
                         <label for="order-credit-term" class="form-label mb-0">Credit Term</label>
                         <input type="text" id="order-credit-term" class="form-control form-control-sm" readonly="readonly" />
                     </div>
-                    <div class="form-group">
+                    @* <div class="form-group">
                         <label for="order-declared-value" class="form-label mb-0">Declared Value</label>
                         <input type="number" id="order-declared-value" step="0.01" min="0" max="1999999" class="form-control form-control-sm" />
-                    </div>
+                    </div> *@
                     <div class="form-group">
                         <label for="order-purchase-number" class="form-label mb-0">Purchase Order Number</label>
                         <select id="order-purchase-number" style="width: 100%"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-region" class="form-label mb-0">Customer Region</label>
+                        <input type="text" id="order-region" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order-commodity-quantity" class="form-label mb-0">Customer Commodity Quantity</label>
+                        <input type="text" id="order-commodity-quantity" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -83,8 +91,16 @@
                         <input type="text" id="order-remarks" class="form-control form-control-sm" />
                     </div>
                     <div class="form-group">
-                        <label for="order-customer-status" class="form-label mb-0">Customer Status</label>
+                        <label for="order-date" class="form-label mb-0">Date Ordered</label>
+                        <input type="date" id="order-date" name="OrderDate" class="form-control form-control-sm" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order-customer-status" class="form-label mb-0">Customer Account Status</label>
                         <input type="text" id="order-customer-status" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order-delivery-date" class="form-label mb-0">Customer Required Delivery Date</label>
+                        <input type="text" id="order-delivery-date" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
             </div>
@@ -252,6 +268,7 @@
                 url: "@Url.Action("GetOptions2", "Agent")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,
@@ -293,6 +310,7 @@
                 url: "@Url.Action("GetByAgentOptions", "Customer")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,
@@ -317,8 +335,11 @@
             $("#order-customer-name").val($(this).select2("data")[0].name);
             $("#order-customer-address").val($(this).select2("data")[0].address);
             $("#order-customer-balance").val($(this).select2("data")[0].outstandingBalance);
-            $("#order-customer-status").val($(this).select2("data")[0].customerStatus);
             $("#order-credit-term").val($(this).select2("data")[0].creditTerm);
+            $("#order-region").val($(this).select2("data")[0].region);
+            $("#order-customer-status").val($(this).select2("data")[0].customerStatus);
+            $("#order-delivery-date").val($(this).select2("data")[0].requiredDeliveryDate);
+            $("#order-commodity-quantity").val($(this).select2("data")[0].commodityQuantity);
 
             if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
                 toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance");
@@ -329,8 +350,11 @@
             $("#order-customer-name").val("");
             $("#order-customer-address").val("");
             $("#order-customer-balance").val("");
-            $("#order-customer-status").val("");
             $("#order-credit-term").val("");
+            $("#order-customer-status").val("");
+            $("#order-customer-status").val("");
+            $("#order-delivery-date").val("");
+            $("#order-commodity-quantity").val("");
         });
 
         // Load price type data for select2
@@ -354,6 +378,7 @@
                 url: "@Url.Action("GetOptions", "PurchaseOrder")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,
@@ -400,6 +425,7 @@
                 url: "@Url.Action("GetOptions", "Item")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,
@@ -720,11 +746,13 @@
         var validateCreate = $("#form-order").validate({
             rules: {
                 CustomerCode: { required: true },
-                AgentCode: { required: true }
+                AgentCode: { required: true },
+                OrderDate: { required: true}
             },
             messages: {
                 CustomerCode: { required: "Please select customer" },
-                AgentCode: { required: "Please select agent" }
+                AgentCode: { required: "Please select agent" },
+                OrderDate: { required: "Please select date of order" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -738,23 +766,51 @@
                 toastr.warning("No item to order. Add an item to the list to continue", "Warning");
             } else if (itemsToOrder.filter(s => parseInt(s.quantity) === 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't order an item with 0 quantity", "Warning");
-            } else if ($("#order-customer-code").select2("data")[0].outstandingBalanceD > 0) {
-                swal({
-                    title: "Customer's Outstanding Balance",
-                    text: "(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance + ". Are you sure you want to continue submitting it?",
-                    icon: "info",
-                    buttons: {
-                        cancel: "No",
-                        continue: "Yes"
-                    },
-                    infoMode: true
-                }).then((value) => {
-                    if (value == "continue") {
-                        DoSave();
-                    }
-                });
+                // } else if ($("#order-customer-code").select2("data")[0].outstandingBalanceD > 0) {
+                //     swal({
+                //         title: "Customer's Outstanding Balance",
+                //         text: "(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance + ". Are you sure you want to continue submitting it?",
+                //         icon: "info",
+                //         buttons: {
+                //             cancel: "No",
+                //             continue: "Yes"
+                //         },
+                //         infoMode: true
+                //     }).then((value) => {
+                //         if (value == "continue") {
+                //             DoSave();
+                //         }
+                //     });
+                // } else {
+                //     DoSave();
+                // }
             } else {
-                DoSave();
+                var customerStatus = $("#order-customer-code").select2("data")[0].customerStatus.trim().toLowerCase();
+                if (customerStatus == "red flag" || customerStatus == "hold") {
+                    swal({
+                        title: "Customer's Status",
+                        text: "Can't proceed because the customer is in \"" + customerStatus + "\" status",
+                        icon: "warning",
+                        dangerMode: true
+                    });
+                } else if (customerStatus == "watch list") {
+                    swal({
+                        title: "Customer's Status",
+                        text: "Customer is currently on watch list. Do you want to continue?",
+                        icon: "info",
+                        buttons: {
+                            cancel: "No",
+                            continue: "Yes"
+                        },
+                        infoMode: true
+                    }).then((value) => {
+                        if (value == "continue") {
+                            DoSave();
+                        }
+                    });
+                } else {
+                    DoSave();
+                }
             }
         }
 
@@ -769,6 +825,7 @@
                     GrossNet: $("#order-gross-net").val(),
                     PurchaseOrder: $("#order-purchase-number").val(),
                     DeclaredValue: $("#order-declared-value").val(),
+                    OrderDate: $("#order-date").val(),
                     Remarks: $("#order-remarks").val(),
                     Items: GetItemsToOrder(),
                     ResubmitId: "@(TempData["SalesOrderId"])"

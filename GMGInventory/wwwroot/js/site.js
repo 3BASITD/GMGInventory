@@ -73,9 +73,13 @@
     });
 
     var ajax_time = Date.now();
+    var active_select_search = $(".select2-search__field").filter(":focus");;
 
     $(document).ajaxStart(function (event, jqxhr, settings) {
         ajax_time = Date.now();
+
+        active_select_search = $(".select2-search__field").filter(":focus");
+        active_select_search.blur();
     });
 
     $(document).ajaxSend(function (event, jqxhr, settings) {
@@ -116,6 +120,9 @@
         logTime += ":" + String(ajax_run_ss).padStart(2, "0");
         logTime += "." + String(ajax_run_time).padStart(3, "0");
         console.log('%c %s%c %s %s', 'background-color:lightblue;font-weight:bold;', log, 'background-color:transparent;', logTime, requestURL);
+
+        if (active_select_search.length > 0)
+            active_select_search.focus();
     });
 
     $.validator.addMethod('lessThanOrEqual', function (value, element, param) {

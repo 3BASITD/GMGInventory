@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -133,14 +134,14 @@ namespace GMGInventory.Application.Repositories
                     s.SINumber,
                     s.Status,
                     s.ReturnDate,
-                }.Any(a => a != null && a.Contains(form.SearchValue, StringComparison.CurrentCultureIgnoreCase)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumn.Contains("date", StringComparison.CurrentCultureIgnoreCase))
+                if (form.SortColumn.ToLower().Contains("date"))
                 {
                     if (form.SortColumnDirection == "asc")
                     {
@@ -253,7 +254,7 @@ namespace GMGInventory.Application.Repositories
                     s.UnitCode,
                     s.UnitCost,
                     s.TotalAmount
-                }.Any(a => a != null && a.Contains(form.SearchValue, StringComparison.CurrentCultureIgnoreCase)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -443,7 +444,7 @@ namespace GMGInventory.Application.Repositories
                 catch (Exception ex)
                 {
                     response.Status = "Error";
-                    response.Message = ex.Message;
+                    response.Message = SystemFormat.GetInnermostExceptionMessage(ex);
                 }
             }
             return response;

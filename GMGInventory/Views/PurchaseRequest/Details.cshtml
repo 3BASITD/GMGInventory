@@ -638,6 +638,7 @@
                         url: "@Url.Action("GetOptions", "Item")",
                         dataType: 'json',
                         type: "POST",
+                        delay: 500,
                         data: function (params) {
                             return {
                                 search: params.term,
@@ -695,6 +696,7 @@
                         url: "@Url.Action("GetUnservedOptions", "Item")",
                         dataType: 'json',
                         type: "POST",
+                        delay: 500,
                         data: function (params) {
                             return {
                                 search: params.term,
@@ -750,6 +752,7 @@
                     url: "@Url.Action("GetSalesOrderOptions", "SalesOrder")",
                     dataType: 'json',
                     type: "POST",
+                    delay: 500,
                     data: function (params) {
                         return {
                             search: params.term,

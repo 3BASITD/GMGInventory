@@ -57,9 +57,6 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Address")]
         public string CustomerAddress { get; set; }
 
-        [Display(Name = "Customer Status")]
-        public string CustomerStatus { get; set; }
-
         [Display(Name = "Outstanding Balance")]
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
         public decimal OutstandingBalanceD { get; set; }
@@ -94,15 +91,27 @@ namespace GMGInventory.Common.Models
         public string? PONumber { get; set; }
 
         [Display(Name = "Sales Order Date")]
-        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
+        public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
+        public string OrderDate3 => OrderDateD.ToString(SystemFormat.StringDate3);
         public DateTime OrderDateD { get; set; }
 
         [Display(Name = "Declared Value")]
         public string DeclaredValue => string.Format(SystemFormat.StringDecimalComma, DeclaredValueD ?? 0m);
         public decimal? DeclaredValueD { get; set; }
 
-        [Display(Name = "Sales Order By")]
-        public string SalesOrderBy { get; set; }
+        [Display(Name = "Customer's Account Status")]
+        public string AccountStatus { get; set; }
+
+        [Display(Name = "Customer's Region")]
+        public string Region { get; set; }
+
+        [Display(Name = "Customer's Commodity Quantity")]
+        public string CommodityQuantity => string.Format(SystemFormat.StringIntegerComma, CommodityQuantityD);
+        public int CommodityQuantityD { get; set; }
+
+        [Display(Name = "Customer's Required Delivery Date")]
+        public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
+        public DateTime RequiredDeliveryDateD { get; set; }
 
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
@@ -128,6 +137,20 @@ namespace GMGInventory.Common.Models
         public string DisapprovedReason { get; set; }
 
         public int? ResubmitId { get; set; }
+
+        [Display(Name = "Created By")]
+        public string UserCreated { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+
+        [Display(Name = "Modified By")]
+        public string? UserModified { get; set; }
+
+        [Display(Name = "Date Modified")]
+        public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
     }
 
     public class SalesOrderPrintVM : SalesOrderDetailsVM
@@ -160,10 +183,17 @@ namespace GMGInventory.Common.Models
                 POId = value.POId;
                 PONumber = value.PONumber;
                 Remarks = value.Remarks;
-                SalesOrderBy = value.SalesOrderBy;
                 ShippingAddress = value.ShippingAddress;
                 SONumber = value.SONumber;
                 Status = value.Status;
+                AccountStatus = value.AccountStatus;
+                Region = value.Region;
+                CommodityQuantityD = value.CommodityQuantityD;
+                RequiredDeliveryDateD = value.RequiredDeliveryDateD;
+                UserCreated = value.UserCreated;
+                DateCreatedD = value.DateCreatedD;
+                UserModified = value.UserModified;
+                DateModifiedD = value.DateModifiedD;
             }
         }
         public IList<SalesOrderItemVM> Items { get; set; }
@@ -251,6 +281,7 @@ namespace GMGInventory.Common.Models
         public int GrossNet { get; set; }
         public int? PurchaseOrder { get; set; }
         public decimal DeclaredValue { get; set; }
+        public DateTime OrderDate { get; set; }
         public string Remarks { get; set; }
         public int? ResubmitId { get; set; }
         public IList<SalesOrderFormItemVM> Items { get; set; }

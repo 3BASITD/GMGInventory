@@ -31,8 +31,8 @@ namespace GMGInventory.Application.Repositories
         {
             var agents = await context.Agents
                                       .Where(s => string.IsNullOrWhiteSpace(search)
-                                               || s.Code.Contains(search, StringComparison.CurrentCultureIgnoreCase)
-                                               || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).Contains(search, StringComparison.CurrentCultureIgnoreCase)))
+                                               || s.Code.ToLower().Contains(search.ToLower())
+                                               || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).ToLower().Contains(search.ToLower())))
                                       .Select(s => new JsonNameOptionsModel
                                       {
                                           Id = s.Id.ToString(),

@@ -125,7 +125,7 @@ namespace GMGInventory.Common.Models
         public bool Selected { get; set; } = false;
     }
 
-    public class JsonAddressOptionsModel
+    public class JsonCustomerOptionsModel
     {
         public string Id { get; set; }
         public string Text { get; set; }
@@ -137,6 +137,10 @@ namespace GMGInventory.Common.Models
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
         public decimal OutstandingBalanceD { get; set; }
         public string CustomerStatus { get; set; }
+        public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
+        public DateTime RequiredDeliveryDateD { get; set; }
+        public string CommodityQuantity => string.Format(SystemFormat.StringIntegerComma, CommodityQuantityD);
+        public int CommodityQuantityD { get; set; }
     }
 
     public class JsonInvoiceOptionsModel

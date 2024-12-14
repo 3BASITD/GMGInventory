@@ -187,6 +187,7 @@
                 url: "@Url.Action("GetOptions2", "Agent")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,
@@ -230,6 +231,7 @@
                 url: "@Url.Action("GetOptions", "Customer")",
                 dataType: 'json',
                 type: "POST",
+                delay: 500,
                 data: function (params) {
                     return {
                         search: params.term,
