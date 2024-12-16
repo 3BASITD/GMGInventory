@@ -300,6 +300,8 @@
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
+            if ($("#groupby").val()) { urlQuery.push("GroupBy=" + $("#groupby").val()); }
+
             window.location = "@Url.Action("DownloadPurchaseOrder")?" + urlQuery.join("&");
         });
 
