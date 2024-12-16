@@ -156,6 +156,7 @@ namespace GMGInventory.Application.Repositories
             return new PurchaseOrderPVM
             {
                 Contents = items,
+                GroupBy = filter.GroupBy,
                 DateFromD = filter.DateFrom.GetValueOrDefault(),
                 DateToD = filter.DateTo.GetValueOrDefault(),
                 Supplier = filter.Supplier == null || supplier == null ? "All" : supplier.Name,
@@ -300,6 +301,7 @@ namespace GMGInventory.Application.Repositories
             return new PurchaseReturnPVM
             {
                 Contents = items,
+                GroupBy = filter.GroupBy,
                 DateFromD = filter.DateFrom.GetValueOrDefault(),
                 DateToD = filter.DateTo.GetValueOrDefault(),
                 Supplier = filter.Supplier == null || supplier == null ? "All" : supplier.Name,
@@ -327,51 +329,24 @@ namespace GMGInventory.Application.Repositories
                              where filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
                             && (filter.Item == null || preceive.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceive.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                             && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
+                            select new PurchaseReceivingRVM
+                            {
+                                                 Item = preceive.OrderItem.RequestItem.Item.Code,
+                                                 ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
+                                                 Quantity = preceive.Quantity,
+                                                 Unit = preceive.OrderItem.RequestItem.Unit.Code,
+                                                 UnitCost = preceive.OrderItem.UnitCost,
+                                                 TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
 
-                             select new PurchaseReceivingRVM
-                             {
-                                 Item = preceive.OrderItem.RequestItem.Item.Code,
-                                 ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
-                                 Quantity = preceive.Quantity,
-                                 Unit = preceive.OrderItem.RequestItem.Unit.Code,
-                                 UnitCost = preceive.OrderItem.UnitCost,
-                                 TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
+                                                 DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
+                                                 Supplier = poItems.PurchaseOrder.Supplier.Code,
+                                                 ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
 
-                                 DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
-                                 Supplier = poItems.PurchaseOrder.Supplier.Code,
-                                 ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
+                                                 UnservedQuantity = preceive.Quantity - poItems.Quantity,
+                                                 UnservedAmount = (preceive.Quantity - poItems.Quantity) * preceive.OrderItem.UnitCost
+                                             };
 
-                                 UnservedQuantity = preceive.Quantity - poItems.Quantity,
-                                 UnservedAmount = (preceive.Quantity - poItems.Quantity) * preceive.OrderItem.UnitCost
-                             };
-
-            //var preceiveVM = from preceive in context.PurchaseReceivingLineItems
-            //                 let allorder = context.PurchaseOrderNewLineItems
-            //                                       .Where(s => s.RequestItemId == preceive.OrderItem.RequestItemId)
-            //                                       .Sum(s => s.Quantity)
-            //                 let allrequest = context.PurchaseRequestLineItems
-            //                                         .Where(s => s.Id == preceive.OrderItem.RequestItemId)
-            //                                         .Sum(s => s.Quantity)
-            //                 // where filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
-            //                 //&& (filter.Item == null || preceive.Item.Id == filter.Item || (filter.Item == 0 && preceive.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
-            //                 //&& (filter.Supplier == null || preceive.PurchaseReceiving.Supplier.Id == filter.Supplier)
-            //                 select new PurchaseReceivingRVM
-            //                 {
-            //                     Item = preceive.OrderItem.RequestItem.Item.Code,
-            //                     ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
-            //                     Quantity = preceive.Quantity,
-            //                     Unit = preceive.OrderItem.RequestItem.Unit.Code,
-            //                     UnitCost = preceive.OrderItem.UnitCost,
-            //                     TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
-
-            //                     DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
-            //                     Supplier = preceive.PurchaseReceiving.PurchaseOrder.Supplier.Code,
-            //                     ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
-
-            //                     UnservedQuantity = allrequest - allorder,
-            //                     UnservedAmount = (allrequest - allorder) * preceive.OrderItem.UnitCost
-            //                 };
-            return await preceiveVM.ToListAsync();
+            return  await preceiveVM.ToListAsync();
         }
         public async Task<ForDataTables<PurchaseReceivingRVM>> GetPurchaseReceivingDT(DataTablesRequestForm form, ListFilterReturnReceivingModel filter)
         {
@@ -449,7 +424,8 @@ namespace GMGInventory.Application.Repositories
             var item = await context.Items.Where(s => s.Id == filter.Item).FirstOrDefaultAsync();
             return new PurchaseReceivingPVM
             {
-                Contents = items,
+                Contents =  items,
+                GroupBy = filter.GroupBy,
                 DateFromD = filter.DateFrom.GetValueOrDefault(),
                 DateToD = filter.DateTo.GetValueOrDefault(),
                 Supplier = filter.Supplier == null || supplier == null ? "All" : supplier.Name,

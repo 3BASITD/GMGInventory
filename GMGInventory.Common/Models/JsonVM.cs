@@ -225,6 +225,7 @@ namespace GMGInventory.Common.Models
         public string? ItemKeyword { get; set; }
         public int? Supplier { get; set; }
         public bool Unserved { get; set; }
+        public string GroupBy { get; set; }
     }
     public class ListFilterReturnReceivingModel : ListFilterCommonModel
     {
@@ -232,6 +233,8 @@ namespace GMGInventory.Common.Models
         public string? ItemKeyword { get; set; }
         public int? Supplier { get; set; }
         public int? PurchaseOrder { get; set; }
+        public string GroupBy { get; set; }
+
     }
 
     public class ListFilterCommonModel

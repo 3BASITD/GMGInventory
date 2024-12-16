@@ -89,52 +89,50 @@
                 </button>
             </div>
             <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="filter-supplier" class="form-label mb-0">Supplier</label>
-                                    <select id="filter-supplier" style="width:100%">
-                                        <option></option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="filter-item" class="form-label mb-0">Item</label>
-                                    <select id="filter-item" style="width:100%">
-                                        <option></option>
-                                    </select>
-                                </div>
-                            </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-supplier" class="form-label mb-0">Supplier</label>
+                            <select id="filter-supplier" style="width:100%">
+                                <option></option>
+                            </select>
                         </div>
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="filter-from" class="form-label mb-0">Date From</label>
-                                    <input type="date" id="filter-from" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="filter-to" class="control-label mb-0">Date To</label>
-                                    <input type="date" id="filter-to" class="form-control form-control-sm" />
-                                </div>
-                            </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-item" class="form-label mb-0">Item</label>
+                            <select id="filter-item" style="width:100%">
+                                <option></option>
+                            </select>
                         </div>
-                        @* <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="groupby" class="form-label mb-0">Group By</label>
-                                    <select id="groupby" style="width:100%" class="custom-select">
-                                        <option value="None">None</option>
-                                        <option value="ReceivingDate">Receiving Date</option>
-                                        <option value="Supplier">Supplier</option>
-                                        <option value="Item">Item</option>
-                                        <option value="Unit">Unit</option>
-                                    </select>
-                                </div>
-                            </div>
-                    </div> *@
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="groupby" class="form-label mb-0">Group By</label>
+                            <select id="groupby" style="width:100%" class="custom-select">
+                                <option value="">None</option>
+                                <option value="supplier">Supplier</option>
+                                <option value="item">Item</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
@@ -268,9 +266,9 @@
                 { data: "unservedAmount", name: "UnservedAmount", className: "text-end" }
 
             ],
-            // rowGroup: {
-            //     dataSrc: 'supplier'
-            // },
+            rowGroup: {
+                dataSrc: ''
+            },
             footerCallback: function (row, data, start, end, display) {
                 var json = purchaseReceivingDT.ajax.json();
                 var api = this.api(), data;
@@ -287,8 +285,9 @@
 
             $(".table-purchaseReceiving thead th").removeClass("text-end");
         });
-
+        // Change the fixed ordering when the data source is updated
         $(".btnFilter").on("click", function () {
+            purchaseReceivingDT.rowGroup().dataSrc($("#groupby").val());
             purchaseReceivingDT.ajax.reload();
             $("#filterModal").modal("hide");
         });
@@ -314,6 +313,8 @@
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
+            if ($("#groupby").val()) { urlQuery.push("GroupBy=" + $("#groupby").val()); }
+
             setTimeout(function () {
                 let win = window.open('@Url.Action("PrintPurchaseReceiving")?' + urlQuery.join("&"), '');
                 var wintimer = setInterval(function () {

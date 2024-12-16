@@ -65,21 +65,53 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Contents)
+            @if (Model.GroupBy != null)
             {
-                <tr>
-                    <td><nobr>@item.ReturnDate</nobr></td>
-                    <td>@item.DocumentNumber</td>
-                    <td>@item.Supplier</td>
-                    <td>@item.Item</td>
-                    <td>@item.ItemDescription</td>
-                    <td>@item.Quantity</td>
-                    <td>@item.Unit</td>
-                    <td>@item.UnitCost</td>
-                    <td>@item.TotalAmount</td>
-                    <td>@item.ReturnQuantity</td>
-                    <td>@item.ReturnTotalAmount</td>
-                </tr>
+                @foreach (var grp in Model.Contents.GroupBy(x => Model.GroupBy == "item" ? x.Item :
+               Model.GroupBy == "supplier" ? x.Supplier : x.ReturnDate))
+                {
+
+                    <tr>
+                        <td><nobr>@grp.Key</nobr></td>
+                    </tr>
+                    @foreach (var item in Model.Contents.Where(x => Model.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
+                   Model.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
+                   x.ReturnDate == grp.FirstOrDefault()!.ReturnDate))
+                    {
+                        <tr>
+                            <td><nobr>@item.ReturnDate</nobr></td>
+                            <td>@item.DocumentNumber</td>
+                            <td>@item.Supplier</td>
+                            <td>@item.Item</td>
+                            <td>@item.ItemDescription</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.Unit</td>
+                            <td>@item.UnitCost</td>
+                            <td>@item.TotalAmount</td>
+                            <td>@item.ReturnQuantity</td>
+                            <td>@item.ReturnTotalAmount</td>
+                        </tr>
+                    }
+                }
+            }
+            else
+            {
+                @foreach (var item in Model.Contents)
+                {
+                    <tr>
+                        <td><nobr>@item.ReturnDate</nobr></td>
+                        <td>@item.DocumentNumber</td>
+                        <td>@item.Supplier</td>
+                        <td>@item.Item</td>
+                        <td>@item.ItemDescription</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Unit</td>
+                        <td>@item.UnitCost</td>
+                        <td>@item.TotalAmount</td>
+                        <td>@item.ReturnQuantity</td>
+                        <td>@item.ReturnTotalAmount</td>
+                    </tr>
+                }
             }
         </tbody>
         <tfoot>
