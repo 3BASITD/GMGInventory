@@ -21,6 +21,7 @@ namespace GMGInventory.Application.Contracts
         Task<bool> UploadCombinationExistAsync(SupplierVM supplierVM);
         Task<IList<SupplierViewVM>> GetAllSupplierAsync();
         Task<ForDataTables<SupplierViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
-
+        Task<ForDataTables<SupplierDetailPurchaseVM>> GetSupplierPurchaseDTAsync(DataTablesRequestForm form, int id);
+        SupplierViewVM? GetSupplierViewVM(int? id);
     }
 }

@@ -135,13 +135,9 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="create-terms" class="control-label mb-0 d-block">Terms</label>
-                                    <input type="text" name="Terms" id="create-terms" class="form-control form-control-sm" />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="create-pricelist" class="control-label mb-0 d-block">Pricelist</label>
-                                    <input type="text" name="Pricelist" id="create-pricelist" class="form-control form-control-sm" />
+                                    <label for="create-term" class="control-label mb-0 d-block">Term</label>
+                                    <select name="Term" id="create-term" class="form-control" style="width: 100%">
+                                    </select>
                                 </div>
 
                                 <div class="form-group">
@@ -234,13 +230,9 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="edit-terms" class="control-label mb-0 d-block">Terms</label>
-                                    <input type="text" name="Terms" id="edit-terms" class="form-control form-control-sm" />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="edit-pricelist" class="control-label mb-0 d-block">Pricelist</label>
-                                    <input type="text" name="Pricelist" id="edit-pricelist" class="form-control form-control-sm" />
+                                    <label for="edit-term" class="control-label mb-0 d-block">Term</label>
+                                    <select name="Term" id="edit-term" class="form-control" style="width: 100%">
+                                    </select>
                                 </div>
 
                                 <div class="form-group">
@@ -271,64 +263,6 @@
         </div>
     </div>
 }
-
-<!-- Details Modal -->
-<div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Supplier Details</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Code</dt>
-                    <dd class="col-sm-8 modal-detail-code"></dd>
-                    <dt class="col-sm-4">Name</dt>
-                    <dd class="col-sm-8 modal-detail-name"></dd>
-                    <dt class="col-sm-4">TIN</dt>
-                    <dd class="col-sm-8 modal-detail-tin"></dd>
-                    <dt class="col-sm-4">Address Line 1</dt>
-                    <dd class="col-sm-8 modal-detail-addressline1"></dd>
-                    <dt class="col-sm-4">Address Line 2</dt>
-                    <dd class="col-sm-8 modal-detail-addressline2"></dd>
-                    <dt class="col-sm-4">Office Tel No</dt>
-                    <dd class="col-sm-8 modal-detail-officetelno"></dd>
-                    <dt class="col-sm-4">Contact Person</dt>
-                    <dd class="col-sm-8 modal-detail-contactperson"></dd>
-                    <dt class="col-sm-4">Region</dt>
-                    <dd class="col-sm-8 modal-detail-region"></dd>
-                    <dt class="col-sm-4">Terms</dt>
-                    <dd class="col-sm-8 modal-detail-terms"></dd>
-                    <dt class="col-sm-4">Pricelist</dt>
-                    <dd class="col-sm-8 modal-detail-pricelist"></dd>
-                    <dt class="col-sm-4">Currency</dt>
-                    <dd class="col-sm-8 modal-detail-currency"></dd>
-                    <dt class="col-sm-4">Business Style</dt>
-                    <dd class="col-sm-8 modal-detail-businessStyle"></dd>
-                    <dt class="col-sm-4">VAT</dt>
-                    <dd class="col-sm-8 modal-detail-vat"></dd>
-                    <dt class="col-sm-4">Is Active?</dt>
-                    <dd class="col-sm-8 modal-detail-isactive"></dd>
-                    <dt class="col-sm-4">User Created</dt>
-                    <dd class="col-sm-8 modal-detail-usercreated"></dd>
-                    <dt class="col-sm-4">Date Created</dt>
-                    <dd class="col-sm-8 modal-detail-datecreated"></dd>
-                    <dt class="col-sm-4">User Modified</dt>
-                    <dd class="col-sm-8 modal-detail-usermodified"></dd>
-                    <dt class="col-sm-4">Date Modified</dt>
-                    <dd class="col-sm-8 modal-detail-datemodified"></dd>
-                </dl>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 @if (userAccess.CanUploadDownload)
 {
@@ -421,6 +355,24 @@
             }
         });
 
+        // Load Select2 Credit Term
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "CreditTerm")",
+            success: function (data, status, xhr) {
+                $("#create-term").select2({
+                    data: data,
+                    dropdownParent: $("#createModal"),
+                    minimumResultsForSearch: -1
+                });
+                $("#edit-term").select2({
+                    data: data,
+                    dropdownParent: $("#editModal"),
+                    minimumResultsForSearch: -1
+                });
+            }
+        });
+
         // Load List on DataTable
         var dataTable = $('.table-supplier').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -462,7 +414,8 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+
                         if (data.isActive) {
                             if (user_access.canEdit) {
                                 actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
@@ -523,27 +476,6 @@
                     });
                 });
             }
-            $('.detailsBtn').click(function (e) {
-                var data = dataTable.row($(this).parents('tr')).data();
-                $(".modal-detail-code").html(data.code);
-                $(".modal-detail-name").html(data.name);
-                $(".modal-detail-tin").html(data.tin);
-                $(".modal-detail-addressline1").html(data.addressLine1);
-                $(".modal-detail-addressline2").html(data.addressLine2);
-                $(".modal-detail-officetelno").html(data.officeTelNo);
-                $(".modal-detail-contactperson").html(data.contactPerson);
-                $(".modal-detail-region").html(data.regionName);
-                $(".modal-detail-terms").html(data.terms);
-                $(".modal-detail-pricelist").html(data.priceList);
-                $(".modal-detail-currency").html(data.currencyName);
-                $(".modal-detail-businessStyle").html(data.businessStyleName);
-                $(".modal-detail-vat").html(data.vat);
-                $(".modal-detail-isactive").html(data.isActive);
-                $(".modal-detail-usercreated").html(data.userCreated);
-                $(".modal-detail-datecreated").html(data.dateCreated);
-                $(".modal-detail-usermodified").html(data.userModified);
-                $(".modal-detail-datemodified").html(data.dateModified);
-            });
 
             if (user_access.canEdit) {
 
@@ -559,8 +491,7 @@
                     $("#edit-officetelno").val(data.officeTelNo);
                     $("#edit-contact-person").val(data.contactPerson);
                     $("#edit-region").val(data.regionId);
-                    $("#edit-terms").val(data.terms);
-                    $("#edit-pricelist").val(data.priceList);
+                    $("#edit-term").val(data.termId).trigger("change");
                     $("#edit-currency").val(data.currencyId);
                     $("#edit-businessStyle").val(data.businessStyleId);
                     $("#edit-vat").val(data.vat);
@@ -642,8 +573,6 @@
                         AddressLine2: { maxlength: 150 },
                         OfficeTelNo: { maxlength: 100 },
                         ContactPerson: { maxlength: 100 },
-                        Terms: { maxlength: 100 },
-                        Pricelist: { maxlength: 100 },
                         Region: { required: true },
                         VAT: { maxlength: 12 }
                     },
@@ -655,10 +584,8 @@
                         AddressLine2: { maxlength: "Address Line 2 must not exceed 150 characters." },
                         OfficeTelNo: { maxlength: "Office Tel No must not exceed 100 characters." },
                         ContactPerson: { maxlength: "Contact Person must not exceed 100 characters." },
-                        Terms: { maxlength: "Terms must not exceed 100 characters." },
-                        Pricelist: { maxlength: "Pricelist must not exceed 100 characters." },
                         Region: { required: "Please enter region." },
-                        VAT: { maxlength: "Terms must not exceed 12 characters." },
+                        VAT: { maxlength: "VAT must not exceed 12 characters." },
                     },
                     submitHandler: function (form, event) {
                         event.preventDefault();
@@ -681,8 +608,7 @@
                             OfficeTelNo: $("#edit-officetelno").val(),
                             ContactPerson: $("#edit-contact-person").val(),
                             RegionId: $("#edit-region").val(),
-                            Terms: $("#edit-terms").val(),
-                            Pricelist: $("#edit-pricelist").val(),
+                            TermId: $("#edit-term").val(),
                             CurrencyId: $("#edit-currency").val(),
                             BusinessStyleId: $("#edit-businessStyle").val(),
                             VAT: $("#edit-vat").val()
@@ -713,8 +639,7 @@
                 $("#create-officetelno").val("");
                 $("#create-contact-person").val("");
                 $("#create-region").prop("selectedIndex", 0).trigger("change");
-                $("#create-terms").val("");
-                $("#create-pricelist").val("");
+                $("#create-term").prop("selectedIndex", 0).trigger("change");
                 $("#create-currency").prop("selectedIndex", 0).trigger("change");
                 $("#create-businessStyle").prop("selectedIndex", 0).trigger("change");
                 $("#create-vat").val("");
@@ -730,8 +655,6 @@
                     AddressLine2: { maxlength: 150 },
                     OfficeTelNo: { maxlength: 100 },
                     ContactPerson: { maxlength: 100 },
-                    Terms: { maxlength: 100 },
-                    Pricelist: { maxlength: 100 },
                     Region: { required: true },
                     VAT: { maxlength: 12 }
                 },
@@ -743,10 +666,8 @@
                     AddressLine2: { maxlength: "Address Line 2 must not exceed 150 characters." },
                     OfficeTelNo: { maxlength: "Office Tel No must not exceed 100 characters." },
                     ContactPerson: { maxlength: "Contact Person must not exceed 100 characters." },
-                    Terms: { maxlength: "Terms must not exceed 100 characters." },
-                    Pricelist: { maxlength: "Pricelist must not exceed 100 characters." },
                     Region: { required: "Please enter region." },
-                    VAT: { maxlength: "Terms must not exceed 12 characters." },
+                    VAT: { maxlength: "VAT must not exceed 12 characters." },
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -768,8 +689,7 @@
                         OfficeTelNo: $("#create-officetelno").val(),
                         ContactPerson: $("#create-contact-person").val(),
                         RegionId: $("#create-region").val(),
-                        Terms: $("#create-terms").val(),
-                        Pricelist: $("#create-pricelist").val(),
+                        TermId: $("#create-term").val(),
                         CurrencyId: $("#create-currency").val(),
                         BusinessStyleId: $("#create-businessStyle").val(),
                         VAT: $("#create-vat").val()

@@ -822,7 +822,6 @@
 
         // Load functions upon DataTable load
         conversionDT.on("draw", function () {
-            hideLoader();
             var data = conversionDT.row(0).data();
 
             if (data != null && data.subItemId != null) {
@@ -1052,6 +1051,8 @@
                     });
                 }
             }
+
+            hideLoader();
         });
 
 
@@ -1173,7 +1174,6 @@
                 { data: "supplier", name: "Supplier" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "unitCost", name: "UnitCost", className: "text-end" },
-                { data: "unitPrice", name: "UnitPrice", className: "text-end" },
                 { data: "currency", name: "Currency" },
                 { data: "conversionFactor", name: "ConversionFactor", className: "text-end" },
                 { data: "convertedUnitPrice", name: "ConvertedUnitPrice", className: "text-end" },

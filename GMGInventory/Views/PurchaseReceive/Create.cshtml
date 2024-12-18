@@ -332,7 +332,13 @@
                 {
                     data: function (data, type, dataToSet) {
                         if (data.toReceive == true) {
-                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            if (data.quantityD > data.orderQuantityD) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.orderQuantityD + ' order quantity.</label>';
+                            } else if (data.quantityD == 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to receive.</label>';
+                            } else {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            }
                         } else {
                             return data.quantity;
                         }
@@ -646,6 +652,8 @@
                             purchaseReceivingId: v.purchaseReceivingId,
                             quantity: FormatStringInteger(0),
                             quantityD: 0,
+                            orderQuantity: v.quantity,
+                            orderQuantityD: v.quantityD,
                             unitCode: v.unitCode,
                             unitId: v.unitId,
                             unitCost: v.unitCost,

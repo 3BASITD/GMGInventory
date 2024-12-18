@@ -40,8 +40,10 @@ namespace GMGInventory.Common.Models
         public string RegionName { get; set; }
         public SelectList? Regions { get; set; }
 
-        [StringLength(100)]
-        public string Terms { get; set; }
+        [Required]
+        [Display(Name = "Term")]
+        public int TermId { get; set; }
+        public string Term { get; set; }
 
         [StringLength(100)]
         public string PriceList { get; set; }
@@ -59,68 +61,6 @@ namespace GMGInventory.Common.Models
         [StringLength(12)]
         public string VAT { get; set; }
         public bool IsActive { get; set; }
-
-
-        //[Required]
-        //[Display(Name = "Area")]
-        //public int AreaId { get; set; }
-        //public string AreaName { get; set; }
-        //public SelectList? Areas { get; set; }
-
-        //[Required]
-        //[Display(Name = "Region")]
-        //public int RegionId { get; set; }
-        //public SelectList? Regions { get; set; }
-
-        //[Required]
-        //[Display(Name = "Currency")]
-        //public int CurrencyId { get; set; }
-        //public string CurrencyName { get; set; }
-        //public SelectList? Currencies { get; set; }
-
-        //[Required]
-        //[Display(Name = "Credit Limit")]
-        //public string CreditLimit => string.Format(SystemFormat.StringIntegerComma, CreditLimitD);
-        //public decimal CreditLimitD { get; set; }
-
-        //[Required]
-        //[MaxLength(250)]
-        //[Display(Name = "Address Line 1")]
-        //public string AddressLine1 { get; set; }
-
-        //[Required]
-        //[MaxLength(250)]
-        //[Display(Name = "Address Line 2")]
-        //public string AddressLine2 { get; set; }
-
-        //[Required]
-        //[MaxLength(250)]
-        //[Display(Name = "City/ Municipality")]
-        //public string City { get; set; }
-
-        //[MaxLength(250)]
-        //[Display(Name = "Barangay")]
-        //public string? Barangay { get; set; }
-
-        //[MaxLength(5)]
-        //[Display(Name = "Zip Code")]
-        //public string? ZipCode { get; set; }
-
-        //[MaxLength(50)]
-        //[Display(Name = "Contact Person")]
-        //public string? ContactPerson { get; set; }
-
-        //[MaxLength(50)]
-        //[Display(Name = "Contact Number")]
-        //public string? ContactNumber { get; set; }
-
-        //[MaxLength(50)]
-        //[Display(Name = "Email Address")]
-        //public string? EmailAddress { get; set; }
-
-        //public bool IsActive { get; set; }
-        //public bool IsForeign { get; set; }
-        //public bool IsDeleted { get; set; }
     }
 
     public class SupplierViewVM : GenericAuditVM
@@ -129,95 +69,74 @@ namespace GMGInventory.Common.Models
         public string TIN { get; set; }
 
         [StringLength(150)]
+        [Display(Name = "Address Line 1")]
+
         public string AddressLine1 { get; set; }
 
         [StringLength(150)]
+        [Display(Name = "Address Line 2")]
         public string AddressLine2 { get; set; }
 
         [StringLength(100)]
+        [Display(Name = "Office Tel No")]
         public string OfficeTelNo { get; set; }
 
         [StringLength(100)]
+        [Display(Name = "Contact Person")]
         public string ContactPerson { get; set; }
 
         [Required]
         [Display(Name = "Region")]
         public int RegionId { get; set; }
+        [Display(Name = "Region")]
         public string RegionName { get; set; }
         public RegionVM Region { get; set; }
 
         [StringLength(100)]
-        public string Terms { get; set; }
+        public string Term { get; set; }
 
-        [StringLength(100)]
-        public string PriceList { get; set; }
 
         [Display(Name = "Currency")]
         public int  CurrencyId { get; set; }
+
+        [Display(Name = "Currency")]
         public string CurrencyName { get; set; }
         public CurrencyVM Currency { get; set; }
 
-
         [Display(Name = "BusinessStyle")]
         public int BusinessStyleId { get; set; }
+
+        [Display(Name = "Business Style")]
         public string BusinessStyleName { get; set; }
         public BusinessStyleVM BusinessStyle { get; set; }
 
         [StringLength(12)]
         public string VAT { get; set; }
-
-        //[Required]
-        //[Display(Name = "Area")]
-        //public int AreaId { get; set; }
-
-        //public string AreaName { get; set; }
-        //public AreaVM Area { get; set; }
-
-        //[Required]
-        //[Display(Name = "Region")]
-        //public int RegionId { get; set; }
-
-        //public RegionVM Region { get; set; }
-        //public string RegionName { get; set; }
-
-        //[Required]
-        //[Display(Name = "Currency")]
-        //public int CurrencyId { get; set; }
-        //public string CurrencyName { get; set; }
-        //public CurrencyVM Currency { get; set; }
-
-
-        //[Display(Name = "Credit Limit")]
-        //public string CreditLimit => string.Format(SystemFormat.StringIntegerComma, CreditLimitD);
-        //public decimal CreditLimitD { get; set; }
-
-        //[Display(Name = "Address Line 1")]
-        //public string AddressLine1 { get; set; }
-
-        //[Display(Name = "Address Line 2")]
-        //public string AddressLine2 { get; set; }
-
-        //[Display(Name = "Barangay")]
-        //public string Barangay { get; set; }
-
-
-        //[Display(Name = "City/ Municipality")]
-        //public string City { get; set; }
-
-
-        //[Display(Name = "Zip Code")]
-        //public string ZipCode { get; set; }
-
-        //[Display(Name = "Contact Person")]
-        //public string ContactPerson { get; set; }
-
-        //[Display(Name = "Contact Number")]
-        //public string ContactNumber { get; set; }
-
-        //[Display(Name = "Email Address")]
-        //public string EmailAddress { get; set; }
-
-        //public bool IsForeign { get; set; }
     }
+
+    public class SupplierDetailPurchaseVM
+    {
+        public string PurchaseNumber { get; set; }
+        public string Warehouse { get; set; }
+        public string Item { get; set; }
+        public int? ItemId { get; set; }
+        public string ItemDescription { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
+        public string UnitCost => string.Format(SystemFormat.StringDecimalComma, UnitCostD);
+        public decimal UnitCostD { get; set; }
+        public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
+        public decimal UnitPriceD { get; set; }
+        public string Currency { get; set; }
+        public string ConversionFactor => string.Format(SystemFormat.StringDecimalComma, ConversionFactorD);
+        public decimal ConversionFactorD { get; set; }
+        public string ConvertedUnitPrice => string.Format(SystemFormat.StringDecimalComma, ConvertedUnitPriceD);
+        public decimal ConvertedUnitPriceD => Math.Round(UnitPriceD * ConversionFactorD, 2);
+        public string ReplenishDate => ReplenishDateD.ToString(SystemFormat.StringDateTime);
+        public DateTime ReplenishDateD { get; set; }
+        public string ReplenishBy { get; set; }
+        public string Status { get; set; }
+    }
+
 
 }
