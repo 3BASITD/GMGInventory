@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -69,7 +70,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
-            var supplierVM = await supplierRepository.GetSupplierViewVMAsync(id);
+            var supplierVM =  supplierRepository.GetSupplierViewVM(id);
             if (supplierVM == null)
             {
                 return NotFound();
@@ -240,8 +241,7 @@ namespace GMGInventory.Controllers
                     suppliers.OfficeTelNo,
                     suppliers.ContactPerson,
                     suppliers.RegionName,
-                    suppliers.Terms,
-                    suppliers.PriceList,
+                    suppliers.Term,
                     suppliers.CurrencyName,
                     suppliers.BusinessStyleName,
                     suppliers.VAT,
@@ -307,5 +307,18 @@ namespace GMGInventory.Controllers
             }
             return Json(responseModel);
         }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> GetPurchasesJson(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
+            return Json(await supplierRepository.GetSupplierPurchaseDTAsync(form, id));
+        }
+
     }
 }

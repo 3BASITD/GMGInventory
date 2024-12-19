@@ -1,4 +1,9 @@
-﻿<div class="modal fade text-sm" id="itemDetailsModal" role="dialog" aria-labelledby="itemDetailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+﻿<style>
+    .modal-xl {
+        max-width: 1200px;
+    }
+</style>
+<div class="modal fade text-sm" id="itemDetailsModal" role="dialog" aria-labelledby="itemDetailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -98,6 +103,13 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a class="nav-link" id="modal-nav-conversion-tab" role="tab"
+                                           data-bs-toggle="tab" data-bs-target="#modal-nav-conversion"
+                                           aria-controls="modal-nav-conversion" aria-selected="true">
+                                            @*<br />*@Conversion Details
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a class="nav-link" id="modal-nav-price-tab" role="tab"
                                            data-bs-toggle="tab" data-bs-target="#modal-nav-price"
                                            aria-controls="modal-nav-price" aria-selected="true">
@@ -143,7 +155,6 @@
                                                     <th>Supplier</th>
                                                     <th>Quantity</th>
                                                     <th>Unit Cost</th>
-                                                    <th>Unit Price</th>
                                                     <th>Currency</th>
                                                     <th>Conversion Factor</th>
                                                     <th>Converted Unit Price</th>
@@ -186,6 +197,10 @@
                                                     <th>Remarks</th>
                                                 </tr>
                                             </thead>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane fade show" id="modal-nav-conversion" role="tabpanel" aria-labelledby="nav-conversion-tab">
+                                        <table class="table table-head-fixed table-striped table-hover modal-table-conversion">
                                         </table>
                                     </div>
                                     <div class="tab-pane fade" id="modal-nav-price" role="tabpanel" aria-labelledby="modal-nav-price-tab">
@@ -278,6 +293,7 @@
                         if (selectedTab == "#modal-nav-purchase") purchaseDT.ajax.reload();
                         if (selectedTab == "#modal-nav-sales") salesDT.ajax.reload();
                         if (selectedTab == "#modal-nav-count") countDT.ajax.reload();
+                        if (selectedTab == "#modal-nav-conversion") conversionDT.ajax.reload();
                         if (selectedTab == "#modal-nav-price") priceDT.ajax.reload();
                         if (selectedTab == "#modal-nav-transfer") transferDT.ajax.reload();
                         if (selectedTab == "#modal-nav-return") returnDT.ajax.reload();
@@ -337,7 +353,6 @@
                             { data: "supplier", name: "Supplier" },
                             { data: "quantity", name: "Quantity", className: "text-end" },
                             { data: "unitCost", name: "UnitCost", className: "text-end" },
-                            { data: "unitPrice", name: "UnitPrice", className: "text-end" },
                             { data: "currency", name: "Currency" },
                             { data: "conversionFactor", name: "ConversionFactor", className: "text-end" },
                             { data: "convertedUnitPrice", name: "ConvertedUnitPrice", className: "text-end" },
@@ -422,10 +437,57 @@
                         HideTabLoader("modal-count");
                     });
 
+                    //Conversion Details
+                    var conversionDT = $('.modal-table-conversion').on('preXhr.dt', function (e, settings, data) {
+                        ShowTabLoader("modal-conversion");
+                    }).DataTable({
+                        destroy: true,
+                        ajax: {
+                            url: "@Url.Action("GetConversionListJson", "Item")",
+                            type: "POST",
+                            data: function (data) {
+                                data.Id = id;
+                            },
+                        },
+                        serverSide: true,
+                        filter: false,
+                        ordering: false,
+                        searching: false,
+                        responsive: true,
+                        autoWidth: false,
+                        paging: true,
+                        search: {
+                            return: true,
+                        },
+                        columns: [
+                            { data: "subItemCode", title: "Item" },
+                            { data: "quantity", title: "Quantity" },
+                            { data: "unitName", title: "Unit" },
+                            { data: "equivalentQuantity", title: "Equivalent Quantity" },
+                            { data: "equivalentUnitName", title: "Equivalent Unit" }
+                        ],
+                        order: [[0, "asc"]]
+                    }).on("draw.dt", function () {
+                        var data = conversionDT.row(0).data();
+
+                        if (data != null && data.subItemId != null) {
+                            for (var i = 2; i < 5; i++) {
+                                conversionDT.column(i).visible(false, false);
+                            }
+                            conversionDT.column(0).visible(true, true);
+                        } else {
+                            var data = conversionDT.row(0).data();
+                            if (data != null && data.subItemId == null) {
+                                conversionDT.column(0).visible(false, false);
+                            }
+                        }
+
+                        HideTabLoader("modal-conversion");
+                    });
 
                     // Price History
                     var priceDT = $('.modal-table-price').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-price");
+                        ShowTabLoader("modal-conversion");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -451,6 +513,8 @@
                         order: [[3, "desc"]]
                     }).on("draw.dt", function () {
                         HideTabLoader("modal-price");
+
+                     
                     });
 
 

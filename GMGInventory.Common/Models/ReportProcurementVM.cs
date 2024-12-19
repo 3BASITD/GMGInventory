@@ -45,6 +45,7 @@ namespace GMGInventory.Common.Models
     public class PurchaseOrderPVM
     {
         public IList<PurchaseOrderRVM> Contents { get; set; }
+        public string GroupBy { get; set; }
         public string DateFrom => DateFromD.ToString(SystemFormat.StringDate2);
         public DateTime DateFromD { get; set; }
         public string DateTo => DateToD.ToString(SystemFormat.StringDate2);
@@ -102,6 +103,7 @@ namespace GMGInventory.Common.Models
     public class PurchaseReturnPVM
     {
         public IList<PurchaseReturnRVM> Contents { get; set; }
+        public string GroupBy { get; set; }
         public string DateFrom => DateFromD.ToString(SystemFormat.StringDate2);
         public DateTime DateFromD { get; set; }
         public string DateTo => DateToD.ToString(SystemFormat.StringDate2);
@@ -158,6 +160,7 @@ namespace GMGInventory.Common.Models
     public class PurchaseReceivingPVM
     {
         public IList<PurchaseReceivingRVM> Contents { get; set; }
+        public string GroupBy { get; set; }
         public string DateFrom => DateFromD.ToString(SystemFormat.StringDate2);
         public DateTime DateFromD { get; set; }
         public string DateTo => DateToD.ToString(SystemFormat.StringDate2);

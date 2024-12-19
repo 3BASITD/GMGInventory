@@ -61,20 +61,51 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Contents)
+            @if (Model.GroupBy != null)
             {
-                <tr>
-                    <td><nobr>@item.OrderDate</nobr></td>
-                    <td>@item.DocumentNumber</td>
-                    <td>@item.Supplier</td>
-                    <td>@item.Item</td>
-                    <td>@item.Quantity</td>
-                    <td>@item.Unit</td>
-                    <td>@item.UnitCost</td>
-                    <td>@item.UnservedQuantity</td>
-                    <td>@item.UnservedAmount</td>
-                </tr>
+                @foreach (var grp in Model.Contents.GroupBy(x => Model.GroupBy == "item" ? x.Item :
+               Model.GroupBy == "supplier" ? x.Supplier : x.OrderDate))
+                {
+                    <tr>
+                        <td><nobr>@grp.Key</nobr></td>
+                    </tr>
+                    @foreach (var item in Model.Contents.Where(x => Model.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
+                   Model.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
+                   x.OrderDate == grp.FirstOrDefault()!.OrderDate))
+                    {
+                        <tr>
+                            <td><nobr>@item.OrderDate</nobr></td>
+                            <td>@item.DocumentNumber</td>
+                            <td>@item.Supplier</td>
+                            <td>@item.Item</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.Unit</td>
+                            <td>@item.UnitCost</td>
+                            <td>@item.UnservedQuantity</td>
+                            <td>@item.UnservedAmount</td>
+                        </tr>
+                    }
+                }
             }
+            else
+            {
+                @foreach (var item in Model.Contents)
+                {
+                    <tr>
+                        <td><nobr>@item.OrderDate</nobr></td>
+                        <td>@item.DocumentNumber</td>
+                        <td>@item.Supplier</td>
+                        <td>@item.Item</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Unit</td>
+                        <td>@item.UnitCost</td>
+                        <td>@item.UnservedQuantity</td>
+                        <td>@item.UnservedAmount</td>
+                    </tr>
+                }
+
+            }
+
         </tbody>
         <tfoot>
             <tr>

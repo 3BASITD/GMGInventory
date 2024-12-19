@@ -61,18 +61,47 @@ namespace GMGInventory.Controllers
 
             });
             var pos = await reportProcurementRepository.GetPurchaseOrder(filter);
-            foreach (var po in pos)
+            if (filter.GroupBy != null)
             {
-                dt.Rows.Add(po.OrderDate,
-                            po.DocumentNumber,
-                            po.Supplier,
-                            po.Item,
-                            po.Quantity,
-                            po.Unit,
-                            po.UnitCost,
-                            po.UnservedQuantity,
-                            po.UnservedAmount);
+                foreach (var grp in pos.GroupBy(x => filter.GroupBy == "item" ? x.Item :
+                                                     filter.GroupBy == "supplier" ? x.Supplier : x.OrderDate))
+                {
+                    dt.Rows.Add(grp.Key, "", "", "", "", "", "", "", "");
+
+                    foreach (var po in pos.Where(x => filter.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
+                                       filter.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
+                                       x.OrderDate == grp.FirstOrDefault()!.OrderDate))
+                    {
+
+                        dt.Rows.Add(po.OrderDate,
+                                    po.DocumentNumber,
+                                    po.Supplier,
+                                    po.Item,
+                                    po.Quantity,
+                                    po.Unit,
+                                    po.UnitCost,
+                                    po.UnservedQuantity,
+                                    po.UnservedAmount);
+                    }
+
+                }
             }
+            else
+            {
+                foreach (var po in pos)
+                {
+                    dt.Rows.Add(po.OrderDate,
+                                po.DocumentNumber,
+                                po.Supplier,
+                                po.Item,
+                                po.Quantity,
+                                po.Unit,
+                                po.UnitCost,
+                                po.UnservedQuantity,
+                                po.UnservedAmount);
+                }
+            }
+
 
             using (XLWorkbook wb = new())
             {
@@ -138,19 +167,50 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<PurchaseReturnRVM>("Amount"))
             });
             var preturns = await reportProcurementRepository.GetPurchaseReturn(filter);
-            foreach (var preturn in preturns)
+
+            if (filter.GroupBy != null)
             {
-                dt.Rows.Add(preturn.ReturnDate,
-                            preturn.DocumentNumber,
-                            preturn.Supplier,
-                            preturn.Item,
-                            preturn.ItemDescription,
-                            preturn.Quantity,
-                            preturn.Unit,
-                            preturn.UnitCost,
-                            preturn.TotalAmount,
-                            preturn.ReturnQuantity,
-                            preturn.ReturnTotalAmount);
+                foreach (var grp in preturns.GroupBy(x => filter.GroupBy == "item" ? x.Item :
+                                                     filter.GroupBy == "supplier" ? x.Supplier : x.ReturnDate))
+                {
+                    dt.Rows.Add(grp.Key, "", "", "", "", "", "", "", "");
+
+                    foreach (var preturn in preturns.Where(x => filter.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
+                                       filter.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
+                                       x.ReturnDate == grp.FirstOrDefault()!.ReturnDate))
+                    {
+                        dt.Rows.Add(preturn.ReturnDate,
+                                    preturn.DocumentNumber,
+                                    preturn.Supplier,
+                                    preturn.Item,
+                                    preturn.ItemDescription,
+                                    preturn.Quantity,
+                                    preturn.Unit,
+                                    preturn.UnitCost,
+                                    preturn.TotalAmount,
+                                    preturn.ReturnQuantity,
+                                    preturn.ReturnTotalAmount);
+                    }
+                }
+            }
+
+            else
+            {
+
+                foreach (var preturn in preturns)
+                {
+                    dt.Rows.Add(preturn.ReturnDate,
+                                preturn.DocumentNumber,
+                                preturn.Supplier,
+                                preturn.Item,
+                                preturn.ItemDescription,
+                                preturn.Quantity,
+                                preturn.Unit,
+                                preturn.UnitCost,
+                                preturn.TotalAmount,
+                                preturn.ReturnQuantity,
+                                preturn.ReturnTotalAmount);
+                }
             }
 
             using (XLWorkbook wb = new())
@@ -218,21 +278,50 @@ namespace GMGInventory.Controllers
 
             });
             var preceives = await reportProcurementRepository.GetPurchaseReceiving(filter);
-            foreach (var preceive in preceives)
-            {
-                dt.Rows.Add(preceive.ReturnDate,
-                            preceive.DocumentNumber,
-                            preceive.Supplier,
-                            preceive.Item,
-                            preceive.ItemDescription,
-                            preceive.Quantity,
-                            preceive.Unit,
-                            preceive.UnitCost,
-                            preceive.TotalAmount,
-                            preceive.UnservedQuantity,
-                            preceive.UnservedAmount);
-            }
 
+            if (filter.GroupBy != null)
+            {
+                foreach (var grp in preceives.GroupBy(x => filter.GroupBy == "item" ? x.Item :
+                                                     filter.GroupBy == "supplier" ? x.Supplier : x.ReturnDate))
+                {
+                    dt.Rows.Add(grp.Key, "", "", "", "", "", "", "", "");
+
+                    foreach (var preceive in preceives.Where(x => filter.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
+                                       filter.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
+                                       x.ReturnDate == grp.FirstOrDefault()!.ReturnDate))
+
+                    {
+                        dt.Rows.Add(preceive.ReturnDate,
+                                    preceive.DocumentNumber,
+                                    preceive.Supplier,
+                                    preceive.Item,
+                                    preceive.ItemDescription,
+                                    preceive.Quantity,
+                                    preceive.Unit,
+                                    preceive.UnitCost,
+                                    preceive.TotalAmount,
+                                    preceive.UnservedQuantity,
+                                    preceive.UnservedAmount);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var preceive in preceives)
+                {
+                    dt.Rows.Add(preceive.ReturnDate,
+                                   preceive.DocumentNumber,
+                                   preceive.Supplier,
+                                   preceive.Item,
+                                   preceive.ItemDescription,
+                                   preceive.Quantity,
+                                   preceive.Unit,
+                                   preceive.UnitCost,
+                                   preceive.TotalAmount,
+                                   preceive.UnservedQuantity,
+                                   preceive.UnservedAmount);
+                }
+            }
             using (XLWorkbook wb = new())
             {
                 wb.Worksheets.Add(dt);

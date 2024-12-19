@@ -121,6 +121,18 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="groupby" class="form-label mb-0">Group By</label>
+                            <select id="groupby" style="width:100%" class="custom-select">
+                                <option value="">None</option>
+                                <option value="supplier">Supplier</option>
+                                <option value="item">Item</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
@@ -257,6 +269,9 @@
                 { data: "returnTotalAmount", name: "ReturnTotalAmount", className: "text-end" },
 
             ],
+            rowGroup: {
+                dataSrc: ''
+            },
             footerCallback: function (row, data, start, end, display) {
                 var json = purchaseReturnDT.ajax.json();
                 var api = this.api(), data;
@@ -274,6 +289,7 @@
         });
 
         $(".btnFilter").on("click", function () {
+            purchaseReturnDT.rowGroup().dataSrc($("#groupby").val());
             purchaseReturnDT.ajax.reload();
             $("#filterModal").modal("hide");
         });
@@ -285,6 +301,8 @@
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
+            if ($("#groupby").val()) { urlQuery.push("GroupBy=" + $("#groupby").val()); }
+
             window.location = "@Url.Action("DownloadPurchaseReturn")?" + urlQuery.join("&");
         });
 
@@ -299,6 +317,8 @@
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
+            if ($("#groupby").val()) { urlQuery.push("GroupBy=" + $("#groupby").val()); }
+
             setTimeout(function () {
                 let win = window.open('@Url.Action("PrintPurchaseReturn")?' + urlQuery.join("&"), '');
                 var wintimer = setInterval(function () {

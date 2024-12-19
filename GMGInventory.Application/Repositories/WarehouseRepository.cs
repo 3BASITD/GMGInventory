@@ -127,7 +127,7 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.ItemInventories.AnyAsync(s => s.WarehouseId == id)
                 || await context.PhysicalCountHistories.AnyAsync(s => s.WarehouseId == id)
-                || await context.PurchaseOrders.AnyAsync(s => s.DestinationId == id)
+                || await context.PurchaseOrderNews.AnyAsync(s => s.DeliveryAddressId == id)
                 || await context.TransferItems.AnyAsync(s => s.SourceId == id)
                 || await context.TransferItems.AnyAsync(s => s.DestinationId == id);
         }

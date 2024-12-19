@@ -812,29 +812,56 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<ItemDetailPurchaseVM>> GetItemPurchaseAsync(int id)
         {
-            var purchasesVM = from purchase in context.PurchaseOrders
-                                                      .Include(s => s.Currency)
-                                                      .Include(s => s.Destination)
-                                                      .Include(s => s.Status)
-                                                      .Include(s => s.Supplier)
-                              join purchaseItem in context.PurchaseOrderLineItems on purchase.Id equals purchaseItem.PurchaseOrderId
+            var purchasesVM = from purchase in context.PurchaseOrderNews
+                                                     .Include(s => s.Currency)
+                                                     .Include(s => s.DeliveryAddress)
+                                                     .Include(s => s.Status)
+                                                     .Include(s => s.Supplier)
+
+                              join purchaseItem in context.PurchaseOrderNewLineItems on purchase.Id equals purchaseItem.PurchaseOrderId
+                              join purchaseRequest in context.PurchaseRequestLineItems on purchaseItem.RequestItemId equals purchaseRequest.Id
                               join user in userManager.Users on purchase.UserCreated equals user.Id
-                              where purchaseItem.Item.Id == id
+
+                              where purchaseRequest.ItemId == id
                               select new ItemDetailPurchaseVM
                               {
                                   ConversionFactorD = purchase.CurrencyRate,
                                   Currency = purchase.Currency.Code,
-                                  PurchaseNumber = purchase.PONumber,
+                                  PurchaseNumber = purchase.DocumentNumber,
                                   QuantityD = purchaseItem.Quantity,
                                   ReplenishBy = user.Nickname,
                                   ReplenishDateD = purchase.DateCreated,
                                   Status = purchase.Status.Code,
                                   Supplier = purchase.Supplier.Code,
-                                  UnitCostD = 0, // tinanggal na sa db
-                                  UnitPriceD = purchaseItem.UnitPrice,
-                                  Warehouse = purchase.Destination.Code
+                                  UnitCostD = purchaseItem.UnitCost, // tinanggal na sa db
+                                  UnitPriceD = purchaseItem.UnitCost,
+                                  Warehouse = purchase.DeliveryAddress.Code
                               };
             return await purchasesVM.ToListAsync();
+
+            //var purchasesVM = from purchase in context.PurchaseOrders
+            //                                          .Include(s => s.Currency)
+            //                                          .Include(s => s.Destination)
+            //                                          .Include(s => s.Status)
+            //                                          .Include(s => s.Supplier)
+            //                  join purchaseItem in context.PurchaseOrderLineItems on purchase.Id equals purchaseItem.PurchaseOrderId
+            //                  join user in userManager.Users on purchase.UserCreated equals user.Id
+            //                  where purchaseItem.Item.Id == id
+            //                  select new ItemDetailPurchaseVM
+            //                  {
+            //                      ConversionFactorD = purchase.CurrencyRate,
+            //                      Currency = purchase.Currency.Code,
+            //                      PurchaseNumber = purchase.PONumber,
+            //                      QuantityD = purchaseItem.Quantity,
+            //                      ReplenishBy = user.Nickname,
+            //                      ReplenishDateD = purchase.DateCreated,
+            //                      Status = purchase.Status.Code,
+            //                      Supplier = purchase.Supplier.Code,
+            //                      UnitCostD = 0, // tinanggal na sa db
+            //                      UnitPriceD = purchaseItem.UnitPrice,
+            //                      Warehouse = purchase.Destination.Code
+            //                  };
+            //return await purchasesVM.ToListAsync();
         }
 
         public async Task<ForDataTables<ItemDetailPurchaseVM>> GetItemPurchaseDTAsync(DataTablesRequestForm form, int id)
