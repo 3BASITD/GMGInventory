@@ -46,7 +46,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var businessStyle = await context.BusinessStyles.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var businessStyle = await context.BusinessStyles
+                                             .Where(s => s.Name.ToLower() == Name.ToLower())
+                                             .FirstOrDefaultAsync();
             return businessStyle?.Id;
         }
 

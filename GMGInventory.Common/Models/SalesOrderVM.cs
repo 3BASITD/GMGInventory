@@ -284,6 +284,7 @@ namespace GMGInventory.Common.Models
         public DateTime OrderDate { get; set; }
         public string Remarks { get; set; }
         public int? ResubmitId { get; set; }
+        public string Status { get; set; }
         public IList<SalesOrderFormItemVM> Items { get; set; }
     }
 

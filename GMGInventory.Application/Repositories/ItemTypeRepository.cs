@@ -44,7 +44,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var itemType = await context.ItemTypes.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var itemType = await context.ItemTypes.Where(s => s.Name.ToLower() == Name.ToLower()).FirstOrDefaultAsync();
             return itemType?.Id;
         }
 
@@ -145,7 +145,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(ItemTypeVM itemTypeVM)
         {
-            return (await GetListAsync()).Any(s => s.Code == itemTypeVM.Code && s.Name == itemTypeVM.Name && s.Category == s.Category);
+            return (await GetListAsync()).Any(s => s.Code == itemTypeVM.Code
+                                                && s.Name == itemTypeVM.Name
+                                                && s.Category == s.Category);
         }
 
         public async Task<ItemTypeVM?> GetItemTypeVMAsync(int? id)

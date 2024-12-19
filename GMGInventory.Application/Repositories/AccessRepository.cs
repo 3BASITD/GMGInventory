@@ -98,7 +98,7 @@ namespace GMGInventory.Application.Repositories
                 response.Status = "Error";
                 response.Message = "Role name is required.";
             }
-            else if (context.Roles.Any(s => s.Name == RoleName && s.Id != RoleId))
+            else if (context.Roles.Any(s => s.Name.ToLower() == RoleName.ToLower() && s.Id != RoleId))
             {
                 response.Status = "Error";
                 response.Message = "Role name already exists.";

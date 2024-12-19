@@ -264,13 +264,13 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetUnitIdAsync(string? Code)
         {
-            var unit = await context.Units.Where(s => s.Code == Code).FirstOrDefaultAsync();
+            var unit = await context.Units.Where(s => s.Code.ToLower() == Code.ToLower()).FirstOrDefaultAsync();
             return unit?.Id;
         }
 
         public async Task<int?> GetUnitIdByNameAsync(string? Name)
         {
-            var unit = await context.Units.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var unit = await context.Units.Where(s => s.Name.ToLower() == Name.ToLower()).FirstOrDefaultAsync();
             return unit?.Id;
         }
 

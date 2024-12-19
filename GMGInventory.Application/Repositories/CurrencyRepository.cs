@@ -29,7 +29,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var currency = await context.Currencies.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var currency = await context.Currencies
+                                        .Where(s => s.Name.ToLower() == Name.ToLower())
+                                        .FirstOrDefaultAsync();
             return currency?.Id;
         }
 

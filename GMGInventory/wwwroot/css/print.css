@@ -1,11 +1,13 @@
 @media print {
     @page {
-        margin-left: 0.5in;
-        margin-right: 0.5in;
-        margin-top: 0.3in;
-        margin-bottom: 0.3in;
+        margin-left: 0.6in;
+        margin-right: 0.6in;
+        margin-top: 0.1in;
+        margin-bottom: 0.1in;
     }
+
     body {
+        margin-top: 50px;
         overflow: visible !important;
     }
 }
@@ -65,28 +67,28 @@ p {
     margin-bottom: 5px;
 }
 
-p strong {
-    display: inline-block;
-    min-width: 75px;
-}
+    p strong {
+        display: inline-block;
+        min-width: 75px;
+    }
 
 .signatory {
     border: none !important;
 }
 
-.signatory div {
-    display: flex;
-    flex-flow: column wrap;
-    height: 85px;
-}
+    .signatory div {
+        display: flex;
+        flex-flow: column wrap;
+        height: 85px;
+    }
 
-.signatory span {
-    border-bottom: solid 2px black !important;
-    padding: 10px 5px 30px 0;
-    font-weight: bold;
-    display: block;
-    width: 25%;
-}
+    .signatory span {
+        border-bottom: solid 2px black !important;
+        padding: 10px 5px 30px 0;
+        font-weight: bold;
+        display: block;
+        width: 25%;
+    }
 
 .min-width-50 {
     min-width: 50px;
@@ -99,3 +101,57 @@ p strong {
 .bold {
     font-weight: bold;
 }
+
+table.formatted {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+table.formatted * {
+    font-size: 10px;
+}
+
+    table.formatted th, table.formatted td {
+        border: solid 2px black;
+        padding: 5px;
+        margin: 0;
+    }
+
+        table.formatted label.title {
+            text-align: center;
+        }
+
+    table.formatted img.logo {
+        width: 75px;
+        height: 75px;
+    }
+
+    table.formatted dl {
+        margin: 0;
+    }
+
+    table.formatted dd, table.formatted strong.detail {
+        font-size: 12px;
+        margin-left: 5px;
+        margin-top: 5px;
+        letter-spacing: 3px;
+        font-weight: bold;
+    }
+
+    table.formatted div.label {
+        margin: 5px;
+    }
+
+    table.formatted div.label span {
+        min-width: 100px !important;
+        display: inline-block;
+    }
+
+    table.formatted .two-column {
+        display: flex;
+        gap: 20px;
+    }
+
+    table.formatted .column {
+        flex: 1;
+    }

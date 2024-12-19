@@ -29,8 +29,8 @@ namespace GMGInventory.Data.Configurations.Entities
                 new Status
                 {
                     Id = 4,
-                    Code = "DENIED",
-                    Name = "SALES ORDER DENIED"
+                    Code = "DISAPPROVED",
+                    Name = "SALES ORDER DISAPPROVED"
                 },
                 new Status
                 {
@@ -54,7 +54,7 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = 8,
                     Code = "INVOICED",
-                    Name = "INVOICED SUBMITTED"
+                    Name = "INVOICE SUBMITTED"
                 },
                 new Status
                 {

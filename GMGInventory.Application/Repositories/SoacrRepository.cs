@@ -139,7 +139,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int> GenerateSOAAsync(GenerateSOAVM soaVM)
         {
-            var soaType = await context.SOACRTypes.Where(s => s.Name == "Statement of Account").Select(s => s.Id).FirstAsync();
+            var soaType = await context.SOACRTypes.Where(s => s.Name.ToLower() == "statement of account").Select(s => s.Id).FirstAsync();
 
             var invoiceInSOACR = from sl in context.SOACRLineItems
                                  select sl.InvoiceId;
@@ -206,7 +206,7 @@ namespace GMGInventory.Application.Repositories
                               && (filter.Agent == null || filter.Agent == inv.SalesOrder.Agent.Id)
                               && filter.DateFrom <= inv.InvoiceDate.Date
                               && inv.InvoiceDate.Date <= filter.DateTo
-                              && inv.Status.Name == "Invoice Draft"
+                              && inv.Status.Name.ToLower() == "invoice draft"
 
                            select new SOACRInvoices
                            {
@@ -309,7 +309,7 @@ namespace GMGInventory.Application.Repositories
                           from soaInvoice in soali.DefaultIfEmpty()
                           where inv.SalesOrder.Customer.Id == customerId
                           && soaInvoice == null
-                          && inv.Status.Name == "Invoice Submitted"
+                          && inv.Status.Name.ToLower() == "invoice submitted"
                           select new SoacrInvoiceVM
                           {
                               Id = inv.Id,
@@ -379,7 +379,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int> GenerateCRAsync(int CustomerId, int[] InvoiceIds)
         {
-            var soaType = await context.SOACRTypes.Where(s => s.Name == "Counter Receipt").Select(s => s.Id).FirstAsync();
+            var soaType = await context.SOACRTypes.Where(s => s.Name.ToLower() == "counter receipt").Select(s => s.Id).FirstAsync();
             var invoices = await context.Invoices.Where(s => InvoiceIds.Contains(s.Id)).ToListAsync();
 
             var soa = new SOACR

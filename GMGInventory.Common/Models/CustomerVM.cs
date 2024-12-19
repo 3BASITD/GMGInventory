@@ -51,11 +51,6 @@ namespace GMGInventory.Common.Models
 
         public bool CommissionRateIsArea { get; set; }
 
-        [Required]
-        [Display(Name = "Commodity Quantity")]
-        public string CommodityQuantity => string.Format(SystemFormat.StringIntegerComma, CommodityQuantityD);
-        public int CommodityQuantityD { get; set; }
-
         [MaxLength(100)]
         [MinLength(5)]
         [Display(Name = "Contact Number")]
@@ -137,10 +132,6 @@ namespace GMGInventory.Common.Models
         //[Display(Name = "Customer Status")] bakit customer status?
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
-
-        [Display(Name = "Required Delivery Date")]
-        public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
-        public DateTime RequiredDeliveryDateD { get; set; }
 
         [Display(Name = "Shipping Address")]
         public string ShippingAddress { get; set; }

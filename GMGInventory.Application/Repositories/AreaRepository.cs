@@ -92,7 +92,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var area = await context.Areas.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var area = await context.Areas.Where(s => s.Name.ToLower() == Name.ToLower()).FirstOrDefaultAsync();
             return area?.Id;
         }
 
@@ -309,8 +309,10 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(AreaVM areaVM)
         {
-            return (await GetAllAreaAsync()).Any(s => s.Code == areaVM.Code && s.Name == areaVM.Name &&
-            s.CommissionRate == areaVM.CommissionRate && s.RegionName == areaVM.RegionName);
+            return (await GetAllAreaAsync()).Any(s => s.Code == areaVM.Code 
+                                                   && s.Name == areaVM.Name 
+                                                   && s.CommissionRate == areaVM.CommissionRate 
+                                                   && s.RegionName == areaVM.RegionName);
         }
 
         public async Task<bool> IsCodeExist(string code)

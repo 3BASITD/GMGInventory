@@ -41,7 +41,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.ReasonOfReturnName.ToLower().Contains(form.SearchValue)
                                     || x.UserCreated.ToLower().Contains(form.SearchValue)
                                     || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
-                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToLower().Contains(form.SearchValue)
                                     || x.DateModified.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search

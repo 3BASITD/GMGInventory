@@ -372,7 +372,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
 
-                var status = await context.PurchaseStatuses.Where(s => s.Name == form.Status).FirstOrDefaultAsync();
+                var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
                 if (status == null)
                 {
                     response.Status = "Error";

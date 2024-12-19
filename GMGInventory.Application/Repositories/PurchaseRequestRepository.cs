@@ -273,7 +273,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
 
-                var status = await context.PurchaseStatuses.Where(s => s.Name == form.Status).FirstOrDefaultAsync();
+                var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
                 if (status == null)
                 {
                     response.Status = "Error";
@@ -322,7 +322,7 @@ namespace GMGInventory.Application.Repositories
                     if (previousRequest != null)
                     {
                         var statusResubmitted = await context.PurchaseStatuses
-                                                             .Where(s => s.Name == "Resubmitted")
+                                                             .Where(s => s.Name.ToLower() == "resubmitted")
                                                              .FirstOrDefaultAsync();
                         previousRequest.ResubmitId = request.Id;
                         if (statusResubmitted != null)
@@ -345,7 +345,7 @@ namespace GMGInventory.Application.Repositories
                     else
                     {
                         response.Status = "Success";
-                        response.Message = form.Status == "Draft" ? "Purchase request saved as draft." : "Purchase request successfully submitted.";
+                        response.Message = form.Status.ToLower() == "draft" ? "Purchase request saved as draft." : "Purchase request successfully submitted.";
                         response.NewRow = request.Id;
                     }
                 }
@@ -371,7 +371,7 @@ namespace GMGInventory.Application.Repositories
             {
                 if (!string.IsNullOrWhiteSpace(status))
                 {
-                    int statusId = context.PurchaseStatuses.Where(s => s.Name == status).Select(s => s.Id).First();
+                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).First();
                     request.StatusId = statusId;
                 }
 
@@ -464,7 +464,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.PurchaseStatuses.Where(s => s.Name == "Approved").Select(s => s.Id).First();
+                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
 
                 if (!string.IsNullOrWhiteSpace(request.Approver1Id) && !string.IsNullOrWhiteSpace(request.Approver2Id))
                 {
@@ -504,7 +504,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.PurchaseStatuses.Where(s => s.Name == "Disapproved").Select(s => s.Id).First();
+                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
                 if (!string.IsNullOrWhiteSpace(request.DisapproverId))
                 {

@@ -150,8 +150,6 @@
 
 @section Scripts {
     <script>
-        var currentType = -1;
-        var currentPurpose = -1;
         if ($("#resubmitROId").length) {
             // for resubmitting a disapproved sales order
             $.ajax({
@@ -162,27 +160,14 @@
                 },
                 success: function (data, status, xhr) {
                     $("#return-document-number").val(data.documentNumber);
-
                     $("#return-date-returned").val(data.returnDate3);
-                    $("#return-currency-rate").val(data.currencyRate);
-                    $("#return-drnumber").val(data.drNumber);
-                    $("#return-sinumber").val(data.siNumber);
                     $("#return-remarks").val(data.remarks);
                     loadRRNumber(data.poNumber);
+                    $("#return-rrnumber").select2({
+                        disabled: true
+                    });
                 },
                 complete: function (xhr, status) {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("GetItemListJson")",
-                        data: {
-                            purchaseReturnId: $("#resubmitROId").val()
-                        },
-                        success: function (data, status, xhr) {
-                            $.each(data, function (i, v) {
-                                itemDT.row.add(v).draw();
-                            });
-                        }
-                    });
                 }
             });
         } else {
@@ -283,7 +268,7 @@
 
                 setTimeout(function () {
                     var restoredRow = $(itemDT.row(function (idx, data) {
-                        return data.lineNumber === lineNumber;
+                        return data.lineNumber == lineNumber;
                     }).node());
                     if (restoredRow) {
                         var restoredInput = $(restoredRow).find(".quantity");
@@ -343,7 +328,12 @@
                         $("#return-drnumber").val("");
                         $("#return-sinumber").val("");
                         itemDT.clear().draw();
-                    }).val(null).trigger('change');
+                    });
+                    if (selectedReceiving == -1) {
+                        $("#return-rrnumber").val(null).trigger('change');
+                    } else {
+                        loadRRDetails();
+                    }
                 }
             });
         }
@@ -376,49 +366,65 @@
         }
 
         function loadRRItems() {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetItemListJson", "PurchaseReceive")",
-                data: {
-                    purchaseReceiveId: $("#return-rrnumber").val()
-                },
-                beforeSend: function (xhr, settings) {
-                    itemDT.clear();
-                },
-                success: function (data, status, xhr) {
-                    $.each(data, function (i, v) {
-                        itemDT.row.add({
-                            toReturn: false,
-                            itemCode: v.itemCode,
-                            itemDescription: v.itemDescription,
-                            itemPartNumber: v.itemPartNumber,
-                            itemId: v.itemId,
-                            lineNumber: v.lineNumber,
-                            quantity: FormatStringInteger(0),
-                            quantityD: 0,
-                            receivedQuantity: v.quantity,
-                            receivedQuantityD: v.quantityD,
-                            unitCode: v.unitCode,
-                            unitId: v.unitId,
-                            unitCost: FormatStringDecimal(v.unitCost),
-                            unitCostD: v.unitCost,
-                            totalAmount: FormatStringDecimal(0),
-                            totalAmountD: 0
+            if ($("#return-rrnumber").prop("disabled")) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetItemListJson")",
+                    data: {
+                        purchaseReturnId: $("#resubmitROId").val()
+                    },
+                    success: function (data, status, xhr) {
+                        $.each(data, function (i, v) {
+                            itemDT.row.add(v).draw();
                         });
-                    });
-                },
-                complete: function (xhr, status) {
-                    itemDT.draw();
-                }
-            });
+                    }
+                });
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetItemListJson", "PurchaseReceive")",
+                    data: {
+                        purchaseReceiveId: $("#return-rrnumber").val()
+                    },
+                    beforeSend: function (xhr, settings) {
+                        itemDT.clear();
+                    },
+                    success: function (data, status, xhr) {
+                        $.each(data, function (i, v) {
+                            itemDT.row.add({
+                                toReturn: false,
+                                itemId: v.itemId,
+                                itemCode: v.itemCode,
+                                itemDescription: v.itemDescription,
+                                itemPartNumber: v.itemPartNumber,
+                                lineNumber: v.lineNumber,
+                                quantity: FormatStringInteger(0),
+                                quantityD: 0,
+                                receivingItemId: v.id,
+                                receivedQuantity: v.quantity,
+                                receivedQuantityD: v.quantityD,
+                                unitId: v.unitId,
+                                unitCode: v.unitCode,
+                                unitCost: FormatStringDecimal(v.unitCost),
+                                unitCostD: v.unitCost,
+                                totalAmount: FormatStringDecimal(0),
+                                totalAmountD: 0
+                            });
+                        });
+                    },
+                    complete: function (xhr, status) {
+                        itemDT.draw();
+                    }
+                });
+            }
         }
 
-        $("#form-request button[type=submit]").on("click", function () {
+        $("#form-return button[type=submit]").on("click", function () {
             $("#action-type").val($(this).data("action"));
         });
 
         // Validation for Create
-        var validateCreate = $("#form-request").validate({
+        var validateCreate = $("#form-return").validate({
             rules: {
                 RRNumber: {
                     required: true
@@ -445,7 +451,7 @@
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
-                SaveRequest();
+                SaveReturn();
             }
         });
 
@@ -460,26 +466,23 @@
             return item_to_return;
         }
 
-        function SaveRequest() {
+        function SaveReturn() {
             var items = itemDT.data();
-            if (items.length == 0) {
-                toastr.warning("No item to request. Add an item to the list to continue", "Warning");
-            } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
+            if (items.filter(s => s.toReturn == true).length == 0) {
+                toastr.warning("No item to return. Select an item on the list to continue", "Warning");
+            } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) == 0).length > 0) {
+                toastr.warning("Some items have 0 quantity. Can't return an item with 0 quantity", "Warning");
             } else {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("AddJson")",
                     data: {
-                        TypeId: $("#request-type").val(),
-                        PurposeId: $("#request-purpose").val(),
-                        PurposeDefinition: $("#request-purpose-definition").val(),
-                        RegionId: $("#request-region").val(),
-                        DateRequested: $("#request-date-requested").val(),
-                        Remarks: $("#request-remarks").val(),
+                        ReceivingId: $("#return-rrnumber").val(),
+                        DateReturn: $("#return-date-returned").val(),
+                        Remarks: $("#return-remarks").val(),
                         Status: $("#action-type").val(),
-                        ResubmitId: $("#resubmitPRId").val(),
-                        Items: GetItemsToRequest()
+                        ResubmitId: $("#resubmitROId").val(),
+                        Items: GetItemsToReturn()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {

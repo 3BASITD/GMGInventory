@@ -2,7 +2,7 @@
 
 @{
     Layout = "";
-    var title = "Pack Listing" + (Model.Details.Status == "Draft" ? " (Draft)" : "");
+    var title = "Pack Listing" + (Model.Details.Status.ToLower() == "draft" ? " (Draft)" : "");
 }
 
 <!DOCTYPE html>

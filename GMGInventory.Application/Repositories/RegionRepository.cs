@@ -84,7 +84,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var region = await context.Regions.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var region = await context.Regions.Where(s => s.Name.ToLower() == Name.ToLower()).FirstOrDefaultAsync();
             return region?.Id;
         }
 

@@ -18,7 +18,7 @@
                     <span class="fas fa-print"></span> Print
                 </button>
             }
-            @if (Model.Status == "DRAFT")
+            @if (Model.Status.ToLower() == "draft")
             {
                 @if (userAccess.CanEdit)
                 {
@@ -33,7 +33,7 @@
                     </button>
                 }
             }
-            else if (Model.Status == "SUBMITTED" && (string.IsNullOrWhiteSpace(Model.ApprovedBy)))
+            else if (Model.Status.ToLower() == "submitted" && (string.IsNullOrWhiteSpace(Model.ApprovedBy)))
             {
                 @if (userAccess.CanApproveDisapprove)
                 {
@@ -45,7 +45,7 @@
                     </button>
                 }
             }
-            else if (Model.Status == "DISAPPROVED" && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model?.ResubmitId == null)
+            else if (Model.Status.ToLower() == "disapproved" && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model?.ResubmitId == null)
             {
                 @if (userAccess.CanAdd)
                 {

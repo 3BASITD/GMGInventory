@@ -42,7 +42,7 @@ namespace GMGInventory.Application.Repositories
                          where order.Status.Code != "Posted"
                          && order.SalesOrder.QuantityOrdered != order.SalesOrder.QuantityInvoiced
                          && (string.IsNullOrWhiteSpace(search)
-                         || (order.Id.ToString().Contains(search.ToLower().Trim())))
+                         || (order.Id.ToString().ToLower().Contains(search.ToLower().Trim())))
                          orderby order.Id ascending
                          select new JsonOptionsModel
                          {
@@ -116,12 +116,12 @@ namespace GMGInventory.Application.Repositories
                         where filter.DateFrom <= pck.DateCreated.Date
                         && pck.DateCreated.Date <= filter.DateTo
                         && (filter.StatusCode == null
-                        || (filter.StatusCode == "Draft" && pck.Status.Name == "Packing Draft" && pck.UserCreated == currentUserId)
-                        || (filter.StatusCode == "Invoicing" && pck.Status.Name == "Packing Submitted")
-                        || (filter.StatusCode == "Invoiced" && pck.Status.Name == "Invoice Submitted"))
+                        || (filter.StatusCode.ToLower() == "draft" && pck.Status.Name.ToLower() == "packing draft" && pck.UserCreated == currentUserId)
+                        || (filter.StatusCode.ToLower() == "invoicing" && pck.Status.Name.ToLower() == "packing submitted")
+                        || (filter.StatusCode.ToLower() == "invoiced" && pck.Status.Name.ToLower() == "invoice submitted"))
                         select new PackVM
                         {
-                            CurrentUsersDraft = pck.Status.Name == "Packing Draft" && pck.UserCreated == currentUserId,
+                            CurrentUsersDraft = pck.Status.Name.ToLower() == "packing draft" && pck.UserCreated == currentUserId,
                             Customer = pck.SalesOrder.Customer.Name,
                             Id = pck.Id,
                             PackedBy = usr.Nickname,
@@ -314,7 +314,7 @@ namespace GMGInventory.Application.Repositories
                 if (orderVM.QuantityOrdered <= orderVM.QuantityPacked && form.SavingAs == "post")
                 {
                     orderVM.StatusId = await context.Statuses
-                                                    .Where(s => s.Name == "Fully Packed")
+                                                    .Where(s => s.Name.ToLower() == "fully packed")
                                                     .Select(s => s.Id)
                                                     .FirstAsync();
                 }
@@ -324,8 +324,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     SalesOrderId = orderVM.Id,
                     StatusId = await context.Statuses
-                                            .Where(s => (form.SavingAs == "post" && s.Name == "Packing Submitted")
-                                                     || (form.SavingAs == "save" && s.Name == "Packing Draft"))
+                                            .Where(s => (form.SavingAs.ToLower() == "post" && s.Name.ToLower() == "packing submitted")
+                                                     || (form.SavingAs.ToLower() == "save" && s.Name.ToLower() == "packing draft"))
                                             .Select(s => s.Id)
                                             .FirstAsync(),
                     TotalQuantity = form.Items.Sum(s => s.Quantity)
@@ -400,15 +400,15 @@ namespace GMGInventory.Application.Repositories
                 if (orderVM.QuantityOrdered <= orderVM.QuantityPacked && form.SavingAs == "post")
                 {
                     orderVM.StatusId = await context.Statuses
-                                                    .Where(s => s.Name == "Fully Packed")
+                                                    .Where(s => s.Name.ToLower() == "fully packed")
                                                     .Select(s => s.Id)
                                                     .FirstAsync();
                 }
                 await context.SaveChangesAsync(currentUserId);
 
                 packVM.StatusId = await context.Statuses
-                                               .Where(s => (form.SavingAs == "post" && s.Name == "Packing Submitted")
-                                                        || (form.SavingAs == "save" && s.Name == "Packing Draft"))
+                                               .Where(s => (form.SavingAs.ToLower() == "post" && s.Name.ToLower() == "packing submitted")
+                                                        || (form.SavingAs.ToLower() == "save" && s.Name.ToLower() == "packing draft"))
                                                .Select(s => s.Id)
                                                .FirstAsync();
                 packVM.TotalQuantity = form.Items.Sum(s => s.Quantity);

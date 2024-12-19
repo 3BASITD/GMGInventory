@@ -328,13 +328,13 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int> SaveDraftAsync(PurchaseOrderFormVM form)
         {
-            int draftStatusId = await context.Statuses.Where(s => s.Name == "Purchase Order Draft").Select(s => s.Id).FirstAsync();
+            int draftStatusId = await context.Statuses.Where(s => s.Name.ToLower() == "purchase order draft").Select(s => s.Id).FirstAsync();
             return await SaveOrderAsync(form, draftStatusId);
         }
 
         public async Task<int> SaveReplenishAsync(PurchaseOrderFormVM form)
         {
-            int draftPostedId = await context.Statuses.Where(s => s.Name == "Purchase Order Posted").Select(s => s.Id).FirstAsync();
+            int draftPostedId = await context.Statuses.Where(s => s.Name.ToLower() == "purchase order posted").Select(s => s.Id).FirstAsync();
             return await SaveOrderAsync(form, draftPostedId);
         }
 
@@ -445,7 +445,7 @@ namespace GMGInventory.Application.Repositories
 
         private async Task ReplenishInventory(int purchaseOrderId)
         {
-            int postedId = await context.Statuses.Where(s => s.Name == "Purchase Order Posted").Select(s => s.Id).FirstAsync();
+            int postedId = await context.Statuses.Where(s => s.Name.ToLower() == "purchase order posted").Select(s => s.Id).FirstAsync();
             var purchaseOrder = await context.PurchaseOrders.Where(s => s.Id == purchaseOrderId && s.StatusId == postedId).FirstOrDefaultAsync();
             if (purchaseOrder != null)
             {

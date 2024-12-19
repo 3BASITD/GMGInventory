@@ -137,10 +137,6 @@ namespace GMGInventory.Common.Models
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
         public decimal OutstandingBalanceD { get; set; }
         public string CustomerStatus { get; set; }
-        public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
-        public DateTime RequiredDeliveryDateD { get; set; }
-        public string CommodityQuantity => string.Format(SystemFormat.StringIntegerComma, CommodityQuantityD);
-        public int CommodityQuantityD { get; set; }
     }
 
     public class JsonInvoiceOptionsModel

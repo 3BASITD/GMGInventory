@@ -140,8 +140,6 @@ namespace GMGInventory.Application.Repositories
                                Status = order.Status.Code,
                                AccountStatus = order.Customer.CustomerAccountStatus.Name,
                                Region = order.Customer.Area.Region.Name,
-                               CommodityQuantityD = order.Customer.CommodityQuantity,
-                               RequiredDeliveryDateD = order.Customer.RequiredDeliveryDate,
                                UserCreated = userc.FirstName + " " + userc.LastName,
                                DateCreatedD = order.DateCreated,
                                UserModified = userm == null ? null : userm.Nickname + " " + userm.LastName,
@@ -190,10 +188,10 @@ namespace GMGInventory.Application.Repositories
                            && filter.DateFrom <= order.DateCreated.Date
                            && order.DateCreated.Date <= filter.DateTo
                            && (filter.StatusCode == null || filter.StatusCode.Trim() == ""
-                           || (filter.StatusCode == "Submitted" && order.UserCreated == currentUserId)
-                           || (filter.StatusCode == "ApprovedDisapproved" && (order.Status.Name == "Sales Order Approved" || order.Status.Name == "Sales Order Disapproved"))
-                           || (filter.StatusCode == "Approval" && order.Status.Name == "Sales Order Submitted")
-                           || (filter.StatusCode == "Approved" && order.ApprovedBy == currentUserId))
+                           || (filter.StatusCode.ToLower() == "submitted" && order.UserCreated == currentUserId)
+                           || (filter.StatusCode.ToLower() == "approveddisapproved" && (order.Status.Name.ToLower() == "sales order approved" || order.Status.Name.ToLower() == "sales order disapproved"))
+                           || (filter.StatusCode.ToLower() == "approval" && order.Status.Name.ToLower() == "sales order submitted")
+                           || (filter.StatusCode.ToLower() == "approved" && order.ApprovedBy == currentUserId))
                            select new SalesOrderVM
                            {
                                Customer = order.Customer.Name,
@@ -420,7 +418,11 @@ namespace GMGInventory.Application.Repositories
                 soNumber = previous.SalesOrderNumber;
             }
 
-            int statusId = context.Statuses.Where(s => s.Name == "Sales Order Submitted").Select(s => s.Id).First();
+            int statusId = context.Statuses
+                                  .Where(s => (form.Status.ToLower() == "submit" && s.Name.ToLower() == "sales order submitted")
+                                           || (form.Status.ToLower() == "draft" && s.Name.ToLower() == "sales order draft"))
+                                  .Select(s => s.Id)
+                                  .First();
             if (orderVM == null)
             {
                 orderVM = new SalesOrder
@@ -554,7 +556,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.Statuses.Where(s => s.Name == "Sales Order Approved").Select(s => s.Id).First();
+                int statusId = context.Statuses.Where(s => s.Name.ToLower() == "sales order approved").Select(s => s.Id).First();
                 orderVM.ApprovedBy = currentUserId;
                 orderVM.ApprovedDate = DateTime.Now;
                 orderVM.DisapprovedBy = null;
@@ -634,7 +636,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = await context.Statuses.Where(s => s.Name == "Sales Order Disapproved").Select(s => s.Id).FirstAsync();
+                int statusId = await context.Statuses.Where(s => s.Name.ToLower() == "sales order disapproved").Select(s => s.Id).FirstAsync();
                 orderVM.ApprovedBy = null;
                 orderVM.ApprovedDate = null;
                 orderVM.DisapprovedBy = currentUserId;

@@ -19,9 +19,13 @@
         <div class="card-header">
             <span class="card-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                <button type="submit" class="btn btn-primary btn-sm float-right ml-2">
+                <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" data-action="Draft">
+                    <span class="fas fa-save"></span> Save as Draft
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submit">
                     <span class="fas fa-save"></span> @(TempData["SalesOrderId"] != null ? "Resubmit" : "Submit")
                 </button>
+                <input type="hidden" id="action-type" name="ActionType" value="">
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
                     <span class="fas fa-arrow-left"></span> Back to List
                 </a>
@@ -742,6 +746,10 @@
             return item_to_order;
         }
 
+        $("#form-order button[type=submit]").on("click", function () {
+            $("#action-type").val($(this).data("action"));
+        });
+
         // Validation for Create
         var validateCreate = $("#form-order").validate({
             rules: {
@@ -827,6 +835,7 @@
                     DeclaredValue: $("#order-declared-value").val(),
                     OrderDate: $("#order-date").val(),
                     Remarks: $("#order-remarks").val(),
+                    Status: $("#action-type").val(),
                     Items: GetItemsToOrder(),
                     ResubmitId: "@(TempData["SalesOrderId"])"
                 },

@@ -66,9 +66,7 @@ namespace GMGInventory.Application.Repositories
                                              Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
                                              OutstandingBalanceD = s.OutstandingBalance,
                                              CustomerStatus = s.CustomerAccountStatus.Name,
-                                             Region = s.Area.Region.Name,
-                                             RequiredDeliveryDateD = s.RequiredDeliveryDate,
-                                             CommodityQuantityD = s.CommodityQuantity
+                                             Region = s.Area.Region.Name
                                          })
                                          .OrderBy(s => s.Text)
                                          .ToListAsync();
@@ -131,7 +129,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var customers = await context.Customers.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var customers = await context.Customers
+                                         .Where(s => s.Name.ToLower() == Name.ToLower())
+                                         .FirstOrDefaultAsync();
             return customers?.Id;
         }
 
@@ -165,7 +165,6 @@ namespace GMGInventory.Application.Repositories
                                   ContactPerson = cust.ContactPerson,
                                   CommissionRateD = cust.CommissionRate == null ? cust.Area.CommissionRate : cust.CommissionRate,
                                   CommissionRateIsArea = cust.CommissionRate == null,
-                                  CommodityQuantityD = cust.CommodityQuantity,
                                   CustomerAccountStatusId = cust.CustomerAccountStatus.Id,
                                   CustomerAccountStatusName = cust.CustomerAccountStatus.Name,
                                   CustomerTypeId = cust.CustomerType.Id,
@@ -177,7 +176,6 @@ namespace GMGInventory.Application.Repositories
                                   FaxNumber = cust.FaxNumber,
                                   RegionId = cust.Area.RegionId,
                                   RegionName = cust.Area.Region.Name,
-                                  RequiredDeliveryDateD = cust.RequiredDeliveryDate,
                                   TIN = cust.TIN,
                                   VAT = cust.VAT,
                                   Remarks = cust.Remarks,
@@ -214,7 +212,6 @@ namespace GMGInventory.Application.Repositories
                                 ContactPerson = cust.ContactPerson,
                                 CommissionRateD = cust.CommissionRate == null ? cust.Area.CommissionRate : cust.CommissionRate,
                                 CommissionRateIsArea = cust.CommissionRate == null,
-                                CommodityQuantityD = cust.CommodityQuantity,
                                 CustomerAccountStatusId = cust.CustomerAccountStatusId,
                                 CustomerAccountStatusName = cust.CustomerAccountStatus.Name,
                                 CustomerTypeId = cust.CustomerTypeId,
@@ -357,7 +354,6 @@ namespace GMGInventory.Application.Repositories
             cust.AgentId = custVM.AgentId;
             cust.AreaId = custVM.AreaId;
             cust.CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null;
-            cust.CommodityQuantity = custVM.CommodityQuantityD;
             cust.ContactNumber = custVM.ContactNumber;
             cust.ContactPerson = custVM.ContactPerson;
             cust.CreditLimit = custVM.CreditLimitD;
@@ -367,7 +363,6 @@ namespace GMGInventory.Application.Repositories
             cust.Email = custVM.Email;
             cust.FaxNumber = custVM.FaxNumber;
             cust.Remarks = custVM.Remarks;
-            cust.RequiredDeliveryDate = custVM.RequiredDeliveryDateD;
             cust.TIN = custVM.TIN;
             cust.VAT = custVM.VAT;
 
@@ -395,7 +390,6 @@ namespace GMGInventory.Application.Repositories
                 AgentId = custVM.AgentId,
                 AreaId = custVM.AreaId,
                 CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null,
-                CommodityQuantity = custVM.CommodityQuantityD,
                 ContactNumber = custVM.ContactNumber,
                 ContactPerson = custVM.ContactPerson,
                 CreditLimit = custVM.CreditLimitD,
@@ -405,7 +399,6 @@ namespace GMGInventory.Application.Repositories
                 Email = custVM.Email,
                 FaxNumber = custVM.FaxNumber,
                 Remarks = custVM.Remarks,
-                RequiredDeliveryDate = custVM.RequiredDeliveryDateD,
                 TIN = custVM.TIN,
                 VAT = custVM.VAT
             };
@@ -852,14 +845,23 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(CustomerVM customerVM)
         {
-            return (await GetAllCustomerAsync()).Any(s => s.Code == customerVM.Code && s.Name == customerVM.Name &&
-            s.CommissionRate == customerVM.CommissionRate && s.RegionName == customerVM.RegionName &&
-            s.AreaName == customerVM.AreaName && s.CustomerTypeName == customerVM.CustomerTypeName &&
-            s.ContactPerson == customerVM.ContactPerson && s.ContactNumber == customerVM.ContactNumber &&
-            s.Address == customerVM.Address && s.Email == customerVM.Email &&
-            s.AgentName == customerVM.AgentName && s.FaxNumber == customerVM.FaxNumber &&
-            s.TIN == customerVM.TIN && s.VAT == customerVM.VAT && s.CreditTermName == customerVM.CreditTermName &&
-            s.CreditLimit == customerVM.CreditLimit && s.Remarks == customerVM.Remarks);
+            return (await GetAllCustomerAsync()).Any(s => s.Code == customerVM.Code
+                                                       && s.Name == customerVM.Name
+                                                       && s.CommissionRate == customerVM.CommissionRate
+                                                       && s.RegionName == customerVM.RegionName
+                                                       && s.AreaName == customerVM.AreaName
+                                                       && s.CustomerTypeName == customerVM.CustomerTypeName
+                                                       && s.ContactPerson == customerVM.ContactPerson
+                                                       && s.ContactNumber == customerVM.ContactNumber
+                                                       && s.Address == customerVM.Address
+                                                       && s.Email == customerVM.Email
+                                                       && s.AgentName == customerVM.AgentName
+                                                       && s.FaxNumber == customerVM.FaxNumber
+                                                       && s.TIN == customerVM.TIN
+                                                       && s.VAT == customerVM.VAT
+                                                       && s.CreditTermName == customerVM.CreditTermName
+                                                       && s.CreditLimit == customerVM.CreditLimit
+                                                       && s.Remarks == customerVM.Remarks);
         }
     }
 }

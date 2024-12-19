@@ -78,7 +78,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.Address.ToLower().Contains(form.SearchValue)
                                     || x.UserCreated.ToLower().Contains(form.SearchValue)
                                     || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
-                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                                    || x.UserModified.ToLower().Contains(form.SearchValue)
                                     || x.DateModified.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -127,8 +127,10 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(ForwarderVM forwarderVM)
         {
-            return (await GetAllForwarderAsync()).Any(s => s.Name == forwarderVM.Name && s.Address == forwarderVM.Address &&
-            s.PhoneNumber == forwarderVM.PhoneNumber && s.FaxNumber == forwarderVM.FaxNumber);
+            return (await GetAllForwarderAsync()).Any(s => s.Name == forwarderVM.Name
+                                                        && s.Address == forwarderVM.Address 
+                                                        && s.PhoneNumber == forwarderVM.PhoneNumber 
+                                                        && s.FaxNumber == forwarderVM.FaxNumber);
         }
 
 

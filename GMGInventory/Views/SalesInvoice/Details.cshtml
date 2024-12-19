@@ -77,9 +77,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status == "Draft")
+                        @*@if (Model?.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status != "Cancelled") 
+                        @if (Model!.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceDate1)</label>
                             <input type="date" id="invoice-date" class="form-control form-control-sm" value="@(Model?.InvoiceDate3)" />
@@ -97,9 +97,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status == "Draft")
+                        @*@if (Model?.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status != "Cancelled")
+                        @if (Model!.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-control-number" class="form-label fw-normal mb-0">BIR Invoice Number</label>
                             <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" value="@Model?.ControlNumber" />
@@ -117,9 +117,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status == "Draft")
+                        @*@if (Model?.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status != "Cancelled") 
+                        @if (Model!.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-invoice-type" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceType)</label>
                             <select id="invoice-invoice-type" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
@@ -137,9 +137,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status == "Draft")
+                        @*@if (Model?.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status != "Cancelled")
+                        @if (Model!.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
                             <input type="text" id="invoice-remarks" class="form-control form-control-sm" value="@(Model?.Remarks == "-" ? "" : Model?.Remarks)" />
@@ -217,9 +217,9 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status == "Draft")
+                        @*@if (Model?.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status != "Cancelled")
+                        @if (Model!.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-agent" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Agent)</label>
                             <select id="invoice-agent" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
@@ -272,7 +272,7 @@
                     <div class="card">
                         <div class="card-header bg-light">
                             <span class="card-title">Invoice Item(s)</span>
-                            @if (Model!.Status == "Draft")
+                            @if (Model!.Status.ToLower() == "draft")
                             {
                                 @if (userAccess.CanAdd)
                                 {
@@ -544,7 +544,7 @@
                 { data: "itemName", name: "ItemName", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#invoice-status").val() == "Draft")
+                        if ($("#invoice-status").val().toLowerCase() == "draft")
                         {
                             return '<input type="number" min="1" max="' + data.quantityOfPack + '" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
@@ -571,7 +571,7 @@
         itemDT.on("draw", function () {
             hideLoader();
 
-            itemDT.column(0).visible($("#invoice-status").val() == "Draft");
+            itemDT.column(0).visible($("#invoice-status").val().toLowerCase() == "draft");
 
             $(".table-item th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");

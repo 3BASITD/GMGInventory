@@ -19,7 +19,7 @@
                     <span class="fas fa-print"></span> Print
                 </button>
             }
-            @if (Model.Status == "Draft")
+            @if (Model.Status.ToLower() == "draft")
             {
                 @if (userAccess.CanEdit)
                 {
@@ -34,7 +34,7 @@
                     </button>
                 }
             }
-            else if (Model.Status == "Submitted"
+            else if (Model.Status.ToLower() == "submitted"
             && string.IsNullOrWhiteSpace(Model.ApprovedBy))
             {
                 @if (userAccess.CanApproveDisapprove)
@@ -47,7 +47,7 @@
                     </button>
                 }
             }
-            else if (Model.Status == "Disapproved"
+            else if (Model.Status.ToLower() == "disapproved"
             && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy)
             && Model?.ResubmitId == null)
             {
@@ -108,10 +108,10 @@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Supplier)
+                        @Html.DisplayNameFor(model => model.RRNumber)
                     </span>
                     <b class="d-block">
-                        @Model?.Supplier
+                        @Model?.RRNumber
                     </b>
                 </p>
             </div>
@@ -125,23 +125,33 @@
                     </b>
                 </p>
             </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.RRNumber)
-                        </span>
-                        <b class="d-block">
-                        @Model?.RRNumber
-                        </b>
-                    </p>
-                </div>
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ReturnDate)
+                        @Html.DisplayNameFor(model => model.Supplier)
                     </span>
                     <b class="d-block">
-                        @Model?.ReturnDate
+                        @Model?.Supplier
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Currency)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Currency
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CurrencyRate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.CurrencyRate
                     </b>
                 </p>
             </div>
@@ -175,6 +185,36 @@
                     </b>
                 </p>
             </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ReturnDate)
+                    </span>
+                    <b class="d-block">
+                        @Model?.ReturnDate
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Status)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Status
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Remarks
+                    </b>
+                </p>
+            </div>
             @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy))
             {
                 <div class="col-12 col-md-4 col-sm-6">
@@ -201,16 +241,6 @@
                     </p>
                 </div>
             }
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Status)
-                    </span>
-                    <b class="d-block" id="request-status">
-                        @Model?.Status
-                    </b>
-                </p>
-            </div>
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -263,14 +293,6 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Purchase Return Item(s)</span>
-                        @if (Model!.Status == "Draft" && userAccess.CanAdd)
-                        {
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                    <span class="fas fa-plus"></span> Add Item
-                                </button>
-                            </div>
-                        }
                     </div>
                     <div class="card-body">
                         <table class="table table-head-fixed table-striped table-hover table-item">
@@ -389,9 +411,7 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var ro_status = @Json.Serialize(Model?.Status);
 
-        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
-        }).DataTable({
+        var itemDT = $('.table-item').DataTable({
             ajax: {
                 url: "@Url.Action("GetItemListJson")",
                 data: { purchaseReturnId: @Model?.Id },
@@ -407,11 +427,11 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        var actions = '';
-                        if (user_access.canEdit && $("#rr-status").text().trim() == "Draft") {
-                            actions += '<input type="checkbox" />';
+                        if (ro_status.toLowerCase() == "draft") {
+                            return '<input type="checkbox" class="to-return" ' + (data.toReturn == true ? 'checked="checked"' : '') + ' />';
+                        } else {
+                            return '';
                         }
-                        return actions;
                     },
                     className: "form-cell"
                 },
@@ -431,8 +451,14 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (ro_status == "Draft") {
-                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        if (ro_status.toLowerCase() == "draft" && data.toReturn == true) {
+                            if (data.quantityD > data.receivedQuantityD) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.receivedQuantity + ' received quantity.</label>';
+                            } else if (data.quantityD == 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to return.</label>';
+                            } else {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            }
                         } else {
                             return data.quantity;
                         }
@@ -445,6 +471,11 @@
                 { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
             ],
             order: [[1, "asc"]],
+            createdRow: function (row, data, dataIndex) {
+                if (data.toReturn == false) {
+                    $(row).addClass('text-muted');
+                }
+            },
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
@@ -459,358 +490,83 @@
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
 
-            if (user_access.canAdd) {
-                $(".quantity").off("change").on("change", function () {
-                    var row = itemDT.row($(this).closest('tr'));
-                    var rowData = row.data();
+            $(".quantity").off("change").on("change", function () {
+                var row = itemDT.row($(this).closest('tr'));
+                var rowData = row.data();
 
-                    var lineNumber = rowData.lineNumber;
+                var lineNumber = rowData.lineNumber;
 
-                    var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
+                var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
 
-                    var totalValue = quantityValue * rowData.unitCostD;
+                var totalValue = quantityValue * rowData.unitCostD;
 
-                    rowData.quantity = FormatStringInteger(quantityValue);
-                    rowData.quantityD = quantityValue;
-                    rowData.totalAmount = FormatStringDecimal(totalValue);
-                    rowData.totalAmountD = totalValue;
+                rowData.quantity = FormatStringInteger(quantityValue);
+                rowData.quantityD = quantityValue;
+                rowData.totalAmount = FormatStringDecimal(totalValue);
+                rowData.totalAmountD = totalValue;
 
-                    row.data(rowData).draw(false);
+                row.data(rowData).draw(false);
 
-                    setTimeout(function () {
-                        var restoredRow = $(itemDT.row(function (idx, data) {
-                            return data.lineNumber === lineNumber;
-                        }).node());
-                        if (restoredRow) {
-                            var restoredInput = $(restoredRow).find(".quantity");
+                setTimeout(function () {
+                    var restoredRow = $(itemDT.row(function (idx, data) {
+                        return data.lineNumber == lineNumber;
+                    }).node());
+                    if (restoredRow) {
+                        var restoredInput = $(restoredRow).find(".quantity");
 
-                            if (restoredInput.length)
-                                restoredInput.focus();
-                        }
-                    }, 0);
-                });
-            }
+                        if (restoredInput.length)
+                            restoredInput.focus();
+                    }
+                }, 0);
+            });
+
+            $(".to-return").off("change").on("change", function () {
+                var tr = $(this).closest('tr');
+                var row = itemDT.row(tr);
+                var rowData = row.data();
+
+                rowData.quantity = FormatStringInteger(0);
+                rowData.quantityD = 0;
+                rowData.totalAmount = FormatStringDecimal(0);
+                rowData.totalAmountD = 0;
+                if ($(this).prop("checked")) {
+                    rowData.toReturn = true;
+                    tr.removeClass("text-muted");
+                } else {
+                    rowData.toReturn = false;
+                    tr.addClass("text-muted");
+                }
+                row.data(rowData).draw(false);
+            });
         });
 
         if (user_access.canAdd) {
-            loadAllItemsOptions();
-            function loadAllItemsOptions() {
-                if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
-                    $("#add-code").select2("destroy");
-                    $("#add-code").empty();
-                }
-                // Load item for select2
-                $("#add-code").select2({
-                    minimumInputLength: 1,
-                    allowClear: true,
-                    placeholder: "<empty>",
-                    templateResult: function (repo) {
-                        if (repo.loading) {
-                            return repo.text;
-                        }
-                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-                    },
-                    ajax: {
-                        url: "@Url.Action("GetOptions", "Item")",
-                        dataType: 'json',
-                        type: "POST",
-                        delay: 500,
-                        data: function (params) {
-                            return {
-                                search: params.term,
-                                page: params.page || 1
-                            };
-                        },
-                        processResults: function (data, params) {
-                            params.page = params.page || 1;
-                            return {
-                                results: data.items,
-                                pagination: {
-                                    more: (params.page * 50) < data.total_count
-                                }
-                            };
-                        },
-                        cache: true,
-                        complete: AssignItemEvent
-                    },
-                    dropdownParent: $("#addModal")
-                });
-            }
 
-            function loadSOItemsOptions() {
-                $("#add-code").val(null).trigger("change");
-                $("#add-part").val("");
-                $("#add-name").val("");
-                $("#add-stock").val(0);
-                $("#add-quantity").val(0);
-                $("#add-unit").val("");
-
-                if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
-                    $("#add-code").select2("destroy");
-                    $("#add-code").empty();
-                }
-                // Load item for select2
-                $("#add-code").select2({
-                    minimumInputLength: -1,
-                    allowClear: true,
-                    placeholder: "<empty>",
-                    templateResult: function (repo) {
-                        if (repo.loading) {
-                            return repo.text;
-                        }
-                        console.log(repo);
-                        if (repo.quantity == 0) {
-                            return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
-                                (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
-                                "</span>");
-                        } else {
-                            return $("<strong>" + repo.text + "</strong> " +
-                                (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-                        }
-                    },
-                    ajax: {
-                        url: "@Url.Action("GetUnservedOptions", "Item")",
-                        dataType: 'json',
-                        type: "POST",
-                        delay: 500,
-                        data: function (params) {
-                            return {
-                                search: params.term,
-                                page: params.page || 1,
-                                SalesOrderId: $("#add-so-number").val()
-                            };
-                        },
-                        processResults: function (data, params) {
-                            params.page = params.page || 1;
-                            return {
-                                results: data.items,
-                                pagination: {
-                                    more: (params.page * 50) < data.total_count
-                                }
-                            };
-                        },
-                        cache: true,
-                        complete: AssignItemEvent
-                    },
-                    dropdownParent: $("#addModal")
-                });
-            }
-
-            function AssignItemEvent(jqXHR, textStatus) {
-                $("#add-code").off("select2:select").on("select2:select", function () {
-                    $("#add-part").val($("#add-code").select2("data")[0].partNumber);
-                    $("#add-name").val($("#add-code").select2("data")[0].name);
-                    $("#add-unit").val($("#add-code").select2("data")[0].unit);
-                    $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
-                    $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
-                    $("#add-code-error").html("");
-                });
-
-                $("#add-code").off("select2:unselecting").on("select2:unselecting", function (e) {
-                    $("#add-part").val("");
-                    $("#add-name").val("");
-                    $("#add-unit").val("");
-                    $("#add-unit").data("Id", "");
-                    $(".add-stocks").text("0");
-                    $("#add-gross-price").val("0.00");
-                });
-            }
-
-            // Load so for select2
-            $("#add-so-number").select2({
-                minimumInputLength: -1,
-                allowClear: true,
-                placeholder: "<empty>",
-                templateResult: function (repo) {
-                    return repo.text;
-                },
-                ajax: {
-                    url: "@Url.Action("GetSalesOrderOptions", "SalesOrder")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
-                },
-                dropdownParent: $("#addModal")
-            });
-
-            $("#add-so-number").on("select2:select", loadSOItemsOptions);
-
-            // Load unit for select2
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Unit")",
-                success: function (data, status, xhr) {
-                    $("#add-unit2").select2({
-                        data: data,
-                        minimumResultsForSearch: -1,
-                        placeholder: "<empty>",
-                        dropdownParent: $("#addModal")
-                    }).on("change", function () {
-                        $("#add-unit").val($("#add-unit2").select2("data")[0].text);
-                        $("#add-unit").data("Id", $("#add-unit2").select2("data")[0].id);
-                    });
-                }
-            });
-
-            $(".createBtn").on("click", clearItemForm);
-
-            function clearItemForm() {
-                $("#add-so-number").val("").trigger("change");
-                $("#add-code").val("").trigger("change");
-                $("#add-part").val("");
-                $("#add-name").val("");
-                $("#add-quantity").val("0");
-                $("#add-stock").text("0");
-                $("#add-unit").val("");
-                $("#add-unit").data("Id", "");
-                $("#add-purpose").val("");
-            }
-
-            function ComputeTotalQuantity() {
-                total_quantity = 0;
-                itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    if ($("#request-status").text().trim() == "Draft") {
-                        total_quantity += parseInt($(this.node()).find(".quantity").val());
-                    } else {
-                        total_quantity += this.data().quantityD;
-                    }
-                    });
-                $(".total-quantity").html(FormatStringInteger(total_quantity));
-            }
-
-            function GetItemsToRequest() {
-                var item_to_request = [];
+            function GetItemsToReturn() {
+                var item_to_return = [];
                 itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
                     row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
                     row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
-                    row_data.stockOnHandD = parseInt($(this.node()).find(".stock").val());
-                    row_data.stockOnHand = FormatStringInteger(parseInt($(this.node()).find(".stock").val()));
-                    item_to_request.push(row_data);
+                    item_to_return.push(row_data);
                 });
-                return item_to_request;
-            }
-
-            // Validation for Add Item Modal
-            var validateAdd = $("#form-item").validate({
-                rules: {
-                    SONumber: {
-                        required: function () { return checkIfRequired("SONumber"); }
-                    },
-                    Code: {
-                        required: function () { return checkIfRequired("Code"); }
-                    },
-                    Name: {
-                        required: function () { return checkIfRequired("Name"); },
-                        maxlength: 100
-                    },
-                    Stock: {
-                        number: true
-                    },
-                    Quantity: {
-                        required: function () { return checkIfRequired("Quantity"); },
-                        number: true,
-                        isNotZero: true
-                    },
-                    Purpose: {
-                        required: function () { return checkIfRequired("Purpose"); },
-                        maxlength: 100
-                    }
-                },
-                messages: {
-                    SONumber: {
-                        required: "Please select a SO Number."
-                    },
-                    Code: {
-                        required: "Please select an Item."
-                    },
-                    Name: {
-                        required: "Please enter the name of item.",
-                        maxlength: "Name must not exceed 100 characters."
-                    },
-                    Stock: {
-                        number: "Please enter a valid number."
-                    },
-                    Quantity: {
-                        required: "Please enter a quantity.",
-                        number: "Please enter a valid number.",
-                        isNotZero: "Can not request an item with 0 quantity."
-                    },
-                    Purpose: {
-                        required: "Please enter the purpose.",
-                        maxlength: "Purpose must not exceed 100 characters."
-                    }
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    AddItem();
-                }
-            });
-
-            function AddItem() {
-                var rowIndexes = [];
-                itemDT.rows(function (idx, data, node) {
-                    if (data.itemDescription == $("#add-name").val()) {
-                        rowIndexes.push(idx);
-                    }
-                    return false;
-                });
-                if (rowIndexes.length > 0) {
-                    toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
-                } else {
-                    itemDT.row.add({
-                        itemCode: $("#add-code").select2("data")[0].text,
-                        itemDescription: $("#add-name").val(),
-                        itemPartNumber: $("#add-part").val(),
-                        itemId: $("#add-code").select2("data")[0].id,
-                        lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
-                        purchaseRequestId: 0,
-                        purpose: $("#add-purpose").val(),
-                        quantity: FormatStringInteger($("#add-quantity").val()),
-                        quantityD: $("#add-quantity").val() || 0,
-                        salesOrderId: $("#add-so-number").select2("data")[0].id,
-                        salesOrderNumber: $("#add-so-number").select2("data")[0].text,
-                        stockOnHand: FormatStringInteger($("#add-stock").val()),
-                        stockOnHandD: $("#add-stock").val() || 0,
-                        unitCode: $("#add-unit").val(),
-                        unitId: $("#add-unit").data("Id")
-                    }).draw();
-                    clearItemForm();
-
-                    toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Purchase Request Item(s)", "Success");
-                }
+                return item_to_return;
             }
 
             $(".btn-details-save").on("click", function () {
-                SaveRequest("Draft");
+                SaveReturn("Draft");
             });
 
             $(".btn-details-submit").on("click", function () {
-                SaveRequest("Submitted");
+                SaveReturn("Submitted");
             });
 
-            function SaveRequest(status) {
+            function SaveReturn(status) {
                 var items = itemDT.data();
-                if (items.length == 0) {
-                    toastr.warning("No item to request. Add an item to the list to continue", "Warning");
-                } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                    toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
+                if (items.filter(s => s.toReturn == true).length == 0) {
+                    toastr.warning("No item to return. Select an item on the list to continue", "Warning");
+                } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) == 0).length > 0) {
+                    toastr.warning("Some items have 0 quantity. Can't return an item with 0 quantity", "Warning");
                 } else {
                     $.ajax({
                         type: "POST",
@@ -818,7 +574,7 @@
                         data: {
                             Id: @Model?.Id,
                             status: status,
-                            items: GetItemsToRequest()
+                            items: GetItemsToReturn()
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Success") {
@@ -835,8 +591,8 @@
         if (user_access.canApproveDisapprove) {
             $('.btn-details-approve').click(function (e) {
                 swal({
-                    title: "Approve Purchase Request",
-                    text: "Continue to approve this purchase request?",
+                    title: "Approve Purchase Return",
+                    text: "Continue to approve this purchase return?",
                     icon: "success",
                     buttons: true,
                     successMode: true
@@ -860,8 +616,8 @@
 
             $('.btn-details-disapprove').click(function (e) {
                 swal({
-                    title: "Disapprove Purchase Request",
-                    text: "Continue to disapprove this purchase request?",
+                    title: "Disapprove Purchase Return",
+                    text: "Continue to disapprove this purchase return?",
                     icon: "warning",
                     buttons: true,
                     dangerMode: true,
@@ -873,7 +629,7 @@
                         }
                     }
                 }).then((confirm) => {
-                    if (confirm !== null) {
+                    if (confirm != null) {
                         $.ajax({
                             url: "@Url.Action("DisapproveJson")",
                             type: "POST",

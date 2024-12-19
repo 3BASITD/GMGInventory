@@ -93,11 +93,11 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var request = await returnRepository.GetDetails(Id ?? 0);
-            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status != "Disapproved"))
+            if (Id != null && (request == null || request.DisapprovedBy == null || request.Status.ToLower() != "disapproved"))
             {
                 return RedirectToAction("Details", new { Id });
             }
-            TempData["PurchaseReturnNewId"] = Id;
+            TempData["PurchaseReturnId"] = Id;
             return View();
         }
 

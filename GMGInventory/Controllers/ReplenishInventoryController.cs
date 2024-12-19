@@ -98,7 +98,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ResponseModel<int> responseModel = new ResponseModel<int>();
-            if (type == "Draft")
+            if (type.ToLower() == "draft")
             {
                 var draft = await purchaseOrderRepository.SaveDraftAsync(form);
                 responseModel.Status = "Success";

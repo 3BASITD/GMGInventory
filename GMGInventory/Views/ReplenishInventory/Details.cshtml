@@ -1,7 +1,7 @@
 ﻿@model PurchaseOrderDetailsVM
 
 @{
-    ViewData["Title"] = "Replenishment Details " + (Model.Status == "Draft" ? " (Draft)" : "");
+    ViewData["Title"] = "Replenishment Details " + (Model.Status.ToLower() == "draft" ? " (Draft)" : "");
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -13,7 +13,7 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (Model.Status == "Draft")
+            @if (Model.Status.ToLower() == "draft")
             {
                 @if (userAccess.CanAdd)
                 {
@@ -83,7 +83,7 @@
             </div>
             <div class="col-4">
                 <p class="text-sm">
-                    @if (Model!.Status == "Draft" || Model!.Status == "Approved")
+                    @if (Model!.Status.ToLower() == "draft" || Model!.Status.ToLower() == "approved")
                     {
                         <label for="replenish-date" class="form-label fw-normal mb-0">Purchase Date</label>
                         <input type="date" id="replenish-date" name="OrderDate" class="form-control form-control-sm" value="@Model?.OrderDate3" />
@@ -99,7 +99,7 @@
                     }
                 </p>
                 <p class="text-sm">
-                    @if (Model!.Status == "Draft" || Model!.Status == "Approved")
+                    @if (Model!.Status.ToLower() == "draft" || Model!.Status.ToLower() == "approved")
                     {
                         <label for="replenish-currency" class="form-label fw-normal mb-0">Currency</label>
                         <select id="replenish-currency" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
@@ -115,7 +115,7 @@
                     }
                 </p>
                 <p class="text-sm">
-                    @if (Model!.Status == "Draft" || Model!.Status == "Approved")
+                    @if (Model!.Status.ToLower() == "draft" || Model!.Status.ToLower() == "approved")
                     {
                         <label for="replenish-currency-rate" class="form-label fw-normal mb-0">Currency Rate</label>
                         <input type="number" id="replenish-currency-rate" name="CurrencyRate" step="0.01" min="0" max="1999999" class="form-control form-control-sm" value="@Model.CurrencyRate" />
@@ -149,7 +149,7 @@
                     </b>
                 </p>
                 <p class="text-sm">
-                    @if (Model!.Status == "Draft" || Model!.Status == "Approved")
+                    @if (Model!.Status.ToLower() == "draft" || Model!.Status.ToLower() == "approved")
                     {
                         <label for="replenish-reference-number" class="form-label fw-normal mb-0">Reference Number</label>
                         <input type="text" id="replenish-reference-number" name="ReferenceNumber" class="form-control form-control-sm" value="@Model?.ReferenceNumber" />
@@ -172,7 +172,7 @@
                     <div class="card-header bg-light">
                         <span class="card-title">Replenish Item(s)</span>
                         <div class="card-tools">
-                            @if (Model?.Status == "Draft")
+                            @if (Model?.Status.ToLower() == "draft")
                             {
                                 @if (userAccess.CanAdd)
                                 {
@@ -499,7 +499,7 @@
                         }
                         return actions;
                     },
-                    visible: $("#po-status").val() == "Draft"
+                    visible: $("#po-status").val().toLowerCase() == "draft"
                 },
                 {
                     orderable: false,
@@ -596,7 +596,7 @@
             $(".table-item thead th").removeClass("text-end");
             $(".table-item th").removeClass("netprice");
 
-            if ($("#po-status").val() == "Draft") {
+            if ($("#po-status").val().toLowerCase() == "draft") {
                 ComputeTotalQuantity();
             }
 

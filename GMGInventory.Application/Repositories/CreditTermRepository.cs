@@ -28,7 +28,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var cterms = await context.CreditTerms.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var cterms = await context.CreditTerms
+                                      .Where(s => s.Name.ToLower() == Name.ToLower())
+                                      .FirstOrDefaultAsync();
             return cterms?.Id;
         }
 

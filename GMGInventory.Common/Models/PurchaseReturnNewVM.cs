@@ -7,7 +7,7 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
 
-        [Display(Name = "Doc Number")]
+        [Display(Name = "Document Number")]
         public string DocumentNumber { get; set; }
 
         [Display(Name = "PO Number")]
@@ -39,6 +39,14 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseReturnNewDetailedVM :PurchaseReturnNewVM
     {
+
+        [Display(Name = "Currency")]
+        public string Currency { get; set; }
+        public int CurrencyId { get; set; }
+
+        [Display(Name = "Currency Rate")]
+        public string CurrencyRate => string.Format(SystemFormat.StringDecimalComma, CurrencyRateD);
+        public decimal CurrencyRateD { get; set; }
 
 
         [Display(Name = "Remarks")]
@@ -77,15 +85,8 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseReturnNewSaveVM
     {
-        public int TypeId { get; set; }
-        public int SupplierId { get; set; }
-        public int TermsId { get; set; }
-        public int CurrencyId { get; set; }
-        public decimal CurrencyRate { get; set; }
-        public int DeliveryModeId { get; set; }
-        public int DeliveryAddressId { get; set; }
-        public DateTime DateOrdered { get; set; }
-        public string Reference { get; set; }
+        public int ReceivingId { get; set; }
+        public DateTime DateReturn { get; set; }
         public string Remarks { get; set; }
         public string Status { get; set; }
         public int? ResubmitId { get; set; }
@@ -95,12 +96,14 @@ namespace GMGInventory.Common.Models
     public class PurchaseReturnNewLineItemVM
     {
         public int Id { get; set; }
+        public bool ToReturn { get; set; }
         public int PurchaseReturnId { get; set; }
 
         [Display(Name = "Line Number")]
         public int LineNumber { get; set; }
 
-        //public int Req
+        public int ReceivingItemId { get; set; }
+
         public int? ItemId { get; set; }
 
         [Display(Name = "Item Code")]
@@ -115,6 +118,10 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Quantity")]
         public string Quantity => string.Format("{0:#,##0}", QuantityD);
         public int QuantityD { get; set; }
+
+        [Display(Name = "Received Quantity")]
+        public string ReceivedQuantity => string.Format("{0:#,##0}", ReceivedQuantityD);
+        public int ReceivedQuantityD { get; set; }
 
         [Display(Name = "UOM")]
         public string UnitCode { get; set; }

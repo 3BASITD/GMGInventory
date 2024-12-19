@@ -147,7 +147,7 @@ namespace GMGInventory.Application.Repositories
                                        + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
                                        + " " + invoice.SalesOrder.Agent.LastName,
                                  ControlNumber = invoice.ControlNumber,
-                                 CurrentUsersDraft = invoice.Status.Name == "Invoice Draft" && invoice.UserCreated == currentUserId,
+                                 CurrentUsersDraft = invoice.Status.Name.ToLower() == "invoice draft" && invoice.UserCreated == currentUserId,
                                  CustomerAddress = invoice.SalesOrder.Customer.Address,
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
@@ -246,14 +246,14 @@ namespace GMGInventory.Application.Repositories
                            && filter.DateFrom <= inv.InvoiceDate.Date
                            && inv.InvoiceDate.Date <= filter.DateTo
                            && (filter.StatusCode == null
-                           || (filter.StatusCode == "Draft" && inv.Status.Name == "Invoice Draft" && inv.UserCreated == currentUserId)
-                           || (filter.StatusCode == "Posted" && inv.Status.Name == "Invoice Submitted")
-                           || (filter.StatusCode == "Cancelled" && inv.Status.Name == "Cancelled Invoice"))
+                           || (filter.StatusCode.ToLower() == "draft" && inv.Status.Name.ToLower() == "invoice draft" && inv.UserCreated == currentUserId)
+                           || (filter.StatusCode.ToLower() == "posted" && inv.Status.Name.ToLower() == "invoice submitted")
+                           || (filter.StatusCode.ToLower() == "cancelled" && inv.Status.Name.ToLower() == "cancelled invoice"))
                            orderby inv.Id descending
                            select new InvoiceVM
                            {
                                BIRInvoiceNumber = inv.ControlNumber,
-                               CurrentUsersDraft = inv.Status.Name == "Invoice Draft" && inv.UserCreated == currentUserId,
+                               CurrentUsersDraft = inv.Status.Name.ToLower() == "invoice draft" && inv.UserCreated == currentUserId,
                                Customer = inv.SalesOrder.Customer.Name,
                                Id = inv.Id,
                                InvoiceDateD = inv.InvoiceDate,
@@ -452,16 +452,25 @@ namespace GMGInventory.Application.Repositories
 
                 var invoiceType = await context.InvoiceTypes.Where(s => s.Id == form.InvoiceType).FirstAsync();
 
-                var lastInvoice = await context.Invoices
-                                               .Where(s => s.InvoiceTypeId == form.InvoiceType)
-                                               .OrderByDescending(s => s.InvoiceNumber)
-                                               .FirstAsync();
-                var lastInvoiceNumber = lastInvoice.InvoiceNumber.Replace(invoiceType.Code + "-", "");
-                var newInvoiceNumber = Int32.Parse(lastInvoiceNumber) + 1;
+                //var lastInvoice = await context.Invoices
+                //                               .Where(s => s.InvoiceTypeId == form.InvoiceType)
+                //                               .OrderByDescending(s => s.InvoiceNumber)
+                //                               .FirstAsync();
+                //var lastInvoiceNumber = lastInvoice.InvoiceNumber.Replace(invoiceType.Code + "-", "");
+                //var newInvoiceNumber = Int32.Parse(lastInvoiceNumber) + 1;
+
+                var invoiceNumberPrefix = $"{invoiceType.Code}-";
+                var lastInvoiceNumber = await context.Invoices
+                                                .Where(s => s.InvoiceNumber.StartsWith(invoiceNumberPrefix))
+                                                .OrderByDescending(s => s.InvoiceNumber)
+                                                .Select(s => s.InvoiceNumber)
+                                                .FirstOrDefaultAsync();
+
+                int.TryParse(lastInvoiceNumber?.Replace(invoiceNumberPrefix, "") ?? "0", out int invoiceNumberLast);
 
                 int statusId = await context.Statuses
-                                            .Where(s => ((s.Name == "Invoice Draft" && form.SavingAs == "save")
-                                                      || (s.Name == "Invoice Submitted" && form.SavingAs == "post")))
+                                            .Where(s => ((s.Name.ToLower() == "invoice draft" && form.SavingAs.ToLower() == "save")
+                                                      || (s.Name.ToLower() == "invoice submitted" && form.SavingAs.ToLower() == "post")))
                                             .Select(s => s.Id)
                                             .FirstAsync();
 
@@ -472,7 +481,8 @@ namespace GMGInventory.Application.Repositories
                     Amount = totalAmount,
                     InvoiceDate = form.InvoiceDate,
                     ControlNumber = form.BIRInvoiceNumber,
-                    InvoiceNumber = invoiceType.Code + "-" + string.Format("{0:0000000}", newInvoiceNumber),
+                    //InvoiceNumber = invoiceType.Code + "-" + string.Format("{0:0000000}", newInvoiceNumber),
+                    InvoiceNumber = $"{invoiceNumberPrefix}{invoiceNumberLast + 1:D7}",
                     InvoiceTypeId = form.InvoiceType,
                     IsGenerated = false,
                     IsPaid = false,
@@ -521,7 +531,7 @@ namespace GMGInventory.Application.Repositories
                 if (pack.TotalQuantity <= pack.QuantityInvoiced)
                 {
                     pack.StatusId = await context.Statuses
-                                                 .Where(s => s.Name == "Invoice Submitted")
+                                                 .Where(s => s.Name.ToLower() == "invoice submitted")
                                                  .Select(s => s.Id)
                                                  .FirstAsync();
                 }
@@ -534,7 +544,7 @@ namespace GMGInventory.Application.Repositories
                 if (salesOrder.QuantityOrdered <= salesOrder.QuantityInvoiced)
                 {
                     salesOrder.StatusId = await context.Statuses
-                                                       .Where(s => s.Name == "Fully Invoiced")
+                                                       .Where(s => s.Name.ToLower() == "fully invoiced")
                                                        .Select(s => s.Id)
                                                        .FirstAsync(); ;
                 }
@@ -579,7 +589,7 @@ namespace GMGInventory.Application.Repositories
             }
 
             int packId = await context.Statuses
-                                          .Where(s => s.Name == "Packing Submitted")
+                                          .Where(s => s.Name.ToLower() == "packing submitted")
                                           .Select(s => s.Id)
                                           .FirstAsync();
 
@@ -612,7 +622,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         await DeleteInvoiceItems(form, false);
                         int statusId = await context.Statuses
-                                                    .Where(s => s.Name == "Cancelled Invoice")
+                                                    .Where(s => s.Name.ToLower() == "cancelled invoice")
                                                     .Select(s => s.Id)
                                                     .FirstAsync();
                         invoice.StatusId = statusId;
@@ -659,8 +669,8 @@ namespace GMGInventory.Application.Repositories
                         }
                     }
                     int statusId = await context.Statuses
-                                                .Where(s => ((s.Name == "Invoice Draft" && form.SavingAs == "save")
-                                                          || (s.Name == "Invoice Submitted" && form.SavingAs == "post")))
+                                                .Where(s => ((s.Name.ToLower() == "invoice draft" && form.SavingAs.ToLower() == "save")
+                                                          || (s.Name.ToLower() == "invoice submitted" && form.SavingAs.ToLower() == "post")))
                                                 .Select(s => s.Id)
                                                 .FirstAsync();
                     invoice.StatusId = statusId;

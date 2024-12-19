@@ -42,8 +42,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? CommissionRate { get; set; }
 
-        public int CommodityQuantity { get; set; }
-
         [Column(TypeName = "nvarchar(100)")]
         public string? ContactNumber { get; set; }
 
@@ -73,7 +71,6 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(250)")]
         public string? Remarks { get; set; }
-        public DateTime RequiredDeliveryDate { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? TIN { get; set; }

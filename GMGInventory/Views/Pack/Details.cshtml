@@ -20,13 +20,13 @@
                 </button>
             }
 
-            @if (Model.Status == "Posted")
+            @if (Model.Status.ToLower() == "posted")
             {
                 <a href="@Url.Action("Create", "SalesInvoice")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
                     <span class="fas fa-file-invoice"></span> Start Invoice
                 </a>
             }
-            @if (Model?.Status == "Draft")
+            @if (Model?.Status.ToLower() == "draft")
             {
                 <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="DeletePack()">
                     <span class="fas fa-trash"></span> Delete
@@ -136,7 +136,7 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Pack Item(s)</span>
-                        @if (Model?.Status == "Draft")
+                        @if (Model?.Status.ToLower() == "draft")
                         {
                             <div class="card-tools">
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -423,7 +423,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if ($("#pack-status").val() == "Draft" && user_access.canEdit) { 
+                        if ($("#pack-status").val().toLowerCase() == "draft" && user_access.canEdit) { 
                             actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-minus"></i></button>';
                         }
                         return actions;
@@ -580,7 +580,7 @@
                 toastr.warning("No item to pack. Add an item to the list to continue", "Warning");
                 //} else if (itemsToPack.filter(s => parseInt(s.quantity) > parseInt(s.served_quantity)).length > 0) {
                 //    toastr.warning("Some items have exceeded the served quantity. Please update the served quantity on sales order", "Warning");
-            } else if (itemsToPack.filter(s => parseInt(s.quantity) === 0).length > 0) {
+            } else if (itemsToPack.filter(s => parseInt(s.quantity) == 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't pack an item with 0 quantity", "Warning");
             } else {
                 $.ajax({

@@ -97,7 +97,7 @@ namespace GMGInventory.Application.Repositories
                         }
                     }
                 }
-                else if (form.SortColumn.ToLower().Contains("displayOrder"))
+                else if (form.SortColumn.ToLower().Contains("displayorder"))
                 {
                     if (form.SortColumnDirection == "asc")
                         data = data.OrderBy(s => s.DisplayOrder == 0 ? int.MaxValue : s.DisplayOrder);

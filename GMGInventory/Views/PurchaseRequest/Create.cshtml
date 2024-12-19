@@ -164,7 +164,7 @@
                         <div class="col-12 col-sm-6 add-stock-container">
                             <div class="form-group">
                                 <label for="add-stock" class="form-label mb-0">Stock on Hand</label>
-                                <input type="number" min="0" max="1999999" step="1" id="add-stock" name="Stock" class="form-control form-control-sm" />
+                                <input type="number" min="0" max="1999999" step="1" id="add-stock" name="Stock" class="form-control form-control-sm" readonly="readonly" />
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-quantity-container">
@@ -289,7 +289,8 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" step="1" value="' + data.stockOnHandD + '" class="form-control form-control-sm stock" style="width: 100%;" />';
+                        //return '<input type="number" min="0" max="1999999" step="1" value="' + data.stockOnHandD + '" class="form-control form-control-sm stock" style="width: 100%;" />';
+                        return data.stockOnHand;
                     },
                     name: "StockOnHand",
                     className: "form-cell text-end"
