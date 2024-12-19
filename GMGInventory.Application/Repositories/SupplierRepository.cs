@@ -94,6 +94,7 @@ namespace GMGInventory.Application.Repositories
                              RegionName = region.Name,
                              RegionId = supplier.RegionId,
                              Term = supplier.Term.Name,
+                             TermId = supplier.TermId,
                              CurrencyId = supplier.CurrencyId,
                              CurrencyName = supplier.Currency.Name,
                              BusinessStyleId = supplier.BusinessStyleId,
@@ -239,6 +240,7 @@ namespace GMGInventory.Application.Repositories
                 .Include(s => s.Currency)
                 .Include(s => s.Region)
                 .Include(s => s.BusinessStyle)
+                .Include(s => s.Term)
                 .Where(s => s.Id == id).FirstOrDefaultAsync();
             if (suppliers == null)
             {
@@ -263,7 +265,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> IsSupplierInUse(int id)
         {
             return await context.Areas.AnyAsync(s => s.Id == id)
-                || await context.PurchaseOrders.AnyAsync(S => S.SupplierId == id);
+                || await context.PurchaseOrderNews.AnyAsync(S => S.SupplierId == id);
         }
 
         public async Task<bool> IsSupplierIdExistAsync(int id)
@@ -330,7 +332,7 @@ namespace GMGInventory.Application.Repositories
             supplier.OfficeTelNo = supplierVM.OfficeTelNo + "";
             supplier.ContactPerson = supplierVM.ContactPerson + "";
             supplier.RegionId = supplierVM.RegionId;
-            supplier.TermId = 0;// supplierVM.Terms;
+            supplier.TermId =  supplierVM.TermId;
             supplier.CurrencyId = supplierVM.CurrencyId;
             supplier.BusinessStyleId  = supplierVM.BusinessStyleId;
             supplier.VAT = supplierVM.VAT + "";

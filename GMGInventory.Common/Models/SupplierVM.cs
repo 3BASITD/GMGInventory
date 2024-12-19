@@ -92,9 +92,10 @@ namespace GMGInventory.Common.Models
         public string RegionName { get; set; }
         public RegionVM Region { get; set; }
 
+        [Display(Name = "Term")]
+        public int TermId { get; set; }
         [StringLength(100)]
         public string Term { get; set; }
-
 
         [Display(Name = "Currency")]
         public int  CurrencyId { get; set; }
