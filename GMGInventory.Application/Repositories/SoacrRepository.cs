@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -811,13 +812,13 @@ namespace GMGInventory.Application.Repositories
         {
             var tbrh = from tbr in context.SOACRLineItemTBRs
                        where tbr.SOACRLineItemId == soaLineItemId
-                       join usr in userManager.Users on tbr.UserCreated equals usr.Id
+                       join user in userManager.Users on tbr.UserCreated equals user.Id
                        select new SOACRInvoiceTBRHistoryVM
                        {
                            AmountD = tbr.Amount,
                            DateCreatedD = tbr.DateCreated,
                            InvoiceNumber = tbr.SalesReturnLineItem.SalesReturn.SalesReturnNumber + " (" + (tbr.SalesReturnLineItem.InvoiceLineItem == null ? "TBR" : tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.InvoiceNumber) + ")",
-                           UserCreated = usr.Nickname
+                           UserCreated = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname)
                        };
             return await tbrh.ToListAsync();
         }

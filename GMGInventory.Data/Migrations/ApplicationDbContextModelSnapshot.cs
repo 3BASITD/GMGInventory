@@ -2092,9 +2092,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int?>("PackTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuantityInvoiced")
-                        .HasColumnType("int");
-
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(150)");
 
@@ -2102,12 +2099,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("StatusId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("TotalQuantity")
                         .HasColumnType("int");
 
                     b.Property<string>("UserCreated")
@@ -4239,15 +4230,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int?>("PurchaseOrderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuantityInvoiced")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantityOrdered")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantityPacked")
-                        .HasColumnType("int");
-
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(150)");
 
@@ -4364,9 +4346,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<decimal>("Discount2")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("InvoicedQuantity")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsServed")
                         .HasColumnType("bit");
 
@@ -4374,9 +4353,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("LineNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PackedQuantity")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -4387,12 +4363,6 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<decimal>("SellingPrice")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ServedQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnservedQuantity")
-                        .HasColumnType("int");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -5633,13 +5603,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d88a7062-daaf-4536-82a2-2020012e0837",
+                            ConcurrencyStamp = "f0e8a5ac-2734-4566-99e4-66a236c0891f",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEuuHQ3F33o7XoEVN+Z1uu34pGkMTj8JPteueOSH14z64NBTF5z7uSIMQVFSwRzlIQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECDGPIMcdob1wc9z2PRyG261BAHdUu7YMhAtf4WdGHZqJx9m7nT8N3RejQk2ezlvZg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "035430d9-5273-40e7-9b72-a475f201028d",
+                            SecurityStamp = "4fc89ac7-62d0-48c1-902c-02bbf0b60406",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5654,13 +5624,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4df78da9-cf34-480e-a718-696dcd78f259",
+                            ConcurrencyStamp = "122c0fe1-492c-4f7a-b5af-9c5a2c649771",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMigtvKzgmG2bNJDCn6u26enlIkddRtcYt9Z+mcvpOZT7lvOv+oBZs1T2idM11K7bg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENjtcxacYzDRNxqyObWyJ5OFRrfeAErmcm/Ea94GCS8ptbQkGzEfDpORi+eaX8XsCw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a80180df-f9f3-497f-b08e-91dd46f6676b",
+                            SecurityStamp = "e82c84e2-e9db-4f4b-a44e-7aaf4cc6cb4d",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

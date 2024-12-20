@@ -74,9 +74,9 @@ namespace GMGInventory.Common.Models
         public IList<SalesReturnItemVM> Contents { get; set; }
         public SalesReturnVM Details { get; set; }
         public string TotalQuantity => string.Format(SystemFormat.StringIntegerComma, TotalQuantityD);
-        public int TotalQuantityD => Contents.Sum(s => s.Quantity);
+        public int TotalQuantityD => Contents.Count() > 0 ? Contents.Sum(s => s.Quantity) : 0;
         public string TotalGrossPrice => string.Format(SystemFormat.StringDecimalComma, TotalGrossPriceD);
-        public decimal TotalGrossPriceD => Contents.Sum(s => s.GrossPriceD);
+        public decimal TotalGrossPriceD => Contents.Count() > 0 ? Contents.Sum(s => s.GrossPriceD) : 0;
 
     }
 

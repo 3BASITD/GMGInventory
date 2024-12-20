@@ -95,7 +95,7 @@ namespace GMGInventory.Application.Repositories
 
                           join userc in userManager.Users on location.UserCreated equals userc.Id
                           join userm in userManager.Users on location.UserModified equals userm.Id into m
-                          from um in m.DefaultIfEmpty()
+                          from userm in m.DefaultIfEmpty()
 
                           select new LocationCodeVM
                           {
@@ -105,8 +105,8 @@ namespace GMGInventory.Application.Repositories
                               IsActive = location.IsActive,
                               DateCreatedD = location.DateCreated,
                               DateModifiedD = location.DateModified == null ? null : location.DateModified.Value,
-                              UserCreated = userc.Nickname,
-                              UserModified = um == null ? "-" : um.Nickname
+                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                              UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                           };
             return await locations.ToListAsync();
         }

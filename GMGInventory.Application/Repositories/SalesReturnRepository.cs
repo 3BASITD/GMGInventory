@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -26,7 +27,7 @@ namespace GMGInventory.Application.Repositories
         {
             var returnVM = from ret in context.SalesReturns
                                               .Include(s => s.Customer)
-                           join usr in userManager.Users on ret.UserCreated equals usr.Id
+                           join user in userManager.Users on ret.UserCreated equals user.Id
                            where ret.Id == Id
                            select new SalesReturnVM
                            {
@@ -35,7 +36,7 @@ namespace GMGInventory.Application.Repositories
                                CustomerName = ret.Customer.Name,
                                Id = ret.Id,
                                Remarks = ret.Remarks,
-                               ReturnBy = usr.Nickname,
+                               ReturnBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                ReturnDateD = ret.DateCreated,
                                SRNumber = ret.SalesReturnNumber
                            };
@@ -46,7 +47,7 @@ namespace GMGInventory.Application.Repositories
         {
             var returns = from ret in context.SalesReturns
                                              .Include(s => s.Customer)
-                          join usr in userManager.Users on ret.UserCreated equals usr.Id
+                          join user in userManager.Users on ret.UserCreated equals user.Id
                           select new SalesReturnVM
                           {
                               CustomerId = ret.CustomerId,
@@ -54,7 +55,7 @@ namespace GMGInventory.Application.Repositories
                               CustomerName = ret.Customer.Name,
                               Id = ret.Id,
                               Remarks = ret.Remarks,
-                              ReturnBy = usr.Nickname,
+                              ReturnBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                               ReturnDateD = ret.DateCreated,
                               SRNumber = ret.SalesReturnNumber
                           };

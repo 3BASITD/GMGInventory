@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -31,7 +32,7 @@ namespace GMGInventory.Application.Repositories
             var brands = from brand in context.Brands
                          join userc in userManager.Users on brand.UserCreated equals userc.Id
                          join userm in userManager.Users on brand.UserModified equals userm.Id into m
-                         from um in m.DefaultIfEmpty()
+                         from userm in m.DefaultIfEmpty()
                          select new BrandViewVM
                          {
                              Id = brand.Id,
@@ -42,8 +43,8 @@ namespace GMGInventory.Application.Repositories
                              DateModifiedD = brand.DateModified,
                              IsActive = brand.IsActive,
                              Name = brand.Name,
-                             UserCreated = userc.Nickname,
-                             UserModified = um == null ? "-" : um.Nickname
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                          };
             return await brands.ToListAsync();
         }

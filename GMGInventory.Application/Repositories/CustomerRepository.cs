@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -180,9 +181,9 @@ namespace GMGInventory.Application.Repositories
                                   VAT = cust.VAT,
                                   Remarks = cust.Remarks,
                                   IsActive = cust.IsActive,
-                                  CreatedBy = userc.FirstName + " " + userc.LastName,
+                                  CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                   DateCreatedD = cust.DateCreated,
-                                  ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                                  ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                                   DateModifiedD = cust.DateModified
                               }).FirstOrDefault();
             return customerVM;
@@ -228,9 +229,9 @@ namespace GMGInventory.Application.Repositories
                                 VAT = cust.VAT,
                                 Remarks = cust.Remarks,
                                 IsActive = cust.IsActive,
-                                CreatedBy = userc.FirstName + " " + userc.LastName,
+                                CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                 DateCreatedD = cust.DateCreated,
-                                ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                                ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                                 DateModifiedD = cust.DateModified
                             };
             return await customers.ToListAsync();
@@ -679,9 +680,9 @@ namespace GMGInventory.Application.Repositories
                                  OverPaymentD = cp.OverPayment,
                                  SOANo = cp.SOACRId,
                                  TotalInvoiceAmountD = cp.TotalInvoiceAmount,
-                                 CreatedBy = userc.FirstName + " " + userc.LastName,
+                                 CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  DateCreatedD = cp.DateCreated,
-                                 ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                                 ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                                  DateModifiedD = cp.DateCreated
                              };
             return await customerVM.ToListAsync();

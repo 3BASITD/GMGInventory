@@ -119,8 +119,7 @@ namespace GMGInventory.Application.Repositories
                                                   .Where(s => s.PurchaseOrderId == receive.PurchaseOrderId)
                                                   .FirstOrDefault()
 
-                          join userc in userManager.Users on receive.UserCreated equals userc.Id into c
-                          from userc in c.DefaultIfEmpty()
+                          join userc in userManager.Users on receive.UserCreated equals userc.Id
                           join userm in userManager.Users on receive.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
                           where receive.Id == requestId
@@ -145,14 +144,14 @@ namespace GMGInventory.Application.Repositories
                               Currency = receive.PurchaseOrder.Currency.Code,
                               CurrencyId = receive.PurchaseOrder.Currency.Id,
                               CurrencyRateD = receive.PurchaseOrder.CurrencyRate,
-                              ApprovedBy = receive.ApproverId == null ? null : receive.Approver.FirstName + " " + receive.Approver.LastName,
-                              DisapprovedBy = receive.DisapproverId == null ? null : receive.Disapprover.FirstName + " " + receive.Disapprover.LastName,
+                              ApprovedBy = receive.ApproverId == null ? null : SystemFormat.Name(receive.Approver.FirstName, receive.Approver.LastName, receive.Approver.Nickname),
+                              DisapprovedBy = receive.DisapproverId == null ? null : SystemFormat.Name(receive.Disapprover.FirstName, receive.Disapprover.LastName, receive.Disapprover.Nickname),
                               DisapprovedReason = receive.DisapprovedReason,
                               ResubmitId = receive.ResubmitId,
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
-                              UserCreated = userc.FirstName + " " + userc.LastName,
+                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = receive.DateCreated,
-                              UserModified = userm.FirstName + " " + userm.LastName,
+                              UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                               DateModifiedD = receive.DateModified
                           };
             return await details.FirstOrDefaultAsync();

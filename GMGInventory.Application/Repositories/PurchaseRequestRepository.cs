@@ -157,8 +157,7 @@ namespace GMGInventory.Application.Repositories
                           let resubmitfrom = context.PurchaseRequests
                                                     .Where(s => s.ResubmitId == request.Id)
                                                     .FirstOrDefault()
-                          join userc in userManager.Users on request.UserCreated equals userc.Id into c
-                          from userc in c.DefaultIfEmpty()
+                          join userc in userManager.Users on request.UserCreated equals userc.Id
                           join userm in userManager.Users on request.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
                           where request.Id == requestId
@@ -175,15 +174,15 @@ namespace GMGInventory.Application.Repositories
                               Status = request.Status.Code,
                               RequestDateD = request.RequestDate,
                               Remarks = request.Remarks,
-                              ApprovedBy1 = request.Approver1Id == null ? null : request.Approver1.FirstName + " " + request.Approver1.LastName,
-                              ApprovedBy2 = request.Approver2Id == null ? null : request.Approver2.FirstName + " " + request.Approver2.LastName,
-                              DisapprovedBy = request.DisapproverId == null ? null : request.Disapprover.FirstName + " " + request.Disapprover.LastName,
+                              ApprovedBy1 = request.Approver1Id == null ? null : SystemFormat.Name(request.Approver1.FirstName, request.Approver1.LastName, request.Approver1.Nickname),
+                              ApprovedBy2 = request.Approver2Id == null ? null : SystemFormat.Name(request.Approver2.FirstName, request.Approver2.LastName, request.Approver2.Nickname),
+                              DisapprovedBy = request.DisapproverId == null ? null : SystemFormat.Name(request.Disapprover.FirstName, request.Disapprover.LastName, request.Disapprover.Nickname),
                               DisapprovedReason = request.DisapprovedReason,
                               ResubmitId = request.ResubmitId,
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
-                              UserCreated = userc.FirstName + " " + userc.LastName,
+                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = request.DateCreated,
-                              UserModified = userm.FirstName + " " + userm.LastName,
+                              UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                               DateModifiedD = request.DateModified
                           };
             return await details.FirstOrDefaultAsync();

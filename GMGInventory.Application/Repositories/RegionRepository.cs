@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -157,7 +158,7 @@ namespace GMGInventory.Application.Repositories
 
                           join userc in userManager.Users on region.UserCreated equals userc.Id
                           join userm in userManager.Users on region.UserModified equals userm.Id into m
-                          from um in m.DefaultIfEmpty()
+                          from userm in m.DefaultIfEmpty()
 
                           select new RegionVM
                           {
@@ -167,8 +168,8 @@ namespace GMGInventory.Application.Repositories
                               IsActive = region.IsActive,
                               DateCreatedD = region.DateCreated,
                               DateModifiedD = region.DateModified == null ? null : region.DateModified.Value,
-                              UserCreated = userc.Nickname,
-                              UserModified = um == null ? "-" : um.Nickname
+                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                              UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                           };
             return await regions.ToListAsync();
         }

@@ -46,7 +46,7 @@ namespace GMGInventory.Application.Repositories
             var forwarders = from forward in context.Forwarders
                          join userc in userManager.Users on forward.UserCreated equals userc.Id
                          join userm in userManager.Users on forward.UserModified equals userm.Id into m
-                         from um in m.DefaultIfEmpty()
+                         from userm in m.DefaultIfEmpty()
 
                          select new ForwarderViewVM
                          {
@@ -58,8 +58,8 @@ namespace GMGInventory.Application.Repositories
                              FaxNumber = forward.FaxNumber,
                              DateCreatedD = forward.DateCreated,
                              DateModifiedD = forward.DateModified,
-                             UserCreated = userc.Nickname,
-                             UserModified = um == null ? "-" : um.Nickname
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                          };
             return await forwarders.ToListAsync();
         }

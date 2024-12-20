@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -99,8 +100,7 @@ namespace GMGInventory.Application.Repositories
                          from userRole in ur.DefaultIfEmpty()
                          join role in context.Roles on userRole.RoleId equals role.Id into r
                          from role in r.DefaultIfEmpty()
-                         join userc in userManager.Users on user.UserCreated equals userc.Id into c
-                         from userc in c.DefaultIfEmpty()
+                         join userc in userManager.Users on user.UserCreated equals userc.Id
                          join userm in userManager.Users on user.UserModified equals userm.Id into m
                          from userm in m.DefaultIfEmpty()
                          where user.Id == id
@@ -114,9 +114,9 @@ namespace GMGInventory.Application.Repositories
                              LastName = user.LastName,
                              Nickname = user.Nickname,
                              IsActive = user.IsActive,
-                             UserCreated = userc == null ? "-" : userc.FirstName + " " + userc.LastName,
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                              DateCreatedS = user.DateCreated.ToString("MMMM d, yyyy hh:mm:ss tt"),
-                             UserModified = userm == null ? "-" : userm.FirstName + " " + userm.LastName,
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                              DateModifiedS = user.DateModified == null ? "-" : user.DateModified!.Value.ToString("MMMM d, yyyy hh:mm:ss tt")
                          };
             return await userVM.FirstOrDefaultAsync();

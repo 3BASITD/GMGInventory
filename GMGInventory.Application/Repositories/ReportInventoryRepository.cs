@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;
@@ -28,10 +29,13 @@ namespace GMGInventory.Application.Repositories
                                             .Include(s => s.Unit)
                         let inventory = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.Code == "MAIN")
-                                               .Sum(s => s.Quantity)
-                        let served = context.SalesOrderLineItems
-                                            .Where(s => s.ItemId == item.Id)
-                                            .ToList()
+                                               .Sum(s => (int?)s.Quantity) ?? 0
+                        let packedQuantity = context.PackLineItems
+                                                    .Where(s => s.ItemId == item.Id)
+                                                    .Sum(s => (int?)s.Quantity) ?? 0
+                        let returnedQuantity = context.SalesReturnLineItems
+                                                      .Where(s => s.ItemId == item.Id)
+                                                      .Sum(s => (int?)s.Quantity) ?? 0
                         where item.IsActive == true
                            && (filter.Brand == null || item.BrandId == filter.Brand)
                            && (filter.Item == null || item.Id == filter.Item)
@@ -42,7 +46,7 @@ namespace GMGInventory.Application.Repositories
                             ItemName = item.Name,
                             MaintainingQuantityD = inventory,
                             PartNumber = item.PartNumber + "",
-                            QuantityOnHandD = inventory + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
+                            QuantityOnHandD = inventory + (packedQuantity - returnedQuantity),
                             Unit = item.Unit.Name
                         };
             return await items.ToListAsync();
@@ -591,7 +595,7 @@ namespace GMGInventory.Application.Repositories
                          select new StockCardRVM
                          {
                              DateD = card.DateModified ?? card.DateCreated,
-                             DetailsRemarks = "Adjusted by - " + user.Nickname,
+                             DetailsRemarks = "Adjusted by - " + SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                              InD = card.QuantityFrom < card.QuantityTo ? card.QuantityTo - card.QuantityFrom : 0,
                              Item = card.Item.Name,
                              OutD = card.QuantityFrom > card.QuantityTo ? card.QuantityFrom - card.QuantityTo : 0,
@@ -721,10 +725,13 @@ namespace GMGInventory.Application.Repositories
 
                          let quantity = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id)
-                                               .Sum(s => s.Quantity)
-                         let served = context.SalesOrderLineItems
-                                             .Where(s => s.ItemId == item.Id)
-                                             .ToList()
+                                               .Sum(s => (int?)s.Quantity) ?? 0
+                         let packedQuantity = context.PackLineItems
+                                                     .Where(s => s.ItemId == item.Id)
+                                                     .Sum(s => (int?)s.Quantity) ?? 0
+                         let returnedQuantity = context.SalesReturnLineItems
+                                                       .Where(s => s.ItemId == item.Id)
+                                                       .Sum(s => (int?)s.Quantity) ?? 0
                          let unitcost = context.PurchaseOrderLineItems
                                                .Include(s => s.PurchaseOrder)
                                                .Where(s => s.ItemId == item.Id)
@@ -739,7 +746,7 @@ namespace GMGInventory.Application.Repositories
                              ItemName = item.Name,
                              ItemType = item.ItemType.Name,
                              PartNumber = item.PartNumber + "",
-                             QuantityOnHandD = quantity + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
+                             QuantityOnHandD = quantity + (packedQuantity - returnedQuantity),
                              Unit = item.Unit.Name,
                              UnitCostD = 0
                          };

@@ -416,15 +416,15 @@ namespace GMGInventory.Application.Repositories
             var roles = from r in roleManager.Roles
                         join userc in userManager.Users on r.UserCreated equals userc.Id
                         join userm in userManager.Users on r.UserModified equals userm.Id into m
-                        from um in m.DefaultIfEmpty()
+                        from userm in m.DefaultIfEmpty()
                         select new RoleVM
                         {
                             Id = r.Id,
                             Name = r.Name,
                             IsActive = r.IsActive,
-                            UserCreated = userc.Nickname,
+                            UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                             DateCreatedD = r.DateCreated,
-                            UserModified = um == null ? "-" : um.Nickname,
+                            UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                             DateModifiedD = r.DateModified
                         };
             return await roles.ToListAsync();

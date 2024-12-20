@@ -45,10 +45,6 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalAmount { get; set; }
-
-        public int QuantityPacked { get; set; }
-        public int QuantityInvoiced { get; set; }
-        public int QuantityOrdered { get; set; }
         public DateTime RequiredDeliveryDate { get; set; }
         public DateTime SalesOrderDate { get; set; }
 

@@ -105,7 +105,7 @@ namespace GMGInventory.Application.Repositories
                                     on area.RegionId equals region.Id
                          join userc in userManager.Users on area.UserCreated equals userc.Id
                          join userm in userManager.Users on area.UserModified equals userm.Id into m
-                         from um in m.DefaultIfEmpty()
+                         from userm in m.DefaultIfEmpty()
 
                          select new AreaViewVM
                          {
@@ -117,8 +117,8 @@ namespace GMGInventory.Application.Repositories
                              IsActive = area.IsActive,
                              DateCreatedD = area.DateCreated,
                              DateModifiedD = area.DateModified == null ? null : area.DateModified.Value,
-                             UserCreated = userc.Nickname,
-                             UserModified = um == null ? "-" : um.Nickname
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                          };
             return await agents.ToListAsync();
         }
@@ -309,9 +309,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(AreaVM areaVM)
         {
-            return (await GetAllAreaAsync()).Any(s => s.Code == areaVM.Code 
-                                                   && s.Name == areaVM.Name 
-                                                   && s.CommissionRate == areaVM.CommissionRate 
+            return (await GetAllAreaAsync()).Any(s => s.Code == areaVM.Code
+                                                   && s.Name == areaVM.Name
+                                                   && s.CommissionRate == areaVM.CommissionRate
                                                    && s.RegionName == areaVM.RegionName);
         }
 

@@ -26,7 +26,7 @@ namespace GMGInventory.Application.Repositories
                           select new AuditLogVM
                           {
                               Id = audit.Id,
-                              User = audit.User.Nickname,
+                              User = audit.User.FirstName + " " + audit.User.LastName,
                               Type = audit.Type,
                               TableName = audit.TableName,
                               DateTimeD = audit.DateTime,

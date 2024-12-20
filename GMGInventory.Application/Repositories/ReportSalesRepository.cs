@@ -259,8 +259,9 @@ namespace GMGInventory.Application.Repositories
         {
             var invoices = from invoice in context.InvoiceLineItems
                            let inventory = context.ItemInventories
-                                                  .Where(s => s.ItemId == invoice.Item.Id && s.Warehouse.Code.ToLower().Contains("main"))
-                                                  .Sum(s => s.Quantity)
+                                                  .Where(s => s.ItemId == invoice.Item.Id 
+                                                           && s.Warehouse.Code.ToLower().Contains("main"))
+                                                  .Sum(s => (int?)s.Quantity) ?? 0
                            where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
                            && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
@@ -1533,22 +1534,25 @@ namespace GMGInventory.Application.Repositories
             var solines = from soline in context.SalesOrderLineItems
                           join so in context.SalesOrders
                                    on soline.SalesOrderId equals so.Id
-                          join inv in context.Invoices
-                                   on so.Id equals inv.SalesOrderId into soas
-                          from soaliGroup in soas.DefaultIfEmpty()
-                              //where soaliGroup.Id == null &&
-                          where soaliGroup == null
-                          && filter.DateFrom <= so.DateCreated.Date
+                          let packedQuantity = context.PackLineItems
+                                                      .Where(s => s.Pack.SalesOrderId == so.Id
+                                                               && s.ItemId == soline.ItemId)
+                                                      .Sum(s => (int?)s.Quantity) ?? 0
+                          let returnedQuantity = context.SalesReturnLineItems
+                                                        .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == so.Id
+                                                                 && s.ItemId == soline.ItemId)
+                                                        .Sum(s => (int?)s.Quantity) ?? 0
+                          where filter.DateFrom <= so.DateCreated.Date
                           && so.DateCreated.Date <= filter.DateTo
                           && (filter.Brand == null || soline.Item.Brand.Id == filter.Brand)
 
                           select new UnservedItemRVM
                           {
                               Brand = soline.Item.Brand.Name,
-                              CurrentD = soline.ServedQuantity,
+                              CurrentD = packedQuantity - returnedQuantity,
                               ItemCode = soline.Item.Code,
                               ItemName = soline.Item.Name,
-                              PendingD = soline.UnservedQuantity,
+                              PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
                               ReplenishDateD = soline.DateCreated
                           };
             var solineslist = await solines.ToListAsync();

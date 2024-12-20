@@ -202,14 +202,14 @@ namespace GMGInventory.Application.Repositories
                               Status = retrn.Status.Code,
                               ReturnDateD = retrn.ReturnDate,
                               Remarks = retrn.Remarks,
-                              ApprovedBy = retrn.ApproverId == null ? null : retrn.Approver.FirstName + " " + retrn.Approver.LastName,
-                              DisapprovedBy = retrn.DisapproverId == null ? null : retrn.Disapprover.FirstName + " " + retrn.Disapprover.LastName,
+                              ApprovedBy = retrn.ApproverId == null ? null : SystemFormat.Name(retrn.Approver.FirstName, retrn.Approver.LastName, retrn.Approver.Nickname),
+                              DisapprovedBy = retrn.DisapproverId == null ? null : SystemFormat.Name(retrn.Disapprover.FirstName, retrn.Disapprover.LastName, retrn.Disapprover.Nickname),
                               DisapprovedReason = retrn.DisapprovedReason,
                               ResubmitId = retrn.ResubmitId,
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
-                              UserCreated = userc.FirstName + " " + userc.LastName,
+                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = retrn.DateCreated,
-                              UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                              UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                               DateModifiedD = retrn.DateModified
                           };
             return await details.FirstOrDefaultAsync();

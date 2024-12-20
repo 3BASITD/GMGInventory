@@ -79,7 +79,7 @@ namespace GMGInventory.Application.Repositories
                          //          on supplier.CurrencyId equals currency.Id
                          join userc in userManager.Users on supplier.UserCreated equals userc.Id
                          join userm in userManager.Users on supplier.UserModified equals userm.Id into m
-                         from um in m.DefaultIfEmpty()
+                         from userm in m.DefaultIfEmpty()
 
                          select new SupplierViewVM
                          {
@@ -103,8 +103,8 @@ namespace GMGInventory.Application.Repositories
                              IsActive = supplier.IsActive,
                              DateCreatedD = supplier.DateCreated,
                              DateModifiedD = supplier.DateModified,
-                             UserCreated = userc.Nickname,
-                             UserModified = um == null ? "-" : um.Nickname
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                          };
             return await suppliers.ToListAsync();
         }
@@ -207,7 +207,7 @@ namespace GMGInventory.Application.Repositories
             var supplierVM = (from supplier in context.Suppliers
                               join userc in userManager.Users on supplier.UserCreated equals userc.Id
                               join userm in userManager.Users on supplier.UserModified equals userm.Id into m
-                              from um in m.DefaultIfEmpty()
+                              from userm in m.DefaultIfEmpty()
                               where supplier.Id == id
 
                           select new SupplierViewVM
@@ -226,9 +226,9 @@ namespace GMGInventory.Application.Repositories
                               BusinessStyleName = supplier.BusinessStyle.Name,
                               VAT = supplier.VAT,
                               IsActive = supplier.IsActive,
-                              UserCreated =  userc.Nickname,
+                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = supplier.DateCreated,
-                              UserModified = um == null ? "-" : um.Nickname,
+                              UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                               DateModifiedD = supplier.DateModified,
                           }).FirstOrDefault();
             return supplierVM;
@@ -365,7 +365,7 @@ namespace GMGInventory.Application.Repositories
                                   Currency = po.Currency.Code,
                                   PurchaseNumber = po.DocumentNumber,
                                   QuantityD = purchaseItem.Quantity,
-                                  ReplenishBy = user.Nickname,
+                                  ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                   ReplenishDateD = po.DateCreated,
                                   Status = po.Status.Code,
                                   UnitCostD = purchaseItem.UnitCost, // tinanggal na sa db

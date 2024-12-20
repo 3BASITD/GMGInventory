@@ -38,7 +38,7 @@ namespace GMGInventory.Application.Repositories
                          select new JsonPurchaseOrderOptionsModel
                          {
                              Id = order.Id.ToString(),
-                             OrderBy = string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.FirstName) ? user.Nickname : (user.FirstName + " " + user.LastName),
+                             OrderBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                              OrderDateD = order.ReplenishDate,
                              Supplier = order.Supplier.Name,
                              Text = order.PONumber
@@ -55,10 +55,15 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonOptionsModel>> GetSalesOrderOptions(string search, int page)
         {
             var orders = from order in context.SalesOrders
-                         where order.Status.Code != "Submitted"
-                         && order.Status.Code != "Disapproved"
-                         && order.Status.Code != "Denied"
-                         && order.QuantityOrdered != order.QuantityPacked
+                         let quantityOrdered = context.SalesOrderLineItems
+                                                      .Where(s => s.SalesOrderId == order.Id)
+                                                      .Sum(s => (int?)s.Quantity) ?? 0
+                         let quantityPacked = context.PackLineItems
+                                                     .Where(s => s.Pack.SalesOrderId == order.Id)
+                                                     .Sum(s => (int?)s.Quantity) ?? 0
+                         where order.Status.Code.ToLower() != "submitted"
+                         && order.Status.Code.ToLower() != "disapproved"
+                         && order.Status.Code.ToLower() != "denied"
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
                          orderby order.SalesOrderNumber ascending
@@ -113,7 +118,7 @@ namespace GMGInventory.Application.Repositories
                                AgentCode = order.Agent.Code,
                                AgentId = order.Agent.Id,
                                AgentName = order.Agent.FirstName + (order.Agent.MiddleName == null ? "" : " " + order.Agent.MiddleName) + " " + order.Agent.LastName,
-                               ApprovedBy = approve.Nickname,
+                               ApprovedBy = SystemFormat.Name(approve.FirstName, approve.LastName, approve.Nickname),
                                ApprovedDateD = order.ApprovedDate,
                                CreditTerms = order.Customer.CreditTerm.Name,
                                CustomerAddress = order.Customer.Address,
@@ -123,7 +128,7 @@ namespace GMGInventory.Application.Repositories
                                CustomerContactNumber = order.Customer.ContactNumber + "",
                                CustomerContactPerson = order.Customer.ContactPerson + "",
                                DeclaredValueD = order.DeclaredValue,
-                               DisapprovedBy = disapprove.Nickname,
+                               DisapprovedBy = SystemFormat.Name(disapprove.FirstName, disapprove.LastName, disapprove.Nickname),
                                DisapprovedDateD = order.DisapprovedDate,
                                DisapprovedReason = order.DisapprovedReason + "",
                                Forwarder = order.Forwarder.Name,
@@ -142,9 +147,9 @@ namespace GMGInventory.Application.Repositories
                                Status = order.Status.Code,
                                AccountStatus = order.Customer.CustomerAccountStatus.Name,
                                Region = order.Customer.Area.Region.Name,
-                               UserCreated = userc.FirstName + " " + userc.LastName,
+                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                DateCreatedD = order.DateCreated,
-                               UserModified = userm == null ? null : userm.Nickname + " " + userm.LastName,
+                               UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                                DateModifiedD = order.DateModified == null ? null : order.DateModified.Value
                            });
 
@@ -181,8 +186,10 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.Customer)
                                                 .Include(s => s.Status)
                            join user in users on order.UserCreated equals user.Id
-                           let auser = users.Where(s => s.Id == order.ApprovedBy).Select(s => s.Nickname).First()
-                           let duser = users.Where(s => s.Id == order.DisapprovedBy).Select(s => s.Nickname).First()
+                           join approvedby in users on order.ApprovedBy equals approvedby.Id into ab
+                           from approvedby in ab.DefaultIfEmpty()
+                           join disapprovedby in users on order.DisapprovedBy equals disapprovedby.Id into db
+                           from disapprovedby in db.DefaultIfEmpty()
                            where /*(order.UserCreated == currentUserId || isAdminOrManager)
                            &&*/ (filter.AgentId == null || order.AgentId == filter.AgentId)
                            && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
@@ -202,7 +209,7 @@ namespace GMGInventory.Application.Repositories
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
                                TotalAmountD = order.TotalAmount,
-                               ApprovedDisapprovedBy = auser ?? duser ?? "-",
+                               ApprovedDisapprovedBy = approvedby != null ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname) : disapprovedby != null ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname) : "-",
                                ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate
                            });
             return await orderVM.ToListAsync();
@@ -277,17 +284,29 @@ namespace GMGInventory.Application.Repositories
                                                    .FirstOrDefault()
                                 let inventory = context.ItemInventories
                                                        .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
-                                                       .Sum(s => s.Quantity)
+                                                       .Sum(s => (int?)s.Quantity) ?? 0
+                                let packedQuantity = context.PackLineItems
+                                                            .Where(s => s.Pack.SalesOrderId == order.SalesOrderId
+                                                                     && s.ItemId == order.ItemId)
+                                                            .Sum(s => (int?)s.Quantity) ?? 0
+                                let invoicedQuantity = context.InvoiceLineItems
+                                                              .Where(s => s.Invoice.SalesOrderId == order.SalesOrderId
+                                                                       && s.ItemId == order.ItemId)
+                                                              .Sum(s => (int?)s.Quantity) ?? 0
+                                let returnedQuantity = context.SalesReturnLineItems
+                                                              .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == order.SalesOrderId
+                                                                       && s.ItemId == order.ItemId)
+                                                              .Sum(s => (int?)s.Quantity) ?? 0
                                 where order.SalesOrderId == salesOrderId
                                 //&& ((order.Quantity != order.PackedQuantity && forPack == true) || forPack == false)
-                                && ((order.Quantity != order.InvoicedQuantity && forPack == true) || forPack == false)
+                                && ((order.Quantity != invoicedQuantity && forPack == true) || forPack == false)
                                 select new SalesOrderItemVM
                                 {
                                     Discount1D = order.Discount1,
                                     Discount2D = order.Discount2,
                                     Id = order.Id,
                                     InventoryCountD = inventory,
-                                    InvoicedQuantityD = order.InvoicedQuantity,
+                                    InvoicedQuantityD = invoicedQuantity,
                                     ItemCode = order.Item.Code,
                                     ItemId = order.Item.Id,
                                     ItemName = order.Item.Name,
@@ -296,13 +315,13 @@ namespace GMGInventory.Application.Repositories
                                     LineNumber = order.LineNumber,
                                     NetPriceD = price == null ? 0 : price.NetSellingPrice,
                                     QuantityD = order.Quantity,
-                                    PackedQuantityD = order.PackedQuantity,
-                                    RemainingQuantityD = order.ServedQuantity - order.PackedQuantity,
+                                    PackedQuantityD = packedQuantity,
+                                    RemainingQuantityD = (packedQuantity - returnedQuantity) - invoicedQuantity,
                                     RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                     SellingPriceD = order.SellingPrice,
-                                    ServedQuantityD = order.ServedQuantity,
+                                    ServedQuantityD = packedQuantity - returnedQuantity,
                                     Unit = order.Item.Unit.Code,
-                                    UnservedQuantityD = order.UnservedQuantity
+                                    UnservedQuantityD = order.Quantity - (packedQuantity - returnedQuantity)
                                 }).ToListAsync();
 
             int newLineNumber = 1;
@@ -446,9 +465,6 @@ namespace GMGInventory.Application.Repositories
                     ForwarderId = form.Forwarder,
                     PriceTypeId = 1,//form.GrossNet,
                     PurchaseOrderId = form.PurchaseOrder,
-                    QuantityInvoiced = 0,
-                    QuantityOrdered = form.Items.Sum(s => s.Quantity),
-                    QuantityPacked = 0,
                     Remarks = form.Remarks,
                     SalesOrderDate = form.OrderDate,
                     SalesOrderNumber = soNumber,
@@ -522,15 +538,11 @@ namespace GMGInventory.Application.Repositories
                                {
                                    Discount1 = s.Discount1,
                                    Discount2 = s.Discount2,
-                                   InvoicedQuantity = 0,
                                    IsServed = false,
                                    ItemId = s.Item,
-                                   PackedQuantity = 0,
                                    Quantity = s.Quantity,
                                    SalesOrderId = salesOrderId,
-                                   SellingPrice = s.UnitPrice,
-                                   ServedQuantity = 0,
-                                   UnservedQuantity = 0
+                                   SellingPrice = s.UnitPrice
                                });
             context.SalesOrderLineItems.AddRange(itemsVM);
 
@@ -585,36 +597,20 @@ namespace GMGInventory.Application.Repositories
                     var itemInventory = await context.ItemInventories
                                                      .Where(s => s.ItemId == salesOrderLineItem.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
                                                      .FirstOrDefaultAsync();
-                    //if (itemInventory != null && itemInventory.Quantity >= salesOrderLineItem.Quantity)
-                    //{
-                    //    itemInventory.Quantity = itemInventory.Quantity - salesOrderLineItem.Quantity;
-                    //    context.ItemInventories.Update(itemInventory);
-                    //    await context.SaveChangesAsync(currentUserId);
-                    //}
-                    //else
-                    //{
-                    //    return false;
-                    //}
-                    if (itemInventory == null)
-                    {
-                        salesOrderLineItem.UnservedQuantity = salesOrderLineItem.Quantity;
-                    }
-                    else
+
+                    if (itemInventory != null)
                     {
                         var oldInventoryQuantity = itemInventory.Quantity;
                         if (itemInventory.Quantity >= salesOrderLineItem.Quantity)
                         {
-                            salesOrderLineItem.ServedQuantity = salesOrderLineItem.Quantity;
                             itemInventory.Quantity -= salesOrderLineItem.Quantity;
                         }
                         else if (itemInventory.Quantity < 0)
                         {
-                            salesOrderLineItem.UnservedQuantity = salesOrderLineItem.Quantity;
+                            itemInventory.Quantity += salesOrderLineItem.Quantity;
                         }
                         else
                         {
-                            salesOrderLineItem.ServedQuantity = itemInventory.Quantity;
-                            salesOrderLineItem.UnservedQuantity = salesOrderLineItem.Quantity - itemInventory.Quantity;
                             itemInventory.Quantity = 0;
                         }
                         context.ItemInventories.Update(itemInventory);
@@ -676,7 +672,7 @@ namespace GMGInventory.Application.Repositories
             var soItem = await context.SalesOrderLineItems
                                       .Where(s => s.Id == salesOrderLineItemId)
                                       .FirstOrDefaultAsync();
-            if (soItem == null || soItem.UnservedQuantity < quantity)
+            if (soItem == null)
             {
                 return false;
             }
@@ -692,14 +688,10 @@ namespace GMGInventory.Application.Repositories
                 }
                 else if (inventory.Quantity >= quantity)
                 {
-                    soItem.ServedQuantity += quantity;
-                    soItem.UnservedQuantity -= quantity;
                     inventory.Quantity -= quantity;
                 }
                 else
                 {
-                    soItem.ServedQuantity += inventory.Quantity;
-                    soItem.UnservedQuantity -= inventory.Quantity;
                     inventory.Quantity = 0;
                 }
                 context.SalesOrderLineItems.Update(soItem);

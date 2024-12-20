@@ -111,7 +111,7 @@ namespace GMGInventory.Application.Repositories
                                     on areas.RegionId equals regions.Id
                          join userc in userManager.Users on agent.UserCreated equals userc.Id
                          join userm in userManager.Users on agent.UserModified equals userm.Id into m
-                         from um in m.DefaultIfEmpty()
+                         from userm in m.DefaultIfEmpty()
                          where ((filter.RegionId == null || filter.RegionId == regions.Id))
 
                          select new AgentViewVM
@@ -126,8 +126,8 @@ namespace GMGInventory.Application.Repositories
                              IsActive = agent.IsActive,
                              DateCreatedD = agent.DateCreated,
                              DateModifiedD = agent.DateModified,
-                             UserCreated = userc.Nickname,
-                             UserModified = um == null ? "-" : um.Nickname
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                          };
             return await agents.ToListAsync();
         }
@@ -209,8 +209,8 @@ namespace GMGInventory.Application.Repositories
                          join regions in context.Regions
                                     on areas.RegionId equals regions.Id
                          join userc in userManager.Users on agent.UserCreated equals userc.Id
-                         let userm = userManager.Users.Where(s => s.Id == agent.UserModified).First()
-
+                         join userm in userManager.Users on agent.UserModified equals userm.Id into m
+                         from userm in m.DefaultIfEmpty()
                          select new AgentViewVM
                          {
                              Id = agent.Id,
@@ -223,9 +223,8 @@ namespace GMGInventory.Application.Repositories
                              IsActive = agent.IsActive,
                              DateCreatedD = agent.DateCreated,
                              DateModifiedD = agent.DateModified,
-
-                             UserCreated = userc.Nickname,
-                             UserModified = userm == null ? "-" : userm.Nickname
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                          };
             return await agents.ToListAsync();
         }

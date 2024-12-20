@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Humanizer;
@@ -47,13 +48,7 @@ namespace GMGInventory.Application.Repositories
                                              .DefaultIfEmpty()
                         let inventory = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
-                                               .Sum(s => s.Quantity)
-                        let soli = context.SalesOrderLineItems
-                                          .Where(s => s.ItemId == item.Id)
-                                          .Sum(s => s.ServedQuantity)
-                        let inv = context.InvoiceLineItems
-                                          .Where(s => s.ItemId == item.Id)
-                                          .Sum(s => s.Quantity)
+                                               .Sum(s => (int?)s.Quantity) ?? 0
                         where item.IsActive == true
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
@@ -62,7 +57,7 @@ namespace GMGInventory.Application.Repositories
                         select new JsonItemOptionsModel
                         {
                             Id = item.Id.ToString(),
-                            InventoryCount = inventory,// + soli - inv,
+                            InventoryCount = inventory,
                             Text = item.Code,
                             Name = item.Name,
                             PartNumber = item.PartNumber + "",
@@ -116,16 +111,17 @@ namespace GMGInventory.Application.Repositories
                                              .DefaultIfEmpty()
                         let inventory = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
-                                               .Sum(s => s.Quantity)
-                        let soli = context.SalesOrderLineItems
-                                          .Where(s => s.ItemId == item.Id)
-                                          .Sum(s => s.ServedQuantity)
-                        let inv = context.InvoiceLineItems
-                                          .Where(s => s.ItemId == item.Id)
-                                          .Sum(s => s.Quantity)
+                                               .Sum(s => (int?)s.Quantity) ?? 0
+                        let packedQuantity = context.PackLineItems
+                                                    .Where(s => s.Pack.SalesOrderId == soitem.SalesOrderId
+                                                             && s.ItemId == soitem.ItemId)
+                                                    .Sum(s => (int?)s.Quantity) ?? 0
+                        let returnedQuantity = context.SalesReturnLineItems
+                                                      .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == soitem.SalesOrderId
+                                                               && s.ItemId == soitem.ItemId)
+                                                      .Sum(s => (int?)s.Quantity) ?? 0
                         where item.IsActive == true
                            && soitem.SalesOrderId == SalesOrderId
-                           //&& soitem.UnservedQuantity > 0
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
                            || item.Name.ToLower().Contains(search.ToLower()))
@@ -133,12 +129,12 @@ namespace GMGInventory.Application.Repositories
                         select new JsonItemOptionsModel
                         {
                             Id = item.Id.ToString(),
-                            InventoryCount = inventory,// + soli - inv,
+                            InventoryCount = inventory,
                             Text = item.Code,
                             Name = item.Name,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
-                            Quantity = soitem.UnservedQuantity,
+                            Quantity = soitem.Quantity - (packedQuantity - returnedQuantity),
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code
@@ -218,25 +214,19 @@ namespace GMGInventory.Application.Repositories
 
             var whouse = context.Warehouses.Where(s => s.Id == warehouse).FirstOrDefault();
             var items = await (from item in context.ItemInventories
-                               let served = context.SalesOrderLineItems
-                                                   .Where(s => s.ItemId == item.Id && whouse != null && whouse.Code.ToLower().Contains("main"))
-                                                   .Sum(s => s.ServedQuantity)
-                               let inv = context.InvoiceLineItems
-                                                 .Where(s => s.ItemId == item.Id)
-                                                 .Sum(s => s.Quantity)
                                where item.WarehouseId == warehouse
                                && item.Item.IsActive == true
                                && (search == null
                                || item.Item.Code.ToLower().Contains(search.ToLower())
                                || item.Item.Name.ToLower().Contains(search.ToLower()))
-                               && (item.Quantity + served) > 0
+                               && item.Quantity > 0
                                orderby item.Item.Code ascending
                                select new JsonItemOptionsModel
                                {
                                    Id = item.ItemId.ToString(),
                                    Text = item.Item.Code,
                                    Name = item.Item.Name,
-                                   Quantity = item.Quantity,// + served - inv,
+                                   Quantity = item.Quantity,
                                    Unit = item.Item.Unit.Code
                                }).ToListAsync();
 
@@ -293,20 +283,6 @@ namespace GMGInventory.Application.Repositories
                                          Warehouse = inv.Warehouse.Name,
                                          HasWarehouse = filter.WarehouseId == null || inv.WarehouseId == filter.WarehouseId
                                      };
-            var ServedQuantity = from soli in context.SalesOrderLineItems
-                                 group soli by soli.ItemId into soligrp
-                                 select new
-                                 {
-                                     ItemId = soligrp.Key,
-                                     Quantity = soligrp.Sum(s => s.ServedQuantity)
-                                 };
-            var InvoicedQuantity = from inv in context.InvoiceLineItems
-                                   group inv by inv.ItemId into invgrp
-                                   select new
-                                   {
-                                       ItemId = invgrp.Key,
-                                       Quantity = invgrp.Sum(s => s.Quantity)
-                                   };
             var itemsVM = await (from item in context.Items
                                  from price in context.ItemPrices
                                                       .Where(s => s.ItemId == item.Id
@@ -315,10 +291,15 @@ namespace GMGInventory.Application.Repositories
                                                       .Take(1)
                                                       .DefaultIfEmpty()
                                  join inventory in WarehouseInventory on item.Id equals inventory.ItemId
-                                 join soli in ServedQuantity on item.Id equals soli.ItemId into soligrp
-                                 from subsoli in soligrp.DefaultIfEmpty()
-                                 join inv in InvoicedQuantity on item.Id equals inv.ItemId into invgrp
-                                 from subinv in invgrp.DefaultIfEmpty()
+                                 let quantityPacked = context.PackLineItems
+                                                             .Where(s => s.ItemId == item.Id)
+                                                             .Sum(s => (int?)s.Quantity) ?? 0
+                                 let quantityInvoiced = context.InvoiceLineItems
+                                                               .Where(s => s.ItemId == item.Id)
+                                                               .Sum(s => (int?)s.Quantity) ?? 0
+                                 let quantityReturned = context.SalesReturnLineItems
+                                                               .Where(s => s.ItemId == item.Id)
+                                                               .Sum(s => (int?)s.Quantity) ?? 0
                                  where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
                                      && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
                                      && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
@@ -340,8 +321,8 @@ namespace GMGInventory.Application.Repositories
                                      NetPriceD = price == null ? 0 : price.NetSellingPrice,
                                      PartNumber = item.PartNumber + "",
                                      QuantityInventoryD = inventory.Quantity,
-                                     //QuantityServedD = subsoli != null ? subsoli.Quantity : null,
-                                     //QuantityInvoiceD = subinv != null ? subinv.Quantity : null,
+                                     QuantityServedD = quantityPacked - quantityReturned,
+                                     QuantityInvoiceD = quantityInvoiced,
                                      RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                      Size = item.Size,
                                      Unit = item.Unit.Name,
@@ -487,7 +468,7 @@ namespace GMGInventory.Application.Repositories
                               //.Include(s => s.Unit)
                           let inventory = context.ItemInventories
                                                  .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
-                                                 .Sum(s => s.Quantity)
+                                                 .Sum(s => (int?)s.Quantity) ?? 0
                           select new ItemFileVM
                           {
                               Brand = item.Brand.Name,
@@ -638,7 +619,7 @@ namespace GMGInventory.Application.Repositories
             item.Name = itemVM.Name;
             item.PartNumber = itemVM.PartNumber + "";
             item.Size = itemVM.Size + "";
-           // item.UnitId = itemVM.UnitId;
+            // item.UnitId = itemVM.UnitId;
 
             context.Items.Update(item);
             await context.SaveChangesAsync(currentUserId);
@@ -646,26 +627,26 @@ namespace GMGInventory.Application.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var itemInventories = context.ItemInventories.Where(s=>s.ItemId ==id).ToList();
+            var itemInventories = context.ItemInventories.Where(s => s.ItemId == id).ToList();
             if (itemInventories.Count > 0)
             {
                 context.ItemInventories.RemoveRange(itemInventories);
             }
 
             var itemPrices = context.ItemPrices.Where(s => s.ItemId == id).ToList();
-            if(itemPrices.Count > 0)
+            if (itemPrices.Count > 0)
             {
                 context.ItemPrices.RemoveRange(itemPrices);
             }
 
             var physicalCount = context.PhysicalCountHistories.Where(s => s.ItemId == id).ToList();
-            if(physicalCount.Count > 0)
+            if (physicalCount.Count > 0)
             {
                 context.PhysicalCountHistories.RemoveRange(physicalCount);
             }
 
             var stockCard = context.StockCards.Where(s => s.ItemId == id).ToList();
-            if(stockCard.Count > 0)
+            if (stockCard.Count > 0)
             {
                 context.StockCards.RemoveRange(stockCard);
             }
@@ -829,7 +810,7 @@ namespace GMGInventory.Application.Repositories
                                   Currency = purchase.Currency.Code,
                                   PurchaseNumber = purchase.DocumentNumber,
                                   QuantityD = purchaseItem.Quantity,
-                                  ReplenishBy = user.Nickname,
+                                  ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                   ReplenishDateD = purchase.DateCreated,
                                   Status = purchase.Status.Code,
                                   Supplier = purchase.Supplier.Code,
@@ -853,7 +834,7 @@ namespace GMGInventory.Application.Repositories
             //                      Currency = purchase.Currency.Code,
             //                      PurchaseNumber = purchase.PONumber,
             //                      QuantityD = purchaseItem.Quantity,
-            //                      ReplenishBy = user.Nickname,
+            //                      ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
             //                      ReplenishDateD = purchase.DateCreated,
             //                      Status = purchase.Status.Code,
             //                      Supplier = purchase.Supplier.Code,
@@ -946,6 +927,15 @@ namespace GMGInventory.Application.Repositories
         {
 
             var salesVM = from sitem in context.SalesOrderLineItems
+
+                          let quantityPacked = context.PackLineItems
+                                                      .Where(s => s.Pack.SalesOrderId == sitem.SalesOrderId
+                                                               && s.ItemId == sitem.ItemId)
+                                                      .Sum(s => (int?)s.Quantity) ?? 0
+                          let quantityReturned = context.SalesReturnLineItems
+                                                      .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == sitem.Id
+                                                               && s.ItemId == sitem.ItemId)
+                                                      .Sum(s => (int?)s.Quantity) ?? 0
                           join user in userManager.Users on sitem.SalesOrder.UserCreated equals user.Id
                           where sitem.Item.Id == id
                           select new ItemDetailSalesVM
@@ -954,13 +944,13 @@ namespace GMGInventory.Application.Repositories
                               Customer = sitem.SalesOrder.Customer.Name,
                               Discount1D = sitem.Discount1,
                               Discount2D = sitem.Discount2,
-                              OrderBy = user.Nickname,
+                              OrderBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                               OrderDateD = sitem.SalesOrder.DateCreated,
-                              PackedQuantityD = sitem.PackedQuantity,
+                              PackedQuantityD = quantityPacked,
                               QuantityD = sitem.Quantity,
                               SalesNumber = sitem.SalesOrder.SalesOrderNumber,
                               UnitPriceD = sitem.SellingPrice,
-                              UnservedQuantityD = sitem.UnservedQuantity
+                              UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned)
                           };
             return await salesVM.ToListAsync();
         }
@@ -1045,7 +1035,7 @@ namespace GMGInventory.Application.Repositories
                             where count.ItemId == id
                             select new ItemDetailCountVM
                             {
-                                AdjustmentBy = user.Nickname,
+                                AdjustmentBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                 AdjustmentDateD = count.DateCreated,
                                 QuantityFromD = count.QuantityFrom,
                                 QuantityToD = count.QuantityTo,
@@ -1127,7 +1117,7 @@ namespace GMGInventory.Application.Repositories
                            {
                                NetPriceD = price.NetSellingPrice,
                                RetailPriceD = price.RetailSellingPrice,
-                               UpdateBy = user.Nickname,
+                               UpdateBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                UpdateDateD = price.DateCreated
                            };
             return await pricesVM.ToListAsync();
@@ -1198,7 +1188,7 @@ namespace GMGInventory.Application.Repositories
                                  QuantityD = titem.Quantity,
                                  Remarks = titem.TransferItem.Remarks,
                                  Source = titem.TransferItem.Source.Code,
-                                 TransferBy = user.Nickname,
+                                 TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                  TransferDateD = titem.TransferItem.DateCreated,
                                  TransferNumber = titem.TransferItem.Id
                              };
@@ -1279,7 +1269,7 @@ namespace GMGInventory.Application.Repositories
                                 ItemCode = ritem.Item.Code,
                                 ItemName = ritem.Item.Name,
                                 QuantityD = ritem.Quantity,
-                                ReturnBy = user.Nickname,
+                                ReturnBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                 ReturnDateD = ritem.SalesReturn.DateCreated,
                                 ReturnNumber = ritem.SalesReturn.SalesReturnNumber
                             };

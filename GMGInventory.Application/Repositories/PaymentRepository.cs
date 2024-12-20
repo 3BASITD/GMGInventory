@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -70,7 +71,7 @@ namespace GMGInventory.Application.Repositories
                                                     ? (soalit.Sum(s => s.Invoice.Amount - s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid) * -1
                                                     : 0,
                                        TransactionDateD = cp.DateCreated,
-                                       CreatedBy = user.Nickname,
+                                       CreatedBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                        Remarks = cp.Remarks
                                    });
             return await customerPayment.ToListAsync();

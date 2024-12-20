@@ -53,7 +53,7 @@ namespace GMGInventory.Application.Repositories
             var itemTypes = from itemType in context.ItemTypes
                             join userc in userManager.Users on itemType.UserCreated equals userc.Id
                             join userm in userManager.Users on itemType.UserModified equals userm.Id into m
-                            from um in m.DefaultIfEmpty()
+                            from userm in m.DefaultIfEmpty()
                             select new ItemTypeViewVM
                             {
                                 Id = itemType.Id,
@@ -64,8 +64,8 @@ namespace GMGInventory.Application.Repositories
                                 DateModifiedD = itemType.DateModified,
                                 IsActive = itemType.IsActive,
                                 Name = itemType.Name,
-                                UserCreated = userc.Nickname,
-                                UserModified = um == null ? "-" : um.Nickname
+                                UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                             };
             return await itemTypes.ToListAsync();
         }

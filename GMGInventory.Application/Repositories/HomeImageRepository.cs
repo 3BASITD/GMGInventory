@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Hosting;
@@ -42,9 +43,9 @@ namespace GMGInventory.Application.Repositories
                              Description = image.Description,
                              DisplayOrder = image.DisplayOrder,
                              DisplayTimeD = image.DisplayTime * 1000,
-                             UserCreated = userc.FirstName + " " + userc.LastName,
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                              DateCreatedD = image.DateCreated,
-                             UserModified = userm == null ? "-" : userm.FirstName + " " + userm.LastName,
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                              DateModifiedD = image.DateModified
                          };
             return await images.ToListAsync();

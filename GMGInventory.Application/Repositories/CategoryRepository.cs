@@ -58,7 +58,7 @@ namespace GMGInventory.Application.Repositories
                         
                          join userc in userManager.Users on category.UserCreated equals userc.Id
                          join userm in userManager.Users on category.UserModified equals userm.Id into m
-                         from um in m.DefaultIfEmpty()
+                         from userm in m.DefaultIfEmpty()
 
                          select new CategoryVM
                          {
@@ -68,8 +68,8 @@ namespace GMGInventory.Application.Repositories
                              IsActive = category.IsActive,
                              DateCreatedD = category.DateCreated,
                              DateModifiedD = category.DateModified == null ? null : category.DateModified.Value,
-                             UserCreated = userc.Nickname,
-                             UserModified = um == null ? "-" : um.Nickname
+                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                          };
             return await categories.ToListAsync();
         }

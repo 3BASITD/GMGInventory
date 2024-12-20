@@ -56,7 +56,7 @@ namespace GMGInventory.Application.Repositories
                                   ItemCount = transfer.TransferItemDetails.Count,
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
-                                  TransferBy = user.Nickname,
+                                  TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                   TransferDateD = transfer.DateCreated
                               });
             return await transferVM.ToListAsync();
@@ -143,7 +143,7 @@ namespace GMGInventory.Application.Repositories
                                   Quantity = trdetail.Quantity,
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
-                                  TransferBy = user.Nickname,
+                                  TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                   TransferDateD = transfer.TransferDate
                               });
             return await transferVM.ToListAsync();
@@ -229,7 +229,7 @@ namespace GMGInventory.Application.Repositories
                                   Quantity = transfer.Quantity.ToString(),
                                   Remarks = transfer.TransferItem.Remarks,
                                   Source = transfer.TransferItem.Source.Code,
-                                  TransferBy = user.Nickname,
+                                  TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                   TransferDateD = transfer.DateCreated,
                                   Unit = transfer.Item.Unit.Code
                               });

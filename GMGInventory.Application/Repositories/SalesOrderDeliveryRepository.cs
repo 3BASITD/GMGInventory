@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -30,7 +31,8 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.Forwarder) on so.Id equals sdm.SalesOrderId into monitoring
                              from sdm in monitoring.DefaultIfEmpty()
                              join userc in userManager.Users on sdm.UserCreated equals userc.Id
-                             let userm = userManager.Users.Where(s => s.Id == sdm.UserModified).First()
+                             join userm in userManager.Users on sdm.UserModified equals userm.Id into m
+                             from userm in m.DefaultIfEmpty()
                              where (filter.AgentId == null || filter.AgentId == so.AgentId)
                                 && (filter.CustomerId == null || filter.CustomerId == so.CustomerId)
                                 && (filter.RegionId == null || filter.RegionId == so.Customer.Area.RegionId)
@@ -38,9 +40,7 @@ namespace GMGInventory.Application.Repositories
                                 && so.DateCreated.Date <= filter.DateTo
                              select new SalesOrderDeliveryVM
                              {
-                                 CreatedBy = string.IsNullOrWhiteSpace(userc.FirstName) || string.IsNullOrWhiteSpace(userc.FirstName) 
-                                           ? userc.Nickname 
-                                           : (userc.FirstName + " " + userc.LastName),
+                                 CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  CreatedDateD = sdm.DateCreated,
                                  CustomerCode = so.Customer.Code,
                                  CustomerName = so.Customer.Name,
@@ -49,11 +49,7 @@ namespace GMGInventory.Application.Repositories
                                  Forwarder = sdm == null ? "-" : sdm.Forwarder.Name,
                                  ForwarderId = sdm == null ? 0 : sdm.ForwarderId,
                                  Id = so.Id,
-                                 ModifiedBy = userm == null
-                                            ? "-"
-                                            : string.IsNullOrWhiteSpace(userm.FirstName) || string.IsNullOrWhiteSpace(userm.FirstName)
-                                            ? userm.Nickname
-                                            : (userm.FirstName + " " + userm.LastName),
+                                 ModifiedBy = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                                  ModifiedDateD = sdm.DateModified,
                                  PONumber = so.PurchaseOrder == null ? "-" : so.PurchaseOrder!.PONumber,
                                  Remarks = sdm == null || sdm.Remarks.Trim() == "" ? "-" : sdm.Remarks,

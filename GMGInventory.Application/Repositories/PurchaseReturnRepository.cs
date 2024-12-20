@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -37,7 +38,7 @@ namespace GMGInventory.Application.Repositories
                                 ItemName = ritem.PurchaseOrderLineItem.Item.Name,
                                 Quantity = ritem.Quantity,
                                 Remarks = rturn.Remarks + "",
-                                ReturnBy = user.Nickname,
+                                ReturnBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                 ReturnDateD = rturn.DateCreated
                             });
             return await returnVM.ToListAsync();

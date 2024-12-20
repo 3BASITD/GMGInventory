@@ -19,12 +19,6 @@ namespace GMGInventory.Data
         public int StatusId { get; set; }
         public Status Status { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal? TotalAmount { get; set; }
-
-        public int TotalQuantity { get; set; }
-        public int QuantityInvoiced { get; set; }
-
         public DateTime PackDate { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]

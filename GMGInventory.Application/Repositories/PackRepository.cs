@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Humanizer;
@@ -39,8 +40,14 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page)
         {
             var orders = from order in context.Packs
+                         let quantityOrdered = context.SalesOrderLineItems
+                                                      .Where(s => s.SalesOrderId == order.SalesOrderId)
+                                                      .Sum(s => (int?)s.Quantity) ?? 0
+                         let quantityInvoiced = context.InvoiceLineItems
+                                                       .Where(s => s.Invoice.SalesOrderId == order.SalesOrderId)
+                                                       .Sum(s => (int?)s.Quantity) ?? 0
                          where order.Status.Code != "Posted"
-                         && order.SalesOrder.QuantityOrdered != order.SalesOrder.QuantityInvoiced
+                         && quantityOrdered != quantityInvoiced
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.Id.ToString().ToLower().Contains(search.ToLower().Trim())))
                          orderby order.Id ascending
@@ -71,7 +78,7 @@ namespace GMGInventory.Application.Repositories
                                CustomerName = order.SalesOrder.Customer.Name,
                                Forwarder = order.SalesOrder.Forwarder.Name,
                                Id = order.Id,
-                               PackBy = user.Nickname,
+                               PackBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                PackDateD = order.DateCreated,
                                SalesOrderDateD = order.SalesOrder.DateCreated,
                                SalesOrderId = order.SalesOrder.Id,
@@ -112,7 +119,7 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<PackVM>> GetListAsync(ListFilterCommonModel filter)
         {
             var packs = from pck in context.Packs
-                        join usr in userManager.Users on pck.UserCreated equals usr.Id
+                        join user in userManager.Users on pck.UserCreated equals user.Id
                         where filter.DateFrom <= pck.DateCreated.Date
                         && pck.DateCreated.Date <= filter.DateTo
                         && (filter.StatusCode == null
@@ -124,7 +131,7 @@ namespace GMGInventory.Application.Repositories
                             CurrentUsersDraft = pck.Status.Name.ToLower() == "packing draft" && pck.UserCreated == currentUserId,
                             Customer = pck.SalesOrder.Customer.Name,
                             Id = pck.Id,
-                            PackedBy = usr.Nickname,
+                            PackedBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                             PackedDateD = pck.DateCreated,
                             PackNumber = pck.Id.ToString(),
                             SONumber = pck.SalesOrder.SalesOrderNumber,
@@ -226,10 +233,19 @@ namespace GMGInventory.Application.Repositories
         {
             var itemVM = from pack in context.PackLineItems
                          join order in context.SalesOrderLineItems on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
-                         let price = context.ItemPrices.Where(s => s.ItemId == pack.Item.Id && s.DateCreated <= pack.DateCreated).OrderByDescending(s => s.DateCreated).First()
+                         let price = context.ItemPrices
+                                            .Where(s => s.ItemId == pack.Item.Id && s.DateCreated <= pack.DateCreated)
+                                            .OrderByDescending(s => s.DateCreated)
+                                            .First()
+                         let packedQuantity = context.PackLineItems
+                                                     .Where(s => s.PackId == pack.Id && s.ItemId == order.ItemId)
+                                                     .Sum(s => (int?)s.Quantity) ?? 0
+                         let invoicedQuantity = context.InvoiceLineItems
+                                                       .Where(s => s.Invoice.PackId == pack.Id && s.ItemId == order.ItemId)
+                                                       .Sum(s => (int?)s.Quantity) ?? 0
                          where pack.PackId == packId
                          && pack.Item.Id == order.Item.Id
-                         && order.InvoicedQuantity < order.PackedQuantity
+                         && invoicedQuantity < packedQuantity
                          group new { pack, order, price } by new { pack.ItemId, order.Discount1, order.Discount2, order.SellingPrice } into grp
                          select new PackItemVM
                          {
@@ -309,9 +325,11 @@ namespace GMGInventory.Application.Repositories
             var orderVM = await context.SalesOrders.Where(s => s.Id == form.SalesOrderId).FirstOrDefaultAsync();
             if (orderVM != null)
             {
-                orderVM.QuantityPacked = await context.PackLineItems.Where(s => s.Pack.SalesOrderId == form.SalesOrderId).SumAsync(s => (int?)s.Quantity) ?? 0;
-                orderVM.QuantityPacked += form.Items.Sum(s => s.Quantity);
-                if (orderVM.QuantityOrdered <= orderVM.QuantityPacked && form.SavingAs == "post")
+                var quantityOrdered = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == form.SalesOrderId).SumAsync(s => s.Quantity);
+                var quantityPacked = await context.PackLineItems.Where(s => s.Pack.SalesOrderId == form.SalesOrderId).SumAsync(s => (int?)s.Quantity) ?? 0;
+                quantityPacked += form.Items.Sum(s => s.Quantity);
+
+                if (quantityOrdered <= quantityPacked && form.SavingAs == "post")
                 {
                     orderVM.StatusId = await context.Statuses
                                                     .Where(s => s.Name.ToLower() == "fully packed")
@@ -327,8 +345,7 @@ namespace GMGInventory.Application.Repositories
                                             .Where(s => (form.SavingAs.ToLower() == "post" && s.Name.ToLower() == "packing submitted")
                                                      || (form.SavingAs.ToLower() == "save" && s.Name.ToLower() == "packing draft"))
                                             .Select(s => s.Id)
-                                            .FirstAsync(),
-                    TotalQuantity = form.Items.Sum(s => s.Quantity)
+                                            .FirstAsync()
                 };
 
                 await context.Packs.AddAsync(pack);
@@ -342,8 +359,10 @@ namespace GMGInventory.Application.Repositories
                                               .FirstOrDefaultAsync();
                     if (soItem != null)
                     {
-                        soItem.PackedQuantity += item.Quantity;
-                        soItem.IsServed = soItem.Quantity <= soItem.PackedQuantity;
+                        var packedQuantity = context.PackLineItems
+                                                    .Where(s => s.Pack.SalesOrderId == soItem.SalesOrderId)
+                                                    .Sum(s => (int?)s.Quantity) ?? 0;
+                        soItem.IsServed = soItem.Quantity <= packedQuantity;
                     }
 
                     PackLineItem packItem = new()
@@ -382,7 +401,6 @@ namespace GMGInventory.Application.Repositories
                                           .FirstOrDefaultAsync();
                 if (soItem != null)
                 {
-                    soItem.PackedQuantity -= item.Quantity;
                     soItem.IsServed = false;
                 }
                 await context.SaveChangesAsync(currentUserId);
@@ -392,12 +410,13 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
             //end of delete pack items
 
-            orderVM.QuantityPacked = await context.PackLineItems.Where(s => s.Pack.SalesOrderId == form.SalesOrderId).SumAsync(s => (int?)s.Quantity) ?? 0;
-
             if (form.SavingAs != "delete")
             {
-                orderVM.QuantityPacked += form.Items.Sum(s => s.Quantity);
-                if (orderVM.QuantityOrdered <= orderVM.QuantityPacked && form.SavingAs == "post")
+                var quantityOrdered = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == form.SalesOrderId).SumAsync(s => s.Quantity);
+                var quantityPacked = await context.PackLineItems.Where(s => s.Pack.SalesOrderId == form.SalesOrderId).SumAsync(s => (int?)s.Quantity) ?? 0;
+                quantityPacked += form.Items.Sum(s => s.Quantity);
+
+                if (quantityOrdered <= quantityPacked && form.SavingAs == "post")
                 {
                     orderVM.StatusId = await context.Statuses
                                                     .Where(s => s.Name.ToLower() == "fully packed")
@@ -411,7 +430,6 @@ namespace GMGInventory.Application.Repositories
                                                         || (form.SavingAs.ToLower() == "save" && s.Name.ToLower() == "packing draft"))
                                                .Select(s => s.Id)
                                                .FirstAsync();
-                packVM.TotalQuantity = form.Items.Sum(s => s.Quantity);
 
                 context.Packs.Update(packVM);
                 await context.SaveChangesAsync(currentUserId);
@@ -424,8 +442,10 @@ namespace GMGInventory.Application.Repositories
                                               .FirstOrDefaultAsync();
                     if (soItem != null)
                     {
-                        soItem.PackedQuantity += item.Quantity;
-                        soItem.IsServed = soItem.Quantity <= soItem.PackedQuantity;
+                        var packedQuantity = context.PackLineItems
+                                                    .Where(s => s.Pack.SalesOrderId == soItem.SalesOrderId)
+                                                    .Sum(s => (int?)s.Quantity) ?? 0;
+                        soItem.IsServed = soItem.Quantity <= packedQuantity;
                     }
 
                     PackLineItem packItem = new()

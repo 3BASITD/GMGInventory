@@ -95,7 +95,7 @@ namespace GMGInventory.Application.Repositories
 
                              join userc in userManager.Users on reason.UserCreated equals userc.Id
                              join userm in userManager.Users on reason.UserModified equals userm.Id into m
-                             from um in m.DefaultIfEmpty()
+                             from userm in m.DefaultIfEmpty()
 
                              select new ReasonOfReturnVM
                              {
@@ -105,8 +105,8 @@ namespace GMGInventory.Application.Repositories
                                  IsActive = reason.IsActive,
                                  DateCreatedD = reason.DateCreated,
                                  DateModifiedD = reason.DateModified == null ? null : reason.DateModified.Value,
-                                 UserCreated = userc.Nickname,
-                                 UserModified = um == null ? "-" : um.Nickname
+                                 UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                 UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
                              };
             return await reasons.ToListAsync();
         }

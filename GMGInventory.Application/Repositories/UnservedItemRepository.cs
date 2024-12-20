@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;
@@ -22,31 +23,39 @@ namespace GMGInventory.Application.Repositories
         {
             var regionSelected = await context.Regions.Where(s => s.Id == filter.Region).Select(s => s.Name).FirstOrDefaultAsync();
             var salesOrder = from l in context.SalesOrderLineItems
-                             join u in userManager.Users on l.SalesOrder.UserCreated equals u.Id
-                             let i = context.ItemInventories.Where(s => s.ItemId == l.ItemId).Sum(s => s.Quantity)
-                             let served = context.SalesOrderLineItems.Where(s => s.ItemId == l.ItemId).Sum(s => (int?)s.Quantity) ?? 0
-                             let invoice = context.SalesOrderLineItems.Where(s => s.ItemId == l.ItemId).Sum(s => (int?)s.Quantity) ?? 0
-                             where l.UnservedQuantity > 0
+                             join user in userManager.Users on l.SalesOrder.UserCreated equals user.Id
+                             let i = context.ItemInventories
+                                            .Where(s => s.ItemId == l.ItemId)
+                                            .Sum(s => (int?)s.Quantity) ?? 0
+                             let packedQuantity = context.PackLineItems
+                                                         .Where(s => s.Pack.SalesOrderId == l.SalesOrderId
+                                                                  && s.ItemId == l.ItemId)
+                                                         .Sum(s => (int?)s.Quantity) ?? 0
+                             let returnedQuantity = context.SalesReturnLineItems
+                                                           .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == l.SalesOrderId
+                                                                    && s.ItemId == l.ItemId)
+                                                           .Sum(s => (int?)s.Quantity) ?? 0
+                             where l.Quantity - (packedQuantity - returnedQuantity) > 0
                              && (filter.Region == null || l.SalesOrder.Customer.Area.Region.Id == filter.Region
-                             || (filter.Region != null && regionSelected == "Luzon" && l.SalesOrder.Customer.Area.Region.Name == "Metro Manila"))
+                             || (filter.Region != null && regionSelected.ToLower() == "luzon" && l.SalesOrder.Customer.Area.Region.Name.ToLower() == "metro manila"))
                              && filter.StartDate <= l.SalesOrder.DateCreated.Date
                              && l.SalesOrder.DateCreated.Date <= filter.EndDate
                              select new UnservedItemVM
                              {
                                  Agent = l.SalesOrder.Agent.Code,
-                                 CreatedBy = u.Nickname,
+                                 CreatedBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                  Customer = l.SalesOrder.Customer.Name,
                                  Discount1D = l.Discount1,
                                  Discount2D = l.Discount2,
                                  Id = l.SalesOrder.Id,
                                  Item = l.Item.Code,
                                  OrderDateD = l.SalesOrder.DateCreated,
-                                 PackedQuantityD = l.PackedQuantity,
+                                 PackedQuantityD = packedQuantity,
                                  QuantityD = l.Quantity,
-                                 QuantityOnHandD = i + served - invoice,
+                                 QuantityOnHandD = i + (packedQuantity - returnedQuantity),
                                  SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
                                  UnitPriceD = l.SellingPrice,
-                                 UnservedQuantityD = l.UnservedQuantity
+                                 UnservedQuantityD = l.Quantity - (packedQuantity - returnedQuantity)
                              };
             return await salesOrder.ToListAsync();
         }

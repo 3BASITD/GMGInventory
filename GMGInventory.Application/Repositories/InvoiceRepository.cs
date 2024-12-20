@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Humanizer;
@@ -153,7 +154,7 @@ namespace GMGInventory.Application.Repositories
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  DateCreatedD = invoice.DateCreated,
                                  Id = invoice.Id,
-                                 InvoiceBy = user.Nickname,
+                                 InvoiceBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                  InvoiceDateD = invoice.InvoiceDate,
                                  InvoiceNumber = invoice.InvoiceNumber,
                                  InvoiceType = invoice.InvoiceType.Name,
@@ -188,7 +189,7 @@ namespace GMGInventory.Application.Repositories
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  DateCreatedD = invoice.DateCreated,
                                  Id = invoice.Id,
-                                 InvoiceBy = user.Nickname,
+                                 InvoiceBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                  InvoiceDateD = invoice.InvoiceDate,
                                  InvoiceNumber = invoice.InvoiceNumber,
                                  InvoiceType = invoice.InvoiceType.Name,
@@ -474,11 +475,8 @@ namespace GMGInventory.Application.Repositories
                                             .Select(s => s.Id)
                                             .FirstAsync();
 
-                decimal totalAmount = await AddQuantityToHeader(form);
-
                 Invoice invoice = new()
                 {
-                    Amount = totalAmount,
                     InvoiceDate = form.InvoiceDate,
                     ControlNumber = form.BIRInvoiceNumber,
                     //InvoiceNumber = invoiceType.Code + "-" + string.Format("{0:0000000}", newInvoiceNumber),
@@ -522,52 +520,6 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
-        private async Task<decimal> AddQuantityToHeader(InvoiceFormVM form)
-        {
-            var pack = await context.Packs.Include(s => s.SalesOrder).Where(s => s.Id == form.PackId).FirstOrDefaultAsync();
-            if (pack != null)
-            {
-                pack.QuantityInvoiced += form.Items.Sum(s => s.Quantity);
-                if (pack.TotalQuantity <= pack.QuantityInvoiced)
-                {
-                    pack.StatusId = await context.Statuses
-                                                 .Where(s => s.Name.ToLower() == "invoice submitted")
-                                                 .Select(s => s.Id)
-                                                 .FirstAsync();
-                }
-                await context.SaveChangesAsync(currentUserId);
-
-                var salesOrder = await context.SalesOrders.Where(s => s.Id == pack.SalesOrderId).FirstAsync();
-                salesOrder.QuantityInvoiced += form.Items.Sum(s => s.Quantity);
-                await context.SaveChangesAsync(currentUserId);
-
-                if (salesOrder.QuantityOrdered <= salesOrder.QuantityInvoiced)
-                {
-                    salesOrder.StatusId = await context.Statuses
-                                                       .Where(s => s.Name.ToLower() == "fully invoiced")
-                                                       .Select(s => s.Id)
-                                                       .FirstAsync(); ;
-                }
-                await context.SaveChangesAsync(currentUserId);
-
-                decimal totalAmount = 0;
-                foreach (var item in form.Items)
-                {
-                    var soItem = await context.SalesOrderLineItems
-                                              .Where(s => s.SalesOrderId == pack.SalesOrderId && s.ItemId == item.Item)
-                                              .FirstAsync();
-                    totalAmount += item.Quantity * (((100m - soItem.Discount1 - soItem.Discount2) * soItem.SellingPrice) / 100m);
-
-                    soItem.InvoicedQuantity += item.Quantity;
-                    context.SalesOrderLineItems.Update(soItem);
-                    await context.SaveChangesAsync(currentUserId);
-                }
-
-                return totalAmount;
-            }
-            return -1;
-        }
-
         private async Task DeleteInvoiceItems(InvoiceFormVM form, bool includeDeleteRecord)
         {
             var invoice = await context.Invoices.Where(s => s.Id == form.Id).FirstAsync();
@@ -578,7 +530,6 @@ namespace GMGInventory.Application.Repositories
                                           .Where(s => s.SalesOrderId == invoice.SalesOrderId && s.ItemId == item.ItemId)
                                           .FirstAsync();
 
-                soItem.InvoicedQuantity -= item.Quantity;
                 context.SalesOrderLineItems.Update(soItem);
                 if(includeDeleteRecord)
                 {
@@ -594,13 +545,11 @@ namespace GMGInventory.Application.Repositories
                                           .FirstAsync();
 
             var pack = await context.Packs.Where(s => s.Id == invoice.PackId).FirstAsync();
-            pack.QuantityInvoiced -= invoiceLineItems.Sum(s => s.Quantity);
             pack.StatusId = packId;
             context.Packs.Update(pack);
             await context.SaveChangesAsync(currentUserId);
 
             var salesOrder = await context.SalesOrders.Where(s => s.Id == invoice.SalesOrderId).FirstAsync();
-            salesOrder.QuantityInvoiced -= invoiceLineItems.Sum(s => s.Quantity);
             salesOrder.StatusId = packId;
             context.SalesOrders.Update(salesOrder);
             await context.SaveChangesAsync(currentUserId);
@@ -674,7 +623,6 @@ namespace GMGInventory.Application.Repositories
                                                 .Select(s => s.Id)
                                                 .FirstAsync();
                     invoice.StatusId = statusId;
-                    invoice.Amount = await AddQuantityToHeader(form);
                     invoice.ControlNumber = form.BIRInvoiceNumber;
                     invoice.InvoiceTypeId = form.InvoiceType;
                     invoice.InvoiceDate = form.InvoiceDate;

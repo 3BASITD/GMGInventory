@@ -83,7 +83,7 @@
                         }
                         group = item.BoxNumber + " (" + item.PackTypeName + ")";
                         <tr>
-                            <td colspan="3"><strong>Package @group</strong> Qty: @(Model.Contents.Where(s => s.BoxNumber == item.BoxNumber && s.PackTypeName == item.PackTypeName).Sum(s => s.Quantity))</td>
+                            <td colspan="3"><strong>Package @group</strong> Qty: @(Model.Contents.Where(s => s.BoxNumber == item.BoxNumber && s.PackTypeName == item.PackTypeName).Sum(s => (int?)s.Quantity) ?? 0)</td>
                         </tr>
                         totalquantity = 0;
                     }

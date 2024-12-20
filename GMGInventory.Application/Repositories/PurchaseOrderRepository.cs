@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -35,7 +36,7 @@ namespace GMGInventory.Application.Repositories
                          select new JsonPurchaseOrderOptionsModel
                          {
                              Id = order.Id.ToString(),
-                             OrderBy = string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.FirstName) ? user.Nickname : (user.FirstName + " " + user.LastName),
+                             OrderBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                              OrderDateD = order.ReplenishDate,
                              Supplier = order.Supplier.Name,
                              Text = order.PONumber
@@ -82,7 +83,7 @@ namespace GMGInventory.Application.Repositories
                                DateModifiedD = order.DateModified,
                                Destination = order.Destination.Name,
                                Id = order.Id,
-                               OrderBy = user.Nickname,
+                               OrderBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                OrderDateD = order.ReplenishDate,
                                PONumber = order.PONumber,
                                ReferenceNumber = order.ReferenceNumber + "",
@@ -104,7 +105,7 @@ namespace GMGInventory.Application.Repositories
                            {
                                Destination = order.Destination.Code,
                                Id = order.Id,
-                               OrderBy = user.Nickname,
+                               OrderBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                OrderDateD = order.ReplenishDate,
                                PONumber = order.PONumber,
                                Status = order.Status.Code,
@@ -196,7 +197,7 @@ namespace GMGInventory.Application.Repositories
                              Id = order.ItemId,
                              ItemCode = order.Item.Code,
                              ItemName = order.Item.Name,
-                             Quantity = order.Quantity - ((int?)context.PurchaseReturnLineItems.Where(s => s.PurchaseOrderLineItemId == order.Id).Sum(s => s.Quantity) ?? 0),
+                             Quantity = order.Quantity - (context.PurchaseReturnLineItems.Where(s => s.PurchaseOrderLineItemId == order.Id).Sum(s => (int?)s.Quantity) ?? 0),
                              Unit = order.Item.Unit.Code,
                              UnitPriceD = order.UnitPrice
                          };

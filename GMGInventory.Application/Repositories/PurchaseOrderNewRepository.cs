@@ -241,9 +241,9 @@ namespace GMGInventory.Application.Repositories
                               DisapprovedReason = order.DisapprovedReason,
                               ResubmitId = order.ResubmitId,
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
-                              UserCreated = userc.FirstName + " " + userc.LastName,
+                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = order.DateCreated,
-                              UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                              UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                               DateModifiedD = order.DateModified
                           };
             return await details.FirstOrDefaultAsync();
