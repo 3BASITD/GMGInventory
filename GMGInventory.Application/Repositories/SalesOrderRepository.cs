@@ -120,6 +120,8 @@ namespace GMGInventory.Application.Repositories
                                CustomerCode = order.Customer.Code,
                                CustomerId = order.Customer.Id,
                                CustomerName = order.Customer.Name,
+                               CustomerContactNumber = order.Customer.ContactNumber + "",
+                               CustomerContactPerson = order.Customer.ContactPerson + "",
                                DeclaredValueD = order.DeclaredValue,
                                DisapprovedBy = disapprove.Nickname,
                                DisapprovedDateD = order.DisapprovedDate,
@@ -265,41 +267,51 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId, bool forPack = false)
         {
-            var itemVM = from order in context.SalesOrderLineItems
-                                              .Include(s => s.Item)
-                                              .ThenInclude(s => s.Unit)
-                         let price = context.ItemPrices
-                                            .Where(s => s.ItemId == order.ItemId
-                                                     && s.DateCreated <= order.SalesOrder.ApprovedDate)
-                                            .OrderByDescending(s => s.DateCreated)
-                                            .FirstOrDefault()
-                         let inventory = context.ItemInventories
-                                                .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
-                                                .Sum(s => s.Quantity)
-                         where order.SalesOrderId == salesOrderId
-                         //&& ((order.Quantity != order.PackedQuantity && forPack == true) || forPack == false)
-                         && ((order.Quantity != order.InvoicedQuantity && forPack == true) || forPack == false)
-                         select new SalesOrderItemVM
-                         {
-                             Discount1D = order.Discount1,
-                             Discount2D = order.Discount2,
-                             Id = order.Id,
-                             InventoryCountD = inventory,
-                             InvoicedQuantityD = order.InvoicedQuantity,
-                             ItemCode = order.Item.Code,
-                             ItemId = order.Item.Id,
-                             ItemName = order.Item.Name,
-                             NetPriceD = price == null ? 0 : price.NetSellingPrice,
-                             QuantityD = order.Quantity,
-                             PackedQuantityD = order.PackedQuantity,
-                             RemainingQuantityD = order.ServedQuantity - order.PackedQuantity,
-                             RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
-                             SellingPriceD = order.SellingPrice,
-                             ServedQuantityD = order.ServedQuantity,
-                             Unit = order.Item.Unit.Code,
-                             UnservedQuantityD = order.UnservedQuantity
-                         };
-            return await itemVM.ToListAsync();
+            var itemVM = await (from order in context.SalesOrderLineItems
+                                                     .Include(s => s.Item)
+                                                     .ThenInclude(s => s.Unit)
+                                let price = context.ItemPrices
+                                                   .Where(s => s.ItemId == order.ItemId
+                                                            && s.DateCreated <= order.SalesOrder.ApprovedDate)
+                                                   .OrderByDescending(s => s.DateCreated)
+                                                   .FirstOrDefault()
+                                let inventory = context.ItemInventories
+                                                       .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
+                                                       .Sum(s => s.Quantity)
+                                where order.SalesOrderId == salesOrderId
+                                //&& ((order.Quantity != order.PackedQuantity && forPack == true) || forPack == false)
+                                && ((order.Quantity != order.InvoicedQuantity && forPack == true) || forPack == false)
+                                select new SalesOrderItemVM
+                                {
+                                    Discount1D = order.Discount1,
+                                    Discount2D = order.Discount2,
+                                    Id = order.Id,
+                                    InventoryCountD = inventory,
+                                    InvoicedQuantityD = order.InvoicedQuantity,
+                                    ItemCode = order.Item.Code,
+                                    ItemId = order.Item.Id,
+                                    ItemName = order.Item.Name,
+                                    ItemPartNumber = order.Item.PartNumber + "",
+                                    ItemSize = order.Item.Size,
+                                    LineNumber = order.LineNumber,
+                                    NetPriceD = price == null ? 0 : price.NetSellingPrice,
+                                    QuantityD = order.Quantity,
+                                    PackedQuantityD = order.PackedQuantity,
+                                    RemainingQuantityD = order.ServedQuantity - order.PackedQuantity,
+                                    RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
+                                    SellingPriceD = order.SellingPrice,
+                                    ServedQuantityD = order.ServedQuantity,
+                                    Unit = order.Item.Unit.Code,
+                                    UnservedQuantityD = order.UnservedQuantity
+                                }).ToListAsync();
+
+            int newLineNumber = 1;
+            foreach (var item in itemVM.OrderBy(s => s.LineNumber))
+            {
+                item.LineNumber = newLineNumber++;
+            }
+
+            return itemVM;
         }
 
         public async Task<ForDataTables<SalesOrderItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int salesOrderId)
@@ -430,6 +442,7 @@ namespace GMGInventory.Application.Repositories
                     AgentId = form.Agent,
                     CustomerId = form.Customer,
                     DeclaredValue = form.DeclaredValue,
+                    RequiredDeliveryDate = form.DeliveryDate,
                     ForwarderId = form.Forwarder,
                     PriceTypeId = 1,//form.GrossNet,
                     PurchaseOrderId = form.PurchaseOrder,

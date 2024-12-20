@@ -115,16 +115,8 @@ namespace GMGInventory.Controllers
             }
             catch (Exception ex)
             {
-                if (!await customerRepository.IsCodeExistAsync(custVM.Code))
-                {
                     responseModel.Status = "Error";
-                    responseModel.Message = "Customer cannot be found";
-                }
-                else
-                {
-                    responseModel.Status = "Error";
-                    responseModel.Message = ex.Message;
-                }
+                    responseModel.Message = SystemFormat.GetInnermostExceptionMessage(ex);
             }
             return Json(responseModel);
         }

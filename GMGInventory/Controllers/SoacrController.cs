@@ -167,7 +167,7 @@ namespace GMGInventory.Controllers
                 else
                 {
                     responseModel.Status = "Error";
-                    responseModel.Message = ex.Message;
+                    responseModel.Message = SystemFormat.GetInnermostExceptionMessage(ex);
                 }
             }
             return Json(responseModel);

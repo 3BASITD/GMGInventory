@@ -1,4 +1,6 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.ExtendedProperties;
+using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -80,14 +82,22 @@ namespace GMGInventory.Controllers
             return Json(requestType);
         }
 
-        public async Task<IActionResult> PrintDetails(int Id)
+        public async Task<IActionResult> PrintDetails(int Id, string? Company)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
-            ViewData["Items"] = await requestRepository.GetItemListAsync(Id);
+            var details = await requestRepository.GetDetails(Id);
+            var items = await requestRepository.GetItemListAsync(Id);
 
-            return View(await requestRepository.GetDetails(Id));
+            if (details == null || Company == null)
+            {
+                return NotFound();
+            }
+
+            TempData["CompanyLogo"] = Company;
+            ViewData["Items"] = items;
+            return View(details);
         }
 
         public async Task<IActionResult> Create(int? Id)

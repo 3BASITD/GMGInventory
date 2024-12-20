@@ -454,3 +454,7 @@ body.dark-mode .temp-carousel .caption {
         stroke-dasharray: 125.6;
         transform: rotate(-90deg);
     }
+
+a.btn-details-print {
+    cursor: pointer;
+}

@@ -108,7 +108,7 @@ table.formatted {
 }
 
 table.formatted * {
-    font-size: 10px;
+    font-size: 8px;
 }
 
     table.formatted th, table.formatted td {
@@ -122,7 +122,6 @@ table.formatted * {
         }
 
     table.formatted img.logo {
-        width: 75px;
         height: 75px;
     }
 
@@ -131,10 +130,10 @@ table.formatted * {
     }
 
     table.formatted dd, table.formatted strong.detail {
-        font-size: 12px;
+        font-size: 10px;
         margin-left: 5px;
         margin-top: 5px;
-        letter-spacing: 3px;
+        letter-spacing: 2px;
         font-weight: bold;
     }
 

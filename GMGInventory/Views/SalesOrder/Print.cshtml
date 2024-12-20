@@ -15,155 +15,225 @@
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
 </head>
 <body>
-    <h3>@title</h3>
-    <table class="table-header w100">
+    <table class="formatted">
         <tr>
-            <th>SO Number</th>
-            <td>@Model?.SONumber</td>
-            <th>@Html.DisplayNameFor(model => model.GrossNetPrice)</th>
-            <td>@Model?.GrossNetPrice</td>
-            @* <th>@Html.DisplayNameFor(model => model.SalesOrderBy)</th>
-            <td>@Model?.SalesOrderBy</td> *@
+            <td colspan="2" rowspan="2" class="center-text">
+                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                {
+                    <img src="~/images/BAS-02.png" class="logo" />
+                } else
+                {
+                    <img src="~/images/GMG-01.png" class="logo" />
+                }
+            </td>
+            <td colspan="4" rowspan="2">
+                <dl>
+                    <dt>Document Classification:</dt>
+                    <dd>@title.ToUpper()</dd>
+                    @if (Model.Status.ToLower() != "approved")
+                    {
+                        <dd>@("(" + Model.Status + ")")</dd>
+                    }
+                </dl>
+            </td>
+            <td colspan="3">
+                <dl>
+                    <dt>SO Date:</dt>
+                    <dd>@Model.OrderDate</dd>
+                </dl>
+            </td>
         </tr>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.CustomerCode)</th>
-            <td>@Model?.CustomerCode</td>
-            <th>@Html.DisplayNameFor(model => model.CreditTerms)</th>
-            <td>@Model?.CreditTerms</td>
-            <th>@Html.DisplayNameFor(model => model.OrderDate)</th>
-            <td>@Model?.OrderDate</td>
+            <td colspan="3">
+                <dl>
+                    <dt>SO No.:</dt>
+                    <dd>@Model.SONumber</dd>
+                </dl>
+            </td>
         </tr>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.CustomerName)</th>
-            <td>@Model?.CustomerName</td>
-            <th>@Html.DisplayNameFor(model => model.DeclaredValue)</th>
-            <td>@Model?.DeclaredValue</td>
-            @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
+            <td colspan="9">
+                <div class="two-column">
+                    <div class="column">
+                        <div class="label">
+                            <span>Customer:</span>
+                            <strong class="detail">@Model.CustomerName</strong>
+                        </div>
+                        <div class="label">
+                            <span>Contact Person:</span>
+                            <strong class="detail">-</strong>
+                        </div>
+                        <div class="label">
+                            <span>Contact No.:</span>
+                            <strong class="detail">-</strong>
+                        </div>
+                        <div class="label">
+                            <span>Address:</span>
+                            <strong class="detail">@Model.CustomerAddress</strong>
+                        </div>
+                        <div class="label">
+                            <span>Payment Terms:</span>
+                            <strong class="detail">@Model.CreditTerms</strong>
+                        </div>
+                        <div class="label">
+                            <span>Purchase Order #:</span>
+                            <strong class="detail">@Model.PONumber</strong>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="label">
+                            <span>Ship to:</span>
+                            <strong class="detail"></strong>
+                        </div>
+                        <div class="label">
+                            <span>Address:</span>
+                            <strong class="detail"></strong>
+                        </div>
+                        <div class="label">
+                            <span>Agent Name:</span>
+                            <strong class="detail">@Model.AgentName</strong>
+                        </div>
+                        <div class="label">
+                            <span>Forwarder:</span>
+                            <strong class="detail">@Model.Forwarder</strong>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th style="min-width: 10px;">#</th>
+            <th style="min-width: 50px;">PART NUMBER</th>
+            <th style="min-width: 25px;">SIZE</th>
+            <th>ITEM DESCRIPTION</th>
+            <th style="min-width: 50px;">QTY</th>
+            <th style="min-width: 25px;">UOM</th>
+            <th style="min-width: 50px;">UNIT PRICE</th>
+            <th style="min-width: 50px;">DISCOUNT</th>
+            <th style="min-width: 50px;">TOTAL</th>
+        </tr>
+        @for (var a = 1; a <= 19; a++)
+        {
+            var item = Model.Items.Where(s => s.LineNumber == a).FirstOrDefault();
+            if (item != null)
             {
-                <th>@Html.DisplayNameFor(model => model.ApprovedBy)</th>
-                <td>@Model?.ApprovedBy</td>
-            }
-            else if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
-            {
-                <th>@Html.DisplayNameFor(model => model.DisapprovedBy)</th>
-                <td>@Model?.DisapprovedBy</td>
+                <tr>
+                    <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                    <td>@(string.IsNullOrWhiteSpace(item.ItemPartNumber) ? "-" : item.ItemPartNumber)</td>
+                    <td>@item.ItemSize</td>
+                    <td>@item.ItemName</td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td>@item.Unit</td>
+                    <td>@item.SellingPrice</td>
+                    <td>@item.Discount1 @item.Discount2</td>
+                    <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
+                </tr>
             }
             else
             {
-                <th>Status</th>
-                <td><em>Not yet approved</em></td>
+                <tr>
+                    <td class="center-text" style="min-width: 10px;"><nobr>@a</nobr></td>
+                    <td></td>
+                    <td>@(Model.Items.Count() + 1 == a ? "* * NOTHING FOLLOWS * *" : "")</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
             }
-        </tr>
+        }
         <tr>
-            <th>@Html.DisplayNameFor(model => model.CustomerAddress)</th>
-            <td>@(string.IsNullOrWhiteSpace(Model?.CustomerAddress) ? "-" : Model.CustomerAddress)</td>
-            <th>PO Number</th>
-            <td>@(string.IsNullOrWhiteSpace(Model?.PONumber) ? "-" : Model.PONumber)</td>
-            @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
-            {
-                <th>@Html.DisplayNameFor(model => model.ApprovedDate)</th>
-                <td>@Model?.ApprovedDate</td>
+            <td class="center-text" style="min-width: 10px;"><nobr>20</nobr></td>
+            @{
+                var twenties = Model.Items.Count(s => s.LineNumber >= 20);
             }
-            else if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
+            @if (twenties == 0)
             {
-                <th>@Html.DisplayNameFor(model => model.DisapprovedDate)</th>
-                <td>@Model?.DisapprovedDate</td>
+                <td></td>
+                <td>@(Model.Items.Count() == 19 ? "* * NOTHING FOLLOWS * *" : "")</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            }
+            else if (twenties == 1)
+            {
+                var item = Model.Items.Where(s => s.LineNumber == 20).First();
+                <td>@(string.IsNullOrWhiteSpace(item.ItemPartNumber) ? "-" : item.ItemPartNumber)</td>
+                <td>-</td>
+                <td>@item.ItemName</td>
+                <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                <td>@item.Unit</td>
+                <td>@item.SellingPrice</td>
+                <td>@item.Discount1 @item.Discount2</td>
+                <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
             }
             else
             {
-                <th></th>
+                var item = Model.Items.Where(s => s.LineNumber >= 20).ToList();
+                <td></td>
+                <td></td>
+                <td>@(item.Count) more item(s)</td>
+                <td class="right-text">@item.Sum(s => s.QuantityD)</td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td></td>
             }
         </tr>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.AgentName)</th>
-            <td>@Model?.AgentName</td>
-            <th>@Html.DisplayNameFor(model => model.Forwarder)</th>
-            <td>@Model?.Forwarder</td>
-            <th></th>
+            <td colspan="4">
+                <dl>
+                    <dt>Remarks:</dt>
+                    <dd>@Model.Remarks</dd>
+                </dl>
+            </td>
+            <td class="right-text"><nobr>@Model?.TotalQuantity</nobr></td>
             <td></td>
+            <td></td>
+            <td></td>
+            <td class="right-text"><nobr>@Model?.TotalGrossPrice</nobr></td>
         </tr>
-    </table>
-
-
-    <table class="table-items no-border">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().Quantity)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().Unit)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().ItemCode)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().ItemName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().InventoryCount)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().NetPrice)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().RetailPrice)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().SellingPrice)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().Discount1)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().Discount2)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Items.First().GrossPrice)
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model?.Items == null)
-            {
-                <tr><td colspan="11">Empty record</td></tr>
-            }
-            else
-            {
-                foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td class="right-text"><nobr>@item.Quantity</nobr></td>
-                        <td><nobr>@item.Unit</nobr></td>
-                        <td>@item.ItemCode</td>
-                        <td>@item.ItemName</td>
-                        <td class="right-text"><nobr>@item.InventoryCount</nobr></td>
-                        <td class="right-text"><nobr>@item.NetPrice</nobr></td>
-                        <td class="right-text"><nobr>@item.RetailPrice</nobr></td>
-                        <td class="right-text"><nobr>@item.SellingPrice</nobr></td>
-                        <td class="right-text"><nobr>@item.Discount1</nobr></td>
-                        <td class="right-text"><nobr>@item.Discount2</nobr></td>
-                        <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
-                    </tr>
-                }
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <th class="right-text"><nobr>@Model?.TotalQuantity</nobr></th>
-                <th colspan="9">Total</th>
-                <th class="right-text"><nobr>@Model?.TotalGrossPrice</nobr></th>
-            </tr>
-        </tfoot>
+        <tr>
+            <td colspan="9">
+                <br />
+                <br />
+                <div class="two-column">
+                    <div class="column center-text">
+                        <dl>
+                            <dd>@Model.UserCreated</dd>
+                            <dt>Prepared By</dt>
+                        </dl>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
+                    {
+                        <div class="column center-text">
+                            <dl>
+                                <dd>@Model.ApprovedBy</dd>
+                                <dt>Approved By</dt>
+                            </dl>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+                    {
+                        <div class="column center-text">
+                            <dl>
+                                <dd>@Model.DisapprovedBy</dd>
+                                <dt>Disapproved By</dt>
+                            </dl>
+                        </div>
+                    }
+                </div>
+            </td>
+        </tr>
     </table>
 </body>
 <script type="text/javascript">
-    window.print();
-    window.onafterprint = function () {
-        setTimeout(function () {
-            window.close();
-        }, 100); 
-    };
+    // window.print();
+    // window.onafterprint = function () {
+    //     setTimeout(function () {
+    //         window.close();
+    //     }, 100);
+    // };
 </script>
 </html>

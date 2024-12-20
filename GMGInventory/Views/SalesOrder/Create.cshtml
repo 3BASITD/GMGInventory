@@ -81,8 +81,8 @@
                         <input type="text" id="order-region" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                     <div class="form-group">
-                        <label for="order-commodity-quantity" class="form-label mb-0">Customer Commodity Quantity</label>
-                        <input type="text" id="order-commodity-quantity" class="form-control form-control-sm" readonly="readonly" />
+                        <label for="order-delivery-date" class="form-label mb-0">Required Delivery Date</label>
+                        <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -101,10 +101,6 @@
                     <div class="form-group">
                         <label for="order-customer-status" class="form-label mb-0">Customer Account Status</label>
                         <input type="text" id="order-customer-status" class="form-control form-control-sm" readonly="readonly" />
-                    </div>
-                    <div class="form-group">
-                        <label for="order-delivery-date" class="form-label mb-0">Customer Required Delivery Date</label>
-                        <input type="text" id="order-delivery-date" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
             </div>
@@ -294,10 +290,14 @@
 
         $("#order-agent-code").on("select2:select", function () {
             $("#order-agent-name").val($(this).select2("data")[0].name);
+            $("#order-customer-code").val(null).trigger("change");
+            clearCustomerDetails();
         });
 
         $("#order-agent-code").on("select2:unselecting", function (e) {
             $("#order-agent-name").val("");
+            $("#order-customer-code").val(null).trigger("change");
+            clearCustomerDetails();
         });
 
         // Load customer data for select2
@@ -342,8 +342,7 @@
             $("#order-credit-term").val($(this).select2("data")[0].creditTerm);
             $("#order-region").val($(this).select2("data")[0].region);
             $("#order-customer-status").val($(this).select2("data")[0].customerStatus);
-            $("#order-delivery-date").val($(this).select2("data")[0].requiredDeliveryDate);
-            $("#order-commodity-quantity").val($(this).select2("data")[0].commodityQuantity);
+            $("#order-delivery-date").val($(this).select2("data")[0].requiredDeliveryDate3);
 
             if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
                 toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance");
@@ -351,15 +350,18 @@
         });
 
         $("#order-customer-code").on("select2:unselecting", function (e) {
+            clearCustomerDetails();
+        });
+
+        function clearCustomerDetails() {
             $("#order-customer-name").val("");
             $("#order-customer-address").val("");
             $("#order-customer-balance").val("");
             $("#order-credit-term").val("");
-            $("#order-customer-status").val("");
+            $("#order-region").val("");
             $("#order-customer-status").val("");
             $("#order-delivery-date").val("");
-            $("#order-commodity-quantity").val("");
-        });
+        }
 
         // Load price type data for select2
         $.ajax({
@@ -755,12 +757,14 @@
             rules: {
                 CustomerCode: { required: true },
                 AgentCode: { required: true },
-                OrderDate: { required: true}
+                OrderDate: { required: true },
+                DeliveryDate: { required: true }
             },
             messages: {
                 CustomerCode: { required: "Please select customer" },
                 AgentCode: { required: "Please select agent" },
-                OrderDate: { required: "Please select date of order" }
+                OrderDate: { required: "Please select date of order" },
+                DeliveryDate: { required: "Please select date of delivery" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -836,6 +840,7 @@
                     OrderDate: $("#order-date").val(),
                     Remarks: $("#order-remarks").val(),
                     Status: $("#action-type").val(),
+                    DeliveryDate: $("#order-delivery-date").val(),
                     Items: GetItemsToOrder(),
                     ResubmitId: "@(TempData["SalesOrderId"])"
                 },

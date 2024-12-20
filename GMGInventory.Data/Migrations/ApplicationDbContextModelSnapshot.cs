@@ -4373,6 +4373,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
+                    b.Property<int>("LineNumber")
+                        .HasColumnType("int");
+
                     b.Property<int>("PackedQuantity")
                         .HasColumnType("int");
 
@@ -5010,10 +5013,6 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("PriceList")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<int>("RegionId")
                         .HasColumnType("int");
 
@@ -5634,13 +5633,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2c5f31ee-1395-490b-b85d-8915ec1df62a",
+                            ConcurrencyStamp = "d88a7062-daaf-4536-82a2-2020012e0837",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPjZzXWu5UfR4GLf23Bq4c0II66hlv70CmDlyBMjip5ooREvkz111sb/UmYIf2+jTQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEuuHQ3F33o7XoEVN+Z1uu34pGkMTj8JPteueOSH14z64NBTF5z7uSIMQVFSwRzlIQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4ba7b882-536f-4357-a098-3db86940d8ac",
+                            SecurityStamp = "035430d9-5273-40e7-9b72-a475f201028d",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5655,13 +5654,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f9855e37-0127-42c0-80d2-419aceefa1c5",
+                            ConcurrencyStamp = "4df78da9-cf34-480e-a718-696dcd78f259",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAELoBjkFqqMuxPAV/+Ti+XRMOtfkNANL1tO7HPniXmTWAorvpLuZ15UwgC1NZHE/ryQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMigtvKzgmG2bNJDCn6u26enlIkddRtcYt9Z+mcvpOZT7lvOv+oBZs1T2idM11K7bg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0932d31f-d8ea-4d53-9c04-ec7000f1a76a",
+                            SecurityStamp = "a80180df-f9f3-497f-b08e-91dd46f6676b",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

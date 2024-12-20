@@ -209,20 +209,8 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="create-commodity-quantity" class="control-label mb-0 d-block">Commodity Quantity</label>
-                                    <input type="number" name="CommodityQuantity" id="create-commodity-quantity" class="form-control form-control-sm" />
-                                </div>
-                            </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="create-rdd" class="control-label mb-0 d-block">Required Delivery Date</label>
-                                    <input type="date" name="RequiredDeliveryDate" id="create-rdd" class="form-control form-control-sm" />
-                                </div>
-                            </div>
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
@@ -368,20 +356,8 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="edit-commodity-quantity" class="control-label mb-0 d-block">Commodity Quantity</label>
-                                    <input type="number" name="CommodityQuantity" id="edit-commodity-quantity" class="form-control form-control-sm" />
-                                </div>
-                            </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="edit-rdd" class="control-label mb-0 d-block">Required Delivery Date</label>
-                                    <input type="date" name="RequiredDeliveryDate" id="edit-rdd" class="form-control form-control-sm" />
-                                </div>
-                            </div>
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label for="edit-remarks" class="control-label mb-0 d-block">Remarks</label>
@@ -664,7 +640,6 @@
                 $("#create-usearearate").val("");
                 $("#create-credit-limit").val("");
                 $("#create-account-status").prop("selectedIndex", 0).trigger("change");
-                $("#create-commodity-quantity").val("");
                 $("#create-remarks").val("");
             });
         }
@@ -678,9 +653,7 @@
                 ContactNumber: { maxlength: 50 },
                 Email: { maxlength: 50 },
                 Address: { required: true },
-                CreditLimit: { required: true, range: [0, 1999999.99] },
-                CommodityQuantity: { required: true, range: [0, 1999999.99] },
-                RequiredDeliveryDate: { required: true }
+                CreditLimit: { required: true, range: [0, 1999999.99] }
             },
             messages: {
                 Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
@@ -690,9 +663,7 @@
                 ContactNumber: { maxlength: "Contact Number number must not exceed 50 characters." },
                 Email: { maxlength: "Email number must not exceed 50 characters." },
                 Address: { required: "Please enter address." },
-                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
-                CommodityQuantity: { required: "Please enter commodity quantity.", range: "Commodity Quantity must be between 0-1999999.99." },
-                RequiredDeliveryDate: { required: "Please enter RDD." }
+                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
 
             },
             submitHandler: function (form, event) {
@@ -724,8 +695,6 @@
                     CreditTermId: $("#create-credit-term").val(),
                     CreditLimitD: $("#create-credit-limit").val(),
                     CustomerAccountStatusId: $("#create-account-status").val(),
-                    CommodityQuantityD: $("#create-commodity-quantity").val(),
-                    RequiredDeliveryDateD: $("#create-rdd").val(),
                     Remarks: $("#create-remarks").val()
                 },
                 success: function (data, status, xhr) {
@@ -805,7 +774,6 @@
                     $("#edit-vat").val(data.vat);
                     $("#edit-credit-limit").val(data.creditLimit);
                     $("#edit-account-status").val(data.customerAccountStatusId).trigger("change");
-                    $("#edit-commodity-quantity").val(data.commodityQuantity);
                     $("#edit-remarks").val(data.remarks);
 
                 });
@@ -822,9 +790,7 @@
                     ContactNumber: { maxlength: 50 },
                     Email: { maxlength: 50 },
                     Address: { required: true },
-                    CreditLimit: { required: true, range: [0, 1999999.99] },
-                    CommodityQuantity: { required: true, range: [0, 1999999.99] },
-                    RequiredDeliveryDate: { required: true }
+                    CreditLimit: { required: true, range: [0, 1999999.99] }
                 },
                 messages: {
                     Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
@@ -834,9 +800,7 @@
                     ContactNumber: { maxlength: "Contact Number number must not exceed 50 characters." },
                     Email: { maxlength: "Email number must not exceed 50 characters." },
                     Address: { required: "Please enter address." },
-                    CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
-                    CommodityQuantity: { required: "Please enter commodity quantity.", range: "Commodity Quantity must be between 0-1999999.99." },
-                    RequiredDeliveryDate: { required: "Please enter RDD." }
+                    CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -867,8 +831,6 @@
                         CreditLimitD: $("#edit-credit-limit").val(),
                         Remarks: $("#edit-remarks").val(),
                         CustomerAccountStatusId: $("#edit-account-status").val(),
-                        CommodityQuantityD: $("#edit-commodity-quantity").val(),
-                        RequiredDeliveryDateD: $("#edit-rdd").val(),
                         Remarks: $("#edit-remarks").val()
                     },
                     success: function (data, status, xhr) {
@@ -962,11 +924,12 @@
                         || columns.includes("VAT") == false
                         || columns.includes("Credit Term") == false
                         || columns.includes("Credit Limit") == false
+                        || columns.includes("Customer Account Status") == false
                         || columns.includes("Remarks") == false) {
                         row$.append($('<td/>').html("Unexpected columns"));
                         UploadRowDone();
                     } else {
-                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Commission Rate"], json_of_excel[i]["Region"], json_of_excel[i]["Area"], json_of_excel[i]["Customer Type"], json_of_excel[i]["Contact Person"], json_of_excel[i]["Contact Number"], json_of_excel[i]["Address"], json_of_excel[i]["Email"], json_of_excel[i]["Agent"], json_of_excel[i]["Fax Number"], json_of_excel[i]["TIN"], json_of_excel[i]["VAT"], json_of_excel[i]["Credit Term"], json_of_excel[i]["Credit Limit"], json_of_excel[i]["Remarks"], rowNum);
+                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Commission Rate"], json_of_excel[i]["Region"], json_of_excel[i]["Area"], json_of_excel[i]["Customer Type"], json_of_excel[i]["Contact Person"], json_of_excel[i]["Contact Number"], json_of_excel[i]["Address"], json_of_excel[i]["Email"], json_of_excel[i]["Agent"], json_of_excel[i]["Fax Number"], json_of_excel[i]["TIN"], json_of_excel[i]["VAT"], json_of_excel[i]["Credit Term"], json_of_excel[i]["Credit Limit"], json_of_excel[i]["Customer Account Status"], json_of_excel[i]["Remarks"], rowNum);
                         row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
                     }
                     $("#upload-table").append(row$);
@@ -974,7 +937,7 @@
             }
         }
 
-        function SaveXLSX(code, name, commissionRateD, regionName, areaName, customerTypeName, contactPerson, contactNumber, address, email, agentName, faxNumber, tIN, vAT, creditTermName, creditLimitD, customerAccountStatus, commodityQuantity, remarks, rownum) {
+        function SaveXLSX(code, name, commissionRateD, regionName, areaName, customerTypeName, contactPerson, contactNumber, address, email, agentName, faxNumber, tIN, vAT, creditTermName, creditLimitD, customerAccountStatus, remarks, rownum) {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("UploadJson")",
@@ -996,7 +959,6 @@
                     CreditTermName: creditTermName,
                     CreditLimitD: creditLimitD,
                     CustomerAccountStatusName: customerAccountStatus,
-                    CommodityQuantity: commodityQuantity,
                     Remarks: remarks
 
                 },

@@ -13,17 +13,26 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
+            @if (userAccess.CanPrint)
+            {
+                <div class="dropdown float-right ml-2">
+                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-print"></span> Print
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
+                        <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
+                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
+                    </ul>
+                </div>
+            }
             @if (Model.Status.ToLower() == "submitted")
             {
                 @if (userAccess.CanEdit)
                 {
                     <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-                        <span class="fas fa-save"></span> Save
+                        <span class="fas fa-save"></span> Submit
                     </button>
                 }
-                @*<button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-            <span class="fas fa-print"></span> Print
-            </button>*@
                 @if (userAccess.CanApproveDisapprove)
                 {
                     <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
@@ -31,6 +40,18 @@
                     </button>
                     <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
                         <span class="fas fa-times"></span> Disapprove
+                    </button>
+                }
+            }
+            else if (Model.Status.ToLower() == "draft")
+            {
+                @if (userAccess.CanEdit)
+                {
+                    <button type="submit" class="btn btn-secondary btn-sm float-right ml-2 btn-details-draft">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
+                        <span class="fas fa-save"></span> Submit
                     </button>
                 }
             }
@@ -44,10 +65,6 @@
                             <span class="fas fa-box-open"></span> Start Packing
                         </a>
                     }
-                    @*
-            <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-            <span class="fas fa-print"></span> Print
-            </button>*@
                 }
                 @if (userAccess.CanEdit)
                 {
@@ -58,12 +75,6 @@
                         </a>
                     }
                 }
-            }
-            @if (userAccess.CanPrint)
-            {
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-                    <span class="fas fa-print"></span> Print
-                </button>
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -1033,12 +1044,13 @@
 
         if (user_access.canPrint) {
             $(".btn-details-print").on("click", function () {
+                var print_company = $(this).data("company");
                 $.LoadingOverlay("show", {
                     image: "",
                     fontawesome: "fas fa-print"
                 });
                 setTimeout(function () {
-                    let win = window.open('@Url.Action("Print")/' + @Model?.Id, '');
+                    let win = window.open('@Url.Action("Print")/' + @Model?.Id + '?Company=' + print_company, '');
                     var wintimer = setInterval(function () {
                         if (win.closed) {
                             clearInterval(wintimer);

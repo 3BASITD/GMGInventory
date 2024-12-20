@@ -80,18 +80,18 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderRepository.GetDetailsAsync(Id));
         }
 
-        public async Task<IActionResult> Print(int? Id)
+        public async Task<IActionResult> Print(int? Id, string? Company)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
 
             var order = await salesOrderRepository.PrintDetailsAsync(Id);
-            if (order == null)
+            if (order == null || Company == null)
             {
                 return NotFound();
             }
-
+            TempData["CompanyLogo"] = Company;
             return View(order);
         }
 

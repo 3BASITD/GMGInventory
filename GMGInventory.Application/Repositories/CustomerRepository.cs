@@ -340,8 +340,8 @@ namespace GMGInventory.Application.Repositories
 
         public async Task UpdateAsync(CustomerVM custVM)
         {
-            var cust = context.Customers.Where(s => s.Code == custVM.Code).FirstOrDefault();
-            var area = context.Areas.Where(s => s.Id == custVM.RegionId).FirstOrDefault();
+            var cust = context.Customers.Where(s => s.Id == custVM.Id).FirstOrDefault();
+            var area = context.Areas.Where(s => s.Id == custVM.AreaId).FirstOrDefault();
 
             if (cust == null || area == null) throw new DbUpdateConcurrencyException();
 

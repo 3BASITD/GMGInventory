@@ -57,6 +57,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Address")]
         public string CustomerAddress { get; set; }
 
+        [Display(Name = "Customer Contact Number")]
+        public string CustomerContactNumber { get; set; }
+
+        [Display(Name = "Customer Contact Person")]
+        public string CustomerContactPerson { get; set; }
+
         [Display(Name = "Outstanding Balance")]
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
         public decimal OutstandingBalanceD { get; set; }
@@ -169,6 +175,8 @@ namespace GMGInventory.Common.Models
                 CustomerCode = value.CustomerCode;
                 CustomerId = value.CustomerId;
                 CustomerName = value.CustomerName;
+                CustomerContactNumber = value.CustomerContactNumber;
+                CustomerContactPerson = value.CustomerContactPerson;
                 DeclaredValueD = value.DeclaredValueD;
                 ForwarderId = value.ForwarderId;
                 Forwarder = value.Forwarder;
@@ -207,6 +215,8 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
 
+        public int LineNumber { get; set; }
+
         public int ItemId { get; set; }
 
         [Display(Name = "Item Code")]
@@ -214,6 +224,12 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
+
+        [Display(Name = "Item Part Number")]
+        public string ItemPartNumber { get; set; }
+
+        [Display(Name = "Item Size")]
+        public string ItemSize { get; set; }
 
         [Display(Name = "Inventory")]
         public string InventoryCount => string.Format(SystemFormat.StringIntegerComma, InventoryCountD);
@@ -282,6 +298,7 @@ namespace GMGInventory.Common.Models
         public int? PurchaseOrder { get; set; }
         public decimal DeclaredValue { get; set; }
         public DateTime OrderDate { get; set; }
+        public DateTime DeliveryDate { get; set; }
         public string Remarks { get; set; }
         public int? ResubmitId { get; set; }
         public string Status { get; set; }

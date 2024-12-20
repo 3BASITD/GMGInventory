@@ -216,7 +216,7 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CustomerAccountStatusName)
                     </span>
-                    <b class="d-block details-commission-rate">
+                    <b class="d-block details-account-status">
                         @Model?.CustomerAccountStatusName
                     </b>
                 </p>
@@ -483,12 +483,10 @@
                             <div class="form-group">
                                 <label class="control-label mb-0 d-block" for="edit-usearearate"> Use Area Rate? </label>
                                 <input class="form-check-input" type="checkbox" id="edit-usearearate" name="UseAreaRate">
-                                @* <label for="create-is-active" class="control-label mb-0 d-block">Use Area Rate?</label>
-                                <input type="checkbox" name="IsActive" id="create-is-active" class="form-control form-control-sm" />*@
+                                @* <label for="edit-is-active" class="control-label mb-0 d-block">Use Area Rate?</label>
+                                <input type="checkbox" name="IsActive" id="edit-is-active" class="form-control form-control-sm" />*@
                             </div>
                         </div>
-
-
                     </div>
                     <div class="row">
                         <div class="col-md-4">
@@ -500,7 +498,7 @@
                         </div>
                         <div class="col-md-4">
                             <label for="edit-area" class="control-label mb-0 d-block">Area</label>
-                            <select name="Area" id="edit-area" class="form-control s2ph-dark" style="width: 100%">
+                            <select name="Area" id="edit-area" class="form-control" style="width: 100%">
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -508,7 +506,6 @@
                             <select name="CustomerType" id="edit-customer-type" class="form-control" style="width: 100%">
                             </select>
                         </div>
-
                     </div>
                     <div class="row">
                         <div class="col-md-4">
@@ -529,7 +526,6 @@
                                 <input type="text" name="Address" id="edit-address" class="form-control form-control-sm" />
                             </div>
                         </div>
-
                     </div>
                     <div class="row">
                         <div class="col-md-4">
@@ -551,7 +547,6 @@
                                 <input type="text" name="FaxNumber" id="edit-fax-number" class="form-control form-control-sm" />
                             </div>
                         </div>
-
                     </div>
                     <div class="row">
                         <div class="col-md-4">
@@ -581,16 +576,23 @@
                                 <input type="number" name="CreditLimit" id="edit-credit-limit" class="form-control form-control-sm" />
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="edit-account-status" class="control-label mb-0 d-block">Customer Account Status</label>
+                                <select name="CustomerAccountStatus" id="edit-account-status" class="form-control" style="width: 100%">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-8">
                             <div class="form-group">
-                                <label for="edit-remarks" class="control-label mb-0 d-block">Customer Status</label>
+                                <label for="edit-remarks" class="control-label mb-0 d-block">Remarks</label>
                                 <input name="Remarks" id="edit-remarks" class="form-control form-control-sm" />
                             </div>
                         </div>
-
                     </div>
                     <input type="hidden" id="edit-id" />
-
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
@@ -870,6 +872,25 @@
         });
 
 
+        // Load Select2 Customer Account Status
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "CustomerAccountStatus")",
+            success: function (data, status, xhr) {
+                $("#create-account-status").select2({
+                    data: data,
+                    dropdownParent: $("#createModal"),
+                    minimumResultsForSearch: -1
+                });
+                $("#edit-account-status").select2({
+                    data: data,
+                    dropdownParent: $("#editModal"),
+                    minimumResultsForSearch: -1
+                });
+            }
+        });
+
+
 
         //Shipping Details
         var shippingDT = $('.table-shipping').on('preXhr.dt', function (e, settings, data) {
@@ -1014,11 +1035,11 @@
         $("#edit-usearearate").on("change", function () {
             if ($(this).prop("checked")) {
                 $("#edit-commission").val("");
-                $("#edit-commission").prop("readonly", "readonly")
+                $("#edit-commission").prop("readonly", "readonly");
             }
             else {
                 $("#edit-commission").val(0);
-                $("#edit-commission").removeAttr("readonly")
+                $("#edit-commission").removeAttr("readonly");
             }
         });
 
@@ -1035,9 +1056,11 @@
                     $("#edit-name").val(data.name);
                     if (data.commissionRateIsArea) {
                         $("#edit-commission").val("");
+                        $("#edit-commission").prop("readonly", "readonly");
                         $("#edit-usearearate").prop("checked", true);
                     } else {
                         $("#edit-commission").val(data.commissionRateD);
+                        $("#edit-commission").removeAttr("readonly");
                         $("#edit-usearearate").prop("checked", false);
                     }
                     $("#edit-customer-type").val(data.customerTypeId);
@@ -1057,6 +1080,7 @@
                     $("#edit-credit-limit").val(data.creditLimit);
                     $("#edit-remarks").val(data.remarks);
                     $("#edit-isactive").val(data.isActive);
+                    $("#edit-account-status").val(data.customerAccountStatusId).trigger("change");
                 }
             });
 
@@ -1099,6 +1123,7 @@
                 type: "POST",
                 url: "@Url.Action("EditJson")",
                 data: {
+                    Id: @Model.Id,
                     Code: $("#edit-code").val(),
                     Name: $("#edit-name").val(),
                     AreaId: $("#edit-area").val() ?? @Model?.AreaId,
@@ -1115,6 +1140,7 @@
                     VAT: $("#edit-vat").val(),
                     CreditTermId: $("#edit-credit-term").val(),
                     CreditLimit: $("#edit-credit-limit").val(),
+                    CustomerAccountStatusId: $("#edit-account-status").val(),
                     Remarks: $("#edit-remarks").val(),
                     IsActive: $("#edit-isactive").val()
                 },
@@ -1143,7 +1169,8 @@
                         $(".details-address").text($("#edit-address").val() || "-");
                         $(".details-fax-number").text($("#edit-fax-number").val() || "-");
                         $(".details-credit-term").text($("#edit-credit-term").select2("data")[0].text);
-                        $(".details-commission-rate").text($("#edit-usearearate").prop("checked") ? FormatStringDecimal($("#edit-commission").val()) : "-");
+                        $(".details-commission-rate").text($("#edit-usearearate").prop("checked") ? "-" : FormatStringDecimal($("#edit-commission").val()));
+                        $(".details-account-status").text($("#edit-account-status").select2("data")[0].text);
                         hideLoader();
                     }
                 }

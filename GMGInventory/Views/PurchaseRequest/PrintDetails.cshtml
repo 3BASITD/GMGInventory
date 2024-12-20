@@ -20,7 +20,14 @@
     <table class="formatted">
         <tr>
             <td colspan="2" rowspan="2" class="center-text">
-                <img src="~/images/BAS-02.png" class="logo" />
+                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                {
+                    <img src="~/images/BAS-02.png" class="logo" />
+                }
+                else
+                {
+                    <img src="~/images/GMG-01.png" class="logo" />
+                }
             </td>
             <td colspan="2" rowspan="2">
                 <dl>
@@ -132,7 +139,7 @@
                 var item = items.Where(s => s.LineNumber >= 20).ToList();
                 <td></td>
                 <td>@(item.Count) more item(s)</td>
-                <td>@item.Sum(s => s.QuantityD)</td>
+                <td class="right-text">@item.Sum(s => s.QuantityD)</td>
                 <td></td>
                 <td></td>
                 <td></td>
