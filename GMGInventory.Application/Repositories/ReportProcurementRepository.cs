@@ -41,8 +41,9 @@ namespace GMGInventory.Application.Repositories
                            select new PurchaseOrderRVM
                            {
                                Item = pRequest.Item.Code,
+                               ItemDescription = pRequest.ItemDescription,
                                Quantity = porder.Quantity,
-                               Unit = pRequest.Unit.Code,
+                               Unit = pRequest.Item.Unit.Code, 
                                UnitCost = porder.UnitCost,
                                DocumentNumber = porder.PurchaseOrder.DocumentNumber,
                                Supplier = porder.PurchaseOrder.Supplier.Code,
@@ -191,7 +192,7 @@ namespace GMGInventory.Application.Repositories
                                 Item = preceiving.OrderItem.RequestItem.Item.Code,
                                 ItemDescription = preceiving.OrderItem.RequestItem.ItemDescription,
                                 Quantity = poItems.Quantity,
-                                Unit = preceiving.OrderItem.RequestItem.Unit.Code,
+                                Unit = preceiving.OrderItem.RequestItem.Item.Unit.Code,
                                 UnitCost = poItems.UnitCost,
                                 TotalAmount = poItems.Quantity * poItems.UnitCost,
                                 DocumentNumber = preturn.PurchaseReturn.DocumentNumber,
@@ -334,7 +335,7 @@ namespace GMGInventory.Application.Repositories
                                                  Item = preceive.OrderItem.RequestItem.Item.Code,
                                                  ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
                                                  Quantity = preceive.Quantity,
-                                                 Unit = preceive.OrderItem.RequestItem.Unit.Code,
+                                                 Unit = preceive.OrderItem.RequestItem.Item.Unit.Code,
                                                  UnitCost = preceive.OrderItem.UnitCost,
                                                  TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
 

@@ -159,24 +159,33 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<PurchaseReceiveLineItemVM>> GetItemListAsync(int purchaseReceivingId)
         {
-            var receiveVM = from receive in context.PurchaseReceivingLineItems
-                                                   //.Include(s => s.Item)
-                                                   //.Include(s => s.Unit)
-                            where receive.PurchaseReceivingId == purchaseReceivingId
-                            select new PurchaseReceiveLineItemVM
-                            {
-                                Id = receive.Id,
-                                PurchaseReceivingId = receive.PurchaseReceivingId,
-                                LineNumber = receive.OrderItem.LineNumber,
-                                OrderItemId = receive.OrderItem.RequestItem.ItemId ?? 0,
-                                ItemCode = receive.OrderItem.RequestItem.Item.Code,
-                                ItemPartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
-                                ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
-                                QuantityD = receive.Quantity,
-                                UnitId = receive.OrderItem.RequestItem.UnitId,
-                                UnitCode = receive.OrderItem.RequestItem.Unit.Code,
-                                UnitCost = receive.OrderItem.UnitCost
-                            };
+            var orderId = await context.PurchaseReceivings
+                                             .Where(s => s.Id == purchaseReceivingId)
+                                             .Select(s => s.PurchaseOrderId)
+                                             .FirstOrDefaultAsync();
+
+            var receiveVM = from order in context.PurchaseOrderNewLineItems
+
+                           join receive in context.PurchaseReceivingLineItems on order.Id equals receive.OrderItemId into rcv
+                           from receive in rcv.DefaultIfEmpty()
+                           where order.PurchaseOrderId == orderId
+                           && (receive == null || receive.PurchaseReceivingId == purchaseReceivingId)
+                           select new PurchaseReceiveLineItemVM
+                           {
+                               Id = receive == null ? 0 : receive.Id,
+                               ToReceive = receive != null,
+                               PurchaseReceivingId = receive.PurchaseReceivingId,
+                               LineNumber = order.LineNumber,
+                               OrderItemId = receive.OrderItemId, 
+                               ItemCode = order.RequestItem.Item.Code,
+                               ItemPartNumber = order.RequestItem.Item.PartNumber,
+                               ItemDescription = order.RequestItem.ItemDescription,
+                               QuantityD = receive.Quantity,
+                               OrderQuantityD = order.Quantity,
+                               UnitId = order.RequestItem.Item != null? order.RequestItem.Item.UnitId : 0,
+                               UnitCode = order.RequestItem.Item != null? order.RequestItem.Item.Unit.Code : "",
+                               UnitCost = order.UnitCost
+                           };
             return await receiveVM.ToListAsync();
         }
 
@@ -249,12 +258,7 @@ namespace GMGInventory.Application.Repositories
                                        {
                                            PurchaseReceivingId = receiveId,
                                            OrderItemId = s.OrderItemId,
-                                           //LineNumber = s.LineNumber,
-                                           //ItemId = s.ItemId,
-                                           //ItemDescription = s.ItemDescription ?? "",
-                                           Quantity = s.QuantityD,
-                                           //UnitId = s.UnitId,
-                                           //UnitCost = s.UnitCost
+                                           Quantity = s.QuantityD
                                        });
                     context.PurchaseReceivingLineItems.AddRange(newitems);
 
@@ -471,8 +475,6 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.PurchaseOrderNewLineItems
                                   .Include(s => s.RequestItem)
-                                //
-                                //.Include(s => s.Unit)
                                 .Where(s => s.PurchaseOrderId == PurchaseOrderId)
                                 .Select(s => new JsonPurchaseItemOptionsModel
                                 {
@@ -483,17 +485,10 @@ namespace GMGInventory.Application.Repositories
                                     ItemDescription = s.RequestItem.ItemDescription,
                                     PartNumber = s.RequestItem.Item.PartNumber,
                                     Quantity = s.Quantity,
-                                    Unit = s.RequestItem.Unit.Name,
-                                    UnitId = s.RequestItem.Unit.Id,
+                                    Unit = s.RequestItem.Item.Unit.Name,
+                                    UnitId = s.RequestItem.Item.UnitId,
                                     UnitCost = s.UnitCost,
                                     LineNumber = s.LineNumber
-                                    //Served = context.PurchaseOrderNewLineItems
-                                    //                .Where(a => a.ItemId == s.ItemId
-                                    //                         && a.ItemDescription == s.ItemDescription
-                                    //                         && a.PurchaseOrder.Status.Name.ToLower() == "approved")
-                                    //                .Select(a => a.Quantity)
-                                    //                .Sum()
-                                    //  Selected = SelectedId != null && s.Id == SelectedId
                                 })
                                 .OrderBy(s => s.LineNumber)
                                 .ToListAsync();

@@ -86,6 +86,8 @@ namespace GMGInventory.Common.Models
     public class PurchaseReceiveLineItemVM
     {
         public int Id { get; set; }
+        public bool ToReceive { get; set; }
+
         public int PurchaseReceivingId { get; set; }
 
         [Display(Name = "Line Number")]
@@ -115,6 +117,9 @@ namespace GMGInventory.Common.Models
         public string Quantity => string.Format("{0:#,##0}", QuantityD);
         public int QuantityD { get; set; }
 
+        [Display(Name = "Order Quantity")]
+        public string OrderQuantity => string.Format("{0:#,##0}", OrderQuantityD);
+        public int OrderQuantityD { get; set; }
     }
 
     public class PurchaseReceiveSaveVM

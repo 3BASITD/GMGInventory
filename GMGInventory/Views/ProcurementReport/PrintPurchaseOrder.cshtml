@@ -37,12 +37,21 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().DocumentNumber)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().Supplier)
-                </th>
+                @if (Model.GroupBy != "supplier")
+                {
+                    <th>
+                        @Html.DisplayNameFor(model => model.Contents.First().Supplier)
+                    </th>
+                }
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().Item)
                 </th>
+                @if (Model.GroupBy != "itemDescription")
+                {
+                    <th>
+                        @Html.DisplayNameFor(model => model.Contents.First().ItemDescription)
+                    </th>
+                }
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().Quantity)
                 </th>
@@ -63,21 +72,28 @@
         <tbody>
             @if (Model.GroupBy != null)
             {
-                @foreach (var grp in Model.Contents.GroupBy(x => Model.GroupBy == "item" ? x.Item :
+                @foreach (var grp in Model.Contents.GroupBy(x => Model.GroupBy == "itemDescription" ? x.ItemDescription :
                Model.GroupBy == "supplier" ? x.Supplier : x.OrderDate))
                 {
                     <tr>
                         <td><nobr>@grp.Key</nobr></td>
                     </tr>
-                    @foreach (var item in Model.Contents.Where(x => Model.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
+                    @foreach (var item in Model.Contents.Where(x => Model.GroupBy == "itemDescription" ? x.ItemDescription == grp.FirstOrDefault()!.ItemDescription :
                    Model.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
                    x.OrderDate == grp.FirstOrDefault()!.OrderDate))
                     {
                         <tr>
                             <td><nobr>@item.OrderDate</nobr></td>
                             <td>@item.DocumentNumber</td>
-                            <td>@item.Supplier</td>
-                            <td>@item.Item</td>
+                            @if (Model.GroupBy != "supplier")
+                            {
+                                <td>@item.Supplier</td>
+                            }
+                           <td>@item.Item</td>
+                            @if (Model.GroupBy != "itemDescription")
+                            {
+                                <td>@item.ItemDescription</td>
+                            }
                             <td>@item.Quantity</td>
                             <td>@item.Unit</td>
                             <td>@item.UnitCost</td>
@@ -109,7 +125,14 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="6" class="right-text">Total</th>
+                @if (Model.GroupBy != null)
+                {
+                    <th colspan="6" class="right-text">Total</th>
+                }
+                else
+                {
+                    <th colspan="7" class="right-text">Total</th>
+                }
                 <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
                 <th></th>
                 <th class="right-text"><nobr>@Model.TotalAmount2</nobr></th>

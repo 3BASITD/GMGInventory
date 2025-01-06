@@ -269,8 +269,8 @@ namespace GMGInventory.Application.Repositories
                               ItemPartNumber = string.IsNullOrWhiteSpace(order.RequestItem.Item.PartNumber) ? "-" : order.RequestItem.Item.PartNumber,
                               ItemDescription = order.RequestItem.ItemDescription,
                               QuantityD = order.Quantity,
-                              UnitId = order.RequestItem.Unit.Id,
-                              UnitCode = order.RequestItem.Unit.Code,
+                              UnitId = order.RequestItem.Item != null ? order.RequestItem.Item.UnitId : 0,
+                              UnitCode = order.RequestItem.Item != null ? order.RequestItem.Item.Unit.Code : "",
                               UnitCostD = order.UnitCost,
                               ServedQuantityD = context.PurchaseOrderNewLineItems
                                                        .Where(a => a.RequestItem.ItemId == order.RequestItem.ItemId
