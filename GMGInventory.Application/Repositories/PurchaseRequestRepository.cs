@@ -193,7 +193,6 @@ namespace GMGInventory.Application.Repositories
             var requestVM = from request in context.PurchaseRequestLineItems
                                                    .Include(s => s.SalesOrder)
                                                    .Include(s => s.Item)
-                                                   .Include(s => s.Unit)
                             where request.PurchaseRequestId == purchaseRequestId
                             select new PurchaseRequestLineItemVM
                             {
@@ -208,8 +207,8 @@ namespace GMGInventory.Application.Repositories
                                 ItemDescription = request.ItemDescription,
                                 StockOnHandD = request.StockOnHand,
                                 QuantityD = request.Quantity,
-                                UnitId = request.UnitId,
-                                UnitCode = request.Unit.Code,
+                                UnitId = request.Item.Unit.Id,
+                                UnitCode = request.Item.Unit.Code,
                                 Purpose = request.Purpose
                             };
             return await requestVM.ToListAsync();
@@ -410,7 +409,6 @@ namespace GMGInventory.Application.Repositories
                                            ItemDescription = s.ItemDescription,
                                            StockOnHand = s.StockOnHandD,
                                            Quantity = s.QuantityD,
-                                           UnitId = s.UnitId,
                                            Purpose = s.Purpose + ""
                                        });
                     context.PurchaseRequestLineItems.AddRange(newitems);

@@ -54,8 +54,8 @@ namespace GMGInventory.Application.Repositories
                                 ItemCode = receive.OrderItem.RequestItem.Item.Code,
                                 PartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
                                 Quantity = receive.Quantity,
-                                Unit = receive.OrderItem.RequestItem.Unit.Name,
-                                UnitId = receive.OrderItem.RequestItem.Unit.Id,
+                                Unit = receive.OrderItem.RequestItem.Item.Unit.Name,
+                                UnitId = receive.OrderItem.RequestItem.Item.Unit.Id,
                                 Selected = SelectedId != null && receive.Id == SelectedId
                             };
             return await receiveVM.Where(s => s.UnorderedQuantity > 0).ToListAsync();
@@ -74,8 +74,8 @@ namespace GMGInventory.Application.Repositories
                                 ItemPartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
                                 ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
                                 QuantityD = receive.Quantity,
-                                UnitId = receive.OrderItem.RequestItem.Unit.Id,
-                                UnitCode = receive.OrderItem.RequestItem.Unit.Code,
+                                UnitId = receive.OrderItem.RequestItem.Item.Unit.Id,
+                                UnitCode = receive.OrderItem.RequestItem.Item.Unit.Code,
                                 UnitCostD = receive.OrderItem.UnitCost
                             };
 
@@ -238,8 +238,8 @@ namespace GMGInventory.Application.Repositories
                                    QuantityD = retrn == null ? 0 : retrn.Quantity,
                                    ReceivingItemId = receive.Id,
                                    ReceivedQuantityD = receive.Quantity,
-                                   UnitId = receive.OrderItem.RequestItem.Unit.Id,
-                                   UnitCode = receive.OrderItem.RequestItem.Unit.Code,
+                                   UnitId = receive.OrderItem.RequestItem.Item.Unit.Id,
+                                   UnitCode = receive.OrderItem.RequestItem.Item.Unit.Code,
                                    UnitCostD = receive.OrderItem.UnitCost
                                };
                 return await returnVM.ToListAsync();

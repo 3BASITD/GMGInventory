@@ -24,7 +24,30 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-
+        public async Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page)
+        {
+            var orders = from order in context.PurchaseOrderNews
+                         join user in userManager.Users on order.UserCreated equals user.Id
+                         where string.IsNullOrWhiteSpace(search)
+                         && order.Status.Code.ToLower() != "draft"
+                            || (order.DocumentNumber.ToLower().Contains(search.ToLower()))
+                         orderby order.DocumentNumber ascending
+                         select new JsonPurchaseOrderOptionsModel
+                         {
+                             Id = order.Id.ToString(),
+                             OrderBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                             OrderDateD = order.OrderDate,
+                             Supplier = order.Supplier.Name,
+                             Text = order.DocumentNumber
+                         };
+            var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonPurchaseOrderOptionsModel>
+            {
+                //incomplete_results = false,
+                items = ordersFiltered,
+                total_count = orders.Count()
+            };
+        }
 
         public async Task<IList<JsonOrderTypeOptionsModel>> GetTypeOptions(int? SelectedId)
         {
@@ -74,7 +97,6 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.PurchaseRequestLineItems
                                 .Include(s => s.Item)
-                                .Include(s => s.Unit)
                                 .Where(s => s.PurchaseRequestId == RequestId)
                                 .Select(s => new JsonPurchaseItemOptionsModel
                                 {
@@ -84,8 +106,8 @@ namespace GMGInventory.Application.Repositories
                                     ItemCode = s.Item.Code,
                                     PartNumber = s.Item.PartNumber,
                                     Quantity = s.Quantity,
-                                    Unit = s.Unit.Name,
-                                    UnitId = s.Unit.Id,
+                                    Unit = s.Item.Unit.Name,
+                                    UnitId = s.Item.Unit.Id,
                                     Served = context.PurchaseOrderNewLineItems
                                                     .Include(s => s.PurchaseOrder).ThenInclude(s => s.Status)
                                                     .Where(a => a.RequestItemId == s.Id
@@ -269,8 +291,8 @@ namespace GMGInventory.Application.Repositories
                               ItemPartNumber = string.IsNullOrWhiteSpace(order.RequestItem.Item.PartNumber) ? "-" : order.RequestItem.Item.PartNumber,
                               ItemDescription = order.RequestItem.ItemDescription,
                               QuantityD = order.Quantity,
-                              UnitId = order.RequestItem.Unit.Id,
-                              UnitCode = order.RequestItem.Unit.Code,
+                              UnitId = order.RequestItem.Item.Unit.Id,
+                              UnitCode = order.RequestItem.Item.Unit.Code,
                               UnitCostD = order.UnitCost,
                               ServedQuantityD = context.PurchaseOrderNewLineItems
                                                        .Where(a => a.RequestItem.ItemId == order.RequestItem.ItemId

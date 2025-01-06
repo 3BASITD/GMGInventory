@@ -26,10 +26,6 @@ namespace GMGInventory.Data
 
         public int Quantity { get; set; }
 
-        [ForeignKey("UnitId")]
-        public int UnitId { get; set; }
-        public virtual Unit Unit { get; set; }
-
         [Column(TypeName = "nvarchar(100)")]
         public string Purpose { get; set; }
     }

@@ -9,6 +9,7 @@ namespace GMGInventory.Data
             PurchaseOrderResubmits = new HashSet<PurchaseOrderNew>();
             PurchaseOrderLineItems = new HashSet<PurchaseOrderNewLineItem>();
             PurchaseReceivings = new HashSet<PurchaseReceiving>();
+            SalesOrders = new HashSet<SalesOrder>();
         }
 
         public string DocumentNumber { get; set; }
@@ -78,5 +79,6 @@ namespace GMGInventory.Data
         public ICollection<PurchaseOrderNew> PurchaseOrderResubmits { get; set; }
         public ICollection<PurchaseOrderNewLineItem> PurchaseOrderLineItems { get; set; }
         public ICollection<PurchaseReceiving> PurchaseReceivings { get; set; }
+        public ICollection<SalesOrder> SalesOrders { get; set; }
     }
 }

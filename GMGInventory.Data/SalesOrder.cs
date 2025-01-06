@@ -34,17 +34,11 @@ namespace GMGInventory.Data
 
         [ForeignKey("PurchaseOrderId")]
         public int? PurchaseOrderId { get; set; }
-        public PurchaseOrder? PurchaseOrder { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal? DeclaredValue { get; set; }
+        public PurchaseOrderNew? PurchaseOrder { get; set; }
 
         [ForeignKey("PriceTypeId")]
         public int PriceTypeId { get; set; }
         public PriceType PriceType { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal TotalAmount { get; set; }
         public DateTime RequiredDeliveryDate { get; set; }
         public DateTime SalesOrderDate { get; set; }
 

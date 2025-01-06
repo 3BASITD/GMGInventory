@@ -173,8 +173,8 @@ namespace GMGInventory.Application.Repositories
                                 ItemPartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
                                 ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
                                 QuantityD = receive.Quantity,
-                                UnitId = receive.OrderItem.RequestItem.UnitId,
-                                UnitCode = receive.OrderItem.RequestItem.Unit.Code,
+                                UnitId = receive.OrderItem.RequestItem.Item.Unit.Id,
+                                UnitCode = receive.OrderItem.RequestItem.Item.Unit.Code,
                                 UnitCost = receive.OrderItem.UnitCost
                             };
             return await receiveVM.ToListAsync();
@@ -471,8 +471,6 @@ namespace GMGInventory.Application.Repositories
         {
             return await context.PurchaseOrderNewLineItems
                                   .Include(s => s.RequestItem)
-                                //
-                                //.Include(s => s.Unit)
                                 .Where(s => s.PurchaseOrderId == PurchaseOrderId)
                                 .Select(s => new JsonPurchaseItemOptionsModel
                                 {
@@ -483,8 +481,8 @@ namespace GMGInventory.Application.Repositories
                                     ItemDescription = s.RequestItem.ItemDescription,
                                     PartNumber = s.RequestItem.Item.PartNumber,
                                     Quantity = s.Quantity,
-                                    Unit = s.RequestItem.Unit.Name,
-                                    UnitId = s.RequestItem.Unit.Id,
+                                    Unit = s.RequestItem.Item.Unit.Name,
+                                    UnitId = s.RequestItem.Item.Unit.Id,
                                     UnitCost = s.UnitCost,
                                     LineNumber = s.LineNumber
                                     //Served = context.PurchaseOrderNewLineItems

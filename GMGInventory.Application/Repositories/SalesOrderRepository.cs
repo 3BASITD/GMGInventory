@@ -127,7 +127,6 @@ namespace GMGInventory.Application.Repositories
                                CustomerName = order.Customer.Name,
                                CustomerContactNumber = order.Customer.ContactNumber + "",
                                CustomerContactPerson = order.Customer.ContactPerson + "",
-                               DeclaredValueD = order.DeclaredValue,
                                DisapprovedBy = SystemFormat.Name(disapprove.FirstName, disapprove.LastName, disapprove.Nickname),
                                DisapprovedDateD = order.DisapprovedDate,
                                DisapprovedReason = order.DisapprovedReason + "",
@@ -139,7 +138,7 @@ namespace GMGInventory.Application.Repositories
                                OrderDateD = order.SalesOrderDate,
                                OutstandingBalanceD = order.Customer.OutstandingBalance,
                                POId = order.PurchaseOrder == null ? null : order.PurchaseOrder.Id,
-                               PONumber = order.PurchaseOrder == null ? "-" : order.PurchaseOrder.PONumber,
+                               PONumber = order.PurchaseOrder == null ? "-" : order.PurchaseOrder.DocumentNumber,
                                Remarks = order.Remarks + "",
                                ResubmitId = order.ResubmittedSalesOrderId,
                                ShippingAddress = "",
@@ -208,7 +207,7 @@ namespace GMGInventory.Application.Repositories
                                OrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
-                               TotalAmountD = order.TotalAmount,
+                               TotalAmountD = order.SalesOrderLineItems.Sum(s => s.Quantity * (((100 - s.Discount1 - s.Discount2) * s.SellingPrice) / 100)),
                                ApprovedDisapprovedBy = approvedby != null ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname) : disapprovedby != null ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname) : "-",
                                ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate
                            });
@@ -460,7 +459,6 @@ namespace GMGInventory.Application.Repositories
                 {
                     AgentId = form.Agent,
                     CustomerId = form.Customer,
-                    DeclaredValue = form.DeclaredValue,
                     RequiredDeliveryDate = form.DeliveryDate,
                     ForwarderId = form.Forwarder,
                     PriceTypeId = 1,//form.GrossNet,
@@ -469,7 +467,7 @@ namespace GMGInventory.Application.Repositories
                     SalesOrderDate = form.OrderDate,
                     SalesOrderNumber = soNumber,
                     StatusId = statusId,
-                    TotalAmount = form.Items.Sum(s => s.GrossPrice)
+                    //TotalAmount = form.Items.Sum(s => s.GrossPrice)
                 };
                 await context.SalesOrders.AddAsync(orderVM);
                 await context.SaveChangesAsync(currentUserId);
@@ -514,7 +512,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 orderVM.StatusId = statusId;
-                orderVM.TotalAmount = form.Items.Sum(s => s.GrossPrice);
+                //orderVM.TotalAmount = form.Items.Sum(s => s.GrossPrice);
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);
             }
