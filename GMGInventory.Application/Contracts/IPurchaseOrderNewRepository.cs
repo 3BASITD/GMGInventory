@@ -4,6 +4,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IPurchaseOrderNewRepository
     {
+        Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page);
         Task<IList<JsonOrderTypeOptionsModel>> GetTypeOptions(int? SelectedId);
         Task<IList<JsonOptionsModel>> GetDeliveryModeOptions(int? SelectedId);
         Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? SelectedId);

@@ -8,7 +8,6 @@ namespace GMGInventory.Data
         {
             this.PurchaseOrderLineItems = new HashSet<PurchaseOrderLineItem>();
             this.PurchaseReturns = new HashSet<PurchaseReturn>();
-            this.SalesOrders = new HashSet<SalesOrder>();
         }
 
         [ForeignKey("SupplierId")]
@@ -46,6 +45,5 @@ namespace GMGInventory.Data
 
         public ICollection<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
         public ICollection<PurchaseReturn> PurchaseReturns { get; set; }
-        public ICollection<SalesOrder> SalesOrders { get; set; }
     }
 }

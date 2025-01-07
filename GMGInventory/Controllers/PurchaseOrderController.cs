@@ -14,6 +14,11 @@ namespace GMGInventory.Controllers
     public class PurchaseOrderController(IAccessRepository accessRepository
                                        , IPurchaseOrderNewRepository orderRepository) : BaseController(accessRepository)
     {
+        public async Task<IActionResult> GetOptions(string search, int page)
+        {
+            return Json(await orderRepository.GetOptions(search, page));
+        }
+
         public async Task<IActionResult> GetTypeOptions(int? SelectedId)
         {
             return Json(await orderRepository.GetTypeOptions(SelectedId));

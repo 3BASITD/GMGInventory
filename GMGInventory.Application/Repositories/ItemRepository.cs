@@ -40,6 +40,7 @@ namespace GMGInventory.Application.Repositories
             //                    })
             //                    .ToListAsync();
             var items = from item in context.Items
+                                            .Include(s => s.Unit)
                         from price in context.ItemPrices
                                              .Where(s => s.ItemId == item.Id
                                                       && s.DateCreated <= DateTime.Now)

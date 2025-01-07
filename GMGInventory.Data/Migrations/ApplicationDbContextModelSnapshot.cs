@@ -3700,9 +3700,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("StockOnHand")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserCreated")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -3717,8 +3714,6 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("PurchaseRequestId");
 
                     b.HasIndex("SalesOrderId");
-
-                    b.HasIndex("UnitId");
 
                     b.ToTable("PurchaseRequestLineItems");
                 });
@@ -4209,9 +4204,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("DeclaredValue")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("DisapprovedBy")
                         .HasColumnType("nvarchar(50)");
 
@@ -4248,9 +4240,6 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -5603,13 +5592,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f0e8a5ac-2734-4566-99e4-66a236c0891f",
+                            ConcurrencyStamp = "2f4baac9-11cf-4a8a-b678-c9eef5bc975b",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAECDGPIMcdob1wc9z2PRyG261BAHdUu7YMhAtf4WdGHZqJx9m7nT8N3RejQk2ezlvZg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEK82YrW47uh/G7ahNktnelKrio0EXo39UFz8+wrSSFNog5+gsUQ2n2G8sQp629FVSA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4fc89ac7-62d0-48c1-902c-02bbf0b60406",
+                            SecurityStamp = "4f583ed3-9ae0-4665-ba06-53f9e0f10913",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5624,13 +5613,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "122c0fe1-492c-4f7a-b5af-9c5a2c649771",
+                            ConcurrencyStamp = "63ea1271-9333-45b9-9554-32ba13b2f3cb",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAENjtcxacYzDRNxqyObWyJ5OFRrfeAErmcm/Ea94GCS8ptbQkGzEfDpORi+eaX8XsCw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFmM4lKvU3ys9H0XqcBvRaceoTvcIi3K72Y6h1j4kYhMx8kcCUjc9nL36Pi0koPZAw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e82c84e2-e9db-4f4b-a44e-7aaf4cc6cb4d",
+                            SecurityStamp = "5abd4a8e-640d-40c7-b68f-6261ca9f46a5",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6369,19 +6358,11 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseRequestLineItems")
                         .HasForeignKey("SalesOrderId");
 
-                    b.HasOne("GMGInventory.Data.Unit", "Unit")
-                        .WithMany("PurchaseRequestLineItems")
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Item");
 
                     b.Navigation("PurchaseRequest");
 
                     b.Navigation("SalesOrder");
-
-                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseRequestPurpose", b =>
@@ -6517,7 +6498,7 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.PurchaseOrder", "PurchaseOrder")
+                    b.HasOne("GMGInventory.Data.PurchaseOrderNew", "PurchaseOrder")
                         .WithMany("SalesOrders")
                         .HasForeignKey("PurchaseOrderId");
 
@@ -7005,8 +6986,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseOrderLineItems");
 
                     b.Navigation("PurchaseReturns");
-
-                    b.Navigation("SalesOrders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderDeliveryMode", b =>
@@ -7026,6 +7005,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseOrderResubmits");
 
                     b.Navigation("PurchaseReceivings");
+
+                    b.Navigation("SalesOrders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNewLineItem", b =>
@@ -7163,8 +7144,6 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Unit", b =>
                 {
                     b.Navigation("Items");
-
-                    b.Navigation("PurchaseRequestLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Warehouse", b =>

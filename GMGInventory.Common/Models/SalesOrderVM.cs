@@ -101,10 +101,6 @@ namespace GMGInventory.Common.Models
         public string OrderDate3 => OrderDateD.ToString(SystemFormat.StringDate3);
         public DateTime OrderDateD { get; set; }
 
-        [Display(Name = "Declared Value")]
-        public string DeclaredValue => string.Format(SystemFormat.StringDecimalComma, DeclaredValueD ?? 0m);
-        public decimal? DeclaredValueD { get; set; }
-
         [Display(Name = "Customer's Account Status")]
         public string AccountStatus { get; set; }
 
@@ -177,7 +173,6 @@ namespace GMGInventory.Common.Models
                 CustomerName = value.CustomerName;
                 CustomerContactNumber = value.CustomerContactNumber;
                 CustomerContactPerson = value.CustomerContactPerson;
-                DeclaredValueD = value.DeclaredValueD;
                 ForwarderId = value.ForwarderId;
                 Forwarder = value.Forwarder;
                 DisapprovedBy = value.DisapprovedBy;

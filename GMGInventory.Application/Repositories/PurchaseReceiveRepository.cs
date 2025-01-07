@@ -485,8 +485,8 @@ namespace GMGInventory.Application.Repositories
                                     ItemDescription = s.RequestItem.ItemDescription,
                                     PartNumber = s.RequestItem.Item.PartNumber,
                                     Quantity = s.Quantity,
-                                    Unit = s.RequestItem.Item.Unit.Name,
-                                    UnitId = s.RequestItem.Item.UnitId,
+                                    Unit = s.RequestItem.Unit.Name,
+                                    UnitId = s.RequestItem.Unit.Id,
                                     UnitCost = s.UnitCost,
                                     LineNumber = s.LineNumber
                                 })
