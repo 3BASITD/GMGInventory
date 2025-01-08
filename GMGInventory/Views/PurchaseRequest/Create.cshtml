@@ -170,7 +170,7 @@
                         <div class="col-12 col-sm-6 add-quantity-container">
                             <div class="form-group">
                                 <label for="add-quantity" class="form-label mb-0">Quantity</label>
-                                <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                <input type="number" min="0" max="1999999" data-max-quantity="2999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-unit-container">
@@ -599,6 +599,7 @@
                 $("#add-code").select2("destroy");
                 $("#add-code").empty();
             }
+
             // Load item for select2
             $("#add-code").select2({
                 minimumInputLength: -1,
@@ -608,14 +609,8 @@
                     if (repo.loading) {
                         return repo.text;
                     }
-                    if (repo.quantity == 0) {
-                        return $("<span style='color: #ccc;'><strong>" + repo.text + "</strong> " +
-                            (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
-                            "</span>");
-                    } else {
-                        return $("<strong>" + repo.text + "</strong> " +
-                            (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-                    }
+                    return $((repo.disabled ? "<s>" : "") + "<strong>" + repo.text + "</strong> " +
+                        (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : "") + (repo.disabled ? "</s>" : ""));
                 },
                 ajax: {
                     url: "@Url.Action("GetUnservedOptions", "Item")",
@@ -630,6 +625,10 @@
                         };
                     },
                     processResults: function (data, params) {
+                        data.items.forEach(repo => {
+                            repo.disabled = repo.quantity == 0;
+                        });
+
                         params.page = params.page || 1;
                         return {
                             results: data.items,
@@ -652,6 +651,10 @@
                 $("#add-unit").val($("#add-code").select2("data")[0].unit);
                 $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
                 $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
+                if (checkIfRequired("SONumber")) {
+                    $("#add-quantity").val($("#add-code").select2("data")[0].quantity);
+                    $("#add-quantity").attr("data-max-quantity", $("#add-code").select2("data")[0].quantity);
+                }
                 $("#add-code-error").html("");
             });
 
@@ -661,6 +664,8 @@
                 $("#add-unit").val("");
                 $("#add-unit").data("Id", "");
                 $(".add-stocks").text("0");
+                $("#add-quantity").val("0");
+                $("#add-quantity").attr("data-max-quantity", "2999999");
                 $("#add-gross-price").val("0.00");
             });
         }
@@ -720,7 +725,7 @@
         $(".createBtn").on("click", clearItemForm);
 
         function clearItemForm() {
-            $("#add-so-number").val("").trigger("change");
+            //$("#add-so-number").val("").trigger("change");
             $("#add-code").val("").trigger("change");
             $("#add-part").val("");
             $("#add-name").val("");
@@ -759,7 +764,8 @@
                 Quantity: {
                     required: function () { return checkIfRequired("Quantity"); },
                     number: true,
-                    isNotZero: true
+                    isNotZero: true,
+                    max: function () { return $("#add-quantity").attr("data-max-quantity"); }
                 },
                 Purpose: {
                     required: function () { return checkIfRequired("Purpose"); },
@@ -783,7 +789,8 @@
                 Quantity: {
                     required: "Please enter a quantity.",
                     number: "Please enter a valid number.",
-                    isNotZero: "Can not request an item with 0 quantity."
+                    isNotZero: "Can not request an item with 0 quantity.",
+                    max: "Cannot exceed unserved quantity."
                 },
                 Purpose: {
                     required: "Please enter the purpose.",
@@ -807,12 +814,13 @@
             if (rowIndexes.length > 0) {
                 toastr.warning($("#add-name").val() + " has already been added", "Duplicate");
             } else {
+                var is_for_na_one_time = $("#request-purpose").select2("data")[0]?.text.toLowerCase() == "one-time purchase";
                 var is_for_maintenance_repair = $("#request-type").select2("data")[0]?.text.toLowerCase() == "maintenance & repair";
                 itemDT.row.add({
-                    itemCode: is_for_maintenance_repair ? "" : $("#add-code").select2("data")[0].text,
+                    itemCode: is_for_na_one_time || is_for_maintenance_repair ? "" : $("#add-code").select2("data")[0].text,
                     itemDescription: $("#add-name").val(),
-                    itemPartNumber: $("#add-part").val(),
-                    itemId: is_for_maintenance_repair ? undefined : $("#add-code").select2("data")[0].id,
+                    itemPartNumber: is_for_na_one_time || is_for_maintenance_repair ? "" : $("#add-part").val(),
+                    itemId: is_for_na_one_time || is_for_maintenance_repair ? undefined : $("#add-code").select2("data")[0].id,
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
                     purchaseRequestId: 0,
                     purpose: $("#add-purpose").val(),
@@ -825,9 +833,10 @@
                     unitCode: $("#add-unit").val(),
                     unitId: $("#add-unit").data("Id")
                 }).draw();
-                clearItemForm();
 
-                toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Purchase Request Item(s)", "Success");
+                toastr.success("Added " + $("#add-name").val() + " on Purchase Request Item(s)", "Success");
+
+                clearItemForm();
             }
         }
 

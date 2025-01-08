@@ -202,13 +202,13 @@ namespace GMGInventory.Application.Repositories
                                 SalesOrderId = request.SalesOrderId,
                                 SalesOrderNumber = request.SalesOrder.SalesOrderNumber,
                                 ItemId = request.ItemId,
-                                ItemCode = request.Item.Code,
-                                ItemPartNumber = string.IsNullOrWhiteSpace(request.Item.PartNumber) ? "-" : request.Item.PartNumber,
+                                ItemCode = request.Item == null ? null : request.Item.Code,
+                                ItemPartNumber = (request.Item == null ? null : request.Item.PartNumber) + "",
                                 ItemDescription = request.ItemDescription,
                                 StockOnHandD = request.StockOnHand,
                                 QuantityD = request.Quantity,
-                                UnitId = request.Item.Unit.Id,
-                                UnitCode = request.Item.Unit.Code,
+                                UnitId = request.Item == null ? 0 : request.Item.Unit.Id,
+                                UnitCode = request.Item == null ? "" : request.Item.Unit.Code,
                                 Purpose = request.Purpose
                             };
             return await requestVM.ToListAsync();

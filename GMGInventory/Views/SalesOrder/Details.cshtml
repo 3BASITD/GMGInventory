@@ -335,13 +335,13 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Sales Order Item(s)</span>
-                        @if (Model?.Status.ToLower() == "submitted")
+                        @if (Model?.Status.ToLower() == "draft")
                         {
                             @if (userAccess.CanAdd)
                             {
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                        <span class="fas fa-plus"></span> Add Item
+                                        <span class="fas fa-plus"></span> Add Sales Order Item
                                     </button>
                                 </div>
                             }
@@ -736,7 +736,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if (user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
                             actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         }
                         return actions;
@@ -745,7 +745,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val().toLowerCase() == "submitted" && user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
                             return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
                             return data.quantity
@@ -774,7 +774,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val().toLowerCase() == "submitted" && user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
                             return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
                         } else {
                             return Round2Decimal(data.sellingPriceD)
@@ -785,7 +785,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val().toLowerCase() == "submitted" && user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
                         } else {
                             return Round2Decimal(data.discount1)
@@ -796,7 +796,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val().toLowerCase() == "submitted" && user_access.canEdit) {
+                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
                         } else {
                             return Round2Decimal(data.discount2D)
