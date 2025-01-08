@@ -41,8 +41,9 @@ namespace GMGInventory.Application.Repositories
                            select new PurchaseOrderRVM
                            {
                                Item = pRequest.Item.Code,
+                               ItemDescription = pRequest.ItemDescription,
                                Quantity = porder.Quantity,
-                               Unit = pRequest.Item.Unit.Code,
+                               Unit = pRequest.Item.Unit.Code, 
                                UnitCost = porder.UnitCost,
                                DocumentNumber = porder.PurchaseOrder.DocumentNumber,
                                Supplier = porder.PurchaseOrder.Supplier.Code,

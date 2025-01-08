@@ -9,9 +9,15 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -618,6 +624,19 @@
             $(".action-modified-by").text(usermodified);
             $(".action-modified-date").text(datemodified);
             $("#actionModal").modal("show");
+        }
+
+        if (user_access.canUploadDownload) {
+            $(".downloadBtn").click(function (e) {
+                var urlQuery = [];
+                if ($("#filter-agent").val()) { urlQuery.push("AgentId=" + $("#filter-agent").val()); }
+                if ($("#filter-customer").val()) { urlQuery.push("CustomerId=" + $("#filter-customer").val()); }
+                if ($("#filter-region").val()) { urlQuery.push("RegionId=" + $("#filter-region").val()); }
+
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+            });
         }
     </script>
     }

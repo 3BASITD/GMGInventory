@@ -23,7 +23,7 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        private async Task<IList<SalesOrderDeliveryVM>> GetListAsync(SalesOrderDeliveryFilterVM filter)
+        public async Task<IList<SalesOrderDeliveryVM>> GetListAsync(SalesOrderDeliveryFilterVM filter)
         {
             var salesOrder = from so in context.SalesOrders
                                                .Include(s => s.Customer)

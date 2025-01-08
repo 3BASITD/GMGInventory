@@ -128,7 +128,8 @@
                             <select id="groupby" style="width:100%" class="custom-select">
                                 <option value="">None</option>
                                 <option value="supplier">Supplier</option>
-                                <option value="item">Item</option>
+                                <option value="itemDescription">Item</option>
+                                <option value="documentNumber">Purchase Order</option>
                             </select>
                         </div>
                     </div>
@@ -288,9 +289,24 @@
             $(".table-purchaseReturn thead th").removeClass("text-end");
         });
 
+        purchaseReturnDT.rowGroup().disable().draw();
+
         $(".btnFilter").on("click", function () {
-            purchaseReturnDT.rowGroup().dataSrc($("#groupby").val());
+            var groupBy = $("#groupby").val();
+            if (groupBy == '') {
+                purchaseReturnDT.rowGroup().disable().draw();
+            }
+            else {
+                var colIndex = purchaseReturnDT.column(groupBy + ':name').index();
+                purchaseReturnDT.columns().visible(true);
+                purchaseReturnDT.column(colIndex).visible(false);
+
+                purchaseReturnDT.rowGroup().enable().draw();
+                purchaseReturnDT.rowGroup().dataSrc(groupBy);
+            }
+
             purchaseReturnDT.ajax.reload();
+
             $("#filterModal").modal("hide");
         });
 

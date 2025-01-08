@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Purchase Receiving Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var userAccessBasic = (ViewsAccessVM)ViewData["UserAccessBasic"]!;
 }
 
 @section Breadcrumb {
@@ -309,6 +310,9 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var user_accessBasic = @Html.Raw(Json.Serialize(userAccessBasic));
+        
+        var ro_status = @Json.Serialize(Model?.Status);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -328,12 +332,11 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        var actions = '';
-                        if (user_access.canEdit && $("#receive-status").text().trim() == "DRAFT") {
-                            actions += '<input type="checkbox" />';
+                        if (user_access.canEdit &&  ro_status.toLowerCase() == "draft") {
+                            return '<input type="checkbox" class="to-receive" ' + (data.toReceive == true ? 'checked="checked"' : '') + ' />';
+                        } else {
+                            return '';
                         }
-
-                        return actions;
                     },
                     className: "form-cell"
                 },
@@ -342,19 +345,30 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (user_access.canEdit && $("#receive-status").text().trim() == "DRAFT") {
-                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        if (ro_status.toLowerCase() == "draft" && data.toReceive == true) {
+                            if (data.quantityD > data.orderQuantityD) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.orderQuantity + ' received quantity.</label>';
+                            } else if (data.quantityD == 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to receive.</label>';
+                            } else {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            }
                         } else {
-                            return data.quantity
+                            return data.quantity;
                         }
                     },
                     name: "Quantity",
                     className: "form-cell text-end"
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
-                { data: "unitCost", name: "UnitCost", className: "form-cell" }
+                { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false:true }
             ],
             order: [[1, "asc"]],
+            createdRow: function (row, data, dataIndex) {
+                if (data.toReceive == false) {
+                    $(row).addClass('text-muted');
+                }
+            },
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
                 columnDTTotalInteger(api, 4);
@@ -363,12 +377,11 @@
         });
 
         itemDT.on("draw", function () {
-            //  updateColumnVisibility();
-
             hideLoader();
 
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
+
 
             if (user_access.canEdit) {
                 $(".quantity").off("change").on("change", function () {
@@ -399,6 +412,25 @@
                                 restoredInput.focus();
                         }
                     }, 0);
+                });
+
+                $(".to-receive").off("change").on("change", function () {
+                    var tr = $(this).closest('tr');
+                    var row = itemDT.row(tr);
+                    var rowData = row.data();
+
+                    rowData.quantity = FormatStringInteger(0);
+                    rowData.quantityD = 0;
+                    rowData.totalAmount = FormatStringDecimal(0);
+                    rowData.totalAmountD = 0;
+                    if ($(this).prop("checked")) {
+                        rowData.toReceive = true;
+                        tr.removeClass("text-muted");
+                    } else {
+                        rowData.toReceive = false;
+                        tr.addClass("text-muted");
+                    }
+                    row.data(rowData).draw(false);
                 });
             }
         });
@@ -542,9 +574,9 @@
 
             function SaveReceive(status) {
                 var items = itemDT.data();
-                if (items.length == 0) {
-                    toastr.warning("No item to receive. Add an item to the list to continue", "Warning");
-                } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                if (items.filter(s => s.toReceive == true).length == 0) {
+                    toastr.warning("No item to receive. Select an item on the list to continue", "Warning");
+                } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't receive an item with 0 quantity", "Warning");
                 } else {
                     $.ajax({

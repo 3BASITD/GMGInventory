@@ -43,6 +43,9 @@
                         @Html.DisplayNameFor(model => model.Item)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.ItemDescription)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Quantity)
                     </th>
                     <th>
@@ -62,7 +65,7 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="6" class="text-end">Total</th>
+                    <th colspan="7" class="text-end">Total</th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -128,7 +131,7 @@
                             <select id="groupby" style="width:100%" class="custom-select">
                                 <option value="">None</option>
                                 <option value="supplier">Supplier</option>
-                                <option value="item">Item</option>
+                                <option value="itemDescription">Item</option>
                             </select>
                         </div>
                     </div>
@@ -222,49 +225,48 @@
     // Load List on DataTable
     var purchaseOrderDT = $('.table-purchaseOrder').on('preXhr.dt', function (e, settings, data) {
         showLoader();
-    }).DataTable({
-        ajax: {
-            url: "@Url.Action("GetPurchaseOrderDT")",
-            type: "POST",
-            data: function (data) {
-                debugger;
-
-                var itemId = $("#filter-item").val();
-                if (itemId) {
-                    if (isNaN(itemId)) {
-                        data.Item = 0;
-                        data.ItemKeyword = itemId;
-                    } else {
-                        data.Item = itemId;
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetPurchaseOrderDT")",
+                type: "POST",
+                data: function (data) {
+                    var itemId = $("#filter-item").val();
+                    if (itemId) {
+                        if (isNaN(itemId)) {
+                            data.Item = 0;
+                            data.ItemKeyword = itemId;
+                        } else {
+                            data.Item = itemId;
+                        }
                     }
-                }
 
-                var supplierId = $("#filter-supplier").val();
+                    var supplierId = $("#filter-supplier").val();
                     if (supplierId) data.Supplier = supplierId;
 
-                data.DateFrom = $("#filter-from").val();
-                data.DateTo = $("#filter-to").val();
-                data.Unserved = $('#filter-unserved').is(':checked');
-            }
-        },
-        processing: true,
-        serverSide: true,
-        filter: true,
-        responsive: true,
-        autoWidth: false,
-        search: {
-            return: true,
-        },
-        columns: [
-                { data: "orderDate", name: "Order Date" },
-                { data: "documentNumber", name: "Document Number" },
-                { data: "supplier", name: "Supplier" },
-                { data: "item", name: "Item" },
-                { data: "quantity", name: "Quantity", className: "text-end" },
-                { data: "unit", name: "Unit" },
-                { data: "unitCost", name: "UnitCost", className: "text-end" },
-                { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end" },
-                { data: "unservedAmount", name: "UnservedAmount", className: "text-end" }
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+                    data.Unserved = $('#filter-unserved').is(':checked');
+                }
+            },
+            processing: true,
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "orderDate", name: "orderDate" },
+                { data: "documentNumber", name: "documentNumber" },
+                { data: "supplier", name: "supplier" },
+                { data: "item", name: "item" },
+                { data: "itemDescription", name: "itemDescription" },
+                { data: "quantity", name: "quantity", className: "text-end" },
+                { data: "unit", name: "unit" },
+                { data: "unitCost", name: "unitCost", className: "text-end" },
+                { data: "unservedQuantity", name: "unservedQuantity", className: "text-end" },
+                { data: "unservedAmount", name: "unservedAmount", className: "text-end" }
 
             ],
             rowGroup: {
@@ -274,21 +276,36 @@
                 var json = purchaseOrderDT.ajax.json();
                 var api = this.api(), data;
 
-                $(api.column(6).footer()).html(FormatStringDecimal(json.totalAmount));
-                $(api.column(8).footer()).html(FormatStringDecimal(json.totalAmount2));
+                $(api.column(7).footer()).html(FormatStringDecimal(json.totalAmount));
+                $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount2));
             }
         });
 
     // Load functions upon DataTable load
         purchaseOrderDT.on("draw", function () {
-        hideLoader();
+            hideLoader();
 
-        $(".table-purchaseOrder thead th").removeClass("text-end");
-    });
+            $(".table-purchaseOrder thead th").removeClass("text-end");
+        });
+
+   //     purchaseOrderDT.rowGroup().disable().draw();
 
         $(".btnFilter").on("click", function () {
-            purchaseOrderDT.rowGroup().dataSrc($("#groupby").val());
+            var groupBy = $("#groupby").val();
+            if (groupBy == '') {
+                purchaseOrderDT.rowGroup().disable().draw();
+            }
+            else {
+                var colIndex = purchaseOrderDT.column(groupBy + ':name').index();
+                purchaseOrderDT.columns().visible(true);
+                purchaseOrderDT.column(colIndex).visible(false);
+
+                purchaseOrderDT.rowGroup().enable().draw();
+                purchaseOrderDT.rowGroup().dataSrc(groupBy);
+            }
+
             purchaseOrderDT.ajax.reload();
+
             $("#filterModal").modal("hide");
         });
 

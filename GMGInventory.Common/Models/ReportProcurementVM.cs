@@ -13,6 +13,8 @@ namespace GMGInventory.Common.Models
     {
         public int LineNumber { get; set; }
         public string Item { get; set; }
+
+        [Display(Name = "Item Desc")]
         public string ItemDescription { get; set; }
         public int Quantity { get; set; }
 

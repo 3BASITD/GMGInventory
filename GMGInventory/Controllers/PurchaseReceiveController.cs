@@ -43,6 +43,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceiving)).Convert();
+            ViewData["UserAccessBasic"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingBasic)).Convert();
 
             var receive = await receiveRepository.GetDetails(Id);
             if (receive == null)

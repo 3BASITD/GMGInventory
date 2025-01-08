@@ -128,7 +128,8 @@
                             <select id="groupby" style="width:100%" class="custom-select">
                                 <option value="">None</option>
                                 <option value="supplier">Supplier</option>
-                                <option value="item">Item</option>
+                                <option value="itemDescription">Item</option>
+                                <option value="documentNumber">Purchase Order</option>
                             </select>
                         </div>
                     </div>
@@ -253,17 +254,17 @@
                 return: true,
             },
             columns: [
-                { data: "returnDate", name: "Receiving Date" },
-                { data: "documentNumber", name: "Document Number" },
-                { data: "supplier", name: "Supplier" },
-                { data: "item", name: "Item" },
-                { data: "itemDescription", name: "ItemDescription" },
-                { data: "quantity", name: "Quantity" },
-                { data: "unit", name: "Unit" },
-                { data: "unitCost", name: "UnitCost", className: "text-end" },
-                { data: "totalAmount", name: "TotalAmount", className: "text-end" },
-                { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end" },
-                { data: "unservedAmount", name: "UnservedAmount", className: "text-end" }
+                { data: "returnDate", name: "returnDate" },
+                { data: "documentNumber", name: "documentNumber" },
+                { data: "supplier", name: "supplier" },
+                { data: "item", name: "item" },
+                { data: "itemDescription", name: "itemDescription" },
+                { data: "quantity", name: "quantity" },
+                { data: "unit", name: "unit" },
+                { data: "unitCost", name: "unitCost", className: "text-end" },
+                { data: "totalAmount", name: "totalAmount", className: "text-end" },
+                { data: "unservedQuantity", name: "unservedQuantity", className: "text-end" },
+                { data: "unservedAmount", name: "unservedAmount", className: "text-end" }
 
             ],
             rowGroup: {
@@ -282,13 +283,29 @@
         // Load functions upon DataTable load
         purchaseReceivingDT.on("draw", function () {
             hideLoader();
-
             $(".table-purchaseReceiving thead th").removeClass("text-end");
         });
+
+        purchaseReceivingDT.rowGroup().disable().draw();
+
         // Change the fixed ordering when the data source is updated
         $(".btnFilter").on("click", function () {
-            purchaseReceivingDT.rowGroup().dataSrc($("#groupby").val());
+            var groupBy = $("#groupby").val();
+            if (groupBy == '') {
+                purchaseReceivingDT.rowGroup().disable().draw();
+            }
+            else
+            {
+                var colIndex = purchaseReceivingDT.column(groupBy+':name').index();
+                purchaseReceivingDT.columns().visible(true);
+                purchaseReceivingDT.column(colIndex).visible(false);
+
+                purchaseReceivingDT.rowGroup().enable().draw();
+                purchaseReceivingDT.rowGroup().dataSrc(groupBy);
+            }
+
             purchaseReceivingDT.ajax.reload();
+           
             $("#filterModal").modal("hide");
         });
 
