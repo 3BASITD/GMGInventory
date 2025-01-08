@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Purchase Receiving Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var userAccessBasic = (ViewsAccessVM)ViewData["UserAccessBasic"]!;
 }
 
 @section Breadcrumb {
@@ -309,6 +310,8 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var user_accessBasic = @Html.Raw(Json.Serialize(userAccessBasic));
+        
         var ro_status = @Json.Serialize(Model?.Status);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
@@ -334,13 +337,6 @@
                         } else {
                             return '';
                         }
-
-                        // var actions = '';
-                        // if (user_access.canEdit && $("#receive-status").text().trim() == "DRAFT") {
-                        //     actions += '<input type="checkbox" />';
-                        // }
-
-                        // return actions;
                     },
                     className: "form-cell"
                 },
@@ -364,19 +360,8 @@
                     name: "Quantity",
                     className: "form-cell text-end"
                 },
-                // {
-                //     data: function (data, type, dataToSet) {
-                //         if (user_access.canEdit && $("#receive-status").text().trim() == "DRAFT") {
-                //             return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
-                //         } else {
-                //             return data.quantity
-                //         }
-                //     },
-                //     name: "Quantity",
-                //     className: "form-cell text-end"
-                // },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
-                { data: "unitCost", name: "UnitCost", className: "form-cell" }
+                { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false:true }
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {
@@ -392,8 +377,6 @@
         });
 
         itemDT.on("draw", function () {
-            //  updateColumnVisibility();
-
             hideLoader();
 
             $(".table-item thead th").removeClass("form-cell");
