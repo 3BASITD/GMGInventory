@@ -172,7 +172,7 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
-        private async Task<IList<SalesOrderVM>> GetListAsync(SalesOrderFilterVM filter)
+        public async Task<IList<SalesOrderVM>> GetListAsync(SalesOrderFilterVM filter)
         {
             var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
             var currentUserId = currentUser.Id;

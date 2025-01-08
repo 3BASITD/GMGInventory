@@ -1,9 +1,11 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -11,6 +13,7 @@ namespace GMGInventory.Controllers
     public class SalesOrderController(IAccessRepository accessRepository
                                     , ISalesOrderRepository salesOrderRepository) : BaseController(accessRepository)
     {
+        private readonly ControllerHelper chelper = new();
 
         public async Task<IActionResult> GetOptions(string search, int page)
         {
@@ -258,5 +261,42 @@ namespace GMGInventory.Controllers
             }
             return Json(responseModel);
         }
+
+        public async Task<IActionResult> DownloadFile(SalesOrderFilterVM filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Sales Order");
+            dt.Columns.AddRange([
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("SONumber")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Customer")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("OrderDate")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("TotalAmount")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Status")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("ApprovedDisapprovedBy")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("ApprovedDisapprovedDate"))
+            ]);
+            var sos = await salesOrderRepository.GetListAsync(filter);
+            foreach (var so in sos)
+            {
+                dt.Rows.Add(so.SONumber,
+                            so.Customer,
+                            so.OrderDate,
+                            so.TotalAmount,
+                            so.Status,
+                            so.ApprovedDisapprovedBy,
+                            so.ApprovedDisapprovedDate);
+            }
+
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Sales Order.xlsx");
+        }
+
     }
 }
