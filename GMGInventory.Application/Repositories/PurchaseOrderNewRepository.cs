@@ -140,20 +140,20 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<PurchaseOrderNewVM>> GetListAsync()
         {
             var orderVM = from order in context.PurchaseOrderNews
-                               //join userc in userManager.Users on order.UserCreated equals userc.Id
-                               //join userm in userManager.Users on order.UserModified equals userm.Id into m
-                               //from um in m.DefaultIfEmpty()
-                           select new PurchaseOrderNewVM
-                           {
-                               Id = order.Id,
-                               DocumentNumber = order.DocumentNumber,
-                               Type = order.Type.Code,
-                               Supplier = order.Supplier.Code,
-                               Term = order.Term.Name,
-                               DeliveryMode = order.DeliveryMode.Code,
-                               Status = order.Status.Code,
-                               OrderDateD = order.OrderDate
-                           };
+                              //join userc in userManager.Users on order.UserCreated equals userc.Id
+                              //join userm in userManager.Users on order.UserModified equals userm.Id into m
+                              //from um in m.DefaultIfEmpty()
+                          select new PurchaseOrderNewVM
+                          {
+                              Id = order.Id,
+                              DocumentNumber = order.DocumentNumber,
+                              Type = order.Type.Code,
+                              Supplier = order.Supplier.Code,
+                              Term = order.Term.Name,
+                              DeliveryMode = order.DeliveryMode.Code,
+                              Status = order.Status.Code,
+                              OrderDateD = order.OrderDate
+                          };
             return await orderVM.ToListAsync();
         }
 
@@ -221,12 +221,12 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
         {
             var details = from order in context.PurchaseOrderNews
-                                               //.Include(s => s.Type)
-                                               //.Include(s => s.Supplier)
-                                               //.Include(s => s.Term)
-                                               //.Include(s => s.DeliveryMode)
-                                               //.Include(s => s.DeliveryAddress)
-                                               //.Include(s => s.Status)
+                              //.Include(s => s.Type)
+                              //.Include(s => s.Supplier)
+                              //.Include(s => s.Term)
+                              //.Include(s => s.DeliveryMode)
+                              //.Include(s => s.DeliveryAddress)
+                              //.Include(s => s.Status)
                           let resubmitfrom = context.PurchaseOrderNews
                                                     .Where(s => s.ResubmitId == order.Id)
                                                     .FirstOrDefault()
@@ -244,12 +244,18 @@ namespace GMGInventory.Application.Repositories
                               RequestTypeId = order.Type.RequestType.Id,
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
+                              SupplierContactPerson = order.Supplier.ContactPerson,
+                              SupplierContactNumber = order.Supplier.OfficeTelNo,
+                              SupplierAddress = order.Supplier.AddressLine1,
                               Term = order.Term.Name,
                               TermId = order.Term.Id,
                               DeliveryMode = order.DeliveryMode.Name,
                               DeliveryModeId = order.DeliveryMode.Id,
-                              DeliveryAddress = order.DeliveryAddress.Name,
+                              DeliveryAddress = order.DeliveryAddress.AddressLine1,
                               DeliveryAddressId = order.DeliveryAddress.Id,
+                              DeliveryName = order.DeliveryAddress.Name,
+                              DeliveryContactPerson = order.DeliveryAddress.ContactPerson,
+                              DeliveryContactNumber = order.DeliveryAddress.ContactNumber,
                               Status = order.Status.Code,
                               OrderDateD = order.OrderDate,
                               Discount1D = order.Discount1,
@@ -263,6 +269,14 @@ namespace GMGInventory.Application.Repositories
                               DisapprovedReason = order.DisapprovedReason,
                               ResubmitId = order.ResubmitId,
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
+                              PurchaseRequestNumber = string.Join(", ", order.PurchaseOrderLineItems
+                                                                             .Select(s => s.RequestItem.PurchaseRequest.DocumentNumber)
+                                                                             .Distinct()),
+                              DateReceivedD = order.PurchaseReceivings
+                                                   .Where(s => s.Status.Name.ToLower() == "approved")
+                                                   .OrderByDescending(s => s.ReceiveDate)
+                                                   .Select(s => (DateTime?)s.ReceiveDate)
+                                                   .FirstOrDefault(),
                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = order.DateCreated,
                               UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),

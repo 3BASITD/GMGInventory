@@ -45,6 +45,9 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseOrderNewDetailedVM : PurchaseOrderNewVM
     {
+        public string SupplierContactPerson { get; set; }
+        public string SupplierContactNumber { get; set; }
+        public string SupplierAddress { get; set; }
         public string RequestType { get; set; }
         public int RequestTypeId { get; set; }
 
@@ -53,12 +56,15 @@ namespace GMGInventory.Common.Models
         public int CurrencyId { get; set; }
 
         [Display(Name = "Currency Rate")]
-        public string CurrencyRate=> string.Format(SystemFormat.StringDecimalComma, CurrencyRateD);
+        public string CurrencyRate => string.Format(SystemFormat.StringDecimalComma, CurrencyRateD);
         public decimal CurrencyRateD { get; set; }
 
         [Display(Name = "Delivery Address")]
         public string DeliveryAddress { get; set; }
         public int DeliveryAddressId { get; set; }
+        public string DeliveryName { get; set; }
+        public string DeliveryContactPerson { get; set; }
+        public string DeliveryContactNumber { get; set; }
 
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
@@ -76,6 +82,11 @@ namespace GMGInventory.Common.Models
         public string? DisapprovedReason { get; set; }
         public int? ResubmitId { get; set; }
         public int? ResubmitFromId { get; set; }
+
+        public string PurchaseRequestNumber { get; set; }
+        public string DateReceived => DateReceivedD == null ? "N/A" : DateReceivedD.Value.ToString("MMMM dd, yyyy");
+        public string TimeReceived => DateReceivedD == null ? "N/A" : DateReceivedD.Value.ToString("hh:mm tt");
+        public DateTime? DateReceivedD { get; set; }
 
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }

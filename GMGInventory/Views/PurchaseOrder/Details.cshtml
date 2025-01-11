@@ -15,9 +15,15 @@
         <div class="card-tools">
             @if (userAccess.CanPrint)
             {
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-                    <span class="fas fa-print"></span> Print
-                </button>
+                <div class="dropdown float-right ml-2">
+                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-print"></span> Print
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
+                        <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
+                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
+                    </ul>
+                </div>
             }
             @if (Model.Status.ToLower() == "draft")
             {
@@ -929,12 +935,13 @@
 
         if (user_access.canPrint) {
             $(".btn-details-print").on("click", function () {
+                var print_company = $(this).data("company");
                 $.LoadingOverlay("show", {
                     image: "",
                     fontawesome: "fas fa-print"
                 });
                 setTimeout(function () {
-                    let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id, '');
+                    let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id + '?Company=' + print_company, '');
                     var wintimer = setInterval(function () {
                         if (win.closed) {
                             clearInterval(wintimer);

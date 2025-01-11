@@ -593,6 +593,7 @@
             $("#add-name").val("");
             $("#add-stock").val(0);
             $("#add-quantity").val(0);
+            $("#add-quantity").attr("data-max-quantity", "1999999");
             $("#add-unit").val("");
 
             if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
@@ -665,7 +666,7 @@
                 $("#add-unit").data("Id", "");
                 $(".add-stocks").text("0");
                 $("#add-quantity").val("0");
-                $("#add-quantity").attr("data-max-quantity", "2999999");
+                $("#add-quantity").attr("data-max-quantity", "1999999");
                 $("#add-gross-price").val("0.00");
             });
         }
@@ -730,6 +731,7 @@
             $("#add-part").val("");
             $("#add-name").val("");
             $("#add-quantity").val("0");
+            $("#add-quantity").attr("data-max-quantity", "1999999");
             $("#add-stock").val("0");
             $("#add-unit").val("");
             $("#add-unit2").val("").trigger("change");
