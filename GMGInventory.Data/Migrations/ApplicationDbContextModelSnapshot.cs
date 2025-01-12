@@ -799,6 +799,18 @@ namespace GMGInventory.Data.Migrations
                             PageId = 60,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 61,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 61,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -3700,6 +3712,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("StockOnHand")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UnitId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserCreated")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -3714,6 +3729,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("PurchaseRequestId");
 
                     b.HasIndex("SalesOrderId");
+
+                    b.HasIndex("UnitId");
 
                     b.ToTable("PurchaseRequestLineItems");
                 });
@@ -5592,13 +5609,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2f4baac9-11cf-4a8a-b678-c9eef5bc975b",
+                            ConcurrencyStamp = "f166c4ea-3b7f-4fae-a72b-d77ae04ac60e",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEK82YrW47uh/G7ahNktnelKrio0EXo39UFz8+wrSSFNog5+gsUQ2n2G8sQp629FVSA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFaKFSza+pFz5GNOp4X/ubEVWk98kIyMoZZU4iGLBl4Sv+16VlWqFIPRrWp7mu3oMg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4f583ed3-9ae0-4665-ba06-53f9e0f10913",
+                            SecurityStamp = "229cca85-a20d-4cfe-ab99-66fb0021acb6",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5613,13 +5630,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "63ea1271-9333-45b9-9554-32ba13b2f3cb",
+                            ConcurrencyStamp = "dbcb3ae9-9f6a-4862-98c6-6a750d3d05c1",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFmM4lKvU3ys9H0XqcBvRaceoTvcIi3K72Y6h1j4kYhMx8kcCUjc9nL36Pi0koPZAw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEA13f/+O7V3JMSCZjIBv11oPxKLI5zgFzEVYHIkRSmNPnonZgQJscsTe97lFrujxLA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5abd4a8e-640d-40c7-b68f-6261ca9f46a5",
+                            SecurityStamp = "55bd5860-d11a-4fa4-bcc6-1f33786d1713",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6358,11 +6375,17 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseRequestLineItems")
                         .HasForeignKey("SalesOrderId");
 
+                    b.HasOne("GMGInventory.Data.Unit", "Unit")
+                        .WithMany("PurchaseRequestLineItems")
+                        .HasForeignKey("UnitId");
+
                     b.Navigation("Item");
 
                     b.Navigation("PurchaseRequest");
 
                     b.Navigation("SalesOrder");
+
+                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseRequestPurpose", b =>
@@ -7144,6 +7167,8 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Unit", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("PurchaseRequestLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Warehouse", b =>

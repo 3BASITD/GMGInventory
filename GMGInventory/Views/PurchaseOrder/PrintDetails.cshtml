@@ -1,0 +1,239 @@
+﻿@model PurchaseOrderNewDetailedVM
+
+@{
+    Layout = "";
+    var title = "Purchase Order";
+    var items = ViewData["Items"] as List<PurchaseOrderLineItemVM> ?? new List<PurchaseOrderLineItemVM>();
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <table class="formatted">
+        <tr>
+            <td colspan="2" rowspan="2" class="center-text">
+                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                {
+                    <img src="~/images/BAS-02.png" class="logo" />
+                }
+                else
+                {
+                    <img src="~/images/GMG-01.png" class="logo" />
+                }
+            </td>
+            <td colspan="2" rowspan="2">
+                <dl>
+                    <dt>Document Classification:</dt>
+                    <dd>@title.ToUpper()</dd>
+                    @if (Model.Status.ToLower() != "approved")
+                    {
+                        <dd>@("(" + Model.Status + ")")</dd>
+                    }
+                </dl>
+            </td>
+            <td colspan="3">
+                <dl>
+                    <dt>PO Date:</dt>
+                    <dd>@Model.OrderDate</dd>
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <dl>
+                    <dt>PR No.:</dt>
+                    <dd>@Model.DocumentNumber</dd>
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="7">
+                <div class="two-column">
+                    <div class="column">
+                        <strong>Supplier Details</strong>
+                        <div class="label">
+                            <span>Name:</span>
+                            <strong class="detail">@Model.Supplier</strong>
+                        </div>
+                        <div class="label">
+                            <span>Contact Person:</span>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierContactPerson) ? "N/A" : Model.SupplierContactPerson)</strong>
+                        </div>
+                        <div class="label">
+                            <span>Contact Number:</span>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierContactNumber) ? "N/A" : Model.SupplierContactNumber)</strong>
+                        </div>
+                        <div class="label">
+                            <span>Address:</span>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierAddress) ? "N/A" : Model.SupplierAddress)</strong>
+                        </div>
+                        @*<div class="label">
+                            <span>Email Address:</span>
+                            <strong class="detail">?</strong>
+                        </div>*@
+                        <div class="label">
+                            <span>Payment Terms:</span>
+                            <strong class="detail">@Model.Term</strong>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <strong>Delivery Details</strong>
+                        <div class="label">
+                            <span>Ship To:</span>
+                            <strong class="detail">@Model.DeliveryName</strong>
+                        </div>
+                        <div class="label">
+                            <span>Contact Person:</span>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryContactPerson) ? "N/A" : Model.DeliveryContactPerson)</strong>
+                        </div>
+                        <div class="label">
+                            <span>Contact Number:</span>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryContactNumber) ? "N/A" : Model.DeliveryContactNumber)</strong>
+                        </div>
+                        <div class="label">
+                            <span>Address:</span>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryAddress) ? "N/A" : Model.DeliveryAddress)</strong>
+                        </div>
+                        <div class="label">
+                            <span>Receiving Time:</span>
+                            <strong class="detail">@Model.TimeReceived</strong>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th style="min-width: 10px;">#</th>
+            <th style="min-width: 50px;">PART NUMBER</th>
+            <th>ITEM DESCRIPTION</th>
+            <th style="min-width: 50px;">QTY</th>
+            <th style="min-width: 25px;">UOM</th>
+            <th style="min-width: 50px;">UNIT PRICE</th>
+            <th style="min-width: 50px;">TOTAL</th>
+        </tr>
+        @foreach (var item in items)
+        {
+            <tr>
+                <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                <td>@item.ItemPartNumber</td>
+                <td>@item.ItemDescription</td>
+                <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                <td>@item.UnitCode</td>
+                <td class="right-text"><nobr>@item.UnitCost</nobr></td>
+                <td class="right-text"><nobr>@item.TotalAmount</nobr></td>
+            </tr>
+        }
+        <tr>
+            <td></td>
+            <td></td>
+            <td>* * NOTHING FOLLOWS * *</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="5" class="bb-0 br-0"></td>
+            <td class="br-0 bb-0 bl-0">TOTAL PURCHASE</td>
+            <td class="right-text bb-0 bl-0"><strong>@items.Sum(s => s.TotalAmountD)</strong></td>
+        </tr>
+        <tr>
+            <td colspan="2">PURCHASE REQUEST NUMBER:</td>
+            <td colspan="2">@Model.PurchaseRequestNumber</td>
+            <td class="bt-0 bb-0 br-0"></td>
+            <td class="b-0">DISCOUNT 1</td>
+            <td class="right-text bt-0 bb-0 bl-0"><strong>@Model.Discount1</strong></td>
+        </tr>
+        @{
+            var discounted1D = items.Sum(s => s.TotalAmountD) * Model.Discount1D / 100;
+            var discounted1 = string.Format("{0:#,##0.00}", discounted1D * -1);
+        }
+        <tr>
+            <td colspan="2">DATE PO SENT:</td>
+            <td colspan="2">@Model.DateModified</td>
+            <td class="bt-0 bb-0 br-0"></td>
+            <td class="b-0">DISCOUNT AMOUNT</td>
+            <td class="right-text bt-0 bb-0 bl-0"><strong>@discounted1</strong></td>
+        </tr>
+        <tr>
+            <td colspan="2">DATE RECEIVED:</td>
+            <td colspan="2">@Model.DateReceived</td>
+            <td class="bt-0 bb-0 br-0"></td>
+            <td class="b-0">DISCOUNT 2</td>
+            <td class="right-text bt-0 bb-0 bl-0"><strong>@Model.Discount2</strong></td>
+        </tr>
+        @{
+            var discounted2D = items.Sum(s => s.TotalAmountD) * Model.Discount2D / 100;
+            var discounted2 = string.Format("{0:#,##0.00}", discounted2D * -1);
+        }
+        <tr>
+            <td colspan="4" rowspan="2">
+                <dl>
+                    <dt>Remarks:</dt>
+                    <dd>@Model.Remarks</dd>
+                </dl>
+            </td>
+            <td class="bt-0 bb-0 br-0"></td>
+            <td class="bt-0 br-0 bl-0">DISCOUNT AMOUNT</td>
+            <td class="right-text bt-0 bl-0"><strong>@discounted2</strong></td>
+        </tr>
+        @{
+            var totalD = items.Sum(s => s.TotalAmountD) - (discounted1D + discounted2D);
+            var total = string.Format("{0:#,##0.00}", totalD);
+        }
+        <tr>
+            <td class="bt-0 bb-0 br-0"></td>
+            <td class="br-0 bl-0">TOTAL AMOUNT</td>
+            <td class="right-text bl-0"><strong>@total</strong></td>
+        </tr>
+        <tr>
+            <td colspan="7">
+                <br />
+                <br />
+                <div class="two-column">
+                    <div class="column center-text">
+                        <dl>
+                            <dd>@Model.UserCreated</dd>
+                            <dt>Prepared By</dt>
+                        </dl>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
+                    {
+                        <div class="column center-text">
+                            <dl>
+                                <dd>@Model.ApprovedBy</dd>
+                                <dt>Approved By</dt>
+                            </dl>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+                    {
+                        <div class="column center-text">
+                            <dl>
+                                <dd>@Model.DisapprovedBy</dd>
+                                <dt>Disapproved By</dt>
+                            </dl>
+                        </div>
+                    }
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = function () {
+        setTimeout(function () {
+            window.close();
+        }, 100);
+    };
+</script>
+</html>

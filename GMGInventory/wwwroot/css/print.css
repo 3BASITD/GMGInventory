@@ -112,10 +112,30 @@ table.formatted * {
 }
 
     table.formatted th, table.formatted td {
-        border: solid 2px black;
+        border: solid 1px black;
         padding: 5px;
         margin: 0;
     }
+
+        table.formatted th.bt-0, table.formatted td.bt-0 {
+            border-top: none;
+        }
+
+        table.formatted th.br-0, table.formatted td.br-0 {
+            border-right: none;
+        }
+
+        table.formatted th.bb-0, table.formatted td.bb-0 {
+            border-bottom: none;
+        }
+
+        table.formatted th.bl-0, table.formatted td.bl-0 {
+            border-left: none;
+        }
+
+        table.formatted th.b-0, table.formatted td.b-0 {
+            border: none;
+        }
 
         table.formatted label.title {
             text-align: center;

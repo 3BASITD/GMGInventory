@@ -24,6 +24,10 @@ namespace GMGInventory.Data
 
         public int StockOnHand { get; set; }
 
+        [ForeignKey("UnitId")]
+        public int? UnitId { get; set; }
+        public virtual Unit Unit { get; set; }
+
         public int Quantity { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]

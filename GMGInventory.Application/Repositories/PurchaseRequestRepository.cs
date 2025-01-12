@@ -202,13 +202,17 @@ namespace GMGInventory.Application.Repositories
                                 SalesOrderId = request.SalesOrderId,
                                 SalesOrderNumber = request.SalesOrder.SalesOrderNumber,
                                 ItemId = request.ItemId,
-                                ItemCode = request.Item.Code,
-                                ItemPartNumber = string.IsNullOrWhiteSpace(request.Item.PartNumber) ? "-" : request.Item.PartNumber,
+                                ItemCode = request.Item == null ? null : request.Item.Code,
+                                ItemPartNumber = (request.Item == null ? null : request.Item.PartNumber) + "",
                                 ItemDescription = request.ItemDescription,
                                 StockOnHandD = request.StockOnHand,
                                 QuantityD = request.Quantity,
-                                UnitId = request.Item.Unit.Id,
-                                UnitCode = request.Item.Unit.Code,
+                                UnitId = request.Unit != null ? request.Unit.Id
+                                       : request.Item != null ? request.Item.Unit.Id
+                                       : 0,
+                                UnitCode = request.Unit != null ? request.Unit.Code
+                                       : request.Item != null ? request.Item.Unit.Code
+                                       : "",
                                 Purpose = request.Purpose
                             };
             return await requestVM.ToListAsync();
@@ -373,25 +377,6 @@ namespace GMGInventory.Application.Repositories
                     request.StatusId = statusId;
                 }
 
-
-                //var existingItems = context.PurchaseRequestLineItems.Where(s => s.PurchaseRequestId == requestId);
-                //context.PurchaseRequestLineItems.RemoveRange(existingItems);
-
-                //var newItems = Items.Select(s => new PurchaseRequestLineItem
-                //{
-                //    PurchaseRequestId = requestId,
-                //    LineNumber = s.LineNumber,
-                //    SalesOrderId = s.SalesOrderId,
-                //    ItemId = s.ItemId,
-                //    ItemDescription = s.ItemDescription,
-                //    StockOnHand = s.StockOnHandD,
-                //    Quantity = s.QuantityD,
-                //    UnitId = s.UnitId,
-                //    Purpose = s.Purpose + ""
-                //});
-                //await context.PurchaseRequestLineItems.AddRangeAsync(newItems);
-                //await context.SaveChangesAsync(currentUserId);
-
                 try
                 {
                     var citems = context.PurchaseRequestLineItems.Where(s => s.PurchaseRequestId == requestId);
@@ -409,6 +394,7 @@ namespace GMGInventory.Application.Repositories
                                            ItemDescription = s.ItemDescription,
                                            StockOnHand = s.StockOnHandD,
                                            Quantity = s.QuantityD,
+                                           UnitId = s.ItemId == null ? s.UnitId : null,
                                            Purpose = s.Purpose + ""
                                        });
                     context.PurchaseRequestLineItems.AddRange(newitems);
@@ -423,6 +409,7 @@ namespace GMGInventory.Application.Repositories
                         dbitem.LineNumber = ei.LineNumber;
                         dbitem.StockOnHand = ei.StockOnHandD;
                         dbitem.Quantity = ei.QuantityD;
+                        dbitem.UnitId = ei.ItemId == null ? ei.UnitId : null;
 
                         context.PurchaseRequestLineItems.Update(dbitem);
                     }

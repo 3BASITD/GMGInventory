@@ -75,75 +75,47 @@
         </tr>
         <tr>
             <th style="min-width: 10px;">#</th>
-            <th style="min-width: 50px;">PART NUMBER</th>
+            @if (Model.Type.ToLower() == "automotive")
+            {
+                <th style="min-width: 50px;">PART NUMBER</th>
+            }
+            else
+            {
+                <th style="min-width: 50px;">ITEM CODE</th>
+            }
             <th>ITEM DESCRIPTION</th>
             <th style="min-width: 50px;">QTY</th>
             <th style="min-width: 25px;">UOM</th>
             <th style="min-width: 50px;">SOH</th>
             <th style="min-width: 50px;">REF.SO#</th>
         </tr>
-        @for (var a = 1; a <= 19; a++)
+        @foreach (var item in items)
         {
-            var item = items.Where(s => s.LineNumber == a).FirstOrDefault();
-            if (item != null)
-            {
-                <tr>
-                    <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+            <tr>
+                <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                @if (Model.Type.ToLower() == "automotive")
+                {
                     <td>@item.ItemPartNumber</td>
-                    <td>@item.ItemDescription</td>
-                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
-                    <td>@item.UnitCode</td>
-                    <td class="right-text"><nobr>@item.StockOnHand</nobr></td>
-                    <td><nobr>@(string.IsNullOrWhiteSpace(item.SalesOrderNumber) ? "-" : item.SalesOrderNumber)</nobr></td>
-                </tr>
-            }
-            else
-            {
-                <tr>
-                    <td class="center-text" style="min-width: 10px;"><nobr>@a</nobr></td>
-                    <td></td>
-                    <td>@(items.Count() + 1 == a ? "* * NOTHING FOLLOWS * *" : "")</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            }
+                }
+                else
+                {
+                    <td>@item.ItemCode</td>
+                }
+                <td>@item.ItemDescription</td>
+                <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                <td>@item.UnitCode</td>
+                <td class="right-text"><nobr>@item.StockOnHand</nobr></td>
+                <td><nobr>@(string.IsNullOrWhiteSpace(item.SalesOrderNumber) ? "-" : item.SalesOrderNumber)</nobr></td>
+            </tr>
         }
         <tr>
-            <td class="center-text" style="min-width: 10px;"><nobr>20</nobr></td>
-            @{
-                var twenties = items.Count(s => s.LineNumber >= 20);
-            }
-            @if (twenties == 0)
-            {
-                <td></td>
-                <td>@(items.Count() == 19 ? "* * NOTHING FOLLOWS * *" : "")</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            }
-            else if (twenties == 1)
-            {
-                var item = items.Where(s => s.LineNumber == 20).First();
-                <td style="min-width: 50px;">@item.ItemPartNumber</td>
-                <td>@item.ItemDescription</td>
-                <td class="right-text" style="min-width: 50px;"><nobr>@item.Quantity</nobr></td>
-                <td style="min-width: 20px;">@item.UnitCode</td>
-                <td class="right-text" style="min-width: 50px;"><nobr>@item.StockOnHand</nobr></td>
-                <td style="min-width: 50px;"><nobr>@(string.IsNullOrWhiteSpace(item.SalesOrderNumber) ? "-" : item.SalesOrderNumber)</nobr></td>
-            }
-            else
-            {
-                var item = items.Where(s => s.LineNumber >= 20).ToList();
-                <td></td>
-                <td>@(item.Count) more item(s)</td>
-                <td class="right-text">@item.Sum(s => s.QuantityD)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-            }
+            <td class="center-text" style="min-width: 10px;"></td>
+            <td></td>
+            <td>* * NOTHING FOLLOWS * *</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td colspan="7">
