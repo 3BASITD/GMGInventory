@@ -348,7 +348,7 @@
                         }
                         if  (user_access.canAdd &&  data.status.toLowerCase() == "approved") {
                             //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></button>';
-                            actions += '<a href="@Url.Action("Create","Pack")/' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></a>';
+                            actions += '<a href="@Url.Action("Create", "Pack")/' + data.id + '?page=SalesOrder" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></a>';
                         }
                         return actions + "</div>";
                     }

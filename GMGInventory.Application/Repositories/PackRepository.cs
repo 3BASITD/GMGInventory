@@ -406,8 +406,8 @@ namespace GMGInventory.Application.Repositories
                 await context.SaveChangesAsync(currentUserId);
             }
 
-            context.PackLineItems.RemoveRange(packItems);
-            await context.SaveChangesAsync(currentUserId);
+             context.PackLineItems.RemoveRange(packItems);
+             await context.SaveChangesAsync(currentUserId);
             //end of delete pack items
 
             if (form.SavingAs != "delete")
@@ -423,7 +423,7 @@ namespace GMGInventory.Application.Repositories
                                                     .Select(s => s.Id)
                                                     .FirstAsync();
                 }
-                await context.SaveChangesAsync(currentUserId);
+               await context.SaveChangesAsync(currentUserId);
 
                 packVM.StatusId = await context.Statuses
                                                .Where(s => (form.SavingAs.ToLower() == "post" && s.Name.ToLower() == "packing submitted")
@@ -431,8 +431,8 @@ namespace GMGInventory.Application.Repositories
                                                .Select(s => s.Id)
                                                .FirstAsync();
 
-                context.Packs.Update(packVM);
-                await context.SaveChangesAsync(currentUserId);
+                 context.Packs.Update(packVM);
+                 await context.SaveChangesAsync(currentUserId);
 
                 foreach (var item in form.Items)
                 {
@@ -456,7 +456,7 @@ namespace GMGInventory.Application.Repositories
                         PackTypeId = item.PackType,
                         Quantity = item.Quantity
                     };
-                    await context.PackLineItems.AddAsync(packItem);
+                 await context.PackLineItems.AddAsync(packItem);
                 }
 
                 await context.SaveChangesAsync(currentUserId);

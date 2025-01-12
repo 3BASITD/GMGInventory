@@ -10,6 +10,13 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
+            @if (userAccess.CanAdd)
+            {
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create" asp-route-id="0" asp-route-page="Pack">
+                    <span class="fas fa-plus"></span> New Packing
+                </a>
+            }
+
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -172,4 +179,4 @@
             hideLoader();
         });
     </script>
-    }
+}

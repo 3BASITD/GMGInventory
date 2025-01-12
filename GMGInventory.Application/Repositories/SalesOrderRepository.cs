@@ -52,7 +52,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonOptionsModel>> GetSalesOrderOptions(string search, int page)
+        public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderOptions(string search, int page)
         {
             var orders = from order in context.SalesOrders
                          let quantityOrdered = context.SalesOrderLineItems
@@ -67,13 +67,17 @@ namespace GMGInventory.Application.Repositories
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
                          orderby order.SalesOrderNumber ascending
-                         select new JsonOptionsModel
+                         select new JsonSalesOrderOptionsModel
                          {
                              Id = order.Id.ToString(),
-                             Text = order.SalesOrderNumber
+                             Text = order.SalesOrderNumber,
+                             CustomerCode = order.Customer.Code,
+                             CustomerName = order.Customer.Name,
+                             SalesOrderDateD = order.SalesOrderDate,
+                             ForwarderName = order.Forwarder.Name
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
-            return new Select2Model<JsonOptionsModel>
+            return new Select2Model<JsonSalesOrderOptionsModel>
             {
                 items = ordersFiltered,
                 total_count = orders.Count()
@@ -315,7 +319,7 @@ namespace GMGInventory.Application.Repositories
                                     NetPriceD = price == null ? 0 : price.NetSellingPrice,
                                     QuantityD = order.Quantity,
                                     PackedQuantityD = packedQuantity,
-                                    RemainingQuantityD = (packedQuantity - returnedQuantity) - invoicedQuantity,
+                                    RemainingQuantityD = order.Quantity - (packedQuantity - returnedQuantity), //(packedQuantity - returnedQuantity) - invoicedQuantity,
                                     RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                     SellingPriceD = order.SellingPrice,
                                     ServedQuantityD = packedQuantity - returnedQuantity,
