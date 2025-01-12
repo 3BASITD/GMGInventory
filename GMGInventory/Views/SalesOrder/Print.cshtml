@@ -61,15 +61,15 @@
                         </div>
                         <div class="label">
                             <span>Contact Person:</span>
-                            <strong class="detail">-</strong>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactPerson) ? "N/A" : Model.CustomerContactPerson)</strong>
                         </div>
                         <div class="label">
                             <span>Contact No.:</span>
-                            <strong class="detail">-</strong>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactNumber) ? "N/A" : Model.CustomerContactNumber)</strong>
                         </div>
                         <div class="label">
                             <span>Address:</span>
-                            <strong class="detail">@Model.CustomerAddress</strong>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</strong>
                         </div>
                         <div class="label">
                             <span>Payment Terms:</span>
@@ -83,11 +83,11 @@
                     <div class="column">
                         <div class="label">
                             <span>Ship to:</span>
-                            <strong class="detail"></strong>
+                            <strong class="detail">?</strong>
                         </div>
                         <div class="label">
                             <span>Address:</span>
-                            <strong class="detail"></strong>
+                            <strong class="detail">?</strong>
                         </div>
                         <div class="label">
                             <span>Agent Name:</span>
@@ -129,8 +129,8 @@
         <tr>
             <td class="center-text" style="min-width: 10px;"></td>
             <td></td>
-            <td>* * NOTHING FOLLOWS * *</td>
             <td></td>
+            <td>* * NOTHING FOLLOWS * *</td>
             <td></td>
             <td></td>
             <td></td>

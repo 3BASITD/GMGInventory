@@ -149,12 +149,11 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            ResponseModel<int> responseModel = new ResponseModel<int>();
-            var orderId = await salesOrderRepository.SaveAsync(form);
-            responseModel.Status = "Success";
-            responseModel.Message = "Order successfully submitted";
-            responseModel.NewRow = orderId;
-            return Json(responseModel);
+
+            var response = await salesOrderRepository.SaveAsync(form);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+
+            return Json(response);
         }
 
         [HttpPost]

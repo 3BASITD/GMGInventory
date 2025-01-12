@@ -13,7 +13,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<SalesOrderVM>> GetListAsync(SalesOrderFilterVM filter);
         Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId, bool forPack = false);
         Task<ForDataTables<SalesOrderItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int salesOrderId);
-        Task<int> SaveAsync(SalesOrderFormVM form);
+        Task<ResponseModel<int>> SaveAsync(SalesOrderFormVM form);
         Task SaveItemsAsync(IList<SalesOrderFormItemVM> Items, int salesOrderId);
         Task<bool> ApproveAsync(int salesOrderId);
         Task<bool> DisapproveAsync(int salesOrderId, string reason);
