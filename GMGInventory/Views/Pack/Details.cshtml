@@ -180,12 +180,13 @@
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                <input type="hidden" id="boxNo" value="0" />
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-12 col-sm-4">
                         <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Package Number</label>
-                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" />
+                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" readonly />
                     </div>
                     <div class="col-12 col-sm-4">
                         <label for="add-type" col-form-label pt-0" style="margin-bottom: 5px;">Package Type</label>
@@ -322,6 +323,10 @@
             dtCheckboxes();
         });
 
+        $(".createBtn").on("click", function () {
+            $("#add-box").val($("#boxNo").val());
+        });
+
         $(".btn-add-item").off("click").on("click", function () {
             if ($("#add-box").val() == 0) {
                 toastr.warning("Please enter package number", "Required field &lt;Package Number&gt;");
@@ -374,6 +379,8 @@
                         }
                     }
                 });
+
+                $('#add-box').get(0).value++;
                 $(".chkclassorderall").prop("checked", false);
                 $(".chkclassorderall").prop("indeterminate", false);
             }
@@ -460,6 +467,9 @@
                         .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
                 dataSrc: function (row) {
+                    var boxNo = parseInt(row.boxNumber) + 1;
+                    $('#boxNo').val(parseInt(row.boxNumber) + 1);
+
                     return "#" + row.boxNumber + " (" + row.packTypeName + ")";
                 }
             }

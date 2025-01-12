@@ -442,7 +442,6 @@
                         minimumInputLength: -1,
                         placeholder: "<empty>"
                     }).off("select2:select").on("select2:select", function () {
-                       // GetPurchaseRequestType();
                         loadPODetails();
                         loadAllItemsOptions(selectedOrder);
                     }).off("select2:unselecting").on("select2:unselecting", function () {
@@ -454,12 +453,7 @@
                         $("#receive-discount1").val("0");
                         $("#receive-discount2").val("0");
 
-                        //  $("#receive-supplier").removeData("Id");
-                        //   $("#receive-warehouse").removeData("Id");
-                        //$("#receive-term").removeData("Id");
-
-                       // $("#add-code").val("").trigger("change");
-                         $("#add-orderItem").val("").trigger("change");
+                        $("#add-orderItem").val("").trigger("change");
 
                         itemDT.clear().draw();
                     }).val(selectedOrder).trigger('change');

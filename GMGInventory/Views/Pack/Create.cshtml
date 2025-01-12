@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Start Packing";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var pageName = (string)ViewData["PageName"]!;
 }
 
 @section Breadcrumb {
@@ -19,9 +20,9 @@
             <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack('post')">
                 <span class="fas fa-paper-plane"></span> Post
             </button>
-            <a class="btn btn-light btn-sm float-right" asp-action="Index" asp-controller="SalesOrder">
-                <span class="fas fa-arrow-left"></span> Back to List
-            </a>
+            <a class="btn btn-light btn-sm float-right" asp-action="Index" asp-controller="@(pageName == "SalesOrder" ? "SalesOrder" : "Pack")">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
         </div>
     </div>
     <div class="card-body">
@@ -30,6 +31,7 @@
                 <div class="form-group">
                     <label for="pack-so-number" class="form-label mb-0">Sales Order Number</label>
                     <select id="pack-so-number" class="s2-bold s2ph-bold s2ph-dark" name="SONumber" style="width: 100%"></select>
+                    <span data-valmsg-for="pack-so-number" data-valmsg-replace="true" class="text-danger"></span>
                 </div>
             </div>
         </div>
@@ -164,6 +166,9 @@
     </div>
 </div>
 
+
+<input type="hidden" id="salesOrderId" value="@ViewData["SOId"]" />
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
@@ -194,12 +199,12 @@
                 cache: true
             }
         });
-
+        
         $("#pack-so-number").on("select2:select", function () {
-            window.location = "@Url.Action("Create", "Pack", new { id = "" })/" + $("#pack-so-number").val();
+            window.location = "@Url.Action("Create", "Pack", new { id = "" })/" + $("#pack-so-number").val() + "?page=Pack";
         });
 
-        // Load Select2 Pack Type
+          // Load Select2 Pack Type
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetPackTypeOptions")",
@@ -211,10 +216,10 @@
             }
         });
 
-        var orderDT = $('.table-order').DataTable({
+         var orderDT = $('.table-order').DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsForPackJson", "SalesOrder")",
-                data: { salesOrderId: @Model?.Id },
+                data: { salesOrderId: $("#salesOrderId").val() },  
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -274,7 +279,7 @@
             $(".table-order thead th").removeClass("text-end");
             dtCheckboxes();
         });
-
+      
         //$(".createBtn").on("click", function () {
         //    orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
         //        var row_data = this.data();
@@ -286,7 +291,7 @@
         //    });
         //});
 
-        $(".btn-add-item").on("click", function () {
+         $(".btn-add-item").on("click", function () {
             if ($("#add-box").val() == 0) {
                 toastr.warning("Please enter package number", "Required field &lt;Package Number&gt;");
                 $("#add-box").addClass("text-danger");
@@ -306,6 +311,7 @@
                                 toastr.info("Partial Quantity exceed the Remaining Quantity. Auto adjusted", "Remaining Quantity");
                             }
                             var quantityToPack = 0;
+
                             if ($("#add-partial").prop("checked")) {
                                 quantityToPack = parseInt($("#add-quantity").val());
                                 row_data.remainingQuantity = parseInt(row_data.remainingQuantity) - parseInt($("#add-quantity").val());
@@ -325,6 +331,7 @@
                                 itemName: row_data.itemName,
                                 quantityToPack: quantityToPack
                             };
+
                             itemDT.row.add(toItem).draw();
                             toastr.success("Added " + row_data.itemCode + " on Packed Item(s)", "Success");
 
@@ -337,12 +344,14 @@
                         }
                     }
                 });
+
+                $('#add-box').get(0).value++;
                 $(".chkclassorderall").prop("checked", false);
                 $(".chkclassorderall").prop("indeterminate", false);
             }
         });
 
-        $("#add-box").on("change", function () {
+                $("#add-box").on("change", function () {
             if ($("#add-box").val() == 0) {
                 toastr.warning("Please enter package number", "Required field &lt;Package Number&gt;");
                 $("#add-box").addClass("text-danger");
@@ -364,7 +373,7 @@
             }
         });
 
-        var itemDT = $('.table-item').DataTable({
+            var itemDT = $('.table-item').DataTable({
             data: [],
             filter: true,
             responsive: true,
@@ -410,8 +419,7 @@
                 }
             }
         });
-
-        itemDT.on("draw", function () {
+          itemDT.on("draw", function () {
             $(".btn-remove-item").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
 
@@ -443,7 +451,7 @@
             });
         });
 
-        $("#add-quantity").hide();
+         $("#add-quantity").hide();
         $("#add-partial").on("change", function () {
             if ($(this).prop("checked")) {
                 $("#add-quantity").val(1);
@@ -462,7 +470,7 @@
             $(".chkclassorderall").prop("indeterminate", false);
         });
 
-        dtCheckboxes();
+            dtCheckboxes();
         function dtCheckboxes() {
             $(".chkclassorderall").off("change").on("change", function () {
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -496,6 +504,38 @@
 
         itemDT.clear().draw();
 
+          function dtCheckboxes() {
+            $(".chkclassorderall").off("change").on("change", function () {
+                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".chkclassorder").prop("checked", $(".chkclassorderall").prop("checked"));
+                });
+            });
+
+            $(".chkclassorder").off("change").on("change", function () {
+                var rows_checked = 0;
+                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".chkclassorder").prop("checked")) {
+                        rows_checked++;
+                    }
+                });
+
+                if (rows_checked == 0) {
+                    $(".chkclassorderall").prop("checked", false);
+                    $(".chkclassorderall").prop("indeterminate", false);
+                } else if (rows_checked == orderDT.rows().count()) {
+                    $(".chkclassorderall").prop("checked", true);
+                    $(".chkclassorderall").prop("indeterminate", false);
+                } else if (rows_checked == 0) {
+                    $(".chkclassorderall").prop("checked", false);
+                    $(".chkclassorderall").prop("indeterminate", false);
+                } else {
+                    $(".chkclassorderall").prop("checked", false);
+                    $(".chkclassorderall").prop("indeterminate", true);
+                }
+            });
+        }
+
+        
         function GetItemsToPack() {
             var item_to_pack = [];
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -509,7 +549,7 @@
             });
             return item_to_pack;
         }
-
+        
         function SavePack(savingAs) {
             var itemsToPack = GetItemsToPack();
             if (itemsToPack.length == 0) {
@@ -523,7 +563,7 @@
                     type: "POST",
                     url: "@Url.Action("SaveJson")",
                     data: {
-                        SalesOrderId: @Model?.Id,
+                        SalesOrderId: $("#salesOrderId").val(),
                         Items: itemsToPack,
                         SavingAs: savingAs
                     },
@@ -536,6 +576,6 @@
                     }
                 });
             }
-        }
+        } 
     </script>
         }

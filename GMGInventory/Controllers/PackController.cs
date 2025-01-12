@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -94,7 +95,7 @@ namespace GMGInventory.Controllers
             return Json(await packRepository.GetItemsDTAsync(form, packId));
         }
 
-        public async Task<IActionResult> Create(int? Id)
+        public async Task<IActionResult> Create(int? Id, string Page)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
@@ -102,10 +103,9 @@ namespace GMGInventory.Controllers
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PackingListing)).Convert();
 
             var order = await packRepository.GetDetailsBySOAsync(Id);
-            if (order == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
+
+            ViewData["SOId"] = Id;
+            ViewData["PageName"] = Page;
 
             return View(order);
         }

@@ -61,7 +61,7 @@
                 {
                     if (Model?.Status.ToLower() == "approved")
                     {
-                        <a href="@Url.Action("Create", "Pack")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                        <a href="@Url.Action("Create", "Pack")/@Model?.Id?page=SalesOrder" target="_blank" class="btn btn-primary btn-sm float-right ml-2">
                             <span class="fas fa-box-open"></span> Start Packing
                         </a>
                     }
