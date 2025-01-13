@@ -556,6 +556,8 @@
 }
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         var soaDT = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({

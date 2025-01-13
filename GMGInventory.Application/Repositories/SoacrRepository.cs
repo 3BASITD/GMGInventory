@@ -207,7 +207,6 @@ namespace GMGInventory.Application.Repositories
                               && (filter.Agent == null || filter.Agent == inv.SalesOrder.Agent.Id)
                               && filter.DateFrom <= inv.InvoiceDate.Date
                               && inv.InvoiceDate.Date <= filter.DateTo
-                              && inv.Status.Name.ToLower() == "invoice draft"
 
                            select new SOACRInvoices
                            {
