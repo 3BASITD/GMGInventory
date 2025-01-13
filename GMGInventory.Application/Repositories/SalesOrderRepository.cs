@@ -423,34 +423,12 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<int> SaveAsync(SalesOrderFormVM form)
+        public async Task<ResponseModel<int>> SaveAsync(SalesOrderFormVM form)
         {
+            ResponseModel<int> response = new();
+
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
-            //var previousOrders = context.SalesOrders.Count();
-            //string soNumber = string.Format("{0:SO00000000}", previousOrders);
-            //while (context.SalesOrders.Any(s => s.SalesOrderNumber == soNumber))
-            //{
-            //    previousOrders++;
-            //    soNumber = string.Format("{0:SO00000000}", previousOrders);
-            //}
-
-            var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
-            string soNumber = "";
-            if (previous == null)
-            {
-                var latestOrder = context.SalesOrders
-                                         .Where(s => s.SalesOrderNumber.StartsWith("SO"))
-                                         .OrderByDescending(s => s.SalesOrderNumber)
-                                         .Select(s => s.SalesOrderNumber)
-                                         .FirstOrDefault();
-                var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
-                soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
-            }
-            else
-            {
-                soNumber = previous.SalesOrderNumber;
-            }
 
             int statusId = context.Statuses
                                   .Where(s => (form.Status.ToLower() == "submit" && s.Name.ToLower() == "sales order submitted")
@@ -459,6 +437,24 @@ namespace GMGInventory.Application.Repositories
                                   .First();
             if (orderVM == null)
             {
+
+                var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
+                string soNumber = "";
+                if (previous == null)
+                {
+                    var latestOrder = context.SalesOrders
+                                             .Where(s => s.SalesOrderNumber.StartsWith("SO"))
+                                             .OrderByDescending(s => s.SalesOrderNumber)
+                                             .Select(s => s.SalesOrderNumber)
+                                             .FirstOrDefault();
+                    var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
+                    soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
+                }
+                else
+                {
+                    soNumber = previous.SalesOrderNumber;
+                }
+
                 orderVM = new SalesOrder
                 {
                     AgentId = form.Agent,
@@ -523,7 +519,11 @@ namespace GMGInventory.Application.Repositories
 
             await SaveItemsAsync(form.Items, orderVM.Id);
 
-            return orderVM.Id;
+            response.Status = "Success";
+            response.Message = form.Status.ToLower() == "draft" ? "Sales order saved as draft." : "Sales order successfully submitted.";
+            response.NewRow = orderVM.Id;
+
+            return response;
         }
 
         public async Task SaveItemsAsync(IList<SalesOrderFormItemVM> Items, int salesOrderId)

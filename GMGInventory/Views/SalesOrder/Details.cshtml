@@ -27,12 +27,12 @@
             }
             @if (Model.Status.ToLower() == "submitted")
             {
-                @if (userAccess.CanEdit)
-                {
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-                        <span class="fas fa-save"></span> Submit
-                    </button>
-                }
+                @* @if (userAccess.CanEdit)
+            {
+            <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
+            <span class="fas fa-save"></span> Submit
+            </button>
+            } *@
                 @if (userAccess.CanApproveDisapprove)
                 {
                     <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
@@ -163,12 +163,12 @@
                     </b>
                 </p>
                 @* <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.GrossNetPrice)
-                    </span>
-                    <b class="d-block">
-                        @Model?.GrossNetPrice
-                    </b>
+                <span class="text-muted">
+                @Html.DisplayNameFor(model => model.GrossNetPrice)
+                </span>
+                <b class="d-block">
+                @Model?.GrossNetPrice
+                </b>
                 </p> *@
                 <p class="text-sm">
                     <span class="text-muted">
@@ -179,12 +179,12 @@
                     </b>
                 </p>
                 @* <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DeclaredValue)
-                    </span>
-                    <b class="d-block">
-                        @Model?.DeclaredValue
-                    </b>
+                <span class="text-muted">
+                @Html.DisplayNameFor(model => model.DeclaredValue)
+                </span>
+                <b class="d-block">
+                @Model?.DeclaredValue
+                </b>
                 </p> *@
                 <p class="text-sm">
                     <span class="text-muted">
@@ -404,9 +404,9 @@
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-code" class="form-label mb-0">Code</label>
-                                        <select id="add-code" name="Code" style="width: 100%;">
-                                            <option></option>
-                                        </select>
+                                    <select id="add-code" name="Code" style="width: 100%;">
+                                        <option></option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">
@@ -978,7 +978,15 @@
         }
 
         if (user_access.canEdit) {
+            $(".btn-details-draft").on("click", function () {
+                SaveOrder("Draft");
+            });
+
             $(".btn-details-submit").on("click", function () {
+                SaveOrder("Submit");
+            });
+
+            function SaveOrder(status) {
                 var itemsToReplenish = GetItemsToOrder();
                 if (itemsToReplenish.length == 0) {
                     toastr.warning("No item to replenish. Add an item to the list to continue", "Warning");
@@ -987,21 +995,22 @@
                 } else {
                     $.ajax({
                         type: "POST",
-                        url: "@Url.Action("SaveItemsJson")",
+                        url: "@Url.Action("SaveJson")",
                         data: {
                             Id: @Model?.Id,
+                            Status: status,
                             Items: itemsToReplenish
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Error") {
                                 toastr.error(data.message, "Error");
                             } else {
-                                toastr.success(data.message, "Success");
+                                window.location.reload();
                             }
                         }
                     });
                 }
-            });
+            }
         }
 
         if (user_access.canApproveDisapprove) {

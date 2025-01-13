@@ -240,14 +240,13 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if (data.remainingQuantity > 0) {
-                            //actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
+                        //if (data.remainingQuantity > 0) {
                             if ($("#add-partial").prop("checked")) {
                                 actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
                             } else {
                                 actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
                             }
-                        }
+                        //}
                         return actions;
                     }
                 },
@@ -270,9 +269,9 @@
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {
-                if (data.remainingQuantity == 0) {
-                    $(row).addClass("text-muted");
-                }
+                // if (data.remainingQuantity == 0) {
+                //     $(row).addClass("text-muted");
+                // }
             }
         });
 
