@@ -319,7 +319,7 @@ namespace GMGInventory.Application.Repositories
                                     NetPriceD = price == null ? 0 : price.NetSellingPrice,
                                     QuantityD = order.Quantity,
                                     PackedQuantityD = packedQuantity,
-                                    RemainingQuantityD = order.Quantity - (packedQuantity - returnedQuantity), //(packedQuantity - returnedQuantity) - invoicedQuantity,
+                                    RemainingQuantityD = (packedQuantity - returnedQuantity) - invoicedQuantity,
                                     RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                     SellingPriceD = order.SellingPrice,
                                     ServedQuantityD = packedQuantity - returnedQuantity,
