@@ -240,13 +240,13 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        //if (data.remainingQuantity > 0) {
+                        if (data.remainingQuantity > 0) {
                             if ($("#add-partial").prop("checked")) {
                                 actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
                             } else {
                                 actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
                             }
-                        //}
+                        }
                         return actions;
                     }
                 },
@@ -301,6 +301,8 @@
                 $("#add-quantity").addClass("text-danger");
                 $('span[data-valmsg-for="add-quantity"]').text("Please enter collector receipt");
             } else {
+                var hasItemToAdd = false;
+
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
                     var itemchk = $(this.node()).find(".chkclassorder");
@@ -332,6 +334,7 @@
                                 quantityToPack: quantityToPack
                             };
 
+                            hasItemToAdd = true;
                             itemDT.row.add(toItem).draw();
                             toastr.success("Added " + row_data.itemCode + " on Packed Item(s)", "Success");
 
@@ -345,7 +348,9 @@
                     }
                 });
 
-                $('#add-box').get(0).value++;
+                if (hasItemToAdd) { 
+                    $('#add-box').get(0).value++;
+                }
                 $(".chkclassorderall").prop("checked", false);
                 $(".chkclassorderall").prop("indeterminate", false);
             }
