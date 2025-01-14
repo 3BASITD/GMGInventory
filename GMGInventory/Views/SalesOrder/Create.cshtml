@@ -564,6 +564,7 @@
                     $("#order-customer-code").trigger('change');
                     $("#order-customer-code").select2("data")[0].name = data.customerName;
                     $("#order-customer-code").select2("data")[0].outstandingBalanceD = data.outstandingBalanceD;
+                    $("#order-customer-code").select2("data")[0].customerStatus = data.accountStatus;
 
                     $("#order-customer-balance").val(data.outstandingBalance);
 
@@ -584,8 +585,6 @@
                     var agentOption = new Option(data.agentCode, data.agentId, true, true);
                     $("#order-agent-code").append(agentOption);
                     $("#order-agent-code").trigger('change');
-
-                    $("#order-declared-value").val(data.declaredValueD.toFixed(2));
 
                     $("#order-agent-name").val(data.agentName);
 

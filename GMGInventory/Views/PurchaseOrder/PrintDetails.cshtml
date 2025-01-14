@@ -131,8 +131,12 @@
                 <td class="right-text"><nobr>@item.TotalAmount</nobr></td>
             </tr>
         }
+        @{
+            var itemCount = items.Count;
+            var lastLineNumber = items.OrderByDescending(s => s.LineNumber).Select(s => s.LineNumber).First();
+        }
         <tr>
-            <td></td>
+            <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
             <td></td>
             <td>* * NOTHING FOLLOWS * *</td>
             <td></td>
@@ -140,6 +144,21 @@
             <td></td>
             <td></td>
         </tr>
+        @if (itemCount < 30)
+        {
+            for (var ctr = 2; ctr <= 30 - itemCount; ctr++)
+            {
+                <tr>
+                    <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            }
+        }
         <tr>
             <td colspan="5" class="bb-0 br-0"></td>
             <td class="br-0 bb-0 bl-0">TOTAL PURCHASE</td>

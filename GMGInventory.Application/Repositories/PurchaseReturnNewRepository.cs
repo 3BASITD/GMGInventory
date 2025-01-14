@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -217,32 +218,36 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<PurchaseReturnNewLineItemVM>> GetItemListAsync(int purchaseReturnId)
         {
-                var receiveId = await context.PurchaseReturnNews
-                                             .Where(s => s.Id == purchaseReturnId)
-                                             .Select(s => s.PurchaseReceiveId)
-                                             .FirstOrDefaultAsync();
-                var returnVM = from receive in context.PurchaseReceivingLineItems
-                               join retrn in context.PurchaseReturnNewLineItems on receive.Id equals retrn.ReceivingItemId into rtrn
-                               from retrn in rtrn.DefaultIfEmpty()
-                               where receive.PurchaseReceivingId == receiveId
-                               && (retrn == null || retrn.PurchaseReturnId == purchaseReturnId)
-                               select new PurchaseReturnNewLineItemVM
-                               {
-                                   Id = retrn == null ? 0 : retrn.Id,
-                                   ToReturn = retrn != null,
-                                   ItemId = receive.OrderItem.RequestItem.Id,
-                                   ItemCode = receive.OrderItem.RequestItem.Item.Code,
-                                   ItemPartNumber = string.IsNullOrWhiteSpace(receive.OrderItem.RequestItem.Item.PartNumber) ? "" : receive.OrderItem.RequestItem.Item.PartNumber,
-                                   ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
-                                   LineNumber = receive.OrderItem.LineNumber,
-                                   QuantityD = retrn == null ? 0 : retrn.Quantity,
-                                   ReceivingItemId = receive.Id,
-                                   ReceivedQuantityD = receive.Quantity,
-                                   UnitId = receive.OrderItem.RequestItem.Item.Unit.Id,
-                                   UnitCode = receive.OrderItem.RequestItem.Item.Unit.Code,
-                                   UnitCostD = receive.OrderItem.UnitCost
-                               };
-                return await returnVM.ToListAsync();
+            var receiveId = await context.PurchaseReturnNews
+                                         .Where(s => s.Id == purchaseReturnId)
+                                         .Select(s => s.PurchaseReceiveId)
+                                         .FirstOrDefaultAsync();
+            var returnVM = from receive in context.PurchaseReceivingLineItems
+                           join retrn in context.PurchaseReturnNewLineItems on receive.Id equals retrn.ReceivingItemId into rtrn
+                           from retrn in rtrn.DefaultIfEmpty()
+                           where receive.PurchaseReceivingId == receiveId
+                           && (retrn == null || retrn.PurchaseReturnId == purchaseReturnId)
+                           select new PurchaseReturnNewLineItemVM
+                           {
+                               Id = retrn == null ? 0 : retrn.Id,
+                               ToReturn = retrn != null,
+                               ItemId = receive.OrderItem.RequestItem.Item == null ? null : receive.OrderItem.RequestItem.Item.Id,
+                               ItemCode = receive.OrderItem.RequestItem.Item == null ? null : receive.OrderItem.RequestItem.Item.Code,
+                               ItemPartNumber = receive.OrderItem.RequestItem.Item == null ? null : receive.OrderItem.RequestItem.Item.PartNumber,
+                               ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
+                               LineNumber = receive.OrderItem.LineNumber,
+                               QuantityD = retrn == null ? 0 : retrn.Quantity,
+                               ReceivingItemId = receive.Id,
+                               ReceivedQuantityD = receive.Quantity,
+                               UnitId = receive.OrderItem.RequestItem.Item == null ? receive.OrderItem.RequestItem.Unit.Id : receive.OrderItem.RequestItem.Item.Unit.Id,
+                               UnitCode = receive.OrderItem.RequestItem.Item == null ? receive.OrderItem.RequestItem.Unit.Code : receive.OrderItem.RequestItem.Item.Unit.Code,
+                               UnitCostD = receive.OrderItem.UnitCost
+                           };
+            var rvms = await returnVM.ToListAsync();
+            foreach (var rvm in rvms)
+                rvm.LineNumber = rvms.IndexOf(rvm) + 1;
+
+            return rvms;
         }
 
         public async Task<ForDataTables<PurchaseReturnNewLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseReturnId)

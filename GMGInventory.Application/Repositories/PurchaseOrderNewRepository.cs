@@ -300,13 +300,13 @@ namespace GMGInventory.Application.Repositories
                               PurchaseRequestId = order.RequestItem.PurchaseRequest.Id,
                               PurchaseRequestNumber = order.RequestItem.PurchaseRequest.DocumentNumber,
                               RequestItemId = order.RequestItem.Id,
-                              ItemId = order.RequestItem.Item.Id,
-                              ItemCode = order.RequestItem.Item.Code,
-                              ItemPartNumber = string.IsNullOrWhiteSpace(order.RequestItem.Item.PartNumber) ? "-" : order.RequestItem.Item.PartNumber,
+                              ItemId = order.RequestItem.Item == null ? null : order.RequestItem.Item.Id,
+                              ItemCode = order.RequestItem.Item == null ? null : order.RequestItem.Item.Code,
+                              ItemPartNumber = order.RequestItem.Item == null ? null : order.RequestItem.Item.PartNumber,
                               ItemDescription = order.RequestItem.ItemDescription,
                               QuantityD = order.Quantity,
-                              UnitId = order.RequestItem.Item != null ? order.RequestItem.Item.UnitId : 0,
-                              UnitCode = order.RequestItem.Item != null ? order.RequestItem.Item.Unit.Code : "",
+                              UnitId = order.RequestItem.Item == null ? order.RequestItem.Unit.Id : order.RequestItem.Item.Unit.Id,
+                              UnitCode = order.RequestItem.Item == null ? order.RequestItem.Unit.Code : order.RequestItem.Item.Unit.Code,
                               UnitCostD = order.UnitCost,
                               ServedQuantityD = context.PurchaseOrderNewLineItems
                                                        .Where(a => a.RequestItem.ItemId == order.RequestItem.ItemId
