@@ -42,9 +42,24 @@
                     }
                     @if (userAccess.CanPrint)
                     {
-                        <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-                            <span class="fas fa-print"></span> Print
-                        </button>
+                        @if (Model.InvoiceType.ToLower() == "sales invoice")
+                        {
+                            <div class="dropdown float-right ml-2">
+                                <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="fas fa-print"></span> Print
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
+                                    <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Template</a></li>
+                                    <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Template</a></li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                                <span class="fas fa-print"></span> Print
+                            </button>
+                        }
                     }
                 }
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
@@ -544,8 +559,7 @@
                 { data: "itemName", name: "ItemName", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#invoice-status").val().toLowerCase() == "draft")
-                        {
+                        if ($("#invoice-status").val().toLowerCase() == "draft") {
                             return '<input type="number" min="1" max="' + data.quantityOfPack + '" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
                             return '<input type="hidden" value="' + data.quantity + '" class="quantity" />' + data.quantity
@@ -714,11 +728,15 @@
                             if (data.status == "Error") {
                                 toastr.error(data.message, "Error");
                             } else {
-                                toastr.success(data.message, "Success");
-                                if (data.newRow == -2) {
+                                if ($("#invoice-invoice-type").val() != @Model!.InvoiceTypeId) {
                                     window.location.reload();
-                                } else if (data.newRow == -3) {
-                                    window.location = "@Url.Action("Index")";
+                                } else {
+                                    toastr.success(data.message, "Success");
+                                    if (data.newRow == -2) {
+                                        window.location.reload();
+                                    } else if (data.newRow == -3) {
+                                        window.location = "@Url.Action("Index")";
+                                    }
                                 }
                             }
                         }
@@ -728,6 +746,7 @@
         }
         if (user_access.canPrint) {
             $(".btn-details-print").on("click", function () {
+                var print_company = $(this).data("company");
                 var invoice_type_changed = $("#invoice-invoice-type").val() != $("#invoice-invoice-type").data("current-invoice-type");
                 var control_number_changed = $("#invoice-control-number").val() != $("#invoice-control-number").data("current-control-number");
                 var remarks_changed = $("#invoice-remarks").val() != $("#invoice-remarks").data("current-remarks");
@@ -746,7 +765,7 @@
                         fontawesome: "fas fa-print"
                     });
                     setTimeout(function () {
-                        let win = window.open('@Url.Action("PrintReceipt")/' + @Model?.Id, '');
+                        let win = window.open('@Url.Action("PrintReceipt")/' + @Model?.Id + '?Company=' + print_company, '');
                         var wintimer = setInterval(function () {
                             if (win.closed) {
                                 clearInterval(wintimer);
