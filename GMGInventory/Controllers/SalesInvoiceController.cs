@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -72,14 +73,16 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetItemsDTAsync(form, invoiceId));
         }
 
-        public async Task<IActionResult> PrintReceipt(int Id)
+        public async Task<IActionResult> PrintReceipt(int Id, string? Company)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
-            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesInvoice)).Convert();
 
             var invoice = await invoiceRepository.GetDetailsWithItemsAsync(Id);
+            if (invoice == null) return NotFound();
+
+            TempData["CompanyTemplate"] = Company;
             return View(invoice);
         }
 
