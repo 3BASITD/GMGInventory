@@ -27,22 +27,22 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<PurchaseReceiveVM>> GetListAsync()
         {
             var receiveVM = (from receive in context.PurchaseReceivings
-                                                //.Include(s => s.Supplier)
-                                                //.Include(s => s.Term)
-                                                //.Include(s => s.PurchaseOrder)
-                                                //.Include(s => s.Warehouse)
-                                                //.Include(s => s.Status)
-                           select new PurchaseReceiveVM
-                           {
-                               Id = receive.Id,
-                               DocumentNumber = receive.DocumentNumber,
-                               Supplier = receive.PurchaseOrder.Supplier.Code,
-                               Term = receive.PurchaseOrder.Term.Name,
-                               PONumber = receive.PurchaseOrder.DocumentNumber,
-                               Warehouse = receive.Warehouse.Code,
-                               Status = receive.Status.Code,
-                               ReceiveDateD = receive.ReceiveDate
-                           });
+                                 //.Include(s => s.Supplier)
+                                 //.Include(s => s.Term)
+                                 //.Include(s => s.PurchaseOrder)
+                                 //.Include(s => s.Warehouse)
+                                 //.Include(s => s.Status)
+                             select new PurchaseReceiveVM
+                             {
+                                 Id = receive.Id,
+                                 DocumentNumber = receive.DocumentNumber,
+                                 Supplier = receive.PurchaseOrder.Supplier.Code,
+                                 Term = receive.PurchaseOrder.Term.Name,
+                                 PONumber = receive.PurchaseOrder.DocumentNumber,
+                                 Warehouse = receive.Warehouse.Code,
+                                 Status = receive.Status.Code,
+                                 ReceiveDateD = receive.ReceiveDate
+                             });
             return await receiveVM.ToListAsync();
         }
 
@@ -110,7 +110,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseReceiveDetailsVM?> GetDetails(int requestId)
         {
             var details = from receive in context.PurchaseReceivings
-                                                
+
                           let resubmitfrom = context.PurchaseReceivings
                                                     .Where(s => s.ResubmitId == receive.Id)
                                                     .FirstOrDefault()
@@ -166,26 +166,26 @@ namespace GMGInventory.Application.Repositories
 
             var receiveVM = from order in context.PurchaseOrderNewLineItems
 
-                           join receive in context.PurchaseReceivingLineItems on order.Id equals receive.OrderItemId into rcv
-                           from receive in rcv.DefaultIfEmpty()
-                           where order.PurchaseOrderId == orderId
-                           && (receive == null || receive.PurchaseReceivingId == purchaseReceivingId)
-                           select new PurchaseReceiveLineItemVM
-                           {
-                               Id = receive == null ? 0 : receive.Id,
-                               ToReceive = receive != null,
-                               PurchaseReceivingId = receive.PurchaseReceivingId,
-                               LineNumber = order.LineNumber,
-                               OrderItemId = receive.OrderItemId, 
-                               ItemCode = order.RequestItem.Item.Code,
-                               ItemPartNumber = order.RequestItem.Item.PartNumber,
-                               ItemDescription = order.RequestItem.ItemDescription,
-                               QuantityD = receive.Quantity,
-                               OrderQuantityD = order.Quantity,
-                               UnitId = order.RequestItem.Item != null? order.RequestItem.Item.UnitId : 0,
-                               UnitCode = order.RequestItem.Item != null? order.RequestItem.Item.Unit.Code : "",
-                               UnitCost = order.UnitCost
-                           };
+                            join receive in context.PurchaseReceivingLineItems on order.Id equals receive.OrderItemId into rcv
+                            from receive in rcv.DefaultIfEmpty()
+                            where order.PurchaseOrderId == orderId
+                            && (receive == null || receive.PurchaseReceivingId == purchaseReceivingId)
+                            select new PurchaseReceiveLineItemVM
+                            {
+                                Id = receive == null ? 0 : receive.Id,
+                                ToReceive = receive != null,
+                                PurchaseReceivingId = receive.PurchaseReceivingId,
+                                LineNumber = order.LineNumber,
+                                OrderItemId = receive.OrderItemId,
+                                ItemCode = order.RequestItem.Item == null ? null : order.RequestItem.Item.Code,
+                                ItemPartNumber = order.RequestItem.Item == null ? null : order.RequestItem.Item.PartNumber,
+                                ItemDescription = order.RequestItem.ItemDescription,
+                                QuantityD = receive.Quantity,
+                                OrderQuantityD = order.Quantity,
+                                UnitId = order.RequestItem.Item == null ? order.RequestItem.Unit.Id : order.RequestItem.Item.Unit.Id,
+                                UnitCode = order.RequestItem.Item == null ? order.RequestItem.Unit.Code : order.RequestItem.Item.Unit.Code,
+                                UnitCost = order.UnitCost
+                            };
             return await receiveVM.ToListAsync();
         }
 
@@ -332,8 +332,8 @@ namespace GMGInventory.Application.Repositories
                     //SupplierId = purchaseOrder!.SupplierId,
                     //TermId = purchaseOrder!.TermId,
                     WarehouseId = purchaseOrder!.DeliveryAddressId,
-                   // Discount1 = purchaseOrder!.Discount1,
-                   // Discount2 = purchaseOrder!.Discount2,
+                    // Discount1 = purchaseOrder!.Discount1,
+                    // Discount2 = purchaseOrder!.Discount2,
                     //CurrencyId = purchaseOrder!.CurrencyId,
                     //CurrencyRate = purchaseOrder.CurrencyRate
                 };
@@ -379,7 +379,7 @@ namespace GMGInventory.Application.Repositories
                           Text = porder.DocumentNumber,
                           Selected = SelectedId != null && porder.Id == SelectedId
                       };
-                        
+
             return await pos.OrderBy(s => s.Text).ToListAsync();
         }
 
@@ -480,13 +480,13 @@ namespace GMGInventory.Application.Repositories
                                 {
                                     Id = s.Id.ToString(),
                                     Text = s.RequestItem.ItemDescription,
-                                    ItemId = s.RequestItem.Item.Id,
-                                    ItemCode = s.RequestItem.Item.Code,
+                                    ItemId = s.RequestItem.Item == null ? null : s.RequestItem.Item.Id,
+                                    ItemCode = s.RequestItem.Item == null ? null : s.RequestItem.Item.Code,
                                     ItemDescription = s.RequestItem.ItemDescription,
-                                    PartNumber = s.RequestItem.Item.PartNumber,
+                                    PartNumber = s.RequestItem.Item == null ? null : s.RequestItem.Item.PartNumber,
                                     Quantity = s.Quantity,
-                                    Unit = s.RequestItem.Item.Unit.Name,
-                                    UnitId = s.RequestItem.Item.UnitId,
+                                    Unit = s.RequestItem.Item == null ? s.RequestItem.Unit.Name : s.RequestItem.Item.Unit.Name,
+                                    UnitId = s.RequestItem.Item == null ? s.RequestItem.Unit.Id : s.RequestItem.Item.Unit.Id,
                                     UnitCost = s.UnitCost,
                                     LineNumber = s.LineNumber
                                 })

@@ -19,7 +19,7 @@
 <body>
     <table class="formatted">
         <tr>
-            <td colspan="2" rowspan="2" class="center-text">
+            <td rowspan="2" class="center-text" style="width: 100px;">
                 @if (TempData["CompanyLogo"]?.ToString() == "BAS")
                 {
                     <img src="~/images/BAS-02.png" class="logo" />
@@ -29,7 +29,7 @@
                     <img src="~/images/GMG-01.png" class="logo" />
                 }
             </td>
-            <td colspan="2" rowspan="2">
+            <td rowspan="2" style="width: 60%;">
                 <dl>
                     <dt>Document Classification:</dt>
                     <dd>@title.ToUpper()</dd>
@@ -39,7 +39,7 @@
                     }
                 </dl>
             </td>
-            <td colspan="3">
+            <td style="width: 40%;">
                 <dl>
                     <dt>PO Date:</dt>
                     <dd>@Model.OrderDate</dd>
@@ -47,7 +47,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3">
+            <td>
                 <dl>
                     <dt>PR No.:</dt>
                     <dd>@Model.DocumentNumber</dd>
@@ -55,7 +55,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="7">
+            <td colspan="3">
                 <div class="two-column">
                     <div class="column">
                         <strong>Supplier Details</strong>
@@ -76,8 +76,8 @@
                             <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierAddress) ? "N/A" : Model.SupplierAddress)</strong>
                         </div>
                         @*<div class="label">
-                            <span>Email Address:</span>
-                            <strong class="detail">?</strong>
+                        <span>Email Address:</span>
+                        <strong class="detail">?</strong>
                         </div>*@
                         <div class="label">
                             <span>Payment Terms:</span>
@@ -110,141 +110,147 @@
                 </div>
             </td>
         </tr>
-        <tr>
-            <th style="min-width: 10px;">#</th>
-            <th style="min-width: 50px;">PART NUMBER</th>
-            <th>ITEM DESCRIPTION</th>
-            <th style="min-width: 50px;">QTY</th>
-            <th style="min-width: 25px;">UOM</th>
-            <th style="min-width: 50px;">UNIT PRICE</th>
-            <th style="min-width: 50px;">TOTAL</th>
-        </tr>
-        @foreach (var item in items)
-        {
+    </table>
+    <table class="formatted">
+        <thead>
             <tr>
-                <td class="center-text"><nobr>@item.LineNumber</nobr></td>
-                <td>@item.ItemPartNumber</td>
-                <td>@item.ItemDescription</td>
-                <td class="right-text"><nobr>@item.Quantity</nobr></td>
-                <td>@item.UnitCode</td>
-                <td class="right-text"><nobr>@item.UnitCost</nobr></td>
-                <td class="right-text"><nobr>@item.TotalAmount</nobr></td>
+                <th style="min-width: 10px;">#</th>
+                <th style="min-width: 50px;">PART NUMBER</th>
+                <th>ITEM DESCRIPTION</th>
+                <th style="min-width: 50px;">QTY</th>
+                <th style="min-width: 25px;">UOM</th>
+                <th style="min-width: 50px;">UNIT PRICE</th>
+                <th style="min-width: 50px;">TOTAL</th>
             </tr>
-        }
-        @{
-            var itemCount = items.Count;
-            var lastLineNumber = items.OrderByDescending(s => s.LineNumber).Select(s => s.LineNumber).First();
-        }
-        <tr>
-            <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
-            <td></td>
-            <td>* * NOTHING FOLLOWS * *</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        @if (itemCount < 30)
-        {
-            for (var ctr = 2; ctr <= 30 - itemCount; ctr++)
+        </thead>
+        <tbody>
+            @foreach (var item in items)
             {
                 <tr>
-                    <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                    <td>@item.ItemPartNumber</td>
+                    <td>@item.ItemDescription</td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td>@item.UnitCode</td>
+                    <td class="right-text"><nobr>@item.UnitCost</nobr></td>
+                    <td class="right-text"><nobr>@item.TotalAmount</nobr></td>
                 </tr>
             }
-        }
-        <tr>
-            <td colspan="5" class="bb-0 br-0"></td>
-            <td class="br-0 bb-0 bl-0">TOTAL PURCHASE</td>
-            <td class="right-text bb-0 bl-0"><strong>@items.Sum(s => s.TotalAmountD)</strong></td>
-        </tr>
-        <tr>
-            <td colspan="2">PURCHASE REQUEST NUMBER:</td>
-            <td colspan="2">@Model.PurchaseRequestNumber</td>
-            <td class="bt-0 bb-0 br-0"></td>
-            <td class="b-0">DISCOUNT 1</td>
-            <td class="right-text bt-0 bb-0 bl-0"><strong>@Model.Discount1</strong></td>
-        </tr>
-        @{
-            var discounted1D = items.Sum(s => s.TotalAmountD) * Model.Discount1D / 100;
-            var discounted1 = string.Format("{0:#,##0.00}", discounted1D * -1);
-        }
-        <tr>
-            <td colspan="2">DATE PO SENT:</td>
-            <td colspan="2">@Model.DateModified</td>
-            <td class="bt-0 bb-0 br-0"></td>
-            <td class="b-0">DISCOUNT AMOUNT</td>
-            <td class="right-text bt-0 bb-0 bl-0"><strong>@discounted1</strong></td>
-        </tr>
-        <tr>
-            <td colspan="2">DATE RECEIVED:</td>
-            <td colspan="2">@Model.DateReceived</td>
-            <td class="bt-0 bb-0 br-0"></td>
-            <td class="b-0">DISCOUNT 2</td>
-            <td class="right-text bt-0 bb-0 bl-0"><strong>@Model.Discount2</strong></td>
-        </tr>
-        @{
-            var discounted2D = items.Sum(s => s.TotalAmountD) * Model.Discount2D / 100;
-            var discounted2 = string.Format("{0:#,##0.00}", discounted2D * -1);
-        }
-        <tr>
-            <td colspan="4" rowspan="2">
-                <dl>
-                    <dt>Remarks:</dt>
-                    <dd>@Model.Remarks</dd>
-                </dl>
-            </td>
-            <td class="bt-0 bb-0 br-0"></td>
-            <td class="bt-0 br-0 bl-0">DISCOUNT AMOUNT</td>
-            <td class="right-text bt-0 bl-0"><strong>@discounted2</strong></td>
-        </tr>
-        @{
-            var totalD = items.Sum(s => s.TotalAmountD) - (discounted1D + discounted2D);
-            var total = string.Format("{0:#,##0.00}", totalD);
-        }
-        <tr>
-            <td class="bt-0 bb-0 br-0"></td>
-            <td class="br-0 bl-0">TOTAL AMOUNT</td>
-            <td class="right-text bl-0"><strong>@total</strong></td>
-        </tr>
-        <tr>
-            <td colspan="7">
-                <br />
-                <br />
-                <div class="two-column">
-                    <div class="column center-text">
-                        <dl>
-                            <dd>@Model.UserCreated</dd>
-                            <dt>Prepared By</dt>
-                        </dl>
+            @{
+                var itemCount = items.Count;
+                var lastLineNumber = items.OrderByDescending(s => s.LineNumber).Select(s => s.LineNumber).First();
+            }
+            <tr>
+                <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
+                <td></td>
+                <td>* * NOTHING FOLLOWS * *</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            @if (itemCount < 23)
+            {
+                for (var ctr = 2; ctr <= 23 - itemCount; ctr++)
+                {
+                    <tr>
+                        <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td colspan="5" class="bb-0 br-0"></td>
+                <td class="br-0 bb-0 bl-0">TOTAL PURCHASE</td>
+                <td class="right-text bb-0 bl-0"><strong>@items.Sum(s => s.TotalAmountD)</strong></td>
+            </tr>
+            <tr>
+                <td colspan="2">PURCHASE REQUEST NUMBER:</td>
+                <td colspan="2">@Model.PurchaseRequestNumber</td>
+                <td class="bt-0 bb-0 br-0"></td>
+                <td class="b-0">DISCOUNT 1</td>
+                <td class="right-text bt-0 bb-0 bl-0"><strong>@Model.Discount1</strong></td>
+            </tr>
+            @{
+                var discounted1D = items.Sum(s => s.TotalAmountD) * Model.Discount1D / 100;
+                var discounted1 = string.Format("{0:#,##0.00}", discounted1D * -1);
+            }
+            <tr>
+                <td colspan="2">DATE PO SENT:</td>
+                <td colspan="2">@Model.DateModified</td>
+                <td class="bt-0 bb-0 br-0"></td>
+                <td class="b-0">DISCOUNT AMOUNT</td>
+                <td class="right-text bt-0 bb-0 bl-0"><strong>@discounted1</strong></td>
+            </tr>
+            <tr>
+                <td colspan="2">DATE RECEIVED:</td>
+                <td colspan="2">@Model.DateReceived</td>
+                <td class="bt-0 bb-0 br-0"></td>
+                <td class="b-0">DISCOUNT 2</td>
+                <td class="right-text bt-0 bb-0 bl-0"><strong>@Model.Discount2</strong></td>
+            </tr>
+            @{
+                var discounted2D = items.Sum(s => s.TotalAmountD) * Model.Discount2D / 100;
+                var discounted2 = string.Format("{0:#,##0.00}", discounted2D * -1);
+            }
+            <tr>
+                <td colspan="4" rowspan="2">
+                    <dl>
+                        <dt>Remarks:</dt>
+                        <dd>@Model.Remarks</dd>
+                    </dl>
+                </td>
+                <td class="bt-0 bb-0 br-0"></td>
+                <td class="bt-0 br-0 bl-0">DISCOUNT AMOUNT</td>
+                <td class="right-text bt-0 bl-0"><strong>@discounted2</strong></td>
+            </tr>
+            @{
+                var totalD = items.Sum(s => s.TotalAmountD) - (discounted1D + discounted2D);
+                var total = string.Format("{0:#,##0.00}", totalD);
+            }
+            <tr>
+                <td class="bt-0 bb-0 br-0"></td>
+                <td class="br-0 bl-0">TOTAL AMOUNT</td>
+                <td class="right-text bl-0"><strong>@total</strong></td>
+            </tr>
+            <tr>
+                <td colspan="7">
+                    <br />
+                    <br />
+                    <div class="two-column">
+                        <div class="column center-text">
+                            <dl>
+                                <dd>@Model.UserCreated</dd>
+                                <dt>Prepared By</dt>
+                            </dl>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    <dd>@Model.ApprovedBy</dd>
+                                    <dt>Approved By</dt>
+                                </dl>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    <dd>@Model.DisapprovedBy</dd>
+                                    <dt>Disapproved By</dt>
+                                </dl>
+                            </div>
+                        }
                     </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
-                    {
-                        <div class="column center-text">
-                            <dl>
-                                <dd>@Model.ApprovedBy</dd>
-                                <dt>Approved By</dt>
-                            </dl>
-                        </div>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
-                    {
-                        <div class="column center-text">
-                            <dl>
-                                <dd>@Model.DisapprovedBy</dd>
-                                <dt>Disapproved By</dt>
-                            </dl>
-                        </div>
-                    }
-                </div>
-            </td>
-        </tr>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </body>
 <script type="text/javascript">

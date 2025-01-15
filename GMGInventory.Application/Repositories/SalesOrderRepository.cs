@@ -142,7 +142,7 @@ namespace GMGInventory.Application.Repositories
                                OrderDateD = order.SalesOrderDate,
                                OutstandingBalanceD = order.Customer.OutstandingBalance,
                                POId = order.PurchaseOrder == null ? null : order.PurchaseOrder.Id,
-                               PONumber = order.PurchaseOrder == null ? "-" : order.PurchaseOrder.DocumentNumber,
+                               PONumber = order.PurchaseOrder == null ? null : order.PurchaseOrder.DocumentNumber,
                                Remarks = order.Remarks + "",
                                ResubmitId = order.ResubmittedSalesOrderId,
                                ShippingAddress = "",

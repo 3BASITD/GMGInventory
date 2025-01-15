@@ -17,16 +17,17 @@
 <body>
     <table class="formatted">
         <tr>
-            <td colspan="2" rowspan="2" class="center-text">
+            <td rowspan="2" class="center-text" style="width: 100px;">
                 @if (TempData["CompanyLogo"]?.ToString() == "BAS")
                 {
                     <img src="~/images/BAS-02.png" class="logo" />
-                } else
+                }
+                else
                 {
                     <img src="~/images/GMG-01.png" class="logo" />
                 }
             </td>
-            <td colspan="4" rowspan="2">
+            <td rowspan="2" style="width: 60%;">
                 <dl>
                     <dt>Document Classification:</dt>
                     <dd>@title.ToUpper()</dd>
@@ -36,7 +37,7 @@
                     }
                 </dl>
             </td>
-            <td colspan="3">
+            <td style="width: 40%;">
                 <dl>
                     <dt>SO Date:</dt>
                     <dd>@Model.OrderDate</dd>
@@ -44,7 +45,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3">
+            <td>
                 <dl>
                     <dt>SO No.:</dt>
                     <dd>@Model.SONumber</dd>
@@ -52,7 +53,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="9">
+            <td colspan="3">
                 <div class="two-column">
                     <div class="column">
                         <div class="label">
@@ -77,7 +78,7 @@
                         </div>
                         <div class="label">
                             <span>Purchase Order #:</span>
-                            <strong class="detail">@Model.PONumber</strong>
+                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)</strong>
                         </div>
                     </div>
                     <div class="column">
@@ -101,108 +102,114 @@
                 </div>
             </td>
         </tr>
-        <tr>
-            <th style="min-width: 10px;">#</th>
-            <th style="min-width: 50px;">PART NUMBER</th>
-            <th style="min-width: 25px;">SIZE</th>
-            <th>ITEM DESCRIPTION</th>
-            <th style="min-width: 50px;">QTY</th>
-            <th style="min-width: 25px;">UOM</th>
-            <th style="min-width: 50px;">UNIT PRICE</th>
-            <th style="min-width: 50px;">DISCOUNT</th>
-            <th style="min-width: 50px;">TOTAL</th>
-        </tr>
-        @foreach (var item in Model.Items)
-        {
+    </table>
+    <table class="formatted">
+        <thead>
             <tr>
-                <td class="center-text"><nobr>@item.LineNumber</nobr></td>
-                <td>@(string.IsNullOrWhiteSpace(item.ItemPartNumber) ? "-" : item.ItemPartNumber)</td>
-                <td>@item.ItemSize</td>
-                <td>@item.ItemName</td>
-                <td class="right-text"><nobr>@item.Quantity</nobr></td>
-                <td>@item.Unit</td>
-                <td>@item.SellingPrice</td>
-                <td>@item.Discount1 @item.Discount2</td>
-                <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
+                <th style="min-width: 10px;">#</th>
+                <th style="min-width: 50px;">PART NUMBER</th>
+                <th style="min-width: 25px;">SIZE</th>
+                <th>ITEM DESCRIPTION</th>
+                <th style="min-width: 50px;">QTY</th>
+                <th style="min-width: 25px;">UOM</th>
+                <th style="min-width: 50px;">UNIT PRICE</th>
+                <th style="min-width: 50px;">DISCOUNT</th>
+                <th style="min-width: 50px;">TOTAL</th>
             </tr>
-        }
-        @{
-            var itemCount = Model.Items.Count;
-            var lastLineNumber = Model.Items.OrderByDescending(s => s.LineNumber).Select(s => s.LineNumber).First();
-        }
-        <tr>
-            <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
-            <td></td>
-            <td></td>
-            <td>* * NOTHING FOLLOWS * *</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        @if (itemCount < 30)
-        {
-            for (var ctr = 2; ctr <= 30 - itemCount; ctr++)
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
             {
                 <tr>
-                    <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                    <td>@(string.IsNullOrWhiteSpace(item.ItemPartNumber) ? "-" : item.ItemPartNumber)</td>
+                    <td>@item.ItemSize</td>
+                    <td>@item.ItemName</td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td>@item.Unit</td>
+                    <td>@item.SellingPrice</td>
+                    <td>@item.Discount1 @item.Discount2</td>
+                    <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
                 </tr>
             }
-        }
-        <tr>
-            <td colspan="4">
-                <dl>
-                    <dt>Remarks:</dt>
-                    <dd>@Model.Remarks</dd>
-                </dl>
-            </td>
-            <td class="right-text"><nobr>@Model?.TotalQuantity</nobr></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="right-text"><nobr>@Model?.TotalGrossPrice</nobr></td>
-        </tr>
-        <tr>
-            <td colspan="9">
-                <br />
-                <br />
-                <div class="two-column">
-                    <div class="column center-text">
-                        <dl>
-                            <dd>@Model.UserCreated</dd>
-                            <dt>Prepared By</dt>
-                        </dl>
+            @{
+                var itemCount = Model.Items.Count;
+                var lastLineNumber = Model.Items.OrderByDescending(s => s.LineNumber).Select(s => s.LineNumber).First();
+            }
+            <tr>
+                <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
+                <td></td>
+                <td></td>
+                <td>* * NOTHING FOLLOWS * *</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            @if (itemCount < 23)
+            {
+                for (var ctr = 2; ctr <= 23 - itemCount; ctr++)
+                {
+                    <tr>
+                        <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td colspan="4">
+                    <dl>
+                        <dt>Remarks:</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)</dd>
+                    </dl>
+                </td>
+                <td class="right-text"><nobr>@Model?.TotalQuantity</nobr></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="right-text"><nobr>@Model?.TotalGrossPrice</nobr></td>
+            </tr>
+            <tr>
+                <td colspan="9">
+                    <br />
+                    <br />
+                    <div class="two-column">
+                        <div class="column center-text">
+                            <dl>
+                                <dd>@Model.UserCreated</dd>
+                                <dt>Prepared By</dt>
+                            </dl>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    <dd>@Model.ApprovedBy</dd>
+                                    <dt>Approved By</dt>
+                                </dl>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    <dd>@Model.DisapprovedBy</dd>
+                                    <dt>Disapproved By</dt>
+                                </dl>
+                            </div>
+                        }
                     </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
-                    {
-                        <div class="column center-text">
-                            <dl>
-                                <dd>@Model.ApprovedBy</dd>
-                                <dt>Approved By</dt>
-                            </dl>
-                        </div>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
-                    {
-                        <div class="column center-text">
-                            <dl>
-                                <dd>@Model.DisapprovedBy</dd>
-                                <dt>Disapproved By</dt>
-                            </dl>
-                        </div>
-                    }
-                </div>
-            </td>
-        </tr>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </body>
 <script type="text/javascript">

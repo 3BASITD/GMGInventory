@@ -19,7 +19,7 @@
 <body>
     <table class="formatted">
         <tr>
-            <td colspan="2" rowspan="2" class="center-text">
+            <td rowspan="2" class="center-text" style="width: 100px;">
                 @if (TempData["CompanyLogo"]?.ToString() == "BAS")
                 {
                     <img src="~/images/BAS-02.png" class="logo" />
@@ -29,7 +29,7 @@
                     <img src="~/images/GMG-01.png" class="logo" />
                 }
             </td>
-            <td colspan="2" rowspan="2">
+            <td rowspan="2" style="width: 60%;">
                 <dl>
                     <dt>Document Classification:</dt>
                     <dd>@title.ToUpper()</dd>
@@ -39,7 +39,7 @@
                     }
                 </dl>
             </td>
-            <td colspan="3">
+            <td style="width: 40%;">
                 <dl>
                     <dt>PR Date:</dt>
                     <dd>@Model.RequestDate</dd>
@@ -47,7 +47,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3">
+            <td>
                 <dl>
                     <dt>PR No.:</dt>
                     <dd>@Model.DocumentNumber</dd>
@@ -55,7 +55,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="7">
+            <td colspan="3">
                 <div class="label">
                     <span>Type of Request:</span>
                     <strong class="detail">@Model.Type</strong>
@@ -73,116 +73,122 @@
                 }
             </td>
         </tr>
-        <tr>
-            <th style="min-width: 10px;">#</th>
-            @if (Model.Type.ToLower() == "automotive")
-            {
-                <th style="min-width: 50px;">PART NUMBER</th>
-            }
-            else
-            {
-                <th style="min-width: 50px;">ITEM CODE</th>
-            }
-            <th>ITEM DESCRIPTION</th>
-            <th style="min-width: 50px;">QTY</th>
-            <th style="min-width: 25px;">UOM</th>
-            <th style="min-width: 50px;">SOH</th>
-            <th style="min-width: 50px;">REF.SO#</th>
-        </tr>
-        @foreach (var item in items)
-        {
+    </table>
+    <table class="formatted">
+        <thead>
             <tr>
-                <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                <th style="min-width: 10px;">#</th>
                 @if (Model.Type.ToLower() == "automotive")
                 {
-                    <td>@item.ItemPartNumber</td>
+                    <th style="min-width: 50px;">PART NUMBER</th>
                 }
                 else
                 {
-                    <td>@item.ItemCode</td>
+                    <th style="min-width: 50px;">ITEM CODE</th>
                 }
-                <td>@item.ItemDescription</td>
-                <td class="right-text"><nobr>@item.Quantity</nobr></td>
-                <td>@item.UnitCode</td>
-                <td class="right-text"><nobr>@item.StockOnHand</nobr></td>
-                <td><nobr>@(string.IsNullOrWhiteSpace(item.SalesOrderNumber) ? "-" : item.SalesOrderNumber)</nobr></td>
+                <th>ITEM DESCRIPTION</th>
+                <th style="min-width: 50px;">QTY</th>
+                <th style="min-width: 25px;">UOM</th>
+                <th style="min-width: 50px;">SOH</th>
+                <th style="min-width: 50px;">REF.SO#</th>
             </tr>
-        }
-        @{
-            var itemCount = items.Count;
-            var lastLineNumber = items.OrderByDescending(s => s.LineNumber).Select(s => s.LineNumber).First();
-        }
-        <tr>
-            <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
-            <td></td>
-            <td>* * NOTHING FOLLOWS * *</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        @if (itemCount < 30)
-        {
-            for (var ctr = 2; ctr <= 30 - itemCount; ctr++)
+        </thead>
+        <tbody>
+            @foreach (var item in items)
             {
                 <tr>
-                    <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                    @if (Model.Type.ToLower() == "automotive")
+                    {
+                        <td>@item.ItemPartNumber</td>
+                    }
+                    else
+                    {
+                        <td>@item.ItemCode</td>
+                    }
+                    <td>@item.ItemDescription</td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td>@item.UnitCode</td>
+                    <td class="right-text"><nobr>@item.StockOnHand</nobr></td>
+                    <td><nobr>@(string.IsNullOrWhiteSpace(item.SalesOrderNumber) ? "-" : item.SalesOrderNumber)</nobr></td>
                 </tr>
             }
-        }
-        <tr>
-            <td colspan="7">
-                <dl>
-                    <dt>Remarks:</dt>
-                    <dd>@Model.Remarks</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="7">
-                <br />
-                <br />
-                <div class="two-column">
-                    <div class="column center-text">
-                        <dl>
-                            <dd>@Model.UserCreated</dd>
-                            <dt>Prepared By</dt>
-                        </dl>
+            @{
+                var itemCount = items.Count;
+                var lastLineNumber = items.OrderByDescending(s => s.LineNumber).Select(s => s.LineNumber).First();
+            }
+            <tr>
+                <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
+                <td></td>
+                <td>* * NOTHING FOLLOWS * *</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            @if (itemCount < 23)
+            {
+                for (var ctr = 2; ctr <= 23 - itemCount; ctr++)
+                {
+                    <tr>
+                        <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td colspan="7">
+                    <dl>
+                        <dt>Remarks:</dt>
+                        <dd>@Model.Remarks</dd>
+                    </dl>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7">
+                    <br />
+                    <br />
+                    <div class="two-column">
+                        <div class="column center-text">
+                            <dl>
+                                <dd>@Model.UserCreated</dd>
+                                <dt>Prepared By</dt>
+                            </dl>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1) || !string.IsNullOrWhiteSpace(Model.ApprovedBy2))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1))
+                                    {
+                                        <dd>@Model.ApprovedBy1</dd>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy2))
+                                    {
+                                        <dd>@Model.ApprovedBy2</dd>
+                                    }
+                                    <dt>Approved By</dt>
+                                </dl>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    <dd>@Model.DisapprovedBy</dd>
+                                    <dt>Disapproved By</dt>
+                                </dl>
+                            </div>
+                        }
                     </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1) || !string.IsNullOrWhiteSpace(Model.ApprovedBy2))
-                    {
-                        <div class="column center-text">
-                            <dl>
-                                @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1))
-                                {
-                                    <dd>@Model.ApprovedBy1</dd>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy2))
-                                {
-                                    <dd>@Model.ApprovedBy2</dd>
-                                }
-                                <dt>Approved By</dt>
-                            </dl>
-                        </div>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
-                    {
-                        <div class="column center-text">
-                            <dl>
-                                <dd>@Model.DisapprovedBy</dd>
-                                <dt>Disapproved By</dt>
-                            </dl>
-                        </div>
-                    }
-                </div>
-            </td>
-        </tr>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </body>
 <script type="text/javascript">
