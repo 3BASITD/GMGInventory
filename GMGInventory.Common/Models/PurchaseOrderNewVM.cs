@@ -140,7 +140,7 @@ namespace GMGInventory.Common.Models
         public string? ItemCode { get; set; }
 
         [Display(Name = "Part Number")]
-        public string ItemPartNumber { get; set; }
+        public string? ItemPartNumber { get; set; }
 
         [Display(Name = "Item Name")]
         public string ItemDescription { get; set; }

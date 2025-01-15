@@ -193,6 +193,15 @@ namespace GMGInventory.Application.Repositories
             var requestVM = from request in context.PurchaseRequestLineItems
                                                    .Include(s => s.SalesOrder)
                                                    .Include(s => s.Item)
+                            let packedQuantity = context.PackLineItems
+                                                        .Where(s => s.ItemId == request.ItemId)
+                                                        .Sum(s => (int?)s.Quantity) ?? 0
+                            let invoicedQuantity = context.InvoiceLineItems
+                                                          .Where(s => s.ItemId == request.ItemId)
+                                                          .Sum(s => (int?)s.Quantity) ?? 0
+                            let returnedQuantity = context.SalesReturnLineItems
+                                                          .Where(s => s.ItemId == request.ItemId)
+                                                          .Sum(s => (int?)s.Quantity) ?? 0
                             where request.PurchaseRequestId == purchaseRequestId
                             select new PurchaseRequestLineItemVM
                             {
@@ -205,7 +214,7 @@ namespace GMGInventory.Application.Repositories
                                 ItemCode = request.Item == null ? null : request.Item.Code,
                                 ItemPartNumber = (request.Item == null ? null : request.Item.PartNumber) + "",
                                 ItemDescription = request.ItemDescription,
-                                StockOnHandD = request.StockOnHand,
+                                StockOnHandD = (packedQuantity - returnedQuantity) - invoicedQuantity,
                                 QuantityD = request.Quantity,
                                 UnitId = request.Unit != null ? request.Unit.Id
                                        : request.Item != null ? request.Item.Unit.Id
@@ -392,7 +401,6 @@ namespace GMGInventory.Application.Repositories
                                            SalesOrderId = s.SalesOrderId,
                                            ItemId = s.ItemId,
                                            ItemDescription = s.ItemDescription,
-                                           StockOnHand = s.StockOnHandD,
                                            Quantity = s.QuantityD,
                                            UnitId = s.ItemId == null ? s.UnitId : null,
                                            Purpose = s.Purpose + ""
@@ -407,7 +415,6 @@ namespace GMGInventory.Application.Repositories
                         // update all available in db
                         var dbitem = await citems.Where(s => s.Id == ei.Id).FirstAsync();
                         dbitem.LineNumber = ei.LineNumber;
-                        dbitem.StockOnHand = ei.StockOnHandD;
                         dbitem.Quantity = ei.QuantityD;
                         dbitem.UnitId = ei.ItemId == null ? ei.UnitId : null;
 

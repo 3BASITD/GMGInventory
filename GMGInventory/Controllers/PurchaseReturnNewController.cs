@@ -77,14 +77,23 @@ namespace GMGInventory.Controllers
             return Json(request);
         }
 
-        public async Task<IActionResult> PrintDetails(int Id)
+        public async Task<IActionResult> PrintDetails(int Id, string? Company)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReturnNew, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
-            ViewData["Items"] = await returnRepository.GetItemListAsync(Id);
+            var details = await returnRepository.GetDetails(Id);
 
-            return View(await returnRepository.GetDetails(Id));
+            var items = await returnRepository.GetItemListAsync(Id);
+
+            if (details == null || Company == null)
+            {
+                return NotFound();
+            }
+
+            TempData["CompanyLogo"] = Company;
+            ViewData["Items"] = items;
+            return View(details);
         }
 
         public async Task<IActionResult> Create(int? Id)
