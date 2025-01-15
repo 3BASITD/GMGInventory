@@ -182,7 +182,8 @@ namespace GMGInventory.Common.Models
         public string ItemName { get; set; }
 
         [Display(Name = "Quantity")]
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringDecimalComma, QuantityD);
+        public int QuantityD { get; set; }
         public int QuantityOfPack { get; set; }
 
         [Display(Name = "Unit")]
@@ -203,11 +204,12 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Gross Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
-        public decimal GrossPriceD => Quantity * (((100m - Discount1D - Discount2D) * NetPriceD) / 100m);
-
+        //public decimal GrossPriceD => Quantity * (((100m - Discount1D - Discount2D) * NetPriceD) / 100m);
+        public decimal GrossPriceD => (QuantityD * NetPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100;
+        //(QuantityD* SellingPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100
         [Display(Name = "Gross Price (No Discount)")]
         public string GrossPriceNoDiscount => string.Format(SystemFormat.StringDecimalComma, GrossPriceNoDiscountD);
-        public decimal GrossPriceNoDiscountD => Quantity * NetPriceD;
+        public decimal GrossPriceNoDiscountD => QuantityD * NetPriceD;
         public string ReferenceNumber { get; set; }
     }
 

@@ -362,7 +362,7 @@ namespace GMGInventory.Application.Repositories
                              ItemCode = item.Code,
                              ItemName = item.Name,
                              NetPriceD = invoicel.UnitPrice,
-                             Quantity = invoicel.Quantity,
+                             QuantityD = invoicel.Quantity,
                              QuantityOfPack = pack,
                              Unit = item.Unit.Code,
                              SellingPriceType = price.RetailSellingPrice > price.NetSellingPrice ? "Gross" : "Net",
