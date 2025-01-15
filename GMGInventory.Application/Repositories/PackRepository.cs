@@ -238,14 +238,15 @@ namespace GMGInventory.Application.Repositories
                                             .OrderByDescending(s => s.DateCreated)
                                             .First()
                          let packedQuantity = context.PackLineItems
-                                                     .Where(s => s.PackId == pack.Id && s.ItemId == order.ItemId)
+                                                     .Where(s => s.PackId == packId && s.ItemId == order.ItemId)
                                                      .Sum(s => (int?)s.Quantity) ?? 0
                          let invoicedQuantity = context.InvoiceLineItems
-                                                       .Where(s => s.Invoice.PackId == pack.Id && s.ItemId == order.ItemId)
+                                                       .Where(s => s.Invoice.PackId == packId && s.ItemId == order.ItemId)
                                                        .Sum(s => (int?)s.Quantity) ?? 0
                          where pack.PackId == packId
                          && pack.Item.Id == order.Item.Id
                          && invoicedQuantity < packedQuantity
+
                          group new { pack, order, price } by new { pack.ItemId, order.Discount1, order.Discount2, order.SellingPrice } into grp
                          select new PackItemVM
                          {
