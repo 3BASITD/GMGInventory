@@ -250,6 +250,11 @@ namespace GMGInventory.Common.Models
         public string InvoicedQuantity => string.Format(SystemFormat.StringIntegerComma, InvoicedQuantityD);
         public int InvoicedQuantityD { get; set; }
 
+        [Display(Name = "Remaining Quantity")]
+        public string RemainingQuantity => string.Format(SystemFormat.StringIntegerComma, RemainingQuantityD);
+        //public int RemainingQuantityD => ServedQuantityD - PackedQuantityD;
+        public int RemainingQuantityD { get; set; }
+
         [Display(Name = "Unit")]
         public string Unit { get; set; }
 
