@@ -211,7 +211,7 @@ namespace GMGInventory.Application.Repositories
                                OrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
-                               TotalAmountD = order.SalesOrderLineItems.Sum(s => s.Quantity * (((100 - s.Discount1 - s.Discount2) * s.SellingPrice) / 100)),
+                               TotalAmountD = order.SalesOrderLineItems.Sum(s => (s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100),
                                ApprovedDisapprovedBy = approvedby != null ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname) : disapprovedby != null ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname) : "-",
                                ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate
                            });
@@ -319,7 +319,6 @@ namespace GMGInventory.Application.Repositories
                                     NetPriceD = price == null ? 0 : price.NetSellingPrice,
                                     QuantityD = order.Quantity,
                                     PackedQuantityD = packedQuantity,
-                                    RemainingQuantityD = (packedQuantity - returnedQuantity) - invoicedQuantity,
                                     RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                     SellingPriceD = order.SellingPrice,
                                     ServedQuantityD = packedQuantity - returnedQuantity,

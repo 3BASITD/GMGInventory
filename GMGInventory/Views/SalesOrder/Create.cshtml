@@ -485,7 +485,8 @@
             var discount1 = parseFloat($("#add-discount1").val());
             var discount2 = parseFloat($("#add-discount2").val());
 
-            $("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+            //$("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+            $("#add-gross-price").val(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
         });
 
         function clearItemForm() {
@@ -703,7 +704,8 @@
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
 
-                var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+                //var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+                var gross_price = FormatStringDecimal(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
                 $(this).parents("tr").find(".grossprice").html(gross_price);
                 ComputeTotalQuantity();
                 ComputeTotalGrossPrice();
