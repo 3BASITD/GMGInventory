@@ -209,7 +209,7 @@ namespace GMGInventory.Common.Models
         //(QuantityD* SellingPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100
         [Display(Name = "Gross Price (No Discount)")]
         public string GrossPriceNoDiscount => string.Format(SystemFormat.StringDecimalComma, GrossPriceNoDiscountD);
-        public decimal GrossPriceNoDiscountD => Quantity * NetPriceD;
+        public decimal GrossPriceNoDiscountD => QuantityD * NetPriceD;
         public string ReferenceNumber { get; set; }
     }
 

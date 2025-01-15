@@ -18,7 +18,8 @@
     @if (Model?.InvoiceType == "Sales Invoice")
     {
         <!-- SALES INVOICE -->
-        <table style="margin-top: 115px;">
+        @* <table style="margin-top: 115px;"> *@
+        <table style="margin-top: 140px;">
             <tbody>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
@@ -60,12 +61,12 @@
                                 <td>@item.ItemName</td>
                                 <td style="width: 80px;" class="currency">@item.NetPrice</td>
                                 <td style="width: 125px;" class="currency">@item.GrossPriceNoDiscount</td>
-                                <td style="width: 30px;"></td>
+                                <td style="width: 10px;"></td>
                             </tr>
                         }
                         else
                         {
-                            otherQuantity += item.Quantity;
+                            otherQuantity += item.QuantityD;
                             otherGrossPrice += item.GrossPriceNoDiscountD;
                         }
                     }
@@ -75,8 +76,8 @@
                         <tr>
                             <td style="width: 75px;">@otherQuantity</td>
                             <td colspan="3">+@(Model.Items.Count - 17) more item(s)</td>
-                            <td style="width: 125px;" class="currency">@string.Format("{0:#,##0.00}",otherGrossPrice)</td>
-                            <td style="width: 30px;"></td>
+                            <td style="width: 125px;" class="currency">@string.Format("{0:#,##0.00}", otherGrossPrice)</td>
+                            <td style="width: 10px;"></td>
                         </tr>
                     }
                     else
@@ -89,7 +90,7 @@
                                 <td></td>
                                 <td style="width: 80px;" class="currency"></td>
                                 <td style="width: 125px;" class="currency"></td>
-                                <td style="width: 30px;"></td>
+                                <td style="width: 10px;"></td>
                             </tr>
                         }
                     }
@@ -97,61 +98,61 @@
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency">Total:</td>
                         <td style="width: 125px;" class="currency">@Model.Total</td>
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency">LESS @Model.DiscountPercent:</td>
                         <td style="width: 125px;" class="currency">@Model.DiscountAmount</td>
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency">Total Amount:</td>
                         <td style="width: 125px;" class="currency">@Model.DiscountedTotal</td>
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency"></td> <!-- Total Sales(VAT Inclusive) -->
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency">@Model.VATExclusive</td> <!--Less: VAT -->
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency"></td> <!-- Amount: Net of VAT -->
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency"></td> <!-- Less: Discount -->
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency"></td> <!-- Amount Due -->
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency">@Model.VATAmount</td> <!-- Add: VAT -->
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="3"></td>
                         <td style="width: 80px;" class="currency"></td>
                         <td style="width: 125px;" class="currency">@Model.DiscountedTotal</td> <!-- TOTAL AMOUNT DUE -->
-                        <td style="width: 30px;"></td>
+                        <td style="width: 10px;"></td>
                     </tr>
                 }
             </tbody>
@@ -161,7 +162,8 @@
     {
         <!-- DELIVERY RECEIPT -->
         @*<table style="margin-top: 115px;">*@
-        <table style="margin-top: 140px;">
+        @*<table style="margin-top: 140px;">*@
+        <table style="margin-top: 180px;">
             <tbody>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
@@ -184,12 +186,12 @@
         <table>
             <tbody>
                 <tr>
-                    <td style="width: 75px;"></td>
-                    <td style="width: 50px;"></td>
-                    <td style="width: 75px;"></td>
+                    <td style="width: 75px !important;"></td>
+                    <td style="width: 50px !important;"></td>
+                    <td style="width: 75px"></td>
                     <td></td>
-                    <td style="width: 80px;" class="currency"></td>
-                    <td style="width: 125px;" class="currency"></td>
+                    <td style="width: 80px !important;" class="currency"></td>
+                    <td style="width: 125px !important;" class="currency"></td>
                 </tr>
                 @if (Model != null)
                 {
@@ -210,7 +212,7 @@
                         }
                         else
                         {
-                            otherQuantity += item.Quantity;
+                            otherQuantity += item.QuantityD;
                             otherGrossPrice += item.GrossPriceNoDiscountD;
                         }
                     }

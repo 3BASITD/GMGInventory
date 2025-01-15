@@ -12,52 +12,45 @@
     <link rel="icon" href="~/images/box.ico" />
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
     <style>
-        @for (int ctr = 10; ctr <= 20; ctr++)
+            @for (int ctr = 10; ctr <= 40; ctr+=2)
         {
             <text>.f@(ctr) { font-size: @(ctr)px!important; }</text>
+            
+        }
+            @for (int ctr = 10; ctr <= 40; ctr+=5)
+        {
+            <text>.w@(ctr) { width: @(ctr * 5)px!important; }</text>
         }
     </style>
 </head>
 <body>
     <h3>@title</h3>
-    <p>
-        @for (int ctr = 10; ctr <= 20; ctr++)
-        {
-            <text>
-                <strong class="f@(ctr)">Font Size @(ctr)</strong>
-                <span class="f@(ctr)">Font Size @(ctr)</span>
-                <br />
-            </text>
-        }
-    </p>
     <table class="table-items">
-        <thead>
-            @for (int ctr = 10; ctr <= 20; ctr++)
-            {
-                <text>
-                <tr class="f@(ctr)">
-                    <th class="f@(ctr)">Name</th>
-                    <th class="f@(ctr)">Description</th>
-                    <th class="f@(ctr)">Code</th>
-                    <th class="f@(ctr)">Date</th>
-                </tr>
-                </text>
-            }
-        </thead>
         <tbody>
-            @for (int ctr = 10; ctr <= 20; ctr++)
+            @for (int ctr = 10; ctr <= 40; ctr+=2)
             {
                 <text>
                 <tr class="f@(ctr)">
-                    <td class="f@(ctr)">Font Size @(ctr)</td>
-                    <td class="f@(ctr)">A quick brown fox jumps over the lazy dog.</td>
+                    <th class="f@(ctr)">Font Size @(ctr)</th>
                     <td class="f@(ctr)">#@(ctr)</td>
-                    <td class="f@(ctr)">@DateTime.MinValue.ToString()</td>
                 </tr>
                 </text>
             }
         </tbody>
     </table>
+            @for (int ctr = 10; ctr <= 40; ctr+=5)
+            {
+    <table class="table-items">
+        <tbody>
+                <tr class="f12">
+                    <th class="w@(ctr)">Width Size @(ctr * 5)</th>
+                    <td class="w@(ctr)">Width Size @(ctr * 5)</td>
+                    <td class="w@(ctr)">#@(ctr * 5)</td>
+                    <td></td>
+                </tr>
+        </tbody>
+    </table>
+            }
 </body>
 <script type="text/javascript">
     window.print();

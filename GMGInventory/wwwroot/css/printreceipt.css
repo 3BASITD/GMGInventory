@@ -19,7 +19,7 @@ table {
 
 td {
     vertical-align: top;
-    /*border: solid thin black;*/
+    /*border: solid thin black;*/ border: solid thin black;
     padding: 0;
     margin: 0;
     height: 23px;
