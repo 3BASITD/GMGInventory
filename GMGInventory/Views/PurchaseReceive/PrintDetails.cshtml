@@ -2,7 +2,7 @@
 
 @{
     Layout = "";
-    var title = "Purchase Receive";
+    var title = "Purchase Receiving Report";
     var items = ViewData["Items"] as List<PurchaseReceiveLineItemVM> ?? new List<PurchaseReceiveLineItemVM>();
 
 }
@@ -17,83 +17,169 @@
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
 </head>
 <body>
-    <h3 class="center-text">@title</h3>
-    <table class="table-header">
+    <table class="formatted">
         <tr>
-            <th>@Html.DisplayNameFor(model => model.DocumentNumber)</th>
-            <td>@Model.DocumentNumber</td>
-            <th>@Html.DisplayNameFor(model => model.UserCreated)</th>
-            <td>@Model.UserCreated</td>
+            <td rowspan="2" class="center-text" style="width: 100px;">
+                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                {
+                    <img src="~/images/BAS-02.png" class="logo" />
+                }
+                else
+                {
+                    <img src="~/images/GMG-01.png" class="logo" />
+                }
+            </td>
+            <td rowspan="2" style="width: 60%;">
+                <dl>
+                    <dt>Document Classification:</dt>
+                    <dd>@title.ToUpper()</dd>
+                    @if (Model.Status.ToLower() != "approved")
+                    {
+                        <dd>@("(" + Model.Status + ")")</dd>
+                    }
+                </dl>
+            </td>
+            <td style="width: 40%;">
+                <dl>
+                    <dt>Date Receive:</dt>
+                    <dd>@Model.ReceiveDate</dd>
+                </dl>
+            </td>
         </tr>
-       
+        <tr>
+            <td>
+                <dl>
+                    <dt>Receiving Number.:</dt>
+                    <dd>@Model.DocumentNumber</dd>
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <div class="two-column">
+                    <div class="column">
+                        <div class="label">
+                            <span>Supplier Name:</span>
+                            <strong class="detail">@Model.Supplier</strong>
+                        </div>
+                        <div class="label">
+                            <span>Ref. PO Number:</span>
+                            <strong class="detail">@Model.PONumber</strong>
+                        </div>
+                        <div class="label">
+                            <span>Warehouse:</span>
+                            <strong class="detail">@Model.Warehouse</strong>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="label">
+                            <span>Delivery Receipt #:</span>
+                            <strong class="detail">@Model.DRNumber</strong>
+                        </div>
+                        <div class="label">
+                            <span>Sales Invoice #:</span>
+                            <strong class="detail">@Model.SINumber</strong>
+                        </div>
+                        <div class="label">
+                            <span>Remarks:</span>
+                            <strong class="detail">@Model.Remarks</strong>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
     </table>
-    <table class="table-items no-border">
+    <table class="formatted">
         <thead>
             <tr>
-                <th class="min-width-50">
-                    #
-                </th>
-                <th>
-                    @Html.DisplayNameFor(_ => items[0].ItemCode)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(_ => items[0].ItemDescription)
-                </th>
-               
-                <th>
-                    @Html.DisplayNameFor(_ => items[0].Quantity)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(_ => items[0].UnitCode)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(_ => items[0].UnitCost)
-                </th>
+                <th style="min-width: 10px;">#</th>
+                <th style="min-width: 50px;">PART NUMBER</th>
+                <th>PARTICULARS</th>
+                <th style="min-width: 50px;">QTY</th>
+                <th style="min-width: 25px;">UOM</th>
+                <th style="min-width: 50px;">UNIT PRICE</th>
+                <th style="min-width: 50px;">TOTAL AMOUNT</th>
             </tr>
         </thead>
         <tbody>
+            @foreach (var item in items)
+            {
+                <tr>
+                    <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                    <td>@item.ItemPartNumber</td>
+                    <td>@item.ItemDescription</td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td>@item.UnitCode</td>
+                    <td class="right-text"><nobr>@item.UnitCost</nobr></td>
+                    <td class="right-text"><nobr>@item.TotalAmount</nobr></td>
+                </tr>
+            }
             @{
-                var totalquantity = 0;
-                foreach (var item in items)
+                var itemCount = items.Count;
+                var lastLineNumber = items.OrderByDescending(s => s.LineNumber).Select(s => s.LineNumber).First();
+            }
+            <tr>
+                <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
+                <td></td>
+                <td>* * NOTHING FOLLOWS * *</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            @if (itemCount < 23)
+            {
+                for (var ctr = 2; ctr <= 23 - itemCount; ctr++)
                 {
                     <tr>
-                        <td class="min-width-50"><nobr>@item.LineNumber</nobr></td>
-                        <td>@item.ItemCode</td>
-                        <td>@item.ItemDescription</td>
-                        <td class="right-text"><nobr>@item.Quantity</nobr></td>
-                        <td>@item.UnitCode</td>
-                        <td>@item.UnitCost</td>
+                        <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
-                    totalquantity += item.QuantityD;
                 }
             }
-        </tbody>
-        <tfoot>
             <tr>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th class="right-text"><nobr>@totalquantity</nobr></th>
-                <th class="left-text">Total</th>
-                <th></th>
+                <td colspan="5" class="bb-0 br-0"></td>
+                <td class="br-0 bb-0 bl-0">TOTAL AMOUNT</td>
+                <td class="right-text bb-0 bl-0"><strong>@items.Sum(s => s.TotalAmountD)</strong></td>
             </tr>
-        </tfoot>
-    </table>
-    <table class="table-header">
-        <tr>
-            <th colspan="3">@Html.DisplayNameFor(model => model.Remarks)</th>
-        </tr>
-        <tr>
-            <td>@Model.DocumentNumber</td>
-        </tr>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.UserCreated)</th>
-            <th>@Html.DisplayNameFor(model => model.ApprovedBy)</th>
-        </tr>
-        <tr>
-            <td>@Model.UserCreated</td>
-            <td>@Model.ApprovedBy</td>
-        </tr>
+            <tr>
+                <td colspan="7">
+                    <br />
+                    <br />
+                    <div class="two-column">
+                        <div class="column center-text">
+                            <dl>
+                                <dd>@Model.UserCreated</dd>
+                                <dt>Prepared By</dt>
+                            </dl>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    <dd>@Model.ApprovedBy</dd>
+                                    <dt>Approved By</dt>
+                                </dl>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    <dd>@Model.DisapprovedBy</dd>
+                                    <dt>Disapproved By</dt>
+                                </dl>
+                            </div>
+                        }
+                    </div>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </body>
 <script type="text/javascript">
@@ -101,7 +187,7 @@
     window.onafterprint = function () {
         setTimeout(function () {
             window.close();
-        }, 100); 
+        }, 100);
     };
 </script>
 </html>

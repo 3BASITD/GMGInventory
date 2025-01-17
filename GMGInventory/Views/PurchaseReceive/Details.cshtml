@@ -15,9 +15,15 @@
         <div class="card-tools">
             @if (userAccess.CanPrint)
             {
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-                    <span class="fas fa-print"></span> Print
-                </button>
+                <div class="dropdown float-right ml-2">
+                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-print"></span> Print
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
+                        <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
+                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
+                    </ul>
+                </div>
             }
             @if (Model.Status.ToLower() == "draft")
             {
@@ -492,7 +498,7 @@
                     } else {
                         total_quantity += this.data().quantityD;
                     }
-                    });
+                });
                 $(".total-quantity").html(FormatStringInteger(total_quantity));
             }
 
@@ -609,76 +615,77 @@
                 return item_to_receive;
             }
 
-             if (user_access.canApproveDisapprove) {
-            $('.btn-details-approve').click(function (e) {
-                swal({
-                    title: "Approve Purchase Receiving",
+            if (user_access.canApproveDisapprove) {
+                $('.btn-details-approve').click(function (e) {
+                    swal({
+                        title: "Approve Purchase Receiving",
                         text: "Continue to approve this purchase receiving?",
-                    icon: "success",
-                    buttons: true,
-                    successMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $.ajax({
-                            url: "@Url.Action("ApproveJson")",
-                            type: "POST",
-                            data: { Id: @Model!.Id },
-                            success: function (data, status, xhr) {
-                                if (data.status == "Success") {
-                                    window.location.reload();
-                                } else {
-                                    toastr.error(data.message, data.status);
+                        icon: "success",
+                        buttons: true,
+                        successMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            $.ajax({
+                                url: "@Url.Action("ApproveJson")",
+                                type: "POST",
+                                data: { Id: @Model!.Id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        window.location.reload();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
                                 }
-                            }
-                        });
-                    }
+                            });
+                        }
+                    });
                 });
-            });
 
-            $('.btn-details-disapprove').click(function (e) {
-                swal({
+                $('.btn-details-disapprove').click(function (e) {
+                    swal({
                         title: "Disapprove Purchase Receiving",
                         text: "Continue to disapprove this purchase receiving?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                    content: {
-                        element: "input",
-                        attributes: {
-                            placeholder: "Reason for Disapproving",
-                            type: "text"
-                        }
-                    }
-                }).then((confirm) => {
-                    if (confirm !== null) {
-                        $.ajax({
-                            url: "@Url.Action("DisapproveJson")",
-                            type: "POST",
-                            data: {
-                                Id: @Model!.Id,
-                                reason: confirm
-                            },
-                            success: function (data, status, xhr) {
-                                if (data.status == "Success") {
-                                    window.location.reload();
-                                } else {
-                                    toastr.error(data.message, data.status);
-                                }
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                        content: {
+                            element: "input",
+                            attributes: {
+                                placeholder: "Reason for Disapproving",
+                                type: "text"
                             }
-                        });
-                    }
+                        }
+                    }).then((confirm) => {
+                        if (confirm !== null) {
+                            $.ajax({
+                                url: "@Url.Action("DisapproveJson")",
+                                type: "POST",
+                                data: {
+                                    Id: @Model!.Id,
+                                    reason: confirm
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        window.location.reload();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
                 });
-            });
-        }
+            }
 
             if (user_access.canPrint) {
                 $(".btn-details-print").on("click", function () {
+                    var print_company = $(this).data("company");
                     $.LoadingOverlay("show", {
                         image: "",
                         fontawesome: "fas fa-print"
                     });
                     setTimeout(function () {
-                        let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id, '');
+                        let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id + '?Company=' + print_company, '');
                         var wintimer = setInterval(function () {
                             if (win.closed) {
                                 clearInterval(wintimer);

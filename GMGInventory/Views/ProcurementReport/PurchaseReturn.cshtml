@@ -124,6 +124,16 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
+                            <label for="filter-status" class="form-label mb-0">Status</label>
+                            <select id="filter-status" style="width:100%" class="custom-select">
+                                <option>Approved</option>
+                                <option>Disapproved</option>
+                                <option>Submitted</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
                             <label for="groupby" class="form-label mb-0">Group By</label>
                             <select id="groupby" style="width:100%" class="custom-select">
                                 <option value="">None</option>
@@ -245,6 +255,7 @@
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
+                    data.Status = $("#filter-status").val();
                 }
             },
             processing: true,
@@ -256,19 +267,17 @@
                 return: true,
             },
             columns: [
-                { data: "returnDate", name: "Return Date" },
-                { data: "documentNumber", name: "Document Number" },
-                { data: "supplier", name: "Supplier" },
-                { data: "item", name: "Item" },
-                { data: "itemDescription", name: "ItemDescription" },
-                { data: "quantity", name: "Quantity" },
-                { data: "unit", name: "Unit" },
-                { data: "unitCost", name: "UnitCost", className: "text-end" },
-
-                { data: "totalAmount", name: "TotalAmount" },
-                { data: "returnQuantity", name: "ReturnQuantity" },
-                { data: "returnTotalAmount", name: "ReturnTotalAmount", className: "text-end" },
-
+                { data: "returnDate", name: "returnDate" },
+                { data: "documentNumber", name: "documentNumber" },
+                { data: "supplier", name: "supplier" },
+                { data: "item", name: "item" },
+                { data: "itemDescription", name: "itemDescription" },
+                { data: "quantity", name: "quantity" },
+                { data: "unit", name: "unit" },
+                { data: "unitCost", name: "unitCost", className: "text-end" },
+                { data: "totalAmount", name: "totalAmount" },
+                { data: "returnQuantity", name: "returnQuantity" },
+                { data: "returnTotalAmount", name: "returnTotalAmount", className: "text-end" },
             ],
             rowGroup: {
                 dataSrc: ''
@@ -279,7 +288,8 @@
 
                 $(api.column(8).footer()).html(FormatStringDecimal(json.totalAmount));
                 $(api.column(10).footer()).html(FormatStringDecimal(json.totalAmount2));
-            }
+            },
+            order: [[0, "desc"]]
         });
 
         // Load functions upon DataTable load
@@ -314,6 +324,7 @@
             var urlQuery = [];
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
+            urlQuery.push("Status=" + $("#filter-status").val());
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
@@ -330,6 +341,7 @@
             var urlQuery = [];
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
+            urlQuery.push("Status=" + $("#filter-status").val());
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
