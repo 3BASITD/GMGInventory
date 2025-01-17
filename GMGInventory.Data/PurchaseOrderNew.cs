@@ -36,13 +36,6 @@ namespace GMGInventory.Data
         public int DeliveryAddressId { get; set; }
         public virtual Warehouse DeliveryAddress { get; set; }
 
-        [ForeignKey("CurrencyId")]
-        public int CurrencyId { get; set; }
-        public virtual Currency Currency { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal CurrencyRate { get; set; }
-
         [Column(TypeName = "nvarchar(50)")]
         public string CanvasSummaryReference { get; set; }
 

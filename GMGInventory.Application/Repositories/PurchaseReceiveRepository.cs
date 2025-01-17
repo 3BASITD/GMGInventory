@@ -24,7 +24,7 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
-        private async Task<IList<PurchaseReceiveVM>> GetListAsync()
+        private async Task<IList<PurchaseReceiveVM>> GetListAsync(int? purchaseStatusId)
         {
             var receiveVM = (from receive in context.PurchaseReceivings
                                  //.Include(s => s.Supplier)
@@ -32,6 +32,7 @@ namespace GMGInventory.Application.Repositories
                                  //.Include(s => s.PurchaseOrder)
                                  //.Include(s => s.Warehouse)
                                  //.Include(s => s.Status)
+                             where purchaseStatusId == null || receive.StatusId == purchaseStatusId
                              select new PurchaseReceiveVM
                              {
                                  Id = receive.Id,
@@ -46,11 +47,11 @@ namespace GMGInventory.Application.Repositories
             return await receiveVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<PurchaseReceiveVM>> GetListDTAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<PurchaseReceiveVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync()).AsQueryable();
+            var data = (await GetListAsync(purchaseStatusId)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -141,9 +142,9 @@ namespace GMGInventory.Application.Repositories
                               Status = receive.Status.Code,
                               ReceiveDateD = receive.ReceiveDate,
                               Remarks = receive.Remarks,
-                              Currency = receive.PurchaseOrder.Currency.Code,
-                              CurrencyId = receive.PurchaseOrder.Currency.Id,
-                              CurrencyRateD = receive.PurchaseOrder.CurrencyRate,
+                              Currency = receive.PurchaseOrder.Supplier.Currency.Code,
+                              CurrencyId = receive.PurchaseOrder.Supplier.Currency.Id,
+                              CurrencyRateD = receive.PurchaseOrder.Supplier.Currency.Rate,
                               ApprovedBy = receive.ApproverId == null ? null : SystemFormat.Name(receive.Approver.FirstName, receive.Approver.LastName, receive.Approver.Nickname),
                               DisapprovedBy = receive.DisapproverId == null ? null : SystemFormat.Name(receive.Disapprover.FirstName, receive.Disapprover.LastName, receive.Disapprover.Nickname),
                               DisapprovedReason = receive.DisapprovedReason,

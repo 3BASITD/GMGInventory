@@ -53,6 +53,7 @@ builder.Services.AddScoped(typeof(IPackRepository), typeof(PackRepository));
 builder.Services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
 builder.Services.AddScoped(typeof(IPurchaseOrderRepository), typeof(PurchaseOrderReporitory));
 builder.Services.AddScoped(typeof(IPurchaseReceiveRepository), typeof(PurchaseReceiveReporitory));
+builder.Services.AddScoped(typeof(IPurchaseStatusRepository), typeof(PurchaseStatusRepository));
 builder.Services.AddScoped(typeof(IPurchaseOrderNewRepository), typeof(PurchaseOrderNewReporitory));
 builder.Services.AddScoped(typeof(IPurchaseRequestRepository), typeof(PurchaseRequestReporitory));
 builder.Services.AddScoped(typeof(IPurchaseReturnRepository), typeof(PurchaseReturnReporitory));

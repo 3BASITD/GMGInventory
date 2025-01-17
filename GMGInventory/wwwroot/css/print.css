@@ -107,9 +107,9 @@ table.formatted {
     border-spacing: 0;
 }
 
-table.formatted * {
-    font-size: 12px;
-}
+    table.formatted * {
+        font-size: 12px;
+    }
 
     table.formatted th, table.formatted td {
         border: solid 1px black;
@@ -137,9 +137,9 @@ table.formatted * {
             border: none;
         }
 
-        table.formatted label.title {
-            text-align: center;
-        }
+    table.formatted label.title {
+        text-align: center;
+    }
 
     table.formatted img.logo {
         height: 75px;
@@ -151,8 +151,7 @@ table.formatted * {
 
     table.formatted dd, table.formatted strong.detail {
         font-size: 14px;
-        margin-left: 5px;
-        margin-top: 5px;
+        margin: 5px 0;
         /*letter-spacing: 2px;*/
         font-weight: bold;
     }
@@ -161,10 +160,10 @@ table.formatted * {
         margin: 5px;
     }
 
-    table.formatted div.label span {
-        min-width: 100px !important;
-        display: inline-block;
-    }
+        table.formatted div.label span {
+            min-width: 100px !important;
+            display: inline-block;
+        }
 
     table.formatted .two-column {
         display: flex;
@@ -174,3 +173,39 @@ table.formatted * {
     table.formatted .column {
         flex: 1;
     }
+
+    table.formatted .row-of-6 {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 5px 5px 5px 0;
+    }
+
+        table.formatted .row-of-6 .col-1 {
+            flex: 0 0 auto;
+            width: 16.66666667%;
+        }
+
+        table.formatted .row-of-6 .col-2 {
+            flex: 0 0 auto;
+            width: 33.33333333%;
+        }
+
+        table.formatted .row-of-6 .col-3 {
+            flex: 0 0 auto;
+            width: 50%;
+        }
+
+        table.formatted .row-of-6 .col-4 {
+            flex: 0 0 auto;
+            width: 66.66666667%;
+        }
+
+        table.formatted .row-of-6 .col-5 {
+            flex: 0 0 auto;
+            width: 83.33333333%;
+        }
+
+        table.formatted .row-of-6 .col-6 {
+            flex: 0 0 auto;
+            width: 100%;
+        }

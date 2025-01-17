@@ -15,6 +15,8 @@
                     <span class="fas fa-plus"></span> New Purchase Receive
                 </a>
             }
+            <select id="request-status" class="form-select form-select-sm float-right mr-2" style="width: auto;">
+            </select>
         </div>
     </div>
     <div class="card-body">
@@ -59,6 +61,9 @@
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",
+                data: function (data) {
+                    data.purchaseStatusId = $("#request-status").val();
+                }
             },
             serverSide: true,
             filter: true,
@@ -94,8 +99,10 @@
                 if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('text-muted');
                 } else if (data.status.toLowerCase() == 'disapproved') {
+                    $(row).addClass('table-danger');
                     $(row).find('td:eq(5)').addClass('text-danger');
                 } else if (data.status.toLowerCase() == 'approved') {
+                    $(row).addClass('table-success');
                     $(row).find('td:eq(5)').addClass('text-success');
                 }
             }
@@ -103,6 +110,33 @@
 
         receiveDT.on("draw", function () {
             hideLoader();
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "PurchaseStatus")",
+            success: function (data, status, xhr) {
+                $("#request-status").off("change");
+                $("#request-status").empty();
+
+                $("#request-status").append(
+                    $("<option></option>")
+                        .val(null)
+                        .text("ALL")
+                );
+
+                $.each(data, function (index, item) {
+                    $("#request-status").append(
+                        $("<option></option>")
+                            .val(item.id)
+                            .text(item.text)
+                    );
+                });
+
+                $("#request-status").on("change", function () {
+                    receiveDT.ajax.reload();
+                });
+            }
         });
     </script>
 }

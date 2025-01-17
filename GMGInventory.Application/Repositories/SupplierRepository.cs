@@ -37,14 +37,14 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(SupplierVM supplierVM)
         {
-            return (await GetAllSupplierAsync()).Any(s => 
+            return (await GetAllSupplierAsync()).Any(s =>
             s.Code == supplierVM.Code &&
             s.Name == supplierVM.Name &&
             s.TIN == supplierVM.TIN &&
             s.AddressLine1 == supplierVM.AddressLine1 &&
             s.AddressLine2 == supplierVM.AddressLine2 &&
             s.OfficeTelNo == supplierVM.OfficeTelNo &&
-            s.ContactPerson == supplierVM.ContactPerson && 
+            s.ContactPerson == supplierVM.ContactPerson &&
             s.RegionName == supplierVM.RegionName &&
             s.Term == supplierVM.Term &&
             s.CurrencyName == supplierVM.CurrencyName &&
@@ -52,10 +52,14 @@ namespace GMGInventory.Application.Repositories
             s.VAT == supplierVM.VAT);
         }
 
-        public async Task<IList<JsonSupplierOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonSupplierOptionsModel>> GetOptions(int? IncludeId, bool? IsLocal, bool? IsForeign)
         {
             return await context.Suppliers
-                                .Where(s => s.IsActive || s.Id == IncludeId)
+                                .Where(s => (s.IsActive || s.Id == IncludeId)
+                                         && (
+                                            (IsLocal == null || (IsLocal == true && s.Currency.Name.ToLower().Contains("peso")))
+                                         || (IsForeign == null || (IsForeign == true && !s.Currency.Name.ToLower().Contains("peso")))
+                                         ))
                                 .Select(s => new JsonSupplierOptionsModel
                                 {
                                     Id = s.Id.ToString(),
@@ -63,7 +67,9 @@ namespace GMGInventory.Application.Repositories
                                     Name = s.Name.Trim(),
                                     Selected = IncludeId != null && IncludeId == s.Id,
                                     Address1 = s.AddressLine1,
-                                    Address2 = s.AddressLine2
+                                    Address2 = s.AddressLine2,
+                                    Currency = s.Currency.Code,
+                                    CurrencyRateD = s.Currency.Rate
                                 })
                                 .OrderBy(s => s.Text)
                                 .ToListAsync();
@@ -73,39 +79,39 @@ namespace GMGInventory.Application.Repositories
         {
 
             var suppliers = from supplier in context.Suppliers
-                         join region in context.Regions
-                                   on supplier.RegionId equals region.Id
-                         //join currency in context.Currencies
-                         //          on supplier.CurrencyId equals currency.Id
-                         join userc in userManager.Users on supplier.UserCreated equals userc.Id
-                         join userm in userManager.Users on supplier.UserModified equals userm.Id into m
-                         from userm in m.DefaultIfEmpty()
+                            join region in context.Regions
+                                      on supplier.RegionId equals region.Id
+                            //join currency in context.Currencies
+                            //          on supplier.CurrencyId equals currency.Id
+                            join userc in userManager.Users on supplier.UserCreated equals userc.Id
+                            join userm in userManager.Users on supplier.UserModified equals userm.Id into m
+                            from userm in m.DefaultIfEmpty()
 
-                         select new SupplierViewVM
-                         {
-                             Id = supplier.Id,
-                             Code = supplier.Code,
-                             Name = supplier.Name,
-                             TIN = supplier.TIN,
-                             AddressLine1 = supplier.AddressLine1,
-                             AddressLine2 = supplier.AddressLine2,
-                             OfficeTelNo = supplier.OfficeTelNo,
-                             ContactPerson = supplier.ContactPerson,
-                             RegionName = region.Name,
-                             RegionId = supplier.RegionId,
-                             Term = supplier.Term.Name,
-                             TermId = supplier.TermId,
-                             CurrencyId = supplier.CurrencyId,
-                             CurrencyName = supplier.Currency.Name,
-                             BusinessStyleId = supplier.BusinessStyleId,
-                             BusinessStyleName = supplier.BusinessStyle.Name,
-                             VAT = supplier.VAT,
-                             IsActive = supplier.IsActive,
-                             DateCreatedD = supplier.DateCreated,
-                             DateModifiedD = supplier.DateModified,
-                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
-                         };
+                            select new SupplierViewVM
+                            {
+                                Id = supplier.Id,
+                                Code = supplier.Code,
+                                Name = supplier.Name,
+                                TIN = supplier.TIN,
+                                AddressLine1 = supplier.AddressLine1,
+                                AddressLine2 = supplier.AddressLine2,
+                                OfficeTelNo = supplier.OfficeTelNo,
+                                ContactPerson = supplier.ContactPerson,
+                                RegionName = region.Name,
+                                RegionId = supplier.RegionId,
+                                Term = supplier.Term.Name,
+                                TermId = supplier.TermId,
+                                CurrencyId = supplier.CurrencyId,
+                                CurrencyName = supplier.Currency.Name,
+                                BusinessStyleId = supplier.BusinessStyleId,
+                                BusinessStyleName = supplier.BusinessStyle.Name,
+                                VAT = supplier.VAT,
+                                IsActive = supplier.IsActive,
+                                DateCreatedD = supplier.DateCreated,
+                                DateModifiedD = supplier.DateModified,
+                                UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
+                            };
             return await suppliers.ToListAsync();
         }
 
@@ -210,27 +216,27 @@ namespace GMGInventory.Application.Repositories
                               from userm in m.DefaultIfEmpty()
                               where supplier.Id == id
 
-                          select new SupplierViewVM
-                          {
-                              Id = supplier.Id,
-                              Code = supplier.Code,
-                              Name = supplier.Name,
-                              TIN = supplier.TIN,
-                              AddressLine1 = supplier.AddressLine1,
-                              AddressLine2 = supplier.AddressLine2, 
-                              OfficeTelNo = supplier.OfficeTelNo,
-                              ContactPerson = supplier.ContactPerson,
-                              RegionName = supplier.Region.Name,
-                              Term = supplier.Term.Name,
-                              CurrencyName = supplier.Currency.Name,
-                              BusinessStyleName = supplier.BusinessStyle.Name,
-                              VAT = supplier.VAT,
-                              IsActive = supplier.IsActive,
-                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                              DateCreatedD = supplier.DateCreated,
-                              UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                              DateModifiedD = supplier.DateModified,
-                          }).FirstOrDefault();
+                              select new SupplierViewVM
+                              {
+                                  Id = supplier.Id,
+                                  Code = supplier.Code,
+                                  Name = supplier.Name,
+                                  TIN = supplier.TIN,
+                                  AddressLine1 = supplier.AddressLine1,
+                                  AddressLine2 = supplier.AddressLine2,
+                                  OfficeTelNo = supplier.OfficeTelNo,
+                                  ContactPerson = supplier.ContactPerson,
+                                  RegionName = supplier.Region.Name,
+                                  Term = supplier.Term.Name,
+                                  CurrencyName = supplier.Currency.Name,
+                                  BusinessStyleName = supplier.BusinessStyle.Name,
+                                  VAT = supplier.VAT,
+                                  IsActive = supplier.IsActive,
+                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                  DateCreatedD = supplier.DateCreated,
+                                  UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                                  DateModifiedD = supplier.DateModified,
+                              }).FirstOrDefault();
             return supplierVM;
         }
 
@@ -303,9 +309,9 @@ namespace GMGInventory.Application.Repositories
                 OfficeTelNo = supplierVM.OfficeTelNo + "",
                 ContactPerson = supplierVM.ContactPerson + "",
                 RegionId = supplierVM.RegionId,
-                TermId =  supplierVM.TermId,
+                TermId = supplierVM.TermId,
                 CurrencyId = supplierVM.CurrencyId,
-                BusinessStyleId  = supplierVM.BusinessStyleId,
+                BusinessStyleId = supplierVM.BusinessStyleId,
                 VAT = supplierVM.VAT + "",
                 IsActive = true
             };
@@ -316,7 +322,7 @@ namespace GMGInventory.Application.Repositories
         public async Task UpdateAsync(SupplierVM supplierVM)
         {
 
-            var supplier= context.Suppliers.Where(s => s.Id == supplierVM.Id).FirstOrDefault();
+            var supplier = context.Suppliers.Where(s => s.Id == supplierVM.Id).FirstOrDefault();
             if (supplier == null)
             {
                 throw new DbUpdateConcurrencyException();
@@ -332,9 +338,9 @@ namespace GMGInventory.Application.Repositories
             supplier.OfficeTelNo = supplierVM.OfficeTelNo + "";
             supplier.ContactPerson = supplierVM.ContactPerson + "";
             supplier.RegionId = supplierVM.RegionId;
-            supplier.TermId =  supplierVM.TermId;
+            supplier.TermId = supplierVM.TermId;
             supplier.CurrencyId = supplierVM.CurrencyId;
-            supplier.BusinessStyleId  = supplierVM.BusinessStyleId;
+            supplier.BusinessStyleId = supplierVM.BusinessStyleId;
             supplier.VAT = supplierVM.VAT + "";
             supplier.IsActive = true;
 
@@ -345,33 +351,29 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<SupplierDetailPurchaseVM>> GetSupplierPurchaseAsync(int id)
         {
             var poVM = from po in context.PurchaseOrderNews
-                                                      .Include(s => s.Currency)
-                                                      .Include(s => s.DeliveryAddress)
-                                                      .Include(s => s.Status)
-                                                      .Include(s => s.Supplier)
-
-                              join purchaseItem in context.PurchaseOrderNewLineItems on po.Id equals purchaseItem.PurchaseOrderId
-                               join purchaseRequest in context.PurchaseRequestLineItems on purchaseItem.RequestItemId equals purchaseRequest.Id
-                               join user in userManager.Users on po.UserCreated equals user.Id
-                              where po.SupplierId == id
-
-
-                              select new SupplierDetailPurchaseVM
-                              {
-                                  ItemId = purchaseRequest.ItemId,
-                                  Item = purchaseRequest.Item.Code , // purchaseRequest.Item != null ? purchaseRequest.Item.Code : purchaseRequest.ItemDescription,
-                                  ItemDescription = purchaseRequest.ItemDescription,
-                                  ConversionFactorD = po.CurrencyRate,
-                                  Currency = po.Currency.Code,
-                                  PurchaseNumber = po.DocumentNumber,
-                                  QuantityD = purchaseItem.Quantity,
-                                  ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
-                                  ReplenishDateD = po.DateCreated,
-                                  Status = po.Status.Code,
-                                  UnitCostD = purchaseItem.UnitCost, // tinanggal na sa db
-                                  UnitPriceD = purchaseItem.UnitCost,
-                                  Warehouse = po.DeliveryAddress.Code
-                              };
+                                         .Include(s => s.DeliveryAddress)
+                                         .Include(s => s.Status)
+                                         .Include(s => s.Supplier).ThenInclude(s => s.Currency)
+                       join purchaseItem in context.PurchaseOrderNewLineItems on po.Id equals purchaseItem.PurchaseOrderId
+                       join purchaseRequest in context.PurchaseRequestLineItems on purchaseItem.RequestItemId equals purchaseRequest.Id
+                       join user in userManager.Users on po.UserCreated equals user.Id
+                       where po.SupplierId == id
+                       select new SupplierDetailPurchaseVM
+                       {
+                           ItemId = purchaseRequest.ItemId,
+                           Item = purchaseRequest.Item.Code, // purchaseRequest.Item != null ? purchaseRequest.Item.Code : purchaseRequest.ItemDescription,
+                           ItemDescription = purchaseRequest.ItemDescription,
+                           ConversionFactorD = po.Supplier.Currency.Rate,
+                           Currency = po.Supplier.Currency.Code,
+                           PurchaseNumber = po.DocumentNumber,
+                           QuantityD = purchaseItem.Quantity,
+                           ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                           ReplenishDateD = po.DateCreated,
+                           Status = po.Status.Code,
+                           UnitCostD = purchaseItem.UnitCost, // tinanggal na sa db
+                           UnitPriceD = purchaseItem.UnitCost,
+                           Warehouse = po.DeliveryAddress.Code
+                       };
             return await poVM.ToListAsync();
         }
 

@@ -864,7 +864,10 @@
                         required: function () { return checkIfRequired("Quantity"); },
                         number: true,
                         isNotZero: true,
-                        max: function () { return $("#add-quantity").attr("data-max-quantity"); }
+                        max: function () {
+                            const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
+                            return maxValue;
+                        }
                     },
                     Purpose: {
                         required: function () { return checkIfRequired("Purpose"); },
@@ -889,7 +892,10 @@
                         required: "Please enter a quantity.",
                         number: "Please enter a valid number.",
                         isNotZero: "Can not request an item with 0 quantity.",
-                        max: "Cannot exceed unserved quantity."
+                        max: function () {
+                            const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
+                            return "Cannot exceed " + maxValue + " unserved quantity.";
+                        }
                     },
                     Purpose: {
                         required: "Please enter the purpose.",

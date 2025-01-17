@@ -54,50 +54,83 @@
         </tr>
         <tr>
             <td colspan="3">
-                <div class="two-column">
-                    <div class="column">
-                        <div class="label">
-                            <span>Customer:</span>
-                            <strong class="detail">@Model.CustomerName</strong>
-                        </div>
-                        <div class="label">
-                            <span>Contact Person:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactPerson) ? "N/A" : Model.CustomerContactPerson)</strong>
-                        </div>
-                        <div class="label">
-                            <span>Contact No.:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactNumber) ? "N/A" : Model.CustomerContactNumber)</strong>
-                        </div>
-                        <div class="label">
-                            <span>Address:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</strong>
-                        </div>
-                        <div class="label">
-                            <span>Payment Terms:</span>
-                            <strong class="detail">@Model.CreditTerms</strong>
-                        </div>
-                        <div class="label">
-                            <span>Purchase Order #:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)</strong>
-                        </div>
+                <div class="row-of-6">
+                    <div class="col-1">
+                        <span>Contact Person:</span>
                     </div>
-                    <div class="column">
-                        <div class="label">
-                            <span>Ship to:</span>
-                            <strong class="detail">?</strong>
-                        </div>
-                        <div class="label">
-                            <span>Address:</span>
-                            <strong class="detail">?</strong>
-                        </div>
-                        <div class="label">
-                            <span>Agent Name:</span>
-                            <strong class="detail">@Model.AgentName</strong>
-                        </div>
-                        <div class="label">
-                            <span>Forwarder:</span>
-                            <strong class="detail">@Model.Forwarder</strong>
-                        </div>
+                    <div class="col-2">
+                        <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactPerson) ? "N/A" : Model.CustomerContactPerson)</strong>
+                    </div>
+                    <div class="col-1">
+                        <span>Ship to:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">?</strong>
+                    </div>
+                </div>
+                <div class="row-of-6">
+                    <div class="col-1">
+                        <span>Contact No.:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactNumber) ? "N/A" : Model.CustomerContactNumber)</strong>
+                    </div>
+                    <div class="col-1">
+                        <span>Address:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">?</strong>
+                    </div>
+                </div>
+                <div class="row-of-6">
+                    <div class="col-1">
+                        <span>Address:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</strong>
+                    </div>
+                    <div class="col-1">
+                        <span>Agent Name:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">@Model.AgentName</strong>
+                    </div>
+                </div>
+                <div class="row-of-6">
+                    <div class="col-1">
+                        <span>Payment Terms:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">@Model.CreditTerms</strong>
+                    </div>
+                    <div class="col-1">
+                        <span>Forwarder:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">@Model.Forwarder</strong>
+                    </div>
+                </div>
+                <div class="row-of-6">
+                    <div class="col-1">
+                        <span>Purchase Order #:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">@(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)</strong>
+                    </div>
+                    <div class="col-1">
+                        <span>Region:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">@Model.Region</strong>
+                    </div>
+                </div>
+                <div class="row-of-6">
+                    <div class="col-3"></div>
+                    <div class="col-1">
+                        <span>RDD:</span>
+                    </div>
+                    <div class="col-2">
+                        <strong class="detail">@Model.RequiredDeliveryDate</strong>
                     </div>
                 </div>
             </td>
@@ -125,10 +158,10 @@
                     <td>@(string.IsNullOrWhiteSpace(item.ItemPartNumber) ? "-" : item.ItemPartNumber)</td>
                     <td>@item.ItemSize</td>
                     <td>@item.ItemName</td>
-                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td class="center-text"><nobr>@item.Quantity</nobr></td>
                     <td>@item.Unit</td>
-                    <td>@item.SellingPrice</td>
-                    <td>@item.Discount1 @item.Discount2</td>
+                    <td class="right-text">@item.SellingPrice</td>
+                    <td class="right-text">@item.Discount1 @item.Discount2</td>
                     <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
                 </tr>
             }
@@ -165,17 +198,23 @@
                 }
             }
             <tr>
-                <td colspan="4">
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th class="center-text"><nobr>@Model?.TotalQuantity</nobr></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th class="right-text"><nobr>@Model?.TotalGrossPrice</nobr></th>
+            </tr>
+            <tr>
+                <td colspan="9">
                     <dl>
                         <dt>Remarks:</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)</dd>
+                        <dd>@(string.IsNullOrWhiteSpace(Model?.Remarks) ? "N/A" : Model.Remarks)</dd>
                     </dl>
                 </td>
-                <td class="right-text"><nobr>@Model?.TotalQuantity</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="right-text"><nobr>@Model?.TotalGrossPrice</nobr></td>
             </tr>
             <tr>
                 <td colspan="9">

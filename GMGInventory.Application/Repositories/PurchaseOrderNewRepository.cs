@@ -102,12 +102,12 @@ namespace GMGInventory.Application.Repositories
                                 {
                                     Id = s.Id.ToString(),
                                     Text = s.ItemDescription,
-                                    ItemId = s.Item.Id,
-                                    ItemCode = s.Item.Code,
-                                    PartNumber = s.Item.PartNumber,
+                                    ItemId = s.Item == null ? null : s.Item.Id,
+                                    ItemCode = s.Item == null ? null : s.Item.Code,
+                                    PartNumber = s.Item == null ? null : s.Item.PartNumber,
                                     Quantity = s.Quantity,
-                                    Unit = s.Item.Unit.Name,
-                                    UnitId = s.Item.Unit.Id,
+                                    Unit = s.Item == null ? s.Unit.Name : s.Item.Unit.Name,
+                                    UnitId = s.Item == null ? s.Unit.Id : s.Item.Unit.Id,
                                     Served = context.PurchaseOrderNewLineItems
                                                     .Include(s => s.PurchaseOrder).ThenInclude(s => s.Status)
                                                     .Where(a => a.RequestItemId == s.Id
@@ -137,12 +137,13 @@ namespace GMGInventory.Application.Repositories
             return $"{docNumberPrefix}{docNumberLast + 1:D4}";
         }
 
-        private async Task<IList<PurchaseOrderNewVM>> GetListAsync()
+        private async Task<IList<PurchaseOrderNewVM>> GetListAsync(int? purchaseStatusId)
         {
             var orderVM = from order in context.PurchaseOrderNews
                               //join userc in userManager.Users on order.UserCreated equals userc.Id
                               //join userm in userManager.Users on order.UserModified equals userm.Id into m
                               //from um in m.DefaultIfEmpty()
+                          where purchaseStatusId == null || order.StatusId == purchaseStatusId
                           select new PurchaseOrderNewVM
                           {
                               Id = order.Id,
@@ -157,11 +158,11 @@ namespace GMGInventory.Application.Repositories
             return await orderVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<PurchaseOrderNewVM>> GetListDTAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<PurchaseOrderNewVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync()).AsQueryable();
+            var data = (await GetListAsync(purchaseStatusId)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -260,9 +261,9 @@ namespace GMGInventory.Application.Repositories
                               OrderDateD = order.OrderDate,
                               Discount1D = order.Discount1,
                               Discount2D = order.Discount2,
-                              Currency = order.Currency.Code,
-                              CurrencyId = order.Currency.Id,
-                              CurrencyRateD = order.CurrencyRate,
+                              Currency = order.Supplier.Currency.Code,
+                              CurrencyId = order.Supplier.Currency.Id,
+                              CurrencyRateD = order.Supplier.Currency.Rate,
                               Remarks = order.Remarks,
                               ApprovedBy = order.ApproverId == null ? null : order.Approver.FirstName + " " + order.Approver.LastName,
                               DisapprovedBy = order.DisapproverId == null ? null : order.Disapprover.FirstName + " " + order.Disapprover.LastName,
@@ -431,8 +432,6 @@ namespace GMGInventory.Application.Repositories
                         TypeId = form.TypeId,
                         SupplierId = form.SupplierId,
                         TermId = form.TermsId,
-                        CurrencyId = form.CurrencyId,
-                        CurrencyRate = form.CurrencyRate,
                         DeliveryModeId = form.DeliveryModeId,
                         DeliveryAddressId = form.DeliveryAddressId,
                         OrderDate = form.DateOrdered,

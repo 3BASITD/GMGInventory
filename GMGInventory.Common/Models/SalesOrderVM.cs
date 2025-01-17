@@ -113,6 +113,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer's Required Delivery Date")]
         public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
+        public string RequiredDeliveryDate3 => RequiredDeliveryDateD.ToString(SystemFormat.StringDate3);
         public DateTime RequiredDeliveryDateD { get; set; }
 
         [Display(Name = "Remarks")]

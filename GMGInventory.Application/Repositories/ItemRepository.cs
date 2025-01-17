@@ -795,10 +795,9 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<ItemDetailPurchaseVM>> GetItemPurchaseAsync(int id)
         {
             var purchasesVM = from purchase in context.PurchaseOrderNews
-                                                     .Include(s => s.Currency)
                                                      .Include(s => s.DeliveryAddress)
                                                      .Include(s => s.Status)
-                                                     .Include(s => s.Supplier)
+                                                     .Include(s => s.Supplier).ThenInclude(s => s.Currency)
 
                               join purchaseItem in context.PurchaseOrderNewLineItems on purchase.Id equals purchaseItem.PurchaseOrderId
                               join purchaseRequest in context.PurchaseRequestLineItems on purchaseItem.RequestItemId equals purchaseRequest.Id
@@ -807,8 +806,8 @@ namespace GMGInventory.Application.Repositories
                               where purchaseRequest.ItemId == id
                               select new ItemDetailPurchaseVM
                               {
-                                  ConversionFactorD = purchase.CurrencyRate,
-                                  Currency = purchase.Currency.Code,
+                                  ConversionFactorD = purchase.Supplier.Currency.Rate,
+                                  Currency = purchase.Supplier.Currency.Code,
                                   PurchaseNumber = purchase.DocumentNumber,
                                   QuantityD = purchaseItem.Quantity,
                                   ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),

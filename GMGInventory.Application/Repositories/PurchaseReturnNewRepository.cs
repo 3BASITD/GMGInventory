@@ -96,9 +96,10 @@ namespace GMGInventory.Application.Repositories
             return $"{docNumberPrefix}{docNumberLast + 1:D6}";
         }
 
-        private async Task<IList<PurchaseReturnNewVM>> GetListAsync()
+        private async Task<IList<PurchaseReturnNewVM>> GetListAsync(int? purchaseStatusId)
         {
             var returnVM = from retrn in context.PurchaseReturnNews
+                           where purchaseStatusId == null || retrn.StatusId == purchaseStatusId
                            select new PurchaseReturnNewVM
                            {
                                Id = retrn.Id,
@@ -115,11 +116,11 @@ namespace GMGInventory.Application.Repositories
             return await returnVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync()).AsQueryable();
+            var data = (await GetListAsync(purchaseStatusId)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -194,9 +195,9 @@ namespace GMGInventory.Application.Repositories
                               RRNumber = retrn.PurchaseReceive.DocumentNumber,
                               PONumber = retrn.PurchaseReceive.PurchaseOrder.DocumentNumber,
                               Supplier = retrn.PurchaseReceive.PurchaseOrder.Supplier.Name,
-                              CurrencyId = retrn.PurchaseReceive.PurchaseOrder.Currency.Id,
-                              Currency = retrn.PurchaseReceive.PurchaseOrder.Currency.Name,
-                              CurrencyRateD = retrn.PurchaseReceive.PurchaseOrder.Currency.Rate,
+                              CurrencyId = retrn.PurchaseReceive.PurchaseOrder.Supplier.Currency.Id,
+                              Currency = retrn.PurchaseReceive.PurchaseOrder.Supplier.Currency.Name,
+                              CurrencyRateD = retrn.PurchaseReceive.PurchaseOrder.Supplier.Currency.Rate,
                               Warehouse = retrn.PurchaseReceive.Warehouse.Name,
                               DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,
                               SINumber = retrn.PurchaseReceive.SalesInvoiceNumber,

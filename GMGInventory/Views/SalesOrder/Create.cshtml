@@ -566,6 +566,9 @@
                     $("#order-customer-code").select2("data")[0].name = data.customerName;
                     $("#order-customer-code").select2("data")[0].outstandingBalanceD = data.outstandingBalanceD;
                     $("#order-customer-code").select2("data")[0].customerStatus = data.accountStatus;
+                    $("#order-customer-name").val(data.customerName);
+                    $("#order-region").val(data.region);
+                    $("#order-customer-status").val(data.accountStatus);
 
                     $("#order-customer-balance").val(data.outstandingBalance);
 
@@ -573,7 +576,6 @@
                     $("#order-forwarder").append(forwarderOption);
                     $("#order-forwarder").trigger('change');
 
-                    $("#order-customer-name").val(data.customerName);
 
                     $("#order-gross-net").val(data.grossNetPriceId).trigger("change");
 
@@ -594,6 +596,9 @@
                         $("#order-purchase-number").append(POOption);
                         $("#order-purchase-number").trigger('change');
                     }
+
+                    $("#order-date").val(data.orderDate3);
+                    $("#order-delivery-date").val(data.requiredDeliveryDate3);
                 }
             });
 
@@ -759,13 +764,16 @@
                 CustomerCode: { required: true },
                 AgentCode: { required: true },
                 OrderDate: { required: true },
-                DeliveryDate: { required: true }
+                DeliveryDate: { required: true, greaterThanOrEqualDate: "#order-date" }
             },
             messages: {
                 CustomerCode: { required: "Please select customer" },
                 AgentCode: { required: "Please select agent" },
                 OrderDate: { required: "Please select date of order" },
-                DeliveryDate: { required: "Please select date of delivery" }
+                DeliveryDate: { 
+                    required: "Please select date of delivery",
+                    greaterThanOrEqualDate: "Required delivery date must be on or after the order date"
+                }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
