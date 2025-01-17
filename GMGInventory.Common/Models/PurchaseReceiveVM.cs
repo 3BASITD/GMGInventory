@@ -109,10 +109,6 @@ namespace GMGInventory.Common.Models
         [Display(Name = "UOM")]
         public string UnitCode { get; set; }
 
-        [Display(Name = "Unit Cost")]
-        public decimal UnitCost { get; set; }
-
-
         [Display(Name = "Quantity")]
         public string Quantity => string.Format("{0:#,##0}", QuantityD);
         public int QuantityD { get; set; }
@@ -120,6 +116,14 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Order Quantity")]
         public string OrderQuantity => string.Format("{0:#,##0}", OrderQuantityD);
         public int OrderQuantityD { get; set; }
+
+        [Display(Name = "Unit Cost")]
+        public string UnitCost => string.Format("{0:#,##0.00}", UnitCostD);
+        public decimal UnitCostD { get; set; }
+
+        [Display(Name = "Total Amount")]
+        public string TotalAmount => string.Format("{0:#,##0.00}", TotalAmountD);
+        public decimal TotalAmountD => QuantityD * UnitCostD;
     }
 
     public class PurchaseReceiveSaveVM

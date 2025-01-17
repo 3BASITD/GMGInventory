@@ -118,10 +118,23 @@
                         </div>
                     </div>
                 </div>
+            
                 <div class="row">
                     <div class="col-12 col-sm-6">
-                        <label for="filter-unserved" class="control-label mb-0">Unserved</label>
-                        <input type="checkbox" id="filter-unserved" />
+                        <div class="form-group">
+                            <label for="filter-unservedQty" class="control-label mb-0">Unserved Quantity</label>
+                            <input type="number" min="0" value="0" id="filter-unservedQty" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-status" class="form-label mb-0">Status</label>
+                            <select id="filter-status" style="width:100%" class="custom-select">
+                                <option>Approved</option>
+                                <option>Disapproved</option>
+                                <option>Submitted</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -245,7 +258,8 @@
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-                    data.Unserved = $('#filter-unserved').is(':checked');
+                    data.UnservedQty = $('#filter-unservedQty').val();
+                    data.Status = $('#filter-status').val();
                 }
             },
             processing: true,
@@ -278,7 +292,8 @@
 
                 $(api.column(7).footer()).html(FormatStringDecimal(json.totalAmount));
                 $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount2));
-            }
+            },
+            order: [[0, "desc"]]
         });
 
     // Load functions upon DataTable load
@@ -288,7 +303,7 @@
             $(".table-purchaseOrder thead th").removeClass("text-end");
         });
 
-   //     purchaseOrderDT.rowGroup().disable().draw();
+        purchaseOrderDT.rowGroup().disable().draw();
 
         $(".btnFilter").on("click", function () {
             var groupBy = $("#groupby").val();
@@ -313,7 +328,8 @@
             var urlQuery = [];
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
-            urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
+            urlQuery.push("UnservedQty=" + $("#filter-unservedQty").val());
+            urlQuery.push("Status=" + $("#filter-status").val());
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
@@ -330,7 +346,8 @@
             var urlQuery = [];
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
-            urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
+            urlQuery.push("UnservedQty=" + $("#filter-unservedQty").val());
+            urlQuery.push("Status=" + $("#filter-status").val());
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }

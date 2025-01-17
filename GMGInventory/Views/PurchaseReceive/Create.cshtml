@@ -620,8 +620,6 @@
                 item_to_receive.push(row_data);
             });
 
-            debugger;
-
             return item_to_receive;
         }
 
@@ -711,7 +709,7 @@
             var items = itemDT.data();
             if (items.length == 0) {
                 toastr.warning("No item to receive. Add an item to the list to continue", "Warning");
-            } else if (items.filter(s => parseInt(s.quantity) === 0).length > 0) {
+            } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) == 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't receive an item with 0 quantity", "Warning");
             } else {
                 $.ajax({

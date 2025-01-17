@@ -185,7 +185,7 @@ namespace GMGInventory.Application.Repositories
                                 OrderQuantityD = order.Quantity,
                                 UnitId = order.RequestItem.Item == null ? order.RequestItem.Unit.Id : order.RequestItem.Item.Unit.Id,
                                 UnitCode = order.RequestItem.Item == null ? order.RequestItem.Unit.Code : order.RequestItem.Item.Unit.Code,
-                                UnitCost = order.UnitCost
+                                UnitCostD = order.UnitCost
                             };
             return await receiveVM.ToListAsync();
         }

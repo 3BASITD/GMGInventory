@@ -26,7 +26,7 @@
         <strong>Date Printed: </strong>
         <span>@Model.DatePrinted</span>
         <br />
-        <strong>@(Model.Unserved == true ? "Unserved" : "Served")</strong>
+        <strong>@(Model.UnservedQty != 0 ? "Unserved" : "Served")</strong>
     </p>
     <table class="table-items">
         <thead>
@@ -112,6 +112,7 @@
                         <td>@item.DocumentNumber</td>
                         <td>@item.Supplier</td>
                         <td>@item.Item</td>
+                        <td>@item.ItemDescription</td>
                         <td>@item.Quantity</td>
                         <td>@item.Unit</td>
                         <td>@item.UnitCost</td>

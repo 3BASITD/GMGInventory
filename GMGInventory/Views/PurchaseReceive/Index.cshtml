@@ -95,7 +95,7 @@
                 }
             ],
             order: [[6, "desc"]],
-            createdRow: function (row, data, dataIndex) {
+              createdRow: function (row, data, dataIndex) {
                 if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('text-muted');
                 } else if (data.status.toLowerCase() == 'disapproved') {
@@ -106,6 +106,16 @@
                     $(row).find('td:eq(5)').addClass('text-success');
                 }
             }
+
+            // createdRow: function (row, data, dataIndex) {
+            //     if (data.status.toLowerCase() == 'resubmitted') {
+            //         $(row).addClass('text-muted');
+            //     } else if (data.status.toLowerCase() == 'disapproved') {
+            //         $(row).find('td:eq(5)').addClass('text-danger');
+            //     } else if (data.status.toLowerCase() == 'approved') {
+            //         $(row).find('td:eq(5)').addClass('text-success');
+            //     }
+            // }
         });
 
         receiveDT.on("draw", function () {

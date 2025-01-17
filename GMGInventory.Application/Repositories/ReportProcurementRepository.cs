@@ -5,6 +5,7 @@ using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using AutoMapper.Internal;
+using GMGInventory.Data.Migrations;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -19,24 +20,21 @@ namespace GMGInventory.Application.Repositories
         #region Purchase Order
         public async Task<IList<PurchaseOrderRVM>> GetPurchaseOrder(ListFilterPurchaseOrderModel filter)
         {
-            var porderVM = from porder in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder)
-                           let poItems = context.PurchaseOrderNewLineItems
-                                              .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
-                                              .FirstOrDefault()
-
+            var porderVM = from porder in context.PurchaseOrderNewLineItems.Include(s => s.PurchaseOrder).ThenInclude(s => s.Status)
                            let pRequest = context.PurchaseRequestLineItems
-                                          .Where(s => s.Id == porder.RequestItemId)
-                                          .FirstOrDefault()
+                                         .Where(s => s.Id == porder.RequestItemId)
+                                         .FirstOrDefault()
 
                            let preceiving = context.PurchaseReceivings
                                            .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
                                            .FirstOrDefault()
 
-                           where filter.DateFrom <= (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date
+                           where porder.PurchaseOrder.Status.Name.ToLower() == filter.Status.ToLower()
+                           && filter.DateFrom <= (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date
                            && (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date <= filter.DateTo
                            && (filter.Item == null || pRequest.Item.Id == filter.Item || (filter.Item == 0 && pRequest.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                            && (filter.Supplier == null || porder.PurchaseOrder.Supplier.Id == filter.Supplier)
-                          && (filter.Unserved == true ? preceiving.PurchaseReceivingLineItems != null : preceiving.PurchaseReceivingLineItems == null)
+                           && (filter.UnservedQty == 0 || pRequest.Quantity - porder.Quantity == filter.UnservedQty)
 
                            select new PurchaseOrderRVM
                            {
@@ -48,36 +46,11 @@ namespace GMGInventory.Application.Repositories
                                DocumentNumber = porder.PurchaseOrder.DocumentNumber,
                                Supplier = porder.PurchaseOrder.Supplier.Code,
                                OrderDateD = porder.PurchaseOrder.OrderDate,
-                               UnservedQuantity = pRequest.Quantity - poItems.Quantity,
-                               UnservedAmount = (pRequest.Quantity - poItems.Quantity) * porder.UnitCost
+                               UnservedQuantity =  pRequest.Quantity - porder.Quantity,
+                               UnservedAmount = (pRequest.Quantity - porder.Quantity) * porder.UnitCost
                            };
 
-            //var porderVM = from porder in context.PurchaseOrderNewLineItems
-            //               let allorder = context.PurchaseOrderNewLineItems
-            //                                     .Where(s => s.RequestItemId == porder.RequestItemId)
-            //                                     .Sum(s => s.Quantity)
-            //               let allrequest = context.PurchaseRequestLineItems
-            //                                       .Where(s => s.Id == porder.RequestItemId)
-            //                                       .Sum(s => s.Quantity)
-            //            where filter.DateFrom <= porder.PurchaseOrder.OrderDate.Date
-            //                    && porder.PurchaseOrder.OrderDate.Date <= filter.DateTo
-            //               && (filter.Item == null || porder.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && porder.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
-            //               && (filter.Supplier == null || porder.PurchaseOrder.Supplier.Id == filter.Supplier)
-            //                   && (filter.Unserved == true? porder.PurchaseReceivingLineItems != null : porder.PurchaseReceivingLineItems == null)
-
-            //               //&& (filter.Unserved == true ? porder.PurchaseReceivingLineItems != null : porder.PurchaseReceivingLineItems == null)
-            //               select new PurchaseOrderRVM
-            //               {
-            //                   Item = porder.RequestItem.Item.Code,
-            //                   Quantity = porder.Quantity,
-            //                   Unit = porder.RequestItem.Unit.Code,
-            //                   UnitCost = porder.UnitCost,
-            //                   DocumentNumber = porder.PurchaseOrder.DocumentNumber,
-            //                   Supplier = porder.PurchaseOrder.Supplier.Code,
-            //                   OrderDateD = porder.PurchaseOrder.OrderDate,
-            //                   UnservedQuantity = allrequest - allorder,
-            //                   UnservedAmount = (allrequest - allorder) * porder.UnitCost
-            //               };
+           
             return await porderVM.ToListAsync();
         }
         public async Task<ForDataTables<PurchaseOrderRVM>> GetPurchaseOrderDT(DataTablesRequestForm form, ListFilterPurchaseOrderModel filter)
@@ -87,24 +60,25 @@ namespace GMGInventory.Application.Repositories
             decimal totalAmount = 0;
             decimal totalAmount2 = 0;
 
-
             var data = (await GetPurchaseOrder(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
+           
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x =>   x.Item != null && x.Item.ToLower().Contains(form.SearchValue)
+                                      || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue)
+                                      || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue)
+                                      || x.DocumentNumber.ToLower().Contains(form.SearchValue)
+                                      || x.Supplier!.ToLower().Contains(form.SearchValue)
+                                      || x.OrderDate.ToString().ToLower().Contains(form.SearchValue));
+            }
 
             //get total amount of data in table
             totalAmount = data.Sum(s => s.UnitCost);
             totalAmount2 = data.Sum(s => s.UnservedAmount);
 
-            // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
-            {
-                data = data.Where(x => x.Item.ToLower().Contains(form.SearchValue)
-                                    || x.Unit.ToString().Contains(form.SearchValue)
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Supplier.ToLower().Contains(form.SearchValue)
-                                    || x.OrderDateD.ToString().Contains(form.SearchValue));
-            }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
@@ -114,11 +88,17 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Item": data = data.OrderBy(s => s.Item); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        case "DocumentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
-                        case "Supplier": data = data.OrderBy(s => s.Supplier); break;
-                        case "OrderDateD": data = data.OrderBy(s => s.OrderDateD); break;
+                        case "item": data = data.OrderBy(s => s.Item); break;
+                        case "itemDescription": data = data.OrderBy(s => s.ItemDescription); break;
+                        case "unit": data = data.OrderBy(s => s.Unit); break;
+                        case "documentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
+                        case "supplier": data = data.OrderBy(s => s.Supplier); break;
+                        case "orderDate": data = data.OrderBy(s => s.OrderDateD); break;
+                        case "unitCost": data = data.OrderBy(s => s.UnitCost); break;
+                        case "quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "unservedQuantity": data = data.OrderBy(s => s.UnservedQuantity); break;
+                        case "unservedAmount": data = data.OrderBy(s => s.UnservedAmount); break;
+                                
                         default: break;
                     }
                 }
@@ -126,11 +106,16 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Item": data = data.OrderByDescending(s => s.Item); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        case "DocumentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
-                        case "Supplier": data = data.OrderByDescending(s => s.Supplier); break;
-                        case "OrderDateD": data = data.OrderByDescending(s => s.OrderDateD); break;
+                        case "item": data = data.OrderByDescending(s => s.Item); break;
+                        case "itemDescription": data = data.OrderByDescending(s => s.ItemDescription); break;
+                        case "unit": data = data.OrderByDescending(s => s.Unit); break;
+                        case "documentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
+                        case "supplier": data = data.OrderByDescending(s => s.Supplier); break;
+                        case "orderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
+                        case "unitCost": data = data.OrderByDescending(s => s.UnitCost); break;
+                        case "quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "unservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantity); break;
+                        case "unservedAmount": data = data.OrderByDescending(s => s.UnservedAmount); break;
                         default: break;
                     }
                 }
@@ -162,8 +147,9 @@ namespace GMGInventory.Application.Repositories
                 DateToD = filter.DateTo.GetValueOrDefault(),
                 Supplier = filter.Supplier == null || supplier == null ? "All" : supplier.Name,
                 Item = filter.Item == null || item == null ? "All" : item.Name,
-                Unserved = filter.Unserved,
+                UnservedQty = filter.UnservedQty,
                 TotalAmountD = items.Sum(s => s.UnitCost),
+                TotalAmount2D = items.Sum(s => s.UnservedAmount),
                 DocNo = items.Any() ? items.OrderBy(x => x.DocumentNumber).FirstOrDefault().DocumentNumber + " - " +
                                       items.OrderBy(x => x.DocumentNumber).LastOrDefault().DocumentNumber : ""
             };
@@ -183,7 +169,8 @@ namespace GMGInventory.Application.Repositories
                                                 .Where(s => s.OrderItemId == poItems.Id)
                                                 .FirstOrDefault()
 
-                           where filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
+                           where preturn.PurchaseReturn.Status.Name.ToLower() == filter.Status.ToLower()
+                            && filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
                             && (filter.Item == null || preceiving.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceiving.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                             && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
 
@@ -203,25 +190,6 @@ namespace GMGInventory.Application.Repositories
                                 ReturnTotalAmount = poItems.UnitCost * preturn.Quantity
                             };
 
-            //var preturnVM = from preturn in context.PurchaseReturnNewLineItems
-            //                where filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date 
-            //                && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
-            //                && (filter.Item == null || preturn.ReceivingItem.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preturn.ReceivingItem.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
-            //                && (filter.Supplier == null || preturn.PurchaseReturn.PurchaseReceive.PurchaseOrder.Supplier.Id == filter.Supplier)
-            //                select new PurchaseReturnRVM
-            //                {
-            //                    Item = preturn.ReceivingItem.OrderItem.RequestItem.Item.Code,
-            //                    ItemDescription = preturn.ReceivingItem.OrderItem.RequestItem.ItemDescription,
-            //                    Quantity = preturn.ReceivingItem.OrderItem.RequestItem.Quantity,
-            //                    Unit = preturn.ReceivingItem.OrderItem.RequestItem.Unit.Code,
-            //                    UnitCost = preturn.ReceivingItem.OrderItem.UnitCost,
-            //                    TotalAmount = preturn.Quantity * preturn.ReceivingItem.OrderItem.UnitCost,
-            //                    DocumentNumber = preturn.PurchaseReturn.DocumentNumber,
-            //                    Supplier = preturn.PurchaseReturn.PurchaseReceive.PurchaseOrder.Supplier.Code,
-            //                    ReturnDateD = preturn.PurchaseReturn.ReturnDate, // change to return
-            //                    ReturnQuantity = preturn.Quantity,
-            //                    ReturnTotalAmount = preturn.ReceivingItem.OrderItem.UnitCost * preturn.Quantity
-            //                };
             return await preturnVM.ToListAsync();
         }
         public async Task<ForDataTables<PurchaseReturnRVM>> GetPurchaseReturnDT(DataTablesRequestForm form, ListFilterReturnReceivingModel filter)
@@ -231,25 +199,26 @@ namespace GMGInventory.Application.Repositories
             decimal totalAmount = 0;
             decimal totalAmount2 = 0;
 
-
             var data = (await GetPurchaseReturn(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.UnitCost);
-            totalAmount2 = data.Sum(s => s.ReturnTotalAmount);
-
 
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.Item.ToLower().Contains(form.SearchValue)
-                                    || x.Unit.ToString().Contains(form.SearchValue)
+                                    || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue)
+                                    || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue)
                                     || x.DocumentNumber.ToLower().Contains(form.SearchValue)
                                     || x.Supplier.ToLower().Contains(form.SearchValue)
-                                    || x.ReturnDateD.ToString().Contains(form.SearchValue));
+                                    || x.ReturnDate.ToString().ToLower().Contains(form.SearchValue));
+
             }
+
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.UnitCost);
+            totalAmount2 = data.Sum(s => s.ReturnTotalAmount);
+
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
@@ -259,11 +228,17 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Item": data = data.OrderBy(s => s.Item); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        case "DocumentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
-                        case "Supplier": data = data.OrderBy(s => s.Supplier); break;
-                        case "ReturnDateD": data = data.OrderBy(s => s.ReturnDateD); break;
+                        case "item": data = data.OrderBy(s => s.Item); break;
+                        case "itemDescription": data = data.OrderBy(s => s.Item); break;
+                        case "unit": data = data.OrderBy(s => s.Unit); break;
+                        case "documentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
+                        case "supplier": data = data.OrderBy(s => s.Supplier); break;
+                        case "returnDate": data = data.OrderBy(s => s.ReturnDate); break;
+                        case "quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "unitCost": data = data.OrderBy(s => s.UnitCost); break;
+                        case "totalAmount": data = data.OrderBy(s => s.TotalAmount); break;
+                        case "returnQuantity": data = data.OrderBy(s => s.ReturnQuantity); break;
+                        case "returnTotalAmount": data = data.OrderBy(s => s.ReturnTotalAmount); break;
                         default: break;
                     }
                 }
@@ -271,11 +246,17 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Item": data = data.OrderByDescending(s => s.Item); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        case "DocumentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
-                        case "Supplier": data = data.OrderByDescending(s => s.Supplier); break;
-                        case "ReturnDateD": data = data.OrderByDescending(s => s.ReturnDateD); break;
+                        case "item": data = data.OrderByDescending(s => s.Item); break;
+                        case "itemDescription": data = data.OrderByDescending(s => s.Item); break;
+                        case "unit": data = data.OrderByDescending(s => s.Unit); break;
+                        case "documentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
+                        case "supplier": data = data.OrderByDescending(s => s.Supplier); break;
+                        case "returnDate": data = data.OrderByDescending(s => s.ReturnDate); break;
+                        case "quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "unitCost": data = data.OrderByDescending(s => s.UnitCost); break;
+                        case "totalAmount": data = data.OrderByDescending(s => s.TotalAmount); break;
+                        case "returnQuantity": data = data.OrderByDescending(s => s.ReturnQuantity); break;
+                        case "returnTotalAmount": data = data.OrderByDescending(s => s.ReturnTotalAmount); break;
                         default: break;
                     }
                 }
@@ -320,19 +301,18 @@ namespace GMGInventory.Application.Repositories
         {
             var preceiveVM = from preceive in context.PurchaseReceivingLineItems.Include(s => s.PurchaseReceiving)
                              let poItems = context.PurchaseOrderNewLineItems
-                                                .Where(s => s.PurchaseOrderId == preceive.PurchaseReceiving.PurchaseOrder.Id)
+                                                .Where(s => s.Id == preceive.OrderItemId)
                                                 .FirstOrDefault()
-
-                             let pRequest = context.PurchaseRequestLineItems
-                                                .Where(s => s.PurchaseRequestId == poItems.RequestItemId)
-                                                .FirstOrDefault()
-
-                             where filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
+                             where preceive.PurchaseReceiving.Status.Name.ToLower() == filter.Status.ToLower()
+                             && filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
                             && (filter.Item == null || preceive.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceive.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                             && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
                             select new PurchaseReceivingRVM
                             {
-                                                 Item = preceive.OrderItem.RequestItem.Item.Code,
+                                recQty = preceive.Quantity,
+                                poItemsQty = poItems.Quantity,
+
+                                Item = preceive.OrderItem.RequestItem.Item.Code,
                                                  ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
                                                  Quantity = preceive.Quantity,
                                                  Unit = preceive.OrderItem.RequestItem.Item.Unit.Code,
@@ -343,8 +323,8 @@ namespace GMGInventory.Application.Repositories
                                                  Supplier = poItems.PurchaseOrder.Supplier.Code,
                                                  ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
 
-                                                 UnservedQuantity = preceive.Quantity - poItems.Quantity,
-                                                 UnservedAmount = (preceive.Quantity - poItems.Quantity) * preceive.OrderItem.UnitCost
+                                                 UnservedQuantity = poItems.Quantity - preceive.Quantity,
+                                                 UnservedAmount = (poItems.Quantity - preceive.Quantity) * preceive.OrderItem.UnitCost
                                              };
 
             return  await preceiveVM.ToListAsync();
@@ -356,24 +336,25 @@ namespace GMGInventory.Application.Repositories
             decimal totalAmount = 0;
             decimal totalUnservedAmount = 0;
 
-
             var data = (await GetPurchaseReceiving(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
+
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.Item != null && x.Item.ToLower().Contains(form.SearchValue)
+                                    || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue)
+                                    || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue)
+                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue)
+                                    || x.Supplier.ToLower().Contains(form.SearchValue)
+                                    || x.ReturnDate.ToString().ToLower().Contains(form.SearchValue));
+            }
 
             //get total amount of data in table
             totalAmount = data.Sum(s => s.TotalAmount);
             totalUnservedAmount = data.Sum(u => u.UnservedAmount);
 
-            // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
-            {
-                data = data.Where(x => x.Item.ToLower().Contains(form.SearchValue)
-                                    || x.Unit.ToString().Contains(form.SearchValue)
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Supplier.ToLower().Contains(form.SearchValue)
-                                    || x.ReturnDateD.ToString().Contains(form.SearchValue));
-            }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
@@ -383,11 +364,19 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Item": data = data.OrderBy(s => s.Item); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        case "DocumentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
-                        case "Supplier": data = data.OrderBy(s => s.Supplier); break;
-                        case "ReturnDateD": data = data.OrderBy(s => s.ReturnDateD); break;
+                        case "item": data = data.OrderBy(s => s.Item); break;
+                        case "itemDescription": data = data.OrderBy(s => s.Item); break;
+                        case "unit": data = data.OrderBy(s => s.Unit); break;
+                        case "documentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
+                        case "supplier": data = data.OrderBy(s => s.Supplier); break;
+                        case "returnDate": data = data.OrderBy(s => s.ReturnDateD); break;
+
+                        case "quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "unitCost": data = data.OrderBy(s => s.UnitCost); break;
+                        case "totalAmount": data = data.OrderBy(s => s.TotalAmount); break;
+                        case "unservedQuantity": data = data.OrderBy(s => s.UnservedQuantity); break;
+                        case "unservedAmount": data = data.OrderBy(s => s.UnservedAmount); break;
+
                         default: break;
                     }
                 }
@@ -395,11 +384,17 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "Item": data = data.OrderByDescending(s => s.Item); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        case "DocumentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
-                        case "Supplier": data = data.OrderByDescending(s => s.Supplier); break;
-                        case "ReturnDateD": data = data.OrderByDescending(s => s.ReturnDateD); break;
+                        case "item": data = data.OrderByDescending(s => s.Item); break;
+                        case "itemDescription": data = data.OrderByDescending(s => s.Item); break;
+                        case "unit": data = data.OrderByDescending(s => s.Unit); break;
+                        case "documentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
+                        case "supplier": data = data.OrderByDescending(s => s.Supplier); break;
+                        case "returnDate": data = data.OrderByDescending(s => s.ReturnDateD); break;
+                        case "quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "unitCost": data = data.OrderByDescending(s => s.UnitCost); break;
+                        case "totalAmount": data = data.OrderByDescending(s => s.TotalAmount); break;
+                        case "unservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantity); break;
+                        case "unservedAmount": data = data.OrderByDescending(s => s.UnservedAmount); break;
                         default: break;
                     }
                 }
