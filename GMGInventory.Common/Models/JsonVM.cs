@@ -64,6 +64,9 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
+        public string Currency { get; set; }
+        public string CurrencyRate => string.Format("{0:#,##0.00}", CurrencyRateD);
+        public decimal CurrencyRateD { get; set; }
     }
 
     public class JsonSalesOrderOptionsModel : JsonOptionsModel

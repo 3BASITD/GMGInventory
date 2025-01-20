@@ -60,13 +60,13 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="order-currency" class="form-label mb-0">Currency</label>
-                        <select id="order-currency" name="Currency" style="width: 100%"></select>
+                        <input type="text" id="order-currency" name="Currency" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="order-currency-rate" class="form-label mb-0">Currency Rate</label>
-                        <input type="number" step="0.001" id="order-currency-rate" name="CurrencyRate" class="form-control form-control-sm" />
+                        <input type="text" id="order-currency-rate" name="CurrencyRate" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6 order-mode-container">
@@ -250,15 +250,13 @@
                     $("#order-document-number").val(data.documentNumber);
                     currentType = data.typeId;
                     loadTypeOptions(currentType);
-                    $("#order-type").select2({
-                        disabled: true
-                    });
+                    $("#order-type").prop("disabled", true);
+                    $("#order-currency").val(data.currency);
                     $("#order-currency-rate").val(data.currencyRate);
                     $("#order-date-ordered").val(data.orderDate3);
                     $("#order-remarks").val(data.remarks);
                     loadSupplier(data.supplierId);
                     loadCreditTerm(data.termId);
-                    loadCurrency(data.currencyId);
                     loadDeliveryMode(data.deliveryModeId);
                     loadDeliveryAddress(data.deliveryAddressId);
                 },
@@ -281,7 +279,6 @@
             loadTypeOptions(currentType);
             loadSupplier(-1);
             loadCreditTerm(-1);
-            loadCurrency(-1);
             loadDeliveryMode(-1);
             loadDeliveryAddress(-1);
         }
@@ -453,8 +450,10 @@
 
         // Load order type data for select2
         function loadTypeOptions(selectedType) {
-            $("#order-type").off("change");
-            $("#order-type").empty().trigger('change');
+            if ($.fn.select2 && $("#order-type").hasClass("select2-hidden-accessible")) {
+                $("#order-type").select2("destroy");
+                $("#order-type").empty();
+            }
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetTypeOptions")",
@@ -465,7 +464,7 @@
                     $("#order-type").select2({
                         data: data,
                         minimumResultsForSearch: -1
-                    }).on("change", function () {
+                    }).on("select2:select", function () {
                         loadDocumentNumber();
                         changingType();
                     });
@@ -543,16 +542,30 @@
                 itemDT.column(4).visible(false);
             }
 
+            loadSupplier();
             loadPurchaseRequestOptions();
         }
 
         // Load supplier for select2
         function loadSupplier(selectedSupplier) {
+            if ($.fn.select2 && $("#order-supplier").hasClass("select2-hidden-accessible")) {
+                $("#order-supplier").select2("destroy");
+                $("#order-supplier").empty();
+            }
+
+            var isLocal = null, isForeign = null;
+            if ($.fn.select2 && $("#order-type").hasClass("select2-hidden-accessible")) {
+                var typeText = $("#order-type").select2("data")[0]?.text.toLowerCase() || "";
+                isLocal = typeText.includes("purchase order") == false ? null : typeText != "international purchase order";
+                isForeign = typeText.includes("purchase order") == false ? null : typeText != "local purchase order";
+            }
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetOptions", "Supplier")",
                 data: {
-                    IncludeId: selectedSupplier
+                    IncludeId: selectedSupplier,
+                    IsLocal: isLocal,
+                    IsForeign: isForeign
                 },
                 success: function (data, status, xhr) {
                     $("#order-supplier").select2({
@@ -565,7 +578,16 @@
                             return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
                         },
                         data: data
+                    }).on("select2:select", function () {
+                        var selectedSupplier = $("#order-supplier").select2("data")[0];
+                        $("#order-currency").val(selectedSupplier.currency);
+                        $("#order-currency-rate").val(selectedSupplier.currencyRate);
                     });
+                    if ($("#order-supplier").val() != null) {
+                        var selectedSupplier = $("#order-supplier").select2("data")[0];
+                        $("#order-currency").val(selectedSupplier.currency);
+                        $("#order-currency-rate").val(selectedSupplier.currencyRate);
+                    }
                 }
             });
         }
@@ -579,33 +601,10 @@
                     IncludeId: selectedTerm
                 },
                 success: function (data, status, xhr) {
-                    console.log(data);
                     $("#order-terms").select2({
                         minimumResultsForSearch: -1,
                         placeholder: "<empty>",
                         data: data
-                    });
-                }
-            });
-        }
-
-        // Load currency for select2
-        function loadCurrency(selectedCurrency) {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetCurrencyOptions", "ReplenishInventory")",
-                data: {
-                    IncludeId: selectedCurrency
-                },
-                success: function (data, status, xhr) {
-                    $("#order-currency").select2({
-                        minimumResultsForSearch: -1,
-                        placeholder: "<empty>",
-                        data: data
-                    });
-                    $("#order-currency-rate").val($("#order-currency").select2("data")[0].rate);
-                    $("#order-currency").on("select2:select", function () {
-                        $("#order-currency-rate").val($("#order-currency").select2("data")[0].rate);
                     });
                 }
             });
@@ -835,8 +834,8 @@
                 }
             },
             submitHandler: function (form, event) {
-                    event.preventDefault();
-                    AddItem();
+                event.preventDefault();
+                AddItem();
             }
         });
 
@@ -977,8 +976,6 @@
                         TypeId: $("#order-type").val(),
                         SupplierId: $("#order-supplier").val(),
                         TermsId: $("#order-terms").val(),
-                        CurrencyId: $("#order-currency").val(),
-                        CurrencyRate: $("#order-currency-rate").val(),
                         DeliveryModeId: $("#order-mode").val(),
                         DeliveryAddressId: $("#order-delivery-address").val(),
                         DateOrdered: $("#order-date-ordered").val(),

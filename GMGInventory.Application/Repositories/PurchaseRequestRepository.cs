@@ -65,13 +65,14 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        private async Task<IList<PurchaseRequestVM>> GetListAsync()
+        private async Task<IList<PurchaseRequestVM>> GetListAsync(int? purchaseStatusId)
         {
             var requestVM = from request in context.PurchaseRequests
-                                                   .Include(s => s.Type)
-                                                   .Include(s => s.Purpose)
-                                                   .Include(s => s.Region)
-                                                   .Include(s => s.Status)
+                                                   //.Include(s => s.Type)
+                                                   //.Include(s => s.Purpose)
+                                                   //.Include(s => s.Region)
+                                                   //.Include(s => s.Status)
+                            where purchaseStatusId == null || request.StatusId == purchaseStatusId
                             select new PurchaseRequestVM
                             {
                                 Id = request.Id,
@@ -87,11 +88,11 @@ namespace GMGInventory.Application.Repositories
             return await requestVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync()).AsQueryable();
+            var data = (await GetListAsync(purchaseStatusId)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found

@@ -131,6 +131,10 @@
         return this.optional(element) || val1 <= val2;
     }, 'Should not be greater than');
 
+    $.validator.addMethod('greaterThanOrEqualDate', function (value, element, param) {
+        return new Date(value) >= new Date($(param).val());
+    }, 'End date must be after the start date');
+
     $.validator.addMethod('notEqualTo', function (value, element, param) {
         return this.optional(element) || parseFloat(value) !== parseFloat($(param).val());
     }, 'Should not be equal');

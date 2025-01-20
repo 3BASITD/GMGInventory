@@ -144,6 +144,7 @@ namespace GMGInventory.Application.Repositories
                                POId = order.PurchaseOrder == null ? null : order.PurchaseOrder.Id,
                                PONumber = order.PurchaseOrder == null ? null : order.PurchaseOrder.DocumentNumber,
                                Remarks = order.Remarks + "",
+                               RequiredDeliveryDateD = order.RequiredDeliveryDate,
                                ResubmitId = order.ResubmittedSalesOrderId,
                                ShippingAddress = "",
                                SONumber = order.SalesOrderNumber,

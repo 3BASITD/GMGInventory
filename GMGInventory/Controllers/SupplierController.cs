@@ -19,9 +19,9 @@ namespace GMGInventory.Controllers
                              , IRegionRepository regionRepository
                              , IBusinessStyleRepository businessStyleRepository) : BaseController(accessRepository)
     {
-        public async Task<IActionResult> GetOptions(int? IncludeId)
+        public async Task<IActionResult> GetOptions(int? IncludeId, bool? IsLocal, bool? IsForeign)
         {
-            return Json(await supplierRepository.GetOptions(IncludeId));
+            return Json(await supplierRepository.GetOptions(IncludeId, IsLocal, IsForeign));
         }
 
         public async Task<IActionResult> Index()
