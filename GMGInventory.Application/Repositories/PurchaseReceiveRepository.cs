@@ -2,10 +2,12 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -411,12 +413,42 @@ namespace GMGInventory.Application.Repositories
                     receive.StatusId = statusId;
 
                     context.PurchaseReceivings.Update(receive);
-                    await context.SaveChangesAsync(currentUserId);
 
-                    response.Status = "Success";
-                    response.Message = "Purchase receive successfully approved.";
+                    var preceiveItems = await context.PurchaseReceivingLineItems
+                        .Include(x => x.PurchaseReceiving)
+                        .Include(x => x.OrderItem).ThenInclude(x => x.RequestItem)
+                        .Where(s => s.PurchaseReceivingId == receivingId).ToListAsync();
+
+                    foreach (var receiving in preceiveItems)
+                    {
+                        var itemId = receiving.OrderItem.RequestItem.ItemId;
+                        var warehouseId = receiving.PurchaseReceiving.WarehouseId;
+
+                        var itemInventory = await context.ItemInventories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).FirstOrDefaultAsync();
+
+                        if (itemInventory != null && itemId != null)
+                        {
+                            var countHistory = new PhysicalCountHistory
+                            {
+                                ItemId = itemId ?? 0,
+                                QuantityFrom = itemInventory.Quantity,
+                                QuantityTo = itemInventory.Quantity + receiving.Quantity,
+                                Remarks = "Purchase Receiving",
+                                WarehouseId = receiving.PurchaseReceiving.WarehouseId
+                            };
+                            context.PhysicalCountHistories.Add(countHistory);
+
+
+                            itemInventory.Quantity += receiving.Quantity;
+                            context.ItemInventories.Update(itemInventory);
+
+                        }
+                    };
+                    await context.SaveChangesAsync(currentUserId);
                 }
-            }
+                response.Status = "Success";
+                response.Message = "Purchase receive successfully approved.";
+                }
             return response;
         }
 

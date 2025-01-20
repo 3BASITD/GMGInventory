@@ -120,12 +120,12 @@
                 </div>
             
                 <div class="row">
-                    <div class="col-12 col-sm-6">
+                   @*  <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-unservedQty" class="control-label mb-0">Unserved Quantity</label>
                             <input type="number" min="0" value="0" id="filter-unservedQty" class="form-control form-control-sm" />
                         </div>
-                    </div>
+                    </div> *@
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-status" class="form-label mb-0">Status</label>
@@ -134,6 +134,12 @@
                                 <option>Disapproved</option>
                                 <option>Submitted</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label mb-0 d-block" for="filter-unserved"> Unserved? </label>
+                            <input class="form-check-input" type="checkbox" id="filter-unserved">
                         </div>
                     </div>
                 </div>
@@ -258,7 +264,8 @@
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-                    data.UnservedQty = $('#filter-unservedQty').val();
+                    data.Unserved = $('#filter-unserved').is(':checked');
+                   // data.UnservedQty = $('#filter-unservedQty').val();
                     data.Status = $('#filter-status').val();
                 }
             },
@@ -328,8 +335,9 @@
             var urlQuery = [];
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
-            urlQuery.push("UnservedQty=" + $("#filter-unservedQty").val());
-            urlQuery.push("Status=" + $("#filter-status").val());
+          //  urlQuery.push("UnservedQty=" + $("#filter-unservedQty").val());
+             urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
+             urlQuery.push("Status=" + $("#filter-status").val());
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
@@ -346,8 +354,9 @@
             var urlQuery = [];
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
-            urlQuery.push("UnservedQty=" + $("#filter-unservedQty").val());
+          //  urlQuery.push("UnservedQty=" + $("#filter-unservedQty").val());
             urlQuery.push("Status=" + $("#filter-status").val());
+            urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
 
             if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
             if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }

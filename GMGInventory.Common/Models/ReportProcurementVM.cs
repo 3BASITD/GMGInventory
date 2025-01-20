@@ -54,7 +54,8 @@ namespace GMGInventory.Common.Models
         public DateTime DateToD { get; set; }
         public string Supplier { get; set; }
         public string Item { get; set; }
-        public int UnservedQty { get; set; }
+      //  public int UnservedQty { get; set; }
+        public bool Unserved { get; set; }
         public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
         public decimal TotalAmountD { get; set; }
         public string TotalAmount2 => string.Format(SystemFormat.StringDecimalComma, TotalAmount2D);

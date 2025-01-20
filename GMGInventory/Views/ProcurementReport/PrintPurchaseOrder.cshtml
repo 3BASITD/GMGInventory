@@ -26,7 +26,7 @@
         <strong>Date Printed: </strong>
         <span>@Model.DatePrinted</span>
         <br />
-        <strong>@(Model.UnservedQty != 0 ? "Unserved" : "Served")</strong>
+        <strong>@(Model.Unserved  ? "Unserved" : "Served")</strong>
     </p>
     <table class="table-items">
         <thead>
