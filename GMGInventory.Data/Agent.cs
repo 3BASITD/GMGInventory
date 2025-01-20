@@ -31,16 +31,7 @@ namespace GMGInventory.Data
         public int AreaId { get; set; }
         public Area Area { get; set; }
 
-        //public string FullName
-        //{
-        //    get
-        //    {
-        //        return FirstName + (MiddleName == null ? "" : " " + MiddleName) + " " + LastName;
-        //    }
-        //}
-
         public bool IsActive { get; set; }
-        public bool IsDeleted { get; set; }
 
         public ICollection<Customer> Customers { get; set; }
         public ICollection<SalesOrder> SalesOrders { get; set; }

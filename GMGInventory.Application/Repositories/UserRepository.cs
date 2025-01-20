@@ -164,7 +164,6 @@ namespace GMGInventory.Application.Repositories
                 || await context.SOACRLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.SOACRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.SOACRLineItemTBRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.StockCards.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.Suppliers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.TransferItemDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
                 || await context.TransferItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)

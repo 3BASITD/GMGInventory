@@ -7,7 +7,6 @@ namespace GMGInventory.Data
         public Currency()
         {
             this.PurchaseOrders = new HashSet<PurchaseOrder>();
-            this.PurchaseOrderNews = new HashSet<PurchaseOrderNew>();
             this.Suppliers = new HashSet<Supplier>();
         }
 
@@ -21,10 +20,9 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 5)")]
         public decimal Rate { get; set; }
-
         public DateTime EffectiveDate { get; set; }
+
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
-        public ICollection<PurchaseOrderNew> PurchaseOrderNews { get; set; }
         public ICollection<Supplier> Suppliers { get; set; }
     }
 }

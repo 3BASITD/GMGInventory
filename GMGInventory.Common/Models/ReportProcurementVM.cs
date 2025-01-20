@@ -158,6 +158,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Amount")]
         public decimal UnservedAmount { get; set; }
+
+        public int recQty { get; set; }
+        public int poItemsQty { get; set; }
     }
 
     public class PurchaseReceivingPVM

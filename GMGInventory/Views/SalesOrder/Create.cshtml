@@ -294,16 +294,15 @@
             clearCustomerDetails();
         });
 
-        $("#order-agent-code").on("select2:unselecting", function (e) {
-            $("#order-agent-name").val("");
-            $("#order-customer-code").val(null).trigger("change");
-            clearCustomerDetails();
-        });
-
         // Load customer data for select2
         $("#order-customer-code").select2({
             //minimumInputLength: 1,
             placeholder: '<empty>',
+            language: {
+                noResults: function () {
+                    return "No customers found for selected Agent";
+                }
+            },
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -348,20 +347,6 @@
                 toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance");
             }
         });
-
-        $("#order-customer-code").on("select2:unselecting", function (e) {
-            clearCustomerDetails();
-        });
-
-        function clearCustomerDetails() {
-            $("#order-customer-name").val("");
-            $("#order-customer-address").val("");
-            $("#order-customer-balance").val("");
-            $("#order-credit-term").val("");
-            $("#order-region").val("");
-            $("#order-customer-status").val("");
-            $("#order-delivery-date").val("");
-        }
 
         // Load price type data for select2
         $.ajax({
@@ -560,6 +545,11 @@
                     Id: $("#resubmitSOId").val()
                 },
                 success: function (data, status, xhr) {
+                    var agentOption = new Option(data.agentCode, data.agentId, true, true);
+                    $("#order-agent-code").append(agentOption);
+                    $("#order-agent-code").trigger('change');
+                    $("#order-agent-name").val(data.agentName);
+
                     var customerOption = new Option(data.customerCode, data.customerId, true, true);
                     $("#order-customer-code").append(customerOption);
                     $("#order-customer-code").trigger('change');
@@ -567,29 +557,9 @@
                     $("#order-customer-code").select2("data")[0].outstandingBalanceD = data.outstandingBalanceD;
                     $("#order-customer-code").select2("data")[0].customerStatus = data.accountStatus;
                     $("#order-customer-name").val(data.customerName);
-                    $("#order-region").val(data.region);
-                    $("#order-customer-status").val(data.accountStatus);
-
-                    $("#order-customer-balance").val(data.outstandingBalance);
-
-                    var forwarderOption = new Option(data.forwarder, data.forwarderId, true, true);
-                    $("#order-forwarder").append(forwarderOption);
-                    $("#order-forwarder").trigger('change');
-
-
-                    $("#order-gross-net").val(data.grossNetPriceId).trigger("change");
-
-                    $("#order-remarks").val(data.remarks);
-
                     $("#order-customer-address").val(data.customerAddress);
-
+                    $("#order-customer-balance").val(data.outstandingBalance);
                     $("#order-credit-term").val(data.creditTerms);
-
-                    var agentOption = new Option(data.agentCode, data.agentId, true, true);
-                    $("#order-agent-code").append(agentOption);
-                    $("#order-agent-code").trigger('change');
-
-                    $("#order-agent-name").val(data.agentName);
 
                     if (data.poId) {
                         var POOption = new Option(data.poNumber, data.poId, true, true);
@@ -597,8 +567,16 @@
                         $("#order-purchase-number").trigger('change');
                     }
 
-                    $("#order-date").val(data.orderDate3);
+                    $("#order-region").val(data.region);
                     $("#order-delivery-date").val(data.requiredDeliveryDate3);
+
+                    var forwarderOption = new Option(data.forwarder, data.forwarderId, true, true);
+                    $("#order-forwarder").append(forwarderOption);
+                    $("#order-forwarder").trigger('change');
+
+                    $("#order-remarks").val(data.remarks);
+                    $("#order-date").val(data.orderDate3);
+                    $("#order-customer-status").val(data.accountStatus);
                 }
             });
 
@@ -625,6 +603,17 @@
                     });
                 }
             });
+        } else {
+            $("#order-agent-name").val("");
+            $("#order-customer-name").val("");
+            $("#order-customer-address").val("");
+            $("#order-customer-balance").val("");
+            $("#order-credit-term").val("");
+            $("#order-region").val("");
+            $("#order-delivery-date").val(DateForInput(new Date()));
+            $("#order-remarks").val("");
+            $("#order-date").val(DateForInput(new Date()));
+            $("#order-customer-status").val("");
         }
 
         var itemDT = $('.table-item').DataTable({

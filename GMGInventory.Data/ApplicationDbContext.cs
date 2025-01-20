@@ -215,7 +215,7 @@ namespace GMGInventory.Data
         public DbSet<SOACRLineItemTBR> SOACRLineItemTBRs { get; set; }
         public DbSet<SOACRType> SOACRTypes { get; set; }
         public DbSet<Status> Statuses { get; set; }
-        public DbSet<StockCard> StockCards { get; set; }
+        //public DbSet<StockCard> StockCards { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<TransferItem> TransferItems { get; set; }
         public DbSet<TransferItemDetail> TransferItemDetails { get; set; }
