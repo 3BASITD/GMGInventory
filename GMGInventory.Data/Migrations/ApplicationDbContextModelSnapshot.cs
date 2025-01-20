@@ -3275,12 +3275,6 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("CurrencyRate")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -3344,8 +3338,6 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApproverId");
-
-                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("DeliveryAddressId");
 
@@ -4893,52 +4885,6 @@ namespace GMGInventory.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.StockCard", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("Balance")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("In")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("InOutDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Out")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("UserCreated")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
-
-                    b.ToTable("StockCards");
-                });
-
             modelBuilder.Entity("GMGInventory.Data.Supplier", b =>
                 {
                     b.Property<int>("Id")
@@ -5606,13 +5552,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ed9e1c45-7f8d-4c61-aefa-3655c398fa99",
+                            ConcurrencyStamp = "d44c9b06-d74e-473d-81b4-9ce53e302c66",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL03JK4Zy+p3A/izQDYD4gKljKXFnd/0GK2O5vA/xOs2eSnwfK0mK2gjXMq+y6HmQA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIo1z4VuO7XAcvkUnnXvJCQ1m8Vz/nF1v7VyCvG9jqg78xmjO0DK5+15ibgJMHFazg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b14076c6-1bea-46e0-ba2d-62acd5c4fc56",
+                            SecurityStamp = "b21919c6-2c57-4686-bb72-84f84f8a31f8",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5627,13 +5573,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "6bb6edea-4612-4f9a-afa9-1ceda03a5de6",
+                            ConcurrencyStamp = "0ea07f01-44e6-4f4b-a920-3ab74251fd4d",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKe3h8+UjGMa2KFuIMxGMYen4QsGcym3ymCYojmrW9DMbdtbiwKp3ImcfpiIP1InaQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKNpxrRgbfSoD5pPe5E60ybikfOvLWMqoCikjw5kdMyx63C0Ds5QwFSQBsDdv53qPA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "52fff6c1-1f24-4e0e-a028-858863c429ae",
+                            SecurityStamp = "4c42a9f6-c86e-468a-a55a-b949b4f93fc8",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6138,12 +6084,6 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseOrderApprover")
                         .HasForeignKey("ApproverId");
 
-                    b.HasOne("GMGInventory.Data.Currency", "Currency")
-                        .WithMany("PurchaseOrderNews")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("GMGInventory.Data.Warehouse", "DeliveryAddress")
                         .WithMany("PurchaseOrderNews")
                         .HasForeignKey("DeliveryAddressId")
@@ -6187,8 +6127,6 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Approver");
-
-                    b.Navigation("Currency");
 
                     b.Navigation("DeliveryAddress");
 
@@ -6694,17 +6632,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesReturnLineItem");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.StockCard", b =>
-                {
-                    b.HasOne("GMGInventory.Data.Item", "Item")
-                        .WithMany("StockCards")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Item");
-                });
-
             modelBuilder.Entity("GMGInventory.Data.Supplier", b =>
                 {
                     b.HasOne("GMGInventory.Data.BusinessStyle", "BusinessStyle")
@@ -6871,8 +6798,6 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Currency", b =>
                 {
-                    b.Navigation("PurchaseOrderNews");
-
                     b.Navigation("PurchaseOrders");
 
                     b.Navigation("Suppliers");
@@ -6959,8 +6884,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesOrderLineItems");
 
                     b.Navigation("SalesReturnLineItems");
-
-                    b.Navigation("StockCards");
 
                     b.Navigation("TransferItemDetails");
                 });

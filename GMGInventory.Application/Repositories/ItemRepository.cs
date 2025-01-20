@@ -646,12 +646,6 @@ namespace GMGInventory.Application.Repositories
                 context.PhysicalCountHistories.RemoveRange(physicalCount);
             }
 
-            var stockCard = context.StockCards.Where(s => s.ItemId == id).ToList();
-            if (stockCard.Count > 0)
-            {
-                context.StockCards.RemoveRange(stockCard);
-            }
-
             var item = context.Items.Where(s => s.Id == id).First();
             context.Items.Remove(item);
             await context.SaveChangesAsync();

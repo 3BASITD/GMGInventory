@@ -16,7 +16,6 @@ namespace GMGInventory.Data
             this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
             this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
             this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>(); 
-            this.StockCards = new HashSet<StockCard>();
             this.TransferItemDetails = new HashSet<TransferItemDetail>();
         }
 
@@ -70,7 +69,7 @@ namespace GMGInventory.Data
         public ICollection<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }
         public ICollection<SalesOrderLineItem> SalesOrderLineItems { get; set; }
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
-        public ICollection<StockCard> StockCards { get; set; }
+        //public ICollection<StockCard> StockCards { get; set; }
         public ICollection<TransferItemDetail> TransferItemDetails { get; set; }
     }
 }

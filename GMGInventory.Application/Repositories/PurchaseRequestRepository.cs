@@ -203,6 +203,9 @@ namespace GMGInventory.Application.Repositories
                             let returnedQuantity = context.SalesReturnLineItems
                                                           .Where(s => s.ItemId == request.ItemId)
                                                           .Sum(s => (int?)s.Quantity) ?? 0
+                            let inventory = context.ItemInventories
+                                                   .Where(s => s.ItemId == request.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
+                                                   .Sum(s => (int?)s.Quantity) ?? 0
                             where request.PurchaseRequestId == purchaseRequestId
                             select new PurchaseRequestLineItemVM
                             {
@@ -215,7 +218,7 @@ namespace GMGInventory.Application.Repositories
                                 ItemCode = request.Item == null ? null : request.Item.Code,
                                 ItemPartNumber = (request.Item == null ? null : request.Item.PartNumber) + "",
                                 ItemDescription = request.ItemDescription,
-                                StockOnHandD = (packedQuantity - returnedQuantity) - invoicedQuantity,
+                                StockOnHandD = inventory,
                                 QuantityD = request.Quantity,
                                 UnitId = request.Unit != null ? request.Unit.Id
                                        : request.Item != null ? request.Item.Unit.Id
