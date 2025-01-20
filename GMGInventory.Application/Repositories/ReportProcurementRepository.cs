@@ -34,7 +34,7 @@ namespace GMGInventory.Application.Repositories
                            && (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date <= filter.DateTo
                            && (filter.Item == null || pRequest.Item.Id == filter.Item || (filter.Item == 0 && pRequest.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                            && (filter.Supplier == null || porder.PurchaseOrder.Supplier.Id == filter.Supplier)
-                           && (filter.UnservedQty == 0 || pRequest.Quantity - porder.Quantity == filter.UnservedQty)
+                           && (!filter.Unserved  || pRequest.Quantity - porder.Quantity > 0)
 
                            select new PurchaseOrderRVM
                            {
@@ -147,7 +147,8 @@ namespace GMGInventory.Application.Repositories
                 DateToD = filter.DateTo.GetValueOrDefault(),
                 Supplier = filter.Supplier == null || supplier == null ? "All" : supplier.Name,
                 Item = filter.Item == null || item == null ? "All" : item.Name,
-                UnservedQty = filter.UnservedQty,
+                //UnservedQty = filter.UnservedQty,
+                Unserved = filter.Unserved,
                 TotalAmountD = items.Sum(s => s.UnitCost),
                 TotalAmount2D = items.Sum(s => s.UnservedAmount),
                 DocNo = items.Any() ? items.OrderBy(x => x.DocumentNumber).FirstOrDefault().DocumentNumber + " - " +
@@ -309,9 +310,6 @@ namespace GMGInventory.Application.Repositories
                             && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
                             select new PurchaseReceivingRVM
                             {
-                                recQty = preceive.Quantity,
-                                poItemsQty = poItems.Quantity,
-
                                 Item = preceive.OrderItem.RequestItem.Item.Code,
                                                  ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
                                                  Quantity = preceive.Quantity,
