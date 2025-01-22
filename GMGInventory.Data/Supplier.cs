@@ -36,6 +36,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string ContactPerson { get; set; }
 
+        [Column(TypeName = "nvarchar(100)")]
+        public string MobileNumber { get; set; }
+
         [Required]
         [ForeignKey("RegionId")]
         public int RegionId { get; set; }
