@@ -87,8 +87,9 @@ namespace GMGInventory.Application.Repositories
                                    || c.Code.ToLower().Contains(search.ToLower())
                                    || c.Name.ToLower().Contains(search.ToLower()))
                                    && context.SalesOrders
-                                             .Any(s => s.Status.Name != "Sales Order Submitted"
-                                                    && s.Status.Name != "Sales Order Disapproved"
+                                             .Any(s => s.Status.Code.ToLower() != "submitted"
+                                                    && s.Status.Code.ToLower() != "disapproved"
+                                                    && s.Status.Code.ToLower() != "draft"
                                                     && s.CustomerId == c.Id)
                                    select new JsonCustomerOptionsModel
                                    {

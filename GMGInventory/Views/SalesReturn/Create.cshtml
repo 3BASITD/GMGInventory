@@ -50,7 +50,13 @@
                             <label for="return-remarks" class="form-label mb-0">Remarks</label>
                             <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" />
                         </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-date" class="form-label fw-normal mb-0">Return Date</label>
+                        <input type="date" id="return-date" name="ReturnDate" class="form-control form-control-sm" />
                     </div>
+                </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
@@ -604,11 +610,13 @@
         var validateCreate = $("#form-return").validate({
             rules: {
                 Customer: { required: true },
-                Remarks: { maxlength: 250 }
+                Remarks: { maxlength: 250 },
+                ReturnDate: { required: true }
             },
             messages: {
                 CustomerCode: { required: "Please select customer" },
-                AgentCode: { maxlength: "Remarks must not exceed 50 characters." }
+                AgentCode: { maxlength: "Remarks must not exceed 50 characters." },
+                ReturnDate: { required: "Please select date" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -629,6 +637,7 @@
                     data: {
                         Customer: $("#return-customer-code").select2("data")[0].id,
                         Remarks: $("#return-remarks").val(),
+                        ReturnDate: $("#return-date").val(),
                         Items: itemsToReturn
                     },
                     success: function (data, status, xhr) {

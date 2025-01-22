@@ -139,7 +139,9 @@ namespace GMGInventory.Application.Repositories
             var invoiceVM = (from invoice in context.Invoices
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
-                             join user in userManager.Users on invoice.UserCreated equals user.Id
+                             join userc in userManager.Users on invoice.UserCreated equals userc.Id
+                             join userm in userManager.Users on invoice.UserModified equals userm.Id into um
+                             from userm in um.DefaultIfEmpty()
                              where invoice.Id == Id
                              select new InvoiceDetailsVM
                              {
@@ -151,9 +153,7 @@ namespace GMGInventory.Application.Repositories
                                  CustomerAddress = invoice.SalesOrder.Customer.Address,
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
-                                 DateCreatedD = invoice.DateCreated,
                                  Id = invoice.Id,
-                                 InvoiceBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                  InvoiceDateD = invoice.InvoiceDate,
                                  InvoiceNumber = invoice.InvoiceNumber,
                                  InvoiceType = invoice.InvoiceType.Name,
@@ -164,7 +164,11 @@ namespace GMGInventory.Application.Repositories
                                  Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
-                                 TIN = invoice.SalesOrder.Customer.TIN + ""
+                                 TIN = invoice.SalesOrder.Customer.TIN + "",
+                                 UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                 DateCreatedD = invoice.DateCreated,
+                                 UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                                 DateModifiedD = invoice.DateModified == null ? null : invoice.DateModified.Value
                              });
             return await invoiceVM.FirstOrDefaultAsync();
         }
@@ -174,7 +178,9 @@ namespace GMGInventory.Application.Repositories
             var invoiceVM = (from invoice in context.Invoices
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
-                             join user in userManager.Users on invoice.UserCreated equals user.Id
+                             join userc in userManager.Users on invoice.UserCreated equals userc.Id
+                             join userm in userManager.Users on invoice.UserModified equals userm.Id into um
+                             from userm in um.DefaultIfEmpty()
                              where invoice.Id == Id
                              select new InvoiceDetailsWithItemsVM
                              {
@@ -185,9 +191,7 @@ namespace GMGInventory.Application.Repositories
                                  CustomerAddress = invoice.SalesOrder.Customer.Address,
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
-                                 DateCreatedD = invoice.DateCreated,
                                  Id = invoice.Id,
-                                 InvoiceBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                  InvoiceDateD = invoice.InvoiceDate,
                                  InvoiceNumber = invoice.InvoiceNumber,
                                  InvoiceType = invoice.InvoiceType.Name,
@@ -198,7 +202,11 @@ namespace GMGInventory.Application.Repositories
                                  Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
-                                 TIN = invoice.SalesOrder.Customer.TIN + ""
+                                 TIN = invoice.SalesOrder.Customer.TIN + "",
+                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                 DateCreatedD = invoice.DateCreated,
+                                 UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                                 DateModifiedD = invoice.DateModified == null ? null : invoice.DateModified.Value
                              });
             var invoiceDetails = await invoiceVM.FirstAsync();
             var items = await GetItemsAsync(Id);

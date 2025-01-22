@@ -15,6 +15,7 @@ namespace GMGInventory.Data
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
+        public DateTime ReturnDate { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }

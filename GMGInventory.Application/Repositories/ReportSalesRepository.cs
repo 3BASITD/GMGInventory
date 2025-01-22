@@ -1542,6 +1542,9 @@ namespace GMGInventory.Application.Repositories
                                                         .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == so.Id
                                                                  && s.ItemId == soline.ItemId)
                                                         .Sum(s => (int?)s.Quantity) ?? 0
+                          let inventory = context.ItemInventories
+                                                 .Where(s => s.ItemId == soline.ItemId)
+                                                 .Sum(s => (int?)s.Quantity) ?? 0
                           where filter.DateFrom <= so.DateCreated.Date
                           && so.DateCreated.Date <= filter.DateTo
                           && (filter.Brand == null || soline.Item.Brand.Id == filter.Brand)
@@ -1552,7 +1555,8 @@ namespace GMGInventory.Application.Repositories
                               CurrentD = packedQuantity - returnedQuantity,
                               ItemCode = soline.Item.Code,
                               ItemName = soline.Item.Name,
-                              PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
+                              //PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
+                              PendingD = soline.Quantity - inventory,
                               ReplenishDateD = soline.DateCreated
                           };
             var solineslist = await solines.ToListAsync();

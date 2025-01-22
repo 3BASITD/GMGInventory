@@ -115,13 +115,6 @@ namespace GMGInventory.Common.Models
         public string InvoiceDate3 => InvoiceDateD.ToString(SystemFormat.StringDate3);
         public DateTime InvoiceDateD { get; set; }
 
-        [Display(Name = "Date Created")]
-        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDate);
-        public DateTime DateCreatedD { get; set; }
-
-        [Display(Name = "Invoice By")]
-        public string InvoiceBy { get; set; }
-
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
 
@@ -130,6 +123,20 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Invoice Type")]
         public string InvoiceType { get; set; }
         public bool CurrentUsersDraft { get; set; }
+
+        [Display(Name = "Created By")]
+        public string UserCreated { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+
+        [Display(Name = "Modified By")]
+        public string? UserModified { get; set; }
+
+        [Display(Name = "Date Modified")]
+        public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
     }
 
     public class InvoiceDetailsWithItemsVM : InvoiceDetailsVM

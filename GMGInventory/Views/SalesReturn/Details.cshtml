@@ -70,6 +70,16 @@
                         }
                     </p>
                 </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UserCreated)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.UserCreated
+                        </b>
+                    </p>
+                </div>
             </div>
             <div class="row">
                 <div class="col-12 col-md-4 col-sm-6">
@@ -94,17 +104,34 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
+                        @if (userAccess.CanEdit)
+                        {
+                            <label for="return-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
+                            <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" value="@(Model?.Remarks)" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.Remarks)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model.Remarks)
+                            </b>
+                        }
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ReturnBy)
+                            @Html.DisplayNameFor(model => model.DateCreated)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.ReturnBy
+                            @Model?.DateCreated
                         </b>
                     </p>
                 </div>
             </div>
             <div class="row">
-
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
                         @if (userAccess.CanEdit)
@@ -123,24 +150,32 @@
                         }
                     </p>
                 </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        @if (userAccess.CanEdit)
-                        {
-                            <label for="return-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
-                            <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" value="@(Model?.Remarks)" />
-                        }
-                        else
-                        {
+                @if (Model?.UserModified != null)
+                {
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <p class="text-sm">
                             <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.Remarks)
+                                @Html.DisplayNameFor(model => model.UserModified)
                             </span>
                             <b class="d-block form-gayahin">
-                                @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model.Remarks)
+                                @Model?.UserModified
                             </b>
-                        }
-                    </p>
-                </div>
+                        </p>
+                    </div>
+                }
+                @if (Model?.DateModified != null)
+                {
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.DateModified)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.DateModified
+                            </b>
+                        </p>
+                    </div>
+                }
             </div>
             @*
             <div class="row">

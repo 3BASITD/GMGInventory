@@ -253,10 +253,21 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.InvoiceBy)
+                            @Html.DisplayNameFor(model => model.Status)
+                        </span>
+                        <b class="d-block form-gayahin invoice-status">
+                            @Model?.Status
+                        </b>
+                        <input type="hidden" id="invoice-status" value="@Model?.Status" />
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UserCreated)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.InvoiceBy
+                            @Model?.UserCreated
                         </b>
                     </p>
                 </div>
@@ -270,17 +281,32 @@
                         </b>
                     </p>
                 </div>
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Status)
-                        </span>
-                        <b class="d-block form-gayahin invoice-status">
-                            @Model?.Status
-                        </b>
-                        <input type="hidden" id="invoice-status" value="@Model?.Status" />
-                    </p>
-                </div>
+                @if (Model?.UserModified != null)
+                {
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.UserModified)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.UserModified
+                            </b>
+                        </p>
+                    </div>
+                }
+                @if (Model?.DateModified != null)
+                {
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.DateModified)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.DateModified
+                            </b>
+                        </p>
+                    </div>
+                }
             </div>
             <div class="row">
                 <div class="col-12">

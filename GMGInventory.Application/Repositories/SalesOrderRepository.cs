@@ -61,7 +61,7 @@ namespace GMGInventory.Application.Repositories
                                                      .Sum(s => (int?)s.Quantity) ?? 0
                          where order.Status.Code.ToLower() != "submitted"
                          && order.Status.Code.ToLower() != "disapproved"
-                         && order.Status.Code.ToLower() != "denied"
+                         && order.Status.Code.ToLower() != "draft"
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
                          orderby order.SalesOrderNumber ascending
@@ -108,7 +108,7 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.Forwarder)
                                                 .Include(s => s.PriceType)
                            join userc in userManager.Users on order.UserCreated equals userc.Id
-                           join userm in userManager.Users on order.UserCreated equals userm.Id into um
+                           join userm in userManager.Users on order.UserModified equals userm.Id into um
                            from userm in um.DefaultIfEmpty()
                            from approve in userManager.Users.Where(s => s.Id == order.ApprovedBy).DefaultIfEmpty()
                            from disapprove in userManager.Users.Where(s => s.Id == order.DisapprovedBy).DefaultIfEmpty()
@@ -283,7 +283,7 @@ namespace GMGInventory.Application.Repositories
                                                    .OrderByDescending(s => s.DateCreated)
                                                    .FirstOrDefault()
                                 let inventory = context.ItemInventories
-                                                       .Where(s => s.ItemId == order.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
+                                                       .Where(s => s.ItemId == order.ItemId)
                                                        .Sum(s => (int?)s.Quantity) ?? 0
                                 let packedQuantity = context.PackLineItems
                                                             .Where(s => s.Pack.SalesOrderId == order.SalesOrderId
@@ -321,7 +321,8 @@ namespace GMGInventory.Application.Repositories
                                     SellingPriceD = order.SellingPrice,
                                     ServedQuantityD = packedQuantity - returnedQuantity,
                                     Unit = order.Item.Unit.Code,
-                                    UnservedQuantityD = order.Quantity - (packedQuantity - returnedQuantity)
+                                    //UnservedQuantityD = order.Quantity - (packedQuantity - returnedQuantity)
+                                    UnservedQuantityD = order.Quantity - inventory
                                 }).ToListAsync();
 
             int newLineNumber = 1;

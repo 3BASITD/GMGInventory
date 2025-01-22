@@ -19,15 +19,26 @@ namespace GMGInventory.Common.Models
         public string CustomerName { get; set; }
 
         [Display(Name = "Return Date")]
-        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDate2);
+        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDate);
         public string ReturnDate3 => ReturnDateD.ToString(SystemFormat.StringDate3);
         public DateTime ReturnDateD { get; set; }
 
-        [Display(Name = "Return By")]
-        public string ReturnBy { get; set; }
-
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
+
+        [Display(Name = "Created By")]
+        public string UserCreated { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+
+        [Display(Name = "Modified By")]
+        public string? UserModified { get; set; }
+
+        [Display(Name = "Date Modified")]
+        public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
     }
 
     public class SalesReturnItemVM
@@ -85,6 +96,7 @@ namespace GMGInventory.Common.Models
         public int? Id { get; set; }
         public int Customer { get; set; }
         public string Remarks { get; set; }
+        public DateTime ReturnDate { get; set; }
         public IList<SalesReturnFormItemVM> Items { get; set; }
     }
 

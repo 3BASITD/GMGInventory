@@ -26,32 +26,12 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ItemPriceVM?> GetAsync(int? id)
         {
-            //var priceVM = from item in context.Items
-            //              from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated >= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
-            //              join inventory in context.ItemInventories on item.Id equals inventory.Id
-            //              group inventory by new { item, price } into i
-            //              let served = context.SalesOrderLineItems.Where(s => s.ItemId == i.Key.item.Id).ToList()
-            //              where i.Key.item.Id == id
-            //              select new ItemPriceVM
-            //              {
-            //                  Brand = i.Key.item.Brand.Code,
-            //                  Category = i.Key.item.Category.Code,
-            //                  Code = i.Key.item.Code,
-            //                  Id = i.Key.item.Id,
-            //                  ItemType = i.Key.item.ItemType.Code,
-            //                  ModelNumber = string.IsNullOrWhiteSpace(i.Key.item.ModelNumber) ? "-" : i.Key.item.ModelNumber,
-            //                  Name = i.Key.item.Name,
-            //                  NetPrice = i.Key.price.NetSellingPrice,
-            //                  PartNumber = string.IsNullOrWhiteSpace(i.Key.item.PartNumber) ? "-" : i.Key.item.PartNumber,
-            //                  Quantity = i.Sum(s => s.Quantity) + (served.Count() == 0 ? 0 : served.Sum(s => s.ServedQuantity - s.PackedQuantity)),
-            //                  RetailPrice = i.Key.price.RetailSellingPrice,
-            //                  Size = i.Key.item.Size,
-            //                  Unit = i.Key.item.Unit.Code
-            //              };
-
+            //var WarehouseInventory = await (from inv in context.ItemInventories
+            //                                where inv.ItemId == id
+            //                                select inv.Quantity).FirstAsync();
             var WarehouseInventory = await (from inv in context.ItemInventories
                                             where inv.ItemId == id
-                                            select inv.Quantity).FirstAsync();
+                                            select (int?)inv.Quantity).SumAsync() ?? 0;
 
             var OrderQuantity = await (from soli in context.SalesOrderLineItems
                                        where soli.ItemId == id
@@ -69,7 +49,8 @@ namespace GMGInventory.Application.Repositories
                                           select (decimal?)rli.Quantity).SumAsync() ?? 0;
 
             var ServedQuantity = PackedQuantity - ReturnedQuantity;
-            var UnservedQuantity = OrderQuantity - ServedQuantity;
+            //var UnservedQuantity = OrderQuantity - ServedQuantity;
+            var UnservedQuantity = OrderQuantity - WarehouseInventory;
 
             var priceVM = from item in context.Items
                           from price in context.ItemPrices

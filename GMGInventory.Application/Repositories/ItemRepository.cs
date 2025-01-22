@@ -930,6 +930,9 @@ namespace GMGInventory.Application.Repositories
                                                       .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == sitem.Id
                                                                && s.ItemId == sitem.ItemId)
                                                       .Sum(s => (int?)s.Quantity) ?? 0
+                          let inventory = context.ItemInventories
+                                                 .Where(s=>s.ItemId == sitem.ItemId)
+                                                 .Sum(s=>(int?)s.Quantity) ?? 0
                           join user in userManager.Users on sitem.SalesOrder.UserCreated equals user.Id
                           where sitem.Item.Id == id
                           select new ItemDetailSalesVM
@@ -944,7 +947,8 @@ namespace GMGInventory.Application.Repositories
                               QuantityD = sitem.Quantity,
                               SalesNumber = sitem.SalesOrder.SalesOrderNumber,
                               UnitPriceD = sitem.SellingPrice,
-                              UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned)
+                              //UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned)
+                              UnservedQuantityD = sitem.Quantity - inventory
                           };
             return await salesVM.ToListAsync();
         }
