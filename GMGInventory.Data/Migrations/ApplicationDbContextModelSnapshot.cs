@@ -5144,6 +5144,10 @@ namespace GMGInventory.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<string>("MobileNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
@@ -5772,13 +5776,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "84431afd-40c2-4995-9dab-8a0d6c65843e",
+                            ConcurrencyStamp = "8d01a285-a8f3-4f5d-951c-5721774c1be7",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHENL0cx7j1B1nvTqCV/wwLN/jf+E6M9prwmg9TaI5eyQUdONC3XfieqwBvH9nUMAw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJP70FCvgaiYAfNE8rWzn/v9ZoNSA3LPfMasVyd8y7oBNppIfjs2DajW/d3uXSs+pA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b5248af9-a2d7-4d54-8ebc-48f87ecd6fb1",
+                            SecurityStamp = "fddeb23b-ef42-4ef3-a96d-bc5b834a5c7e",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5793,13 +5797,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c13434f9-dbce-4c0f-8522-ff4400b25c9f",
+                            ConcurrencyStamp = "de1af559-f6f2-4179-8e08-988b376d17c8",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEA4gGl5FjYVQ9le4eHX54OPdD7YcXJ+UFmEL9lVJ16gAd7cYDAzKKXRRQ2fAmbMQbA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBZePdOaFJxT8h96MiD2/nsXuMXeU42iLk3O4qMdAmaW1H2F6O0mLA5xSQWJLOayfw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "cf97e519-dcb5-4885-b733-f66802d69894",
+                            SecurityStamp = "4f3b1fb6-b6e3-4437-8560-546db5ff86c9",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
