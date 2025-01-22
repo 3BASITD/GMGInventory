@@ -91,8 +91,6 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Credit Terms")]
         public string CreditTerms { get; set; }
 
-        public int? POId { get; set; }
-
         [Display(Name = "Purchase Order Number")]
         public string? PONumber { get; set; }
 
@@ -106,10 +104,6 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer's Region")]
         public string Region { get; set; }
-
-        [Display(Name = "Customer's Commodity Quantity")]
-        public string CommodityQuantity => string.Format(SystemFormat.StringIntegerComma, CommodityQuantityD);
-        public int CommodityQuantityD { get; set; }
 
         [Display(Name = "Customer's Required Delivery Date")]
         public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
@@ -184,7 +178,6 @@ namespace GMGInventory.Common.Models
                 Id = value.Id;
                 OrderDateD = value.OrderDateD;
                 OutstandingBalanceD = value.OutstandingBalanceD;
-                POId = value.POId;
                 PONumber = value.PONumber;
                 Remarks = value.Remarks;
                 ShippingAddress = value.ShippingAddress;
@@ -192,7 +185,6 @@ namespace GMGInventory.Common.Models
                 Status = value.Status;
                 AccountStatus = value.AccountStatus;
                 Region = value.Region;
-                CommodityQuantityD = value.CommodityQuantityD;
                 RequiredDeliveryDateD = value.RequiredDeliveryDateD;
                 UserCreated = value.UserCreated;
                 DateCreatedD = value.DateCreatedD;
@@ -291,7 +283,7 @@ namespace GMGInventory.Common.Models
         public int Forwarder { get; set; }
         public int Agent { get; set; }
         public int GrossNet { get; set; }
-        public int? PurchaseOrder { get; set; }
+        public string? PurchaseOrder { get; set; }
         public decimal DeclaredValue { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime DeliveryDate { get; set; }

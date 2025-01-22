@@ -72,8 +72,18 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @{
+                                var currentGroup = "";
+                            }
                             @for (int i = 0; i < Model.Accesses.Count; i++)
                             {
+                                if (currentGroup != Model.Accesses[i].PageGroup)
+                                {
+                                    <tr class="group-header">
+                                        <th colspan="8">@Model.Accesses[i].PageGroup</th>
+                                    </tr>
+                                    currentGroup = Model.Accesses[i].PageGroup;
+                                }
                                 <tr>
                                     <td>
                                         <span>@Model.Accesses[i].Name</span>

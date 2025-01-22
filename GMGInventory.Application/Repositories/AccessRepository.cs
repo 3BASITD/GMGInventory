@@ -46,10 +46,14 @@ namespace GMGInventory.Application.Repositories
             var role = context.Roles.Where(s => s.Id == RoleId).FirstOrDefault();
             var accesses = from p in context.Pages
                            from a in context.Accesses.Where(s => s.PageId == p.Id && s.RoleId == RoleId).DefaultIfEmpty()
+                           orderby p.PageGroup.Id ascending, p.OrderNumber ascending
                            select new AccessVM
                            {
                                AccessId = a == null ? -1 : a.Id,
                                PageId = p.Id,
+                               OrderNumber = p.OrderNumber,
+                               PageGroupId = p.PageGroup.Id,
+                               PageGroup = p.PageGroup.Name,
                                Name = p.Name,
                                HasView = p.HasView,
                                CanView = a != null && a.CanView,
@@ -358,6 +362,9 @@ namespace GMGInventory.Application.Repositories
                            {
                                AccessId = a == null ? -1 : a.Id,
                                PageId = p.Id,
+                               OrderNumber = p.OrderNumber,
+                               PageGroupId = p.PageGroup.Id,
+                               PageGroup = p.PageGroup.Name,
                                Name = p.Name,
                                HasView = p.HasView,
                                CanView = a != null && a.CanView,
@@ -398,7 +405,7 @@ namespace GMGInventory.Application.Repositories
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
+                data = data.OrderBy(s => s.PageGroupId).ThenBy(form.SortColumn + " " + form.SortColumnDirection);
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();

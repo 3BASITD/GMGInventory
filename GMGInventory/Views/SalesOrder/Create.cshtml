@@ -60,29 +60,21 @@
                         <label for="order-customer-balance" class="form-label mb-0">Outstanding Balance</label>
                         <input type="text" id="order-customer-balance" class="form-control form-control-sm" readonly="readonly" />
                     </div>
-                    @* <div class="form-group">
-                        <label for="order-gross-net" class="form-label mb-0">Gross / Net Price</label>
-                        <select id="order-gross-net" class="form-control form-control-sm"></select>
-                    </div> *@
                     <div class="form-group">
                         <label for="order-credit-term" class="form-label mb-0">Credit Term</label>
                         <input type="text" id="order-credit-term" class="form-control form-control-sm" readonly="readonly" />
-                    </div>
-                    @* <div class="form-group">
-                        <label for="order-declared-value" class="form-label mb-0">Declared Value</label>
-                        <input type="number" id="order-declared-value" step="0.01" min="0" max="1999999" class="form-control form-control-sm" />
-                    </div> *@
-                    <div class="form-group">
-                        <label for="order-purchase-number" class="form-label mb-0">Purchase Order Number</label>
-                        <select id="order-purchase-number" style="width: 100%"></select>
                     </div>
                     <div class="form-group">
                         <label for="order-region" class="form-label mb-0">Customer Region</label>
                         <input type="text" id="order-region" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                     <div class="form-group">
-                        <label for="order-delivery-date" class="form-label mb-0">Required Delivery Date</label>
-                        <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
+                        <label for="order-customer-status" class="form-label mb-0">Customer Account Status</label>
+                        <input type="text" id="order-customer-status" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order-purchase-number" class="form-label mb-0">Purchase Order Number</label>
+                        <input type="text" id="order-purchase-number" name="PurchaseNumber" class="form-control form-control-sm" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -99,8 +91,8 @@
                         <input type="date" id="order-date" name="OrderDate" class="form-control form-control-sm" />
                     </div>
                     <div class="form-group">
-                        <label for="order-customer-status" class="form-label mb-0">Customer Account Status</label>
-                        <input type="text" id="order-customer-status" class="form-control form-control-sm" readonly="readonly" />
+                        <label for="order-delivery-date" class="form-label mb-0">Required Delivery Date</label>
+                        <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
                     </div>
                 </div>
             </div>
@@ -291,7 +283,12 @@
         $("#order-agent-code").on("select2:select", function () {
             $("#order-agent-name").val($(this).select2("data")[0].name);
             $("#order-customer-code").val(null).trigger("change");
-            clearCustomerDetails();
+            $("#order-customer-name").val("");
+            $("#order-customer-address").val("");
+            $("#order-customer-balance").val("");
+            $("#order-credit-term").val("");
+            $("#order-region").val("");
+            $("#order-customer-status").val("");
         });
 
         // Load customer data for select2
@@ -357,35 +354,6 @@
                     data: data,
                     minimumResultsForSearch: -1
                 });
-            }
-        });
-
-        // Load purchase order data for select2
-        $("#order-purchase-number").select2({
-            minimumInputLength: 1,
-            allowClear: true,
-            placeholder: '<empty>',
-            ajax: {
-                url: "@Url.Action("GetOptions", "PurchaseOrder")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
             }
         });
 
@@ -560,12 +528,6 @@
                     $("#order-customer-address").val(data.customerAddress);
                     $("#order-customer-balance").val(data.outstandingBalance);
                     $("#order-credit-term").val(data.creditTerms);
-
-                    if (data.poId) {
-                        var POOption = new Option(data.poNumber, data.poId, true, true);
-                        $("#order-purchase-number").append(POOption);
-                        $("#order-purchase-number").trigger('change');
-                    }
 
                     $("#order-region").val(data.region);
                     $("#order-delivery-date").val(data.requiredDeliveryDate3);

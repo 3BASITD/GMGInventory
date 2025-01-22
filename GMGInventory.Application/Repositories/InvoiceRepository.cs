@@ -139,7 +139,6 @@ namespace GMGInventory.Application.Repositories
             var invoiceVM = (from invoice in context.Invoices
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
-                                                    .Include(s => s.SalesOrder).ThenInclude(s => s.PurchaseOrder)
                              join user in userManager.Users on invoice.UserCreated equals user.Id
                              where invoice.Id == Id
                              select new InvoiceDetailsVM
@@ -161,7 +160,7 @@ namespace GMGInventory.Application.Repositories
                                  InvoiceTypeId = invoice.InvoiceType.Id,
                                  PackNumber = invoice.PackId,
                                  PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? "-" : invoice.SalesOrder.Customer.CreditTerm.Name,
-                                 PONumber = invoice.SalesOrder.PurchaseOrder == null ? "-" : invoice.SalesOrder.PurchaseOrder.DocumentNumber,
+                                 PONumber = invoice.SalesOrder.PurchaseOrder,
                                  Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
@@ -175,7 +174,6 @@ namespace GMGInventory.Application.Repositories
             var invoiceVM = (from invoice in context.Invoices
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
-                                                    .Include(s => s.SalesOrder).ThenInclude(s => s.PurchaseOrder)
                              join user in userManager.Users on invoice.UserCreated equals user.Id
                              where invoice.Id == Id
                              select new InvoiceDetailsWithItemsVM
@@ -196,7 +194,7 @@ namespace GMGInventory.Application.Repositories
                                  InvoiceTypeId = invoice.InvoiceTypeId,
                                  PackNumber = invoice.PackId,
                                  PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? "-" : invoice.SalesOrder.Customer.CreditTerm.Name,
-                                 PONumber = invoice.SalesOrder.PurchaseOrder == null ? "-" : invoice.SalesOrder.PurchaseOrder.DocumentNumber,
+                                 PONumber = invoice.SalesOrder.PurchaseOrder,
                                  Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
@@ -219,7 +217,6 @@ namespace GMGInventory.Application.Repositories
             var packVM = (from pack in context.Packs
                                               .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
                                               .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
-                                              .Include(s => s.SalesOrder).ThenInclude(s => s.PurchaseOrder)
                           where pack.Id == Id
                           select new InvoiceDetailsVM
                           {
@@ -232,7 +229,7 @@ namespace GMGInventory.Application.Repositories
                               Id = pack.Id,
                               PackNumber = pack.Id,
                               PaymentTerms = pack.SalesOrder.Customer.CreditTerm == null ? "-" : pack.SalesOrder.Customer.CreditTerm.Name,
-                              PONumber = pack.SalesOrder.PurchaseOrder == null ? "-" : pack.SalesOrder.PurchaseOrder.DocumentNumber,
+                              PONumber = pack.SalesOrder.PurchaseOrder,
                               SONumber = pack.SalesOrder.SalesOrderNumber,
                               Status = pack.Status.Code,
                               TIN = pack.SalesOrder.Customer.TIN + ""

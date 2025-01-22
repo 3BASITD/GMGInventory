@@ -17,6 +17,9 @@ namespace GMGInventory.Common.Models
     {
         public int AccessId { get; set; }
         public int PageId { get; set; }
+        public int OrderNumber { get; set; }
+        public int PageGroupId { get;set; }
+        public string PageGroup { get; set; }
         public string Name { get; set; }
         public bool HasView { get; set; }
         public bool CanView { get; set; }

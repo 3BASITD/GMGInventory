@@ -811,6 +811,42 @@ namespace GMGInventory.Data.Migrations
                             PageId = 61,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 62,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 62,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 63,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 63,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 64,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 64,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -2299,7 +2335,15 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("OrderNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PageGroupId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PageGroupId");
 
                     b.ToTable("Pages");
 
@@ -2314,7 +2358,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Customer Purchase History"
+                            Name = "Customer Purchase History",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2326,7 +2372,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Packing Listing"
+                            Name = "Packing Listing",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2338,7 +2386,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Sales Invoice"
+                            Name = "Sales Invoice",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2350,7 +2400,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Sales Order"
+                            Name = "Sales Order",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2362,7 +2414,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Sales Order Delivery"
+                            Name = "Sales Order Delivery",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2374,7 +2428,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Sales Return"
+                            Name = "Sales Return",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2386,7 +2442,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Item"
+                            Name = "Item",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2398,7 +2456,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Price List"
+                            Name = "Price List",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2410,7 +2470,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Price Update"
+                            Name = "Price Update",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2422,7 +2484,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Purchase Return"
+                            Name = "Purchase Return",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2434,7 +2498,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Replenish Inventory"
+                            Name = "Replenish Inventory",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2446,7 +2512,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Warehouse"
+                            Name = "Warehouse",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2458,7 +2526,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Warehouse Transfer"
+                            Name = "Warehouse Transfer",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2470,7 +2540,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Unserved Item"
+                            Name = "Unserved Item",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2482,7 +2554,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Purchase Request"
+                            Name = "Purchase Request",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2494,7 +2568,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Purchase Order"
+                            Name = "Purchase Order",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2506,7 +2582,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Purchase Receiving"
+                            Name = "Purchase Receiving",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2518,7 +2596,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Purchase Return (New)"
+                            Name = "Purchase Return (New)",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2530,7 +2610,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Customer"
+                            Name = "Customer",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2542,7 +2624,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Payment"
+                            Name = "Payment",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2554,7 +2638,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "SOA / Counter Receipt"
+                            Name = "SOA / Counter Receipt",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2566,7 +2652,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Check / Cheque"
+                            Name = "Check / Cheque",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2578,7 +2666,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Agents"
+                            Name = "Agents",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2590,7 +2680,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Accesses"
+                            Name = "Accesses",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2602,7 +2694,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Areas"
+                            Name = "Areas",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2614,7 +2708,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Brands"
+                            Name = "Brands",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2626,7 +2722,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Categories"
+                            Name = "Categories",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2638,7 +2736,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Forwarders"
+                            Name = "Forwarders",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2650,7 +2750,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Item Types"
+                            Name = "Item Types",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2662,7 +2764,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Location Codes"
+                            Name = "Location Codes",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2674,7 +2778,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Reasons of Return"
+                            Name = "Reasons of Return",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2686,7 +2792,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Regions"
+                            Name = "Regions",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2698,7 +2806,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Suppliers"
+                            Name = "Suppliers",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2710,7 +2820,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Users"
+                            Name = "Users",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2722,7 +2834,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Home Image"
+                            Name = "Home Image",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2734,7 +2848,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
-                            Name = "Audit Logs"
+                            Name = "Audit Logs",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2746,7 +2862,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Agent Sales per Item"
+                            Name = "Agent Sales per Item",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2758,7 +2876,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Brand Sales Report"
+                            Name = "Brand Sales Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2770,7 +2890,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Best Selling Items"
+                            Name = "Best Selling Items",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2782,7 +2904,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Commision Report"
+                            Name = "Commision Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2794,7 +2918,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Customer Sales Ranking Report"
+                            Name = "Customer Sales Ranking Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2806,7 +2932,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Customer Sales Report"
+                            Name = "Customer Sales Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2818,7 +2946,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Daily Sales Report"
+                            Name = "Daily Sales Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2830,7 +2960,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Sales Invoice Listing Report"
+                            Name = "Sales Invoice Listing Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2842,7 +2974,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Sales by Agent/Area"
+                            Name = "Sales by Agent/Area",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2854,7 +2988,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Sales Report by Basis"
+                            Name = "Sales Report by Basis",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2866,7 +3002,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Sales Return Listing Report"
+                            Name = "Sales Return Listing Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2878,7 +3016,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Unserved Item Report"
+                            Name = "Unserved Item Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2890,7 +3030,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Below Maintaining Items"
+                            Name = "Below Maintaining Items",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2902,7 +3044,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Receiving Listing"
+                            Name = "Receiving Listing",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2914,7 +3058,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Receiving Listing by Supplier"
+                            Name = "Receiving Listing by Supplier",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2926,7 +3072,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Receiving Summary"
+                            Name = "Receiving Summary",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2938,7 +3086,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Stock Card"
+                            Name = "Stock Card",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2950,7 +3100,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Stock Status Report"
+                            Name = "Stock Status Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2962,7 +3114,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Supplier Purchase History"
+                            Name = "Supplier Purchase History",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2974,7 +3128,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Credit Memo Listing Report"
+                            Name = "Credit Memo Listing Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2986,7 +3142,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Debit Memo Listing Report"
+                            Name = "Debit Memo Listing Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -2998,7 +3156,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Purchase Order Report"
+                            Name = "Purchase Order Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -3010,7 +3170,9 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Purchase Return Report"
+                            Name = "Purchase Return Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
                         },
                         new
                         {
@@ -3022,7 +3184,70 @@ namespace GMGInventory.Data.Migrations
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
-                            Name = "Purchase Receiving Report"
+                            Name = "Purchase Receiving Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
+                        });
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PageGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PageGroups");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "SALES"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "INVENTORY"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "PROCUREMENT"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "CREDITS & COLLECTIONS"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "ADMINISTRATION"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "SALES REPORT"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "INVENTORY REPORT"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "ACCOUNTING REPORT"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "PROCUREMENT REPORT"
                         });
                 });
 
@@ -4222,8 +4447,8 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("PriceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PurchaseOrderId")
-                        .HasColumnType("int");
+                    b.Property<string>("PurchaseOrder")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(150)");
@@ -4260,8 +4485,6 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("ForwarderId");
 
                     b.HasIndex("PriceTypeId");
-
-                    b.HasIndex("PurchaseOrderId");
 
                     b.HasIndex("StatusId");
 
@@ -4921,6 +5144,10 @@ namespace GMGInventory.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<string>("MobileNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
@@ -5549,13 +5776,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0aa83673-85c5-4346-94e0-00510fc77804",
+                            ConcurrencyStamp = "8d01a285-a8f3-4f5d-951c-5721774c1be7",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEII3cbt+7m0D6nCdW3Vd2tcfIrqFr7vK8LatxckrFquJZmnPCzyhPz5kEnnyqXQoWw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJP70FCvgaiYAfNE8rWzn/v9ZoNSA3LPfMasVyd8y7oBNppIfjs2DajW/d3uXSs+pA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "adbb1fe3-1794-4159-ad7e-e3c7944e7e35",
+                            SecurityStamp = "fddeb23b-ef42-4ef3-a96d-bc5b834a5c7e",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5570,13 +5797,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "be2b8ad8-6178-44cd-be18-d949c49c07c4",
+                            ConcurrencyStamp = "de1af559-f6f2-4179-8e08-988b376d17c8",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEB3YuswT6PaO4e4274MOn5FFhm6+pv2YGiE6OPzx8JCg3ZNP15fHwo/yyUcKQWq//Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBZePdOaFJxT8h96MiD2/nsXuMXeU42iLk3O4qMdAmaW1H2F6O0mLA5xSQWJLOayfw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "484f86b5-eba5-4cd0-a492-7eead447d028",
+                            SecurityStamp = "4f3b1fb6-b6e3-4437-8560-546db5ff86c9",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6000,6 +6227,17 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Item");
 
                     b.Navigation("PackReturn");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Page", b =>
+                {
+                    b.HasOne("GMGInventory.Data.PageGroup", "PageGroup")
+                        .WithMany("Pages")
+                        .HasForeignKey("PageGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PageGroup");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PhysicalCountHistory", b =>
@@ -6453,10 +6691,6 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.PurchaseOrderNew", "PurchaseOrder")
-                        .WithMany("SalesOrders")
-                        .HasForeignKey("PurchaseOrderId");
-
                     b.HasOne("GMGInventory.Data.Status", "Status")
                         .WithMany("SalesOrders")
                         .HasForeignKey("StatusId")
@@ -6470,8 +6704,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Forwarder");
 
                     b.Navigation("PriceType");
-
-                    b.Navigation("PurchaseOrder");
 
                     b.Navigation("Status");
                 });
@@ -6916,6 +7148,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Accesses");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.PageGroup", b =>
+                {
+                    b.Navigation("Pages");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.PriceType", b =>
                 {
                     b.Navigation("SalesOrders");
@@ -6945,8 +7182,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseOrderResubmits");
 
                     b.Navigation("PurchaseReceivings");
-
-                    b.Navigation("SalesOrders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseOrderNewLineItem", b =>

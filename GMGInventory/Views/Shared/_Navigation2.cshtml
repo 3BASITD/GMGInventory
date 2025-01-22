@@ -22,12 +22,14 @@ else
     <ul class="navbar-nav">
         @if (navPages.Contains(PageNames.CustomerPurchaseHistory.ToEnumString())
        || navPages.Contains(PageNames.PackingListing.ToEnumString())
+       || navPages.Contains(PageNames.Receptacle.ToEnumString())
        || navPages.Contains(PageNames.SalesReturn.ToEnumString())
        || navPages.Contains(PageNames.SalesOrder.ToEnumString())
        || navPages.Contains(PageNames.SalesOrderDelivery.ToEnumString())
-       || navPages.Contains(PageNames.SalesInvoice.ToEnumString()))
+       || navPages.Contains(PageNames.SalesInvoice.ToEnumString())
+       || navPages.Contains(PageNames.ShippingList.ToEnumString()))
         {
-            var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice" }).Contains(currentController ?? "");
+            var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "Receptacle", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice", "ShippingList" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuSales" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navSalesActive ? "active" : "")">
@@ -65,6 +67,16 @@ else
                             </a>
                         </li>
                     }
+                    @if (navPages.Contains(PageNames.Receptacle.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Receptacle" ? "active" : "")"
+                               asp-area="" asp-controller="Receptacle" asp-action="Index">
+                                <i class="nav-icon fas fa-scroll"></i>
+                                Receptacle
+                            </a>
+                        </li>
+                    }
                     @if (navPages.Contains(PageNames.SalesInvoice.ToEnumString()))
                     {
                         <li>
@@ -92,6 +104,16 @@ else
                                asp-area="" asp-controller="SalesReturn" asp-action="Index">
                                 <i class="nav-icon fas fa-undo"></i>
                                 Sales Return
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.ShippingList.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "ShippingList" ? "active" : "")"
+                               asp-area="" asp-controller="ShippingList" asp-action="Index">
+                                <i class="nav-icon fas fa-shipping-fast"></i>
+                                Shipping List
                             </a>
                         </li>
                     }
@@ -149,20 +171,22 @@ else
                     @if (navPages.Contains(PageNames.PurchaseReturn.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "PurchaseReturn" ? "active" : "")"
-                               asp-area="" asp-controller="PurchaseReturn" asp-action="Index">
-                                <i class="nav-icon fas fa-shapes"></i>
-                                Purchase Return (Old)
+                            <a class="dropdown-item @(currentController == "PurchaseReturn" ? "active" : "")" asp-area="" asp-controller="PurchaseReturn" asp-action="Index">
+                                <del>
+                                    <i class="nav-icon fas fa-unlink"></i>
+                                    Purchase Return (Old)
+                                </del>
                             </a>
                         </li>
                     }
                     @if (navPages.Contains(PageNames.ReplenishInventory.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "ReplenishInventory" ? "active" : "")"
-                               asp-area="" asp-controller="ReplenishInventory" asp-action="Index">
-                                <i class="nav-icon fas fa-shapes"></i>
-                                Replenish Inventory
+                            <a class="dropdown-item @(currentController == "ReplenishInventory" ? "active" : "")" asp-area="" asp-controller="ReplenishInventory" asp-action="Index">
+                                <del>
+                                    <i class="nav-icon fas fa-unlink"></i>
+                                    Replenish Inventory
+                                </del>
                             </a>
                         </li>
                     }
@@ -310,7 +334,7 @@ else
                             </a>
                         </li>
                     }
-                  
+
                 </ul>
             </li>
         }

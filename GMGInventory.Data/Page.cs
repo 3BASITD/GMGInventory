@@ -12,6 +12,12 @@ namespace GMGInventory.Data
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
+        [ForeignKey("PageGroupId")]
+        public int PageGroupId { get; set; }
+        public PageGroup PageGroup { get; set; }
+
+        public int OrderNumber { get; set; }
+
         [Column(TypeName = "nvarchar(50)")]
         public string Name { get; set; }
 
