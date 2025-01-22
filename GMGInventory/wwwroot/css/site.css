@@ -224,6 +224,10 @@ select.form-control-sm ~ .select2-container--default .select2-selection--single 
     border-bottom-color: #dee2e6 !important;
 }
 
+tr.group-header {
+    background-color: #e0e0e0;
+}
+
 button .fas, button .far,
 a .fas, a .far {
     margin-right: 5px;

@@ -32,9 +32,7 @@ namespace GMGInventory.Data
         public int StatusId { get; set; }
         public Status Status { get; set; }
 
-        [ForeignKey("PurchaseOrderId")]
-        public int? PurchaseOrderId { get; set; }
-        public PurchaseOrderNew? PurchaseOrder { get; set; }
+        public string? PurchaseOrder { get; set; }
 
         [ForeignKey("PriceTypeId")]
         public int PriceTypeId { get; set; }

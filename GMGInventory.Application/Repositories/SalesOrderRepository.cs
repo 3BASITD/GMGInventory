@@ -107,7 +107,6 @@ namespace GMGInventory.Application.Repositories
                                                 .Include(s => s.Customer).ThenInclude(s => s.CreditTerm)
                                                 .Include(s => s.Forwarder)
                                                 .Include(s => s.PriceType)
-                                                .Include(s => s.PurchaseOrder)
                            join userc in userManager.Users on order.UserCreated equals userc.Id
                            join userm in userManager.Users on order.UserCreated equals userm.Id into um
                            from userm in um.DefaultIfEmpty()
@@ -139,8 +138,7 @@ namespace GMGInventory.Application.Repositories
                                Id = order.Id,
                                OrderDateD = order.SalesOrderDate,
                                OutstandingBalanceD = order.Customer.OutstandingBalance,
-                               POId = order.PurchaseOrder == null ? null : order.PurchaseOrder.Id,
-                               PONumber = order.PurchaseOrder == null ? null : order.PurchaseOrder.DocumentNumber,
+                               PONumber = order.PurchaseOrder,
                                Remarks = order.Remarks + "",
                                RequiredDeliveryDateD = order.RequiredDeliveryDate,
                                ResubmitId = order.ResubmittedSalesOrderId,
@@ -461,7 +459,7 @@ namespace GMGInventory.Application.Repositories
                     RequiredDeliveryDate = form.DeliveryDate,
                     ForwarderId = form.Forwarder,
                     PriceTypeId = 1,//form.GrossNet,
-                    PurchaseOrderId = form.PurchaseOrder,
+                    PurchaseOrder = form.PurchaseOrder,
                     Remarks = form.Remarks,
                     SalesOrderDate = form.OrderDate,
                     SalesOrderNumber = soNumber,
@@ -510,8 +508,14 @@ namespace GMGInventory.Application.Repositories
             }
             else
             {
+                orderVM.AgentId = form.Agent;
+                orderVM.CustomerId = form.Customer;
+                orderVM.RequiredDeliveryDate = form.DeliveryDate;
+                orderVM.ForwarderId = form.Forwarder;
+                orderVM.Remarks = form.Remarks;
+                orderVM.SalesOrderDate = form.OrderDate;
                 orderVM.StatusId = statusId;
-                //orderVM.TotalAmount = form.Items.Sum(s => s.GrossPrice);
+
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);
             }

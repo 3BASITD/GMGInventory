@@ -17,7 +17,7 @@ namespace GMGInventory.Common.Models
         public string SONumber { get; set; }
 
         [Display(Name = "Purchase Order Number")]
-        public string PONumber { get; set; }
+        public string? PONumber { get; set; }
 
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }

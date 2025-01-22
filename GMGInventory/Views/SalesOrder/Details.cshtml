@@ -10,383 +10,423 @@
 }
 
 <div class="card card-default">
-    <div class="card-header">
-        <span class="card-title po-title">@ViewData["Title"]</span>
-        <div class="card-tools">
-            @if (userAccess.CanPrint)
-            {
-                <div class="dropdown float-right ml-2">
-                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="fas fa-print"></span> Print
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
-                        <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
-                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
-                    </ul>
-                </div>
-            }
-            @if (Model.Status.ToLower() == "submitted")
-            {
-                @* @if (userAccess.CanEdit)
-            {
-            <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-            <span class="fas fa-save"></span> Submit
-            </button>
-            } *@
-                @if (userAccess.CanApproveDisapprove)
+    <form id="form-order">
+        <div class="card-header">
+            <span class="card-title po-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                @if (userAccess.CanPrint)
                 {
-                    <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
-                        <span class="fas fa-check"></span> Approve
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                        <span class="fas fa-times"></span> Disapprove
-                    </button>
-                }
-            }
-            else if (Model.Status.ToLower() == "draft")
-            {
-                @if (userAccess.CanEdit)
-                {
-                    <button type="submit" class="btn btn-secondary btn-sm float-right ml-2 btn-details-draft">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-                        <span class="fas fa-save"></span> Submit
-                    </button>
-                }
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
-                {
-                    if (Model?.Status.ToLower() == "approved")
-                    {
-                        <a href="@Url.Action("Create", "Pack")/@Model?.Id?page=SalesOrder" target="_blank" class="btn btn-primary btn-sm float-right ml-2">
-                            <span class="fas fa-box-open"></span> Start Packing
-                        </a>
-                    }
-                }
-                @if (userAccess.CanEdit)
-                {
-                    if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null && Model?.ResubmitId == null)
-                    {
-                        <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
-                            <span class="fas fa-edit"></span> Update to Resubmit
-                        </a>
-                    }
-                }
-            }
-            <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                <span class="fas fa-arrow-left"></span> Back to List
-            </a>
-        </div>
-    </div>
-    <div class="card-body">
-        @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
-        {
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-danger text-sm" role="alert">
-                        <strong>Disapproved:</strong>
-                        @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                    <div class="dropdown float-right ml-2">
+                        <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="fas fa-print"></span> Print
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
+                            <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
+                            <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
+                        </ul>
                     </div>
-                </div>
-                @if (Model?.ResubmitId != null)
+                }
+                @if (Model.Status.ToLower() == "submitted")
                 {
+                    @if (userAccess.CanApproveDisapprove)
+                    {
+                        <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
+                            <span class="fas fa-check"></span> Approve
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
+                            <span class="fas fa-times"></span> Disapprove
+                        </button>
+                    }
+                }
+                else if (Model.Status.ToLower() == "draft")
+                {
+                    @if (userAccess.CanEdit)
+                    {
+                        <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" data-action="Draft">
+                            <span class="fas fa-save"></span> Save as Draft
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submitted">
+                            <span class="fas fa-save"></span> Submit
+                        </button>
+                        <input type="hidden" id="action-type" name="ActionType" value="">
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
+                    {
+                        if (Model?.Status.ToLower() == "approved")
+                        {
+                            <a href="@Url.Action("Create", "Pack")/@Model?.Id?page=SalesOrder" target="_blank" class="btn btn-primary btn-sm float-right ml-2">
+                                <span class="fas fa-box-open"></span> Start Packing
+                            </a>
+                        }
+                    }
+                    @if (userAccess.CanEdit)
+                    {
+                        if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null && Model?.ResubmitId == null)
+                        {
+                            <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                                <span class="fas fa-edit"></span> Update to Resubmit
+                            </a>
+                        }
+                    }
+                }
+                <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
+            {
+                <div class="row">
                     <div class="col-12">
-                        <div class="alert alert-info text-sm" role="alert">
-                            <strong>Resubmitted:</strong>
-                            This has been resubmitted. You can view the details <a href="@Url.Action("Details", "SalesOrder", new {Id = Model?.ResubmitId})">here</a>.
+                        <div class="alert alert-danger text-sm" role="alert">
+                            <strong>Disapproved:</strong>
+                            @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
                         </div>
                     </div>
-                }
-            </div>
-        }
-        <div class="row">
-            <div class="col-3">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.SONumber)
-                    </span>
-                    <b class="d-block">
-                        @Model?.SONumber
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CustomerCode)
-                    </span>
-                    <b class="d-block">
-                        @Model?.CustomerCode
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CustomerName)
-                    </span>
-                    <b class="d-block">
-                        @Model?.CustomerName
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CustomerAddress)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrEmpty(Model?.CustomerAddress.Trim()) ? "-" : Model.CustomerAddress)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AccountStatus)
-                    </span>
-                    <b class="d-block">
-                        @Model!.AccountStatus
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AgentCode)
-                    </span>
-                    <b class="d-block">
-                        @Model?.AgentCode
-                    </b>
-                </p>
-            </div>
-            <div class="col-3">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.OutstandingBalance)
-                    </span>
-                    <b class="d-block">
-                        @Model?.OutstandingBalance
-                    </b>
-                </p>
-                @* <p class="text-sm">
-                <span class="text-muted">
-                @Html.DisplayNameFor(model => model.GrossNetPrice)
-                </span>
-                <b class="d-block">
-                @Model?.GrossNetPrice
-                </b>
-                </p> *@
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CreditTerms)
-                    </span>
-                    <b class="d-block">
-                        @Model?.CreditTerms
-                    </b>
-                </p>
-                @* <p class="text-sm">
-                <span class="text-muted">
-                @Html.DisplayNameFor(model => model.DeclaredValue)
-                </span>
-                <b class="d-block">
-                @Model?.DeclaredValue
-                </b>
-                </p> *@
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.PONumber)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrEmpty(Model?.PONumber?.Trim()) ? "-" : Model.PONumber)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Region)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Region
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CommodityQuantity)
-                    </span>
-                    <b class="d-block">
-                        @Model?.CommodityQuantity
-                    </b>
-                </p>
-            </div>
-            <div class="col-3">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Forwarder)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Forwarder
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Remarks)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrEmpty(Model?.Remarks.Trim()) ? "-" : Model.Remarks)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Status)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Status
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.OrderDate)
-                    </span>
-                    <b class="d-block">
-                        @Model?.OrderDate
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
-                    </span>
-                    <b class="d-block">
-                        @Model?.RequiredDeliveryDate
-                    </b>
-                </p>
-            </div>
-            <div class="col-3">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.UserCreated)
-                    </span>
-                    <b class="d-block">
-                        @Model?.UserCreated
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DateCreated)
-                    </span>
-                    <b class="d-block">
-                        @Model?.DateCreated
-                    </b>
-                </p>
-                @if (Model?.UserModified != null)
-                {
+                    @if (Model?.ResubmitId != null)
+                    {
+                        <div class="col-12">
+                            <div class="alert alert-info text-sm" role="alert">
+                                <strong>Resubmitted:</strong>
+                                This has been resubmitted. You can view the details <a href="@Url.Action("Details", "SalesOrder", new {Id = Model?.ResubmitId})">here</a>.
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            <div class="row">
+                <div class="col-3">
                     <p class="text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.UserModified)
+                            @Html.DisplayNameFor(model => model.SONumber)
                         </span>
-                        <b class="d-block">
-                            @Model?.UserModified
-                        </b>
-                    </p>
-                }
-                @if (Model?.DateModified != null)
-                {
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.DateModified)
-                        </span>
-                        <b class="d-block">
-                            @Model?.DateModified
-                        </b>
-                    </p>
-                }
-                @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
-                {
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ApprovedBy)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrWhiteSpace(Model?.ApprovedBy) ? "-" : Model.ApprovedBy)
+                        <b class="d-block form-gayahin">
+                            @Model?.SONumber
                         </b>
                     </p>
                     <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ApprovedDate)
-                        </span>
-                        <b class="d-block">
-                            @Model?.ApprovedDate
-                        </b>
-                    </p>
-                }
-                @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
-                {
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.DisapprovedBy)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrWhiteSpace(Model?.DisapprovedBy?.Trim()) ? "-" : Model.DisapprovedBy)
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.DisapprovedDate)
-                        </span>
-                        <b class="d-block">
-                            @Model?.DisapprovedDate
-                        </b>
-                    </p>
-                }
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <span class="card-title">Sales Order Item(s)</span>
-                        @if (Model?.Status.ToLower() == "draft")
+                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
-                            @if (userAccess.CanAdd)
-                            {
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                        <span class="fas fa-plus"></span> Add Sales Order Item
-                                    </button>
-                                </div>
-                            }
+                            <label for="order-agent-code" class="form-label fw-normal mb-0">
+                                @Html.DisplayNameFor(model => model.AgentCode)
+                            </label>
+                            <select id="order-agent-code" class="s2-bold s2ph-bold s2ph-dark" name="AgentCode" style="width: 100%"></select>
                         }
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-head-fixed table-striped table-hover table-item">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Quantity</th>
-                                    <th>Unit</th>
-                                    <th>Item Code</th>
-                                    <th>Item Name</th>
-                                    <th>Inventory Count</th>
-                                    <th>Unit Price</th>
-                                    <th>Discount 1</th>
-                                    <th>Discount 2</th>
-                                    <th>Extended Price</th>
-                                    <th>Served Quantity</th>
-                                    <th>Unserved Quantity</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th class="text-end">Total</th>
-                                    <th class="total-quantity">0</th>
-                                    <th colspan="7"></th>
-                                    <th class="total-gross-price">0.00</th>
-                                    <th class="total-served">0</th>
-                                    <th class="total-unserved">0</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.AgentCode)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.AgentCode
+                            </b>
+                        }
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.AgentName)
+                        </span>
+                        <b class="d-block form-gayahin order-agent-name">
+                            @Model?.AgentName
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
+                        {
+                            <label for="order-customer-code" class="form-label fw-normal mb-0">
+                                @Html.DisplayNameFor(model => model.CustomerCode)
+                            </label>
+                            <select id="order-customer-code" class="s2-bold s2ph-bold s2ph-dark" name="CustomerCode" style="width: 100%"></select>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.CustomerCode)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.CustomerCode
+                            </b>
+                        }
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerName)
+                        </span>
+                        <b class="d-block form-gayahin order-customer-name">
+                            @Model?.CustomerName
+                        </b>
+                    </p>
+                </div>
+                <div class="col-3">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerAddress)
+                        </span>
+                        <b class="d-block form-gayahin order-customer-address">
+                            @(string.IsNullOrEmpty(Model?.CustomerAddress.Trim()) ? "N/A" : Model.CustomerAddress)
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.OutstandingBalance)
+                        </span>
+                        <b class="d-block form-gayahin order-customer-balance">
+                            @Model?.OutstandingBalance
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CreditTerms)
+                        </span>
+                        <b class="d-block form-gayahin order-credit-term">
+                            @Model?.CreditTerms
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Region)
+                        </span>
+                        <b class="d-block form-gayahin order-region">
+                            @Model?.Region
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.AccountStatus)
+                        </span>
+                        <b class="d-block form-gayahin order-customer-status">
+                            @Model!.AccountStatus
+                        </b>
+                    </p>
+                </div>
+                <div class="col-3">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.PONumber)
+                        </span>
+                        <b class="d-block form-gayahin order-purchase-number">
+                            @(string.IsNullOrEmpty(Model?.PONumber?.Trim()) ? "N/A" : Model.PONumber)
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
+                        {
+                            <label for="order-forwarder" class="form-label fw-normal mb-0">
+                                @Html.DisplayNameFor(model => model.Forwarder)
+                            </label>
+                            <select id="order-forwarder" class="s2-bold s2ph-bold s2ph-dark" name="Forwarder" style="width: 100%"></select>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.Forwarder)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.Forwarder
+                            </b>
+                        }
+                    </p>
+                    <p class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
+                        {
+                            <label for="order-remarks" class="form-label fw-normal mb-0">
+                                @Html.DisplayNameFor(model => model.Remarks)
+                            </label>
+                            <input type="text" id="order-remarks" name="Remarks" class="form-control form-control-sm" value="@Model.Remarks" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.Remarks)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @(string.IsNullOrEmpty(Model?.Remarks.Trim()) ? "N/A" : Model.Remarks)
+                            </b>
+                        }
+                    </p>
+                    <p class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft"))
+                        {
+                            <label for="order-date" class="form-label fw-normal mb-0">
+                                @Html.DisplayNameFor(model => model.OrderDate)
+                            </label>
+                            <input type="date" id="order-date" name="OrderDate" class="form-control form-control-sm" value="@Model.OrderDate3" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.OrderDate)
+                            </span>
+                            <b class="d-block form-gayahin order-date">
+                                @Model?.OrderDate
+                            </b>
+                        }
+                    </p>
+                    <p class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft"))
+                        {
+                            <label for="order-delivery-date" class="form-label fw-normal mb-0">
+                                @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                            </label>
+                            <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" value="@Model.RequiredDeliveryDate3" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.RequiredDeliveryDate
+                            </b>
+                        }
+                    </p>
+                </div>
+                <div class="col-3">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Status)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.Status
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UserCreated)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.UserCreated
+                        </b>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateCreated)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.DateCreated
+                        </b>
+                    </p>
+                    @if (Model?.UserModified != null)
+                    {
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.UserModified)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.UserModified
+                            </b>
+                        </p>
+                    }
+                    @if (Model?.DateModified != null)
+                    {
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.DateModified)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.DateModified
+                            </b>
+                        </p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
+                    {
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.ApprovedBy)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model.ApprovedBy
+                            </b>
+                        </p>
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.ApprovedDate)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.ApprovedDate
+                            </b>
+                        </p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model.DisapprovedDate != null)
+                    {
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.DisapprovedBy)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model.DisapprovedBy
+                            </b>
+                        </p>
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.DisapprovedDate)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.DisapprovedDate
+                            </b>
+                        </p>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Sales Order Item(s)</span>
+                            @if (Model?.Status.ToLower() == "draft")
+                            {
+                                @if (userAccess.CanAdd)
+                                {
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                            <span class="fas fa-plus"></span> Add Sales Order Item
+                                        </button>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-item">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Quantity</th>
+                                        <th>Unit</th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Inventory Count</th>
+                                        <th>Unit Price</th>
+                                        <th>Discount 1</th>
+                                        <th>Discount 2</th>
+                                        <th>Extended Price</th>
+                                        <th>Served Quantity</th>
+                                        <th>Unserved Quantity</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th class="text-end">Total</th>
+                                        <th class="total-quantity">0</th>
+                                        <th colspan="7"></th>
+                                        <th class="total-gross-price">0.00</th>
+                                        <th class="total-served">0</th>
+                                        <th class="total-unserved">0</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
-<input type="hidden" id="po-status" value="@Model?.Status" />
 
 @if (userAccess.CanAdd)
 {
@@ -576,6 +616,188 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var so_details = @Html.Raw(Json.Serialize(Model));
+
+        if (user_access.canEdit && so_details.status.toLowerCase().includes("draft")) {
+            // Load agent data for select2
+            $("#order-agent-code").select2({
+                //minimumInputLength: 1,
+                placeholder: '<empty>',
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions2", "Agent")",
+                    dataType: 'json',
+                    type: "POST",
+                    delay: 500,
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $("#order-agent-code").on("select2:select", function () {
+                $(".order-agent-name").text($(this).select2("data")[0].name);
+                $("#order-customer-code").val(null).trigger("change");
+                $(".order-customer-name").text("N/A");
+                $(".order-customer-address").text("N/A");
+                $(".order-customer-balance").text("N/A");
+                $(".order-credit-term").text("N/A");
+                $(".order-region").text("N/A");
+                $(".order-customer-status").text("N/A");
+            });
+
+            // Load customer data for select2
+            $("#order-customer-code").select2({
+                //minimumInputLength: 1,
+                placeholder: '<empty>',
+                language: {
+                    noResults: function () {
+                        return "No customers found for selected Agent";
+                    }
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetByAgentOptions", "Customer")",
+                    dataType: 'json',
+                    type: "POST",
+                    delay: 500,
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1,
+                            agent: $("#order-agent-code").val()
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $("#order-customer-code").on("select2:select", function () {
+                $(".order-customer-name").text($(this).select2("data")[0].name);
+                $(".order-customer-address").text($(this).select2("data")[0].address);
+                $(".order-customer-balance").text($(this).select2("data")[0].outstandingBalance);
+                $(".order-credit-term").text($(this).select2("data")[0].creditTerm);
+                $(".order-region").text($(this).select2("data")[0].region);
+                $(".order-customer-status").text($(this).select2("data")[0].customerStatus);
+            });
+
+            // Load forwarder data for select2
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Forwarder")",
+                success: function (data, status, xhr) {
+                    $("#order-forwarder").select2({
+                        data: data,
+                        //minimumResultsForSearch: Infinity
+                    });
+                }
+            });
+
+            var agentOption = new Option(so_details.agentCode, so_details.agentId, true, true);
+            $("#order-agent-code").append(agentOption);
+            $("#order-agent-code").trigger('change');
+
+            var customerOption = new Option(so_details.customerCode, so_details.customerId, true, true);
+            $("#order-customer-code").append(customerOption);
+            $("#order-customer-code").trigger('change');
+
+            var forwarderOption = new Option(so_details.forwarder, so_details.forwarderId, true, true);
+            $("#order-forwarder").append(forwarderOption);
+            $("#order-forwarder").trigger('change');
+
+            $("#form-order button[type=submit]").on("click", function () {
+                $("#action-type").val($(this).data("action"));
+            });
+
+            // Validation for Save
+            var validateSave = $("#form-order").validate({
+                rules: {
+                    AgentCode: { required: true },
+                    CustomerCode: { required: true },
+                    Forwarder: { required: true },
+                    OrderDate: { required: true },
+                    DeliveryDate: { required: true, greaterThanOrEqualDate: "#order-date" }
+                },
+                messages: {
+                    AgentCode: { required: "Please select agent" },
+                    CustomerCode: { required: "Please select customer" },
+                    Forwarder: { required: "Please select forwarder" },
+                    OrderDate: { required: "Please select date of order" },
+                    DeliveryDate: {
+                        required: "Please select date of delivery",
+                        greaterThanOrEqualDate: "Required delivery date must be on or after the order date"
+                    }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    SaveOrder();
+                }
+            });
+
+            function SaveOrder() {
+                var itemsToReplenish = GetItemsToOrder();
+                if (itemsToReplenish.length == 0) {
+                    toastr.warning("No item to replenish. Add an item to the list to continue", "Warning");
+                } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                    toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveJson")",
+                        data: {
+                            Id: @Model?.Id,
+                            Agent: $("#order-agent-code").val(),
+                            Customer: $("#order-customer-code").val(),
+                            DeliveryDate: $("#order-delivery-date").val(),
+                            Forwarder: $("#order-forwarder").val(),
+                            Remarks: $("#order-remarks").val(),
+                            OrderDate: $("#order-date").val(),
+                            Status: $("#action-type").val(),
+                            Items: itemsToReplenish
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                window.location.reload();
+                            }
+                        }
+                    });
+                }
+            }
+        }
 
         // Load item for select2
         $("#add-code").select2({
@@ -738,7 +960,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
                             actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         }
                         return actions;
@@ -747,7 +969,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
                             return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
                             return data.quantity
@@ -776,7 +998,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
                             return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
                         } else {
                             return Round2Decimal(data.sellingPriceD)
@@ -787,7 +1009,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
                         } else {
                             return Round2Decimal(data.discount1)
@@ -798,7 +1020,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if ($("#po-status").val().toLowerCase() == "draft" && user_access.canEdit) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
                             return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
                         } else {
                             return Round2Decimal(data.discount2D)
@@ -836,12 +1058,13 @@
         });
 
         itemDT.on("draw", function () {
-            if ($("#po-status").val().toLowerCase() == "submitted") {
+            //if (so_details.status.toLowerCase().includes("submitted")) {
+            if (so_details.status.toLowerCase().includes("draft")) {
                 itemDT.column(0).visible(true); // remove button
                 itemDT.column(10).visible(false); // served quantity
                 itemDT.column(11).visible(false); // unserved quantity
                 itemDT.column(12).visible(false); // update served quantity button
-            } else if ($("#po-status").val().toLowerCase() == "approved") {
+            } else if (so_details.status.toLowerCase().includes("approved")) {
                 itemDT.column(0).visible(false);
                 itemDT.column(10).visible(true);
                 itemDT.column(11).visible(true);
@@ -852,7 +1075,6 @@
                 itemDT.column(11).visible(false);
                 itemDT.column(12).visible(false);
             }
-            //itemDT.ajax.reload();
 
             hideLoader();
 
@@ -977,42 +1199,6 @@
                 });
             });
             return item_to_replenish;
-        }
-
-        if (user_access.canEdit) {
-            $(".btn-details-draft").on("click", function () {
-                SaveOrder("Draft");
-            });
-
-            $(".btn-details-submit").on("click", function () {
-                SaveOrder("Submit");
-            });
-
-            function SaveOrder(status) {
-                var itemsToReplenish = GetItemsToOrder();
-                if (itemsToReplenish.length == 0) {
-                    toastr.warning("No item to replenish. Add an item to the list to continue", "Warning");
-                } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                    toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning");
-                } else {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("SaveJson")",
-                        data: {
-                            Id: @Model?.Id,
-                            Status: status,
-                            Items: itemsToReplenish
-                        },
-                        success: function (data, status, xhr) {
-                            if (data.status == "Error") {
-                                toastr.error(data.message, "Error");
-                            } else {
-                                window.location.reload();
-                            }
-                        }
-                    });
-                }
-            }
         }
 
         if (user_access.canApproveDisapprove) {

@@ -64,7 +64,10 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Purchase Order Report")] PurchaseOrderReport,
         [PageNamesString("Purchase Return Report")] PurchaseReturnReport,
         [PageNamesString("Purchase Receiving Report")] PurchaseReceivingReport,
-        [PageNamesString("Purchase Receiving Basic")] PurchaseReceivingBasic        
+        [PageNamesString("Purchase Receiving Basic")] PurchaseReceivingBasic,
+        [PageNamesString("Item Basic")] ItemBasic,
+        [PageNamesString("Receptacle")] Receptacle,
+        [PageNamesString("Shipping List")] ShippingList
     }
 
     public static class PageNameExtensions

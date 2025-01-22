@@ -102,7 +102,7 @@ namespace GMGInventory.Common.Models
         public string SONumber { get; set; }
 
         [Display(Name = "Purchase Order Number")]
-        public string PONumber { get; set; }
+        public string? PONumber { get; set; }
 
         [Display(Name = "Pack Number")]
         public int PackNumber { get; set; }
