@@ -429,10 +429,12 @@ namespace GMGInventory.Application.Repositories
 
                         if (itemInventory != null && itemId != null)
                         {
+                            var previousCount = await context.PhysicalCountHistories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).LastOrDefaultAsync();
+
                             var countHistory = new PhysicalCountHistory
                             {
                                 ItemId = itemId ?? 0,
-                                QuantityFrom = itemInventory.Quantity,
+                                QuantityFrom = previousCount != null ? previousCount.QuantityTo : itemInventory.Quantity,
                                 QuantityTo = itemInventory.Quantity + receiving.Quantity,
                                 Remarks = "Purchase Receiving",
                                 WarehouseId = receiving.PurchaseReceiving.WarehouseId

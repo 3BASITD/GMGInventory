@@ -33,6 +33,9 @@ namespace GMGInventory.Common.Models
 
         [StringLength(100)]
         public string ContactPerson { get; set; }
+        [StringLength(100)]
+        [Display(Name = "Mobile Number")]
+        public string MobileNumber { get; set; }        
 
         [Required]
         [Display(Name = "Region")]
@@ -95,6 +98,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Term")]
         public int TermId { get; set; }
         [StringLength(100)]
+        [Display(Name = "Payment Term")]
         public string Term { get; set; }
 
         [Display(Name = "Currency")]
