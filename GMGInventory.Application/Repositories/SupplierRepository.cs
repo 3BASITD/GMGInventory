@@ -45,6 +45,7 @@ namespace GMGInventory.Application.Repositories
             s.AddressLine2 == supplierVM.AddressLine2 &&
             s.OfficeTelNo == supplierVM.OfficeTelNo &&
             s.ContactPerson == supplierVM.ContactPerson &&
+            s.MobileNumber == supplierVM.MobileNumber &&
             s.RegionName == supplierVM.RegionName &&
             s.Term == supplierVM.Term &&
             s.CurrencyName == supplierVM.CurrencyName &&
@@ -97,6 +98,7 @@ namespace GMGInventory.Application.Repositories
                                 AddressLine2 = supplier.AddressLine2,
                                 OfficeTelNo = supplier.OfficeTelNo,
                                 ContactPerson = supplier.ContactPerson,
+                                MobileNumber = supplier.MobileNumber,
                                 RegionName = region.Name,
                                 RegionId = supplier.RegionId,
                                 Term = supplier.Term.Name,
@@ -221,16 +223,17 @@ namespace GMGInventory.Application.Repositories
                                   Id = supplier.Id,
                                   Code = supplier.Code,
                                   Name = supplier.Name,
-                                  TIN = supplier.TIN,
-                                  AddressLine1 = supplier.AddressLine1,
-                                  AddressLine2 = supplier.AddressLine2,
-                                  OfficeTelNo = supplier.OfficeTelNo,
-                                  ContactPerson = supplier.ContactPerson,
-                                  RegionName = supplier.Region.Name,
-                                  Term = supplier.Term.Name,
-                                  CurrencyName = supplier.Currency.Name,
-                                  BusinessStyleName = supplier.BusinessStyle.Name,
-                                  VAT = supplier.VAT,
+                                  TIN = string.IsNullOrWhiteSpace(supplier.TIN) ? "N/A" : supplier.TIN,
+                                  AddressLine1 = string.IsNullOrWhiteSpace(supplier.AddressLine1) ? "N/A" : supplier.AddressLine1,
+                                  AddressLine2 = string.IsNullOrWhiteSpace(supplier.AddressLine2) ? "N/A" : supplier.AddressLine2,
+                                  OfficeTelNo = string.IsNullOrWhiteSpace(supplier.OfficeTelNo) ? "N/A" : supplier.OfficeTelNo,
+                                  ContactPerson = string.IsNullOrWhiteSpace(supplier.ContactPerson) ? "N/A" : supplier.ContactPerson,
+                                  MobileNumber = string.IsNullOrWhiteSpace(supplier.MobileNumber) ? "N/A" : supplier.MobileNumber,
+                                  RegionName = supplier.Region == null ? "N/A" : supplier.Region.Name,
+                                  Term = supplier.Term == null ? "N/A" : supplier.Term.Name,
+                                  CurrencyName = supplier.Currency == null ? "N/A" : supplier.Currency.Name,
+                                  BusinessStyleName = supplier.BusinessStyle == null ? "N/A" : supplier.BusinessStyle.Name,
+                                  VAT = string.IsNullOrWhiteSpace(supplier.VAT) ? "N/A" : supplier.VAT,
                                   IsActive = supplier.IsActive,
                                   UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                   DateCreatedD = supplier.DateCreated,
@@ -308,6 +311,7 @@ namespace GMGInventory.Application.Repositories
                 AddressLine2 = supplierVM.AddressLine2,
                 OfficeTelNo = supplierVM.OfficeTelNo + "",
                 ContactPerson = supplierVM.ContactPerson + "",
+                MobileNumber = supplierVM.MobileNumber + "",
                 RegionId = supplierVM.RegionId,
                 TermId = supplierVM.TermId,
                 CurrencyId = supplierVM.CurrencyId,
@@ -337,6 +341,7 @@ namespace GMGInventory.Application.Repositories
             supplier.AddressLine2 = supplierVM.AddressLine2;
             supplier.OfficeTelNo = supplierVM.OfficeTelNo + "";
             supplier.ContactPerson = supplierVM.ContactPerson + "";
+            supplier.MobileNumber = supplierVM.MobileNumber + "";
             supplier.RegionId = supplierVM.RegionId;
             supplier.TermId = supplierVM.TermId;
             supplier.CurrencyId = supplierVM.CurrencyId;
@@ -350,31 +355,27 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<SupplierDetailPurchaseVM>> GetSupplierPurchaseAsync(int id)
         {
-            var poVM = from po in context.PurchaseOrderNews
-                                         .Include(s => s.DeliveryAddress)
-                                         .Include(s => s.Status)
-                                         .Include(s => s.Supplier).ThenInclude(s => s.Currency)
-                       join purchaseItem in context.PurchaseOrderNewLineItems on po.Id equals purchaseItem.PurchaseOrderId
+            var prVM = from pr in context.PurchaseReceivings.Include(s => s.PurchaseReceivingLineItems)
+
+                       join purchaseItem in context.PurchaseOrderNewLineItems on pr.PurchaseOrderId equals purchaseItem.PurchaseOrderId
                        join purchaseRequest in context.PurchaseRequestLineItems on purchaseItem.RequestItemId equals purchaseRequest.Id
-                       join user in userManager.Users on po.UserCreated equals user.Id
-                       where po.SupplierId == id
+
+                       join user in userManager.Users on pr.PurchaseOrder.UserCreated equals user.Id
+                       where pr.PurchaseOrder.SupplierId == id && pr.Status.Name.ToLower() == "approved"
                        select new SupplierDetailPurchaseVM
                        {
                            ItemId = purchaseRequest.ItemId,
-                           Item = purchaseRequest.Item.Code, // purchaseRequest.Item != null ? purchaseRequest.Item.Code : purchaseRequest.ItemDescription,
+                           Item = purchaseRequest.Item.Code,
                            ItemDescription = purchaseRequest.ItemDescription,
-                           ConversionFactorD = po.Supplier.Currency.Rate,
-                           Currency = po.Supplier.Currency.Code,
-                           PurchaseNumber = po.DocumentNumber,
+                           ConversionFactorD = pr.PurchaseOrder.Supplier.Currency.Rate,
+                           Currency = pr.PurchaseOrder.Supplier.Currency.Code,
                            QuantityD = purchaseItem.Quantity,
                            ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
-                           ReplenishDateD = po.DateCreated,
-                           Status = po.Status.Code,
+                           ReplenishDateD = pr.ReceiveDate,
                            UnitCostD = purchaseItem.UnitCost, // tinanggal na sa db
-                           UnitPriceD = purchaseItem.UnitCost,
-                           Warehouse = po.DeliveryAddress.Code
+                           UnitPriceD = purchaseItem.UnitCost
                        };
-            return await poVM.ToListAsync();
+            return await prVM.ToListAsync();
         }
 
         public async Task<ForDataTables<SupplierDetailPurchaseVM>> GetSupplierPurchaseDTAsync(DataTablesRequestForm form, int id)

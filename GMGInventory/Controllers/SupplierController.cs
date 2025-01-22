@@ -14,10 +14,10 @@ namespace GMGInventory.Controllers
     [Authorize]
     public class SupplierController(IAccessRepository accessRepository
                              , ISupplierRepository supplierRepository
-                             , IAreaRepository areaRepository
                              , ICurrencyRepository currencyRepository
                              , IRegionRepository regionRepository
-                             , IBusinessStyleRepository businessStyleRepository) : BaseController(accessRepository)
+                             , IBusinessStyleRepository businessStyleRepository
+                             , ICreditTermRepository creditTermRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(int? IncludeId, bool? IsLocal, bool? IsForeign)
         {
@@ -85,7 +85,6 @@ namespace GMGInventory.Controllers
 
             var supplierVM = new SupplierVM
             {
-               // Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(-1), "Id", "Name"),
                 Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(-1), "Id", "Name"),
                 Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(-1), "Id", "Name")
             };
@@ -216,17 +215,17 @@ namespace GMGInventory.Controllers
             dt.Columns.AddRange(new DataColumn[14] {
                 new DataColumn("Code"),
                 new DataColumn("Name"),
-                new DataColumn("TIN"),
                 new DataColumn("Address Line 1"),
                 new DataColumn("Address Line 2"),
-                new DataColumn("Office Tel No"),
-                new DataColumn("Contact Person"),
                 new DataColumn("Region"),
-                new DataColumn("Terms"),
-                new DataColumn("PriceList"),
+                new DataColumn("Contact Person"),
+                new DataColumn("Office Tel No"),
+                new DataColumn("Mobile No"),
+                new DataColumn("Term"),
                 new DataColumn("Currency"),
                 new DataColumn("BusinessStyle"),
                 new DataColumn("VAT"),
+                new DataColumn("TIN"),
                 new DataColumn("Is Active")
             });
             var supplier = (await supplierRepository.GetAllSupplierAsync()).Where(s => s.IsActive == true).ToList();
@@ -235,16 +234,17 @@ namespace GMGInventory.Controllers
                 dt.Rows.Add(
                     suppliers.Code,
                     suppliers.Name,
-                    suppliers.TIN,
                     suppliers.AddressLine1,
                     suppliers.AddressLine2,
-                    suppliers.OfficeTelNo,
-                    suppliers.ContactPerson,
                     suppliers.RegionName,
+                    suppliers.ContactPerson,
+                    suppliers.OfficeTelNo,
+                    suppliers.MobileNumber,
                     suppliers.Term,
                     suppliers.CurrencyName,
                     suppliers.BusinessStyleName,
                     suppliers.VAT,
+                    suppliers.TIN,
                     suppliers.IsActive
                 );
             }
@@ -280,9 +280,10 @@ namespace GMGInventory.Controllers
             }
             else
             {
-                int? RegionId = await areaRepository.GetIdAsync(supplierVM.RegionName);
+                int? RegionId = await regionRepository.GetIdAsync(supplierVM.RegionName);
                 int? CurrencyId = await currencyRepository.GetIdAsync(supplierVM.CurrencyName);
                 int? BusinessStyleId = await businessStyleRepository.GetIdAsync(supplierVM.BusinessStyleName);
+                int? TermId = await creditTermRepository.GetIdAsync(supplierVM.Term);
 
                 if (RegionId == null)
                 {
@@ -299,10 +300,11 @@ namespace GMGInventory.Controllers
                     supplierVM.RegionId = RegionId.Value;
                     supplierVM.CurrencyId = CurrencyId.Value;
                     supplierVM.BusinessStyleId = BusinessStyleId.Value;
+                    supplierVM.TermId = TermId.Value;
 
                     await supplierRepository.AddAsync(supplierVM);
                     responseModel.Status = "Success";
-                    responseModel.Message = "Area added";
+                    responseModel.Message = "Supplier added";
                 }
             }
             return Json(responseModel);

@@ -6,7 +6,7 @@
 }
 
 @section Breadcrumb {
-    <li class="breadcrumb-item"><a asp-controller="Item" asp-action="Index">Items</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Supplier" asp-action="Index">Suppliers</a></li>
 }
 
 <div class="card card-default">
@@ -20,7 +20,7 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-4">
+            <div class="col-3">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Code)
@@ -29,52 +29,6 @@
                         @Model?.Code
                     </b>
                 </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Name)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.Name
-                    </b>
-                </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.TIN)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.TIN
-                    </b>
-                </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AddressLine1)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.AddressLine1
-                    </b>
-                </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DateCreated)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.DateCreated
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DateModified)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.DateModified
-                    </b>
-                </p>
-            </div>
-            <div class="col-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.RegionName)
@@ -83,44 +37,6 @@
                         @Model?.RegionName
                     </b>
                 </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.OfficeTelNo)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.OfficeTelNo
-                    </b>
-                </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ContactPerson)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.ContactPerson
-                    </b>
-                </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AddressLine2)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.AddressLine2
-                    </b>
-                </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.UserCreated)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.UserCreated
-                    </b>
-                </p>
-            </div>
-            <div class="col-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Term)
@@ -129,7 +45,44 @@
                         @Model?.Term
                     </b>
                 </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.TIN)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.TIN
+                    </b>
+                </p>
+                @if (Model?.UserModified != "-")
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateModified)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.DateModified
+                        </b>
+                    </p>
+                }
+            </div>
 
+            <div class="col-3">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.Name
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.ContactPerson)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.ContactPerson
+                    </b>
+                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.CurrencyName)
@@ -138,7 +91,36 @@
                         @Model?.CurrencyName
                     </b>
                 </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.UserCreated)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.UserCreated
+                    </b>
+                </p>
 
+             
+              
+              
+            </div>
+            <div class="col-3">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.AddressLine1)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.AddressLine1
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.OfficeTelNo)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.OfficeTelNo
+                    </b>
+                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.BusinessStyleName)
@@ -147,7 +129,33 @@
                         @Model?.BusinessStyleName
                     </b>
                 </p>
-
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.DateCreated
+                    </b>
+                </p>
+              
+            </div>
+            <div class="col-3">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.AddressLine2)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.AddressLine2
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.MobileNumber)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.MobileNumber
+                    </b>
+                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.VAT)
@@ -157,24 +165,25 @@
                     </b>
                 </p>
 
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.UserModified)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.UserModified
-                    </b>
-                </p>
-
+                @if (Model?.UserModified != "-")
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UserModified)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.UserModified
+                        </b>
+                    </p>
+                }
               
             </div>
         </div>
-
         <div class="row">
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <span class="card-title">Price List</span>                       
+                        <span class="card-title">Supplier Item Register</span>                       
                     </div>
                     <div class="card-body">
                         <div class="tab-content">
@@ -182,17 +191,13 @@
                                 <table class="table table-head-fixed table-striped table-hover table-purchase">
                                     <thead>
                                         <tr>
-                                            <th>PO Number</th>
-                                            <th>Warehouse</th>
                                             <th>Item Code</th>
-                                            <th>Quantity</th>
-                                            <th>Unit Cost</th>
+                                            <th>Item Description</th>
                                             <th>Currency</th>
                                             <th>Conversion Factor</th>
+                                            <th>Unit Cost</th>
                                             <th>Converted Unit Price</th>
                                             <th>Replenish Date</th>
-                                            <th>Replenish By</th>
-                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -227,33 +232,26 @@
                 return: true,
             },
             columns: [
-                { data: "purchaseNumber", name: "PurchaseNumber" },
-                { data: "warehouse", name: "Warehouse" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        
                         if (data.item == null) {
-                            return data.itemDescription;
-                        }
-                        else {
+                            return "";
+                        } else {
                             return data.item + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
                         }
                     },
                     name: "ItemCode",
                     className: "form-cell"
                 },
-
-                { data: "quantity", name: "Quantity", className: "text-end" },
-                { data: "unitCost", name: "UnitCost", className: "text-end" },
+                { data: "itemDescription", name: "ItemDescription" },
                 { data: "currency", name: "Currency" },
                 { data: "conversionFactor", name: "ConversionFactor", className: "text-end" },
+                { data: "unitCost", name: "UnitCost", className: "text-end" },
                 { data: "convertedUnitPrice", name: "ConvertedUnitPrice", className: "text-end" },
-                { data: "replenishDate", name: "ReplenishDate" },
-                { data: "replenishBy", name: "ReplenishBy" },
-                { data: "status", name: "Status" }
+                { data: "replenishDate", name: "ReplenishDate" }
             ],
-            order: [[9, "desc"]]
+            order: [[6, "desc"]]
         }).on("draw.dt", function () {
         });
     </script>
