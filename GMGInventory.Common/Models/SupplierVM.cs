@@ -88,6 +88,10 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Contact Person")]
         public string ContactPerson { get; set; }
 
+        [StringLength(100)]
+        [Display(Name = "Mobile Number")]
+        public string MobileNumber { get; set; }
+
         [Required]
         [Display(Name = "Region")]
         public int RegionId { get; set; }
