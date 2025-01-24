@@ -11,6 +11,7 @@ namespace GMGInventory.Data
             this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
             this.SalesOrderDeliveryMonitorings = new HashSet<SalesOrderDeliveryMonitoring>();
             this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
+            this.Shippings = new HashSet<Shipping>();
         }
 
         [ForeignKey("AgentId")]
@@ -61,5 +62,6 @@ namespace GMGInventory.Data
         public ICollection<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }
         public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
         public ICollection<SalesOrderLineItem> SalesOrderLineItems { get; set; }
+        public ICollection<Shipping> Shippings { get; set; }
     }
 }

@@ -9,9 +9,9 @@ namespace GMGInventory.Data
             ShippingLineItem = new HashSet<ShippingLineItem>();
         }
 
-        [ForeignKey("InvoiceId")]
-        public int InvoiceId { get; set; }
-        public virtual Invoice Invoice { get; set; }
+        [ForeignKey("SalesOrderId")]
+        public int SalesOrderId { get; set; }
+        public virtual SalesOrder SalesOrder { get; set; }
 
         public ICollection<ShippingLineItem> ShippingLineItem { get; set; }
     }

@@ -210,7 +210,9 @@ namespace GMGInventory.Data
         //public DbSet<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
         public DbSet<SalesReturnLineItem> SalesReturnLineItems { get; set; }
         //public DbSet<SalesReturnTotalReturnAmount> SalesReturnTotalReturnAmounts { get; set; }
+        public DbSet<Shipping> Shippings { get; set; }
         public DbSet<ShippingAddress> ShippingAddresses { get; set; }
+        public DbSet<ShippingLineItem> ShippingLineItems { get; set; }
         public DbSet<SOACR> SOACRs { get; set; }
         public DbSet<SOACRCheck> SOACRChecks { get; set; }
         public DbSet<SOACRLineItem> SOACRLineItems { get; set; }
