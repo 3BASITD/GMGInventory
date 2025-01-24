@@ -6,7 +6,8 @@ namespace GMGInventory.Data
     {
         public InvoiceLineItem()
         {
-            this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
+            SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
+            ShippingLineItems = new HashSet<ShippingLineItem>();
         }
 
         [ForeignKey("InvoiceId")]
@@ -23,5 +24,6 @@ namespace GMGInventory.Data
         public int Quantity { get; set; }
 
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
+        public ICollection<ShippingLineItem> ShippingLineItems { get; set; }
     }
 }

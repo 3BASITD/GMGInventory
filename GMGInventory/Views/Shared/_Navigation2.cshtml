@@ -97,7 +97,7 @@ else
                             </a>
                         </li>
                     }
-                    @if (navPages.Contains(PageNames.CustomerPurchaseHistory.ToEnumString()))
+                    @if (navPages.Contains(PageNames.SalesReturn.ToEnumString()))
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "SalesReturn" ? "active" : "")"
@@ -508,7 +508,30 @@ else
             </li>
         }
 
-        @if (navPages.Contains(PageNames.AuditLogs.ToEnumString()))
+        @if (navPages.Contains(PageNames.AgentSalesPerItemReport.ToEnumString())
+       || navPages.Contains(PageNames.BrandSalesReport.ToEnumString())
+       || navPages.Contains(PageNames.BestSellingItemsReport.ToEnumString())
+       || navPages.Contains(PageNames.CommissionReport.ToEnumString())
+       || navPages.Contains(PageNames.CustomerSalesRankingReport.ToEnumString())
+       || navPages.Contains(PageNames.CustomerSalesReport.ToEnumString())
+       || navPages.Contains(PageNames.DailySalesReport.ToEnumString())
+       || navPages.Contains(PageNames.SalesInvoiceListingReport.ToEnumString())
+       || navPages.Contains(PageNames.SalesByAgentAreaReport.ToEnumString())
+       || navPages.Contains(PageNames.SalesReportByBasisReport.ToEnumString())
+       || navPages.Contains(PageNames.SalesReturnListingReport.ToEnumString())
+       || navPages.Contains(PageNames.UnservedItemReport.ToEnumString())
+       || navPages.Contains(PageNames.BelowMaintainingItemsReport.ToEnumString())
+       || navPages.Contains(PageNames.ReceivingListingReport.ToEnumString())
+       || navPages.Contains(PageNames.ReceivingListingBySupplierReport.ToEnumString())
+       || navPages.Contains(PageNames.ReceivingSummaryReport.ToEnumString())
+       || navPages.Contains(PageNames.StockCardReport.ToEnumString())
+       || navPages.Contains(PageNames.StockStatusReport.ToEnumString())
+       || navPages.Contains(PageNames.SupplierPurchaseHistoryReport.ToEnumString())
+       || navPages.Contains(PageNames.CreditMemoListingReport.ToEnumString())
+       || navPages.Contains(PageNames.DebitMemoListingReport.ToEnumString())
+       || navPages.Contains(PageNames.PurchaseOrderReport.ToEnumString())
+       || navPages.Contains(PageNames.PurchaseReturnReport.ToEnumString())
+       || navPages.Contains(PageNames.PurchaseReceivingReport.ToEnumString()))
         {
             var navReportActive = (new List<string> { "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturnNew" }).Contains(currentController ?? "")
             && (new List<string> { "AgentSalesPerItem", "BrandSales", "BestSellingItem", "Commission", "CustomerSalesRanking", "CustomerSales", "DailySales", "SalesInvoice", "SalesAgentArea", "SalesReportBasis", "SalesReturn", "UnservedItem", "BelowMaintainingItem", "ReceivingListing", "ReceivingListingSupplier", "ReceivingSummary", "StockCard", "StockStatus", "SupplierPurchase", "CreditMemo", "DebitMemo", "Order", "Return", "Receiving" }).Contains(currentAction ?? "");

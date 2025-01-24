@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
@@ -7,6 +6,7 @@ namespace GMGInventory.Data
     {
         public ReasonOfReturn()
         {
+            Invoices = new HashSet<Invoice>();
         }
 
         [Column(TypeName = "nvarchar(10)")]
@@ -16,5 +16,6 @@ namespace GMGInventory.Data
         public string Name { get; set; }
 
         public bool IsActive { get; set; }
+        public ICollection<Invoice> Invoices { get; set; }
     }
 }

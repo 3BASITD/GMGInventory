@@ -1730,6 +1730,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<decimal>("PaidAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("ReasonOfReturnId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Remarks")
                         .IsRequired()
                         .HasColumnType("nvarchar(250)");
@@ -1752,6 +1755,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("InvoiceTypeId");
 
                     b.HasIndex("PackId");
+
+                    b.HasIndex("ReasonOfReturnId");
 
                     b.HasIndex("SalesOrderId");
 
@@ -4790,7 +4795,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SalesOrderLineItemId")
+                    b.Property<int>("InvoiceLineItemId")
                         .HasColumnType("int");
 
                     b.Property<int>("ShippingId")
@@ -4805,7 +4810,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SalesOrderLineItemId");
+                    b.HasIndex("InvoiceLineItemId");
 
                     b.HasIndex("ShippingId");
 
@@ -5851,13 +5856,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4e8b7743-2aa5-4c66-87c5-5ef6f8ba375f",
+                            ConcurrencyStamp = "944186b5-703b-43c5-a9e8-652974c085da",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMr+NwiZI3MrCCibWzl0NB2vQkqHi5BUnTxHoWh+QDvLwyPID6tbhoOl5QO0XOejEw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJZ2x/kV5qMurf1hdYs7SgPUY/J6YPCrLnr89a//nJDjoQCmJigeurh+IP9fHaOtYg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "233463c9-a354-418f-9d98-923b52c40b5a",
+                            SecurityStamp = "43a7c7e1-5577-4f2f-b00e-5225e55d8d6f",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5872,13 +5877,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "99585efe-88c6-46ea-8832-48fe03f0e485",
+                            ConcurrencyStamp = "c53abc5f-4c77-409b-b6b6-89b1bdeef805",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHDw65nvOf+L/lhm9f+3SvCIAlSPxmtRdhl2w9t/EQqSOiRvYKpvbciALQQRben2ZA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFP4zK96p+93NRn1e3zi2NHcUiCyC+D5UT3XYnaIZGBDmNZfC0j6eZYbK4s5CsQYbw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4e363e20-d247-406e-9bac-a5912d62f414",
+                            SecurityStamp = "894606fb-82f6-40c7-9af2-973304e9fc71",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6079,6 +6084,12 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.ReasonOfReturn", "ReasonOfReturn")
+                        .WithMany("Invoices")
+                        .HasForeignKey("ReasonOfReturnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
                         .WithMany("Invoices")
                         .HasForeignKey("SalesOrderId")
@@ -6094,6 +6105,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("InvoiceType");
 
                     b.Navigation("Pack");
+
+                    b.Navigation("ReasonOfReturn");
 
                     b.Navigation("SalesOrder");
 
@@ -6887,9 +6900,9 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.ShippingLineItem", b =>
                 {
-                    b.HasOne("GMGInventory.Data.SalesOrderLineItem", "SalesOrderLineItem")
+                    b.HasOne("GMGInventory.Data.InvoiceLineItem", "InvoiceLineItem")
                         .WithMany("ShippingLineItems")
-                        .HasForeignKey("SalesOrderLineItemId")
+                        .HasForeignKey("InvoiceLineItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -6899,7 +6912,7 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("SalesOrderLineItem");
+                    b.Navigation("InvoiceLineItem");
 
                     b.Navigation("Shipping");
                 });
@@ -7196,6 +7209,8 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.InvoiceLineItem", b =>
                 {
                     b.Navigation("SalesReturnLineItems");
+
+                    b.Navigation("ShippingLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.InvoiceType", b =>
@@ -7368,6 +7383,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseReturns");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.ReasonOfReturn", b =>
+                {
+                    b.Navigation("Invoices");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Region", b =>
                 {
                     b.Navigation("Areas");
@@ -7390,11 +7410,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesOrderLineItems");
 
                     b.Navigation("Shippings");
-                });
-
-            modelBuilder.Entity("GMGInventory.Data.SalesOrderLineItem", b =>
-                {
-                    b.Navigation("ShippingLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>

@@ -9,8 +9,8 @@ namespace GMGInventory.Data
         public int ShippingId { get; set; }
         public virtual Shipping Shipping { get; set; }
 
-        [ForeignKey("SalesOrderLineItemId")]
-        public int SalesOrderLineItemId { get; set; }
-        public virtual SalesOrderLineItem SalesOrderLineItem { get; set; }
+        [ForeignKey("InvoiceLineItemId")]
+        public int InvoiceLineItemId { get; set; }
+        public virtual InvoiceLineItem InvoiceLineItem { get; set; }
     }
 }
