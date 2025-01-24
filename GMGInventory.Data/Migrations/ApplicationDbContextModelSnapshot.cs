@@ -1870,6 +1870,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("ItemTypeId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("LocationCodeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ModelNumber")
                         .HasColumnType("nvarchar(50)");
 
@@ -1901,6 +1904,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ItemTypeId");
+
+                    b.HasIndex("LocationCodeId");
 
                     b.HasIndex("UnitId");
 
@@ -5779,13 +5784,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "403345dd-7755-4daf-b4a6-431795dad650",
+                            ConcurrencyStamp = "0819cb26-eb66-4ec2-9d8a-f439364de631",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAcJDuaVweN11XHMdvU8l+amxqJzGalOiQqMp6SU8HJQVhryZ3rb48HcepK87b8W/w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGpEAm1pNeGzSprEYy3yION/YIZczjJVg8NMwjpvk7pu74HlQWaKBgtSybKKoi/4mg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1dabfe1f-0e55-4eb1-85a0-9290e5d80ea6",
+                            SecurityStamp = "3ac602e4-2922-48ec-a29d-ba22f091d18e",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5800,13 +5805,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9d7e8303-13c8-43ef-abaa-770814f16b93",
+                            ConcurrencyStamp = "c7d24c83-f083-44dc-a306-121be09af452",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEZvlbastTfXX4ONtEcSFDocJIib55hlpuqZ8eAEjU5qg+U4mPTDVLE0SnxtAtMI3Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPIqMFAP/4pAUEZg4IXWBLa8DFY5VzdRCp4ZLjVrEkxo41WgZjvudv4SbfvIVnZ/lQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "894cf33d-d3ce-4083-bbab-322a51ee1d17",
+                            SecurityStamp = "8362a753-6835-4de6-a5c4-feb560c4df08",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6067,6 +6072,10 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.LocationCode", "LocationCode")
+                        .WithMany("Items")
+                        .HasForeignKey("LocationCodeId");
+
                     b.HasOne("GMGInventory.Data.Unit", "Unit")
                         .WithMany("Items")
                         .HasForeignKey("UnitId")
@@ -6078,6 +6087,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("ItemType");
+
+                    b.Navigation("LocationCode");
 
                     b.Navigation("Unit");
                 });
@@ -7124,6 +7135,11 @@ namespace GMGInventory.Data.Migrations
                 {
                     b.Navigation("Brands");
 
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.LocationCode", b =>
+                {
                     b.Navigation("Items");
                 });
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using GMGInventory.Common.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
@@ -52,6 +53,10 @@ namespace GMGInventory.Data
         [ForeignKey("BrandId")]
         public int BrandId { get; set; }
         public Brand Brand { get; set; }
+
+        [ForeignKey("LocationCodeId")]
+        public int? LocationCodeId { get; set; }
+        public LocationCode LocationCode { get; set; }
 
         //public int? MinimumQuantity { get; set; }
         //public int? MaximumQuantity { get; set; }

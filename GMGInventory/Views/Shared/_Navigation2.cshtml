@@ -122,6 +122,7 @@ else
         }
 
         @if (navPages.Contains(PageNames.Item.ToEnumString())
+       || navPages.Contains(PageNames.ItemBasic.ToEnumString())
        || navPages.Contains(PageNames.PriceList.ToEnumString())
        || navPages.Contains(PageNames.PriceUpdate.ToEnumString())
        || navPages.Contains(PageNames.PurchaseReturn.ToEnumString())
@@ -138,7 +139,7 @@ else
                     INVENTORY
                 </a>
                 <ul aria-labelledby="menuInventory" class="dropdown-menu mt-lg-3 border-0 shadow">
-                    @if (navPages.Contains(PageNames.Item.ToEnumString()))
+                    @if (navPages.Contains(PageNames.Item.ToEnumString()) || navPages.Contains(PageNames.ItemBasic.ToEnumString()))
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "Item" ? "active" : "")"

@@ -322,7 +322,7 @@ namespace GMGInventory.Application.Repositories
                                     ServedQuantityD = packedQuantity - returnedQuantity,
                                     Unit = order.Item.Unit.Code,
                                     //UnservedQuantityD = order.Quantity - (packedQuantity - returnedQuantity)
-                                    UnservedQuantityD = order.Quantity - inventory
+                                    UnservedQuantityD = inventory <= 0 ? order.Quantity - inventory : 0
                                 }).ToListAsync();
 
             int newLineNumber = 1;

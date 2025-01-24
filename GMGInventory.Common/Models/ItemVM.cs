@@ -82,6 +82,10 @@ namespace GMGInventory.Common.Models
         public string Brand { get; set; }
         public int BrandId { get; set; }
 
+        [Display(Name = "Location Code")]
+        public string? LocationCode { get; set; }
+        public int? LocationCodeId { get; set; }
+
 
         [Display(Name = "Gross Price")]
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
@@ -168,6 +172,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Category")]
         public string Category { get; set; }
+
+        [Display(Name = "Location Code")]
+        public string? LocationCode { get; set; }
 
         [Display(Name = "Gross Price")]
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);

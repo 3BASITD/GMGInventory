@@ -1556,7 +1556,7 @@ namespace GMGInventory.Application.Repositories
                               ItemCode = soline.Item.Code,
                               ItemName = soline.Item.Name,
                               //PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
-                              PendingD = soline.Quantity - inventory,
+                              PendingD = inventory <= 0 ? soline.Quantity - inventory : 0,
                               ReplenishDateD = soline.DateCreated
                           };
             var solineslist = await solines.ToListAsync();

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
@@ -7,6 +6,7 @@ namespace GMGInventory.Data
     {
         public LocationCode()
         {
+            Items = new HashSet<Item>();
         }
 
         [Column(TypeName = "nvarchar(10)")]
@@ -14,7 +14,8 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(100)")]
         public string Name { get; set; }
-
         public bool IsActive { get; set; }
+
+        public ICollection<Item> Items { get; set; }
     }
 }

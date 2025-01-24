@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -11,6 +12,11 @@ namespace GMGInventory.Controllers
     public class LocationCodeController(IAccessRepository accessRepository
                             , ILocationCodeRepository locationCodeRepository) : BaseController(accessRepository)
     {
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await locationCodeRepository.GetOptions(IncludeId));
+        }
+
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.LocationCodes, AccessTypes.View);

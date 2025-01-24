@@ -51,7 +51,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
 
@@ -68,7 +69,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetListJson(ItemFilterVM filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetAllForDataTablesAsync(form, filter));
@@ -128,7 +130,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
 
@@ -145,7 +148,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> DetailsJson(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
 
@@ -380,7 +384,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetWarehousesJson(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemWarehouseDTAsync(form, id));
@@ -400,7 +405,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetSalesJson(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemSalesDTAsync(form, id));
@@ -410,7 +416,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetCountsJson(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemCountDTAsync(form, id));
@@ -430,7 +437,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetTransfersJson(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemTransferDTAsync(form, id));
@@ -440,7 +448,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetReturnsJson(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemReturnDTAsync(form, id));
@@ -471,7 +480,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetConversionListJson(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemConversionRepository.GetAllForDataTablesAsync(form, id));
@@ -510,7 +520,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetItemConversionVM(int itemId)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             return Json(itemConversionRepository.GetItemConversionVM(itemId));
         }

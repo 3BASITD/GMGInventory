@@ -135,7 +135,8 @@ namespace GMGInventory.Application.Repositories
                             Name = item.Name,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
-                            Quantity = soitem.Quantity - (packedQuantity - returnedQuantity),
+                            //Quantity = soitem.Quantity - (packedQuantity - returnedQuantity),
+                            Quantity = inventory <= 0 ? soitem.Quantity - inventory : 0,
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code
@@ -317,6 +318,8 @@ namespace GMGInventory.Application.Repositories
                                      ItemType = item.ItemType.Name,
                                      ItemTypeId = item.ItemType.Id,
                                      InterchangeNumber = item.InterchangeNumber + "",
+                                     LocationCode = item.LocationCode == null ? null : item.LocationCode.Code,
+                                     LocationCodeId = item.LocationCode == null ? null : item.LocationCode.Id,
                                      ModelNumber = item.ModelNumber + "",
                                      Name = item.Name,
                                      NetPriceD = price == null ? 0 : price.NetSellingPrice,
@@ -370,6 +373,8 @@ namespace GMGInventory.Application.Repositories
                                 ItemType = j.ItemType,
                                 ItemTypeId = j.ItemTypeId,
                                 InterchangeNumber = j.InterchangeNumber,
+                                LocationCode = j.LocationCode,
+                                LocationCodeId = j.LocationCodeId,
                                 ModelNumber = j.ModelNumber,
                                 Name = j.Name,
                                 NetPriceD = j.NetPriceD,
@@ -447,6 +452,7 @@ namespace GMGInventory.Application.Repositories
                               InterchangeNumber = item.InterchangeNumber + "",
                               ItemType = item.ItemType.Name,
                               IsActive = item.IsActive,
+                              LocationCode = item.LocationCode == null ? null : item.LocationCode.Code,
                               ModelNumber = item.ModelNumber + "",
                               Name = item.Name,
                               NetPriceD = price == null ? 0 : price.NetSellingPrice,
@@ -561,6 +567,7 @@ namespace GMGInventory.Application.Repositories
                 InterchangeNumber = itemVM.InterchangeNumber + "",
                 IsActive = true,
                 ItemTypeId = itemVM.ItemTypeId,
+                LocationCodeId = itemVM.LocationCodeId,
                 ModelNumber = itemVM.ModelNumber + "",
                 Name = itemVM.Name,
                 PartNumber = itemVM.PartNumber + "",
@@ -616,6 +623,7 @@ namespace GMGInventory.Application.Repositories
             item.CategoryId = itemVM.CategoryId;
             item.InterchangeNumber = itemVM.InterchangeNumber + "";
             item.ItemTypeId = itemVM.ItemTypeId;
+            item.LocationCodeId = itemVM.LocationCodeId;
             item.ModelNumber = itemVM.ModelNumber + "";
             item.Name = itemVM.Name;
             item.PartNumber = itemVM.PartNumber + "";
@@ -948,7 +956,7 @@ namespace GMGInventory.Application.Repositories
                               SalesNumber = sitem.SalesOrder.SalesOrderNumber,
                               UnitPriceD = sitem.SellingPrice,
                               //UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned)
-                              UnservedQuantityD = sitem.Quantity - inventory
+                            UnservedQuantityD = inventory <= 0 ? sitem.Quantity - inventory : 0
                           };
             return await salesVM.ToListAsync();
         }

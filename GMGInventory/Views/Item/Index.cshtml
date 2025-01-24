@@ -167,6 +167,15 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        <label for="create-location-code" class="control-label mb-0 d-block">Location Code</label>
+                                        <select name="LocationCode" id="create-location-code" class="form-control" style="width: 100%">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                         <label for="create-retail-price" class="control-label mb-0 d-block">Gross Price</label>
                                         <input type="number" step="0.01" min="0" max="1999999.99" name="RetailPrice" id="create-retail-price" class="form-control form-control-sm" />
                                     </div>
@@ -251,13 +260,6 @@
                             </div>
                         </div>
                         <div class="row">
-                           @*  <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="edit-unit" class="control-label mb-0 d-block">Unit</label>
-                                    <select name="Unit" id="edit-unit" class="form-control" style="width: 100%" r>
-                                    </select>
-                                </div>
-                            </div> *@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-category" class="control-label mb-0 d-block">Category</label>
@@ -278,6 +280,13 @@
                                 <div class="form-group">
                                     <label for="edit-brand" class="control-label mb-0 d-block">Brand</label>
                                     <select name="Brand" id="edit-brand" class="form-control" style="width: 100%">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-location-code" class="control-label mb-0 d-block">Location Code</label>
+                                    <select name="LocationCode" id="edit-location-code" class="form-control" style="width: 100%">
                                     </select>
                                 </div>
                             </div>
@@ -344,71 +353,124 @@
         function LoadSelect2() {
             if (loadselect2loaded) return;
             loadselect2loaded = true;
-            // Load Select2 Unit
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetUnitOptions", "Item")",
-                success: function (data, status, xhr) {
-                    $("#create-unit").select2({
-                        data: data,
-                        dropdownParent: $("#createModal")
-                    });
-                    $("#edit-unit").select2({
-                        data: data,
-                        dropdownParent: $("#editModal")
-                    });
-                }
-            });
+            if (user_access.canAdd || user_access.canEdit) {
+                // Load Select2 Unit
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetUnitOptions", "Item")",
+                    success: function (data, status, xhr) {
+                        if (user_access.canAdd) {
+                            $("#create-unit").select2({
+                                data: data,
+                                dropdownParent: $("#createModal")
+                            });
+                        }
 
-            // Load Select2 Category
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Category")",
-                success: function (data, status, xhr) {
-                    $("#create-category").select2({
-                        data: data,
-                        dropdownParent: $("#createModal")
-                    });
-                    $("#edit-category").select2({
-                        data: data,
-                        dropdownParent: $("#editModal")
-                    });
-                }
-            });
+                        if (user_access.canEdit) {
+                            $("#edit-unit").select2({
+                                data: data,
+                                dropdownParent: $("#editModal")
+                            });
+                        }
+                    }
+                });
 
-            // Load Select2 Item Type
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "ItemType")",
-                success: function (data, status, xhr) {
-                    $("#create-item-type").select2({
-                        data: data,
-                        //theme: "bootstrap-5",
-                        dropdownParent: $("#createModal")
-                    });
-                    $("#edit-item-type").select2({
-                        data: data,
-                        //theme: "bootstrap-5",
-                        dropdownParent: $("#editModal")
-                    });
-                }
-            });
+                // Load Select2 Category
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions", "Category")",
+                    success: function (data, status, xhr) {
+                        if (user_access.canAdd) {
+                        $("#create-category").select2({
+                            data: data,
+                            dropdownParent: $("#createModal")
+                            });
+                        }
 
-            // Load Select2 Brand
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Brand")",
-                success: function (data, status, xhr) {
-                    $("#create-brand").select2({
-                        data: data,
-                        dropdownParent: $("#createModal")
-                    });
-                    $("#edit-brand").select2({
-                        data: data,
-                        dropdownParent: $("#editModal")
-                    });
-                }
-            });
+                        if (user_access.canEdit) {
+                            $("#edit-category").select2({
+                                data: data,
+                                dropdownParent: $("#editModal")
+                            });
+                        }
+                    }
+                });
+
+                // Load Select2 Item Type
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions", "ItemType")",
+                    success: function (data, status, xhr) {
+                        if (user_access.canAdd) {
+                        $("#create-item-type").select2({
+                            data: data,
+                            //theme: "bootstrap-5",
+                            dropdownParent: $("#createModal")
+                            });
+                        }
+
+                        if (user_access.canEdit) {
+                            $("#edit-item-type").select2({
+                                data: data,
+                                //theme: "bootstrap-5",
+                                dropdownParent: $("#editModal")
+                            });
+                        }
+                    }
+                });
+
+                // Load Select2 Brand
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions", "Brand")",
+                    success: function (data, status, xhr) {
+                        if (user_access.canAdd) {
+                        $("#create-brand").select2({
+                            data: data,
+                            dropdownParent: $("#createModal")
+                            });
+                        }
+
+                        if (user_access.canEdit) {
+                            $("#edit-brand").select2({
+                                data: data,
+                                dropdownParent: $("#editModal")
+                            });
+                        }
+                    }
+                });
+
+                // Load Select2 Location Code
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOptions", "LocationCode")",
+                    success: function (data, status, xhr) {
+                        if (user_access.canAdd) {
+                        $("#create-location-code").select2({
+                            data: data,
+                            allowClear: true,
+                            placeholder: {
+                                id: "",
+                                text: "<N/A>"
+                            },
+                            dropdownParent: $("#createModal")
+                            });
+                        }
+
+                        if (user_access.canEdit) {
+                            $("#edit-location-code").select2({
+                                data: data,
+                                allowClear: true,
+                                placeholder: {
+                                    id: "",
+                                    text: "<N/A>"
+                                },
+                                dropdownParent: $("#editModal")
+                            });
+                        }
+                    }
+                });
+            }
         }
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
@@ -442,8 +504,8 @@
                 { data: "partNumber", name: "PartNumber" },
                 { data: "interchangeNumber", name: "InterchangeNumber" },
                 { data: "warehouse", name: "Warehouse" },
-                { data: "retailPrice", name: "RetailPrice", className: "text-end" },
-                { data: "netPrice", name: "NetPrice", className: "text-end" },
+                { data: "retailPrice", name: "RetailPrice", className: "text-end", visible: user_access.canView },
+                { data: "netPrice", name: "NetPrice", className: "text-end", visible: user_access.canView },
                 {
                     data: function (data, type, dataToSet) {
                         //return '<span data-microtip-title="[Inventory:' + FormatStringInteger(data.quantityInventoryD) + ']+[Served:' + FormatStringInteger(data.quantityServedD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityServedD) + ']-[Invoiced:' + FormatStringInteger(data.quantityInvoiceD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityInvoiceD) + ']" data-microtip-position="top-left" role="tooltip">' + data.quantity + '</span>';
@@ -530,10 +592,10 @@
                     $("#edit-interchange-number").val(data.interchangeNumber);
                     $("#edit-model-number").val(data.modelNumber);
                     $("#edit-size").val(data.size);
-                    $("#edit-unit").val(data.unitId).trigger("change");
                     $("#edit-category").val(data.categoryId).trigger("change");
                     $("#edit-item-type").val(data.itemTypeId).trigger("change");
                     $("#edit-brand").val(data.brandId).trigger("change");
+                    $("#edit-location-code").val(data.locationCodeId).trigger("change");
                 });
 
                 // Validation for Edit Modal
@@ -573,10 +635,10 @@
                             InterchangeNumber: $("#edit-interchange-number").val(),
                             ModelNumber: $("#edit-model-number").val(),
                             Size: $("#edit-size").val(),
-                           // UnitId: $("#edit-unit").val(),
                             CategoryId: $("#edit-category").val(),
                             ItemTypeId: $("#edit-item-type").val(),
-                            BrandId: $("#edit-brand").val()
+                            BrandId: $("#edit-brand").val(),
+                            LocationCodeId: $("#edit-location-code").val()
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Error") {
@@ -604,6 +666,7 @@
                 $("#create-category").prop("selectedIndex", 0).trigger("change");
                 $("#create-item-type").prop("selectedIndex", 0).trigger("change");
                 $("#create-brand").prop("selectedIndex", 0).trigger("change");
+                $("#create-location-code").prop("selectedIndex", "").trigger("change");
                 $("#create-retail-price").val("");
                 $("#create-net-price").val("");
             });
@@ -653,7 +716,8 @@
                         UnitId: $("#create-unit").val(),
                         CategoryId: $("#create-category").val(),
                         ItemTypeId: $("#create-item-type").val(),
-                        BrandId: $("#create-brand").val()
+                        BrandId: $("#create-brand").val(),
+                        LocationCodeId: $("#create-location-code").val()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
@@ -667,6 +731,7 @@
                 });
             }
         }
+
         function ApplyFilter() {
             itemDT.ajax.reload();
             $("#filterModal").modal("hide");

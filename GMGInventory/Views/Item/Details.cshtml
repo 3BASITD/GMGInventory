@@ -64,8 +64,6 @@
                         @(string.IsNullOrWhiteSpace(Model?.InterchangeNumber) ? "-" : Model.InterchangeNumber)
                     </b>
                 </p>
-            </div>
-            <div class="col-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.ModelNumber)
@@ -74,6 +72,8 @@
                         @(string.IsNullOrWhiteSpace(Model?.ModelNumber) ? "-" : Model.ModelNumber)
                     </b>
                 </p>
+            </div>
+            <div class="col-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Category)
@@ -98,6 +98,14 @@
                         @Model?.Brand
                     </b>
                 </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.LocationCode)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrWhiteSpace(Model?.LocationCode) ? "N/A" : Model.LocationCode)
+                    </b>
+                </p>
             </div>
             <div class="col-4">
                 <p class="text-sm">
@@ -116,6 +124,7 @@
                         @Model?.Size
                     </b>
                 </p>
+                @if(userAccess.CanView) {
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.RetailPrice)
@@ -124,6 +133,8 @@
                         @Model?.RetailPrice
                     </b>
                 </p>
+                }
+                @if(userAccess.CanView) {
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.NetPrice)
@@ -132,6 +143,7 @@
                         @Model?.NetPrice
                     </b>
                 </p>
+                }
             </div>
         </div>
         <div class="row">
@@ -146,6 +158,7 @@
                                     @*<br />*@Warehouse Details
                                 </a>
                             </li>
+                @if(userAccess.CanView) {
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-purchase-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-purchase"
@@ -153,6 +166,7 @@
                                     Cost@*<br />*@ History
                                 </a>
                             </li>
+                }
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-sales-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-sales"
@@ -174,6 +188,7 @@
                                     @*<br />*@Conversion Details
                                 </a>
                             </li>
+                @if(userAccess.CanView) {
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-price-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-price"
@@ -181,6 +196,7 @@
                                     @*<br />*@Price History
                                 </a>
                             </li>
+                }
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-transfer-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-transfer"
@@ -213,8 +229,10 @@
                                     </thead>
                                 </table>
                             </div>
-                            <div class="tab-pane fade" id="nav-purchase" role="tabpanel" aria-labelledby="nav-purchase-tab">
-                                <table class="table table-head-fixed table-striped table-hover table-purchase">
+                            @if (userAccess.CanView)
+                            {
+                                <div class="tab-pane fade" id="nav-purchase" role="tabpanel" aria-labelledby="nav-purchase-tab">
+                                    <table class="table table-head-fixed table-striped table-hover table-purchase">
                                     <thead>
                                         <tr>
                                             <th>PO Number</th>
@@ -232,7 +250,7 @@
                                         </tr>
                                     </thead>
                                 </table>
-                            </div>
+                            </div>}
                             <div class="tab-pane fade" id="nav-sales" role="tabpanel" aria-labelledby="nav-sales-tab">
                                 <table class="table table-head-fixed table-striped table-hover table-sales">
                                     <thead>
@@ -278,18 +296,21 @@
                          
                                 </table>
                             </div>
-                            <div class="tab-pane fade" id="nav-price" role="tabpanel" aria-labelledby="nav-price-tab">
-                                <table class="table table-head-fixed table-striped table-hover table-price">
-                                    <thead>
-                                        <tr>
-                                            <th>Retail Price</th>
-                                            <th>Net Price</th>
-                                            <th>Update Date</th>
-                                            <th>Update By</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
+                            @if (userAccess.CanView)
+                            {
+                                <div class="tab-pane fade" id="nav-price" role="tabpanel" aria-labelledby="nav-price-tab">
+                                    <table class="table table-head-fixed table-striped table-hover table-price">
+                                        <thead>
+                                            <tr>
+                                                <th>Retail Price</th>
+                                                <th>Net Price</th>
+                                                <th>Update Date</th>
+                                                <th>Update By</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            }
                             <div class="tab-pane fade" id="nav-transfer" role="tabpanel" aria-labelledby="nav-transfer-tab">
                                 <table class="table table-head-fixed table-striped table-hover table-transfer">
                                     <thead>
@@ -1150,41 +1171,43 @@
             }
         });
 
-        // Purchase Order Details
-        var purchaseDT = $('.table-purchase').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("purchase");
-        }).DataTable({
-            ajax: {
-                url: "@Url.Action("GetPurchasesJson")",
-                type: "POST",
-                data: function (data) {
-                    data.Id = @Model?.Id;
-                }
-            },
-            serverSide: true,
-            filter: true,
-            responsive: true,
-            autoWidth: false,
-            search: {
-                return: true,
-            },
-            columns: [
-                { data: "purchaseNumber", name: "PurchaseNumber" },
-                { data: "warehouse", name: "Warehouse" },
-                { data: "supplier", name: "Supplier" },
-                { data: "quantity", name: "Quantity", className: "text-end" },
-                { data: "unitCost", name: "UnitCost", className: "text-end" },
-                { data: "currency", name: "Currency" },
-                { data: "conversionFactor", name: "ConversionFactor", className: "text-end" },
-                { data: "convertedUnitPrice", name: "ConvertedUnitPrice", className: "text-end" },
-                { data: "replenishDate", name: "ReplenishDate" },
-                { data: "replenishBy", name: "ReplenishBy" },
-                { data: "status", name: "Status" }
-            ],
-            order: [[9, "desc"]]
-        }).on("draw.dt", function () {
-            HideTabLoader("purchase");
-        });
+        if (user_access.canView) {
+            // Purchase Order Details
+            var purchaseDT = $('.table-purchase').on('preXhr.dt', function (e, settings, data) {
+                ShowTabLoader("purchase");
+            }).DataTable({
+                ajax: {
+                    url: "@Url.Action("GetPurchasesJson")",
+                    type: "POST",
+                    data: function (data) {
+                        data.Id = @Model?.Id;
+                    }
+                },
+                serverSide: true,
+                filter: true,
+                responsive: true,
+                autoWidth: false,
+                search: {
+                    return: true,
+                },
+                columns: [
+                    { data: "purchaseNumber", name: "PurchaseNumber" },
+                    { data: "warehouse", name: "Warehouse" },
+                    { data: "supplier", name: "Supplier" },
+                    { data: "quantity", name: "Quantity", className: "text-end" },
+                    { data: "unitCost", name: "UnitCost", className: "text-end" },
+                    { data: "currency", name: "Currency" },
+                    { data: "conversionFactor", name: "ConversionFactor", className: "text-end" },
+                    { data: "convertedUnitPrice", name: "ConvertedUnitPrice", className: "text-end" },
+                    { data: "replenishDate", name: "ReplenishDate" },
+                    { data: "replenishBy", name: "ReplenishBy" },
+                    { data: "status", name: "Status" }
+                ],
+                order: [[9, "desc"]]
+            }).on("draw.dt", function () {
+                HideTabLoader("purchase");
+            });
+        }
 
 
         // Sales Order Details
@@ -1208,7 +1231,7 @@
             columns: [
                 { data: "salesNumber", name: "SalesNumber" },
                 { data: "customer", name: "Customer" },
-                { data: "unitPrice", name: "UnitPrice" },
+                { data: "unitPrice", name: "UnitPrice", visible: user_access.canView },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "packedQuantity", name: "PackedQuantity", className: "text-end" },
                 { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end" },
@@ -1256,35 +1279,36 @@
             HideTabLoader("count");
         });
 
-
-        // Price History
-        var priceDT = $('.table-price').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("price");
-        }).DataTable({
-            ajax: {
-                url: "@Url.Action("GetPricesJson")",
-                type: "POST",
-                data: function (data) {
-                    data.Id = @Model?.Id;
-                }
-            },
-            serverSide: true,
-            filter: true,
-            responsive: true,
-            autoWidth: false,
-            search: {
-                return: true,
-            },
-            columns: [
-                { data: "retailPrice", name: "RetailPrice", className: "text-end" },
-                { data: "netPrice", name: "NetPrice", className: "text-end" },
-                { data: "updateDate", name: "UpdateDate" },
-                { data: "updateBy", name: "UpdateBy" }
-            ],
-            order: [[3, "desc"]]
-        }).on("draw.dt", function () {
-            HideTabLoader("price");
-        });
+        if (user_access.canView) {
+            // Price History
+            var priceDT = $('.table-price').on('preXhr.dt', function (e, settings, data) {
+                ShowTabLoader("price");
+            }).DataTable({
+                ajax: {
+                    url: "@Url.Action("GetPricesJson")",
+                    type: "POST",
+                    data: function (data) {
+                        data.Id = @Model?.Id;
+                    }
+                },
+                serverSide: true,
+                filter: true,
+                responsive: true,
+                autoWidth: false,
+                search: {
+                    return: true,
+                },
+                columns: [
+                    { data: "retailPrice", name: "RetailPrice", className: "text-end" },
+                    { data: "netPrice", name: "NetPrice", className: "text-end" },
+                    { data: "updateDate", name: "UpdateDate" },
+                    { data: "updateBy", name: "UpdateBy" }
+                ],
+                order: [[3, "desc"]]
+            }).on("draw.dt", function () {
+                HideTabLoader("price");
+            });
+        }
 
 
         // Warehouse Transfer History
