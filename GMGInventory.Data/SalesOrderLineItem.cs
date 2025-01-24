@@ -4,6 +4,11 @@ namespace GMGInventory.Data
 {
     public class SalesOrderLineItem : BaseEntity
     {
+        public SalesOrderLineItem()
+        {
+            this.ShippingLineItems = new HashSet<ShippingLineItem>();
+        }
+
         [ForeignKey("SalesOrderId")]
         public int SalesOrderId { get; set; }
         public SalesOrder SalesOrder { get; set; }
@@ -26,5 +31,6 @@ namespace GMGInventory.Data
         public decimal Discount2 { get; set; }
 
         public bool IsServed { get; set; }
+        public ICollection<ShippingLineItem> ShippingLineItems { get; set; }
     }
 }

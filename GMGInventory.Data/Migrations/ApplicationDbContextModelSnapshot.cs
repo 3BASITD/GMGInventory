@@ -4790,7 +4790,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("InvoiceLineItemId")
+                    b.Property<int>("SalesOrderLineItemId")
                         .HasColumnType("int");
 
                     b.Property<int>("ShippingId")
@@ -4805,7 +4805,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvoiceLineItemId");
+                    b.HasIndex("SalesOrderLineItemId");
 
                     b.HasIndex("ShippingId");
 
@@ -5851,13 +5851,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "232ce611-8b07-4b4e-98a2-d908a1ad3601",
+                            ConcurrencyStamp = "4e8b7743-2aa5-4c66-87c5-5ef6f8ba375f",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEADpndxyfx1aRmdhMshjbcsdiZX/0cdSfVOF7q7B+fedMTmqeKx34Ggc++aF4lAgIg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMr+NwiZI3MrCCibWzl0NB2vQkqHi5BUnTxHoWh+QDvLwyPID6tbhoOl5QO0XOejEw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a5c5c86f-de67-42f3-abf8-765858539a9f",
+                            SecurityStamp = "233463c9-a354-418f-9d98-923b52c40b5a",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5872,13 +5872,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1476bb28-c760-452e-b17f-3c9fb43955b6",
+                            ConcurrencyStamp = "99585efe-88c6-46ea-8832-48fe03f0e485",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJge8Wkt81EQ65TQ15lilcA9TC/aKZxaUx/ujDPExalG8jGQfG3TI3UIIyiiKm87ew==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHDw65nvOf+L/lhm9f+3SvCIAlSPxmtRdhl2w9t/EQqSOiRvYKpvbciALQQRben2ZA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e8280af3-5d78-4053-8db9-ab71254065db",
+                            SecurityStamp = "4e363e20-d247-406e-9bac-a5912d62f414",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6887,9 +6887,9 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.ShippingLineItem", b =>
                 {
-                    b.HasOne("GMGInventory.Data.InvoiceLineItem", "InvoiceLineItem")
-                        .WithMany()
-                        .HasForeignKey("InvoiceLineItemId")
+                    b.HasOne("GMGInventory.Data.SalesOrderLineItem", "SalesOrderLineItem")
+                        .WithMany("ShippingLineItems")
+                        .HasForeignKey("SalesOrderLineItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -6899,7 +6899,7 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("InvoiceLineItem");
+                    b.Navigation("SalesOrderLineItem");
 
                     b.Navigation("Shipping");
                 });
@@ -7390,6 +7390,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesOrderLineItems");
 
                     b.Navigation("Shippings");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.SalesOrderLineItem", b =>
+                {
+                    b.Navigation("ShippingLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
