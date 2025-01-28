@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -19,6 +20,10 @@ namespace GMGInventory.Controllers
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Users)).Convert();
             var users = await userRepository.GetUsersInformationVMAsync();
             return View(users);
+        }
+        public async Task<IActionResult> GetOptions2(string? IncludeId)
+        {
+            return Json(await userRepository.GetOptions2(IncludeId));
         }
 
         public async Task<IActionResult> Details(string id)

@@ -14,6 +14,21 @@ namespace GMGInventory.Application.Repositories
                               , UserManager<User> userManager
                               , IMapper mapper) : IUserRepository
     {
+
+        public async Task<IList<JsonOptionsModel>> GetOptions2(string? IncludeId)
+        {
+            return await userManager.Users
+                .Where(s => s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.UserName,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .OrderBy(s => s.Text)
+                .ToListAsync();
+        }
+
         public async Task<IList<UserInformationVM>> GetUsersInformationVMAsync()
         {
             var users = await userManager.Users.ToListAsync();

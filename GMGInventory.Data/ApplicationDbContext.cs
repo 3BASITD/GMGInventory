@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Data.Configurations.Entities;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -229,5 +230,7 @@ namespace GMGInventory.Data
         public DbSet<BusinessStyle> BusinessStyles { get; set; }
         public DbSet<ItemConversion> ItemConversions { get; set; }
         public DbSet<Cheque> Cheques { get; set; }
+        public DbSet<ChequeStatus> ChequeStatuses { get; set; }
+
     }
 }

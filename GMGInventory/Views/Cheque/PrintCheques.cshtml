@@ -1,10 +1,8 @@
-﻿@model ChequeVM
+﻿@model ChequePVM
 
 @{
     Layout = "";
-    var title = "Cheques";
-    var items = ViewData["Cheques"] as List<ChequeVM> ?? new List<ChequeVM>();
-
+    var title = "Check Report";
 }
 
 <!DOCTYPE html>
@@ -22,38 +20,34 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(_ => items[0].CollectDate)
+                    @Html.DisplayNameFor(model => model.Cheques.First().RefNo)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(_ => items[0].RefNo)
+                    @Html.DisplayNameFor(model => model.Cheques.First().CustomerCode)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(_ => items[0].CustomerCode)
+                    @Html.DisplayNameFor(model => model.Cheques.First().CheckDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(_ => items[0].CheckDate)
+                    @Html.DisplayNameFor(model => model.Cheques.First().Check)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(_ => items[0].Check)
+                    @Html.DisplayNameFor(model => model.Cheques.First().Branch)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(_ => items[0].Branch)
+                    @Html.DisplayNameFor(model => model.Cheques.First().CheckNo)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(_ => items[0].CheckNo)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(_ => items[0].Amount)
+                    @Html.DisplayNameFor(model => model.Cheques.First().Amount)
                 </th>
             </tr>
         </thead>
         <tbody>
             @{
                 decimal totalamount = 0;
-                foreach (var item in items)
+                @foreach (var item in Model.Cheques)
                 {
                     <tr>
-                        <td>@item.CollectDate</td>
                         <td>@item.RefNo</td>
                         <td>@item.CustomerCode</td>
                         <td>@item.CheckDate</td>
@@ -68,7 +62,6 @@
         </tbody>
         <tfoot>
             <tr>
-                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>

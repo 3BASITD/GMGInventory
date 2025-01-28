@@ -1148,6 +1148,9 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserCreated")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -1159,7 +1162,30 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("StatusId");
+
                     b.ToTable("Cheques");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ChequeStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChequeStatuses");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
@@ -5936,7 +5962,13 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.ChequeStatus", "Status")
+                        .WithMany("Cheques")
+                        .HasForeignKey("StatusId");
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
@@ -7097,6 +7129,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("ItemTypes");
 
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ChequeStatus", b =>
+                {
+                    b.Navigation("Cheques");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemoType", b =>

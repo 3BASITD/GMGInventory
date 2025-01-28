@@ -43,5 +43,24 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Amount")]
         public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
         public decimal AmountD { get; set; }
+        public int? StatusId { get; set; }
+
+        [Display(Name = "Status Code")]
+        public string StatusCode { get; set; }
+
+        [Display(Name = "Status Name")]
+        public string StatusName { get; set; }
+    }
+
+    public class ChequePVM
+    {
+        public IList<ChequeVM> Cheques { get; set; }
+        //public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        //public DateTime DateFromD { get; set; }
+        //public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        //public DateTime DateToD { get; set; }
+        //public string Customer { get; set; }
+        //public string Status { get; set; }
+
     }
 }
