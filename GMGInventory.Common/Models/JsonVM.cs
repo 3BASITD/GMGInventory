@@ -78,6 +78,19 @@ namespace GMGInventory.Common.Models
         public string ForwarderName { get; set; }
 
     }
+    public class JsonShippingOptionsModel : JsonOptionsModel
+    {
+        public string CustomerCode { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerAddress { get; set; }
+        public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDateTime);
+        public DateTime SalesOrderDateD { get; set; }
+        public string ForwarderName { get; set; }
+        public string PairedInvoices { get; set; }
+        public string Packaging { get; set; }
+
+
+    }
 
     public class JsonItemOptionsModel
     {
@@ -251,6 +264,14 @@ namespace GMGInventory.Common.Models
 
     }
 
+    public class ListFilterChequeModel : ListFilterCommonModel
+    {
+        public int? CustomerId { get; set; }
+        public string? CustomerKeyword { get; set; }
+        public int? StatusId { get; set; }
+        public string? UserCreated { get; set; }
+
+    }
     public class ListFilterCommonModel
     {
         DateTime? _DateFrom = null, _DateTo = null;

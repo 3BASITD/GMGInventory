@@ -1148,6 +1148,9 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserCreated")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -1159,7 +1162,30 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("StatusId");
+
                     b.ToTable("Cheques");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ChequeStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChequeStatuses");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
@@ -5856,13 +5882,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "944186b5-703b-43c5-a9e8-652974c085da",
+                            ConcurrencyStamp = "81c90c87-72de-43d5-9989-8b00af823114",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJZ2x/kV5qMurf1hdYs7SgPUY/J6YPCrLnr89a//nJDjoQCmJigeurh+IP9fHaOtYg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJGSbJ2VNXrkhsyU1Bzwn1QRYEfbRMmeZCfNRO+iP8eyadnwylGHqVg8K36waS2CtA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "43a7c7e1-5577-4f2f-b00e-5225e55d8d6f",
+                            SecurityStamp = "798a2eed-fe49-46f3-9eaa-479fae18b151",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5877,13 +5903,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c53abc5f-4c77-409b-b6b6-89b1bdeef805",
+                            ConcurrencyStamp = "b6890f91-d9d9-47d9-a8d9-efc898f928da",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFP4zK96p+93NRn1e3zi2NHcUiCyC+D5UT3XYnaIZGBDmNZfC0j6eZYbK4s5CsQYbw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEC+9x6UcWbo4FuvOE/h+vIXBqty6p+59iHL7PXg8MLAVdvt9xxiDMTYyYadMx/B0kA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "894606fb-82f6-40c7-9af2-973304e9fc71",
+                            SecurityStamp = "73cc0784-a023-4810-b504-ee49ddddf2b8",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5967,7 +5993,13 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.ChequeStatus", "Status")
+                        .WithMany("Cheques")
+                        .HasForeignKey("StatusId");
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
@@ -7133,6 +7165,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("ItemTypes");
 
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ChequeStatus", b =>
+                {
+                    b.Navigation("Cheques");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditDebitMemoType", b =>

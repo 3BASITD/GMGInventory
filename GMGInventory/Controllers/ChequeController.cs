@@ -13,6 +13,7 @@ namespace GMGInventory.Controllers
     [Authorize]
     public class ChequeController(IAccessRepository accessRepository, 
                                  IChequeRepository chequeRepository,
+                                 IChequeStatusRepository chequeStatusRepository,
                                  ICustomerRepository customerRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
@@ -26,13 +27,13 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetListJson()
+        public async Task<IActionResult> GetListJson(ListFilterChequeModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Cheque, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             var form = new DataTablesRequestForm(Request.Form);
-            return Json(await chequeRepository.GetAllForDataTablesAsync(form));
+            return Json(await chequeRepository.GetAllForDataTablesAsync(form, filter));
         }
 
         [HttpPost]
@@ -97,7 +98,7 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> DownloadFile()
+        public async Task<IActionResult> DownloadFile(ListFilterChequeModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Cheque, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
@@ -111,9 +112,11 @@ namespace GMGInventory.Controllers
                 new DataColumn("Check"),
                 new DataColumn("Branch"),
                 new DataColumn("CheckNo"),
-                new DataColumn("Amount") 
+                new DataColumn("Amount"),
+                new DataColumn("Status")
+
             ]);
-            var cheques = (await chequeRepository.GetAllChequeAsync()).ToList();
+            var cheques = (await chequeRepository.GetAllChequeAsync(filter)).ToList();
             foreach (var cheque in cheques)
             {
                 dt.Rows.Add(cheque.CollectDate,
@@ -123,7 +126,8 @@ namespace GMGInventory.Controllers
                     cheque.Check,
                     cheque.Branch,
                     cheque.CheckNo,
-                    cheque.Amount);
+                    cheque.Amount,
+                    cheque.StatusCode);
             }
             using XLWorkbook wb = new();
             wb.Worksheets.Add(dt);
@@ -149,11 +153,12 @@ namespace GMGInventory.Controllers
             else if (await chequeRepository.IsRefNoExistAsync(chequeVM.RefNo))
             {
                 responseModel.Status = "Error";
-                responseModel.Message = "Code already in use";
+                responseModel.Message = "Ref No already in use";
             }
             else
             {
                 int? CustomerId = await customerRepository.GetIdByCodeAsync(chequeVM.CustomerCode);
+                int? StatusId = await chequeStatusRepository.GetIdByCodeAsync(chequeVM.StatusCode);
 
                 if (CustomerId == null)
                 {
@@ -163,7 +168,8 @@ namespace GMGInventory.Controllers
                 else
                 {
                     chequeVM.CustomerId = CustomerId.Value;
-                   
+                    chequeVM.StatusId = StatusId.Value;
+
                     await chequeRepository.AddAsync(chequeVM);
                     responseModel.Status = "Success";
                     responseModel.Message = "Cheque added";
@@ -172,13 +178,12 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        public async Task<IActionResult> PrintDetails()
+        public async Task<IActionResult> PrintCheques(ListFilterChequeModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Cheque, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
-            ViewData["Cheques"] = await chequeRepository.GetListAsync();
-            return View();
+            return View(await chequeRepository.PrintCheque(filter));
         }
     }
 }

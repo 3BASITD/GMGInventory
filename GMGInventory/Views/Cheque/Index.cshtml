@@ -9,6 +9,8 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
+  
+
             @if (userAccess.CanPrint)
             {
                 <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
@@ -31,6 +33,9 @@
                     <span class="fas fa-download"></span> Download
                 </button>
             }
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
         </div>
     </div>
     <div class="card-body">
@@ -61,6 +66,9 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Amount)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StatusCode)
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -84,6 +92,7 @@
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
+                 
                 </div>
                 <form autocomplete="off" id="createForm">
                     <div class="modal-body">
@@ -105,6 +114,11 @@
                                 <div class="form-group">
                                     <label for="create-amount" class="control-label mb-0 d-block">Amount</label>
                                     <input type="number" step="0.01" min="0" id="create-amount" name="Amount" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-status" class="form-label mb-0">Status</label>
+                                    <select id="create-status" name="Status" style="width:100%">
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -172,6 +186,11 @@
                                 <div class="form-group">
                                     <label for="edit-amount" class="control-label mb-0 d-block">Amount</label>
                                     <input type="number" step="0.01" min="0" id="edit-amount" name="Amount" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-status" class="form-label mb-0">Status</label>
+                                    <select id="edit-status" name="Status" style="width:100%">
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -285,6 +304,8 @@
                     <dd class="col-sm-8 modal-detail-checkNo"></dd>
                     <dt class="col-sm-4">Amount</dt>
                     <dd class="col-sm-8 modal-detail-amount"></dd>
+                     <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8 modal-detail-status"></dd>
                 </dl>
             </div>
             <div class="modal-footer">
@@ -294,9 +315,169 @@
     </div>
 </div>
 
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-customer" class="form-label mb-0">Customer Code</label>
+                            <select id="filter-customer" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-status" class="form-label mb-0">Status</label>
+                            <select id="filter-status" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Check Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Check Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-createdBy" class="form-label mb-0">Created By User</label>
+                            <select id="filter-createdBy" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        SetDateFilter();
+        function SetDateFilter() {
+            if ($("#filter-to").val() == "") {
+                if ($("#filter-from").val() == "") {
+                    $("#filter-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter-from").val());
+                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    dt_from.setMonth(dt_from.getMonth() + 1);
+                    $("#filter-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter-from").val() == "") {
+                var dt_to = new Date($("#filter-to").val());
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
+                dt_to.setMonth(dt_to.getMonth() - 1);
+                $("#filter-from").val(DateForInput(dt_to));
+            }
+        }
+
+        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+
+        // Load Select2 for Customer
+        $("#filter-customer").select2({
+            tags: true,
+            allowClear: true,
+            placeholder: 'All',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Customer")",
+                dataType: 'json',
+                type: "POST",
+                delay: 500,
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $(".btnFilter").on("click", function () {
+            chequeDT.ajax.reload();
+            $("#filterModal").modal("hide");
+        });
+
+        // Load Select2 Cheque Status
+         $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "ChequeStatus")",
+            success: function (data, status, xhr) {
+                if (user_access.canAdd) {
+                    $("#create-status").select2({
+                        data: data,
+                        dropdownParent: $("#createModal")
+                    });
+                }
+                if (user_access.canEdit) {
+                    $("#edit-status").select2({
+                        data: data,
+                        dropdownParent: $("#editModal")
+                    });
+                }
+
+                $("#filter-status").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $("#filterModal")
+                })
+            }
+        });
 
         // Load Select2 Customer
         $.ajax({
@@ -318,15 +499,43 @@
             }
         });
 
+        // Load Select2 User
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions2", "User")",
+            success: function (data, status, xhr) {
+                $("#filter-createdBy").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $("#filterModal")
+                })
+            }
+        });
+
         // Load List on DataTable
-        var dataTable = $('.table-cheque').on('preXhr.dt', function (e, settings, data) {
+        var chequeDT = $('.table-cheque').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
                 data: function (data) {
-                    
+                    var customerId = $("#filter-customer").val();
+                    if (customerId) {
+                        if ($("#filter-customer").select2("data")[0].name) {
+                            data.CustomerId = customerId;
+                        } else {
+                            data.CustomerId = 0;
+                        }
+                    }
+                    data.UserCreated = $("#filter-createdBy").val()
+                    data.StatusId = $("#filter-status").val();
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
                 },
             },
             serverSide: true,
@@ -337,7 +546,7 @@
                 return: true,
             },
             columns: [
-                { data: "collectDate", name: "collectDate" },
+                { data: "collectDate", name: "CollectDate" },
                 { data: "refNo", name: "RefNo" },
                 { data: "customerCode", name: "CustomerCode" },
                 { data: "checkDate", name: "CheckDate" },
@@ -345,6 +554,7 @@
                 { data: "branch", name: "Branch" },
                 { data: "checkNo", name: "CheckNo" },
                 { data: "amount", name: "Amount" },
+                { data: "statusCode", name: "Status" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -357,15 +567,15 @@
                     }
                 }
             ],
-            order: [[0, "asc"]]
+            order: [[0, "desc"]]
         });
 
         // Load functions upon DataTable load
-        dataTable.on("draw", function () {
+        chequeDT.on("draw", function () {
             hideLoader();
          
             $('.detailsBtn').click(function (e) {
-                var data = dataTable.row($(this).parents('tr')).data();
+                var data = chequeDT.row($(this).parents('tr')).data();
                 $(".modal-detail-collectDate").html(data.collectDate);
                 $(".modal-detail-refNo").html(data.refNo);
                 $(".modal-detail-customerCode").html(data.customerCode);
@@ -374,6 +584,7 @@
                 $(".modal-detail-branch").html(data.branch);
                 $(".modal-detail-checkNo").html(data.checkNo);
                 $(".modal-detail-amount").html(data.amount);
+                $(".modal-detail-status").html(data.statusCode);
             });
 
             if (user_access.canDelete) {
@@ -398,7 +609,7 @@
             if (user_access.canEdit) {
                 // Actions upon Display Edit Modal
                 $(".editBtn").click(function (e) {
-                    var data = dataTable.row($(this).parents('tr')).data();
+                    var data = chequeDT.row($(this).parents('tr')).data();
                     $("#edit-id").val(data.id);
                     $("#edit-collectDate").val(data.collectDate);
                     $("#edit-refNo").val(data.refNo);
@@ -408,6 +619,7 @@
                     $("#edit-branch").val(data.branch);
                     $("#edit-checkNo").val(data.checkNo);
                     $("#edit-amount").val(data.amount);
+                    $("#edit-status").val(data.statusId).trigger("change");
                 });
 
                 // Validation for Edit Modal
@@ -417,6 +629,7 @@
                         Customer: { required: true },
                         RefNo: { required: true },
                         Check: { required: true },
+                        CheckDate: { required: true },
                         Amount: { required: true }
                     },
                     messages: {
@@ -424,6 +637,7 @@
                         Customer: { required: "Please choose Customer" },
                         RefNo: { required: "Please enter Ref No." },
                         Check: { required: "Please enter Check" },
+                        CheckDate: { required: "Please enter Check Date" },
                         Amount: { required: "Please enter Amount" }
                     },
                     submitHandler: function (form, event) {
@@ -434,8 +648,6 @@
 
                 // Send Edit to Controller
                 function DoEdit() {
-                    debugger;
-
                     $.ajax({
                         type: "POST",
                         url: "@Url.Action("EditJson")",
@@ -448,7 +660,8 @@
                             Check: $("#edit-check").val(),
                             Branch: $("#edit-branch").val(),
                             CheckNo: $("#edit-checkNo").val(),
-                            AmountD: $("#edit-amount").val()
+                            AmountD: $("#edit-amount").val(),
+                            StatusId: $("#edit-status").val()
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Error") {
@@ -456,7 +669,7 @@
                             } else {
                                 toastr.success(data.message, "Success");
                                 $("#editModal").modal("hide");
-                                dataTable.ajax.reload();
+                                chequeDT.ajax.reload();
                                 hideLoader();
                             }
                         }
@@ -475,6 +688,8 @@
                 $("#create-branch").val("");
                 $("#create-checkNo").val("");
                 $("#create-amount").val("0");
+                $("#create-status").prop("selectedIndex", 0).trigger("change");
+
             });
 
             // Validation for Create Modal
@@ -512,7 +727,8 @@
                         Check: $("#create-check").val(),
                         Branch: $("#create-branch").val(),
                         CheckNo: $("#create-checkNo").val(),
-                        AmountD: $("#create-amount").val()
+                        AmountD: $("#create-amount").val(),
+                        StatusId: $("#create-status").val(),
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
@@ -520,7 +736,7 @@
                         } else {
                             toastr.success(data.message, "Success");
                             $("#createModal").modal("hide");
-                            dataTable.ajax.reload();
+                            chequeDT.ajax.reload();
                             hideLoader()
                         }
                     }
@@ -530,7 +746,15 @@
 
         if (user_access.canUploadDownload) {
             $(".downloadBtn").click(function (e) {
-                window.location = "@Url.Action("DownloadFile")";
+                var urlQuery = [];
+                if ($("#filter-customer").val()) { urlQuery.push("CustomerId=" + $("#filter-customer").val()); }
+                if ($("#filter-status").val()) { urlQuery.push("StatusId=" + $("#filter-status").val()); }
+                if ($("#filter-createdBy").val()) { urlQuery.push("UserCreated=" + $("#filter-createdBy").val()); }
+
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
             });
 
             var json_of_excel;
@@ -594,11 +818,12 @@
                             || columns.includes("Check") == false
                             || columns.includes("Branch") == false
                             || columns.includes("CheckNo") == false
-                            || columns.includes("Amount") == false) {
+                            || columns.includes("Amount") == false
+                            || columns.includes("Status") == false) {
                             row$.append($('<td/>').html("Unexpected columns"));
                             UploadRowDone();
                         } else {
-                            SaveXLSX(json_of_excel[i]["CollectDate"], json_of_excel[i]["RefNo"], json_of_excel[i]["CustomerCode"], json_of_excel[i]["CheckDate"], json_of_excel[i]["Check"], json_of_excel[i]["Branch"], json_of_excel[i]["CheckNo"], json_of_excel[i]["Amount"], rowNum);
+                            SaveXLSX(json_of_excel[i]["CollectDate"], json_of_excel[i]["RefNo"], json_of_excel[i]["CustomerCode"], json_of_excel[i]["CheckDate"], json_of_excel[i]["Check"], json_of_excel[i]["Branch"], json_of_excel[i]["CheckNo"], json_of_excel[i]["Amount"], json_of_excel[i]["Status"], rowNum);
                             row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
                         }
                         $("#upload-table").append(row$);
@@ -606,7 +831,7 @@
                 }
             }
 
-            function SaveXLSX(collectDate, refNo, customerCode, checkDate, check, branch, checkNo, amount, rownum) {
+            function SaveXLSX(collectDate, refNo, customerCode, checkDate, check, branch, checkNo, amount, status, rownum) {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("UploadJson")",
@@ -618,7 +843,8 @@
                         Check: check,
                         Branch: branch,
                         CheckNo: checkNo,
-                        AmountD: amount
+                        AmountD: amount,
+                        statusCode: status
                     },
                     success: function (data, status, xhr) {
                         if (data.message == "Already exist") {
@@ -651,8 +877,16 @@
                     image: "",
                     fontawesome: "fas fa-print"
                 });
+                var urlQuery = [];
+                if ($("#filter-customer").val()) { urlQuery.push("CustomerId=" + $("#filter-customer").val()); }
+                if ($("#filter-status").val()) { urlQuery.push("StatusId=" + $("#filter-status").val()); }
+                if ($("#filter-createdBy").val()) { urlQuery.push("UserCreated=" + $("#filter-createdBy").val()); }
+
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+
                 setTimeout(function () {
-                    let win = window.open('@Url.Action("PrintDetails")', '');
+                    let win = window.open('@Url.Action("PrintCheques")?' + urlQuery.join("&"), '');
                     var wintimer = setInterval(function () {
                         if (win.closed) {
                             clearInterval(wintimer);

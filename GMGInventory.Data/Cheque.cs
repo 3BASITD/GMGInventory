@@ -29,5 +29,10 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Amount { get; set; }
 
+        [ForeignKey("StatusId")]
+        public int? StatusId { get; set; }
+        public ChequeStatus Status { get; set; }
+      //  public virtual ChequeStatus Status { get; set; }
+
     }
 }

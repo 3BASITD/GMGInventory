@@ -24,10 +24,13 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
             this.mapper = mapper;
         }
+   
 
         public async Task AddAsync(ChequeVM chequeVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var status = await context.ChequeStatuses.Where(s => s.Id == chequeVM.StatusId).FirstOrDefaultAsync();
+
             var cheque = new Cheque
             {
                 Id = chequeVM.Id,
@@ -38,19 +41,26 @@ namespace GMGInventory.Application.Repositories
                 Check = chequeVM.Check,
                 Branch = chequeVM.Branch,
                 CheckNo = chequeVM.CheckNo,
-                Amount = chequeVM.AmountD
+                Amount = chequeVM.AmountD,
+                StatusId = status?.Id
             };
             await context.Cheques.AddAsync(cheque);
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task<IList<ChequeVM>> GetAllChequeAsync()
+        public async Task<IList<ChequeVM>> GetAllChequeAsync(ListFilterChequeModel filter)
         {
             var cheques = from cheque in context.Cheques
 
                           join userc in userManager.Users on cheque.UserCreated equals userc.Id
                           join userm in userManager.Users on cheque.UserModified equals userm.Id into m
                           from um in m.DefaultIfEmpty()
+
+                          where   (filter.CustomerId == null || cheque.CustomerId == filter.CustomerId)
+                           && (filter.StatusId == null || cheque.StatusId == filter.StatusId)
+                           && (filter.UserCreated == null || cheque.UserCreated == filter.UserCreated)
+
+                           && filter.DateFrom <= cheque.CheckDate.Value.Date  && cheque.CheckDate.Value.Date <= filter.DateTo
 
                           select new ChequeVM
                           {
@@ -65,6 +75,11 @@ namespace GMGInventory.Application.Repositories
                               Branch = cheque.Branch,
                               CheckNo = cheque.CheckNo,
                               AmountD = cheque.Amount,
+                              
+                              StatusId = cheque.StatusId,
+                              StatusCode = cheque.Status.Code,
+                              StatusName = cheque.Status.Name,
+
                               DateCreatedD = cheque.DateCreated,
                               DateModifiedD = cheque.DateModified == null ? null : cheque.DateModified.Value,
                               UserCreated = userc.UserName,
@@ -73,11 +88,11 @@ namespace GMGInventory.Application.Repositories
             return await cheques.ToListAsync();
         }
 
-        public async Task<ForDataTables<ChequeVM>> GetAllForDataTablesAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<ChequeVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, ListFilterChequeModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetAllChequeAsync()).AsQueryable();
+            var data = (await GetAllChequeAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -104,9 +119,11 @@ namespace GMGInventory.Application.Repositories
                         case "Check": data = data.OrderBy(s => s.Check); break;
                         case "CustomerCode": data = data.OrderBy(s => s.CustomerCode); break;
                         case "Branch": data = data.OrderBy(s => s.Branch); break;
-                        case "CollectDate": data = data.OrderBy(s => s.CollectDate); break;
+                        case "CollectDate": data = data.OrderBy(s => s.CollectDateD); break;
                         case "CheckNo": data = data.OrderBy(s => s.CheckNo); break;
-                        case "CheckDate": data = data.OrderBy(s => s.CheckDate); break;
+                        case "CheckDate": data = data.OrderBy(s => s.CheckDateD); break;
+                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
+                        case "Status": data = data.OrderBy(s => s.StatusCode); break;
                         default: break;
                     }
                 }
@@ -118,9 +135,11 @@ namespace GMGInventory.Application.Repositories
                         case "Check": data = data.OrderByDescending(s => s.Check); break;
                         case "CustomerCode": data = data.OrderByDescending(s => s.CustomerCode); break;
                         case "Branch": data = data.OrderByDescending(s => s.Branch); break;
-                        case "CollectDate": data = data.OrderByDescending(s => s.CollectDate); break;
+                        case "CollectDate": data = data.OrderByDescending(s => s.CollectDateD); break;
                         case "CheckNo": data = data.OrderByDescending(s => s.CheckNo); break;
-                        case "CheckDate": data = data.OrderByDescending(s => s.CheckDate); break;
+                        case "CheckDate": data = data.OrderByDescending(s => s.CheckDateD); break;
+                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
+                        case "Status": data = data.OrderByDescending(s => s.StatusCode); break;
                         default: break;
                     }
                 }
@@ -153,6 +172,7 @@ namespace GMGInventory.Application.Repositories
             cheque.Branch = chequeVM.Branch;
             cheque.CheckNo = chequeVM.CheckNo;
             cheque.Amount = chequeVM.AmountD;
+            cheque.StatusId = chequeVM.StatusId;
 
             context.Cheques.Update(cheque);
             await context.SaveChangesAsync(currentUserId);
@@ -160,15 +180,16 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(ChequeVM chequeVM)
         {
-            return (await GetAllChequeAsync()).Any(s =>
+            return (await GetListAsync()).Any(s =>
             s.CollectDate == chequeVM.CollectDate &&
             s.RefNo == chequeVM.RefNo &&
-            s.CustomerName == chequeVM.CustomerName &&
+            s.CustomerCode == chequeVM.CustomerCode &&
             s.CheckDate == chequeVM.CheckDate &&
             s.Check == chequeVM.Check &&
             s.Branch == chequeVM.Branch &&
             s.CheckNo == chequeVM.CheckNo &&
-            s.Amount == chequeVM.Amount);
+            s.Amount == chequeVM.Amount &&
+            s.StatusCode == chequeVM.StatusCode);
         }
 
         public async Task<IList<ChequeVM>> GetListAsync()
@@ -185,6 +206,7 @@ namespace GMGInventory.Application.Repositories
                                 Branch = cheque.Branch,
                                 CheckNo = cheque.CheckNo,
                                 AmountD = cheque.Amount,
+                                StatusCode = cheque.Status.Code
                             };
             return await chequeVM.ToListAsync();
         }
@@ -192,6 +214,15 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> IsRefNoExistAsync(string refNo)
         {
             return await context.Cheques.AnyAsync(s => s.RefNo == refNo);
+        }
+
+        public async Task<ChequePVM> PrintCheque(ListFilterChequeModel filter)
+        {
+            var items = await GetAllChequeAsync(filter);
+            return new ChequePVM
+            {
+                Cheques = items
+            };
         }
     }
 }
