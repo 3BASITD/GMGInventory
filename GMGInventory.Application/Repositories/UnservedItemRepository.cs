@@ -35,7 +35,8 @@ namespace GMGInventory.Application.Repositories
                                                            .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == l.SalesOrderId
                                                                     && s.ItemId == l.ItemId)
                                                            .Sum(s => (int?)s.Quantity) ?? 0
-                             where l.Quantity - (packedQuantity - returnedQuantity) > 0
+                             //where l.Quantity - (packedQuantity - returnedQuantity) > 0
+                             where (i <= 0 ? l.Quantity - i : 0) > 0
                              && (filter.Region == null || l.SalesOrder.Customer.Area.Region.Id == filter.Region
                              || (filter.Region != null && regionSelected.ToLower() == "luzon" && l.SalesOrder.Customer.Area.Region.Name.ToLower() == "metro manila"))
                              && filter.StartDate <= l.SalesOrder.DateCreated.Date

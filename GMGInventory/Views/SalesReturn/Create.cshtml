@@ -186,8 +186,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="item-unit-price" class="control-label mb-0 d-block">Unit Price</label>
-                                    <input type="number" min="0" max="1999999.99" step="0.01" id="item-unit-price" class="form-control form-control-sm" />
+                                <label for="item-unit-price" class="control-label mb-0 d-block">Unit Price</label>
+                                <input type="text" id="item-unit-price" class="form-control form-control-sm" readonly="readonly" />
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -403,7 +403,8 @@
             var discount2 = parseFloat($("#item-discount2").val());
 
             $("#item-gross-price").val((Math.round(unitprice * quantity * 100) / 100).toFixed(2));
-            $("#item-extended-price").val((Math.round((unitprice * ((100 - discount1 - discount2) / 100)) * quantity * 100) / 100).toFixed(2));
+            //$("#item-extended-price").val((Math.round((unitprice * ((100 - discount1 - discount2) / 100)) * quantity * 100) / 100).toFixed(2));
+            $("#item-extended-price").val(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
         }
 
         // Validation for Item
@@ -520,7 +521,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="checkbox" class="isdefective" />';
+                        return '<select style="width: 100%;" class="isdefective"></select>';
                     },
                     className: "form-cell text-end"
                 },
@@ -592,7 +593,7 @@
             returnDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                var row_isdefective = $(this.node()).find(".isdefective").prop("checked");
+                var row_isdefective = $(this.node()).find(".isdefective").val();
                 item_to_return.push({
                     item: row_data.itemId,
                     quantity: row_quantity,

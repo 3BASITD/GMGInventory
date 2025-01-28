@@ -27,6 +27,8 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount2 { get; set; }
 
-        public bool IsDefective { get; set; }
+        [ForeignKey("ReasonOfReturnId")]
+        public int ReasonOfReturnId { get; set; }
+        public ReasonOfReturn ReasonOfReturn { get; set; }
     }
 }

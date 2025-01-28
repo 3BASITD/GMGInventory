@@ -209,3 +209,24 @@ table.formatted {
             flex: 0 0 auto;
             width: 100%;
         }
+
+
+    table.formatted.receptacle * {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    table.formatted.receptacle {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    table.formatted.receptacle dt,
+    table.formatted.receptacle dd {
+        margin: 10px;
+    }
+
+    table.formatted.receptacle dt {
+        font-size: 14px;
+    }

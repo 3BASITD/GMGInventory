@@ -52,7 +52,7 @@ namespace GMGInventory.Common.Models
         public string ItemName { get; set; }
 
         [Display(Name = "Defective")]
-        public bool IsDefective { get; set; }
+        public string ReasonOfReturn { get; set; }
 
         [Display(Name = "Quantity to Return")]
         public int Quantity { get; set; }
@@ -74,7 +74,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Gross Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
-        public decimal GrossPriceD => Quantity * (((100m - Discount1D - Discount2D) * SellingPriceD) / 100m);
+        public decimal GrossPriceD => Math.Round((Quantity * SellingPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100, 2);
 
         [Display(Name = "Reference Number")]
         public string ReferenceNumber { get; set; }
@@ -116,7 +116,7 @@ namespace GMGInventory.Common.Models
         public decimal SellingPrice { get; set; }
         public decimal Discount1 { get; set; }
         public decimal Discount2 { get; set; }
-        public bool IsDefective { get; set; }
+        public int ReasonOfReturn { get; set; }
         public int? Invoice { get; set; }
     }
 }

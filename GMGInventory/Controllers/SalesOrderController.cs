@@ -30,6 +30,11 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderRepository.GetPriceTypeOptions(IncludeId));
         }
 
+        public async Task<IActionResult> GetStatusOptions()
+        {
+            return Json(await salesOrderRepository.GetStatusOptions());
+        }
+
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);

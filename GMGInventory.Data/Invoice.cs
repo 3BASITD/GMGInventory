@@ -48,10 +48,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
 
-        [ForeignKey("ReasonOfReturnId")]
-        public int ReasonOfReturnId { get; set; }
-        public ReasonOfReturn ReasonOfReturn { get; set; }
-
         public DateTime InvoiceDate { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]

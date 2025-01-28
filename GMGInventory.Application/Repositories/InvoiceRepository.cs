@@ -150,7 +150,12 @@ namespace GMGInventory.Application.Repositories
                                        + " " + invoice.SalesOrder.Agent.LastName,
                                  ControlNumber = invoice.ControlNumber,
                                  CurrentUsersDraft = invoice.Status.Name.ToLower() == "invoice draft" && invoice.UserCreated == currentUserId,
-                                 CustomerAddress = invoice.SalesOrder.Customer.Address,
+                                 CustomerAddress = invoice.SalesOrder
+                                                          .Customer
+                                                          .ShippingAddresses
+                                                          .Where(s => s.IsDefault == true)
+                                                          .Select(s => s.Address)
+                                                          .FirstOrDefault() ?? "N/A",
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  Id = invoice.Id,
@@ -188,7 +193,12 @@ namespace GMGInventory.Application.Repositories
                                        + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
                                        + " " + invoice.SalesOrder.Agent.LastName,
                                  ControlNumber = invoice.ControlNumber,
-                                 CustomerAddress = invoice.SalesOrder.Customer.Address,
+                                 CustomerAddress = invoice.SalesOrder
+                                                          .Customer
+                                                          .ShippingAddresses
+                                                          .Where(s => s.IsDefault == true)
+                                                          .Select(s => s.Address)
+                                                          .FirstOrDefault() ?? "N/A",
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  Id = invoice.Id,
@@ -231,7 +241,12 @@ namespace GMGInventory.Application.Repositories
                               Agent = pack.SalesOrder.Agent.FirstName
                                     + (pack.SalesOrder.Agent.MiddleName == null ? "" : " " + pack.SalesOrder.Agent.MiddleName)
                                     + " " + pack.SalesOrder.Agent.LastName,
-                              CustomerAddress = pack.SalesOrder.Customer.Address,
+                              CustomerAddress = pack.SalesOrder
+                                                    .Customer
+                                                    .ShippingAddresses
+                                                    .Where(s => s.IsDefault == true)
+                                                    .Select(s => s.Address)
+                                                    .FirstOrDefault() ?? "N/A",
                               CustomerCode = pack.SalesOrder.Customer.Code,
                               CustomerName = pack.SalesOrder.Customer.Name,
                               Id = pack.Id,

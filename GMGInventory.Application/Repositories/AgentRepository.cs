@@ -307,9 +307,15 @@ namespace GMGInventory.Application.Repositories
                           select new AgentVM
                           {
                               CustomerName = cust.Name,
-                              CustomerAddress = cust.Address,
+                              CustomerAddress = cust.ShippingAddresses
+                                                    .Where(s => s.IsDefault == true)
+                                                    .Select(s => s.Address)
+                                                    .FirstOrDefault() ?? "N/A",
                               CustomerEmail = cust.Email + "",
-                              CustomerContactNo = cust.ContactNumber + ""
+                              CustomerContactNo = cust.ShippingAddresses
+                                                      .Where(s => s.IsDefault == true)
+                                                      .Select(s => s.PhoneNumber)
+                                                      .FirstOrDefault() ?? "N/A",
                           };
             return await agentVM.ToListAsync();
         }

@@ -25,9 +25,6 @@ namespace GMGInventory.Data
 
         public bool IsActive { get; set; }
 
-        [Column(TypeName = "nvarchar(MAX)")]
-        public string Address { get; set; }
-
         [ForeignKey("AgentId")]
         public int AgentId { get; set; }
         public Agent Agent { get; set; }
@@ -41,12 +38,6 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? CommissionRate { get; set; }
-
-        [Column(TypeName = "nvarchar(100)")]
-        public string? ContactNumber { get; set; }
-
-        [Column(TypeName = "nvarchar(150)")]
-        public string? ContactPerson { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal CreditLimit { get; set; }
@@ -63,9 +54,6 @@ namespace GMGInventory.Data
         public int CustomerTypeId { get; set; }
         public CustomerType CustomerType { get; set; }
 
-        [Column(TypeName = "nvarchar(100)")]
-        public string? FaxNumber { get; set; }
-
         [Column(TypeName = "decimal(18, 2)")]
         public decimal OutstandingBalance { get; set; }
 
@@ -77,6 +65,18 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(50)")]
         public string? VAT { get; set; }
+
+        //[Column(TypeName = "nvarchar(MAX)")]
+        //public string Address { get; set; }
+
+        //[Column(TypeName = "nvarchar(100)")]
+        //public string? ContactNumber { get; set; }
+
+        //[Column(TypeName = "nvarchar(150)")]
+        //public string? ContactPerson { get; set; }
+
+        //[Column(TypeName = "nvarchar(100)")]
+        //public string? FaxNumber { get; set; }
 
         public ICollection<CustomerPayment> CustomerPayments { get; set; }
         //public ICollection<Forwarder> Forwarders { get; set; }

@@ -23,11 +23,6 @@ namespace GMGInventory.Common.Models
         public bool IsActive { get; set; }
 
         [Required]
-        [MinLength(5)]
-        [Display(Name = "Address")]
-        public string Address { get; set; }
-
-        [Required]
         [Display(Name = "Agent")]
         public int AgentId { get; set; }
         public SelectList Agents { get; set; }
@@ -50,16 +45,6 @@ namespace GMGInventory.Common.Models
         public decimal? CommissionRateD { get; set; }
 
         public bool CommissionRateIsArea { get; set; }
-
-        [MaxLength(100)]
-        [MinLength(5)]
-        [Display(Name = "Contact Number")]
-        public string? ContactNumber { get; set; }
-
-        [MaxLength(150)]
-        [MinLength(3)]
-        [Display(Name = "Contact Person")]
-        public string? ContactPerson { get; set; }
 
         [Required]
         [Display(Name = "Credit Term")]
@@ -97,10 +82,25 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Email")]
         public string? Email { get; set; }
 
-        [MaxLength(20)]
-        [MinLength(3)]
-        [Display(Name = "Fax Number")]
-        public string? FaxNumber { get; set; }
+        //[Required]
+        //[MinLength(5)]
+        //[Display(Name = "Address")]
+        //public string Address { get; set; }
+
+        //[MaxLength(100)]
+        //[MinLength(5)]
+        //[Display(Name = "Contact Number")]
+        //public string? ContactNumber { get; set; }
+
+        //[MaxLength(150)]
+        //[MinLength(3)]
+        //[Display(Name = "Contact Person")]
+        //public string? ContactPerson { get; set; }
+
+        //[MaxLength(20)]
+        //[MinLength(3)]
+        //[Display(Name = "Fax Number")]
+        //public string? FaxNumber { get; set; }
 
         [Display(Name = "Forwarder Address")]
         public string ForwarderAddress { get; set; }
@@ -132,18 +132,6 @@ namespace GMGInventory.Common.Models
         //[Display(Name = "Customer Status")] bakit customer status?
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
-
-        [Display(Name = "Shipping Address")]
-        public string ShippingAddress { get; set; }
-
-        [Display(Name = "Shipping Contact Person")]
-        public string ShippingContactPerson { get; set; }
-
-        [Display(Name = "Shipping Fax No")]
-        public string ShippingFaxNo { get; set; }
-
-        [Display(Name = "Shipping Phone No")]
-        public string ShippingPhoneNo { get; set; }
 
         [MaxLength(20)]
         [MinLength(3)]
@@ -203,6 +191,28 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Modified By")]
         public string? ModifiedBy { get; set; }
+    }
+
+    public class CustomerShippingVM
+    {
+        public int? Id { get; set; }
+
+        public int CustomerId { get; set; }
+
+        [Display(Name = "Shipping Address")]
+        public string Address { get; set; }
+
+        [Display(Name = "Shipping Contact Person")]
+        public string ContactPerson { get; set; }
+
+        [Display(Name = "Shipping Fax No")]
+        public string FaxNumber { get; set; }
+
+        [Display(Name = "Shipping Phone No")]
+        public string PhoneNumber { get; set; }
+
+        public bool IsDefault { get; set; }
+        public bool IsActive { get; set; }
     }
 
     public class CustomerViewVM : GenericAuditVM

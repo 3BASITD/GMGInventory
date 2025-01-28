@@ -21,8 +21,8 @@
                 <span class="fas fa-paper-plane"></span> Post
             </button>
             <a class="btn btn-light btn-sm float-right" asp-action="Index" asp-controller="@(pageName == "SalesOrder" ? "SalesOrder" : "Pack")">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
         </div>
     </div>
     <div class="card-body">
@@ -199,12 +199,12 @@
                 cache: true
             }
         });
-        
+
         $("#pack-so-number").on("select2:select", function () {
             window.location = "@Url.Action("Create", "Pack", new { id = "" })/" + $("#pack-so-number").val() + "?page=Pack";
         });
 
-          // Load Select2 Pack Type
+        // Load Select2 Pack Type
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetPackTypeOptions")",
@@ -216,10 +216,10 @@
             }
         });
 
-         var orderDT = $('.table-order').DataTable({
+        var orderDT = $('.table-order').DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsForPackJson", "SalesOrder")",
-                data: { salesOrderId: $("#salesOrderId").val() },  
+                data: { salesOrderId: $("#salesOrderId").val() },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -240,7 +240,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if (data.remainingQuantity > 0) {
+                        if (data.inventoryCount > 0) {
                             if ($("#add-partial").prop("checked")) {
                                 actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
                             } else {
@@ -279,7 +279,7 @@
             $(".table-order thead th").removeClass("text-end");
             dtCheckboxes();
         });
-      
+
         //$(".createBtn").on("click", function () {
         //    orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
         //        var row_data = this.data();
@@ -291,7 +291,7 @@
         //    });
         //});
 
-         $(".btn-add-item").on("click", function () {
+        $(".btn-add-item").on("click", function () {
             if ($("#add-box").val() == 0) {
                 toastr.warning("Please enter package number", "Required field &lt;Package Number&gt;");
                 $("#add-box").addClass("text-danger");
@@ -303,25 +303,27 @@
             } else {
                 var hasItemToAdd = false;
 
+                var successItem = [], warningItem = [];
+                var alertMessage = "";
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
                     var itemchk = $(this.node()).find(".chkclassorder");
                     if (itemchk.prop("checked")) {
-                        if (parseInt(row_data.remainingQuantity) > 0) {
-                            if (parseInt(row_data.remainingQuantity) < parseInt($("#add-quantity").val())) {
-                                $("#add-quantity").val(parseInt(row_data.remainingQuantity));
-                                toastr.info("Partial Quantity exceed the Remaining Quantity. Auto adjusted", "Remaining Quantity");
+                        if (parseInt(row_data.inventoryQuantity) > 0) {
+                            if (parseInt(row_data.inventoryQuantity) < parseInt($("#add-quantity").val())) {
+                                $("#add-quantity").val(parseInt(row_data.inventoryQuantity));
+                                alertMessage = "Partial Quantity exceed the Inventory Quantity. Auto adjusted";
                             }
                             var quantityToPack = 0;
 
                             if ($("#add-partial").prop("checked")) {
                                 quantityToPack = parseInt($("#add-quantity").val());
-                                row_data.remainingQuantity = parseInt(row_data.remainingQuantity) - parseInt($("#add-quantity").val());
+                                row_data.inventoryQuantity = parseInt(row_data.inventoryQuantity) - parseInt($("#add-quantity").val());
                                 row_data.packedQuantity = parseInt(row_data.packedQuantity) + parseInt($("#add-quantity").val());
                             } else {
-                                quantityToPack = parseInt(row_data.remainingQuantity);
-                                row_data.packedQuantity = parseInt(row_data.remainingQuantity) + parseInt(row_data.packedQuantity);
-                                row_data.remainingQuantity = 0;
+                                quantityToPack = parseInt(row_data.inventoryQuantity);
+                                row_data.packedQuantity = parseInt(row_data.inventoryQuantity) + parseInt(row_data.packedQuantity);
+                                row_data.inventoryQuantity = 0;
                             }
                             var toItem = {
                                 id: row_data.id,
@@ -336,19 +338,28 @@
 
                             hasItemToAdd = true;
                             itemDT.row.add(toItem).draw();
-                            toastr.success("Added " + row_data.itemCode + " on Packed Item(s)", "Success");
+                            successItem.push(row_data.itemCode);
 
                             this.data(row_data);
                             if (row_data.remainingQuantity == 0) {
                                 $(this.node()).addClass("text-muted");
                             }
                         } else {
-                            toastr.warning(row_data.itemName + " has 0 remaining quantity", "Remaining Quantity");
+                            warningItem.push(row_data.itemCode);
                         }
                     }
                 });
+                if (successItem.length > 0) {
+                    toastr.success("Added " + successItem.join(", ") + " on Packed Item(s)", "Success");
+                }
+                if (alertMessage != "") {
+                    toastr.info(alertMessage, "Inventory Quantity");
+                }
+                if (warningItem.length > 0) {
+                    toastr.warning(warningItem.join(", ") + " has 0 inventory quantity", "Inventory Quantity");
+                }
 
-                if (hasItemToAdd) { 
+                if (hasItemToAdd) {
                     $('#add-box').get(0).value++;
                 }
                 $(".chkclassorderall").prop("checked", false);
@@ -356,7 +367,7 @@
             }
         });
 
-                $("#add-box").on("change", function () {
+        $("#add-box").on("change", function () {
             if ($("#add-box").val() == 0) {
                 toastr.warning("Please enter package number", "Required field &lt;Package Number&gt;");
                 $("#add-box").addClass("text-danger");
@@ -378,7 +389,7 @@
             }
         });
 
-            var itemDT = $('.table-item').DataTable({
+        var itemDT = $('.table-item').DataTable({
             data: [],
             filter: true,
             responsive: true,
@@ -424,7 +435,7 @@
                 }
             }
         });
-          itemDT.on("draw", function () {
+        itemDT.on("draw", function () {
             $(".btn-remove-item").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
 
@@ -456,7 +467,7 @@
             });
         });
 
-         $("#add-quantity").hide();
+        $("#add-quantity").hide();
         $("#add-partial").on("change", function () {
             if ($(this).prop("checked")) {
                 $("#add-quantity").val(1);
@@ -475,7 +486,7 @@
             $(".chkclassorderall").prop("indeterminate", false);
         });
 
-            dtCheckboxes();
+        dtCheckboxes();
         function dtCheckboxes() {
             $(".chkclassorderall").off("change").on("change", function () {
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -509,7 +520,7 @@
 
         itemDT.clear().draw();
 
-          function dtCheckboxes() {
+        function dtCheckboxes() {
             $(".chkclassorderall").off("change").on("change", function () {
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     $(this.node()).find(".chkclassorder").prop("checked", $(".chkclassorderall").prop("checked"));
@@ -540,7 +551,7 @@
             });
         }
 
-        
+
         function GetItemsToPack() {
             var item_to_pack = [];
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -554,7 +565,7 @@
             });
             return item_to_pack;
         }
-        
+
         function SavePack(savingAs) {
             var itemsToPack = GetItemsToPack();
             if (itemsToPack.length == 0) {
@@ -581,6 +592,6 @@
                     }
                 });
             }
-        } 
-    </script>
         }
+    </script>
+}

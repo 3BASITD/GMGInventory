@@ -12,6 +12,10 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string SalesReturnNumber { get; set; }
 
+        [ForeignKey("SalesOrderId")]
+        public int SalesOrderId { get; set; }
+        public SalesOrder SalesOrder { get; set; }
+
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
