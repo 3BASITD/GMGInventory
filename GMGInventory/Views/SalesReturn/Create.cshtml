@@ -7,11 +7,11 @@
     <li class="breadcrumb-item"><a asp-controller="SalesReturn" asp-action="Index">Sales Returns</a></li>
 }
 
-    <div class="card card-default">
-        <form id="form-return">
-            <div class="card-header">
-                <span class="card-title">@ViewData["Title"]</span>
-                <div class="card-tools">
+<div class="card card-default">
+    <form id="form-return">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
                 @if (userAccess.CanAdd)
                 {
                     <button type="submit" class="btn btn-primary btn-sm float-right btn-save ml-2">
@@ -19,241 +19,255 @@
                     </button>
                 }
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                        <span class="fas fa-arrow-left"></span> Back to List
-                    </a>
-                </div>
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="return-customer-code" class="form-label mb-0">Customer Code</label>
-                            <select id="return-customer-code" name="Customer" style="width: 100%;">
-                                <option></option>
-                            </select>
-                        </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-number" class="form-label mb-0">Return Number</label>
+                        <input type="text" id="return-number" name="ReturnNumber" class="form-control form-control-sm" />
                     </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="return-customer-name" class="form-label mb-0">Customer Name</label>
-                            <input type="text" id="return-customer-name" class="form-control form-control-sm" readonly="readonly" />
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="return-customer-address" class="form-label mb-0">Customer Address</label>
-                            <input type="text" id="return-customer-address" class="form-control form-control-sm" readonly="readonly" />
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4 col-sm-6">
-                        <div class="form-group">
-                            <label for="return-remarks" class="form-label mb-0">Remarks</label>
-                            <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" />
-                        </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
-                        <label for="return-date" class="form-label fw-normal mb-0">Return Date</label>
+                        <label for="return-sales-order" class="form-label mb-0">Sales Order Number <span data-microtip-title="Invoiced Sales Order Only" data-microtip-position="right" role="tooltip"><i class="fas fa-info-circle text-info"></i></span></label>
+                        <select id="return-sales-order" name="SalesOrder" style="width: 100%;">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-date" class="form-label mb-0">Return Date</label>
                         <input type="date" id="return-date" name="ReturnDate" class="form-control form-control-sm" />
                     </div>
                 </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-customer-code" class="form-label mb-0">Customer Code</label>
+                        <input type="text" id="return-customer-code" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
                 </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <span class="card-title">Sales Return Item(s)</span>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-primary btn-sm float-right btn-tbr ml-2" data-microtip-title="(To Be Returned) Add Item selection from All Items" data-microtip-position="top-left" role="tooltip">
-                                        <span class="fas fa-plus"></span> TBR
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-sm float-right btn-invoice ml-2" data-microtip-title="Add Item selection from Invoice" data-microtip-position="top-left" role="tooltip">
-                                        <span class="fas fa-file-invoice-dollar"></span> Invoice
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-return">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Defective</th>
-                                            <th>Item Code</th>
-                                            <th>Item Name</th>
-                                            <th>Quantity to Return</th>
-                                            <th>Unit Price</th>
-                                            <th>Discount 1</th>
-                                            <th>Discount 2</th>
-                                            <th>Extended Price</th>
-                                            <th>Reference Number</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                        <th colspan="4" class="text-end">Total</th>
-                                            <th class="total-quantity">0</th>
-                                            <th colspan="3"></th>
-                                            <th class="total-gross-price">0</th>
-                                            <th></th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-customer-name" class="form-label mb-0">Customer Name</label>
+                        <input type="text" id="return-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-customer-address" class="form-label mb-0">Customer Address</label>
+                        <input type="text" id="return-customer-address" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="return-remarks" class="form-label mb-0">Remarks</label>
+                        <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" />
                     </div>
                 </div>
             </div>
-        </form>
-    </div>
-
-    <!-- Item Invoice Modal -->
-    <div class="modal fade" id="invoiceModal" role="dialog" aria-labelledby="invoiceModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Invoice Item(s)</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12 col-md-4 col-sm-6">
-                            <p class="text-sm">
-                                <label for="invoice-invoice" class="text-muted fw-normal mb-0">Invoice</label>
-                                <select id="invoice-invoice" style="width: 100%;">
-                                    <option></option>
-                                </select>
-                            </p>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <span class="card-title">Sales Return Item(s)</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm float-right btn-tbr ml-2" data-microtip-title="(To Be Returned) Add Item selection from All Items" data-microtip-position="top-left" role="tooltip">
+                                    <span class="fas fa-plus"></span> TBR
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm float-right btn-invoice ml-2" data-microtip-title="Add Item selection from Invoice" data-microtip-position="top-left" role="tooltip">
+                                    <span class="fas fa-file-invoice-dollar"></span> Invoice
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <table class="table table-striped table-hover table-return-items">
+                        <div class="card-body">
+                            <table class="table table-head-fixed table-striped table-hover table-return">
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th>Quantity</th>
+                                        <th>Reason of Return</th>
                                         <th>Item Code</th>
                                         <th>Item Name</th>
-                                        <th>Selling Price</th>
+                                        <th>Quantity to Return</th>
+                                        <th>Unit Price</th>
                                         <th>Discount 1</th>
                                         <th>Discount 2</th>
                                         <th>Extended Price</th>
+                                        <th>Reference Number</th>
                                     </tr>
                                 </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4" class="text-end">Total</th>
+                                        <th class="total-quantity">0</th>
+                                        <th colspan="3"></th>
+                                        <th class="total-gross-price">0</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Item Invoice Modal -->
+<div class="modal fade" id="invoiceModal" role="dialog" aria-labelledby="invoiceModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Invoice Item(s)</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <p class="text-sm">
+                            <label for="invoice-invoice" class="text-muted fw-normal mb-0">Invoice</label>
+                            <select id="invoice-invoice" style="width: 100%;">
+                                <option></option>
+                            </select>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table table-striped table-hover table-return-items">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Quantity</th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Selling Price</th>
+                                    <th>Discount 1</th>
+                                    <th>Discount 2</th>
+                                    <th>Extended Price</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TBR Modal -->
+<div class="modal fade" id="tbrModal" role="dialog" aria-labelledby="tbrModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Return Item</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="form-item">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="item-code" class="control-label mb-0 d-block">Code</label>
+                                <select id="item-code" name="Code" style="width: 100%;">
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="item-name" class="control-label mb-0 d-block">Name</label>
+                                <input type="text" id="item-name" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="item-unit-price" class="control-label mb-0 d-block">Unit Price</label>
+                                <input type="text" id="item-unit-price" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="item-quantity" class="control-label mb-0 d-block">Quantity</label>
+                                <input type="number" min="0" max="1999999" step="1" name="Quantity" id="item-quantity" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="item-discount1" class="control-label mb-0 d-block">Discount 1</label>
+                                <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount1" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="item-discount2" class="control-label mb-0 d-block">Discount 2</label>
+                                <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount2" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="item-gross-price" class="control-label mb-0 d-block">Gross Price</label>
+                                <input type="number" id="item-gross-price" step="0.01" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="item-extended-price" class="control-label mb-0 d-block">Extended Price</label>
+                                <input type="number" id="item-extended-price" step="0.01" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <span class="fas fa-times"></span> Close
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <!-- TBR Modal -->
-    <div class="modal fade" id="tbrModal" role="dialog" aria-labelledby="tbrModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Return Item</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form autocomplete="off" id="form-item">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="item-code" class="control-label mb-0 d-block">Code</label>
-                                    <select id="item-code" name="Code" style="width: 100%;">
-                                        <option></option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="item-name" class="control-label mb-0 d-block">Name</label>
-                                    <input type="text" id="item-name" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                <label for="item-unit-price" class="control-label mb-0 d-block">Unit Price</label>
-                                <input type="text" id="item-unit-price" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="item-quantity" class="control-label mb-0 d-block">Quantity</label>
-                                    <input type="number" min="0" max="1999999" step="1" name="Quantity" id="item-quantity" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="item-discount1" class="control-label mb-0 d-block">Discount 1</label>
-                                    <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount1" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="item-discount2" class="control-label mb-0 d-block">Discount 2</label>
-                                    <input type="number" min="0" max="1999999.99" step="0.01" id="item-discount2" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="item-gross-price" class="control-label mb-0 d-block">Gross Price</label>
-                                    <input type="number" id="item-gross-price" step="0.01" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="item-extended-price" class="control-label mb-0 d-block">Extended Price</label>
-                                    <input type="number" id="item-extended-price" step="0.01" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="fas fa-plus"></span> Add
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Close
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    @section Scripts {
+@section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        $("#return-customer-code").select2({
-            minimumInputLength: 1,
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetNextFormattedNumberJson")",
+            success: function (data, status, xhr) {
+                $("#return-number").val(data);
+            }
+        });
+
+        $("#return-sales-order").select2({
+            minimumInputLength: -1,
             placeholder: '<empty>',
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-            },
             ajax: {
-                url: "@Url.Action("GetOptions", "Customer")",
+                url: "@Url.Action("GetSalesOrderInvoicedOptions", "SalesOrder")",
                 dataType: 'json',
                 type: "POST",
                 delay: 500,
@@ -276,24 +290,34 @@
             }
         });
 
-        $("#return-customer-code").on("select2:select", function () {
-            $("#return-customer-name").val($(this).select2("data")[0].name);
-            $("#return-customer-address").val($(this).select2("data")[0].address);
+        $("#return-sales-order").on("select2:select", function () {
+            $("#return-customer-code").val($(this).select2("data")[0].customerCode);
+            $("#return-customer-name").val($(this).select2("data")[0].customerName);
+            $("#return-customer-address").val($(this).select2("data")[0].customerAddress);
 
+            if ($.fn.select2 && $("#invoice-invoice").hasClass("select2-hidden-accessible")) {
+                $("#invoice-invoice").select2("destroy");
+                $("#invoice-invoice").empty();
+            }
 
-            $("#invoice-invoice").html("").select2({
-                //minimumInputLength: 1,
+            $("#invoice-invoice").select2({
+                minimumInputLength: -1,
                 placeholder: '<empty>',
                 ajax: {
-                    url: "@Url.Action("GetInvoiceByCustomer", "SalesInvoice")",
+                    url: "@Url.Action("GetInvoiceBySalesOrder", "SalesInvoice")",
                     dataType: 'json',
                     type: "POST",
                     delay: 500,
+                    language: {
+                        noResults: function () {
+                            return "No invoice record on selected invoiced sales order";
+                        }
+                    },
                     data: function (params) {
                         return {
                             search: params.term,
                             page: params.page || 1,
-                            customer: $("#return-customer-code").select2("data")[0].id
+                            salesOrderId: $("#return-sales-order").select2("data")[0].id
                         };
                     },
                     processResults: function (data, params) {
@@ -315,9 +339,26 @@
             });
         });
 
+        function LoadReasonOnItems() {
+                $(".isdefective").each(function () {
+                    var current_defective_option = $(this);
+                if (($.fn.select2 && current_defective_option.hasClass("select2-hidden-accessible")) == false) {
+                        $.ajax({
+                            type: "POST",
+                        url: "@Url.Action("GetOptionsJson", "ReasonsOfReturn")",
+                            success: function (data, status, xhr) {
+                            current_defective_option.select2({
+                                    data: data
+                                });
+                            }
+                        });
+                    }
+                });
+        }
+
         $(".btn-invoice").on("click", function () {
-            if ($("#return-customer-code").val() == "") {
-                toastr.warning("Please select customer first", "Warning");
+            if ($("#return-sales-order").val() == "") {
+                toastr.warning("Please select sales order first", "Warning");
             } else {
                 $("#invoice-invoice").html("");
                 invoiceDT.ajax.reload();
@@ -326,8 +367,8 @@
         });
 
         $(".btn-tbr").on("click", function () {
-            if ($("#return-customer-code").val() == "") {
-                toastr.warning("Please select customer first", "Warning");
+            if ($("#return-sales-order").val() == "") {
+                toastr.warning("Please select sales order first", "Warning");
             } else {
                 $("#item-code").val("").trigger("change");
                 ResetTBR();
@@ -404,7 +445,7 @@
 
             $("#item-gross-price").val((Math.round(unitprice * quantity * 100) / 100).toFixed(2));
             //$("#item-extended-price").val((Math.round((unitprice * ((100 - discount1 - discount2) / 100)) * quantity * 100) / 100).toFixed(2));
-            $("#item-extended-price").val(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
+            $("#item-extended-price").val(Round2Decimal((quantity * unitprice * (100 - discount1) / 100) * (100 - discount2) / 100));
         }
 
         // Validation for Item
@@ -425,24 +466,24 @@
 
         function AddItem() {
             var item = {
-                discount1: $("#item-discount1").val(),
+                discount1: FormatStringDecimal($("#item-discount1").val()),
                 discount1D: parseFloat($("#item-discount1").val()),
-                discount2: $("#item-discount2").val(),
+                discount2: FormatStringDecimal($("#item-discount2").val()),
                 discount2D: parseFloat($("#item-discount2").val()),
                 grossPrice: $("#item-extended-price").val(),
                 grossPriceD: parseFloat($("#item-extended-price").val()),
-                //id: 0, // no invoice id
                 itemCode: $("#item-code").select2("data")[0].text,
                 itemId: $("#item-code").select2("data")[0].id,
                 itemName: $("#item-name").val(),
-                netPrice: $("#item-gross-price").val(),
+                netPrice: FormatStringDecimal($("#item-gross-price").val()),
                 netPriceD: parseFloat($("#item-gross-price").val()),
                 quantity: parseInt($("#item-quantity").val()),
                 referenceNumber: "TBR"
             };
 
             returnDT.row.add(item).draw();
-            $("#item-code").val("").trigger("change");
+            LoadReasonOnItems();
+            $("#item-code").val("").trigger("change"); 
             ResetTBR();
         }
 
@@ -498,6 +539,7 @@
                 var rowdata = invoiceDT.row($(this).parents('tr')).data();
                 if (rowdata) {
                     returnDT.row.add(rowdata).draw();
+                    LoadReasonOnItems();
                     invoiceDT.row($(this).parents('tr')).remove().draw();
                     toastr.success("Added " + rowdata.itemCode + " on Return Item(s)", "Success");
                 }
@@ -529,7 +571,7 @@
                 { data: "itemName", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="' + data.quantity + '" value="1" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        return '<input type="number" min="0" value="' + data.quantity + '" max="' + data.quantity + '" value="1" class="form-control form-control-sm quantity" style="width: 100%;" />';
                     },
                     className: "form-cell text-end"
                 },
@@ -593,7 +635,7 @@
             returnDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                var row_isdefective = $(this.node()).find(".isdefective").val();
+                var row_reason = $(this.node()).find(".isdefective").val();
                 item_to_return.push({
                     item: row_data.itemId,
                     quantity: row_quantity,
@@ -601,7 +643,7 @@
                     sellingPrice: row_data.netPriceD,
                     discount1: row_data.discount1D,
                     discount2: row_data.discount2D,
-                    isDefective: row_isdefective
+                    reasonOfReturn: row_reason
                 });
             });
             return item_to_return;
@@ -610,14 +652,16 @@
         // Validation for Save
         var validateCreate = $("#form-return").validate({
             rules: {
-                Customer: { required: true },
+                ReturnNumber: { required: true, maxlength: 50 },
+                SalesOrder: { required: true },
                 Remarks: { maxlength: 250 },
                 ReturnDate: { required: true }
             },
             messages: {
-                CustomerCode: { required: "Please select customer" },
-                AgentCode: { maxlength: "Remarks must not exceed 50 characters." },
-                ReturnDate: { required: "Please select date" }
+                ReturnNumber: { required: "Please enter Sales Return Number", maxlength: "Sales Return Number must not exceed 50 characters" },
+                SalesOrder: { required: "Please select Sales Order" },
+                Remarks: { maxlength: "Sales Return must not exceed 250 characters" },
+                ReturnDate: { required: "Please select the Return Date" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -636,7 +680,8 @@
                     type: "POST",
                     url: "@Url.Action("SaveJson")",
                     data: {
-                        Customer: $("#return-customer-code").select2("data")[0].id,
+                        ReturnNumber: $("#return-number").val(),
+                        SalesOrder: $("#return-sales-order").val(),
                         Remarks: $("#return-remarks").val(),
                         ReturnDate: $("#return-date").val(),
                         Items: itemsToReturn
@@ -652,4 +697,4 @@
             }
         }
     </script>
-    }
+}

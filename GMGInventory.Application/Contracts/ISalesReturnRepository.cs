@@ -7,9 +7,8 @@ namespace GMGInventory.Application.Contracts
         Task<SalesReturnVM?> GetDetailsAsync(int? Id);
         Task<ForDataTables<SalesReturnVM>> GetListDTAsync(DataTablesRequestForm form);
         Task<IList<SalesReturnItemVM>> GetItemsAsync(int salesReturnId);
-        Task<int> SaveAsync(SalesReturnFormVM form);
-        Task<bool> IsNumberInUse(int Id, string Number);
-        Task<int> UpdateAsync(SalesReturnUpdateVM form);
+        Task<string> GetNextFormattedNumber();
+        Task<ResponseModel<int>> SaveAsync(SalesReturnFormVM form);
         Task<SalesReturnDetailPVM> PrintDetails(int returnId);
     }
 }

@@ -5,6 +5,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IReasonOfReturnRepository : IGenericRepository<ReasonOfReturn>
     {
+        Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
         Task<IList<ReasonOfReturnVM>> GetAllReasonOfReturnAsync();
         Task<ForDataTables<ReasonOfReturnVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
 

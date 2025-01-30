@@ -778,7 +778,7 @@ namespace GMGInventory.Application.Repositories
             var invoices = from ret in context.SalesReturnLineItems
                            let tbr = context.SOACRLineItemTBRs.Where(s => s.SalesReturnLineItemId == ret.Id).ToList()
                            where (string.IsNullOrWhiteSpace(search) || ret.InvoiceLineItem!.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) || ("tbr".Contains(search.ToLower()) && ret.InvoiceLineItemId == null))
-                           && ret.SalesReturn.Customer.Id == CustomerId
+                           && ret.SalesReturn.SalesOrder.Customer.Id == CustomerId
                            select new SOACRInvoiceTBRVM
                            {
                                Id = ret.Id,

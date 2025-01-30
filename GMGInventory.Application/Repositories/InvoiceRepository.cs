@@ -100,10 +100,10 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonOptionsModel>> GetInvoiceByCustomer(string search, int page, int customer)
+        public async Task<Select2Model<JsonOptionsModel>> GetInvoiceBySalesOrder(string search, int page, int salesOrderId)
         {
             var invoices = from invoice in context.Invoices
-                           where invoice.SalesOrder.Customer.Id == customer
+                           where invoice.SalesOrder.Id == salesOrderId
                               && (string.IsNullOrWhiteSpace(search)
                               || invoice.ControlNumber.ToLower().Contains(search.ToLower()))
                            orderby invoice.ControlNumber ascending

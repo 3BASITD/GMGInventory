@@ -66,17 +66,19 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetNextFormattedNumberJson()
+        {
+            return Json(await salesReturnRepository.GetNextFormattedNumber());
+        }
+
+        [HttpPost]
         public async Task<IActionResult> SaveJson(SalesReturnFormVM form)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Add);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
 
-            ResponseModel<int> responseModel = new ();
-            var orderId = await salesReturnRepository.SaveAsync(form);
-            responseModel.Status = "Success";
-            responseModel.Message = "Pack successfully submitted";
-            responseModel.NewRow = orderId;
-
+            ResponseModel<int> responseModel = await salesReturnRepository.SaveAsync(form);
             return Json(responseModel);
         }
 
@@ -86,31 +88,6 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             return View(await salesReturnRepository.PrintDetails(Id));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateJson(SalesReturnUpdateVM form)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Edit);
-            if (redirectResult != null) return redirectResult;
-
-            ResponseModel<int> responseModel = new();
-            if(await salesReturnRepository.IsNumberInUse(form.Id, form.ReturnNumber))
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Sales Return Number already in use";
-            }
-            var orderId = await salesReturnRepository.UpdateAsync(form);
-            if(orderId == -1)
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Sales Return cannot be found. Try reloading the page";
-            }
-            responseModel.Status = "Success";
-            responseModel.Message = "Pack successfully updated";
-            responseModel.NewRow = orderId;
-
-            return Json(responseModel);
         }
     }
 }

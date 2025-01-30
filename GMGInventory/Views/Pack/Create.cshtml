@@ -309,7 +309,7 @@
                     var row_data = this.data();
                     var itemchk = $(this.node()).find(".chkclassorder");
                     if (itemchk.prop("checked")) {
-                        if (parseInt(row_data.inventoryQuantity) > 0) {
+                        if (parseInt(row_data.inventoryQuantity) == 0) {
                             if (parseInt(row_data.inventoryQuantity) < parseInt($("#add-quantity").val())) {
                                 $("#add-quantity").val(parseInt(row_data.inventoryQuantity));
                                 alertMessage = "Partial Quantity exceed the Inventory Quantity. Auto adjusted";

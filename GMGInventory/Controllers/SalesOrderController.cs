@@ -25,6 +25,11 @@ namespace GMGInventory.Controllers
             return Json(await salesOrderRepository.GetSalesOrderOptions(search, page));
         }
 
+        public async Task<IActionResult> GetSalesOrderInvoicedOptions(string search, int page)
+        {
+            return Json(await salesOrderRepository.GetSalesOrderInvoicedOptions(search, page));
+        }
+
         public async Task<IActionResult> GetPriceTypeOptions(int? IncludeId)
         {
             return Json(await salesOrderRepository.GetPriceTypeOptions(IncludeId));

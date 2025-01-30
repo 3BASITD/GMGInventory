@@ -27,6 +27,20 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.ReasonOfReturns
+                                .Where(s => s.IsActive || s.Id == IncludeId)
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Name,
+                                    Selected = IncludeId != null && IncludeId == s.Id
+                                })
+                                .OrderBy(s => s.Text)
+                                .ToListAsync();
+        }
+
         public async Task<ForDataTables<ReasonOfReturnVM>> GetAllForDataTablesAsync(DataTablesRequestForm form)
         {
             int totalRecord = 0;

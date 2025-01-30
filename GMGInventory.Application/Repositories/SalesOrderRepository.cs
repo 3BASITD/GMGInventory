@@ -71,6 +71,40 @@ namespace GMGInventory.Application.Repositories
                              Text = order.SalesOrderNumber,
                              CustomerCode = order.Customer.Code,
                              CustomerName = order.Customer.Name,
+                             CustomerAddress = order.Customer
+                                                    .ShippingAddresses
+                                                    .Where(s => s.IsDefault == true)
+                                                    .Select(s => s.Address)
+                                                    .FirstOrDefault(),
+                             SalesOrderDateD = order.SalesOrderDate,
+                             ForwarderName = order.Forwarder.Name
+                         };
+            var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonSalesOrderOptionsModel>
+            {
+                items = ordersFiltered,
+                total_count = orders.Count()
+            };
+        }
+
+        public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderInvoicedOptions(string search, int page)
+        {
+            var orders = from order in context.SalesOrders
+                         where order.Status.Code.ToLower() == "invoiced"
+                         && (string.IsNullOrWhiteSpace(search)
+                         || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         orderby order.SalesOrderNumber ascending
+                         select new JsonSalesOrderOptionsModel
+                         {
+                             Id = order.Id.ToString(),
+                             Text = order.SalesOrderNumber,
+                             CustomerCode = order.Customer.Code,
+                             CustomerName = order.Customer.Name,
+                             CustomerAddress = order.Customer
+                                                    .ShippingAddresses
+                                                    .Where(s => s.IsDefault == true)
+                                                    .Select(s => s.Address)
+                                                    .FirstOrDefault(),
                              SalesOrderDateD = order.SalesOrderDate,
                              ForwarderName = order.Forwarder.Name
                          };

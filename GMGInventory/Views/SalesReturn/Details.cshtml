@@ -54,6 +54,16 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.SONumber)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.SONumber
+                        </b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
                         @if (userAccess.CanEdit)
                         {
                             <label for="return-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.ReturnDate)</label>
@@ -73,33 +83,31 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.UserCreated)
+                            @Html.DisplayNameFor(model => model.CustomerCode)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.UserCreated
+                            @Model?.CustomerCode
                         </b>
                     </p>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @if (userAccess.CanEdit)
-                        {
-                            <label for="return-customer" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.CustomerCode)</label>
-                            <select id="return-customer" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark" name="Customer" style="width: 100%;">
-                                <option></option>
-                            </select>
-                        }
-                        else
-                        {
-                            <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.CustomerCode)
-                            </span>
-                            <b class="d-block form-gayahin">
-                                @Model?.CustomerCode
-                            </b>
-                        }
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerName)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.CustomerName
+                        </b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CustomerAddress)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.CustomerAddress
+                        </b>
                     </p>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -123,31 +131,21 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
                         <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UserCreated)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.UserCreated
+                        </b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
                             @Html.DisplayNameFor(model => model.DateCreated)
                         </span>
                         <b class="d-block form-gayahin">
                             @Model?.DateCreated
                         </b>
-                    </p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        @if (userAccess.CanEdit)
-                        {
-                            <label for="return-customer-name" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.CustomerName)</label>
-                            <input type="text" id="return-customer-name" class="form-control form-control-sm" value="@(Model?.CustomerName)" readonly="readonly" />
-                        }
-                        else
-                        {
-                            <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.CustomerName)
-                            </span>
-                            <b class="d-block form-gayahin">
-                                @Model?.CustomerName
-                            </b>
-                        }
                     </p>
                 </div>
                 @if (Model?.UserModified != null)
@@ -177,61 +175,6 @@
                     </div>
                 }
             </div>
-            @*
-            <div class="row">
-            <div class="col-4">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.SRNumber)
-            </span>
-            <b class="d-block">
-            @Model?.SRNumber
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.CustomerCode)
-            </span>
-            <b class="d-block">
-            @Model?.CustomerCode
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.CustomerName)
-            </span>
-            <b class="d-block">
-            @Model?.CustomerName
-            </b>
-            </p>
-            </div>
-            <div class="col-4">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.ReturnDate)
-            </span>
-            <b class="d-block">
-            @Model?.ReturnDate
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.ReturnBy)
-            </span>
-            <b class="d-block">
-            @Model?.ReturnBy
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.Remarks)
-            </span>
-            <b class="d-block">
-            @(string.IsNullOrEmpty(Model?.Remarks?.Trim()) ? "-" : Model.Remarks)
-            </b>
-            </p>
-            </div>
-            </div>*@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
@@ -382,11 +325,11 @@
         function SaveReturn() {
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("UpdateJson")",
+                url: "@Url.Action("SaveJson")",
                 data: {
                     Id: @Model?.Id,
                     ReturnNumber: $("#return-number").val(),
-                    Customer: $("#return-customer").val() || @Model?.CustomerId,
+                    SalesOrder: @Model?.SOId,
                     ReturnDate: $("#return-date").val(),
                     Remarks: $("#return-remarks").val()
                 },

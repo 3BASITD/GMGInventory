@@ -10,7 +10,7 @@ namespace GMGInventory.Data
             //this.Forwarders = new HashSet<Forwarder>();
             //this.Payments = new HashSet<Payment>();
             this.SalesOrders = new HashSet<SalesOrder>();
-            this.SalesReturns = new HashSet<SalesReturn>();
+            //this.SalesReturns = new HashSet<SalesReturn>();
             //this.SalesReturnTotalReturnAmounts = new HashSet<SalesReturnTotalReturnAmount>();
             this.ShippingAddresses = new HashSet<ShippingAddress>();
             this.SOACRs = new HashSet<SOACR>();
@@ -82,7 +82,7 @@ namespace GMGInventory.Data
         //public ICollection<Forwarder> Forwarders { get; set; }
         //public ICollection<Payment> Payments { get; set; }
         public ICollection<SalesOrder> SalesOrders { get; set; }
-        public ICollection<SalesReturn> SalesReturns { get; set; }
+        //public ICollection<SalesReturn> SalesReturns { get; set; }
         //public ICollection<SalesReturnTotalReturnAmount> SalesReturnTotalReturnAmounts { get; set; }
         public ICollection<ShippingAddress> ShippingAddresses { get; set; }
         public ICollection<SOACR> SOACRs { get; set; }

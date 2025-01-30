@@ -1271,7 +1271,7 @@ namespace GMGInventory.Application.Repositories
                             where ritem.Item.Id == id
                             select new ItemDetailReturnVM
                             {
-                                Customer = ritem.SalesReturn.Customer.Code,
+                                Customer = ritem.SalesReturn.SalesOrder.Customer.Code,
                                 ItemCode = ritem.Item.Code,
                                 ItemName = ritem.Item.Name,
                                 QuantityD = ritem.Quantity,

@@ -21,8 +21,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
-        [Display(Name = "Amount")]
-        public string Quantity => string.Format(SystemFormat.StringIntegerComma, Quantity);
+        [Display(Name = "Quantity")]
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
 
         [Display(Name = "Price")]

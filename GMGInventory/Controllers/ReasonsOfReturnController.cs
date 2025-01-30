@@ -11,7 +11,13 @@ namespace GMGInventory.Controllers
     public class ReasonsOfReturnController(IAccessRepository accessRepository
                                          , IReasonOfReturnRepository reasonOfReturnRepository) : BaseController(accessRepository)
     {
-       
+
+        [HttpPost]
+        public async Task<IActionResult> GetOptionsJson(int? IncludeId)
+        {
+            return Json(await reasonOfReturnRepository.GetOptions(IncludeId));
+        }
+
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReasonsOfReturn, AccessTypes.View);

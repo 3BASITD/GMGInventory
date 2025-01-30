@@ -3,6 +3,7 @@ using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -58,49 +59,49 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue)
-                                    || x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.ItemType.ToLower().Contains(form.SearchValue)
-                                    || x.PriceD.ToString().Contains(form.SearchValue)
-                                    || x.QuantityD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Agent,
+                    s.AmountD.ToString(),
+                    s.Brand,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.ItemType,
+                    s.PriceD.ToString(),
+                    s.QuantityD.ToString()
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                if (form.SortColumn == "Amount" || form.SortColumn == "Price" || form.SortColumn == "Quantity")
                 {
-                    switch (form.SortColumn)
+                    if (form.SortColumnDirection == "asc")
                     {
-                        case "Agent": data = data.OrderBy(s => s.Agent); break;
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderBy(s => s.ItemType); break;
-                        case "Price": data = data.OrderBy(s => s.PriceD); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        default: break;
+                        switch (form.SortColumn)
+                        {
+                            case "Amount": data = data.OrderBy(s => s.AmountD); break;
+                            case "Price": data = data.OrderBy(s => s.PriceD); break;
+                            case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
+                            default: break;
+                        }
+                    }
+                    else if (form.SortColumnDirection == "desc")
+                    {
+                        switch (form.SortColumn)
+                        {
+                            case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
+                            case "Price": data = data.OrderByDescending(s => s.PriceD); break;
+                            case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
+                            default: break;
+                        }
                     }
                 }
-                else if (form.SortColumnDirection == "desc")
+                else
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderByDescending(s => s.Agent); break;
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderByDescending(s => s.ItemType); break;
-                        case "Price": data = data.OrderByDescending(s => s.PriceD); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        default: break;
-                    }
+                    data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
                 }
             }
             //pagination
@@ -1387,14 +1388,14 @@ namespace GMGInventory.Application.Repositories
             var sreturns = from sreturn in context.SalesReturnLineItems
                            where filter.DateFrom <= (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated).Date
                            && (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated).Date <= filter.DateTo
-                           && (filter.Customer == null || sreturn.SalesReturn.Customer.Id == filter.Customer)
+                           && (filter.Customer == null || sreturn.SalesReturn.SalesOrder.Customer.Id == filter.Customer)
                            && (filter.Item == null || sreturn.Item.Id == filter.Item || (filter.Item == 0 && sreturn.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                            select new SalesReturnRVM
                            {
                                Agent = sreturn.InvoiceLineItem == null ? "" : sreturn.InvoiceLineItem.Invoice.SalesOrder.Agent.Code,
                                Brand = sreturn.Item.Brand.Name,
                                ControlNumber = sreturn.InvoiceLineItem == null ? "TBR" : sreturn.InvoiceLineItem.Invoice.ControlNumber,
-                               Customer = sreturn.SalesReturn.Customer.Name,
+                               Customer = sreturn.SalesReturn.SalesOrder.Customer.Name,
                                ItemCode = sreturn.Item.Code,
                                ItemName = sreturn.Item.Name,
                                ItemType = sreturn.Item.ItemType.Code,

@@ -73,6 +73,7 @@ namespace GMGInventory.Common.Models
     {
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
+        public string? CustomerAddress { get; set; }
         public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDateTime);
         public DateTime SalesOrderDateD { get; set; }
         public string ForwarderName { get; set; }

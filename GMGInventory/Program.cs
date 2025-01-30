@@ -80,7 +80,7 @@ builder.Services.AddScoped(typeof(IItemConversionRepository), typeof(ItemConvers
 builder.Services.AddScoped(typeof(IUnitRepository), typeof(UnitRepository));
 builder.Services.AddScoped(typeof(IReportProcurementRepository), typeof(ReportProcurementRepository));
 builder.Services.AddScoped(typeof(IChequeRepository), typeof(ChequeRepository));
-builder.Services.AddScoped(typeof(IShippingRepository), typeof(ShippingRepository));
+//builder.Services.AddScoped(typeof(IShippingRepository), typeof(ShippingRepository));
 builder.Services.AddScoped(typeof(IChequeStatusRepository), typeof(ChequeStatusRepository));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));

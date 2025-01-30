@@ -4664,9 +4664,6 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -4695,8 +4692,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
 
                     b.HasIndex("SalesOrderId");
 
@@ -5851,13 +5846,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "03b90689-93d0-4a3e-a46f-85a78dd3fcd2",
+                            ConcurrencyStamp = "d385a0d9-c69b-4215-8064-3fa50475ed7f",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEI/apb4P3WEnVYuoGPlJOd51gyZtbSZBJ18wI33oY0rxOB+JgzAauWG8SCxjLBim/g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENPA1H5pl+MYmm7Vu9+trOjT3qL0gYcZ1RIFC49zodK1Xfia1b8B+Hh6jvtWfKsDKg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f5450a6b-a6fd-4614-9f49-d52f5e7309aa",
+                            SecurityStamp = "67a20266-c980-4fc7-a83c-b365c034ddd5",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5872,13 +5867,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "37688550-fd85-4a39-b4a1-c664bb3a9b37",
+                            ConcurrencyStamp = "9ed94c96-7b01-4cbe-a507-2cfb0e17df5b",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL5kSt8PwUbnwYGhshQAgacIQzbMXvs0yGpQR7Cg7POc9B0cq4Q7bF//xZi4+KDb2g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJVyTXLvX3OAmrX25rglcXiaJ/R88oXFD00Ehs49lZoGYQeN30Jj0HW6RlakQp7XbQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9b5d4073-dd13-4983-b80c-00aa534bccd3",
+                            SecurityStamp = "fcfd0674-2d40-4d22-82f4-1303a33a3888",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6852,19 +6847,11 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
                 {
-                    b.HasOne("GMGInventory.Data.Customer", "Customer")
-                        .WithMany("SalesReturns")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
                         .WithMany("SalesReturns")
                         .HasForeignKey("SalesOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Customer");
 
                     b.Navigation("SalesOrder");
                 });
@@ -7166,8 +7153,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SOACRs");
 
                     b.Navigation("SalesOrders");
-
-                    b.Navigation("SalesReturns");
 
                     b.Navigation("ShippingAddresses");
                 });
