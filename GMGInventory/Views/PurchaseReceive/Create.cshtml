@@ -8,6 +8,7 @@
 
         ViewData["Title"] = "New Purchase Receive";
     }
+    var userAccessBasic = (ViewsAccessVM)ViewData["UserAccessBasic"]!;
 }
 
 @section Breadcrumb {
@@ -257,7 +258,8 @@
 
 @section Scripts {
     <script>
-       
+        var user_accessBasic = @Html.Raw(Json.Serialize(userAccessBasic));
+
         if ($("#resubmitPRId").length) {
             $("#receive-poNumber").prop('disabled', true);
 
@@ -347,7 +349,7 @@
                     className: "form-cell text-end"
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
-                { data: "unitCost", name: "UnitCost", className: "form-cell" }
+                { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false : true }
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {

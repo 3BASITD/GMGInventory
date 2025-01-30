@@ -4,7 +4,7 @@
     Layout = "";
     var title = "Purchase Receiving Report";
     var items = ViewData["Items"] as List<PurchaseReceiveLineItemVM> ?? new List<PurchaseReceiveLineItemVM>();
-
+    var userAccessBasic = (ViewsAccessVM)ViewData["UserAccessBasic"]!;
 }
 
 <!DOCTYPE html>
@@ -97,8 +97,12 @@
                 <th>PARTICULARS</th>
                 <th style="min-width: 50px;">QTY</th>
                 <th style="min-width: 25px;">UOM</th>
-                <th style="min-width: 50px;">UNIT PRICE</th>
-                <th style="min-width: 50px;">TOTAL AMOUNT</th>
+                @if (!userAccessBasic.CanView)
+                {
+                    <th style="min-width: 50px;">UNIT PRICE</th>
+                    <th style="min-width: 50px;">TOTAL AMOUNT</th>
+                }
+
             </tr>
         </thead>
         <tbody>
@@ -110,8 +114,11 @@
                     <td>@item.ItemDescription</td>
                     <td class="right-text"><nobr>@item.Quantity</nobr></td>
                     <td>@item.UnitCode</td>
-                    <td class="right-text"><nobr>@item.UnitCost</nobr></td>
-                    <td class="right-text"><nobr>@item.TotalAmount</nobr></td>
+                    @if (!userAccessBasic.CanView)
+                    {
+                        <td class="right-text"><nobr>@item.UnitCost</nobr></td>
+                        <td class="right-text"><nobr>@item.TotalAmount</nobr></td>
+                    }
                 </tr>
             }
             @{
@@ -124,8 +131,11 @@
                 <td>* * NOTHING FOLLOWS * *</td>
                 <td></td>
                 <td></td>
-                <td></td>
-                <td></td>
+                @if (!userAccessBasic.CanView)
+                {
+                    <td></td>
+                    <td></td>
+                }
             </tr>
             @if (itemCount < 23)
             {
@@ -137,15 +147,21 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td></td>
-                        <td></td>
+                        @if (!userAccessBasic.CanView)
+                        {
+                            <td></td>
+                            <td></td>
+                        }
                     </tr>
                 }
             }
             <tr>
                 <td colspan="5" class="bb-0 br-0"></td>
-                <td class="br-0 bb-0 bl-0">TOTAL AMOUNT</td>
-                <td class="right-text bb-0 bl-0"><strong>@items.Sum(s => s.TotalAmountD)</strong></td>
+                 @if (!userAccessBasic.CanView)
+                {
+                    <td class="br-0 bb-0 bl-0">TOTAL AMOUNT</td>
+                    <td class="right-text bb-0 bl-0"><strong>@items.Sum(s => s.TotalAmountD)</strong></td>
+                }
             </tr>
             <tr>
                 <td colspan="7">
