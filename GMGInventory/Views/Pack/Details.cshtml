@@ -337,6 +337,10 @@
                 $("#add-quantity").addClass("text-danger");
                 $('span[data-valmsg-for="add-quantity"]').text("Please enter collector receipt");
             } else {
+                var hasItemToAdd = false;
+
+                var successItem = [], warningItem = [];
+                var alertMessage = "";
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
                     var itemchk = $(this.node()).find(".chkclassorder");
@@ -344,9 +348,10 @@
                         if (parseInt(row_data.remainingQuantity) > 0) {
                             if (parseInt(row_data.remainingQuantity) < parseInt($("#add-quantity").val())) {
                                 $("#add-quantity").val(parseInt(row_data.remainingQuantity));
-                                toastr.info("Partial Quantity exceed the Remaining Quantity. Auto adjusted", "Remaining Quantity");
+                                alertMessage = "Partial Quantity exceed the Remaining Quantity. Auto adjusted";
                             }
                             var quantityToPack = 0;
+
                             if ($("#add-partial").prop("checked")) {
                                 quantityToPack = parseInt($("#add-quantity").val());
                                 row_data.remainingQuantity = parseInt(row_data.remainingQuantity) - parseInt($("#add-quantity").val());
@@ -367,20 +372,33 @@
                                 itemName: row_data.itemName,
                                 quantity: quantityToPack
                             };
+
+                            hasItemToAdd = true;
                             itemDT.row.add(toItem).draw();
-                            toastr.success("Added " + row_data.itemCode + " on Packed Item(s)", "Success");
+                            successItem.push(row_data.itemCode);
 
                             this.data(row_data);
                             if (row_data.remainingQuantity == 0) {
                                 $(this.node()).addClass("text-muted");
                             }
                         } else {
-                            toastr.warning(row_data.itemName + " has 0 remaining quantity", "Remaining Quantity");
+                            warningItem.push(row_data.itemCode);
                         }
                     }
                 });
+                if (successItem.length > 0) {
+                    toastr.success("Added " + successItem.join(", ") + " on Packed Item(s)", "Success");
+                }
+                if (alertMessage != "") {
+                    toastr.info(alertMessage, "Remaining Quantity");
+                }
+                if (warningItem.length > 0) {
+                    toastr.warning(warningItem.join(", ") + " has 0 remaining quantity", "Remaining Quantity");
+                }
 
-                $('#add-box').get(0).value++;
+                if (hasItemToAdd) {
+                    $('#add-box').get(0).value++;
+                }
                 $(".chkclassorderall").prop("checked", false);
                 $(".chkclassorderall").prop("indeterminate", false);
             }

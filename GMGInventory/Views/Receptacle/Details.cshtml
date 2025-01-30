@@ -1,0 +1,285 @@
+﻿@model ReceptacleDetailVM
+
+@{
+    ViewData["Title"] = "Receptacle Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Receptacle" asp-action="Index">Receptacle</a></li>
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title po-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.SONumber)
+                    </span>
+                    <b class="d-block">
+                        @Model.SONumber
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.PackNumber)
+                    </span>
+                    <b class="d-block">
+                        @Model.PackNumber
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DeliveryDate)
+                    </span>
+                    <b class="d-block">
+                        @Model.DeliveryDate
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </span>
+                    <b class="d-block">
+                        @Model.Customer
+                    </b>
+                </p>
+            </div>
+            <div class="col-8">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Destination)
+                    </span>
+                    <b class="d-block">
+                        @(Model.Destination == null ? "N/A" : Model.Destination)
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mt-2">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Package Item(s)</span>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-link btn-sm float-right btn-history ml-2" data-bs-toggle="modal" data-bs-target="#historyModal">
+                                <span class="fas fa-history"></span> Print Receptacle History
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-item">
+                            <thead>
+                                <tr>
+                                    <th>Package Number</th>
+                                    <th>Package Type</th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-end">Total</th>
+                                    <th>0</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print History Modal -->
+<div class="modal fade" id="historyModal" role="dialog" aria-labelledby="historyModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Print History</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-head-fixed table-striped table-hover table-history">
+                    <thead>
+                        <tr>
+                            <th>Package Number</th>
+                            <th>Shipping Address</th>
+                            <th>Print Date</th>
+                            <th>Print By</th>
+                            <th>Company As</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemsJson")",
+                data: { packId: @Model.Id },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                },
+                type: "POST",
+            },
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            paging: false,
+            searching: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "boxNumber", name: "BoxNumber", visible: false },
+                { data: "packTypeName", name: "PackTypeName", visible: false },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode"
+                },
+                { data: "itemName", name: "ItemName" },
+                { data: "quantity", name: "Quantity", className: "text-end" }
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                columnDTTotalInteger(api, 4);
+            },
+            order: [[2, "asc"]],
+            orderFixed: [[0, 'asc'], [1, 'asc']],
+            rowGroup: {
+                startRender: function (rows, group) {
+                    console.log();
+                    var tr = '<tr>';
+                    tr += '<td colspan="2"><strong>Package ' + group + '</strong></td>';
+                    tr += '<td class="text-end">';
+                    tr += '<div class="btn-group" role="group">';
+                    tr += '<button type="button" class="btn btn-info btn-xs" disabled="disabled"><i class="fas fa-print"></i></button>';
+                    tr += '<button type="button" class="btn btn-info btn-xs btn-print" data-company="GMG" data-box-number="' + rows.data()[0].boxNumber + '" data-microtip-title="Print as GMG" data-microtip-position="top-right" role="tooltip">GMG</button>';
+                    tr += '<button type="button" class="btn btn-info btn-xs btn-print" data-company="BAS" data-box-number="' + rows.data()[0].boxNumber + '" data-microtip-title="Print as GMG" data-microtip-position="top-right" role="tooltip">BAS</button>';
+                    tr += '</div>';
+                    tr += '</td>';
+                    return $(tr + '</tr>');
+                },
+                endRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="2" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
+                        .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
+                },
+                dataSrc: function (row) {
+                    var boxNo = parseInt(row.boxNumber) + 1;
+                    $('#boxNo').val(parseInt(row.boxNumber) + 1);
+
+                    return "#" + row.boxNumber + " (" + row.packTypeName + ")";
+                }
+            }
+        });
+
+        itemDT.on("draw", function () {
+            hideLoader();
+
+            $(".table-item thead th").removeClass("text-end");
+
+            if (user_access.canPrint) {
+                $(".btn-print").off("click").on("click", function () {
+                    var print_company = $(this).data("company");
+                    var box_number = $(this).data("box-number");
+
+                    $.LoadingOverlay("show", {
+                        image: "",
+                        fontawesome: "fas fa-print"
+                    });
+                    setTimeout(function () {
+                        let win = window.open('@Url.Action("Print")/' + @Model?.Id + '?Company=' + print_company + '&BoxNumber=' + box_number, '');
+                        var wintimer = setInterval(function () {
+                            if (win.closed) {
+                                clearInterval(wintimer);
+                                hideLoader();
+                            }
+                        }, 100);
+                    }, 500);
+                });
+            }
+        });
+
+        // Load List on DataTable
+        var historyDT = $('.table-history').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetReceptaclePrintHistoriesDTJson")",
+                data: { packId: @Model.Id },
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    data: function (data, type, dataToSet) {
+                        return "Package #" + data.boxNumber;
+                    },
+                    name: "BoxNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.shippingAddress == null ? "N/A" : data.shippingAddress;
+                    },
+                    name: "ShippingAddress"
+                },
+                { data: "printDate", name: "PrintDate" },
+                { data: "printBy", name: "PrintBy" },
+                { data: "companyAs", name: "CompanyAs" }
+            ],
+            order: [[2, "desc"]]
+        });
+
+        // Load functions upon DataTable load
+        historyDT.on("draw", function () {
+            hideLoader();
+        });
+
+        $(".btn-history").on("click", function () {
+            historyDT.ajax.reload();
+        });
+    </script>
+}

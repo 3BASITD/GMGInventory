@@ -78,17 +78,6 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateShippingJson(CustomerVM shippingVM)
-        {
-            ResponseModel responseModel = new ResponseModel();
-            await customerRepository.AddShippingAsync(shippingVM);
-            responseModel.Status = "Success";
-            responseModel.Message = "Shipping successfully added";
-
-            return Json(responseModel);
-        }
-
         //[HttpPost]
         //public async Task<JsonResult> CreateForwarderJson(CustomerVM forwarderVM)
         //{
@@ -169,6 +158,50 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetCustomerShippingDTAsync(form, id));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SaveShippingJson(CustomerShippingVM shippingVM)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await customerRepository.SaveShippingAsync(shippingVM);
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetDefaultShippingJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await customerRepository.SetDefaultShippingAsync(Id);
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteOrDeactivateShippingJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await customerRepository.DeleteOrDeactivateShippingAsync(Id);
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReactivateShippingJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await customerRepository.ReactivateShippingAsync(Id);
+
+            return Json(response);
+        }
+
         //[HttpPost]
         //public async Task<JsonResult> GetForwarderJson(int id)
         //{
@@ -247,12 +280,12 @@ namespace GMGInventory.Controllers
                 new DataColumn("Region"),
                 new DataColumn("Area"),
                 new DataColumn("Customer Type"),
-                new DataColumn("Contact Person"),
-                new DataColumn("Contact Number"),
-                new DataColumn("Address"),
+                //new DataColumn("Address"),
+                //new DataColumn("Contact Person"),
+                //new DataColumn("Contact Number"),
+                //new DataColumn("Fax Number"),
                 new DataColumn("Email"),
                 new DataColumn("Agent"),
-                new DataColumn("Fax Number"),
                 new DataColumn("TIN"),
                 new DataColumn("VAT"),
                 new DataColumn("Credit Term"),
@@ -264,8 +297,8 @@ namespace GMGInventory.Controllers
             {
                 dt.Rows.Add(customers.Code, customers.Name, customers.CommissionRateD,
                     customers.RegionName, customers.AreaName, customers.CustomerTypeName,
-                    customers.ContactPerson, customers.ContactNumber, customers.Address, customers.Email,
-                    customers.AgentName, customers.FaxNumber, customers.TIN, customers.VAT, customers.CreditTermName,
+                    //customers.Address, customers.ContactPerson, customers.ContactNumber, customers.FaxNumber,
+                    customers.Email,customers.AgentName, customers.TIN, customers.VAT, customers.CreditTermName,
                     customers.CreditLimit, customers.Remarks);
             }
             using XLWorkbook wb = new();

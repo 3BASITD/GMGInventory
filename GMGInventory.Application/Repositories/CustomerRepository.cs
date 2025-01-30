@@ -34,7 +34,10 @@ namespace GMGInventory.Application.Repositories
                                              Id = s.Id.ToString(),
                                              Text = s.Code,
                                              Name = s.Name,
-                                             Address = s.Address,
+                                             Address = s.ShippingAddresses
+                                                        .Where(a => a.IsDefault == true)
+                                                        .Select(a => a.Address)
+                                                        .FirstOrDefault() ?? "N/A",
                                              CreditTerm = s.CreditTerm.Name,
                                              Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
                                              OutstandingBalanceD = s.OutstandingBalance
@@ -62,7 +65,10 @@ namespace GMGInventory.Application.Repositories
                                              Id = s.Id.ToString(),
                                              Text = s.Code,
                                              Name = s.Name,
-                                             Address = s.Address,
+                                             Address = s.ShippingAddresses
+                                                        .Where(a => a.IsDefault == true)
+                                                        .Select(a => a.Address)
+                                                        .FirstOrDefault() ?? "N/A",
                                              CreditTerm = s.CreditTerm.Name,
                                              Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
                                              OutstandingBalanceD = s.OutstandingBalance,
@@ -96,7 +102,10 @@ namespace GMGInventory.Application.Repositories
                                        Id = c.Id.ToString(),
                                        Text = c.Code,
                                        Name = c.Name,
-                                       Address = c.Address,
+                                       Address = c.ShippingAddresses
+                                                        .Where(a => a.IsDefault == true)
+                                                        .Select(a => a.Address)
+                                                        .FirstOrDefault() ?? "N/A",
                                        CreditTerm = c.CreditTerm.Name,
                                        Agent = c.Agent.FirstName + ' ' + c.Agent.MiddleName + ' ' + c.Agent.LastName,
                                        OutstandingBalanceD = c.OutstandingBalance
@@ -145,10 +154,6 @@ namespace GMGInventory.Application.Repositories
         public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers
-                                  //.Include(s => s.Area)
-                                  //.Include(s => s.CustomerType)
-                                  //.Include(s => s.Agent)
-                                  //.Include(s => s.CreditTerm)
                               join userc in userManager.Users on cust.UserCreated equals userc.Id
                               join userm in userManager.Users on cust.UserModified equals userm.Id into um
                               from userm in um.DefaultIfEmpty()
@@ -158,13 +163,10 @@ namespace GMGInventory.Application.Repositories
                                   Id = cust.Id,
                                   Code = cust.Code,
                                   Name = cust.Name,
-                                  Address = cust.Address,
                                   AgentId = cust.Agent.Id,
                                   AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
                                   AreaId = cust.Area.Id,
                                   AreaName = cust.Area.Name,
-                                  ContactNumber = cust.ContactNumber,
-                                  ContactPerson = cust.ContactPerson,
                                   CommissionRateD = cust.CommissionRate == null ? cust.Area.CommissionRate : cust.CommissionRate,
                                   CommissionRateIsArea = cust.CommissionRate == null,
                                   CustomerAccountStatusId = cust.CustomerAccountStatus.Id,
@@ -175,13 +177,28 @@ namespace GMGInventory.Application.Repositories
                                   CreditTermId = cust.CreditTerm.Id,
                                   CreditTermName = cust.CreditTerm.Name,
                                   Email = cust.Email,
-                                  FaxNumber = cust.FaxNumber,
                                   RegionId = cust.Area.RegionId,
                                   RegionName = cust.Area.Region.Name,
                                   TIN = cust.TIN,
                                   VAT = cust.VAT,
                                   Remarks = cust.Remarks,
                                   IsActive = cust.IsActive,
+                                  //Address = cust.ShippingAddresses
+                                  //              .Where(a => a.IsDefault == true)
+                                  //              .Select(a => a.Address)
+                                  //              .FirstOrDefault() ?? "N/A",
+                                  //ContactNumber = cust.ShippingAddresses
+                                  //                    .Where(a => a.IsDefault == true)
+                                  //                    .Select(a => a.PhoneNumber)
+                                  //                    .FirstOrDefault() ?? "N/A",
+                                  //ContactPerson = cust.ShippingAddresses
+                                  //                    .Where(a => a.IsDefault == true)
+                                  //                    .Select(a => a.ContactPerson)
+                                  //                    .FirstOrDefault() ?? "N/A",
+                                  //FaxNumber = cust.ShippingAddresses
+                                  //                .Where(a => a.IsDefault == true)
+                                  //                .Select(a => a.FaxNumber)
+                                  //                .FirstOrDefault() ?? "N/A",
                                   CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                   DateCreatedD = cust.DateCreated,
                                   ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
@@ -205,13 +222,10 @@ namespace GMGInventory.Application.Repositories
                                 Id = cust.Id,
                                 Code = cust.Code,
                                 Name = cust.Name,
-                                Address = cust.Address,
                                 AgentId = cust.AgentId,
                                 AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
                                 AreaId = cust.AreaId,
                                 AreaName = cust.Area.Name,
-                                ContactNumber = cust.ContactNumber,
-                                ContactPerson = cust.ContactPerson,
                                 CommissionRateD = cust.CommissionRate == null ? cust.Area.CommissionRate : cust.CommissionRate,
                                 CommissionRateIsArea = cust.CommissionRate == null,
                                 CustomerAccountStatusId = cust.CustomerAccountStatusId,
@@ -222,7 +236,6 @@ namespace GMGInventory.Application.Repositories
                                 CreditTermId = cust.CreditTermId,
                                 CreditTermName = cust.CreditTerm.Name,
                                 Email = cust.Email,
-                                FaxNumber = cust.FaxNumber,
                                 OutstandingBalanceD = cust.OutstandingBalance,
                                 RegionId = cust.Area.RegionId,
                                 RegionName = cust.Area.Region.Name,
@@ -230,6 +243,22 @@ namespace GMGInventory.Application.Repositories
                                 VAT = cust.VAT,
                                 Remarks = cust.Remarks,
                                 IsActive = cust.IsActive,
+                                //Address = cust.ShippingAddresses
+                                //              .Where(a => a.IsDefault == true)
+                                //              .Select(a => a.Address)
+                                //              .FirstOrDefault() ?? "N/A",
+                                //ContactNumber = cust.ShippingAddresses
+                                //                    .Where(a => a.IsDefault == true)
+                                //                    .Select(a => a.PhoneNumber)
+                                //                    .FirstOrDefault() ?? "N/A",
+                                //ContactPerson = cust.ShippingAddresses
+                                //                    .Where(a => a.IsDefault == true)
+                                //                    .Select(a => a.ContactPerson)
+                                //                    .FirstOrDefault() ?? "N/A",
+                                //FaxNumber = cust.ShippingAddresses
+                                //                .Where(a => a.IsDefault == true)
+                                //                .Select(a => a.FaxNumber)
+                                //                .FirstOrDefault() ?? "N/A",
                                 CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                 DateCreatedD = cust.DateCreated,
                                 ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
@@ -352,21 +381,21 @@ namespace GMGInventory.Application.Repositories
             cust.Name = custVM.Name;
             cust.IsActive = true;
 
-            cust.Address = custVM.Address;
             cust.AgentId = custVM.AgentId;
             cust.AreaId = custVM.AreaId;
             cust.CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null;
-            cust.ContactNumber = custVM.ContactNumber;
-            cust.ContactPerson = custVM.ContactPerson;
             cust.CreditLimit = custVM.CreditLimitD;
             cust.CreditTermId = custVM.CreditTermId;
             cust.CustomerAccountStatusId = custVM.CustomerAccountStatusId;
             cust.CustomerTypeId = custVM.CustomerTypeId;
             cust.Email = custVM.Email;
-            cust.FaxNumber = custVM.FaxNumber;
             cust.Remarks = custVM.Remarks;
             cust.TIN = custVM.TIN;
             cust.VAT = custVM.VAT;
+            //cust.Address = custVM.Address;
+            //cust.ContactNumber = custVM.ContactNumber;
+            //cust.ContactPerson = custVM.ContactPerson;
+            //cust.FaxNumber = custVM.FaxNumber;
 
             context.Customers.Update(cust);
             await context.SaveChangesAsync(currentUserId);
@@ -376,11 +405,6 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
-            //var customerVM = (from cust in context.Customers
-            //                        .Include(s => s.Area)
-            //                        .Include(s => s.CustomerType)
-            //                        .Include(s => s.Agent)
-            //                        .Include(s => s.CreditTerm)
 
             var cust = new Customer
             {
@@ -388,38 +412,23 @@ namespace GMGInventory.Application.Repositories
                 Name = custVM.Name,
                 IsActive = true,
 
-                Address = custVM.Address,
                 AgentId = custVM.AgentId,
                 AreaId = custVM.AreaId,
                 CommissionRate = custVM.UseAreaRate == false ? custVM.CommissionRateD : null,
-                ContactNumber = custVM.ContactNumber,
-                ContactPerson = custVM.ContactPerson,
                 CreditLimit = custVM.CreditLimitD,
                 CreditTermId = custVM.CreditTermId,
                 CustomerAccountStatusId = custVM.CustomerAccountStatusId,
                 CustomerTypeId = custVM.CustomerTypeId,
                 Email = custVM.Email,
-                FaxNumber = custVM.FaxNumber,
                 Remarks = custVM.Remarks,
                 TIN = custVM.TIN,
                 VAT = custVM.VAT
+                //Address = custVM.Address,
+                //ContactNumber = custVM.ContactNumber,
+                //ContactPerson = custVM.ContactPerson,
+                //FaxNumber = custVM.FaxNumber,
             };
             await context.Customers.AddAsync(cust);
-            await context.SaveChangesAsync(currentUserId);
-        }
-
-        public async Task AddShippingAsync(CustomerVM shippingVM)
-        {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var shipping = new ShippingAddress
-            {
-                CustomerId = shippingVM.Id,
-                Address = shippingVM.ShippingAddress,
-                PhoneNumber = shippingVM.ShippingPhoneNo,
-                FaxNumber = shippingVM.ShippingFaxNo,
-                ContactPerson = shippingVM.ShippingContactPerson
-            };
-            await context.ShippingAddresses.AddAsync(shipping);
             await context.SaveChangesAsync(currentUserId);
         }
 
@@ -451,20 +460,32 @@ namespace GMGInventory.Application.Repositories
                                  Name = cust.Name,
                                  IsActive = true,
 
-                                 Address = cust.Address,
                                  AgentId = cust.AgentId,
                                  AreaId = cust.AreaId,
-                                 ContactNumber = cust.ContactNumber,
-                                 ContactPerson = cust.ContactPerson,
                                  CreditLimitD = cust.CreditLimit,
                                  CreditTermId = cust.CreditTermId,
                                  CustomerAccountStatusId = cust.CustomerAccountStatusId,
                                  CustomerTypeId = cust.CustomerTypeId,
                                  Email = cust.Email,
-                                 FaxNumber = cust.FaxNumber,
                                  Remarks = cust.Remarks,
                                  TIN = cust.TIN,
-                                 VAT = cust.VAT
+                                 VAT = cust.VAT,
+                                 //Address = cust.ShippingAddresses
+                                 //              .Where(a => a.IsDefault == true)
+                                 //              .Select(a => a.Address)
+                                 //              .FirstOrDefault() ?? "N/A",
+                                 //ContactNumber = cust.ShippingAddresses
+                                 //                    .Where(a => a.IsDefault == true)
+                                 //                    .Select(a => a.PhoneNumber)
+                                 //                    .FirstOrDefault() ?? "N/A",
+                                 //ContactPerson = cust.ShippingAddresses
+                                 //                    .Where(a => a.IsDefault == true)
+                                 //                    .Select(a => a.ContactPerson)
+                                 //                    .FirstOrDefault() ?? "N/A",
+                                 //FaxNumber = cust.ShippingAddresses
+                                 //                .Where(a => a.IsDefault == true)
+                                 //                .Select(a => a.FaxNumber)
+                                 //                .FirstOrDefault() ?? "N/A"
                              };
             return await customerVM.ToListAsync();
         }
@@ -524,23 +545,25 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        private async Task<IList<CustomerVM>> GetCustomerShippingAsync(int id)
+        private async Task<IList<CustomerShippingVM>> GetCustomerShippingAsync(int id)
         {
-            var customerVM = from customer in context.Customers
-                             join shipping in context.ShippingAddresses
-                                            on customer.Id equals shipping.CustomerId
+            var customerVM = from shipping in context.ShippingAddresses
                              where shipping.CustomerId == id
-                             select new CustomerVM
+                             select new CustomerShippingVM
                              {
-                                 ShippingAddress = shipping.Address,
-                                 ShippingContactPerson = shipping.ContactPerson,
-                                 ShippingFaxNo = shipping.FaxNumber,
-                                 ShippingPhoneNo = shipping.PhoneNumber
+                                 Id = shipping.Id,
+                                 CustomerId = id,
+                                 Address = shipping.Address,
+                                 ContactPerson = shipping.ContactPerson,
+                                 FaxNumber = shipping.FaxNumber ?? "N/A",
+                                 PhoneNumber = shipping.PhoneNumber ?? "N/A",
+                                 IsDefault = shipping.IsDefault,
+                                 IsActive = shipping.IsActive
                              };
             return await customerVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<CustomerVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id)
+        public async Task<ForDataTables<CustomerShippingVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -550,10 +573,10 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.ShippingAddress.ToString().Contains(form.SearchValue)
-                                    || x.ShippingContactPerson.ToString().Contains(form.SearchValue)
-                                    || x.ShippingFaxNo.ToString().Contains(form.SearchValue)
-                                    || x.ShippingPhoneNo.ToString().Contains(form.SearchValue));
+                data = data.Where(x => x.Address.ToString().Contains(form.SearchValue)
+                                    || x.ContactPerson.ToString().Contains(form.SearchValue)
+                                    || x.FaxNumber.ToString().Contains(form.SearchValue)
+                                    || x.PhoneNumber.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -564,10 +587,10 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "ShippingAddress": data = data.OrderBy(s => s.ShippingAddress); break;
-                        case "ShippingContactPerson": data = data.OrderBy(s => s.ShippingContactPerson); break;
-                        case "ShippingFaxNo": data = data.OrderBy(s => s.ShippingFaxNo); break;
-                        case "ShippingPhoneNo": data = data.OrderBy(s => s.ShippingPhoneNo); break;
+                        case "Address": data = data.OrderBy(s => s.Address); break;
+                        case "ContactPerson": data = data.OrderBy(s => s.ContactPerson); break;
+                        case "FaxNumber": data = data.OrderBy(s => s.FaxNumber); break;
+                        case "PhoneNumber": data = data.OrderBy(s => s.PhoneNumber); break;
                         default: break;
                     }
                 }
@@ -575,23 +598,191 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "ShippingAddress": data = data.OrderByDescending(s => s.ShippingAddress); break;
-                        case "ShippingContactPerson": data = data.OrderByDescending(s => s.ShippingContactPerson); break;
-                        case "ShippingFaxNo": data = data.OrderByDescending(s => s.ShippingFaxNo); break;
-                        case "ShippingPhoneNo": data = data.OrderByDescending(s => s.ShippingPhoneNo); break;
+                        case "Address": data = data.OrderByDescending(s => s.Address); break;
+                        case "ContactPerson": data = data.OrderByDescending(s => s.ContactPerson); break;
+                        case "FaxNumber": data = data.OrderByDescending(s => s.FaxNumber); break;
+                        case "PhoneNumber": data = data.OrderByDescending(s => s.PhoneNumber); break;
                         default: break;
                     }
                 }
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
-            return new ForDataTables<CustomerVM>
+            return new ForDataTables<CustomerShippingVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
                 Data = pageList
             };
+        }
+
+        public async Task<ResponseModel> SaveShippingAsync(CustomerShippingVM shippingVM)
+        {
+            ResponseModel response = new();
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            var checkShipping = await context.ShippingAddresses.Where(s => (shippingVM.Id == null || (shippingVM.Id != null && shippingVM.Id != s.Id)) && s.Address.Trim().ToLower() == shippingVM.Address.Trim().ToLower()).FirstOrDefaultAsync();
+            if (checkShipping != null)
+            {
+                if (checkShipping.CustomerId == shippingVM.CustomerId)
+                {
+                    response.Status = "Error";
+                    response.Message = "Address already added";
+                }
+                else
+                {
+                    response.Status = "Error";
+                    response.Message = "Address is used by different customer";
+                }
+            }
+            else
+            {
+
+                var shipping = await context.ShippingAddresses.Where(s => s.Id == shippingVM.Id).FirstOrDefaultAsync();
+                if (shipping == null)
+                {
+                    shipping = new ShippingAddress
+                    {
+                        CustomerId = shippingVM.CustomerId,
+                        Address = shippingVM.Address,
+                        PhoneNumber = shippingVM.PhoneNumber,
+                        FaxNumber = shippingVM.FaxNumber,
+                        ContactPerson = shippingVM.ContactPerson,
+                        IsActive = true,
+                        IsDefault = false
+                    };
+
+                    await context.ShippingAddresses.AddAsync(shipping);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Address successfully added";
+                }
+                else
+                {
+                    shipping.CustomerId = shippingVM.CustomerId;
+                    shipping.Address = shippingVM.Address;
+                    shipping.PhoneNumber = shippingVM.PhoneNumber;
+                    shipping.FaxNumber = shippingVM.FaxNumber;
+                    shipping.ContactPerson = shippingVM.ContactPerson;
+
+                    context.ShippingAddresses.Update(shipping);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Address successfully updated";
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> SetDefaultShippingAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+
+            var shipping = await context.ShippingAddresses.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (shipping == null)
+            {
+                response.Status = "Error";
+                response.Message = "Address is invalid";
+            }
+            else
+            {
+                var others = await context.ShippingAddresses
+                                          .Where(s => s.CustomerId == shipping.CustomerId && s.IsDefault == true)
+                                          .ToListAsync();
+                foreach (var other in others)
+                {
+                    other.IsDefault = false;
+                }
+                context.ShippingAddresses.UpdateRange(others);
+
+                shipping.IsDefault = true;
+                context.ShippingAddresses.Update(shipping);
+
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Default address successfully updated";
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> DeleteOrDeactivateShippingAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+            var shipping = await context.ShippingAddresses.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (shipping == null)
+            {
+                response.Status = "Error";
+                response.Message = "Address is invalid";
+            }
+            else if (shipping.IsDefault == true)
+            {
+                response.Status = "Error";
+                response.Message = "Cannot delete default address";
+            }
+            else
+            {
+                if (await context.ShippingAddresses.AnyAsync(s => s.CustomerId == shipping.CustomerId
+                                                               && s.Id != shipping.Id
+                                                               && s.IsActive == true))
+                {
+                    if (await context.ReceptaclePrintHistories.AnyAsync(s => s.ShippingAddressId == shipping.Id))
+                    {
+                        shipping.IsActive = false;
+                        context.ShippingAddresses.Update(shipping);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        response.Status = "Success";
+                        response.Message = "Address successfully deactivated";
+                    }
+                    else
+                    {
+                        context.ShippingAddresses.Remove(shipping);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        response.Status = "Success";
+                        response.Message = "Address successfully deleted";
+                    }
+                }
+                else
+                {
+                    response.Status = "Error";
+                    response.Message = "Cannot delete because this is the only active address of the customer";
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> ReactivateShippingAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+            var shipping = await context.ShippingAddresses.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (shipping == null)
+            {
+                response.Status = "Error";
+                response.Message = "Address is invalid";
+            }
+            else
+            {
+                shipping.IsActive = true;
+                shipping.IsDefault = false;
+                context.ShippingAddresses.Update(shipping);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Address successfully reactivated";
+            }
+
+            return response;
         }
 
         //private async Task<IList<CustomerVM>> GetCustomerForwarderAsync(int id)
@@ -843,8 +1034,6 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-
-
         public async Task<bool> UploadCombinationExistAsync(CustomerVM customerVM)
         {
             return (await GetAllCustomerAsync()).Any(s => s.Code == customerVM.Code
@@ -853,12 +1042,12 @@ namespace GMGInventory.Application.Repositories
                                                        && s.RegionName == customerVM.RegionName
                                                        && s.AreaName == customerVM.AreaName
                                                        && s.CustomerTypeName == customerVM.CustomerTypeName
-                                                       && s.ContactPerson == customerVM.ContactPerson
-                                                       && s.ContactNumber == customerVM.ContactNumber
-                                                       && s.Address == customerVM.Address
                                                        && s.Email == customerVM.Email
                                                        && s.AgentName == customerVM.AgentName
-                                                       && s.FaxNumber == customerVM.FaxNumber
+                                                       //&& s.ContactPerson == customerVM.ContactPerson
+                                                       //&& s.ContactNumber == customerVM.ContactNumber
+                                                       //&& s.Address == customerVM.Address
+                                                       //&& s.FaxNumber == customerVM.FaxNumber
                                                        && s.TIN == customerVM.TIN
                                                        && s.VAT == customerVM.VAT
                                                        && s.CreditTermName == customerVM.CreditTermName

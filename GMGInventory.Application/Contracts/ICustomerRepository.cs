@@ -23,7 +23,6 @@ namespace GMGInventory.Application.Contracts
         Task ReactivateCustomerAsync(int id);
         Task AddAsync(CustomerVM custVM);
 
-        Task AddShippingAsync(CustomerVM shippingVM);
         //Task AddForwarderAsync(CustomerVM forwarderVM);
         Task UpdateAsync(CustomerVM custVM);
 
@@ -35,7 +34,12 @@ namespace GMGInventory.Application.Contracts
         Task<int?> GetIdAsync(string? Name);
         Task<int?> GetIdByCodeAsync(string? Code);
 
-        Task<ForDataTables<CustomerVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<CustomerShippingVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id);
+        Task<ResponseModel> SaveShippingAsync(CustomerShippingVM shippingVM);
+        Task<ResponseModel> SetDefaultShippingAsync(int Id);
+        Task<ResponseModel> DeleteOrDeactivateShippingAsync(int Id);
+        Task<ResponseModel> ReactivateShippingAsync(int Id);
+
         //Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerPaymentDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerReceivableDTAsync(DataTablesRequestForm form, int id);

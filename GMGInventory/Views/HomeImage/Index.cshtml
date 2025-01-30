@@ -184,7 +184,10 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.displayOrder == 0 ? "deleted" : data.displayOrder;
+                        var dateExpiry = new Date(data.dateModified);
+                        dateExpiry.setDate(dateExpiry.getDate() + 7);
+
+                        return data.displayOrder == 0 ? "deleted (expires on: " + formatDateEn(dateExpiry) + ")" : data.displayOrder;
                     },
                     name: "DisplayOrder",
                     className: "form-cell"

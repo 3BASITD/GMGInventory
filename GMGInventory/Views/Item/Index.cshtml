@@ -353,6 +353,17 @@
         function LoadSelect2() {
             if (loadselect2loaded) return;
             loadselect2loaded = true;
+
+            $('.select2filter').select2({
+                allowClear: true,
+                placeholder: {
+                    id: "",
+                    text: "<empty>"
+                },
+                width: 'resolve',
+                dropdownParent: $("#filterModal")
+            });
+
             if (user_access.canAdd || user_access.canEdit) {
                 // Load Select2 Unit
                 $.ajax({

@@ -46,7 +46,7 @@ namespace GMGInventory.Application.Repositories
                          let quantityInvoiced = context.InvoiceLineItems
                                                        .Where(s => s.Invoice.SalesOrderId == order.SalesOrderId)
                                                        .Sum(s => (int?)s.Quantity) ?? 0
-                         where order.Status.Code != "Posted"
+                         where order.Status.Code.ToLower() != "posted"
                          && quantityOrdered != quantityInvoiced
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.Id.ToString().ToLower().Contains(search.ToLower().Trim())))

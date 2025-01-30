@@ -6,7 +6,7 @@ namespace GMGInventory.Data
     {
         public ReasonOfReturn()
         {
-            Invoices = new HashSet<Invoice>();
+            SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
         }
 
         [Column(TypeName = "nvarchar(10)")]
@@ -16,6 +16,6 @@ namespace GMGInventory.Data
         public string Name { get; set; }
 
         public bool IsActive { get; set; }
-        public ICollection<Invoice> Invoices { get; set; }
+        public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
     }
 }

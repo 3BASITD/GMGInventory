@@ -143,7 +143,7 @@
     </form>
 </div>
 
- @if (userAccess.CanAdd)
+@if (userAccess.CanAdd)
 {
     <!-- Save Order Item Modal -->
     <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -161,9 +161,9 @@
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-code" class="form-label mb-0">Code</label>
-                                        <select id="add-code" name="Code" style="width: 100%;">
-                                            <option></option>
-                                        </select>
+                                    <select id="add-code" name="Code" style="width: 100%;">
+                                        <option></option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">
@@ -192,7 +192,8 @@
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-unit-price" class="form-label mb-0">Unit Price <span class="add-price-source"></span></label>
-                                    <input type="number" step="0.01" min="0.00" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
+                                    @*<input type="number" step="0.01" min="0.00" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />*@
+                                    <input type="text" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" readonly="readonly" />
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">
@@ -338,7 +339,6 @@
             $("#order-credit-term").val($(this).select2("data")[0].creditTerm);
             $("#order-region").val($(this).select2("data")[0].region);
             $("#order-customer-status").val($(this).select2("data")[0].customerStatus);
-            $("#order-delivery-date").val($(this).select2("data")[0].requiredDeliveryDate3);
 
             if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
                 toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance");
@@ -613,15 +613,15 @@
                 {
                     data: function (data, type, dataToSet) {
                         return (data.inventoryCount == 0 ? "<span class='text-danger'>" : "")
-                             + data.inventoryCount
-                             + (data.inventoryCount == 0 ? "</span>" : "");
+                            + data.inventoryCount
+                            + (data.inventoryCount == 0 ? "</span>" : "");
                     },
                     name: "InventoryCount",
                     className: "form-cell text-end"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + data.unitPrice + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
+                        return FormatStringDecimal(data.unitPrice);
                     },
                     name: "UnitPrice",
                     className: "form-cell text-end"
@@ -655,10 +655,14 @@
             $(".table-item thead th").removeClass("form-cell");
             //$(".table-item thead th").removeClass("text-end");
 
-            $(".quantity, .sellingprice, .discount1, .discount2").on("input", function () {
+            $(".quantity, .discount1, .discount2").on("input", function () {
+                var row = itemDT.row($(this).closest('tr'));
+                var rowData = row.data();
+
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
+                var unit_price = rowData.unitPrice;
 
                 //var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
                 var gross_price = FormatStringDecimal(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
@@ -691,7 +695,8 @@
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
+                //var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
+                var row_unitprice = row_data.unitPrice;
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
                 item_to_order.push({
@@ -721,7 +726,7 @@
                 CustomerCode: { required: "Please select customer" },
                 AgentCode: { required: "Please select agent" },
                 OrderDate: { required: "Please select date of order" },
-                DeliveryDate: { 
+                DeliveryDate: {
                     required: "Please select date of delivery",
                     greaterThanOrEqualDate: "Required delivery date must be on or after the order date"
                 }
@@ -821,4 +826,4 @@
             });
         }
     </script>
-        }
+}

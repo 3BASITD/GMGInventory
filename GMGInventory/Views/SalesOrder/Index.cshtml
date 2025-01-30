@@ -130,12 +130,8 @@
                     <div class="col-12">
                         <div class="form-group">
                             <label for="filter-status" class="control-label mb-0">Status</label>
-                            <select id="filter-status" class="form-control form-control-sm">
-                                <option value="">All</option>
-                                <option value="Submitted">My Submission</option>
-                                <option value="ApprovedDisapproved">Approved / Disapproved</option>
-                                <option value="Approval">For Approval</option>
-                                <option value="Approved">Approved by Me</option>
+                            <select id="filter-status" style="width:100%">
+                                <option></option>
                             </select>
                         </div>
                     </div>
@@ -226,7 +222,7 @@
             $("#filter-customer").select2({
                 minimumInputLength: 1,
                 allowClear: true,
-                placeholder: '<empty>',
+                placeholder: '<All>',
                 templateResult: function (repo) {
                     if (repo.loading) {
                         return repo.text;
@@ -273,7 +269,7 @@
                 success: function (data, status, xhr) {
                     $("#filter-region").select2({
                         allowClear: true,
-                        placeholder: '<empty>',
+                        placeholder: '<All>',
                         data: data,
                         minimumResultsForSearch: Infinity
                     });
@@ -290,9 +286,23 @@
                         allowClear: true,
                         placeholder: {
                             id: "",
-                            text: "<empty>"
+                            text: "<All>"
                         },
                         dropdownParent: $("#editModal")
+                    });
+                }
+            });
+
+            // Load status data for select2
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetStatusOptions")",
+                success: function (data, status, xhr) {
+                    $("#filter-status").select2({
+                        allowClear: true,
+                        placeholder: '<All>',
+                        data: data,
+                        minimumResultsForSearch: Infinity
                     });
                 }
             });
@@ -319,7 +329,7 @@
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-                    data.StatusCode = $("#filter-status").val();
+                    data.Status = $("#filter-status").val();
                 },
                 type: "POST",
             },
@@ -399,7 +409,7 @@
 
                 urlQuery.push("DateFrom=" + $("#filter-from").val());
                 urlQuery.push("DateTo=" + $("#filter-to").val());
-                urlQuery.push("StatusCode=" + $("#filter-status").val());
+                urlQuery.push("Status=" + $("#filter-status").val());
 
 
                 window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");

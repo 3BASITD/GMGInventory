@@ -30,6 +30,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<HomeImageVM>> GetListAsync()
         {
+            await DeleteAfter7Days();
+            await DeleteNotInDB();
+
             var images = from image in context.HomeImages
                          join userc in userManager.Users on image.UserCreated equals userc.Id
                          join userm in userManager.Users on image.UserModified equals userm.Id into m
@@ -49,6 +52,52 @@ namespace GMGInventory.Application.Repositories
                              DateModifiedD = image.DateModified
                          };
             return await images.ToListAsync();
+        }
+
+        private async Task DeleteAfter7Days()
+        {
+            var expiredDay = DateTime.Today.AddDays(-7);
+            var images = await context.HomeImages.Where(s => s.DisplayOrder == 0 && s.DateModified != null && expiredDay >= s.DateModified).ToListAsync();
+
+            var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images\\HomeImages");
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            foreach (var image in images)
+            {
+                var filePath = Path.Combine(uploadsFolder, image.File);
+
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+
+                context.HomeImages.Remove(image);
+                await context.SaveChangesAsync(currentUserId);
+            }
+        }
+
+        private async Task DeleteNotInDB()
+        {
+            try
+            {
+                var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images\\HomeImages");
+
+                var databaseFiles = await context.HomeImages.Select(image => image.File).ToListAsync();
+
+                var folderFiles = Directory.GetFiles(uploadsFolder).Select(Path.GetFileName).ToList();
+
+                var filesToDelete = folderFiles.Except(databaseFiles).ToList();
+
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                foreach (var fileName in filesToDelete)
+                {
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+                }
+            }
+            catch (Exception) { }
         }
 
         public async Task<ForDataTables<HomeImageVM>> GetListDTAsync(DataTablesRequestForm form)

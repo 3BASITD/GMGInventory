@@ -242,7 +242,7 @@
                             <table class="table table-head-fixed table-striped table-hover table-item">
                                 <thead>
                                     <tr>
-                                        <th>Defective</th>
+                                        <th>Reason of Return</th>
                                         <th>Item Code</th>
                                         <th>Item Name</th>
                                         <th>Quantity</th>
@@ -334,18 +334,7 @@
                 return: true,
             },
             columns: [
-                {
-                    orderable: false,
-                    data: function (data, type, dataToSet) {
-                        var actions = '';
-                        if (data.isDefective) {
-                            actions += '<span class="fas fa-check text-danger"></span>';
-                        } else {
-                            actions += '<span class="fas fa-times text-success"></span>';
-                        }
-                        return actions;
-                    }
-                },
+                { data: "reasonOfReturn", name: "ReasonOfReturn" },
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },

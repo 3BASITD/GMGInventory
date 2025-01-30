@@ -15,9 +15,15 @@
                     <span class="fas fa-print"></span> Print
                 </button>
             }
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterPriceModal">
+            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterPriceModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -577,6 +583,55 @@
                     }, 100);
                 }, 500);
             }
+        }
+
+        if (user_access.canUploadDownload) {
+            $(".downloadBtn").click(function (e) {
+                var urlQuery = [];
+
+                var brandId = $("#filter-brand").val();
+                if (brandId) {
+                    if (isNaN(brandId)) {
+                        urlQuery.push("BrandId=0");
+                        urlQuery.push("BrandKeyword=" + brandId);
+                    } else {
+                        urlQuery.push("BrandId=" + brandId);
+                    }
+                }
+
+                var itemTypeId = $("#filter-type").val();
+                if (itemTypeId) {
+                    if (isNaN(itemTypeId)) {
+                        urlQuery.push("ItemTypeId=0");
+                        urlQuery.push("ItemTypeKeyword=" + itemTypeId);
+                    } else {
+                        urlQuery.push("ItemTypeId=" + itemTypeId);
+                    }
+                }
+
+                var itemId = $("#filter-item-code").val();
+                if (itemId) {
+                    if (isNaN(itemId)) {
+                        urlQuery.push("ItemId=0");
+                        urlQuery.push("ItemCategory=" + itemId);
+                    } else {
+                        urlQuery.push("ItemId=" + itemId);
+                    }
+                }
+
+                var model = $("#filter-model").select2("data")[0].text;
+                if (model) {
+                    urlQuery.push("ModelNumber=" + model);
+                }
+
+                var size = $("#filter-size").select2("data")[0].text;
+                if (size) {
+                    urlQuery.push("Size=" + size);
+                }
+
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+            });
+
         }
     </script>
 }

@@ -1,0 +1,117 @@
+﻿@model ReceptacleDetailVM
+
+@{
+    Layout = "";
+    var title = "Receptacle";
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <table class="formatted receptacle">
+        <tr>
+            <td class="center-text" style="width: 25%;">
+                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                {
+                    <img src="~/images/BAS-02.png" class="logo" />
+                }
+                else
+                {
+                    <img src="~/images/GMG-01.png" class="logo" />
+                }
+            </td>
+            <td colspan="3">
+                <dl>
+                    <dd>AUTO PARTS TRADING</dd>
+                    <dt>PACK DATE: @Model.PackDate.ToUpper()</dt>
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <dl>
+                    <dt>CUSTOMER NAME</dt>
+                    <dd>@Model.Customer.ToUpper()</dd>
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <dl>
+                    <dt>DESTINATION</dt>
+                    <dd>@(Model.Destination == null ? "*** NO SHIPPING ADDRESS ***" : Model.Destination.ToUpper())</dd>
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <dl>
+                    <dt>SALES ORDER NUMBER</dt>
+                </dl>
+                <svg id="barcode"></svg>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <dl>
+                    <dt>REQUIRED DELIVERY DATE</dt>
+                    <dd>@Model.DeliveryDate.ToUpper()</dd>
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="width: 50%;">
+                <dl>
+                    <dt>PACKAGING TYPE</dt>
+                    <dd>@Model.PackagingType.ToUpper()</dd>
+                </dl>
+            </td>
+            <td colspan="2">
+                <dl>
+                    <dt>PACKAGE #</dt>
+                    <dd>Package #@Model.BoxNumber</dd>
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <dl>
+                    <dt>TOTAL ITEMS</dt>
+                    <dd>@Model.TotalItems</dd>
+                </dl>
+            </td>
+            <td colspan="2">
+                <dl>
+                    <dt>TOTAL PACKAGE</dt>
+                    <dd>@Model.TotalPackage</dd>
+                </dl>
+            </td>
+        </tr>
+    </table>
+</body>
+<script src="~/lib/jsbarcode/JsBarcode.all.min.js"></script>
+<script type="text/javascript">
+    JsBarcode("#barcode", "@Model.SONumber.ToUpper()", {
+        format: "CODE128", // Barcode format (e.g., CODE128, EAN, UPC)
+        lineColor: "#000", // Color of the barcode
+        width: 3,          // Width of the bars
+        height: 75,        // Height of the bars
+        displayValue: true // Show the text below the barcode
+    });
+
+    window.print();
+    window.onafterprint = function () {
+        setTimeout(function () {
+            window.close();
+        }, 100);
+    };
+</script>
+</html>

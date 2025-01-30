@@ -16,12 +16,6 @@
             <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
-            @if (userAccess.CanAdd)
-            {
-                <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
-                    <span class="fas fa-plus"></span> Add Shipping Details
-                </button>
-            }
             @if (userAccess.CanEdit)
             {
                 <button type="button" class="btn btn-primary btn-sm float-right editBtn ml-2" data-bs-toggle="modal" data-bs-target="#editModal">
@@ -101,43 +95,43 @@
                     </b>
                 </p>
             </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ContactPerson)
-                    </span>
-                    <b class="d-block details-contact-person">
-                        @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
-                    </b>
-                </p>
+            @* <div class="col-12 col-md-4 col-sm-6">
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.ContactPerson)
+            </span>
+            <b class="d-block details-contact-person">
+            @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "N/A" : Model?.ContactPerson)
+            </b>
+            </p>
             </div>
             <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ContactNumber)
-                    </span>
-                    <b class="d-block details-contact-number">
-                        @(string.IsNullOrWhiteSpace(Model?.ContactNumber) ? "-" : Model?.ContactNumber)
-                    </b>
-                </p>
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.ContactNumber)
+            </span>
+            <b class="d-block details-contact-number">
+            @(string.IsNullOrWhiteSpace(Model?.ContactNumber) ? "N/A" : Model?.ContactNumber)
+            </b>
+            </p>
             </div>
             <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Address)
-                    </span>
-                    <b class="d-block details-address">
-                        @(string.IsNullOrWhiteSpace(Model?.Address) ? "-" : Model?.Address)
-                    </b>
-                </p>
-            </div>
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.Address)
+            </span>
+            <b class="d-block details-address">
+            @(string.IsNullOrWhiteSpace(Model?.Address) ? "N/A" : Model?.Address)
+            </b>
+            </p>
+            </div> *@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Email)
                     </span>
                     <b class="d-block details-email">
-                        @(string.IsNullOrWhiteSpace(Model?.Email) ? "-" : Model?.Email)
+                        @(string.IsNullOrWhiteSpace(Model?.Email) ? "N/A" : Model?.Email)
                     </b>
                 </p>
             </div>
@@ -147,27 +141,27 @@
                         @Html.DisplayNameFor(model => model.AgentName)
                     </span>
                     <b class="d-block details-agent">
-                        @(string.IsNullOrWhiteSpace(Model?.AgentName) ? "-" : Model?.AgentName)
+                        @(string.IsNullOrWhiteSpace(Model?.AgentName) ? "N/A" : Model?.AgentName)
                     </b>
                 </p>
             </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.FaxNumber)
-                    </span>
-                    <b class="d-block details-fax-number">
-                        @(string.IsNullOrWhiteSpace(Model?.FaxNumber) ? "-" : Model?.FaxNumber)
-                    </b>
-                </p>
-            </div>
+            @* <div class="col-12 col-md-4 col-sm-6">
+            <p class="text-sm">
+            <span class="text-muted">
+            @Html.DisplayNameFor(model => model.FaxNumber)
+            </span>
+            <b class="d-block details-fax-number">
+            @(string.IsNullOrWhiteSpace(Model?.FaxNumber) ? "N/A" : Model?.FaxNumber)
+            </b>
+            </p>
+            </div> *@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.TIN)
                     </span>
                     <b class="d-block details-tin">
-                        @(string.IsNullOrWhiteSpace(Model?.TIN) ? "-" : Model?.TIN)
+                        @(string.IsNullOrWhiteSpace(Model?.TIN) ? "N/A" : Model?.TIN)
                     </b>
                 </p>
             </div>
@@ -177,7 +171,7 @@
                         @Html.DisplayNameFor(model => model.VAT)
                     </span>
                     <b class="d-block details-vat">
-                        @(string.IsNullOrWhiteSpace(Model?.VAT) ? "-" : Model?.VAT)
+                        @(string.IsNullOrWhiteSpace(Model?.VAT) ? "N/A" : Model?.VAT)
                     </b>
                 </p>
             </div>
@@ -227,7 +221,7 @@
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
                     <b class="d-block details-remarks">
-                        @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model?.Remarks)
+                        @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "N/A" : Model?.Remarks)
                     </b>
                 </p>
             </div>
@@ -360,18 +354,29 @@
         </div>*@
         <div class="row">
             <div class="col-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        Shipping Address Details
+                <div class="card">
+                    <div class="card-header bg-light">
+
+                        <span class="card-title">Shipping Address Details</span>
+                        <div class="card-tools">
+                            @if (userAccess.CanAdd)
+                            {
+                                <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
+                                    <span class="fas fa-plus"></span> Add Shipping Details
+                                </button>
+                            }
+                        </div>
                     </div>
                     <div class="card-body">
                         <table class="table table-head-fixed table-striped table-hover table-shipping">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Address</th>
                                     <th>Contact Person</th>
                                     <th>Fax Number</th>
                                     <th>Phone Number</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                         </table>
@@ -381,8 +386,8 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
+                <div class="card">
+                    <div class="card-header bg-light">
                         Receivables
                     </div>
                     <div class="card-body">
@@ -407,8 +412,8 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
+                <div class="card">
+                    <div class="card-header bg-light">
                         Payments
                     </div>
                     <div class="card-body">
@@ -507,26 +512,26 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="edit-contact-person" class="control-label mb-0 d-block">Contact Person</label>
-                                <input type="text" name="ContactPerson" id="edit-contact-person" class="form-control form-control-sm" />
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="edit-contact-number" class="control-label mb-0 d-block">Contact Number</label>
-                                <input type="text" name="ContactNumber" id="edit-contact-number" class="form-control form-control-sm" />
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="edit-address" class="control-label mb-0 d-block">Address</label>
-                                <input type="text" name="Address" id="edit-address" class="form-control form-control-sm" />
-                            </div>
-                        </div>
+                    @* <div class="row">
+                    <div class="col-md-4">
+                    <div class="form-group">
+                    <label for="edit-contact-person" class="control-label mb-0 d-block">Contact Person</label>
+                    <input type="text" name="ContactPerson" id="edit-contact-person" class="form-control form-control-sm" />
                     </div>
+                    </div>
+                    <div class="col-md-4">
+                    <div class="form-group">
+                    <label for="edit-contact-number" class="control-label mb-0 d-block">Contact Number</label>
+                    <input type="text" name="ContactNumber" id="edit-contact-number" class="form-control form-control-sm" />
+                    </div>
+                    </div>
+                    <div class="col-md-4">
+                    <div class="form-group">
+                    <label for="edit-address" class="control-label mb-0 d-block">Address</label>
+                    <input type="text" name="Address" id="edit-address" class="form-control form-control-sm" />
+                    </div>
+                    </div>
+                    </div> *@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
@@ -541,10 +546,17 @@
                                 </select>
                             </div>
                         </div>
+                        @* <div class="col-md-4">
+                        <div class="form-group">
+                        <label for="edit-fax-number" class="control-label mb-0 d-block">Fax Number</label>
+                        <input type="text" name="FaxNumber" id="edit-fax-number" class="form-control form-control-sm" />
+                        </div>
+                        </div> *@
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-fax-number" class="control-label mb-0 d-block">Fax Number</label>
-                                <input type="text" name="FaxNumber" id="edit-fax-number" class="form-control form-control-sm" />
+                                <label for="edit-account-status" class="control-label mb-0 d-block">Customer Account Status</label>
+                                <select name="CustomerAccountStatus" id="edit-account-status" class="form-control" style="width: 100%">
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -576,15 +588,6 @@
                                 <input type="number" name="CreditLimit" id="edit-credit-limit" class="form-control form-control-sm" />
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="edit-account-status" class="control-label mb-0 d-block">Customer Account Status</label>
-                                <select name="CustomerAccountStatus" id="edit-account-status" class="form-control" style="width: 100%">
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label for="edit-remarks" class="control-label mb-0 d-block">Remarks</label>
@@ -622,12 +625,13 @@
                 </button>
             </div>
             <form autocomplete="off" id="shippingForm">
+                <input type="hidden" name="Id" id="save-shipping-id" />
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-shipping-address" class="control-label mb-0 d-block">Address</label>
-                                <input type="text" name="ShippingAddress" id="create-shipping-address" class="form-control form-control-sm" />
+                                <label for="save-shipping-address" class="control-label mb-0 d-block">Address</label>
+                                <input type="text" name="Address" id="save-shipping-address" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -635,8 +639,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-shipping-cperson" class="control-label mb-0 d-block">Contact Person</label>
-                                <input type="text" name="ShippingContactPerson" id="create-shipping-cperson" class="form-control form-control-sm" />
+                                <label for="save-shipping-cperson" class="control-label mb-0 d-block">Contact Person</label>
+                                <input type="text" name="ContactPerson" id="save-shipping-cperson" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -644,8 +648,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-shipping-cnumber" class="control-label mb-0 d-block">Phone Number</label>
-                                <input type="text" name="ShippingPhoneNo" id="create-shipping-cnumber" class="form-control form-control-sm" />
+                                <label for="save-shipping-cnumber" class="control-label mb-0 d-block">Phone Number</label>
+                                <input type="text" name="PhoneNumber" id="save-shipping-cnumber" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -653,8 +657,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="create-shipping-fnumber" class="control-label mb-0 d-block">Fax Number</label>
-                                <input type="text" name="ShippingFaxNo" id="create-shipping-fnumber" class="form-control form-control-sm" />
+                                <label for="save-shipping-fnumber" class="control-label mb-0 d-block">Fax Number</label>
+                                <input type="text" name="FaxNumber" id="save-shipping-fnumber" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -745,6 +749,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         //$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
         //    var selectedTab = e.currentTarget.dataset.bsTarget;
         //    if (selectedTab == "#nav-shipping") shippingDT.ajax.reload();
@@ -804,7 +810,7 @@
                         page: params.page || 1,
                         region: $("#edit-region").val(),
                         includeId: @Model?.AreaId
-                            };
+                                    };
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
@@ -911,16 +917,149 @@
                 return: true,
             },
             columns: [
-                { data: "shippingAddress", name: "ShippingAddress" },
-                { data: "shippingContactPerson", name: "ShippingContactPerson" },
-                { data: "shippingFaxNo", name: "ShippingFaxNo" },
-                { data: "shippingPhoneNo", name: "ShippingPhoneNo" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        if (data.isDefault == true) {
+                            return '<span class="text-success" data-microtip-title="Default Address" data-microtip-position="top" role="tooltip"><i class="fas fa-star"></i></span>';
+                        } else {
+                            return '';
+                        }
+                    }
+                },
+                { data: "address", name: "Address" },
+                { data: "contactPerson", name: "ContactPerson" },
+                { data: "faxNumber", name: "FaxNumber" },
+                { data: "phoneNumber", name: "PhoneNumber" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        if (user_access.canEdit) {
+                            if (data.isActive != true) {
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-shipping" data-microtip-title="Reactivate Shipping Address" data-microtip-position="top" role="tooltip"><i class="fas fa-check"></i></button>';
+                            } else {
+                                if (data.isDefault != true) {
+                                    actions += '<button type="button" class="btn btn-info btn-xs btn-default-shipping" data-microtip-title="Set Default Shipping Address" data-microtip-position="top" role="tooltip"><i class="fas fa-star"></i></button>';
+                                }
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-update-shipping" data-microtip-title="Update Shipping Address" data-microtip-position="top" role="tooltip"><i class="fas fa-edit"></i></button>';
+                            }
+                        }
+                        if (user_access.canDelete && data.isActive == true) {
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-shipping" data-microtip-title="Delete / Deactivate Shipping Address" data-microtip-position="top" role="tooltip"><i class="fas fa-trash-alt"></i></button>';
+                        }
+                        return actions + '</div>';
+                    },
+                    className: "form-cell"
+                }
 
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
             HideLoader("shipping");
 
+            if (user_access.canDelete) {
+                $('.btn-remove-shipping').off("click").on("click", function () {
+                    swal({
+                        title: "Delete / Deactivate Shipping Address",
+                        text: "Are you sure you want to remove this record?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = shippingDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("DeleteOrDeactivateShippingJson")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        shippingDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (user_access.canEdit) {
+                $('.btn-default-shipping').off("click").on("click", function () {
+                    swal({
+                        title: "Set Default Shipping Address",
+                        text: "Are you sure you want to make this record as default?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = shippingDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("SetDefaultShippingJson")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        shippingDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+
+                $('.btn-reactivate-shipping').off("click").on("click", function () {
+                    swal({
+                        title: "Reactivate Shipping Address",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = shippingDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("ReactivateShippingJson")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        shippingDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+
+                $('.btn-update-shipping').off("click").on("click", function () {
+                    var row_data = shippingDT.row($(this).parents('tr')).data();
+
+                    $("#save-shipping-id").val(row_data.id);
+                    $("#save-shipping-address").val(row_data.address);
+                    $("#save-shipping-cperson").val(row_data.contactPerson);
+                    $("#save-shipping-cnumber").val(row_data.phoneNumber);
+                    $("#save-shipping-fnumber").val(row_data.faxNumber);
+
+                    $("#shippingModal").modal("show");
+                });
+            }
         });
 
 
@@ -1064,9 +1203,6 @@
                         $("#edit-usearearate").prop("checked", false);
                     }
                     $("#edit-customer-type").val(data.customerTypeId);
-                    $("#edit-contact-person").val(data.contactPerson);
-                    $("#edit-contact-number").val(data.contactNumber);
-                    $("#edit-address").val(data.address);
                     $("#edit-agent").val(data.agentId).trigger("change");
                     $("#edit-region").val(data.regionId).trigger("change");
                     $('#select2-edit-area-container').find('.select2-selection__placeholder').text(data.areaName);
@@ -1074,13 +1210,16 @@
                     $("#edit-credit-term").val(data.creditTermId).trigger("change");
                     $("#edit-customer-type").val(data.customerTypeId).trigger("change");
                     $("#edit-email").val(data.email);
-                    $("#edit-fax-number").val(data.faxNumber);
                     $("#edit-tin").val(data.tin);
                     $("#edit-vat").val(data.vat);
                     $("#edit-credit-limit").val(data.creditLimit);
                     $("#edit-remarks").val(data.remarks);
                     $("#edit-isactive").val(data.isActive);
                     $("#edit-account-status").val(data.customerAccountStatusId).trigger("change");
+                    // $("#edit-address").val(data.address);
+                    // $("#edit-contact-person").val(data.contactPerson);
+                    // $("#edit-contact-number").val(data.contactNumber);
+                    // $("#edit-fax-number").val(data.faxNumber);
                 }
             });
 
@@ -1092,23 +1231,22 @@
             rules: {
                 Code: { required: true, maxlength: 10 },
                 Name: { required: true, maxlength: 100 },
-                ContactPerson: { maxlength: 150 },
-                ContactNumber: { maxlength: 100 },
                 Email: { maxlength: 50 },
-                Address: { required: true },
                 CreditLimit: { required: true, range: [0, 1999999.99] },
-                FaxNumber: { maxlength: 100 },
+                // Address: { required: true },
+                // ContactPerson: { maxlength: 150 },
+                // ContactNumber: { maxlength: 100 },
+                // FaxNumber: { maxlength: 100 },
             },
             messages: {
                 Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
                 Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
-                ContactPerson: { maxlength: "Contact Person must not exceed 150 characters." },
-                ContactNumber: { maxlength: "Contact Number number must not exceed 100 characters." },
                 Email: { maxlength: "Email number must not exceed 50 characters." },
-                Address: { required: "Please enter address." },
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
-                FaxNumber: { maxlength: "Fax Number number must not exceed 100 characters." }
-
+                // Address: { required: "Please enter address." },
+                // ContactPerson: { maxlength: "Contact Person must not exceed 150 characters." },
+                // ContactNumber: { maxlength: "Contact Number number must not exceed 100 characters." },
+                // FaxNumber: { maxlength: "Fax Number number must not exceed 100 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -1130,19 +1268,19 @@
                     CommissionRateD: $("#edit-commission").val(),
                     UseAreaRate: $("#edit-usearearate").prop("checked"),
                     CustomerTypeId: $("#edit-customer-type").val(),
-                    ContactPerson: $("#edit-contact-person").val(),
-                    ContactNumber: $("#edit-contact-number").val(),
-                    Address: $("#edit-address").val(),
                     Email: $("#edit-email").val(),
                     AgentId: $("#edit-agent").val(),
-                    FaxNumber: $("#edit-fax-number").val(),
                     TIN: $("#edit-tin").val(),
                     VAT: $("#edit-vat").val(),
                     CreditTermId: $("#edit-credit-term").val(),
                     CreditLimit: $("#edit-credit-limit").val(),
                     CustomerAccountStatusId: $("#edit-account-status").val(),
                     Remarks: $("#edit-remarks").val(),
-                    IsActive: $("#edit-isactive").val()
+                    IsActive: $("#edit-isactive").val(),
+                    // Address: $("#edit-address").val(),
+                    // ContactPerson: $("#edit-contact-person").val(),
+                    // ContactNumber: $("#edit-contact-number").val(),
+                    // FaxNumber: $("#edit-fax-number").val()
                 },
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
@@ -1153,55 +1291,51 @@
 
                         $(".details-code").text($("#edit-code").val());
                         $(".details-region").text($("#edit-region").select2("data")[0].text);
-                        $(".details-contact-person").text($("#edit-contact-person").val() || "-");
-                        $(".details-email").text($("#edit-email").val() || "-");
-                        $(".details-tin").text($("#edit-tin").val() || "-");
+                        $(".details-email").text($("#edit-email").val() || "N/A");
+                        $(".details-tin").text($("#edit-tin").val() || "N/A");
                         $(".details-credit-limit").text(FormatStringDecimal($("#edit-credit-limit").val()));
                         $(".details-name").text($("#edit-name").val());
                         if ($("#edit-area").val() != null) {
                             $(".details-area").text($("#edit-area").select2("data")[0].text);
                         }
-                        $(".details-contact-number").text($("#edit-contact-number").val() || "-");
-                        $(".details-agent").text($("#edit-agent").select2("data")[0].text || "-");
-                        $(".details-vat").text($("#edit-vat").val() || "-");
-                        $(".details-remarks").text($("#edit-remarks").val() || "-");
+                        $(".details-agent").text($("#edit-agent").select2("data")[0].text || "N/A");
+                        $(".details-vat").text($("#edit-vat").val() || "N/A");
+                        $(".details-remarks").text($("#edit-remarks").val() || "N/A");
                         $(".details-type").text($("#edit-customer-type").select2("data")[0].text);
-                        $(".details-address").text($("#edit-address").val() || "-");
-                        $(".details-fax-number").text($("#edit-fax-number").val() || "-");
                         $(".details-credit-term").text($("#edit-credit-term").select2("data")[0].text);
-                        $(".details-commission-rate").text($("#edit-usearearate").prop("checked") ? "-" : FormatStringDecimal($("#edit-commission").val()));
+                        $(".details-commission-rate").text($("#edit-usearearate").prop("checked") ? "N/A" : FormatStringDecimal($("#edit-commission").val()));
                         $(".details-account-status").text($("#edit-account-status").select2("data")[0].text);
+                        // $(".details-address").text($("#edit-address").val() || "N/A");
+                        // $(".details-contact-person").text($("#edit-contact-person").val() || "N/A");
+                        // $(".details-contact-number").text($("#edit-contact-number").val() || "N/A");
+                        // $(".details-fax-number").text($("#edit-fax-number").val() || "N/A");
                         hideLoader();
                     }
                 }
             });
         }
 
-
-
-
-        // Actions upon Display Shipping Modal
         $(".shippingBtn").click(function (e) {
-            $("#create-shipping-address").val("");
-            $("#create-shipping-cperson").val("");
-            $("#create-shipping-cnumber").val("");
-            $("#create-shipping-fnumber").val("");
-
+            $("#save-shipping-id").val("");
+            $("#save-shipping-address").val("");
+            $("#save-shipping-cperson").val("");
+            $("#save-shipping-cnumber").val("");
+            $("#save-shipping-fnumber").val("");
         });
 
         // Validation for Shipping Modal
         var validateShipping = $("#shippingForm").validate({
             rules: {
-                ShippingAddress: { maxlength: 50 },
-                ShippingPhoneNo: { maxlength: 50 },
-                ShippingContactPerson: { maxlength: 50 },
-                ShippingFaxNo: { maxlength: 50 }
+                Address: { required: true },
+                ContactPerson: { required: true, maxlength: 150 },
+                PhoneNumber: { maxlength: 100 },
+                FaxNumber: { maxlength: 100 }
             },
             messages: {
-                ShippingAddress: { maxlength: "Address number must not exceed 50 characters." },
-                ShippingContactPerson: { maxlength: "Contact Person number must not exceed 50 characters." },
-                ShippingPhoneNo: { maxlength: "Contact Number number must not exceed 50 characters." },
-                ShippingFaxNo: { maxlength: "Fax Number number must not exceed 50 characters." }
+                Address: { required: "Address is required" },
+                ContactPerson: { required: "Contact Person is required", maxlength: "Contact Person must not exceed 150 characters." },
+                PhoneNumber: { maxlength: "Contact Number number must not exceed 100 characters." },
+                FaxNumber: { maxlength: "Fax Number number must not exceed 100 characters." }
 
             },
             submitHandler: function (form, event) {
@@ -1214,13 +1348,14 @@
         function DoShipping() {
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("CreateShippingJson")",
+                url: "@Url.Action("SaveShippingJson")",
                 data: {
-                    Id: @Model?.Id,
-                    ShippingAddress: $("#create-shipping-address").val(),
-                    ShippingPhoneNo: $("#create-shipping-cnumber").val(),
-                    ShippingContactPerson: $("#create-shipping-cperson").val(),
-                    ShippingFaxNo: $("#create-shipping-fnumber").val()
+                    Id: $("#save-shipping-id").val(),
+                    CustomerId: @Model?.Id,
+                    Address: $("#save-shipping-address").val(),
+                    ContactPerson: $("#save-shipping-cperson").val(),
+                    PhoneNumber: $("#save-shipping-cnumber").val(),
+                    FaxNumber: $("#save-shipping-fnumber").val()
                 },
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {

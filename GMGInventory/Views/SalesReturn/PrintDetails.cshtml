@@ -54,7 +54,7 @@
     <table class="table-items no-border">
         <thead>
             <tr>
-                @*<th>Defective</th>*@
+                <th>Reason Of Return</th>
                 <th>Qty</th>
                 <th>Unit</th>
                 <th>Item Code</th>
@@ -70,7 +70,7 @@
             @foreach (var item in Model.Contents)
             {
                 <tr>
-                    @*<td><nobr>@(item.IsDefective ? "✔" : "🞮")</nobr></td>*@
+                    <td><nobr>@item.ReasonOfReturn</nobr></td>
                     <td class="right-text"><nobr>@item.Quantity</nobr></td>
                     <td class="center-text"><nobr>@item.Unit</nobr></td>
                     <td class="center-text">@item.ItemCode</td>

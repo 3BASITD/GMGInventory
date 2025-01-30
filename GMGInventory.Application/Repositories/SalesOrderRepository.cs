@@ -95,6 +95,19 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
+        public async Task<IList<JsonOptionsModel>> GetStatusOptions()
+        {
+            return await context.SalesOrders
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Status.Id.ToString(),
+                                    Text = s.Status.Name
+                                })
+                                .Distinct()
+                                .OrderBy(s => s.Id)
+                                .ToListAsync();
+        }
+
         public async Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
             var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
@@ -122,12 +135,24 @@ namespace GMGInventory.Application.Repositories
                                ApprovedBy = SystemFormat.Name(approve.FirstName, approve.LastName, approve.Nickname),
                                ApprovedDateD = order.ApprovedDate,
                                CreditTerms = order.Customer.CreditTerm.Name,
-                               CustomerAddress = order.Customer.Address,
+                               CustomerAddress = order.Customer
+                                                      .ShippingAddresses
+                                                      .Where(s => s.IsDefault == true)
+                                                      .Select(s => s.Address)
+                                                      .FirstOrDefault() ?? "N/A",
                                CustomerCode = order.Customer.Code,
                                CustomerId = order.Customer.Id,
                                CustomerName = order.Customer.Name,
-                               CustomerContactNumber = order.Customer.ContactNumber + "",
-                               CustomerContactPerson = order.Customer.ContactPerson + "",
+                               CustomerContactNumber = order.Customer
+                                                            .ShippingAddresses
+                                                            .Where(s => s.IsDefault == true)
+                                                            .Select(s => s.PhoneNumber)
+                                                            .FirstOrDefault() ?? "N/A",
+                               CustomerContactPerson = order.Customer
+                                                            .ShippingAddresses
+                                                            .Where(s => s.IsDefault == true)
+                                                            .Select(s => s.ContactPerson)
+                                                            .FirstOrDefault() ?? "N/A",
                                DisapprovedBy = SystemFormat.Name(disapprove.FirstName, disapprove.LastName, disapprove.Nickname),
                                DisapprovedDateD = order.DisapprovedDate,
                                DisapprovedReason = order.DisapprovedReason + "",
@@ -196,11 +221,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
                            && filter.DateFrom <= order.DateCreated.Date
                            && order.DateCreated.Date <= filter.DateTo
-                           && (filter.StatusCode == null || filter.StatusCode.Trim() == ""
-                           || (filter.StatusCode.ToLower() == "submitted" && order.UserCreated == currentUserId)
-                           || (filter.StatusCode.ToLower() == "approveddisapproved" && (order.Status.Name.ToLower() == "sales order approved" || order.Status.Name.ToLower() == "sales order disapproved"))
-                           || (filter.StatusCode.ToLower() == "approval" && order.Status.Name.ToLower() == "sales order submitted")
-                           || (filter.StatusCode.ToLower() == "approved" && order.ApprovedBy == currentUserId))
+                           && (filter.Status == null || filter.Status == order.Status.Id)
                            select new SalesOrderVM
                            {
                                Customer = order.Customer.Name,
@@ -429,8 +450,8 @@ namespace GMGInventory.Application.Repositories
             var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
 
             int statusId = context.Statuses
-                                  .Where(s => (form.Status.ToLower() == "submit" && s.Name.ToLower() == "sales order submitted")
-                                           || (form.Status.ToLower() == "draft" && s.Name.ToLower() == "sales order draft"))
+                                  .Where(s => (form.Status.ToLower().Contains("submit") && s.Name.ToLower() == "sales order submitted")
+                                           || (form.Status.ToLower().Contains("draft") && s.Name.ToLower() == "sales order draft"))
                                   .Select(s => s.Id)
                                   .First();
             if (orderVM == null)
