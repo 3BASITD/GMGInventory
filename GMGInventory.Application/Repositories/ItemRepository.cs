@@ -2,11 +2,13 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -269,73 +271,97 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<ItemCommonVM>> GetAllAsync(ItemFilterVM filter)
         {
             //var WarehouseInventory = from inv in context.ItemInventories
-            //                         group inv by inv.ItemId into invgrp
             //                         select new
             //                         {
-            //                             ItemId = invgrp.Key,
-            //                             Quantity = invgrp.Sum(s => s.Quantity),
-            //                             Warehouse = string.Join(", ", invgrp.Select(s => s.Warehouse.Name)),
-            //                             HasWarehouse = filter.WarehouseId == null || invgrp.Any(s => s.WarehouseId == filter.WarehouseId)
+            //                             ItemId = inv.ItemId,
+            //                             Quantity = inv.Quantity,
+            //                             Warehouse = inv.Warehouse.Name,
+            //                             HasWarehouse = filter.WarehouseId == null || inv.WarehouseId == filter.WarehouseId
             //                         };
-            var WarehouseInventory = from inv in context.ItemInventories
-                                     select new
-                                     {
-                                         ItemId = inv.ItemId,
-                                         Quantity = inv.Quantity,
-                                         Warehouse = inv.Warehouse.Name,
-                                         HasWarehouse = filter.WarehouseId == null || inv.WarehouseId == filter.WarehouseId
-                                     };
-            var itemsVM = await (from item in context.Items
-                                 from price in context.ItemPrices
-                                                      .Where(s => s.ItemId == item.Id
-                                                               && s.DateCreated.Date <= DateTime.Now)
-                                                      .OrderByDescending(s => s.DateCreated)
-                                                      .Take(1)
-                                                      .DefaultIfEmpty()
-                                 join inventory in WarehouseInventory on item.Id equals inventory.ItemId
-                                 let quantityPacked = context.PackLineItems
-                                                             .Where(s => s.ItemId == item.Id)
-                                                             .Sum(s => (int?)s.Quantity) ?? 0
-                                 let quantityInvoiced = context.InvoiceLineItems
-                                                               .Where(s => s.ItemId == item.Id)
-                                                               .Sum(s => (int?)s.Quantity) ?? 0
-                                 let quantityReturned = context.SalesReturnLineItems
-                                                               .Where(s => s.ItemId == item.Id)
-                                                               .Sum(s => (int?)s.Quantity) ?? 0
-                                 where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
-                                     && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
-                                     && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
-                                     && (filter.BrandId == null || filter.BrandId == item.BrandId)
-                                     && inventory.HasWarehouse == true
-                                 select new ItemCommonVM
-                                 {
-                                     Brand = item.Brand.Name,
-                                     BrandId = item.Brand.Id,
-                                     Category = item.Category.Name,
-                                     CategoryId = item.Category.Id,
-                                     Code = item.Code,
-                                     Id = item.Id,
-                                     ItemType = item.ItemType.Name,
-                                     ItemTypeId = item.ItemType.Id,
-                                     InterchangeNumber = item.InterchangeNumber + "",
-                                     LocationCode = item.LocationCode == null ? null : item.LocationCode.Code,
-                                     LocationCodeId = item.LocationCode == null ? null : item.LocationCode.Id,
-                                     ModelNumber = item.ModelNumber + "",
-                                     Name = item.Name,
-                                     NetPriceD = price == null ? 0 : price.NetSellingPrice,
-                                     PartNumber = item.PartNumber + "",
-                                     QuantityInventoryD = inventory.Quantity,
-                                     QuantityServedD = quantityPacked - quantityReturned,
-                                     QuantityInvoiceD = quantityInvoiced,
-                                     RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
-                                     Size = item.Size,
-                                     Unit = item.Unit.Name,
-                                     UnitId = item.Unit.Id,
-                                     Warehouse = inventory.Warehouse,
-                                     IsActive = item.IsActive,
-                                     GiveAction = false
-                                 }).ToListAsync();
-            return itemsVM;
+            //var itemsVM = await (from item in context.Items
+            //                     from price in context.ItemPrices
+            //                                          .Where(s => s.ItemId == item.Id
+            //                                                   && s.DateCreated.Date <= DateTime.Now)
+            //                                          .OrderByDescending(s => s.DateCreated)
+            //                                          .Take(1)
+            //                                          .DefaultIfEmpty()
+            //                     join inventory in WarehouseInventory on item.Id equals inventory.ItemId
+            //                     let quantityPacked = context.PackLineItems
+            //                                                 .Where(s => s.ItemId == item.Id)
+            //                                                 .Sum(s => (int?)s.Quantity) ?? 0
+            //                     let quantityInvoiced = context.InvoiceLineItems
+            //                                                   .Where(s => s.ItemId == item.Id)
+            //                                                   .Sum(s => (int?)s.Quantity) ?? 0
+            //                     let quantityReturned = context.SalesReturnLineItems
+            //                                                   .Where(s => s.ItemId == item.Id)
+            //                                                   .Sum(s => (int?)s.Quantity) ?? 0
+            //                     where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+            //                         && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
+            //                         && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
+            //                         && (filter.BrandId == null || filter.BrandId == item.BrandId)
+            //                         && inventory.HasWarehouse == true
+            //                     select new ItemCommonVM
+            //                     {
+            //                         Brand = item.Brand.Name,
+            //                         BrandId = item.Brand.Id,
+            //                         Category = item.Category.Name,
+            //                         CategoryId = item.Category.Id,
+            //                         Code = item.Code,
+            //                         Id = item.Id,
+            //                         ItemType = item.ItemType.Name,
+            //                         ItemTypeId = item.ItemType.Id,
+            //                         InterchangeNumber = item.InterchangeNumber + "",
+            //                         LocationCode = item.LocationCode == null ? null : item.LocationCode.Code,
+            //                         LocationCodeId = item.LocationCode == null ? null : item.LocationCode.Id,
+            //                         ModelNumber = item.ModelNumber + "",
+            //                         Name = item.Name,
+            //                         NetPriceD = price == null ? 0 : price.NetSellingPrice,
+            //                         PartNumber = item.PartNumber + "",
+            //                         QuantityInventoryD = inventory.Quantity,
+            //                         QuantityServedD = quantityPacked - quantityReturned,
+            //                         QuantityInvoiceD = quantityInvoiced,
+            //                         RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
+            //                         Size = item.Size,
+            //                         Unit = item.Unit.Name,
+            //                         UnitId = item.Unit.Id,
+            //                         Warehouse = inventory.Warehouse,
+            //                         IsActive = item.IsActive,
+            //                         GiveAction = false
+            //                     }).ToListAsync();
+            // Code, Name,  PartNumber, InterchangeNumber, Warehouse, GrossPrice, NetPrice, QuantityOnHand
+
+            // Code, Name, PartNumber, InterchangeNumber, Warehouse, ModelNumber, Category, ItemType, Brand, Size, Unit, Quantity
+
+            var itemsVM = from item in context.Items
+                          join inventory in context.ItemInventories on item.Id equals inventory.ItemId
+                          let price = item.ItemPrices
+                                          .Where(s => s.DateCreated.Date <= DateTime.Now)
+                                          .OrderByDescending(s => s.DateCreated)
+                                          .FirstOrDefault()
+                          where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+                              && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
+                              && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
+                              && (filter.BrandId == null || filter.BrandId == item.BrandId)
+                          select new ItemCommonVM
+                          {
+                              Id = item.Id,
+                              Code = item.Code,
+                              Name = item.Name,
+                              PartNumber = item.PartNumber,
+                              InterchangeNumber = item.InterchangeNumber,
+                              ModelNumber = item.ModelNumber,
+                              Category = item.Category.Name,
+                              ItemType = item.ItemType.Name,
+                              Brand = item.Brand.Name,
+                              Size = item.Size,
+                              Unit = item.Unit.Name,
+                              QuantityD = inventory.Quantity,
+                              RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
+                              NetPriceD = price == null ? 0 : price.NetSellingPrice,
+                              Warehouse = inventory.Warehouse.Name,
+                              IsActive = item.IsActive
+                          };
+            return await itemsVM.ToListAsync();
         }
 
         public async Task<ForDataTables<ItemCommonVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, ItemFilterVM filter)
@@ -348,86 +374,85 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
-                                    || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.InterchangeNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.NetPrice.ToString().Contains(form.SearchValue)
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue)
-                                    || x.QuantityTotalD.ToString().Contains(form.SearchValue)
-                                    || x.RetailPrice.ToString().Contains(form.SearchValue)
-                                    || x.Warehouse.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Code,
+                    s.Name,
+                    s.PartNumber,
+                    s.InterchangeNumber + "",
+                    s.ModelNumber + "",
+                    s.Category,
+                    s.ItemType,
+                    s.Brand,
+                    s.Size,
+                    s.Unit,
+                    s.QuantityD.ToString(),
+                    s.RetailPriceD.ToString(),
+                    s.NetPriceD.ToString(),
+                    s.Warehouse
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
             }
 
 
-            data = data.ToList().OrderBy(s => s.Id)
-                            .GroupBy(s => s.Id)
-                            .SelectMany(s => s.Select((j, i) => new ItemCommonVM
-                            {
-                                Brand = j.Brand,
-                                BrandId = j.BrandId,
-                                Category = j.Category,
-                                CategoryId = j.CategoryId,
-                                Code = j.Code,
-                                Id = j.Id,
-                                ItemType = j.ItemType,
-                                ItemTypeId = j.ItemTypeId,
-                                InterchangeNumber = j.InterchangeNumber,
-                                LocationCode = j.LocationCode,
-                                LocationCodeId = j.LocationCodeId,
-                                ModelNumber = j.ModelNumber,
-                                Name = j.Name,
-                                NetPriceD = j.NetPriceD,
-                                PartNumber = j.PartNumber,
-                                QuantityInventoryD = j.QuantityInventoryD,
-                                QuantityServedD = j.QuantityServedD,
-                                QuantityInvoiceD = j.QuantityInvoiceD,
-                                RetailPriceD = j.RetailPriceD,
-                                Size = j.Size,
-                                Unit = j.Unit,
-                                UnitId = j.UnitId,
-                                Warehouse = j.Warehouse,
-                                IsActive = j.IsActive,
-                                GiveAction = i == 0
-                            })).AsQueryable();
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                if (form.SortColumn == "Quantity" || form.SortColumn == "RetailPrice" || form.SortColumn == "NetPrice")
                 {
-                    switch (form.SortColumn)
+                    if (form.SortColumnDirection == "asc")
                     {
-                        case "Code": data = data.OrderBy(s => s.Code); break;
-                        case "InterchangeNumber": data = data.OrderBy(s => s.InterchangeNumber); break;
-                        case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
-                        case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityTotalD); break;
-                        case "RetailPrice": data = data.OrderBy(s => s.RetailPriceD); break;
-                        case "Warehouse": data = data.OrderBy(s => s.Warehouse); break;
-                        default: break;
+                        switch (form.SortColumn)
+                        {
+                            case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
+                            case "RetailPrice": data = data.OrderBy(s => s.RetailPriceD); break;
+                            case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
+                            default: break;
+                        }
+                    }
+                    else if (form.SortColumnDirection == "desc")
+                    {
+                        switch (form.SortColumn)
+                        {
+                            case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
+                            case "RetailPrice": data = data.OrderByDescending(s => s.RetailPriceD); break;
+                            case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
+                            default: break;
+                        }
                     }
                 }
-                else if (form.SortColumnDirection == "desc")
+                else
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderByDescending(s => s.Code); break;
-                        case "InterchangeNumber": data = data.OrderByDescending(s => s.InterchangeNumber); break;
-                        case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
-                        case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityTotalD); break;
-                        case "RetailPrice": data = data.OrderByDescending(s => s.RetailPriceD); break;
-                        case "Warehouse": data = data.OrderByDescending(s => s.Warehouse); break;
-                        default: break;
-                    }
+                    data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
                 }
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+
+            pageList = pageList.GroupBy(s => s.Id)
+                               .SelectMany(s => s.Select((j, i) => new ItemCommonVM
+                               {
+                                   Id = j.Id,
+                                   Code = j.Code,
+                                   Name = j.Name,
+                                   PartNumber = j.PartNumber,
+                                   InterchangeNumber = j.InterchangeNumber,
+                                   ModelNumber = j.ModelNumber,
+                                   Category = j.Category,
+                                   ItemType = j.ItemType,
+                                   Brand = j.Brand,
+                                   Size = j.Size,
+                                   Unit = j.Unit,
+                                   QuantityD = j.QuantityD,
+                                   RetailPriceD = j.RetailPriceD,
+                                   NetPriceD = j.NetPriceD,
+                                   Warehouse = j.Warehouse,
+                                   IsActive = j.IsActive,
+                                   GiveAction = i == 0
+                               }))
+                               .ToList();
+
             return new ForDataTables<ItemCommonVM>
             {
                 Draw = form.Draw,
@@ -939,8 +964,8 @@ namespace GMGInventory.Application.Repositories
                                                                && s.ItemId == sitem.ItemId)
                                                       .Sum(s => (int?)s.Quantity) ?? 0
                           let inventory = context.ItemInventories
-                                                 .Where(s=>s.ItemId == sitem.ItemId)
-                                                 .Sum(s=>(int?)s.Quantity) ?? 0
+                                                 .Where(s => s.ItemId == sitem.ItemId)
+                                                 .Sum(s => (int?)s.Quantity) ?? 0
                           join user in userManager.Users on sitem.SalesOrder.UserCreated equals user.Id
                           where sitem.Item.Id == id
                           select new ItemDetailSalesVM
@@ -956,7 +981,7 @@ namespace GMGInventory.Application.Repositories
                               SalesNumber = sitem.SalesOrder.SalesOrderNumber,
                               UnitPriceD = sitem.SellingPrice,
                               //UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned)
-                            UnservedQuantityD = inventory <= 0 ? sitem.Quantity - inventory : 0
+                              UnservedQuantityD = inventory <= 0 ? sitem.Quantity - inventory : 0
                           };
             return await salesVM.ToListAsync();
         }

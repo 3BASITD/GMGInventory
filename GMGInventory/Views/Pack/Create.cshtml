@@ -309,21 +309,21 @@
                     var row_data = this.data();
                     var itemchk = $(this.node()).find(".chkclassorder");
                     if (itemchk.prop("checked")) {
-                        if (parseInt(row_data.inventoryQuantity) == 0) {
-                            if (parseInt(row_data.inventoryQuantity) < parseInt($("#add-quantity").val())) {
-                                $("#add-quantity").val(parseInt(row_data.inventoryQuantity));
+                        if (row_data.inventoryCountD > 0) {
+                            if (row_data.inventoryCountD < parseInt($("#add-quantity").val())) {
+                                $("#add-quantity").val(parseInt(row_data.inventoryCountD));
                                 alertMessage = "Partial Quantity exceed the Inventory Quantity. Auto adjusted";
                             }
                             var quantityToPack = 0;
 
                             if ($("#add-partial").prop("checked")) {
                                 quantityToPack = parseInt($("#add-quantity").val());
-                                row_data.inventoryQuantity = parseInt(row_data.inventoryQuantity) - parseInt($("#add-quantity").val());
-                                row_data.packedQuantity = parseInt(row_data.packedQuantity) + parseInt($("#add-quantity").val());
+                                row_data.inventoryCountD = row_data.inventoryCountD - parseInt($("#add-quantity").val());
+                                row_data.packedQuantity = row_data.packedQuantityD + parseInt($("#add-quantity").val());
                             } else {
-                                quantityToPack = parseInt(row_data.inventoryQuantity);
-                                row_data.packedQuantity = parseInt(row_data.inventoryQuantity) + parseInt(row_data.packedQuantity);
-                                row_data.inventoryQuantity = 0;
+                                quantityToPack = row_data.inventoryCountD;
+                                row_data.packedQuantity = row_data.inventoryCountD + row_data.packedQuantityD;
+                                row_data.inventoryCountD = 0;
                             }
                             var toItem = {
                                 id: row_data.id,
@@ -341,7 +341,7 @@
                             successItem.push(row_data.itemCode);
 
                             this.data(row_data);
-                            if (row_data.remainingQuantity == 0) {
+                            if (row_data.remainingQuantityD == 0) {
                                 $(this.node()).addClass("text-muted");
                             }
                         } else {
