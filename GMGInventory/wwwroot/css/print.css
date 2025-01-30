@@ -51,12 +51,14 @@ h3 {
         padding: 2px;
     }
 
-    .table-items.border-bottom thead tr th {
+    .table-items.cheque thead tr th {
+        font-size: 14px;
         border-bottom: solid 2px black !important;
         padding: 5px;
     }
 
-    .table-items.border-bottom th, .table-items td {
+    .table-items.cheque th, .table-items td {
+        font-size: 14px;
         border: none;
         padding: 2px;
     }
