@@ -20,7 +20,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceivingBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceiving)).Convert();
 
@@ -31,7 +32,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetListDTJson(int? purchaseStatusId)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceivingBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             var form = new DataTablesRequestForm(Request.Form);
             return Json(await receiveRepository.GetListDTAsync(form, purchaseStatusId));
@@ -40,7 +42,9 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> Details(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceivingBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
+
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceiving)).Convert();
             ViewData["UserAccessBasic"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingBasic)).Convert();
@@ -55,7 +59,8 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> DetailsJson(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceivingBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             var receive = await receiveRepository.GetDetails(Id);
             if (receive == null)
@@ -87,6 +92,8 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
+            ViewData["UserAccessBasic"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingBasic)).Convert();
+
             var details = await receiveRepository.GetDetails(Id);
 
             var items = await receiveRepository.GetItemListAsync(Id);
@@ -113,6 +120,9 @@ namespace GMGInventory.Controllers
                 return RedirectToAction("Details", new { Id });
             }
             TempData["PurchaseReceivingId"] = Id;
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceiving)).Convert();
+            ViewData["UserAccessBasic"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingBasic)).Convert();
+
             return View();
         }
 
