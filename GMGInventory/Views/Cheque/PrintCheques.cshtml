@@ -16,30 +16,16 @@
 </head>
 <body>
     <h3 class="center-text">@title</h3>
-    <table class="table-items no-border">
+    <table class="table-items border-bottom">
         <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cheques.First().RefNo)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cheques.First().CustomerCode)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cheques.First().CheckDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cheques.First().Check)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cheques.First().Branch)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cheques.First().CheckNo)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cheques.First().Amount)
-                </th>
+            <tr class="left-text">
+                <th> RefNo  </th>
+                <th> Customer</th>
+                <th> CheckDate </th>
+                <th> Check </th>
+                <th width="20%"> Branch </th>
+                <th> CheckNo</th>
+                <th> Amount </th>
             </tr>
         </thead>
         <tbody>
@@ -47,12 +33,12 @@
                 decimal totalamount = 0;
                 @foreach (var item in Model.Cheques)
                 {
-                    <tr>
-                        <td>@item.RefNo</td>
+                    <tr class="left-text">
+                        <td >@item.RefNo</td>
                         <td>@item.CustomerCode</td>
                         <td>@item.CheckDate</td>
                         <td>@item.Check</td>
-                        <td>@item.Branch</td>
+                        <td width="20%">@item.Branch</td>
                         <td>@item.CheckNo</td>
                         <td class="right-text">@item.Amount</td>
                     </tr>
@@ -69,7 +55,6 @@
                 <th></th>
                 <th class="left-text">Total</th>
                 <th class="right-text"><nobr>@totalamount</nobr></th>
-                <th></th>
             </tr>
         </tfoot>
     </table>

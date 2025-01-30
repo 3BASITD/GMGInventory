@@ -5,6 +5,7 @@ using GMGInventory.Data;
 using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -332,13 +333,7 @@ namespace GMGInventory.Application.Repositories
                     ResubmitId = form.ResubmitId,
 
                     PurchaseOrderId = purchaseOrder!.Id,
-                    //SupplierId = purchaseOrder!.SupplierId,
-                    //TermId = purchaseOrder!.TermId,
-                    WarehouseId = purchaseOrder!.DeliveryAddressId,
-                    // Discount1 = purchaseOrder!.Discount1,
-                    // Discount2 = purchaseOrder!.Discount2,
-                    //CurrencyId = purchaseOrder!.CurrencyId,
-                    //CurrencyRate = purchaseOrder.CurrencyRate
+                    WarehouseId = purchaseOrder!.DeliveryAddressId
                 };
                 await context.PurchaseReceivings.AddAsync(receive);
                 await context.SaveChangesAsync(currentUserId);
@@ -423,28 +418,39 @@ namespace GMGInventory.Application.Repositories
                     foreach (var receiving in preceiveItems)
                     {
                         var itemId = receiving.OrderItem.RequestItem.ItemId;
-                        var warehouseId = receiving.PurchaseReceiving.WarehouseId;
-
-                        var itemInventory = await context.ItemInventories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).FirstOrDefaultAsync();
-
-                        if (itemInventory != null && itemId != null)
+                        if (itemId != null)
                         {
-                            var previousCount = await context.PhysicalCountHistories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).LastOrDefaultAsync();
+                            var warehouseId = receiving.PurchaseReceiving.WarehouseId;
+
+                            var itemInventory = await context.ItemInventories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).FirstOrDefaultAsync();
+
+                            var previousCount = await context.PhysicalCountHistories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
 
                             var countHistory = new PhysicalCountHistory
                             {
                                 ItemId = itemId ?? 0,
-                                QuantityFrom = previousCount != null ? previousCount.QuantityTo : itemInventory.Quantity,
-                                QuantityTo = itemInventory.Quantity + receiving.Quantity,
+                                QuantityFrom = previousCount != null ? previousCount.QuantityTo : itemInventory != null ? itemInventory.Quantity : 0,
+                                QuantityTo = itemInventory!.Quantity + receiving.Quantity,
                                 Remarks = "Purchase Receiving",
-                                WarehouseId = receiving.PurchaseReceiving.WarehouseId
+                                WarehouseId = warehouseId
                             };
                             context.PhysicalCountHistories.Add(countHistory);
 
-
-                            itemInventory.Quantity += receiving.Quantity;
-                            context.ItemInventories.Update(itemInventory);
-
+                            if (itemInventory != null)
+                            {
+                                itemInventory.Quantity += receiving.Quantity;
+                                context.ItemInventories.Update(itemInventory);
+                            }
+                            else
+                            {
+                                var newItemInventory = new ItemInventory
+                                {
+                                    ItemId = itemId ?? 0,
+                                    Quantity = receiving.Quantity,
+                                    WarehouseId = warehouseId
+                                };
+                                await context.ItemInventories.AddAsync(newItemInventory);
+                            }
                         }
                     };
                     await context.SaveChangesAsync(currentUserId);

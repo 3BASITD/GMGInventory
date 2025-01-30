@@ -51,6 +51,15 @@ h3 {
         padding: 2px;
     }
 
+    .table-items.border-bottom thead tr th {
+        border-bottom: solid 2px black !important;
+        padding: 5px;
+    }
+
+    .table-items.border-bottom th, .table-items td {
+        border: none;
+        padding: 2px;
+    }
 .right-text {
     text-align: right;
 }
