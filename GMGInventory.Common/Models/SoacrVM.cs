@@ -48,7 +48,7 @@ namespace GMGInventory.Common.Models
         public string FreightCharge => string.Format(SystemFormat.StringDecimalComma, FreightChargeD);
         public decimal FreightChargeD { get; set; }
 
-        private decimal BalanceComputation => TotalAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD; 
+        private decimal BalanceComputation => TotalAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD;
 
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
@@ -92,20 +92,20 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Agent")]
         public string Agent { get; set; }
-	}
+    }
 
-	public class SOACRInvoicesPVM
-	{
-		public IList<SOACRInvoices> Invoices { get; set; }
-		public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
-		public DateTime DateFromD { get; set; }
-		public string DateTo => DateToD.ToString(SystemFormat.StringDate);
-		public DateTime DateToD { get; set; }
-		public string Customer { get; set; }
-		public string Agent { get; set; }
-		public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
-		public decimal TotalAmountD { get; set; }
-	}
+    public class SOACRInvoicesPVM
+    {
+        public IList<SOACRInvoices> Invoices { get; set; }
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        public DateTime DateFromD { get; set; }
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        public DateTime DateToD { get; set; }
+        public string Customer { get; set; }
+        public string Agent { get; set; }
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal TotalAmountD { get; set; }
+    }
     #endregion
 
     #region for SOACR/Details
@@ -159,10 +159,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Credit")]
         public string Credit => string.Format(SystemFormat.StringDecimalComma, CreditD);
         public decimal CreditD { get; set; }
+        public string? CreditReferenceNumber { get; set; }
 
         [Display(Name = "Debit")]
         public string Debit => string.Format(SystemFormat.StringDecimalComma, DebitD);
         public decimal DebitD { get; set; }
+        public string? DebitReferenceNumber { get; set; }
 
         [Display(Name = "Paid Amount")]
         public string PaidAmount => string.Format(SystemFormat.StringDecimalComma, PaidAmountD);
@@ -171,6 +173,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Freight Charge")]
         public string FreightCharge => string.Format(SystemFormat.StringDecimalComma, FreightChargeD);
         public decimal FreightChargeD { get; set; }
+        public string? FreightReferenceNumber { get; set; }
 
         [Display(Name = "Freight's Waybill")]
         public string FreightWaybill { get; set; }
@@ -189,8 +192,11 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public decimal Credit { get; set; }
+        public string CreditReference { get; set; }
         public decimal Debit { get; set; }
+        public string DebitReference { get; set; }
         public decimal FreightCharge { get; set; }
+        public string FreightReference { get; set; }
         public string FreightWaybill { get; set; }
     }
 

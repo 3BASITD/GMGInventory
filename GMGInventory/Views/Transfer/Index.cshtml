@@ -34,13 +34,13 @@
                         @Html.DisplayNameFor(model => model.ItemCount)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.TransferBy)
-                    </th>
-                    <th>
                         @Html.DisplayNameFor(model => model.TransferDate)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Remarks)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CreatedBy)
                     </th>
                     <th></th>
                 </tr>
@@ -119,9 +119,9 @@
                 { data: "source", name: "Source" },
                 { data: "destination", name: "Destination" },
                 { data: "itemCount", name: "ItemCount", className: "text-end" },
-                { data: "transferBy", name: "TransferBy" },
                 { data: "transferDate", name: "TransferDate" },
                 { data: "remarks", name: "Remarks" },
+                { data: "createdBy", name: "CreatedBy" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {

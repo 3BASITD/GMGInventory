@@ -103,16 +103,16 @@ namespace GMGInventory.Common.Models
         //public string? FaxNumber { get; set; }
 
         [Display(Name = "Forwarder Address")]
-        public string ForwarderAddress { get; set; }
+        public string? ForwarderAddress { get; set; }
 
         [Display(Name = "Forwarder Fax No")]
-        public string ForwarderFaxNo { get; set; }
+        public string? ForwarderFaxNo { get; set; }
 
         [Display(Name = "Forwarder Name")]
-        public string ForwarderName { get; set; }
+        public string? ForwarderName { get; set; }
 
         [Display(Name = "Forwarder Phone No")]
-        public string ForwarderPhoneNo { get; set; }
+        public string? ForwarderPhoneNo { get; set; }
 
         [Display(Name = "Outstanding Balance")]
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
@@ -139,7 +139,7 @@ namespace GMGInventory.Common.Models
         public string? TIN { get; set; }
 
         [Display(Name = "Use Area Rate?")]
-        public bool UseAreaRate { get; set; }
+        public bool? UseAreaRate { get; set; }
 
         [Display(Name = "VAT")]
         public string? VAT { get; set; }

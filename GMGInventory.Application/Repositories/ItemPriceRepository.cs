@@ -49,8 +49,9 @@ namespace GMGInventory.Application.Repositories
                                           select (decimal?)rli.Quantity).SumAsync() ?? 0;
 
             var ServedQuantity = PackedQuantity - ReturnedQuantity;
-            //var UnservedQuantity = OrderQuantity - ServedQuantity;
-            var UnservedQuantity = OrderQuantity - WarehouseInventory;
+            var UnservedQuantity = OrderQuantity - WarehouseInventory > 0
+                                 ? OrderQuantity - WarehouseInventory
+                                 : 0;
 
             var priceVM = from item in context.Items
                           from price in context.ItemPrices

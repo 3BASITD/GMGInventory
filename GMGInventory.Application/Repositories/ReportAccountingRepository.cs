@@ -19,22 +19,17 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<CreditDebitMemoRVM>> GetCreditMemo(ListFilterCustomerModel filter)
         {
-            var credits = from credit in context.CreditDebitMemos
-                                                .Include(s => s.CreditDebitMemoType)
-                          join invoice in context.Invoices
-                                                 .Include(s => s.SalesOrder)
-                                                 .ThenInclude(s => s.Customer) on credit.InvoiceId equals invoice.Id
-                          where credit.CreditDebitMemoType.Name == "Credit"
-                          && filter.DateFrom <= credit.DateCreated.Date
-                          && credit.DateCreated.Date <= filter.DateTo
-                          && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
-                          orderby credit.DateCreated descending
+            var credits = from soa in context.SOACRLineItems
+                          where filter.DateFrom <= soa.DateCreated.Date
+                          && soa.DateCreated.Date <= filter.DateTo
+                          && (filter.Customer == null || soa.Invoice.SalesOrder.Customer.Id == filter.Customer)
+                          orderby soa.DateCreated descending
                           select new CreditDebitMemoRVM
                           {
-                              AmountD = credit.Amount,
-                              Customer = invoice.SalesOrder.Customer.Name,
-                              MemoDateD = credit.DateCreated,
-                              MemoNumber = credit.MemoNumber
+                              AmountD = soa.CreditAmount,
+                              Customer = soa.Invoice.SalesOrder.Customer.Name,
+                              MemoDateD = soa.DateCreated,
+                              MemoNumber = soa.CreditReferenceNumber
                           };
             return await credits.ToListAsync();
         }
@@ -54,7 +49,7 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.MemoDate.ToLower().Contains(form.SearchValue)
-                                    || x.MemoNumber.ToLower().Contains(form.SearchValue)
+                                    || (x.MemoNumber + "").ToLower().Contains(form.SearchValue)
                                     || x.Customer.ToLower().Contains(form.SearchValue)
                                     || x.AmountD.ToString().Contains(form.SearchValue));
             }
@@ -119,22 +114,17 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<CreditDebitMemoRVM>> GetDebitMemo(ListFilterCustomerModel filter)
         {
-            var debits = from debit in context.CreditDebitMemos
-                                              .Include(s => s.CreditDebitMemoType)
-                         join invoice in context.Invoices
-                                                .Include(s => s.SalesOrder)
-                                                .ThenInclude(s => s.Customer) on debit.InvoiceId equals invoice.Id
-                         where debit.CreditDebitMemoType.Name == "Debit"
-                         && filter.DateFrom <= debit.DateCreated.Date
-                         && debit.DateCreated.Date <= filter.DateTo
-                         && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
-                         orderby debit.DateCreated descending
+            var debits = from soa in context.SOACRLineItems
+                         where filter.DateFrom <= soa.DateCreated.Date
+                         && soa.DateCreated.Date <= filter.DateTo
+                         && (filter.Customer == null || soa.Invoice.SalesOrder.Customer.Id == filter.Customer)
+                         orderby soa.DateCreated descending
                          select new CreditDebitMemoRVM
                          {
-                             AmountD = debit.Amount,
-                             Customer = invoice.SalesOrder.Customer.Name,
-                             MemoDateD = debit.DateCreated,
-                             MemoNumber = debit.MemoNumber
+                             AmountD = soa.DebitAmount,
+                             Customer = soa.Invoice.SalesOrder.Customer.Name,
+                             MemoDateD = soa.DateCreated,
+                             MemoNumber = soa.DebitReferenceNumber
                          };
             return await debits.ToListAsync();
         }
@@ -154,7 +144,7 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.MemoDate.ToLower().Contains(form.SearchValue)
-                                    || x.MemoNumber.ToLower().Contains(form.SearchValue)
+                                    || (x.MemoNumber + "").ToLower().Contains(form.SearchValue)
                                     || x.Customer.ToLower().Contains(form.SearchValue)
                                     || x.AmountD.ToString().Contains(form.SearchValue));
             }

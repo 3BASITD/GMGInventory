@@ -9,17 +9,17 @@
     <li class="breadcrumb-item"><a asp-controller="Warehouse" asp-action="Index">Warehouses</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                @if (Model?.IsActive == true)
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (Model?.IsActive == true)
             {
                 @if (userAccess.CanEdit)
                 {
                     <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
                         <span class="fas fa-edit"></span> Edit Warehouse
-                </a>
+                    </a>
                 }
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
@@ -161,8 +161,8 @@
                                             <th>Item Code</th>
                                             <th>Item Name</th>
                                             <th>Quantity</th>
-                                            <th>Transfer By</th>
                                             <th>Transfer Date</th>
+                                            <th>Created By</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -183,13 +183,13 @@
             if (selectedTab == "#nav-transfer") transferDT.ajax.reload();
         });
 
-        var itemDT = $('.table-warehouse-items').on('preXhr.dt', function(e, settings, data) {
+        var itemDT = $('.table-warehouse-items').on('preXhr.dt', function (e, settings, data) {
             ShowTabLoader("items");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson", "Item")",
                 type: "POST",
-                data: function(data) {
+                data: function (data) {
                     data.WarehouseId = @Model?.Id;
                 },
             },
@@ -209,7 +209,7 @@
             order: [[0, "asc"]]
         });
 
-        itemDT.on("draw", function() {
+        itemDT.on("draw", function () {
             HideTabLoader("items");
         });
 
@@ -218,9 +218,9 @@
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehouseTransferJson", "Transfer")",
-                data: function(data) {
+                data: function (data) {
                     data.warehouseId = @Model?.Id
-                },
+                        },
                 type: "POST",
             },
             serverSide: true,
@@ -236,8 +236,8 @@
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
-                { data: "transferBy", name: "TransferBy" },
-                { data: "transferDate", name: "TransferDate" }
+                { data: "transferDate", name: "TransferDate" },
+                { data: "createdBy", name: "CreatedBy" }
             ],
             order: [[6, "desc"]]
         });

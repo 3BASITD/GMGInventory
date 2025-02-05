@@ -46,7 +46,7 @@ namespace GMGInventory.Application.Repositories
                             ItemName = item.Name,
                             MaintainingQuantityD = inventory,
                             PartNumber = item.PartNumber + "",
-                            QuantityOnHandD = inventory + (packedQuantity - returnedQuantity),
+                            QuantityOnHandD = inventory,
                             Unit = item.Unit.Name
                         };
             return await items.ToListAsync();
@@ -146,32 +146,27 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ReceivingRVM>> GetReceiving(ListFilterInventoryModel filter)
         {
-            var purchases = from purchase in context.PurchaseOrders
-                                                    .Include(s => s.Status)
-                            join poline in context.PurchaseOrderLineItems
-                                                  .Include(s => s.Item).ThenInclude(s => s.Brand)
-                                                  .Include(s => s.Item).ThenInclude(s => s.ItemType)
-                                                  .Include(s => s.Item).ThenInclude(s => s.Unit) on purchase.Id equals poline.PurchaseOrderId
-                            where purchase.Status.Code == "Posted"
-                            && filter.DateFrom <= purchase.ReplenishDate.Date
-                            && purchase.ReplenishDate.Date <= filter.DateTo
-                            && (filter.Brand == null || poline.Item.BrandId == filter.Brand)
-                            orderby purchase.ReplenishDate ascending,
-                                    poline.Item.Brand.Code ascending,
-                                    poline.Item.Code ascending
-                            select new ReceivingRVM
-                            {
-                                Brand = poline.Item.Brand.Code,
-                                DateD = purchase.ReplenishDate,
-                                DocumentNumber = purchase.PONumber,
-                                ItemCode = poline.Item.Code,
-                                ItemName = poline.Item.Name,
-                                ItemType = poline.Item.ItemType.Code,
-                                PartNumber = poline.Item.PartNumber + "",
-                                QuantityD = poline.Quantity,
-                                Unit = poline.Item.Unit.Code
-                            };
-            return await purchases.ToListAsync();
+            var receives = from receive in context.PurchaseReceivingLineItems
+                           where (filter.DateFrom == null || filter.DateFrom <= receive.DateCreated)
+                           && (filter.DateTo == null || receive.DateCreated <= filter.DateTo)
+                           && (filter.Brand == null || receive.OrderItem.RequestItem.Item.Brand.Id == filter.Brand)
+                           orderby receive.DateCreated ascending,
+                                   receive.OrderItem.RequestItem.Item.Brand.Code ascending,
+                                   receive.OrderItem.RequestItem.Item.Code ascending
+                           select new ReceivingRVM
+                           {
+                               Brand = receive.OrderItem.RequestItem.Item.Brand.Code,
+                               DateD = receive.DateCreated,
+                               DocumentNumber = receive.PurchaseReceiving.DocumentNumber,
+                               ItemCode = receive.OrderItem.RequestItem.Item.Code,
+                               ItemName = receive.OrderItem.RequestItem.Item.Name,
+                               ItemType = receive.OrderItem.RequestItem.Item.ItemType.Code,
+                               PartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
+                               QuantityD = receive.Quantity,
+                               Unit = receive.OrderItem.RequestItem.Item.Unit.Code,
+                               Warehouse = receive.PurchaseReceiving.Warehouse.Name
+                           };
+            return await receives.ToListAsync();
         }
 
         public async Task<ForDataTables<ReceivingRVM>> GetReceivingDT(DataTablesRequestForm form, ListFilterInventoryModel filter)
@@ -269,25 +264,25 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ReceivingSupplierRVM>> GetReceivingSupplier(ListFilterInventoryModel filter)
         {
-            var purchases = from purchase in context.PurchaseOrders
-                            join poline in context.PurchaseOrderLineItems on purchase.Id equals poline.PurchaseOrderId
-                            where filter.DateFrom <= purchase.ReplenishDate.Date
-                            && purchase.ReplenishDate.Date <= filter.DateTo
-                            && (filter.Supplier == null || purchase.SupplierId == filter.Supplier)
-                            orderby purchase.Supplier.Name ascending, purchase.ReplenishDate ascending
-                            select new ReceivingSupplierRVM
-                            {
-                                AmountD = purchase.TotalPurchaseAmount.GetValueOrDefault(0),
-                                DateD = purchase.ReplenishDate,
-                                DocumentNumber = purchase.PONumber,
-                                Item = poline.Item.Code + " - " + poline.Item.Name,
-                                QuantityD = poline.Quantity,
-                                Supplier = purchase.Supplier.Name,
-                                Unit = poline.Item.Unit.Code,
-                                UnitCostD = poline.UnitPrice * purchase.CurrencyRate,
-                            };
+            var orders = from order in context.PurchaseOrderNewLineItems
+                         where (filter.DateFrom == null || filter.DateFrom <= order.DateCreated)
+                         && (filter.DateTo == null || order.DateCreated <= filter.DateTo)
+                         && (filter.Supplier == null || order.PurchaseOrder.Supplier.Id == filter.Supplier)
+                         orderby order.PurchaseOrder.Supplier.Name ascending,
+                                 order.DateCreated ascending
+                         select new ReceivingSupplierRVM
+                         {
+                             AmountD = order.UnitCost * order.Quantity,
+                             DateD = order.DateCreated,
+                             DocumentNumber = order.PurchaseOrder.DocumentNumber,
+                             Item = order.RequestItem.Item.Name,
+                             QuantityD = order.Quantity,
+                             Supplier = order.PurchaseOrder.Supplier.Name,
+                             Unit = order.RequestItem.Item.Unit.Code,
+                             UnitCostD = order.UnitCost
+                         };
 
-            return await purchases.ToListAsync();
+            return await orders.ToListAsync();
         }
 
         public async Task<ForDataTables<ReceivingSupplierRVM>> GetReceivingSupplierDT(DataTablesRequestForm form, ListFilterInventoryModel filter)
@@ -382,16 +377,12 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ReceivingSummaryRVM>> GetReceivingSummary(ListFilterInventoryModel filter)
         {
-            var temp = from purchase in context.PurchaseOrders
-                       join poline in context.PurchaseOrderLineItems
-                                             .Include(s => s.Item).ThenInclude(s => s.Brand)
-                                             .Include(s => s.Item).ThenInclude(s => s.ItemType)
-                                             .Include(s => s.Item).ThenInclude(s => s.Unit) on purchase.Id equals poline.PurchaseOrderId
+            var temp = from purchase in context.PurchaseOrderNewLineItems
                        select new
                        {
-                           ReplenishDate = purchase.ReplenishDate,
-                           Quantity = poline.Quantity,
-                           Item = poline.Item
+                           ReplenishDate = purchase.DateModified == null ? purchase.DateCreated : purchase.DateModified.Value,
+                           Quantity = purchase.Quantity,
+                           Item = purchase.RequestItem.Item
                        };
 
             var purchases = from purchase in await temp.ToListAsync()
@@ -411,26 +402,6 @@ namespace GMGInventory.Application.Repositories
                                 Unit = p.Key.Unit.Code
                             };
 
-            //var purchases = from poline in context.PurchaseOrderLineItems
-            //                                        .Include(s => s.Item).ThenInclude(s => s.Brand)
-            //                                        .Include(s => s.Item).ThenInclude(s => s.ItemType)
-            //                                        .Include(s => s.Item).ThenInclude(s => s.Unit)
-            //                group poline by poline.Item into p
-            //                join purchase in context.PurchaseOrders on p.First().PurchaseOrderId equals purchase.Id
-            //                where filter.DateFrom <= purchase.ReplenishDate
-            //                && purchase.ReplenishDate <= filter.DateTo
-            //                && (filter.Brand == null || p.Key.Brand.Id == filter.Brand)
-            //                orderby p.Key.Brand.Code ascending, p.Key.Code ascending
-            //                select new ReceivingSummaryRVM
-            //                {
-            //                    Brand = p.Key.Brand.Code,
-            //                    ItemCode = p.Key.Code,
-            //                    ItemName = p.Key.Name,
-            //                    ItemType = p.Key.ItemType.Code,
-            //                    PartNumber = p.Key.PartNumber + "",
-            //                    QuantityD = p.Sum(s => s.Quantity),
-            //                    Unit = p.Key.Unit.Code
-            //                };
             return purchases.ToList();
         }
 
@@ -715,7 +686,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<StockStatusRVM>> GetStockStatus(ListFilterInventoryModel filter)
         {
-            
+
             var stocks = from item in context.Items
                                              .Include(s => s.Brand)
                                              .Include(s => s.ItemType)
@@ -738,7 +709,7 @@ namespace GMGInventory.Application.Repositories
                                                .Average(s => s.PurchaseOrder.CurrencyRate * s.UnitPrice)
                          where (filter.Brand == null || item.Brand.Id == filter.Brand)
                          && (filter.Item == null || item.Id == filter.Item)
-                         && (filter.Warehouse == null || iteminv.WarehouseId == filter.Warehouse) 
+                         && (filter.Warehouse == null || iteminv.WarehouseId == filter.Warehouse)
                          select new StockStatusRVM
                          {
                              Brand = item.Brand.Name,
@@ -876,23 +847,23 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<SupplierPurchaseRVM>> GetSupplierPurchase(ListFilterInventoryModel filter)
         {
-            var purchases = from purchase in context.PurchaseOrderLineItems
-                            where filter.DateFrom <= purchase.PurchaseOrder.ReplenishDate
-                            && purchase.PurchaseOrder.ReplenishDate <= filter.DateTo
-                            && (filter.Brand == null || purchase.Item.Brand.Id == filter.Brand)
-                            && (filter.Item == null || purchase.Item.Id == filter.Item)
+            var purchases = from purchase in context.PurchaseOrderNewLineItems
+                            where (filter.DateFrom == null || filter.DateFrom <= purchase.DateCreated)
+                            && (filter.DateTo == null || purchase.DateCreated <= filter.DateTo)
+                            && (filter.Brand == null || purchase.RequestItem.Item.Brand.Id == filter.Brand)
+                            && (filter.Item == null || purchase.RequestItem.Item.Id == filter.Item)
                             && (filter.Supplier == null || purchase.PurchaseOrder.Supplier.Id == filter.Supplier)
                             select new SupplierPurchaseRVM
                             {
-                                Brand = purchase.Item.Brand.Name,
+                                Brand = purchase.RequestItem.Item.Brand.Name,
                                 Currency = purchase.PurchaseOrder.Supplier.Currency.Name,
-                                ItemCode = purchase.Item.Code,
-                                ItemName = purchase.Item.Name,
-                                PurchaseDateD = purchase.PurchaseOrder.ReplenishDate,
+                                ItemCode = purchase.RequestItem.Item.Code,
+                                ItemName = purchase.RequestItem.Item.Name,
+                                PurchaseDateD = purchase.DateCreated,
                                 QuantityD = purchase.Quantity,
                                 Supplier = purchase.PurchaseOrder.Supplier.Name,
-                                Unit = purchase.Item.Unit.Name,
-                                UnitPriceD = purchase.PurchaseOrder.CurrencyRate * purchase.UnitPrice
+                                Unit = purchase.RequestItem.Item.Unit.Name,
+                                UnitPriceD = purchase.UnitCost
                             };
             return await purchases.ToListAsync();
         }

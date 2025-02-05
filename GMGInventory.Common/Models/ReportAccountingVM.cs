@@ -11,7 +11,7 @@ namespace GMGInventory.Common.Models
         public DateTime MemoDateD { get; set; }
 
         [Display(Name = "Memo Number")]
-        public string MemoNumber { get; set; }
+        public string? MemoNumber { get; set; }
 
         [Display(Name = "Customer")]
         public string Customer { get; set; }

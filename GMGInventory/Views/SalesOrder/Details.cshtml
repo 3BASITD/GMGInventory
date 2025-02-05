@@ -1061,15 +1061,15 @@
                 itemDT.column(10).visible(false); // served quantity
                 itemDT.column(11).visible(false); // unserved quantity
                 itemDT.column(12).visible(false); // update served quantity button
-            } else if (so_details.status.toLowerCase().includes("approved")) {
-                itemDT.column(0).visible(false);
-                itemDT.column(10).visible(true);
-                itemDT.column(11).visible(true);
-                itemDT.column(12).visible(true);
+            // } else if (so_details.status.toLowerCase().includes("approved")) {
+            //     itemDT.column(0).visible(false);
+            //     itemDT.column(10).visible(true);
+            //     itemDT.column(11).visible(true);
+            //     itemDT.column(12).visible(false);//true dati
             } else {
                 itemDT.column(0).visible(false);
-                itemDT.column(10).visible(false);
-                itemDT.column(11).visible(false);
+                itemDT.column(10).visible(true);//false dati
+                itemDT.column(11).visible(true);//false dati
                 itemDT.column(12).visible(false);
             }
 
@@ -1109,7 +1109,7 @@
                     $("#served-name").val(itemdata.itemName);
                     $("#served-quantity").val(itemdata.quantity);
                     $("#served-toadd").val(0);
-                    $("#served-toadd").attr("max", itemdata.unservedQuantity);
+                    $("#served-toadd").attr("max", itemdata.inventoryCount);
                     $("#served-inventory").val(itemdata.inventoryCount);
                     $("#served-inventory").data("prime", itemdata.inventoryCount);
                     $("#served-served").val(itemdata.servedQuantity);
@@ -1125,18 +1125,12 @@
             var toadd = parseInt($(this).val());
             var inventory = parseInt($("#served-inventory").data("prime"));
             var served = parseInt($("#served-served").data("prime"));
-            var unserved = parseInt($("#served-unserved").data("prime"));
-            if (toadd > unserved) {
-                toadd = unserved;
-            }
             if (toadd == 0) {
                 $("#served-inventory").val(inventory);
                 $("#served-served").val(served);
-                $("#served-unserved").val(unserved);
             } else {
                 $("#served-inventory").val(inventory + " → " + (inventory - toadd));
                 $("#served-served").val(served + " → " + (served + toadd));
-                $("#served-unserved").val(unserved + " → " + (unserved - toadd));
             }
         });
 

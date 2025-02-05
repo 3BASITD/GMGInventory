@@ -47,11 +47,15 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Amount)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateInvoice)
+                    </th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
                     <th colspan="5" class="text-end">Total</th>
+                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -266,7 +270,8 @@
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "price", name: "Price", className: "text-end" },
-                { data: "amount", name: "Amount", className: "text-end" }
+                { data: "amount", name: "Amount", className: "text-end" },
+                { data: "dateInvoice", name: "DateInvoice" }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var json = salesDT.ajax.json();

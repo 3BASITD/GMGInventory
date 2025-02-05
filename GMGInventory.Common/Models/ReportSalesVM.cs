@@ -32,6 +32,10 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Amount")]
         public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
         public decimal AmountD => QuantityD * PriceD;
+
+        [Display(Name = "Date Invoice")]
+        public string DateInvoice => DateInvoiceD.ToString(SystemFormat.StringDate);
+        public DateTime DateInvoiceD { get; set; }
     }
 
     public class AgentSalesPerItemPVM

@@ -1188,84 +1188,6 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("ChequeStatuses");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("CreditDebitMemoTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("InvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MemoNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("UserCreated")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreditDebitMemoTypeId");
-
-                    b.HasIndex("InvoiceId");
-
-                    b.ToTable("CreditDebitMemos");
-                });
-
-            modelBuilder.Entity("GMGInventory.Data.CreditDebitMemoType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CreditDebitMemoTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = "CR",
-                            Name = "Credit"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "DB",
-                            Name = "Debit"
-                        });
-                });
-
             modelBuilder.Entity("GMGInventory.Data.CreditTerm", b =>
                 {
                     b.Property<int>("Id")
@@ -1374,9 +1296,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("OutstandingBalance")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(250)");
@@ -4622,9 +4541,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<decimal>("Discount2")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<bool>("IsServed")
-                        .HasColumnType("bit");
-
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
@@ -4912,6 +4828,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<decimal>("CreditAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("CreditReferenceNumber")
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -4921,8 +4840,14 @@ namespace GMGInventory.Data.Migrations
                     b.Property<decimal>("DebitAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("DebitReferenceNumber")
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<decimal>("FreightCost")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("FreightReferenceNumber")
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("FreightWaybill")
                         .HasColumnType("nvarchar(50)");
@@ -5846,13 +5771,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d385a0d9-c69b-4215-8064-3fa50475ed7f",
+                            ConcurrencyStamp = "42e5f366-bdcc-4718-8f74-fa9b92991185",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAENPA1H5pl+MYmm7Vu9+trOjT3qL0gYcZ1RIFC49zodK1Xfia1b8B+Hh6jvtWfKsDKg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB0QlGDFh9+uxtnI3nqTt23d7Y+CsZaWc0ItSUYAzUX5DskJrEw3fw22f2C6S55ziw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "67a20266-c980-4fc7-a83c-b365c034ddd5",
+                            SecurityStamp = "89ebf741-ed9f-4952-87a3-3c458d6fbbe0",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5867,13 +5792,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9ed94c96-7b01-4cbe-a507-2cfb0e17df5b",
+                            ConcurrencyStamp = "077c4146-09e5-4a18-9703-ed62075eb15a",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJVyTXLvX3OAmrX25rglcXiaJ/R88oXFD00Ehs49lZoGYQeN30Jj0HW6RlakQp7XbQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKmymrv1+aTrgUtfHgXXJhvlipUibdAjxf5gBo76FQ0+r4upKKeYbQ35m7w3ej4C3Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fcfd0674-2d40-4d22-82f4-1303a33a3888",
+                            SecurityStamp = "d0c3be67-a65b-48a1-bbf0-80cde7f09820",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5964,25 +5889,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Status");
-                });
-
-            modelBuilder.Entity("GMGInventory.Data.CreditDebitMemo", b =>
-                {
-                    b.HasOne("GMGInventory.Data.CreditDebitMemoType", "CreditDebitMemoType")
-                        .WithMany("CreditDebitMemos")
-                        .HasForeignKey("CreditDebitMemoTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GMGInventory.Data.Invoice", "Invoice")
-                        .WithMany("CreditDebitMemos")
-                        .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreditDebitMemoType");
-
-                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Customer", b =>
@@ -7123,11 +7029,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Cheques");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.CreditDebitMemoType", b =>
-                {
-                    b.Navigation("CreditDebitMemos");
-                });
-
             modelBuilder.Entity("GMGInventory.Data.CreditTerm", b =>
                 {
                     b.Navigation("Customers");
@@ -7183,8 +7084,6 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
                 {
-                    b.Navigation("CreditDebitMemos");
-
                     b.Navigation("CustomerPaymentDetails");
 
                     b.Navigation("InvoiceLineItems");

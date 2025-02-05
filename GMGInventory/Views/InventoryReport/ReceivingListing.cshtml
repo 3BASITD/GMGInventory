@@ -57,11 +57,15 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Quantity)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Warehouse)
+                    </th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
                     <th colspan="8" class="text-end">Total</th>
+                    <th></th>
                     <th></th>
                 </tr>
             </tfoot>
@@ -188,7 +192,8 @@
                 { data: "unit", name: "Unit" },
                 { data: "documentNumber", name: "DocumentNumber" },
                 { data: "date", name: "Date" },
-                { data: "quantity", name: "Quantity", className: "text-end" }
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "warehouse", name: "Warehouse" }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var json = receiveDT.ajax.json();
