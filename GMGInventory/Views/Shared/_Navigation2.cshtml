@@ -110,8 +110,8 @@ else
                     @if (navPages.Contains(PageNames.ShippingList.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "ShippingList" ? "active" : "")"
-                               asp-area="" asp-controller="ShippingList" asp-action="Index">
+                            <a class="dropdown-item @(currentController == "Shipping" ? "active" : "")"
+                               asp-area="" asp-controller="Shipping" asp-action="Index">
                                 <i class="nav-icon fas fa-shipping-fast"></i>
                                 Shipping List
                             </a>

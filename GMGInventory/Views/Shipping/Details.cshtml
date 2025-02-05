@@ -1,0 +1,212 @@
+﻿@model ShippingVM
+
+@{
+    ViewData["Title"] = "Shipping Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Shipping" asp-action="Index">Shipping List</a></li>
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right" asp-action="Index" )">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.SONumber)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.SONumber
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CustomerName)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.CustomerName
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CustomerAddress)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.CustomerAddress
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.PairedInvoices)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.PairedInvoices
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Number of boxes,crates,roll etc
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model?.Packaging
+                    </b>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Packed Item(s)</span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-item">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Item Description</th>
+                                    <th>UOM</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                          @*   <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th class="total-quantity">0</th>
+                                </tr> *@
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetItemsJson")",
+                data: { salesOrderId: @Model?.SalesOrderId },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                },
+                type: "POST",
+            },
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            paging: false,
+            searching: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "boxNumber", name: "BoxNumber"},
+                { data: "packTypeName", name: "PackTypeName" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode"
+                },
+                { data: "itemName", name: "ItemName" },
+                { data: "quantity", name: "Quantity", className: "text-end" }
+            ],
+            order: [[0, "asc"]],
+            // footerCallback: function (row, data, start, end, display) {
+            //     var api = this.api(), data;
+            //     columnDTTotalInteger(api, 5);
+            // },
+            // order: [[3, "asc"]],
+            // orderFixed: [[1, 'asc'], [2, 'asc']],
+            rowGroup: {
+                startRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="4"><strong>Package ' + group + '</strong></td>');
+                },
+                endRender: function (rows, group) {
+                    return $('<tr/>')
+                        .append('<td colspan="3" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
+                        .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
+                },
+                dataSrc: function (row) {
+                    var boxNo = parseInt(row.boxNumber) + 1;
+                    $('#boxNo').val(parseInt(row.boxNumber) + 1);
+
+                    return "#" + row.boxNumber + " (" + row.packTypeName + ")";
+                }
+            }
+        });
+
+        itemDT.on("draw", function () {
+            hideLoader();
+        });
+
+        // $("#shipping-so-number").select2({
+        //     minimumInputLength: 1,
+        //     placeholder: '@Model?.SONumber',
+        //     ajax: {
+        //         url: "@Url.Action("GetInvoicedSalesOrderOptions")",
+        //         dataType: 'json',
+        //         type: "POST",
+        //         delay: 500,
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //                 page: params.page || 1
+        //             };
+        //         },
+        //         processResults: function (data, params) {
+        //             params.page = params.page || 1;
+        //             return {
+        //                 results: data.items,
+        //                 pagination: {
+        //                     more: (params.page * 50) < data.total_count
+        //                 }
+        //             };
+        //         },
+        //         cache: true
+        //     }
+        // });
+
+        // $("#shipping-so-number").on("select2:select", function () {
+        //     $("#customer-name").text($(this).select2("data")[0].customerName);
+        //     $("#customer-address").text($(this).select2("data")[0].customerAddress);
+        //     $("#paired-invoices").text($(this).select2("data")[0].pairedInvoices);
+        //     $("#packaging").text($(this).select2("data")[0].packaging);
+        // });
+
+    </script>
+}

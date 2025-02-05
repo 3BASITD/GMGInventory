@@ -1,0 +1,68 @@
+﻿@model ShippingVM
+
+@{
+    Layout = "";
+    var title = "Shipping Report";
+    // var items = ViewData["Items"] as List<ShippingVM> ?? new List<ShippingVM>();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <table class="formatted">
+        <tr>
+            <td rowspan="2" class="center-text">
+                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                {
+                    <img src="~/images/BAS-02.png" class="logo" />
+                }
+                else
+                {
+                    <img src="~/images/GMG-01.png" class="logo" />
+                }
+            </td>
+            <td rowspan="2"  style="width: 90%;">
+                <div class="column center-text">
+                    <dl>
+                        <dd>BINA'S AUTO SUPPLY INC</dd>
+                        <dt>1034 KUSANG LOOB  STA. CRUZ MANILA</dt>
+                        <dt>CONTACT NO: 712-9260 / 0920-909-2787</dt>
+                        <dd>SHIPPING LIST</dd>
+                    </dl>
+                </div>
+            </td>
+        </tr>
+    
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="min-width: 50px;">Quantity</th>
+                <th style="min-width: 25px;">UOM</th>
+                <th>DESCRIPTION OF ARTICLE</th>
+                <th style="min-width: 50px;">VALUE</th>
+                <th style="min-width: 50px;">FREIGHT</th>
+            </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = function () {
+        setTimeout(function () {
+            window.close();
+        }, 100);
+    };
+</script>
+</html>

@@ -68,6 +68,7 @@ namespace GMGInventory.Common.Models
     public class PackItemVM
     {
         public int Id { get; set; }
+        public int PackId { get; set; }
 
         [Display(Name = "Package Number")]
         public int BoxNumber { get; set; }
