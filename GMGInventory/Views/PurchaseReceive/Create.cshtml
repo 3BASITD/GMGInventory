@@ -129,11 +129,6 @@
                     <div class="card">
                         <div class="card-header bg-light">
                             <span class="card-title">Purchase Receive Item(s)</span>
-                         @*    <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                    <span class="fas fa-plus"></span> Add Item
-                                </button>
-                            </div> *@
                         </div>
                         <div class="card-body">
                             <table class="table table-head-fixed table-striped table-hover table-item">
@@ -146,6 +141,7 @@
                                         <th>Quantity</th>
                                         <th>Unit</th>
                                         <th>Unit Cost</th>
+                                        <th>Total Amount</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
@@ -156,7 +152,8 @@
                                         <th class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
                                         <th></th>
-                                        <th class="total-cost"></th>
+                                        <th></th>
+                                        <th class="total-amount">0.00</th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -166,89 +163,6 @@
             </div>
         </div>
     </form>
-</div>
-
-<!-- Purchase Receive Item Modal -->
-<div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Purchase Receive Item</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form id="form-item">
-                <div class="modal-body">
-                    <div class="row">
-                        <input type="hidden" id="add-description" name="ItemDescription" class="form-control form-control-sm" />
-                        <input type="hidden" id="add-lineNumber" name="LineNumber" class="form-control form-control-sm" />
-
-                         <div class="col-12 col-sm-6 add-code-container">
-                            <div class="form-group">
-                                <label for="add-orderItem" class="form-label mb-0">Order Item</label>
-                                <select id="add-orderItem" name="OrderItem" style="width: 100%;">
-                                    <option></option>
-                                </select>
-                            </div>
-                        </div>
-
-                        @* <div class="col-12 col-sm-6 add-code-container">
-                            <div class="form-group">
-                                <label for="add-code" class="form-label mb-0">Item</label>
-                                <select id="add-code" name="Code" style="width: 100%;">
-                                    <option></option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 add-name-container">
-                            <div class="form-group">
-                                <label for="add-name" class="form-label mb-0">Item Description</label>
-                                <input type="text" id="add-name" name="Name" class="form-control form-control-sm" />
-                            </div>
-                        </div> *@
-
-                        <div class="col-12 col-sm-6 add-quantity-container">
-                            <div class="form-group">
-                                <label for="add-quantity" class="form-label mb-0">Quantity</label>
-                                <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
-                            </div>
-                        </div>
-                 @*        <div class="col-12 col-sm-6 add-unit2-container">
-                            <div class="form-group">
-                                <label for="add-unit2" class="form-label mb-0">Unit</label>
-                                <div>
-                                    <select id="add-unit2" style="width: 100%;">
-                                        <option></option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div> *@
-                          <div class="col-12 col-sm-6 add-unit-container">
-                            <div class="form-group">
-                                <label for="add-unit" class="form-label mb-0">Unit</label>
-                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 add-cost">
-                            <div class="form-group">
-                                <label for="add-cost" class="form-label mb-0">Unit Cost</label>
-                                <input type="number"  id="add-cost" name="UnitCost" class="form-control form-control-sm" readonly="readonly" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-add">
-                        <span class="fas fa-plus"></span> Add
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
 
 @if (TempData["PurchaseReceivingId"] != null)
@@ -349,7 +263,8 @@
                     className: "form-cell text-end"
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
-                { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false : true }
+                { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false : true },
+                { data: "totalAmount", name: "TotalAmount", className: "form-cell", visible: user_accessBasic.canView ? false : true }
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {
@@ -360,7 +275,7 @@
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
                 columnDTTotalInteger(api, 4);
-                columnDTTotalInteger(api, 6);
+                columnDTTotalInteger(api, 7);
             }
         });
 
@@ -382,8 +297,8 @@
 
                 rowData.quantity = FormatStringInteger(quantityValue);
                 rowData.quantityD = quantityValue;
-                // rowData.totalAmount = FormatStringDecimal(totalValue);
-                // rowData.totalAmountD = totalValue;
+                rowData.totalAmount = FormatStringDecimal(totalValue);
+                rowData.totalAmountD = totalValue;
 
                 row.data(rowData).draw(false);
 
@@ -407,6 +322,9 @@
 
                 rowData.quantity = FormatStringInteger(0);
                 rowData.quantityD = 0;
+                rowData.totalAmount = FormatStringDecimal(0);
+                rowData.totalAmountD = 0;
+
                 if ($(this).prop("checked")) {
                     rowData.toReceive = true;
                     tr.removeClass("text-muted");
@@ -445,7 +363,6 @@
                         placeholder: "<empty>"
                     }).off("select2:select").on("select2:select", function () {
                         loadPODetails();
-                        loadAllItemsOptions(selectedOrder);
                     }).off("select2:unselecting").on("select2:unselecting", function () {
                         $("#receive-supplier").val("");
                         $("#receive-warehouse").val("");
@@ -458,7 +375,12 @@
                         $("#add-orderItem").val("").trigger("change");
 
                         itemDT.clear().draw();
-                    }).val(selectedOrder).trigger('change');
+                    });
+                    if (selectedReceiving == -1) {
+                        $("#receive-poNumber").val(null).trigger('change');
+                    } else {
+                        loadPODetails();
+                    }
                 } 
             });
         }
@@ -484,134 +406,6 @@
                 }
             });
         }
-
-        function loadAllItemsOptions(selectedOrder) {
-            if ($.fn.select2 && $("#add-orderItem").hasClass("select2-hidden-accessible")) {
-                $("#add-orderItem").select2("destroy");
-                $("#add-orderItem").empty();
-            } 
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetPurchaseOrderItemOptions")", 
-                data: {
-                    SelectedId: function () {
-                        return $("#receive-poNumber").val(); 
-                    }
-                },
-                success: function (data, status, xhr) {
-                    $("#add-orderItem").select2({
-                        data: data,
-                        minimumResultsForSearch: -1,
-                        placeholder: "<empty>",
-                        allowClear: true,
-                        language: {
-                            noResults: function () {
-                                return "No items found";
-                            }
-                        },
-                        templateResult: function (repo) {
-                            if (repo.loading) {
-                                return repo.text;
-                            }
-                            return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
-                        },
-                        dropdownParent: $("#addModal")
-                    }).on("select2:select", function () {
-                        var selected = $(this).select2("data")[0];
-                        // $("#add-code").val(selected.itemCode);
-                        // $("#add-part").val(selected.partNumber);
-                        // $("#add-quantity").val(selected.unorderedQuantity);
-                        // $("#add-quantity").data("max", selected.unorderedQuantity);
-                        // $("#add-unit").val(selected.unit);
-                        // $("#add-unit").data("Id", selected.unitId);
-                        // $("#add-unit-cost").val(0);
-                        // $("#add-total-amount").val("0.00");
-                    }).on("select2:unselecting", function () {
-                        // $("#add-code").val("");
-                        // $("#add-quantity").val(0);
-                        // $("#add-quantity").data("max", 0);
-                        // $("#add-unit").val("");
-                        // $("#add-unit").data("Id", -1);
-                        // $("#add-unit-cost").val("0.00");
-                        // $("#add-total-amount").val("0.00");
-                    });
-                }, 
-                complete: AssignItemEvent
-
-            });
-
-        } 
-
-        function AssignItemEvent(jqXHR, textStatus) {
-            $("#add-orderItem").off("select2:select").on("select2:select", function () {
-                $("#add-name").val($("#add-orderItem").select2("data")[0].name);
-                $("#add-unit").val($("#add-orderItem").select2("data")[0].unit);
-                $("#add-unit").data("Id", $("#add-orderItem").select2("data")[0].unitId);
-                $("#add-cost").val($("#add-orderItem").select2("data")[0].unitCost);
-                $("#add-description").val($("#add-orderItem").select2("data")[0].itemDescription);
-                $("#add-lineNumber").val($("#add-orderItem").select2("data")[0].lineNumber);
-            });
-
-            $("#add-orderItem").off("select2:unselecting").on("select2:unselecting", function (e) {
-                $("#add-name").val("");
-                $("#add-unit").val("");
-                $("#add-unit").data("Id", "");
-                $("#add-cost").val("0.00");
-                $("#add-description").val("");
-                $("#add-lineNumber").val("");
-            });
-        }
-
-        // Load unit for select2
-        // $.ajax({
-        //     type: "POST",
-        //     url: "@Url.Action("GetOptions", "Unit")",
-        //     success: function (data, status, xhr) {
-        //         $("#add-unit2").select2({
-        //             data: data,
-        //             minimumResultsForSearch: -1,
-        //             placeholder: "<empty>",
-        //             dropdownParent: $("#addModal")
-        //         }).on("change", function () {
-        //             $("#add-unit").val($("#add-unit2").select2("data")[0].text);
-        //             $("#add-unit").data("Id", $("#add-unit2").select2("data")[0].id);
-        //         });
-        //     }
-        // });
-
-        $(".createBtn").on("click", clearItemForm);
-
-        function clearItemForm() {
-            $("#add-orderItem").val("").trigger("change");
-            $("#add-name").val("");
-            $("#add-quantity").val("0");
-            $("#add-cost").val("0");
-            $("#add-unit").val("");
-            $("#add-unit").data("Id", "");
-        }
-
-        // Validation for Add Item Modal
-        var validateAdd = $("#form-item").validate({
-            rules: {
-               
-                Quantity: {
-                    required: true,
-                    number: true,
-                    isNotZero: true
-                }
-            },
-            messages: {
-                Quantity: {
-                    required: "Please enter quantity.",
-                    number: "Please enter a valid number.",
-                    isNotZero: "Can not receive an item with 0 quantity."
-                }
-            },
-            submitHandler: function (form, event) {
-                event.preventDefault();
-                AddItem();
-            }
-        });
 
         function GetItemsToReceive() {
             var item_to_receive = [];
@@ -652,7 +446,9 @@
                             unitCode: v.unitCode,
                             unitId: v.unitId,
                             unitCost: v.unitCost,
-                            unitCostD: v.unitCostD
+                            unitCostD: v.unitCostD,
+                            totalAmount: FormatStringDecimal(0),
+                            totalAmountD: 0
                         });
                     });
                 },
@@ -710,7 +506,7 @@
 
         function SaveReceive() {
             var items = itemDT.data();
-            if (items.length == 0) {
+            if (items.filter(s => s.toReceive == true).length == 0) {
                 toastr.warning("No item to receive. Add an item to the list to continue", "Warning");
             } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) == 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't receive an item with 0 quantity", "Warning");
