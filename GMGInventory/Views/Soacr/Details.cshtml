@@ -163,7 +163,7 @@
 {
     <!-- Edit Modal -->
     <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Invoice</h5>
@@ -174,27 +174,51 @@
                 <form autocomplete="off" id="editForm">
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-6">
                                 <div class="form-group">
                                     <label for="edit-debit" class="control-label mb-0 d-block">Debit</label>
                                     @*<input type="number" step="0.01" min="0" max="1999999.99" name="Debit" id="edit-debit" class="form-control form-control-sm" />*@
                                     <input type="text" name="Debit" id="edit-debit" class="form-control form-control-sm mask-decimal" />
                                 </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-debit-reference" class="control-label mb-0 d-block">Debit Reference Number</label>
+                                    <input type="text" name="DebitReference" id="edit-debit-reference" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
                                 <div class="form-group">
                                     <label for="edit-credit" class="control-label mb-0 d-block">Credit</label>
                                     @*<input type="number" step="0.01" min="0" max="1999999.99" name="Credit" id="edit-credit" class="form-control form-control-sm" />*@
                                     <input type="text" name="Credit" id="edit-credit" class="form-control form-control-sm mask-decimal" />
                                 </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-credit-reference" class="control-label mb-0 d-block">Credit Reference Number</label>
+                                    <input type="text" name="CreditReference" id="edit-credit-reference" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
                                 <div class="form-group">
                                     <label for="edit-freight-cost" class="control-label mb-0 d-block">Freight Cost</label>
                                     @*<input type="number" step="0.01" min="0" max="1999999.99" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm" />*@
                                     <input type="text" name="FreightCost" id="edit-freight-cost" class="form-control form-control-sm mask-decimal" />
                                 </div>
                             </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-freight-reference" class="control-label mb-0 d-block">Freight Reference Number</label>
+                                    <input type="text" name="FreightReference" id="edit-freight-reference" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="edit-freight-waybill" class="control-label mb-0 d-block">Freight's Waybill</label>
@@ -644,9 +668,12 @@
                     var data = soaDT.row($(this).parents('tr')).data();
                     $("#edit-debit").data("id", data.id);
                     $("#edit-debit").val(data.debitD.toFixed(2));
+                    $("#edit-debit-reference").val(data.debitReferenceNumber);
                     $("#edit-credit").val(data.creditD.toFixed(2));
+                    $("#edit-credit-reference").val(data.creditReferenceNumber);
                     $("#edit-freight-cost").val(data.freightChargeD.toFixed(2));
-                    $("#edit-frieght-waybill").val(data.frieghtWaybill);
+                    $("#edit-freight-reference").val(data.freightReferenceNumber);
+                    $("#edit-freight-waybill").val(data.freightWaybill);
                 });
             }
             if (user_access.canDelete) {
@@ -748,9 +775,12 @@
                 data: {
                     Id: $("#edit-debit").data("id"),
                     Debit: removeCommaOfNumber($("#edit-debit").val()),
+                    DebitReference: $("#edit-debit-reference").val(),
                     Credit: removeCommaOfNumber($("#edit-credit").val()),
+                    CreditReference: $("#edit-credit-reference").val(),
                     FreightCharge: removeCommaOfNumber($("#edit-freight-cost").val()),
-                    FreightWaybill: $("#edit-frieght-waybill").val(),
+                    FreightReference: $("#edit-freight-reference").val(),
+                    FreightWaybill: $("#edit-freight-waybill").val(),
                 },
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {

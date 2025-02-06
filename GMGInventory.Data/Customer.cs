@@ -54,8 +54,8 @@ namespace GMGInventory.Data
         public int CustomerTypeId { get; set; }
         public CustomerType CustomerType { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal OutstandingBalance { get; set; }
+        //[Column(TypeName = "decimal(18, 2)")]
+        //public decimal OutstandingBalance { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
         public string? Remarks { get; set; }

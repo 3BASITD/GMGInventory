@@ -454,9 +454,12 @@ namespace GMGInventory.Application.Repositories
                           IsPaid = sl.IsPaid ?? false,
                           TBRD = tbr,
                           CreditD = sl.CreditAmount,
+                          CreditReferenceNumber = sl.CreditReferenceNumber,
                           DebitD = sl.DebitAmount,
+                          DebitReferenceNumber = sl.DebitReferenceNumber,
                           PaidAmountD = sl.PaidAmount,
                           FreightChargeD = sl.FreightCost,
+                          FreightReferenceNumber = sl.FreightReferenceNumber,
                           FreightWaybill = sl.FreightWaybill + ""
                       };
             return await soa.ToListAsync();
@@ -547,8 +550,11 @@ namespace GMGInventory.Application.Repositories
             }
 
             soa.DebitAmount = soaVM.Debit;
+            soa.DebitReferenceNumber = soaVM.DebitReference;
             soa.CreditAmount = soaVM.Credit;
+            soa.CreditReferenceNumber = soaVM.CreditReference;
             soa.FreightCost = soaVM.FreightCharge;
+            soa.FreightReferenceNumber = soaVM.FreightReference;
             soa.FreightWaybill = soaVM.FreightWaybill;
 
             context.SOACRLineItems.Update(soa);
@@ -766,7 +772,7 @@ namespace GMGInventory.Application.Repositories
                     CreditAmount = 0,
                     DebitAmount = 0,
                     FreightCost = 0,
-                    FreightWaybill = "0",
+                    FreightWaybill = "",
                     IsPaid = false
                 };
                 await context.SOACRLineItems.AddAsync(soali);

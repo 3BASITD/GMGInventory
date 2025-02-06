@@ -7,7 +7,7 @@ namespace GMGInventory.Data
         public Invoice()
         {
             this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
-            this.CreditDebitMemos = new HashSet<CreditDebitMemo>();
+            //this.CreditDebitMemos = new HashSet<CreditDebitMemo>();
             this.InvoiceLineItems = new HashSet<InvoiceLineItem>();
             //this.InvoicePayments = new HashSet<InvoicePayment>();
             //this.PaymentDetails = new HashSet<PaymentDetail>();
@@ -59,7 +59,7 @@ namespace GMGInventory.Data
         public DateTime? DisapprovedDate { get; set; }
 
         public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
-        public ICollection<CreditDebitMemo> CreditDebitMemos { get; set; }
+        //public ICollection<CreditDebitMemo> CreditDebitMemos { get; set; }
         public ICollection<InvoiceLineItem> InvoiceLineItems { get; set; }
         //public ICollection<InvoicePayment> InvoicePayments { get; set; }
         //public ICollection<PaymentDetail> PaymentDetails { get; set; }

@@ -38,6 +38,7 @@
                 <th>Document Number</th>
                 <th>Date</th>
                 <th>Quantity</th>
+                <th>Warehouse</th>
             </tr>
         </thead>
         <tbody>
@@ -53,6 +54,7 @@
                     <td><nobr>@item.DocumentNumber</nobr></td>
                     <td><nobr>@item.Date</nobr></td>
                     <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td><nobr>@item.Warehouse</nobr></td>
                 </tr>
             }
         </tbody>
@@ -60,6 +62,7 @@
             <tr>
                 <th colspan="8" class="right-text">Total</th>
                 <th class="right-text">@Model.TotalQuantity</th>
+                <th></th>
             </tr>
         </tfoot>
     </table>

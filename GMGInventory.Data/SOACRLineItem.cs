@@ -18,17 +18,23 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal PaidAmount { get; set; }
 
-        //[Column(TypeName = "decimal(18, 2)")]
-        //public decimal TBRAmount { get; set; }
-
         [Column(TypeName = "decimal(18, 2)")]
         public decimal CreditAmount { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? CreditReferenceNumber { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal DebitAmount { get; set; }
 
+        [Column(TypeName = "nvarchar(50)")]
+        public string? DebitReferenceNumber { get; set; }
+
         [Column(TypeName = "decimal(18, 2)")]
         public decimal FreightCost { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? FreightReferenceNumber { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? FreightWaybill { get; set; }

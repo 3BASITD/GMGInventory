@@ -2,9 +2,14 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Humanizer.In;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using GMGInventory.Data.Migrations;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -25,101 +30,261 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptions(string search, int page)
         {
-            var customers = await context.Customers
-                                         .Where(s => string.IsNullOrWhiteSpace(search)
-                                                 || (s.Code.ToLower().Contains(search.ToLower()))
-                                                 || (s.Name.ToLower().Contains(search.ToLower())))
-                                         .Select(s => new JsonCustomerOptionsModel
-                                         {
-                                             Id = s.Id.ToString(),
-                                             Text = s.Code,
-                                             Name = s.Name,
-                                             Address = s.ShippingAddresses
-                                                        .Where(a => a.IsDefault == true)
-                                                        .Select(a => a.Address)
-                                                        .FirstOrDefault() ?? "N/A",
-                                             CreditTerm = s.CreditTerm.Name,
-                                             Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
-                                             OutstandingBalanceD = s.OutstandingBalance
-                                         })
-                                         .OrderBy(s => s.Text)
-                                         .ToListAsync();
-            var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
+            var customerInvoices = from inv in context.InvoiceLineItems
+                                   where inv.Invoice.Status.Name.ToLower() != "invoice draft"
+                                      && inv.Invoice.Status.Name.ToLower() != "cancelled invoice"
+                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                   };
+
+            var customerPayments = from pay in context.CustomerPayments
+                                   group pay by pay.CustomerId into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       PaymentAmount = g.Sum(s => (decimal?)s.TotalAmountPaid) ?? 0
+                                   };
+
+            var customerSalesReturns = from sr in context.SalesReturnLineItems
+                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+                                       select new
+                                       {
+                                           CustomerId = g.Key,
+                                           SalesReturnAmount = g.Sum(s => (decimal?)((s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                       };
+
+            var customerSOACR = from s in context.SOACRLineItems
+                                group s by s.Invoice.SalesOrder.Customer.Id into g
+                                select new
+                                {
+                                    CustomerId = g.Key,
+                                    CreditMemoAmount = g.Sum(s => (decimal?)s.CreditAmount) ?? 0,
+                                    DebitMemoAmount = g.Sum(s => (decimal?)s.DebitAmount) ?? 0,
+                                    FreightAmount = g.Sum(s => (decimal?)s.FreightCost) ?? 0
+                                };
+
+            var customers = from customer in context.Customers
+                            let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
+                                                                .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                            let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
+                                                                .Sum(s => (decimal?)s.PaymentAmount) ?? 0
+                            let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
+                                                                        .Sum(s => (decimal?)s.SalesReturnAmount) ?? 0
+                            let creditAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                            .Sum(s => (decimal?)s.CreditMemoAmount) ?? 0
+                            let debitAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                           .Sum(s => (decimal?)s.DebitMemoAmount) ?? 0
+                            let freightAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                             .Sum(s => (decimal?)s.FreightAmount) ?? 0
+                            where string.IsNullOrWhiteSpace(search)
+                               || customer.Code.ToLower().Contains(search.ToLower())
+                               || customer.Name.ToLower().Contains(search.ToLower())
+                            orderby customer.Code ascending
+                            select new JsonCustomerOptionsModel
+                            {
+                                Id = customer.Id.ToString(),
+                                Text = customer.Code,
+                                Name = customer.Name,
+                                Address = customer.ShippingAddresses
+                                                  .Where(s => s.IsDefault == true)
+                                                  .Select(s => s.Address)
+                                                  .FirstOrDefault() ?? "N/A",
+                                CreditTerm = customer.CreditTerm.Name,
+                                Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
+                                OutstandingBalanceD = invoiceAmount
+                                                    - paymentAmount
+                                                    - salesReturnAmount
+                                                    - creditAmount
+                                                    + debitAmount
+                                                    + freightAmount
+                            };
+
+            var customersList = await customers.ToListAsync();
+            var customersFiltered = customersList.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonCustomerOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,
-                total_count = customers.Count
+                total_count = customersList.Count
             };
         }
 
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetByAgentOptions(string search, int page, int? agent)
         {
-            var customers = await context.Customers
-                                         .Where(s => (string.IsNullOrWhiteSpace(search)
-                                                 || (s.Code.ToLower().Contains(search.ToLower()))
-                                                 || (s.Name.ToLower().Contains(search.ToLower())))
-                                                 && (agent == null || s.AgentId == agent))
-                                         .Select(s => new JsonCustomerOptionsModel
-                                         {
-                                             Id = s.Id.ToString(),
-                                             Text = s.Code,
-                                             Name = s.Name,
-                                             Address = s.ShippingAddresses
-                                                        .Where(a => a.IsDefault == true)
-                                                        .Select(a => a.Address)
-                                                        .FirstOrDefault() ?? "N/A",
-                                             CreditTerm = s.CreditTerm.Name,
-                                             Agent = s.Agent.FirstName + ' ' + s.Agent.MiddleName + ' ' + s.Agent.LastName,
-                                             OutstandingBalanceD = s.OutstandingBalance,
-                                             CustomerStatus = s.CustomerAccountStatus.Name,
-                                             Region = s.Area.Region.Name
-                                         })
-                                         .OrderBy(s => s.Text)
-                                         .ToListAsync();
-            var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
+            var customerInvoices = from inv in context.InvoiceLineItems
+                                   where inv.Invoice.Status.Name.ToLower() != "invoice draft"
+                                      && inv.Invoice.Status.Name.ToLower() != "cancelled invoice"
+                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       InvoiceAmount = g.Sum(s => s.UnitPrice * s.Quantity)
+                                   };
+
+            var customerPayments = from pay in context.CustomerPayments
+                                   group pay by pay.CustomerId into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       PaymentAmount = g.Sum(s => s.TotalAmountPaid)
+                                   };
+
+            var customerSalesReturns = from sr in context.SalesReturnLineItems
+                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+                                       select new
+                                       {
+                                           CustomerId = g.Key,
+                                           SalesReturnAmount = g.Sum(s => (s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)
+                                       };
+
+            var customerSOACR = from s in context.SOACRLineItems
+                                group s by s.Invoice.SalesOrder.Customer.Id into g
+                                select new
+                                {
+                                    CustomerId = g.Key,
+                                    CreditMemoAmount = g.Sum(s => s.CreditAmount),
+                                    DebitMemoAmount = g.Sum(s => s.DebitAmount),
+                                    FreightAmount = g.Sum(s => s.FreightCost)
+                                };
+
+            var customers = from customer in context.Customers
+                            let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
+                                                                .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                            let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
+                                                                .Sum(s => (decimal?)s.PaymentAmount) ?? 0
+                            let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
+                                                                        .Sum(s => (decimal?)s.SalesReturnAmount) ?? 0
+                            let creditAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                            .Sum(s => (decimal?)s.CreditMemoAmount) ?? 0
+                            let debitAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                           .Sum(s => (decimal?)s.DebitMemoAmount) ?? 0
+                            let freightAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                             .Sum(s => (decimal?)s.FreightAmount) ?? 0
+                            where (string.IsNullOrWhiteSpace(search)
+                            || customer.Code.ToLower().Contains(search.ToLower())
+                            || customer.Name.ToLower().Contains(search.ToLower()))
+                            && (agent == null || customer.AgentId == agent)
+                            orderby customer.Code ascending
+                            select new JsonCustomerOptionsModel
+                            {
+                                Id = customer.Id.ToString(),
+                                Text = customer.Code,
+                                Name = customer.Name,
+                                Address = customer.ShippingAddresses
+                                                  .Where(s => s.IsDefault == true)
+                                                  .Select(s => s.Address)
+                                                  .FirstOrDefault() ?? "N/A",
+                                CreditTerm = customer.CreditTerm.Name,
+                                Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
+                                OutstandingBalanceD = invoiceAmount
+                                                    - paymentAmount
+                                                    - salesReturnAmount
+                                                    - creditAmount
+                                                    + debitAmount
+                                                    + freightAmount,
+                                CustomerStatus = customer.CustomerAccountStatus.Name,
+                                Region = customer.Area.Region.Name
+                            };
+
+            var customersList = await customers.ToListAsync();
+
+            var customersFiltered = customersList.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonCustomerOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,
-                total_count = customers.Count
+                total_count = customersList.Count
             };
         }
 
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptionsWithOrder(string search, int page)
         {
-            var customers = await (from c in context.Customers
-                                   where (string.IsNullOrWhiteSpace(search)
-                                   || c.Code.ToLower().Contains(search.ToLower())
-                                   || c.Name.ToLower().Contains(search.ToLower()))
-                                   && context.SalesOrders
-                                             .Any(s => s.Status.Code.ToLower() != "submitted"
-                                                    && s.Status.Code.ToLower() != "disapproved"
-                                                    && s.Status.Code.ToLower() != "draft"
-                                                    && s.CustomerId == c.Id)
-                                   select new JsonCustomerOptionsModel
+            var customerInvoices = from inv in context.InvoiceLineItems
+                                   where inv.Invoice.Status.Name.ToLower() != "invoice draft"
+                                      && inv.Invoice.Status.Name.ToLower() != "cancelled invoice"
+                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   select new
                                    {
-                                       Id = c.Id.ToString(),
-                                       Text = c.Code,
-                                       Name = c.Name,
-                                       Address = c.ShippingAddresses
-                                                        .Where(a => a.IsDefault == true)
-                                                        .Select(a => a.Address)
-                                                        .FirstOrDefault() ?? "N/A",
-                                       CreditTerm = c.CreditTerm.Name,
-                                       Agent = c.Agent.FirstName + ' ' + c.Agent.MiddleName + ' ' + c.Agent.LastName,
-                                       OutstandingBalanceD = c.OutstandingBalance
-                                   })
-                                     .OrderBy(s => s.Text)
-                                     .ToListAsync();
+                                       CustomerId = g.Key,
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                   };
 
+            var customerPayments = from pay in context.CustomerPayments
+                                   group pay by pay.CustomerId into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       PaymentAmount = g.Sum(s => (decimal?)s.TotalAmountPaid) ?? 0
+                                   };
 
-            var customersFiltered = customers.Skip((page - 1) * 50).Take(50).ToList();
+            var customerSalesReturns = from sr in context.SalesReturnLineItems
+                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+                                       select new
+                                       {
+                                           CustomerId = g.Key,
+                                           SalesReturnAmount = g.Sum(s => (decimal?)((s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                       };
+
+            var customerSOACR = from s in context.SOACRLineItems
+                                group s by s.Invoice.SalesOrder.Customer.Id into g
+                                select new
+                                {
+                                    CustomerId = g.Key,
+                                    CreditMemoAmount = g.Sum(s => (decimal?)s.CreditAmount) ?? 0,
+                                    DebitMemoAmount = g.Sum(s => (decimal?)s.DebitAmount) ?? 0,
+                                    FreightAmount = g.Sum(s => (decimal?)s.FreightCost) ?? 0
+                                };
+
+            var customers = from customer in context.Customers
+                            let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
+                                                                .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                            let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
+                                                                .Sum(s => (decimal?)s.PaymentAmount) ?? 0
+                            let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
+                                                                        .Sum(s => (decimal?)s.SalesReturnAmount) ?? 0
+                            let creditAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                            .Sum(s => (decimal?)s.CreditMemoAmount) ?? 0
+                            let debitAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                           .Sum(s => (decimal?)s.DebitMemoAmount) ?? 0
+                            let freightAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                             .Sum(s => (decimal?)s.FreightAmount) ?? 0
+                            where (string.IsNullOrEmpty(search)
+                            || customer.Code.ToLower().Contains(search.ToLower())
+                            || customer.Name.ToLower().Contains(search.ToLower()))
+                            && customer.SalesOrders
+                                       .Any(s => s.Status.Code.ToLower() != "submitted"
+                                              && s.Status.Code.ToLower() != "disapproved"
+                                              && s.Status.Code.ToLower() != "draft")
+                            orderby customer.Code ascending
+                            select new JsonCustomerOptionsModel
+                            {
+                                Id = customer.Id.ToString(),
+                                Text = customer.Code,
+                                Name = customer.Name,
+                                Address = customer.ShippingAddresses
+                                                  .Where(s => s.IsDefault == true)
+                                                  .Select(s => s.Address)
+                                                  .FirstOrDefault() ?? "N/A",
+                                CreditTerm = customer.CreditTerm.Name,
+                                Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
+                                OutstandingBalanceD = invoiceAmount
+                                                    - paymentAmount
+                                                    - salesReturnAmount
+                                                    - creditAmount
+                                                    + debitAmount
+                                                    + freightAmount
+                            };
+
+            var customersList = await customers.ToListAsync();
+            var customersFiltered = customersList.Skip((page - 1) * 50).Take(50).ToList();
             return new Select2Model<JsonCustomerOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,
-                total_count = customers.Count
+                total_count = customersList.Count
             };
         }
 
@@ -183,22 +348,6 @@ namespace GMGInventory.Application.Repositories
                                   VAT = cust.VAT,
                                   Remarks = cust.Remarks,
                                   IsActive = cust.IsActive,
-                                  //Address = cust.ShippingAddresses
-                                  //              .Where(a => a.IsDefault == true)
-                                  //              .Select(a => a.Address)
-                                  //              .FirstOrDefault() ?? "N/A",
-                                  //ContactNumber = cust.ShippingAddresses
-                                  //                    .Where(a => a.IsDefault == true)
-                                  //                    .Select(a => a.PhoneNumber)
-                                  //                    .FirstOrDefault() ?? "N/A",
-                                  //ContactPerson = cust.ShippingAddresses
-                                  //                    .Where(a => a.IsDefault == true)
-                                  //                    .Select(a => a.ContactPerson)
-                                  //                    .FirstOrDefault() ?? "N/A",
-                                  //FaxNumber = cust.ShippingAddresses
-                                  //                .Where(a => a.IsDefault == true)
-                                  //                .Select(a => a.FaxNumber)
-                                  //                .FirstOrDefault() ?? "N/A",
                                   CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                   DateCreatedD = cust.DateCreated,
                                   ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
@@ -209,60 +358,93 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<CustomerVM>> GetAllCustomerAsync()
         {
-            var customers = from cust in context.Customers
-                                //.Include(s => s.Area)
-                                //.Include(s => s.CustomerType)
-                                //.Include(s => s.Agent)
-                                //.Include(s => s.CreditTerm)
-                            join userc in userManager.Users on cust.UserCreated equals userc.Id
-                            join userm in userManager.Users on cust.UserModified equals userm.Id into um
+            var customerInvoices = from inv in context.InvoiceLineItems
+                                   where inv.Invoice.Status.Name.ToLower() != "invoice draft"
+                                      && inv.Invoice.Status.Name.ToLower() != "cancelled invoice"
+                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                   };
+
+            var customerPayments = from pay in context.CustomerPayments
+                                   group pay by pay.CustomerId into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       PaymentAmount = g.Sum(s => (decimal?)s.TotalAmountPaid) ?? 0
+                                   };
+
+            var customerSalesReturns = from sr in context.SalesReturnLineItems
+                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+                                       select new
+                                       {
+                                           CustomerId = g.Key,
+                                           SalesReturnAmount = g.Sum(s => (decimal?)((s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                       };
+
+            var customerSOACR = from s in context.SOACRLineItems
+                                group s by s.Invoice.SalesOrder.Customer.Id into g
+                                select new
+                                {
+                                    CustomerId = g.Key,
+                                    CreditMemoAmount = g.Sum(s => (decimal?)s.CreditAmount) ?? 0,
+                                    DebitMemoAmount = g.Sum(s => (decimal?)s.DebitAmount) ?? 0,
+                                    FreightAmount = g.Sum(s => (decimal?)s.FreightCost) ?? 0
+                                };
+
+            var customers = from customer in context.Customers
+                            join userc in userManager.Users on customer.UserCreated equals userc.Id
+                            join userm in userManager.Users on customer.UserModified equals userm.Id into um
                             from userm in um.DefaultIfEmpty()
+                            let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
+                                                                .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                            let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
+                                                                .Sum(s => (decimal?)s.PaymentAmount) ?? 0
+                            let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
+                                                                        .Sum(s => (decimal?)s.SalesReturnAmount) ?? 0
+                            let creditAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                            .Sum(s => (decimal?)s.CreditMemoAmount) ?? 0
+                            let debitAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                           .Sum(s => (decimal?)s.DebitMemoAmount) ?? 0
+                            let freightAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
+                                                             .Sum(s => (decimal?)s.FreightAmount) ?? 0
                             select new CustomerVM
                             {
-                                Id = cust.Id,
-                                Code = cust.Code,
-                                Name = cust.Name,
-                                AgentId = cust.AgentId,
-                                AgentName = cust.Agent.FirstName + (cust.Agent.MiddleName == null ? "" : " " + cust.Agent.MiddleName) + " " + cust.Agent.LastName,
-                                AreaId = cust.AreaId,
-                                AreaName = cust.Area.Name,
-                                CommissionRateD = cust.CommissionRate == null ? cust.Area.CommissionRate : cust.CommissionRate,
-                                CommissionRateIsArea = cust.CommissionRate == null,
-                                CustomerAccountStatusId = cust.CustomerAccountStatusId,
-                                CustomerAccountStatusName = cust.CustomerAccountStatus.Name,
-                                CustomerTypeId = cust.CustomerTypeId,
-                                CustomerTypeName = cust.CustomerType.Name,
-                                CreditLimitD = cust.CreditLimit,
-                                CreditTermId = cust.CreditTermId,
-                                CreditTermName = cust.CreditTerm.Name,
-                                Email = cust.Email,
-                                OutstandingBalanceD = cust.OutstandingBalance,
-                                RegionId = cust.Area.RegionId,
-                                RegionName = cust.Area.Region.Name,
-                                TIN = cust.TIN,
-                                VAT = cust.VAT,
-                                Remarks = cust.Remarks,
-                                IsActive = cust.IsActive,
-                                //Address = cust.ShippingAddresses
-                                //              .Where(a => a.IsDefault == true)
-                                //              .Select(a => a.Address)
-                                //              .FirstOrDefault() ?? "N/A",
-                                //ContactNumber = cust.ShippingAddresses
-                                //                    .Where(a => a.IsDefault == true)
-                                //                    .Select(a => a.PhoneNumber)
-                                //                    .FirstOrDefault() ?? "N/A",
-                                //ContactPerson = cust.ShippingAddresses
-                                //                    .Where(a => a.IsDefault == true)
-                                //                    .Select(a => a.ContactPerson)
-                                //                    .FirstOrDefault() ?? "N/A",
-                                //FaxNumber = cust.ShippingAddresses
-                                //                .Where(a => a.IsDefault == true)
-                                //                .Select(a => a.FaxNumber)
-                                //                .FirstOrDefault() ?? "N/A",
-                                CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                                DateCreatedD = cust.DateCreated,
-                                ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                                DateModifiedD = cust.DateModified
+                                Id = customer.Id,
+                                Code = customer.Code,
+                                Name = customer.Name,
+                                AgentId = customer.AgentId,
+                                AgentName = customer.Agent.FirstName + " " + customer.Agent.LastName,
+                                AreaId = customer.AreaId,
+                                AreaName = customer.Area.Name,
+                                CommissionRateD = customer.CommissionRate == null ? customer.Area.CommissionRate : customer.CommissionRate,
+                                CommissionRateIsArea = customer.CommissionRate == null,
+                                CustomerAccountStatusId = customer.CustomerAccountStatusId,
+                                CustomerAccountStatusName = customer.CustomerAccountStatus.Name,
+                                CustomerTypeId = customer.CustomerTypeId,
+                                CustomerTypeName = customer.CustomerType.Name,
+                                CreditLimitD = customer.CreditLimit,
+                                CreditTermId = customer.CreditTermId,
+                                CreditTermName = customer.CreditTerm.Name,
+                                Email = customer.Email,
+                                OutstandingBalanceD = invoiceAmount
+                                                    - paymentAmount
+                                                    - salesReturnAmount
+                                                    - creditAmount
+                                                    + debitAmount
+                                                    + freightAmount,
+                                RegionId = customer.Area.RegionId,
+                                RegionName = customer.Area.Region.Name,
+                                TIN = customer.TIN,
+                                VAT = customer.VAT,
+                                Remarks = customer.Remarks,
+                                IsActive = customer.IsActive,
+                                CreatedBy = userc.FirstName + " " + userc.LastName,
+                                DateCreatedD = customer.DateCreated,
+                                ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                                DateModifiedD = customer.DateModified == null ? null : customer.DateModified
                             };
             return await customers.ToListAsync();
         }

@@ -37,13 +37,13 @@
         <thead>
             <tr>
                 <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
+                </th>
+                <th>
                     BIR Invoice Number
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().CustomerCode)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().CustomerName)
@@ -63,9 +63,9 @@
             @foreach (var item in Model.Contents)
             {
                 <tr>
+                    <td><nobr>@item.InvoiceNumber</nobr></td>
                     <td><nobr>@item.ControlNumber</nobr></td>
                     <td><nobr>@item.InvoiceDate</nobr></td>
-                    <td><nobr>@item.CustomerCode</nobr></td>
                     <td>@item.CustomerName</td>
                     <td>@item.AgentCode</td>
                     <td><nobr>@item.Status</nobr></td>

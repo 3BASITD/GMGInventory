@@ -28,7 +28,9 @@ namespace GMGInventory.Application.Repositories
             var transferVM = (from transfer in context.TransferItems
                                                       .Include(s => s.Source)
                                                       .Include(s => s.Destination)
-                              join user in userManager.Users on transfer.UserCreated equals user.Id
+                              join userc in userManager.Users on transfer.UserCreated equals userc.Id
+                              join userm in userManager.Users on transfer.UserModified equals userm.Id into um
+                              from userm in um.DefaultIfEmpty()
                               where transfer.Id == Id
                               select new TransferVM
                               {
@@ -36,8 +38,11 @@ namespace GMGInventory.Application.Repositories
                                   Id = transfer.Id,
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
-                                  TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
-                                  TransferDateD = transfer.TransferDate
+                                  TransferDateD = transfer.TransferDate,
+                                  CreatedBy = userc.FirstName + " " + userc.LastName,
+                                  DateCreatedD = transfer.DateCreated,
+                                  ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                                  DateModifiedD = transfer.DateModified
                               });
             return await transferVM.FirstOrDefaultAsync();
         }
@@ -56,7 +61,7 @@ namespace GMGInventory.Application.Repositories
                                   ItemCount = transfer.TransferItemDetails.Count,
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
-                                  TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                                  CreatedBy = user.FirstName + " " + user.LastName,
                                   TransferDateD = transfer.DateCreated
                               });
             return await transferVM.ToListAsync();
@@ -77,7 +82,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.Destination.ToLower().Contains(form.SearchValue)
                                     || x.ItemCount.ToString().Contains(form.SearchValue)
                                     || x.TransferDate.ToLower().Contains(form.SearchValue)
-                                    || x.TransferBy.ToLower().Contains(form.SearchValue)
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
                                     || x.Remarks.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -94,7 +99,7 @@ namespace GMGInventory.Application.Repositories
                         case "Destination": data = data.OrderBy(s => s.Destination); break;
                         case "ItemCount": data = data.OrderBy(s => s.ItemCount); break;
                         case "TransferDate": data = data.OrderBy(s => s.TransferDateD); break;
-                        case "TransferBy": data = data.OrderBy(s => s.TransferBy); break;
+                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderBy(s => s.Remarks); break;
                         default: break;
                     }
@@ -108,7 +113,7 @@ namespace GMGInventory.Application.Repositories
                         case "Destination": data = data.OrderByDescending(s => s.Destination); break;
                         case "ItemCount": data = data.OrderByDescending(s => s.ItemCount); break;
                         case "TransferDate": data = data.OrderByDescending(s => s.TransferDateD); break;
-                        case "TransferBy": data = data.OrderByDescending(s => s.TransferBy); break;
+                        case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
                         default: break;
                     }
@@ -143,7 +148,7 @@ namespace GMGInventory.Application.Repositories
                                   Quantity = trdetail.Quantity,
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
-                                  TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                                  CreatedBy = user.FirstName + " " + user.LastName,
                                   TransferDateD = transfer.TransferDate
                               });
             return await transferVM.ToListAsync();
@@ -165,7 +170,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.Source.ToLower().Contains(form.SearchValue)
                                     || x.Destination.ToLower().Contains(form.SearchValue)
                                     || x.TransferDate.ToLower().Contains(form.SearchValue)
-                                    || x.TransferBy.ToLower().Contains(form.SearchValue)
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
                                     || x.Remarks.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -182,7 +187,7 @@ namespace GMGInventory.Application.Repositories
                         case "Destination": data = data.OrderBy(s => s.Destination); break;
                         case "ItemCount": data = data.OrderBy(s => s.ItemCount); break;
                         case "TransferDate": data = data.OrderBy(s => s.TransferDateD); break;
-                        case "TransferBy": data = data.OrderBy(s => s.TransferBy); break;
+                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderBy(s => s.Remarks); break;
                         default: break;
                     }
@@ -196,7 +201,7 @@ namespace GMGInventory.Application.Repositories
                         case "Destination": data = data.OrderByDescending(s => s.Destination); break;
                         case "ItemCount": data = data.OrderByDescending(s => s.ItemCount); break;
                         case "TransferDate": data = data.OrderByDescending(s => s.TransferDateD); break;
-                        case "TransferBy": data = data.OrderByDescending(s => s.TransferBy); break;
+                        case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
                         case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
                         default: break;
                     }
@@ -229,7 +234,7 @@ namespace GMGInventory.Application.Repositories
                                   Quantity = transfer.Quantity.ToString(),
                                   Remarks = transfer.TransferItem.Remarks,
                                   Source = transfer.TransferItem.Source.Code,
-                                  TransferBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                                  CreatedBy = user.FirstName + " " + user.LastName,
                                   TransferDateD = transfer.DateCreated,
                                   Unit = transfer.Item.Unit.Code
                               });
@@ -253,7 +258,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.Quantity.ToLower().Contains(form.SearchValue)
                                     || x.Remarks.ToLower().Contains(form.SearchValue)
                                     || x.Source.ToLower().Contains(form.SearchValue)
-                                    || x.TransferBy.ToLower().Contains(form.SearchValue)
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
                                     || x.TransferDate.ToLower().Contains(form.SearchValue)
                                     || x.Unit.ToLower().Contains(form.SearchValue));
             }
@@ -273,7 +278,7 @@ namespace GMGInventory.Application.Repositories
                         case "Quantity": data = data.OrderBy(s => s.Quantity); break;
                         case "Remarks": data = data.OrderBy(s => s.Remarks); break;
                         case "Source": data = data.OrderBy(s => s.Source); break;
-                        case "TransferBy": data = data.OrderBy(s => s.TransferBy); break;
+                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "TransferDate": data = data.OrderBy(s => s.TransferDateD); break;
                         case "Unit": data = data.OrderBy(s => s.Unit); break;
                         default: break;
@@ -290,7 +295,7 @@ namespace GMGInventory.Application.Repositories
                         case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
                         case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
                         case "Source": data = data.OrderByDescending(s => s.Source); break;
-                        case "TransferBy": data = data.OrderByDescending(s => s.TransferBy); break;
+                        case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
                         case "TransferDate": data = data.OrderByDescending(s => s.TransferDateD); break;
                         case "Unit": data = data.OrderByDescending(s => s.Unit); break;
                         default: break;

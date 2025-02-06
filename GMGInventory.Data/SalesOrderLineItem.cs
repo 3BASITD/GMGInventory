@@ -28,7 +28,5 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount2 { get; set; }
-
-        public bool IsServed { get; set; }
     }
 }

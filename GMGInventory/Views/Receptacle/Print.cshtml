@@ -30,7 +30,14 @@
             </td>
             <td colspan="3">
                 <dl>
-                    <dd>AUTO PARTS TRADING</dd>
+                    @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                    {
+                        <dd>BINA'S AUTO SUPPLY</dd>
+                    }
+                    else
+                    {
+                        <dd>AUTO PARTS TRADING</dd>
+                    }
                     <dt>PACK DATE: @Model.PackDate.ToUpper()</dt>
                 </dl>
             </td>
@@ -84,8 +91,8 @@
         <tr>
             <td colspan="2">
                 <dl>
-                    <dt>TOTAL ITEMS</dt>
-                    <dd>@Model.TotalItems</dd>
+                    <dt>FORWARDER</dt>
+                    <dd>@Model.Forwarder</dd>
                 </dl>
             </td>
             <td colspan="2">

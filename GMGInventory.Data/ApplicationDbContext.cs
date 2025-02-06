@@ -16,7 +16,6 @@ namespace GMGInventory.Data
         {
             base.OnModelCreating(builder);
 
-            builder.ApplyConfiguration(new CreditDebitMemoTypeSeedConfiguration());
             builder.ApplyConfiguration(new CustomerAccountStatusSeedConfiguration());
             builder.ApplyConfiguration(new CustomerTypeSeedConfiguration());
             builder.ApplyConfiguration(new InvoiceTypeSeedConfiguration());
@@ -155,8 +154,8 @@ namespace GMGInventory.Data
         public DbSet<Area> Areas { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<CreditDebitMemo> CreditDebitMemos { get; set; }
-        public DbSet<CreditDebitMemoType> CreditDebitMemoTypes { get; set; }
+        //public DbSet<CreditDebitMemo> CreditDebitMemos { get; set; }
+        //public DbSet<CreditDebitMemoType> CreditDebitMemoTypes { get; set; }
         public DbSet<CreditTerm> CreditTerms { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Customer> Customers { get; set; }

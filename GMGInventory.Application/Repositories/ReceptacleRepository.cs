@@ -145,7 +145,7 @@ namespace GMGInventory.Application.Repositories
                                    PackDateD = pack.DateCreated,
                                    PackagingType = pack.PackLineItems.Where(s => s.BoxNumber == BoxNumber).First().PackType.Name,
                                    BoxNumber = BoxNumber,
-                                   TotalItemsD = pack.PackLineItems.Where(s => s.BoxNumber == BoxNumber).Sum(s => s.Quantity),
+                                   Forwarder = pack.SalesOrder.Forwarder.Name,
                                    TotalPackageD = pack.PackLineItems.Select(s => s.BoxNumber).Distinct().Count()
                                };
             return await receptacleVM.FirstOrDefaultAsync();

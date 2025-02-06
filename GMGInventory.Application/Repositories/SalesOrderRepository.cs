@@ -2,6 +2,7 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -144,29 +145,66 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
-            var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
-            var currentUserId = currentUser.Id;
-            //var currentUserRoles = await userManager.GetRolesAsync(currentUser);
-            //var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
+            var customerInvoices = from inv in context.InvoiceLineItems
+                                   where inv.Invoice.Status.Name.ToLower() != "invoice draft"
+                                      && inv.Invoice.Status.Name.ToLower() != "cancelled invoice"
+                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                   };
 
+            var customerPayments = from pay in context.CustomerPayments
+                                   group pay by pay.CustomerId into g
+                                   select new
+                                   {
+                                       CustomerId = g.Key,
+                                       PaymentAmount = g.Sum(s => (decimal?)s.TotalAmountPaid) ?? 0
+                                   };
+
+            var customerSalesReturns = from sr in context.SalesReturnLineItems
+                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+                                       select new
+                                       {
+                                           CustomerId = g.Key,
+                                           SalesReturnAmount = g.Sum(s => (decimal?)((s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                       };
+
+            var customerSOACR = from s in context.SOACRLineItems
+                                group s by s.Invoice.SalesOrder.Customer.Id into g
+                                select new
+                                {
+                                    CustomerId = g.Key,
+                                    CreditMemoAmount = g.Sum(s => (decimal?)s.CreditAmount) ?? 0,
+                                    DebitMemoAmount = g.Sum(s => (decimal?)s.DebitAmount) ?? 0,
+                                    FreightAmount = g.Sum(s => (decimal?)s.FreightCost) ?? 0
+                                };
             var orderVM = (from order in context.SalesOrders
-                                                .Include(s => s.Agent)
-                                                .Include(s => s.Customer).ThenInclude(s => s.CreditTerm)
-                                                .Include(s => s.Forwarder)
-                                                .Include(s => s.PriceType)
                            join userc in userManager.Users on order.UserCreated equals userc.Id
                            join userm in userManager.Users on order.UserModified equals userm.Id into um
                            from userm in um.DefaultIfEmpty()
                            from approve in userManager.Users.Where(s => s.Id == order.ApprovedBy).DefaultIfEmpty()
                            from disapprove in userManager.Users.Where(s => s.Id == order.DisapprovedBy).DefaultIfEmpty()
+                           let invoiceAmount = customerInvoices.Where(s => s.CustomerId == order.Customer.Id)
+                                                               .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                           let paymentAmount = customerPayments.Where(s => s.CustomerId == order.Customer.Id)
+                                                               .Sum(s => (decimal?)s.PaymentAmount) ?? 0
+                           let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == order.Customer.Id)
+                                                                       .Sum(s => (decimal?)s.SalesReturnAmount) ?? 0
+                           let creditAmount = customerSOACR.Where(s => s.CustomerId == order.Customer.Id)
+                                                           .Sum(s => (decimal?)s.CreditMemoAmount) ?? 0
+                           let debitAmount = customerSOACR.Where(s => s.CustomerId == order.Customer.Id)
+                                                          .Sum(s => (decimal?)s.DebitMemoAmount) ?? 0
+                           let freightAmount = customerSOACR.Where(s => s.CustomerId == order.Customer.Id)
+                                                            .Sum(s => (decimal?)s.FreightAmount) ?? 0
                            where order.Id == Id
-                           //&& (currentUserId == order.UserCreated || isAdminOrManager)
                            select new SalesOrderDetailsVM
                            {
                                AgentCode = order.Agent.Code,
                                AgentId = order.Agent.Id,
-                               AgentName = order.Agent.FirstName + (order.Agent.MiddleName == null ? "" : " " + order.Agent.MiddleName) + " " + order.Agent.LastName,
-                               ApprovedBy = SystemFormat.Name(approve.FirstName, approve.LastName, approve.Nickname),
+                               AgentName = order.Agent.FirstName + " " + order.Agent.LastName,
+                               ApprovedBy = approve.FirstName + " " + approve.LastName,
                                ApprovedDateD = order.ApprovedDate,
                                CreditTerms = order.Customer.CreditTerm.Name,
                                CustomerAddress = order.Customer
@@ -196,7 +234,12 @@ namespace GMGInventory.Application.Repositories
                                GrossNetPriceId = order.PriceType.Id,
                                Id = order.Id,
                                OrderDateD = order.SalesOrderDate,
-                               OutstandingBalanceD = order.Customer.OutstandingBalance,
+                               OutstandingBalanceD = invoiceAmount
+                                                    - paymentAmount
+                                                    - salesReturnAmount
+                                                    - creditAmount
+                                                    + debitAmount
+                                                    + freightAmount,
                                PONumber = order.PurchaseOrder,
                                Remarks = order.Remarks + "",
                                RequiredDeliveryDateD = order.RequiredDeliveryDate,
@@ -206,9 +249,9 @@ namespace GMGInventory.Application.Repositories
                                Status = order.Status.Code,
                                AccountStatus = order.Customer.CustomerAccountStatus.Name,
                                Region = order.Customer.Area.Region.Name,
-                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                               UserCreated = userc.FirstName + " " + userc.LastName,
                                DateCreatedD = order.DateCreated,
-                               UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                               UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
                                DateModifiedD = order.DateModified == null ? null : order.DateModified.Value
                            });
 
@@ -377,7 +420,7 @@ namespace GMGInventory.Application.Repositories
                                     ServedQuantityD = packedQuantity - returnedQuantity,
                                     Unit = order.Item.Unit.Code,
                                     //UnservedQuantityD = order.Quantity - (packedQuantity - returnedQuantity)
-                                    UnservedQuantityD = inventory <= 0 ? order.Quantity - inventory : 0
+                                    UnservedQuantityD = order.Quantity - inventory > 0 ? order.Quantity - inventory : 0
                                 }).ToListAsync();
 
             int newLineNumber = 1;
@@ -599,7 +642,6 @@ namespace GMGInventory.Application.Repositories
                                {
                                    Discount1 = s.Discount1,
                                    Discount2 = s.Discount2,
-                                   IsServed = false,
                                    ItemId = s.Item,
                                    Quantity = s.Quantity,
                                    SalesOrderId = salesOrderId,
@@ -652,45 +694,45 @@ namespace GMGInventory.Application.Repositories
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);
 
-                List<SalesOrderLineItem> salesOrderLineItems = context.SalesOrderLineItems.Where(s => s.SalesOrderId == orderVM.Id).ToList();
-                foreach (var salesOrderLineItem in salesOrderLineItems)
-                {
-                    var itemInventory = await context.ItemInventories
-                                                     .Where(s => s.ItemId == salesOrderLineItem.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
-                                                     .FirstOrDefaultAsync();
+                //List<SalesOrderLineItem> salesOrderLineItems = context.SalesOrderLineItems.Where(s => s.SalesOrderId == orderVM.Id).ToList();
+                //foreach (var salesOrderLineItem in salesOrderLineItems)
+                //{
+                //    var itemInventory = await context.ItemInventories
+                //                                     .Where(s => s.ItemId == salesOrderLineItem.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
+                //                                     .FirstOrDefaultAsync();
 
-                    if (itemInventory != null)
-                    {
-                        var oldInventoryQuantity = itemInventory.Quantity;
-                        if (itemInventory.Quantity >= salesOrderLineItem.Quantity)
-                        {
-                            itemInventory.Quantity -= salesOrderLineItem.Quantity;
-                        }
-                        else if (itemInventory.Quantity < 0)
-                        {
-                            itemInventory.Quantity += salesOrderLineItem.Quantity;
-                        }
-                        else
-                        {
-                            itemInventory.Quantity = 0;
-                        }
-                        context.ItemInventories.Update(itemInventory);
-                        await context.SaveChangesAsync(currentUserId);
+                //    if (itemInventory != null)
+                //    {
+                //        var oldInventoryQuantity = itemInventory.Quantity;
+                //        if (itemInventory.Quantity >= salesOrderLineItem.Quantity)
+                //        {
+                //            itemInventory.Quantity -= salesOrderLineItem.Quantity;
+                //        }
+                //        else if (itemInventory.Quantity < 0)
+                //        {
+                //            itemInventory.Quantity += salesOrderLineItem.Quantity;
+                //        }
+                //        else
+                //        {
+                //            itemInventory.Quantity = 0;
+                //        }
+                //        context.ItemInventories.Update(itemInventory);
+                //        await context.SaveChangesAsync(currentUserId);
 
-                        var countHistory = new PhysicalCountHistory
-                        {
-                            ItemId = salesOrderLineItem.ItemId,
-                            QuantityFrom = oldInventoryQuantity,
-                            QuantityTo = itemInventory.Quantity,
-                            Remarks = "SO Served",
-                            WarehouseId = itemInventory.WarehouseId
-                        };
-                        context.PhysicalCountHistories.Add(countHistory);
-                        await context.SaveChangesAsync(currentUserId);
-                    }
-                    context.SalesOrderLineItems.Update(salesOrderLineItem);
-                    await context.SaveChangesAsync(currentUserId);
-                }
+                //        var countHistory = new PhysicalCountHistory
+                //        {
+                //            ItemId = salesOrderLineItem.ItemId,
+                //            QuantityFrom = oldInventoryQuantity,
+                //            QuantityTo = itemInventory.Quantity,
+                //            Remarks = "SO Served",
+                //            WarehouseId = itemInventory.WarehouseId
+                //        };
+                //        context.PhysicalCountHistories.Add(countHistory);
+                //        await context.SaveChangesAsync(currentUserId);
+                //    }
+                //    context.SalesOrderLineItems.Update(salesOrderLineItem);
+                //    await context.SaveChangesAsync(currentUserId);
+                //}
 
                 return true;
             }

@@ -37,7 +37,8 @@ namespace GMGInventory.Application.Repositories
                                ItemName = invoice.Item.Name,
                                ItemType = invoice.Item.ItemType.Name,
                                PriceD = invoice.UnitPrice,
-                               QuantityD = invoice.Quantity
+                               QuantityD = invoice.Quantity,
+                               DateInvoiceD = invoice.DateCreated
                            };
             return await invoices.ToListAsync();
         }
@@ -1557,7 +1558,7 @@ namespace GMGInventory.Application.Repositories
                               ItemCode = soline.Item.Code,
                               ItemName = soline.Item.Name,
                               //PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
-                              PendingD = inventory <= 0 ? soline.Quantity - inventory : 0,
+                              PendingD = soline.Quantity - inventory > 0 ? soline.Quantity - inventory : 0,
                               ReplenishDateD = soline.DateCreated
                           };
             var solineslist = await solines.ToListAsync();

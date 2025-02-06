@@ -18,11 +18,22 @@ namespace GMGInventory.Common.Models
         public string TransferDate => TransferDateD.ToString(SystemFormat.StringDate);
         public DateTime TransferDateD { get; set; }
 
-        [Display(Name = "Transfer By")]
-        public string TransferBy { get; set; }
-
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+
+        [Display(Name = "Created By")]
+        public string CreatedBy { get; set; }
+
+        [Display(Name = "Date Modified")]
+        public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
+
+        [Display(Name = "Modified By")]
+        public string? ModifiedBy { get; set; }
     }
 
     public class WarehouseTransferVM : TransferVM

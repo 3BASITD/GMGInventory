@@ -980,8 +980,7 @@ namespace GMGInventory.Application.Repositories
                               QuantityD = sitem.Quantity,
                               SalesNumber = sitem.SalesOrder.SalesOrderNumber,
                               UnitPriceD = sitem.SellingPrice,
-                              //UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned)
-                              UnservedQuantityD = inventory <= 0 ? sitem.Quantity - inventory : 0
+                              UnservedQuantityD = sitem.Quantity - inventory > 0 ? sitem.Quantity - inventory : 0
                           };
             return await salesVM.ToListAsync();
         }

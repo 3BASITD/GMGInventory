@@ -8,84 +8,132 @@
     <li class="breadcrumb-item"><a asp-controller="Transfer" asp-action="Index">Warehouse Transfer</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
         </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Id)
+                    </span>
+                    <b class="d-block">
+                        @Model.Id
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Source)
+                    </span>
+                    <b class="d-block">
+                        @Model.Source
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Destination)
+                    </span>
+                    <b class="d-block">
+                        @Model.Destination
+                    </b>
+                </p>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-4">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Id)
-                        </span>
-                        <b class="d-block">
-                            @Model?.Id
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Source)
-                        </span>
-                        <b class="d-block">
-                            @Model?.Source
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Destination)
-                        </span>
-                        <b class="d-block">
-                            @Model?.Destination
-                        </b>
-                    </p>
-                </div>
-                <div class="col-4">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.TransferBy)
-                        </span>
-                        <b class="d-block">
-                            @Model?.TransferBy
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.TransferDate)
-                        </span>
-                        <b class="d-block">
-                            @Model?.TransferDate
-                        </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Remarks)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model?.Remarks)
-                        </b>
-                    </p>
-                </div>
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.TransferDate)
+                    </span>
+                    <b class="d-block">
+                        @Model.TransferDate
+                    </b>
+                </p>
             </div>
-            <div class="row">
-                <table class="table table-head-fixed table-striped table-hover table-item">
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Name</th>
-                            <th>Quantity</th>
-                            <th>Unit</th>
-                        </tr>
-                    </thead>
-                </table>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)
+                    </b>
+                </p>
             </div>
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.CreatedBy)
+                    </span>
+                    <b class="d-block">
+                        @Model.CreatedBy
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </span>
+                    <b class="d-block">
+                        @Model.DateCreated
+                    </b>
+                </p>
+            </div>
+            <div class="col-4">
+                @if (!string.IsNullOrWhiteSpace(Model.ModifiedBy))
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ModifiedBy)
+                        </span>
+                        <b class="d-block">
+                            @Model.ModifiedBy
+                        </b>
+                    </p>
+                }
+            </div>
+            <div class="col-4">
+                @if (!string.IsNullOrWhiteSpace(Model.DateModified))
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateModified)
+                        </span>
+                        <b class="d-block">
+                            @Model.DateModified
+                        </b>
+                    </p>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <table class="table table-head-fixed table-striped table-hover table-item">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
+</div>
 
 
 @section Scripts {
@@ -114,7 +162,7 @@
             order: [[0, "asc"]]
         });
 
-        itemDT.on("draw", function() {
+        itemDT.on("draw", function () {
             hideLoader();
         });
     </script>

@@ -44,9 +44,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Package #")]
         public int BoxNumber { get; set; }
 
-        [Display(Name = "Total Items")]
-        public string TotalItems => string.Format(SystemFormat.StringIntegerComma, TotalItemsD);
-        public int TotalItemsD { get; set; }
+        [Display(Name = "Forwarder")]
+        public string Forwarder { get; set; }
 
         [Display(Name = "Total Package")]
         public string TotalPackage => string.Format(SystemFormat.StringIntegerComma, TotalPackageD);
