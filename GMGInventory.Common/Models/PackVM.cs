@@ -45,7 +45,7 @@ namespace GMGInventory.Common.Models
         public string CustomerName { get; set; }
 
         [Display(Name = "Forwarder")]
-        public string Forwarder { get; set; }
+        public string? Forwarder { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }

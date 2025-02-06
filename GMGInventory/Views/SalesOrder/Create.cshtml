@@ -345,18 +345,6 @@
             }
         });
 
-        // Load price type data for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetPriceTypeOptions")",
-            success: function (data, status, xhr) {
-                $("#order-gross-net").select2({
-                    data: data,
-                    minimumResultsForSearch: -1
-                });
-            }
-        });
-
         // Load forwarder data for select2
         $.ajax({
             type: "POST",
@@ -799,7 +787,6 @@
                     Customer: $("#order-customer-code").val(),
                     Forwarder: $("#order-forwarder").val(),
                     Agent: $("#order-agent-code").val(),
-                    GrossNet: $("#order-gross-net").val(),
                     PurchaseOrder: $("#order-purchase-number").val(),
                     DeclaredValue: $("#order-declared-value").val(),
                     OrderDate: $("#order-date").val(),

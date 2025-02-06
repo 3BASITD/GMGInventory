@@ -1,5 +1,4 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -40,23 +39,28 @@ namespace GMGInventory.Application.Repositories
                                 && so.DateCreated.Date <= filter.DateTo
                              select new SalesOrderDeliveryVM
                              {
-                                 CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                 CreatedBy = userc.FirstName + " " + userc.LastName,
                                  CreatedDateD = sdm.DateCreated,
                                  CustomerCode = so.Customer.Code,
                                  CustomerName = so.Customer.Name,
                                  DateDeliverD = sdm.DateDeliver,
                                  DatePickupD = sdm.DatePickup,
-                                 Forwarder = sdm == null ? "-" : sdm.Forwarder.Name,
-                                 ForwarderId = sdm == null ? 0 : sdm.ForwarderId,
+                                 Forwarder = sdm.Forwarder.Name,
+                                 ForwarderId = sdm.ForwarderId,
                                  Id = so.Id,
-                                 ModifiedBy = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                                 ModifiedBy = userm == null ? null : userm.FirstName + " " + userm.LastName,
                                  ModifiedDateD = sdm.DateModified,
                                  PONumber = so.PurchaseOrder,
-                                 Remarks = sdm == null || sdm.Remarks.Trim() == "" ? "-" : sdm.Remarks,
+                                 Remarks = string.IsNullOrWhiteSpace(sdm.Remarks) ? null : sdm.Remarks,
                                  SalesOrderDateD = so.DateCreated,
                                  SalesOrderId = so.Id,
                                  SONumber = so.SalesOrderNumber,
-                                 WaybillNumber = sdm == null ? "-" : sdm.Waybill
+                                 WaybillNumber = string.IsNullOrWhiteSpace(sdm.Waybill) ? null : sdm.Waybill,
+                                 ServiceLevelAgreementD = sdm.ServiceLevelAgreement,
+                                 SalesOrderStatus = so.Status.Code,
+                                 RequiredDeliveryDateD = so.RequiredDeliveryDate,
+                                 Representative = string.IsNullOrWhiteSpace(sdm.Representative) ? null : sdm.Representative,
+                                 DateReceiveD = sdm.DateReceive
                              };
 
             return await salesOrder.ToListAsync();
@@ -74,14 +78,19 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.CustomerCode.ToLower().Contains(form.SearchValue)
                                     || x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || x.DateDeliver.ToLower().Contains(form.SearchValue)
-                                    || x.DatePickup.ToLower().Contains(form.SearchValue)
-                                    || x.Forwarder.ToLower().Contains(form.SearchValue)
-                                    || x.Remarks.ToLower().Contains(form.SearchValue)
-                                    || x.PONumber.ToLower().Contains(form.SearchValue)
+                                    || (x.DateDeliver + "").ToLower().Contains(form.SearchValue)
+                                    || (x.DatePickup + "").ToLower().Contains(form.SearchValue)
+                                    || (x.Forwarder + "").ToLower().Contains(form.SearchValue)
+                                    || (x.Remarks + "").ToLower().Contains(form.SearchValue)
+                                    || (x.PONumber + "").ToLower().Contains(form.SearchValue)
                                     || x.SalesOrderDate.ToLower().Contains(form.SearchValue)
                                     || x.SONumber.ToLower().Contains(form.SearchValue)
-                                    || x.WaybillNumber.ToLower().Contains(form.SearchValue));
+                                    || (x.WaybillNumber + "").ToLower().Contains(form.SearchValue)
+                                    || (x.ServiceLevelAgreement + "").ToLower().Contains(form.SearchValue)
+                                    || x.SalesOrderStatus.ToLower().Contains(form.SearchValue)
+                                    || x.RequiredDeliveryDate.ToLower().Contains(form.SearchValue)
+                                    || (x.Representative + "").ToLower().Contains(form.SearchValue)
+                                    || (x.DateReceive + "").ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -102,6 +111,11 @@ namespace GMGInventory.Application.Repositories
                         case "SalesOrderDate": data = data.OrderBy(s => s.SalesOrderDateD); break;
                         case "SONumber": data = data.OrderBy(s => s.SONumber); break;
                         case "WaybillNumber": data = data.OrderBy(s => s.WaybillNumber); break;
+                        case "ServiceLevelAgreement": data = data.OrderBy(s => s.ServiceLevelAgreementD); break;
+                        case "SalesOrderStatus": data = data.OrderBy(s => s.SalesOrderStatus); break;
+                        case "RequiredDeliveryDate": data = data.OrderBy(s => s.RequiredDeliveryDateD); break;
+                        case "Representative": data = data.OrderBy(s => s.Representative); break;
+                        case "DateReceive": data = data.OrderBy(s => s.DateReceiveD); break;
                         default: break;
                     }
                 }
@@ -119,6 +133,11 @@ namespace GMGInventory.Application.Repositories
                         case "SalesOrderDate": data = data.OrderByDescending(s => s.SalesOrderDateD); break;
                         case "SONumber": data = data.OrderByDescending(s => s.SONumber); break;
                         case "WaybillNumber": data = data.OrderByDescending(s => s.WaybillNumber); break;
+                        case "ServiceLevelAgreement": data = data.OrderByDescending(s => s.ServiceLevelAgreementD); break;
+                        case "SalesOrderStatus": data = data.OrderByDescending(s => s.SalesOrderStatus); break;
+                        case "RequiredDeliveryDate": data = data.OrderByDescending(s => s.RequiredDeliveryDateD); break;
+                        case "Representative": data = data.OrderByDescending(s => s.Representative); break;
+                        case "DateReceive": data = data.OrderByDescending(s => s.DateReceiveD); break;
                         default: break;
                     }
                 }
@@ -151,7 +170,10 @@ namespace GMGInventory.Application.Repositories
                         SalesOrderId = form.SalesOrderId,
                         ForwarderId = form.Forwarder,
                         Waybill = form.Waybill,
-                        Remarks = form.Remarks + ""
+                        Remarks = form.Remarks + "",
+                        ServiceLevelAgreement = form.ServiceLevelAgreement,
+                        Representative = form.Representative,
+                        DateReceive = form.DateReceive
                     };
                     await context.SalesOrderDeliveryMonitorings.AddAsync(delivery);
                     message = "Delivery details added successfully";
@@ -163,15 +185,11 @@ namespace GMGInventory.Application.Repositories
                     delivery.ForwarderId = form.Forwarder;
                     delivery.Waybill = form.Waybill;
                     delivery.Remarks = form.Remarks + "";
+                    delivery.ServiceLevelAgreement = form.ServiceLevelAgreement;
+                    delivery.Representative = form.Representative;
+                    delivery.DateReceive = form.DateReceive;
                     context.SalesOrderDeliveryMonitorings.Update(delivery);
                     message = "Delivery details updated successfully";
-                }
-
-                var so = await context.SalesOrders.Where(s => s.Id == delivery.SalesOrderId).FirstOrDefaultAsync();
-                if(so != null)
-                {
-                    so.ForwarderId = delivery.ForwarderId;
-                    context.SalesOrders.Update(so);
                 }
 
                 await context.SaveChangesAsync(currentUserId);

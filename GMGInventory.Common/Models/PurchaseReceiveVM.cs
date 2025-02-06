@@ -94,6 +94,7 @@ namespace GMGInventory.Common.Models
         public int LineNumber { get; set; }
 
         public int OrderItemId { get; set; }
+        public int? ItemId { get; set; }
 
         [Display(Name = "Item Code")]
         public string? ItemCode { get; set; }

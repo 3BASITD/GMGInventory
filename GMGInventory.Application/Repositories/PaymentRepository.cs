@@ -2,6 +2,7 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +29,18 @@ namespace GMGInventory.Application.Repositories
         public PaymentVM? GetPaymentVM(int? id)
         {
             var paymentVM = (from cp in context.CustomerPayments
-                                     .Include(s => s.Customer)
-
+                             let soalit = context.SOACRLineItems.Where(s => s.SOACRId == cp.SOACRId).ToList()
+                             let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
+                             let invamt = (from ili in context.InvoiceLineItems
+                                           join inv in context.Invoices on ili.InvoiceId equals inv.Id
+                                           join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                                           join soa in context.SOACRs on sli.SOACRId equals soa.Id
+                                           where cp.SOACRId == soa.Id
+                                           select new
+                                           {
+                                               Amount = ili.Quantity * ili.UnitPrice
+                                           }).ToList()
+                             let invamttotal = invamt.Sum(s => s.Amount) - soalit.Sum(s => s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid
                              where cp.Id == id
                              select new PaymentVM
                              {
@@ -37,7 +48,7 @@ namespace GMGInventory.Application.Repositories
                                  CRNumber = cp.CRNumber,
                                  SOANo = cp.SOACRId,
                                  CustomerName = cp.Customer.Name,
-                                 OverPaymentD = cp.OverPayment,
+                                 OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
                                  TaxD = cp.Tax,
                                  DiscountD = cp.Discount,
                                  TKTD = cp.TKTSolicitation,
@@ -47,7 +58,7 @@ namespace GMGInventory.Application.Repositories
                                  CashAdvancedD = cp.CashAdvance,
                                  Remarks = cp.Remarks,
                                  AmountPaidD = cp.TotalAmountPaid,
-                                 TotalInvoiceAmountD = cp.TotalInvoiceAmount
+                                 TotalInvoiceAmountD = invamt.Sum(s => s.Amount)
                              }).FirstOrDefault();
             return paymentVM;
         }
@@ -58,20 +69,27 @@ namespace GMGInventory.Application.Repositories
                                    let soalit = context.SOACRLineItems.Where(s => s.SOACRId == cp.SOACRId).ToList()
                                    let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
                                    join user in userManager.Users on cp.UserCreated equals user.Id
+                                   let invamt = (from ili in context.InvoiceLineItems
+                                                 join inv in context.Invoices on ili.InvoiceId equals inv.Id
+                                                 join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                                                 join soa in context.SOACRs on sli.SOACRId equals soa.Id
+                                                 where cp.SOACRId == soa.Id
+                                                 select new
+                                                 {
+                                                     Amount = ili.Quantity * ili.UnitPrice
+                                                 }).ToList()
+                                   let invamttotal = invamt.Sum(s => s.Amount) - soalit.Sum(s => s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid
                                    select new PaymentVM
                                    {
                                        Id = cp.Id,
                                        CRNumber = cp.CRNumber,
                                        SOANo = cp.SOACRId,
                                        CustomerName = cp.Customer.Name,
-                                       TotalInvoiceAmountD = cp.TotalInvoiceAmount,
+                                       TotalInvoiceAmountD = invamttotal,
                                        AmountPaidD = cp.TotalAmountPaid,
-                                       //OverPaymentD = cp.OverPayment,
-                                       OverPaymentD = 0 > (soalit.Sum(s => s.Invoice.Amount - s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid)
-                                                    ? (soalit.Sum(s => s.Invoice.Amount - s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid) * -1
-                                                    : 0,
+                                       OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
                                        TransactionDateD = cp.DateCreated,
-                                       CreatedBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                                       CreatedBy = user.FirstName + " " + user.LastName,
                                        Remarks = cp.Remarks
                                    });
             return await customerPayment.ToListAsync();
@@ -266,8 +284,8 @@ namespace GMGInventory.Application.Repositories
                               InvoiceNumber = pay.Invoice.InvoiceNumber,
                               InvoiceDateD = pay.Invoice.InvoiceDate,
                               InvoiceType = pay.Invoice.InvoiceType.Name,
-                              InvoiceAmountD = pay.Invoice.Amount,
-                              BalanceAmountD = Math.Max(0, pay.Invoice.Amount - pay.Invoice.PaidAmount),
+                              InvoiceAmountD = pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice),
+                              BalanceAmountD = Math.Max(0, pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice) - pay.Invoice.PaidAmount),
                               PackNo = pay.Invoice.Pack.Id,
                               SalesOrderNo = pay.Invoice.SalesOrder.SalesOrderNumber
                           };

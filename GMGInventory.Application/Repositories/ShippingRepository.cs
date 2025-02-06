@@ -122,16 +122,13 @@ namespace GMGInventory.Application.Repositories
         public async Task<ShippingVM?> GetDetailsAsync(int Id)
         {
             var orderVM = (from order in context.SalesOrders
-                                                .Include(s => s.Customer).ThenInclude(s=> s.ShippingAddresses)
-                                                .Include(s => s.Forwarder)
                            let invoices = context.InvoiceLineItems
-                             .Where(s => s.Invoice.SalesOrderId == order.Id)
-                             .GroupBy(s => s.Invoice.InvoiceNumber)
-                             .Select(x => new
-                             {
-                                 Id = x.Key
-                             }).ToList()
-
+                                                 .Where(s => s.Invoice.SalesOrderId == order.Id)
+                                                 .GroupBy(s => s.Invoice.InvoiceNumber)
+                                                 .Select(x => new
+                                                 {
+                                                     Id = x.Key
+                                                 }).ToList()
                            let packaging = context.PackLineItems.Include(x => x.PackType)
                                           .Where(s => s.Pack.SalesOrderId == order.Id)
                                            .GroupBy(s => new
@@ -143,7 +140,6 @@ namespace GMGInventory.Application.Repositories
                                               Id = s.Key,
                                               Text = s.Select(l => l.BoxNumber).Distinct().Count() + " " + s.Key.Code
                                           }).ToList()
-
                            let shippingAddress = order.Customer.ShippingAddresses.Where(s => s.IsDefault == true).FirstOrDefault()
 
                            where order.Id == Id
@@ -152,7 +148,9 @@ namespace GMGInventory.Application.Repositories
                                CustomerCode = order.Customer.Code,
                                CustomerName = order.Customer.Name,
                                CustomerAddress = shippingAddress == null ? null : shippingAddress.Address,
-                               Forwarder = order.Forwarder.Name,
+                               Forwarder = order.SalesOrderDeliveryMonitorings
+                                                .Select(s => s.Forwarder.Name)
+                                                .FirstOrDefault(),
                                SalesOrderId = order.Id,
                                SalesOrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,

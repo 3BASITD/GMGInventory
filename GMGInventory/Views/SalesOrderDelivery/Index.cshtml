@@ -54,6 +54,21 @@
                     <th>
                         @Html.DisplayNameFor(model => model.PONumber)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ServiceLevelAgreement)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesOrderStatus)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Representative)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateReceive)
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -139,7 +154,7 @@
 {
     <!-- Edit Modal -->
     <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Sales Order Delivery</h5>
@@ -149,29 +164,65 @@
                 </div>
                 <form id="editForm">
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="delivery-pickup-date" class="form-label mb-0">Pick-up Date</label>
-                            <input type="date" id="delivery-pickup-date" name="PickupDate" class="form-control form-control-sm" />
-                        </div>
-                        <div class="form-group">
-                            <label for="delivery-date" class="form-label mb-0">Delivery Date</label>
-                            <input type="date" id="delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
-                        </div>
-                        <div class="form-group">
-                            <label for="delivery-forwarder" class="form-label mb-0">Forwarder</label>
-                            <div>
-                                <select id="delivery-forwarder" name="Forwarder" style="width:100%">
-                                    <option></option>
-                                </select>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="delivery-pickup-date" class="form-label mb-0">@Html.DisplayNameFor(model => model.DatePickup)</label>
+                                    <input type="date" id="delivery-pickup-date" name="PickupDate" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="delivery-date" class="form-label mb-0">@Html.DisplayNameFor(model => model.DateDeliver)</label>
+                                    <input type="date" id="delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="delivery-waybill" class="form-label mb-0">Waybill Number</label>
-                            <input type="text" id="delivery-waybill" name="Waybill" class="form-control form-control-sm" />
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="delivery-forwarder" class="form-label mb-0">@Html.DisplayNameFor(model => model.Forwarder)</label>
+                                    <div>
+                                        <select id="delivery-forwarder" name="Forwarder" style="width:100%">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="delivery-waybill" class="form-label mb-0">@Html.DisplayNameFor(model => model.WaybillNumber)</label>
+                                    <input type="text" id="delivery-waybill" name="Waybill" class="form-control form-control-sm" />
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="delivery-remarks" class="form-label mb-0">Remarks</label>
-                            <input type="text" id="delivery-remarks" class="form-control form-control-sm" />
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="delivery-sla-date" class="form-label mb-0">@Html.DisplayNameFor(model => model.ServiceLevelAgreement)</label>
+                                    <input type="date" id="delivery-sla-date" name="ServiceLevelAgreement" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="delivery-representative" class="form-label mb-0">@Html.DisplayNameFor(model => model.Representative)</label>
+                                    <input type="text" id="delivery-representative" name="Waybill" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="delivery-receive-date" class="form-label mb-0">@Html.DisplayNameFor(model => model.DateReceive)</label>
+                                    <input type="date" id="delivery-receive-date" name="DateReceive" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="delivery-remarks" class="form-label mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
+                                    <input type="text" id="delivery-remarks" class="form-control form-control-sm" />
+                                </div>
+                            </div>
                         </div>
                         <input type="hidden" id="delivery-sales-order-id" />
                     </div>
@@ -459,12 +510,61 @@
                 { data: "soNumber", name: "SONumber" },
                 { data: "customerCode", name: "CustomerCode" },
                 { data: "customerName", name: "CustomerName" },
-                { data: "datePickup", name: "DatePickup" },
-                { data: "dateDeliver", name: "DateDeliver" },
-                { data: "forwarder", name: "Forwarder" },
-                { data: "waybillNumber", name: "WaybillNumber" },
-                { data: "remarks", name: "Remarks" },
-                { data: "poNumber", name: "PONumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.datePickup == null ? "N/A" : data.datePickup;
+                    },
+                    name: "DatePickup"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateDeliver == null ? "N/A" : data.dateDeliver;
+                    }, name: "DateDeliver"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.forwarder == null ? "N/A" : data.forwarder;
+                    },
+                    name: "Forwarder"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.waybillNumber == null ? "N/A" : data.waybillNumber;
+                    },
+                    name: "WaybillNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.remarks == null ? "N/A" : data.remarks;
+                    },
+                    name: "Remarks"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.poNumber == null ? "N/A" : data.poNumber;
+                    },
+                    name: "PONumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.serviceLevelAgreement == null ? "N/A" : data.serviceLevelAgreement;
+                    },
+                    name: "ServiceLevelAgreement"
+                },
+                { data: "salesOrderStatus", name: "SalesOrderStatus" },
+                { data: "requiredDeliveryDate", name: "RequiredDeliveryDate" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.representative == null ? "N/A" : data.representative;
+                    },
+                    name: "Representative"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateReceive == null ? "N/A" : data.dateReceive;
+                    }, 
+                    name: "DateReceive"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -497,6 +597,9 @@
                     $("#delivery-pickup-date").val(DateForInput(data.datePickupD));
                     $("#delivery-waybill").val(data.waybillNumber == "-" ? "" : data.waybillNumber);
                     $("#delivery-remarks").val(data.remarks == "-" ? "" : data.remarks);
+                    $("#delivery-sla-date").val(DateForInput(data.serviceLevelAgreement));
+                    $("#delivery-representative").val(DateForInput(data.representative));
+                    $("#delivery-receive-date").val(DateForInput(data.dateReceive));
 
                     // Load forwarder data for select2 on edit
                     //if ($("#delivery-forwarder").attr("data-select2-id")) {
@@ -528,12 +631,14 @@
                     rules: {
                         Forwarder: { required: true },
                         Waybill: { required: true, maxlength: 150 },
-                        Remarks: { maxlength: 250 }
+                        Remarks: { maxlength: 250 },
+                        Representative: { maxlength: 150 }
                     },
                     messages: {
                         Forwarder: { required: "Please select a forwarder." },
                         Waybill: { required: "Please enter waybill number.", maxlength: "Waybill must not exceed 150 characters." },
-                        Remarks: { maxlength: "Remarks must not exceed 250 characters." }
+                        Remarks: { maxlength: "Remarks must not exceed 250 characters." },
+                        Representative: { maxlength: "Driver / Representative must not exceed 150 characters." }
                     },
                     submitHandler: function (form, event) {
                         event.preventDefault();
@@ -552,7 +657,10 @@
                             DatePickup: $("#delivery-pickup-date").val(),
                             Forwarder: $("#delivery-forwarder").val(),
                             Waybill: $("#delivery-waybill").val(),
-                            Remarks: $("#delivery-remarks").val()
+                            Remarks: $("#delivery-remarks").val(),
+                            ServiceLevelAgreement: $("#delivery-sla-date").val(),
+                            Representative: $("#delivery-representative").val(),
+                            DateReceive: $("#delivery-receive-date").val()
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Error") {
@@ -639,4 +747,4 @@
             });
         }
     </script>
-    }
+}

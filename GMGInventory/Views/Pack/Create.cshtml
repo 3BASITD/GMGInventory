@@ -240,7 +240,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if (data.inventoryCount > 0) {
+                        if (data.inventoryCountD > 0 && data.remainingQuantityD > 0) {
                             if ($("#add-partial").prop("checked")) {
                                 actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
                             } else {
@@ -314,17 +314,23 @@
                                 $("#add-quantity").val(parseInt(row_data.inventoryCountD));
                                 alertMessage = "Partial Quantity exceed the Inventory Quantity. Auto adjusted";
                             }
-                            var quantityToPack = 0;
 
+                            var quantityToPack = 0;
                             if ($("#add-partial").prop("checked")) {
                                 quantityToPack = parseInt($("#add-quantity").val());
-                                row_data.inventoryCountD = row_data.inventoryCountD - parseInt($("#add-quantity").val());
-                                row_data.packedQuantity = row_data.packedQuantityD + parseInt($("#add-quantity").val());
                             } else {
-                                quantityToPack = row_data.inventoryCountD;
-                                row_data.packedQuantity = row_data.inventoryCountD + row_data.packedQuantityD;
-                                row_data.inventoryCountD = 0;
+                                quantityToPack = row_data.quantityD;
                             }
+                            var tempInventoryCount = row_data.inventoryCountD - quantityToPack;
+                            row_data.inventoryCountD = tempInventoryCount;
+                            row_data.inventoryCount = FormatStringDecimal(tempInventoryCount);
+                            var tempPackedQuantity = row_data.packedQuantityD + quantityToPack;
+                            row_data.packedQuantityD = tempPackedQuantity;
+                            row_data.packedQuantity = FormatStringDecimal(tempPackedQuantity);
+                            var tempRemainingQuantity = row_data.quantityD - tempPackedQuantity;
+                            row_data.remainingQuantityD = tempRemainingQuantity;
+                            row_data.remainingQuantity = FormatStringDecimal(tempRemainingQuantity);
+
                             var toItem = {
                                 id: row_data.id,
                                 boxNumber: $("#add-box").val(),

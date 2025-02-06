@@ -1,10 +1,5 @@
 ﻿using GMGInventory.Common.Constants;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GMGInventory.Common.Models
 {
@@ -25,7 +20,7 @@ namespace GMGInventory.Common.Models
         public string? CustomerAddress { get; set; }
 
         [Display(Name = "Forwarder")]
-        public string Forwarder { get; set; }
+        public string? Forwarder { get; set; }
 
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }

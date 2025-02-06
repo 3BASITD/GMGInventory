@@ -18,14 +18,20 @@ namespace GMGInventory.Data
         public Forwarder Forwarder { get; set; }
 
         [Column(TypeName = "nvarchar(150)")]
-        public string Waybill { get; set; }
+        public string? Waybill { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         public DateTime? DatePickup { get; set; }
 
         public DateTime? DateDeliver { get; set; }
+
+        public DateTime? ServiceLevelAgreement { get; set; }
+
+        [Column(TypeName = "nvarchar(150)")]
+        public string? Representative { get; set; }
+        public DateTime? DateReceive { get; set; }
 
         //public ICollection<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
     }

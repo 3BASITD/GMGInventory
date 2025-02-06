@@ -6,9 +6,6 @@ namespace GMGInventory.Data
     {
         public PriceType()
         {
-            this.SalesOrders = new HashSet<SalesOrder>();
         }
-
-        public ICollection<SalesOrder> SalesOrders { get; set; }
     }
 }
