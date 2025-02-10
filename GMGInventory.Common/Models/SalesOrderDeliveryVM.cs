@@ -1,6 +1,5 @@
 ﻿using GMGInventory.Common.Constants;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 
 namespace GMGInventory.Common.Models
 {
@@ -26,11 +25,11 @@ namespace GMGInventory.Common.Models
         public string CustomerName { get; set; }
 
         [Display(Name = "Pick-up Date")]
-        public string DatePickup => DatePickupD == null ? "-" : DatePickupD.Value.ToString(SystemFormat.StringDate);
+        public string? DatePickup => DatePickupD == null ? null : DatePickupD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DatePickupD { get; set; }
 
         [Display(Name = "Delivery Date")]
-        public string DateDeliver => DateDeliverD == null ? "-" : DateDeliverD.Value.ToString(SystemFormat.StringDate);
+        public string? DateDeliver => DateDeliverD == null ? null : DateDeliverD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DateDeliverD { get; set; }
 
         [Display(Name = "Forwarder")]
@@ -38,23 +37,41 @@ namespace GMGInventory.Common.Models
         public int ForwarderId { get; set; }
 
         [Display(Name = "Waybill Number")]
-        public string WaybillNumber { get; set; }
+        public string? WaybillNumber { get; set; }
 
         [Display(Name = "Remarks")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
+
+        [Display(Name = "Service Level Agreement")]
+        public string? ServiceLevelAgreement => ServiceLevelAgreementD == null ? null : ServiceLevelAgreementD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? ServiceLevelAgreementD { get; set; }
+
+        [Display(Name = "Required Delivery Date")]
+        public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDateTime);
+        public DateTime RequiredDeliveryDateD { get; set; }
+
+        [Display(Name = "Sales Order Status")]
+        public string SalesOrderStatus { get; set; }
+
+        [Display(Name = "Driver / Representative")]
+        public string? Representative { get; set; }
+
+        [Display(Name = "Order Received by Customer(VISMIN)")]
+        public string? DateReceive => DateReceiveD == null ? null: DateReceiveD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateReceiveD { get; set; }
 
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
 
         [Display(Name = "Modified By")]
-        public string ModifiedBy { get; set; }
+        public string? ModifiedBy { get; set; }
 
         [Display(Name = "Date Created")]
         public string CreatedDate => CreatedDateD.ToString(SystemFormat.StringDateTime);
         public DateTime CreatedDateD { get; set; }
 
         [Display(Name = "Date Modified")]
-        public string ModifiedDate => ModifiedDateD == null ? "-" : ModifiedDateD.Value.ToString(SystemFormat.StringDateTime);
+        public string? ModifiedDate => ModifiedDateD == null ? null : ModifiedDateD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? ModifiedDateD { get; set; }
     }
 
@@ -73,5 +90,8 @@ namespace GMGInventory.Common.Models
         public int Forwarder { get; set; }
         public string Waybill { get; set; }
         public string Remarks { get; set; }
+        public DateTime? ServiceLevelAgreement { get; set; }
+        public string Representative { get; set; }
+        public DateTime? DateReceive { get; set; }
     }
 }

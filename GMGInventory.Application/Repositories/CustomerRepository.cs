@@ -1040,20 +1040,31 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<CustomerVM>> GetCustomerPaymentAsync(int id)
         {
             var customerVM = from customer in context.Customers
-                             join cp in context.CustomerPayments
-                                      on customer.Id equals cp.CustomerId
+                             join cp in context.CustomerPayments on customer.Id equals cp.CustomerId
                              join userc in userManager.Users on cp.UserCreated equals userc.Id
                              join userm in userManager.Users on cp.UserModified equals userm.Id into um
                              from userm in um.DefaultIfEmpty()
+                             let soalit = context.SOACRLineItems.Where(s => s.SOACRId == cp.SOACRId).ToList()
+                             let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
+                             let invamt = (from ili in context.InvoiceLineItems
+                                           join inv in context.Invoices on ili.InvoiceId equals inv.Id
+                                           join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                                           join soa in context.SOACRs on sli.SOACRId equals soa.Id
+                                           where cp.SOACRId == soa.Id
+                                           select new
+                                           {
+                                               Amount = ili.Quantity * ili.UnitPrice
+                                           }).ToList()
+                             let invamttotal = invamt.Sum(s => s.Amount) - soalit.Sum(s => s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid
                              where cp.CustomerId == id
                              select new CustomerVM
                              {
                                  AmountPaidD = cp.TotalAmountPaid,
                                  CRNo = cp.CRNumber,
                                  PaymentRemarks = cp.Remarks,
-                                 OverPaymentD = cp.OverPayment,
+                                 OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
                                  SOANo = cp.SOACRId,
-                                 TotalInvoiceAmountD = cp.TotalInvoiceAmount,
+                                 TotalInvoiceAmountD = invamt.Sum(s => s.Amount),
                                  CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  DateCreatedD = cp.DateCreated,
                                  ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
@@ -1160,7 +1171,7 @@ namespace GMGInventory.Application.Repositories
                               {
                                   InvoiceNo = inv.InvoiceNumber,
                                   InvoicedDateD = inv.InvoiceDate,
-                                  InvoicedAmountD = inv.Amount
+                                  InvoicedAmountD = inv.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice)
                               };
             return await receivables.ToListAsync();
         }

@@ -34,6 +34,14 @@ namespace GMGInventory.Application.Repositories
                         //let over = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.OverPayment)
                         let paid = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.TotalAmountPaid)
                         let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
+                        let invamt = (from ili in context.InvoiceLineItems
+                                      join inv in context.Invoices on ili.InvoiceId equals inv.Id
+                                      join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                                      where sli.SOACRId == soa.Id
+                                      select new
+                                      {
+                                          Amount = ili.Quantity * ili.UnitPrice
+                                      }).ToList()
                         // where soa.Customer.Name == "ROX - RIX AUTO SUPPLY" // for testing only
                         select new SOACRVM
                         {
@@ -42,7 +50,7 @@ namespace GMGInventory.Application.Repositories
                             Type = soa.SOACRType.Code,
                             SOAFromD = soa.SOAFrom,
                             SOAToD = soa.SOATo,
-                            TotalAmountD = soalit.Sum(s => s.Invoice.Amount),
+                            TotalAmountD = invamt.Sum(s => s.Amount),
                             TBRD = tbr,
                             CreditD = soalit.Sum(s => s.CreditAmount),
                             DebitD = soalit.Sum(s => s.DebitAmount),
@@ -161,15 +169,7 @@ namespace GMGInventory.Application.Repositories
                 CustomerId = soaVM.Customer,
                 SOACRTypeId = soaType,
                 SOAFrom = soaVM.DateFrom,
-                SOATo = soaVM.DateTo,
-                AmountToPay = invoices.Sum(s => s.Amount),
-                //TotalCMAAmount = 0,
-                //TotalDMAAmount = 0,
-                //TotalTBRAmount = 0,
-                //TotalBalance = 0,
-                //TotalFreightCost = 0,
-                //TotalAmount = 0,
-                //OverPayment = 0,
+                SOATo = soaVM.DateTo
             };
             await context.SOACRs.AddAsync(soa);
             await context.SaveChangesAsync(currentUserId);
@@ -180,9 +180,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     SOACRId = soa.Id,
                     InvoiceId = invoice.Id,
-                    InvoiceAmount = invoice.Amount,
+                    InvoiceAmount = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
                     PaidAmount = 0,
-                    //TBRAmount = 0,
                     CreditAmount = 0,
                     DebitAmount = 0,
                     FreightCost = 0,
@@ -215,7 +214,7 @@ namespace GMGInventory.Application.Repositories
                                InvoiceDateD = inv.InvoiceDate,
                                InvoiceNumber = inv.InvoiceNumber, //.Remove(0, 4),
                                InvoiceType = inv.InvoiceType.Name,
-                               TotalAmountD = inv.Amount
+                               TotalAmountD = inv.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice)
                            };
 
             return await invoices.ToListAsync();
@@ -229,7 +228,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
 
-          //  var test = data.Select(x => x.InvoiceNumber = "DR-0549638")
+            //  var test = data.Select(x => x.InvoiceNumber = "DR-0549638")
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
@@ -316,7 +315,7 @@ namespace GMGInventory.Application.Repositories
                               InvoiceDateD = inv.InvoiceDate,
                               InvoiceNumber = inv.InvoiceNumber,
                               InvoiceType = inv.InvoiceType.Name,
-                              TotalAmountD = inv.Amount
+                              TotalAmountD = inv.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice)
                           };
 
             return await invoice.ToListAsync();
@@ -385,15 +384,7 @@ namespace GMGInventory.Application.Repositories
             var soa = new SOACR
             {
                 CustomerId = CustomerId,
-                SOACRTypeId = soaType,
-                AmountToPay = invoices.Sum(s => s.Amount),
-                //TotalCMAAmount = 0,
-                //TotalDMAAmount = 0,
-                //TotalTBRAmount = 0,
-                //TotalBalance = 0,
-                //TotalFreightCost = 0,
-                //TotalAmount = 0,
-                //OverPayment = 0,
+                SOACRTypeId = soaType
             };
             await context.SOACRs.AddAsync(soa);
             await context.SaveChangesAsync(currentUserId);
@@ -404,7 +395,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     SOACRId = soa.Id,
                     InvoiceId = invoice.Id,
-                    InvoiceAmount = invoice.Amount,
+                    InvoiceAmount = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
                     PaidAmount = 0,
                     //TBRAmount = 0,
                     CreditAmount = 0,
@@ -448,7 +439,7 @@ namespace GMGInventory.Application.Repositories
                           Id = sl.Id,
                           InvoiceDateD = /*sl.Invoice.DateModified ?? */sl.Invoice.DateCreated,
                           InvoiceNumber = sl.Invoice.InvoiceNumber,
-                          InvoiceAmountD = sl.Invoice.Amount,
+                          InvoiceAmountD = sl.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice),
                           InvoiceType = sl.Invoice.InvoiceType.Code,
                           InvoiceId = sl.Invoice.Id,
                           IsPaid = sl.IsPaid ?? false,
@@ -598,21 +589,10 @@ namespace GMGInventory.Application.Repositories
                 SOACRId = soacr.Id,
                 Tax = payment.Tax,
                 TKTSolicitation = payment.TKTSolicitation,
-                //TotalAmountPaid = payment.BackLoad + payment.CashAdvance + payment.CashAmount - payment.Discount - payment.Offset + payment.OverPayment
-                //                - payment.Tax - payment.TKTSolicitation + totalChecks,
-                TotalAmountPaid = payment.BackLoad + payment.CashAdvance + payment.CashAmount + payment.Discount + payment.Offset + payment.OverPayment
-                                + payment.Tax + payment.TKTSolicitation + totalChecks,
-                //TotalInvoiceAmount = soacrli.Sum(s => s.InvoiceAmount)
-                TotalInvoiceAmount = invoices.Sum(s => s.Amount)
+                TotalAmountPaid = payment.BackLoad + payment.CashAdvance + payment.CashAmount + payment.Discount + payment.Offset + payment.OverPayment + payment.Tax + payment.TKTSolicitation + totalChecks,
             };
 
             await context.CustomerPayments.AddAsync(customerPayment);
-            await context.SaveChangesAsync(currentUserId);
-
-            soacr.AmountToPay += customerPayment.TotalAmountPaid;
-            //soacr.TotalBalance = soacr.TotalAmount - soacr.TotalTBRAmount - soacr.TotalCMAAmount + soacr.TotalDMAAmount - soacr.AmountToPay + soacr.TotalFreightCost;
-
-            context.SOACRs.Update(soacr);
             await context.SaveChangesAsync(currentUserId);
 
             if (payment.Checks != null && payment.Checks.Count > 0)
@@ -766,7 +746,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     SOACRId = soaId,
                     InvoiceId = invoiceId,
-                    InvoiceAmount = invoice.Amount,
+                    InvoiceAmount = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
                     PaidAmount = 0,
                     //TBRAmount = 0,
                     CreditAmount = 0,

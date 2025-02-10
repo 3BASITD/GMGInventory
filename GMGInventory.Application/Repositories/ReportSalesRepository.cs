@@ -261,7 +261,7 @@ namespace GMGInventory.Application.Repositories
         {
             var invoices = from invoice in context.InvoiceLineItems
                            let inventory = context.ItemInventories
-                                                  .Where(s => s.ItemId == invoice.Item.Id 
+                                                  .Where(s => s.ItemId == invoice.Item.Id
                                                            && s.Warehouse.Code.ToLower().Contains("main"))
                                                   .Sum(s => (int?)s.Quantity) ?? 0
                            where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
@@ -858,7 +858,7 @@ namespace GMGInventory.Application.Repositories
                                Agent = invoice.SalesOrder.Agent.FirstName
                                      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) + " "
                                      + invoice.SalesOrder.Agent.LastName,
-                               AmountD = invoice.Amount,
+                               AmountD = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
                                //CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
                                //                ? invoice.Invoice.SalesOrder.Agent.CommissionRate
                                //                : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
@@ -1042,7 +1042,7 @@ namespace GMGInventory.Application.Repositories
                                      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) + " "
                                      + invoice.SalesOrder.Agent.LastName,
                                AgentCode = invoice.SalesOrder.Agent.Code,
-                               AmountD = invoice.Amount,
+                               AmountD = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
                                ControlNumber = invoice.ControlNumber,
                                CustomerCode = invoice.SalesOrder.Customer.Code,
                                CustomerName = invoice.SalesOrder.Customer.Name,

@@ -54,8 +54,8 @@ namespace GMGInventory.Data
         //[Column(TypeName = "decimal(18, 2)")]
         //public decimal OverPay { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal TotalInvoiceAmount { get; set; }
+        //[Column(TypeName = "decimal(18, 2)")]
+        //public decimal TotalInvoiceAmount { get; set; }
 
         public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public ICollection<SOACRCheck> SOACRChecks { get; set; }

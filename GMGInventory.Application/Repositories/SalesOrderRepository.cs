@@ -78,7 +78,9 @@ namespace GMGInventory.Application.Repositories
                                                     .Select(s => s.Address)
                                                     .FirstOrDefault(),
                              SalesOrderDateD = order.SalesOrderDate,
-                             ForwarderName = order.Forwarder.Name
+                             ForwarderName = order.SalesOrderDeliveryMonitorings
+                                                  .Select(s => s.Forwarder.Name)
+                                                  .FirstOrDefault()
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonSalesOrderOptionsModel>
@@ -107,7 +109,9 @@ namespace GMGInventory.Application.Repositories
                                                     .Select(s => s.Address)
                                                     .FirstOrDefault(),
                              SalesOrderDateD = order.SalesOrderDate,
-                             ForwarderName = order.Forwarder.Name
+                             ForwarderName = order.SalesOrderDeliveryMonitorings
+                                                  .Select(s => s.Forwarder.Name)
+                                                  .FirstOrDefault()
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonSalesOrderOptionsModel>
@@ -115,19 +119,6 @@ namespace GMGInventory.Application.Repositories
                 items = ordersFiltered,
                 total_count = orders.Count()
             };
-        }
-
-        public async Task<IList<JsonOptionsModel>> GetPriceTypeOptions(int? IncludeId)
-        {
-            return await context.PriceTypes
-                                .Select(s => new JsonOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.Name,
-                                    Selected = IncludeId == s.Id
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
         }
 
         public async Task<IList<JsonOptionsModel>> GetStatusOptions()
@@ -228,10 +219,8 @@ namespace GMGInventory.Application.Repositories
                                DisapprovedBy = SystemFormat.Name(disapprove.FirstName, disapprove.LastName, disapprove.Nickname),
                                DisapprovedDateD = order.DisapprovedDate,
                                DisapprovedReason = order.DisapprovedReason + "",
-                               Forwarder = order.Forwarder.Name,
-                               ForwarderId = order.Forwarder.Id,
-                               GrossNetPrice = order.PriceType.Name,
-                               GrossNetPriceId = order.PriceType.Id,
+                               Forwarder = order.SalesOrderDeliveryMonitorings.Select(s => s.Forwarder.Name).FirstOrDefault(),
+                               ForwarderId = order.SalesOrderDeliveryMonitorings.Select(s => s.Forwarder.Id).FirstOrDefault(),
                                Id = order.Id,
                                OrderDateD = order.SalesOrderDate,
                                OutstandingBalanceD = invoiceAmount
@@ -556,23 +545,17 @@ namespace GMGInventory.Application.Repositories
                     AgentId = form.Agent,
                     CustomerId = form.Customer,
                     RequiredDeliveryDate = form.DeliveryDate,
-                    ForwarderId = form.Forwarder,
-                    PriceTypeId = 1,//form.GrossNet,
                     PurchaseOrder = form.PurchaseOrder,
                     Remarks = form.Remarks,
                     SalesOrderDate = form.OrderDate,
                     SalesOrderNumber = soNumber,
-                    StatusId = statusId,
-                    //TotalAmount = form.Items.Sum(s => s.GrossPrice)
+                    StatusId = statusId
                 };
                 await context.SalesOrders.AddAsync(orderVM);
                 await context.SaveChangesAsync(currentUserId);
 
                 if (previous != null)
                 {
-                    //previous.ResubmittedSalesOrderId = orderVM.Id;
-                    //previous.SalesOrderNumber = "*" + previous.SalesOrderNumber;
-
                     var soLineItems = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
                     if (soLineItems != null)
                     {
@@ -594,12 +577,8 @@ namespace GMGInventory.Application.Repositories
 
                 SalesOrderDeliveryMonitoring salesOrderDelivery = new()
                 {
-                    DateDeliver = null,
-                    DatePickup = null,
-                    ForwarderId = orderVM.ForwarderId,
-                    Remarks = orderVM.Remarks + "",
-                    SalesOrderId = orderVM.Id,
-                    Waybill = ""
+                    ForwarderId = form.Forwarder,
+                    SalesOrderId = orderVM.Id
                 };
 
                 await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
@@ -610,13 +589,20 @@ namespace GMGInventory.Application.Repositories
                 orderVM.AgentId = form.Agent;
                 orderVM.CustomerId = form.Customer;
                 orderVM.RequiredDeliveryDate = form.DeliveryDate;
-                orderVM.ForwarderId = form.Forwarder;
                 orderVM.Remarks = form.Remarks;
                 orderVM.SalesOrderDate = form.OrderDate;
                 orderVM.StatusId = statusId;
 
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);
+
+                var salesOrderDelivery = await context.SalesOrderDeliveryMonitorings
+                                                      .Where(s => s.SalesOrderId == orderVM.Id)
+                                                      .FirstOrDefaultAsync();
+                if (salesOrderDelivery != null)
+                {
+                    salesOrderDelivery.ForwarderId = form.Forwarder;
+                }
             }
 
             await SaveItemsAsync(form.Items, orderVM.Id);

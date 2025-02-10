@@ -25,19 +25,12 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string SalesOrderNumber { get; set; }
 
-        [ForeignKey("ForwarderId")]
-        public int ForwarderId { get; set; }
-        public Forwarder Forwarder { get; set; }
-
         [ForeignKey("StatusId")]
         public int StatusId { get; set; }
         public Status Status { get; set; }
 
         public string? PurchaseOrder { get; set; }
 
-        [ForeignKey("PriceTypeId")]
-        public int PriceTypeId { get; set; }
-        public PriceType PriceType { get; set; }
         public DateTime RequiredDeliveryDate { get; set; }
         public DateTime SalesOrderDate { get; set; }
 

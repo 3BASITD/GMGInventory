@@ -66,26 +66,27 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<PackDetailsVM?> GetDetailsAsync(int? Id)
         {
-            var orderVM = (from order in context.Packs
-                                                .Include(s => s.SalesOrder).ThenInclude(s => s.Customer)
-                                                .Include(s => s.SalesOrder).ThenInclude(s => s.Forwarder)
-                           join user in userManager.Users on order.UserCreated equals user.Id
-                           where order.Id == Id
-                           select new PackDetailsVM
-                           {
-                               Agent = order.SalesOrder.Agent.FirstName + " " + order.SalesOrder.Agent.LastName,
-                               CustomerCode = order.SalesOrder.Customer.Code,
-                               CustomerName = order.SalesOrder.Customer.Name,
-                               Forwarder = order.SalesOrder.Forwarder.Name,
-                               Id = order.Id,
-                               PackBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
-                               PackDateD = order.DateCreated,
-                               SalesOrderDateD = order.SalesOrder.DateCreated,
-                               SalesOrderId = order.SalesOrder.Id,
-                               SONumber = order.SalesOrder.SalesOrderNumber,
-                               Status = order.Status.Code
-                           });
-            return await orderVM.FirstOrDefaultAsync();
+            var packs = from pack in context.Packs
+                          join user in userManager.Users on pack.UserCreated equals user.Id
+                          where pack.Id == Id
+                          select new PackDetailsVM
+                          {
+                              Agent = pack.SalesOrder.Agent.FirstName + " " + pack.SalesOrder.Agent.LastName,
+                              CustomerCode = pack.SalesOrder.Customer.Code,
+                              CustomerName = pack.SalesOrder.Customer.Name,
+                              Forwarder = pack.SalesOrder
+                                              .SalesOrderDeliveryMonitorings
+                                              .Select(s => s.Forwarder.Name)
+                                              .FirstOrDefault(),
+                              Id = pack.Id,
+                              PackBy = user.FirstName + " " +user.LastName,
+                              PackDateD = pack.DateCreated,
+                              SalesOrderDateD = pack.SalesOrder.DateCreated,
+                              SalesOrderId = pack.SalesOrder.Id,
+                              SONumber = pack.SalesOrder.SalesOrderNumber,
+                              Status = pack.Status.Code
+                          };
+            return await packs.FirstOrDefaultAsync();
         }
 
 
@@ -101,14 +102,14 @@ namespace GMGInventory.Application.Repositories
         public async Task<PackDetailsVM?> GetDetailsBySOAsync(int? Id)
         {
             var orderVM = (from order in context.SalesOrders
-                                                .Include(s => s.Customer)
-                                                .Include(s => s.Forwarder)
                            where order.Id == Id
                            select new PackDetailsVM
                            {
                                CustomerCode = order.Customer.Code,
                                CustomerName = order.Customer.Name,
-                               Forwarder = order.Forwarder.Name,
+                               Forwarder = order.SalesOrderDeliveryMonitorings
+                                                .Select(s => s.Forwarder.Name)
+                                                .FirstOrDefault(),
                                Id = order.Id,
                                SalesOrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber

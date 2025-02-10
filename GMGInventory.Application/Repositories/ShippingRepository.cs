@@ -122,8 +122,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<ShippingVM?> GetDetailsAsync(int Id)
         {
             var orderVM = (from order in context.SalesOrders
-                                                .Include(s => s.Customer).ThenInclude(s=> s.ShippingAddresses)
-                                                .Include(s => s.Forwarder)
                            let invoices = context.InvoiceLineItems
                              .Where(s => s.Invoice.SalesOrderId == order.Id)
                              .GroupBy(s => s.Invoice.InvoiceNumber)
@@ -144,7 +142,6 @@ namespace GMGInventory.Application.Repositories
                                               Id = s.Key,
                                               Text = s.Select(l => l.BoxNumber).Distinct().Count() + " " + s.Key.Code
                                           }).ToList()
-
                            let shippingAddress = order.Customer.ShippingAddresses.Where(s => s.IsDefault == true).FirstOrDefault()
 
                            where order.Id == Id

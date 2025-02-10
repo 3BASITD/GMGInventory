@@ -44,7 +44,7 @@ namespace GMGInventory.Application.Repositories
                                Id = inv.Id.ToString(),
                                Customer = soacrsGroup.Customer.Name,
                                InvoiceNumber = inv.InvoiceNumber,
-                               TotalAmountD = inv.Amount,
+                               TotalAmountD = inv.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
                                TBRD = tbr,
                                CreditD = soali.CreditAmount,
                                DebitD = soali.DebitAmount,
@@ -213,7 +213,7 @@ namespace GMGInventory.Application.Repositories
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
                                  TIN = invoice.SalesOrder.Customer.TIN + "",
-                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                 UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  DateCreatedD = invoice.DateCreated,
                                  UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
                                  DateModifiedD = invoice.DateModified == null ? null : invoice.DateModified.Value
@@ -283,7 +283,7 @@ namespace GMGInventory.Application.Repositories
                                PackNumber = inv.PackId,
                                SONumber = inv.SalesOrder.SalesOrderNumber,
                                Status = inv.Status.Code,
-                               TotalAmountD = inv.Amount,
+                               TotalAmountD = inv.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
                            };
 
             return await invoices.ToListAsync();
@@ -460,7 +460,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsInvoiceInUse(int? invoiceId)
         {
-            var isInSalesReturn = await context.SalesReturnLineItems.AnyAsync(s=>s.InvoiceLineItem!.InvoiceId == invoiceId);
+            var isInSalesReturn = await context.SalesReturnLineItems.AnyAsync(s => s.InvoiceLineItem!.InvoiceId == invoiceId);
             var isInSOACR = await context.SOACRLineItems.AnyAsync(s => s.InvoiceId == invoiceId);
             return isInSalesReturn || isInSOACR;
         }
@@ -499,13 +499,9 @@ namespace GMGInventory.Application.Repositories
                 {
                     InvoiceDate = form.InvoiceDate,
                     ControlNumber = form.BIRInvoiceNumber,
-                    //InvoiceNumber = invoiceType.Code + "-" + string.Format("{0:0000000}", newInvoiceNumber),
                     InvoiceNumber = $"{invoiceNumberPrefix}{invoiceNumberLast + 1:D7}",
                     InvoiceTypeId = form.InvoiceType,
-                    IsGenerated = false,
-                    IsPaid = false,
                     PackId = form.PackId,
-                    PaidAmount = 0,
                     Remarks = form.Remarks + "",
                     SalesOrderId = packVM.SalesOrderId,
                     StatusId = statusId
@@ -551,7 +547,7 @@ namespace GMGInventory.Application.Repositories
                                           .FirstAsync();
 
                 context.SalesOrderLineItems.Update(soItem);
-                if(includeDeleteRecord)
+                if (includeDeleteRecord)
                 {
                     context.InvoiceLineItems.Remove(item);
                 }
@@ -577,7 +573,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int> UpdateAsync(InvoiceFormVM form)
         {
-            var invoice = await context.Invoices.Include(s=>s.Status).Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+            var invoice = await context.Invoices.Include(s => s.Status).Where(s => s.Id == form.Id).FirstOrDefaultAsync();
             if (invoice == null)
             {
                 return -1;
@@ -598,7 +594,8 @@ namespace GMGInventory.Application.Repositories
                         context.Invoices.Update(invoice);
                         await context.SaveChangesAsync(currentUserId);
                         return -2;
-                    } else
+                    }
+                    else
                     {
                         await DeleteInvoiceItems(form, true);
                         context.Invoices.Remove(invoice);
@@ -625,7 +622,8 @@ namespace GMGInventory.Application.Repositories
                     await context.SaveChangesAsync(currentUserId);
 
                     return invoice.Id;
-                } else
+                }
+                else
                 {
                     await DeleteInvoiceItems(form, true);
                     if (await context.Agents.AnyAsync(s => s.Id == form.Agent))
@@ -651,7 +649,7 @@ namespace GMGInventory.Application.Repositories
                     await context.SaveChangesAsync(currentUserId);
 
                     await AddInvoiceItems(invoice.Id, invoice.SalesOrderId, form);
-                    return form.SavingAs == "post" ? -2 : invoice.Id; 
+                    return form.SavingAs == "post" ? -2 : invoice.Id;
                 }
             }
         }

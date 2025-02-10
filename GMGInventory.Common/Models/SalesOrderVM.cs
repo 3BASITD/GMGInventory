@@ -67,10 +67,10 @@ namespace GMGInventory.Common.Models
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
         public decimal OutstandingBalanceD { get; set; }
 
-        public int ForwarderId { get; set; }
+        public int? ForwarderId { get; set; }
 
         [Display(Name = "Forwarder")]
-        public string Forwarder { get; set; }
+        public string? Forwarder { get; set; }
 
         [Display(Name = "Shipping Address")]
         public string ShippingAddress { get; set; }
@@ -82,11 +82,6 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Agent Name")]
         public string AgentName { get; set; }
-
-        public int GrossNetPriceId { get; set; }
-
-        [Display(Name = "Gross/Net Price")]
-        public string GrossNetPrice { get; set; }
 
         [Display(Name = "Credit Terms")]
         public string CreditTerms { get; set; }
@@ -173,8 +168,6 @@ namespace GMGInventory.Common.Models
                 DisapprovedBy = value.DisapprovedBy;
                 DisapprovedDateD = value.DisapprovedDateD;
                 DisapprovedReason = value.DisapprovedReason;
-                GrossNetPriceId = value.GrossNetPriceId;
-                GrossNetPrice = value.GrossNetPrice;
                 Id = value.Id;
                 OrderDateD = value.OrderDateD;
                 OutstandingBalanceD = value.OutstandingBalanceD;

@@ -384,7 +384,6 @@
                             <label for="payment-over-payment" class="control-label mb-0">Over Payment</label>
                         </div>
                         <div class="col-8 col-lg-3">
-                            @*<input type="number" step="0.01" min="0" max="1999999.99" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm" />*@
                             <input type="text" name="OverPayment" id="payment-over-payment" class="form-control form-control-sm mask-decimal" />
 
                         </div>
@@ -863,7 +862,6 @@
                         SOACRId: @Model?.Id,
                         CollectorReceiptNumber: $("#payment-collector-receipt").val(),
                         Remarks: $("#payment-remarks").val(),
-                        OverPayment: removeCommaOfNumber($("#payment-over-payment").val()),
                         TKTSolicitation: removeCommaOfNumber($("#payment-tkt").val()),
                         Tax: removeCommaOfNumber($("#payment-tax").val()),
                         CashAdvance: removeCommaOfNumber($("#payment-cash-advanced").val()),

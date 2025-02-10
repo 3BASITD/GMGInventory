@@ -18,9 +18,6 @@ namespace GMGInventory.Data
         public int SalesOrderId { get; set; }
         public SalesOrder SalesOrder { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal Amount { get; set; }
-
         [Column(TypeName = "nvarchar(50)")]
         public string InvoiceNumber { get; set; }
 
@@ -41,9 +38,6 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal PaidAmount { get; set; }
-
-        public bool IsPaid { get; set; }
-        public bool IsGenerated { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }

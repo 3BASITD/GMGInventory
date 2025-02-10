@@ -49,7 +49,7 @@
         <tr>
             <td>
                 <dl>
-                    <dt>PR No.:</dt>
+                    <dt>PO No.:</dt>
                     <dd>@Model.DocumentNumber</dd>
                 </dl>
             </td>
@@ -149,9 +149,9 @@
                 <td></td>
                 <td></td>
             </tr>
-            @if (itemCount < 23)
+            @if (itemCount < 15)
             {
-                for (var ctr = 2; ctr <= 23 - itemCount; ctr++)
+                for (var ctr = 2; ctr <= 15 - itemCount; ctr++)
                 {
                     <tr>
                         <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>

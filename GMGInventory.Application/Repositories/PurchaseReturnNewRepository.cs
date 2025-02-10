@@ -228,20 +228,21 @@ namespace GMGInventory.Application.Repositories
                            from retrn in rtrn.DefaultIfEmpty()
                            where receive.PurchaseReceivingId == receiveId
                            && (retrn == null || retrn.PurchaseReturnId == purchaseReturnId)
+                           let item = receive.OrderItem.RequestItem.Item
                            select new PurchaseReturnNewLineItemVM
                            {
                                Id = retrn == null ? 0 : retrn.Id,
                                ToReturn = retrn != null,
-                               ItemId = receive.OrderItem.RequestItem.Item == null ? null : receive.OrderItem.RequestItem.Item.Id,
-                               ItemCode = receive.OrderItem.RequestItem.Item == null ? null : receive.OrderItem.RequestItem.Item.Code,
-                               ItemPartNumber = receive.OrderItem.RequestItem.Item == null ? null : receive.OrderItem.RequestItem.Item.PartNumber,
+                               ItemId = item == null ? null : item.Id,
+                               ItemCode = item == null ? null : item.Code,
+                               ItemPartNumber = item == null ? null : item.PartNumber,
                                ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
                                LineNumber = receive.OrderItem.LineNumber,
                                QuantityD = retrn == null ? 0 : retrn.Quantity,
                                ReceivingItemId = receive.Id,
                                ReceivedQuantityD = receive.Quantity,
-                               UnitId = receive.OrderItem.RequestItem.Item == null ? receive.OrderItem.RequestItem.Unit.Id : receive.OrderItem.RequestItem.Item.Unit.Id,
-                               UnitCode = receive.OrderItem.RequestItem.Item == null ? receive.OrderItem.RequestItem.Unit.Code : receive.OrderItem.RequestItem.Item.Unit.Code,
+                               UnitId = item == null ? receive.OrderItem.RequestItem.Unit.Id : item.Unit.Id,
+                               UnitCode = item == null ? receive.OrderItem.RequestItem.Unit.Code : item.Unit.Code,
                                UnitCostD = receive.OrderItem.UnitCost
                            };
             var rvms = await returnVM.ToListAsync();

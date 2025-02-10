@@ -17,9 +17,6 @@ namespace GMGInventory.Data
         public DateTime? SOAFrom { get; set; }
         public DateTime? SOATo { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal AmountToPay { get; set; }
-
         [ForeignKey("SOACRTypeId")]
         public int SOACRTypeId { get; set; }
         public SOACRType SOACRType { get; set; }

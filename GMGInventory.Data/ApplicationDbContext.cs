@@ -19,7 +19,6 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new CustomerAccountStatusSeedConfiguration());
             builder.ApplyConfiguration(new CustomerTypeSeedConfiguration());
             builder.ApplyConfiguration(new InvoiceTypeSeedConfiguration());
-            builder.ApplyConfiguration(new PriceTypeSeedConfiguration());
             builder.ApplyConfiguration(new RegionSeedConfiguration());
             builder.ApplyConfiguration(new SOACRTypeSeedConfiguration());
             builder.ApplyConfiguration(new StatusSeedConfiguration());
@@ -184,7 +183,7 @@ namespace GMGInventory.Data
         //public DbSet<Payment> Payments { get; set; }
         //public DbSet<PaymentDetail> PaymentDetails { get; set; }
         public DbSet<PhysicalCountHistory> PhysicalCountHistories { get; set; }
-        public DbSet<PriceType> PriceTypes { get; set; }
+        //public DbSet<PriceType> PriceTypes { get; set; }
         public DbSet<PurchaseOrderDeliveryMode> PurchaseOrderDeliveryModes { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<PurchaseOrderNew> PurchaseOrderNews { get; set; }

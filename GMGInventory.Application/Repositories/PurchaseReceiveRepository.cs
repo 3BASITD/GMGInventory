@@ -181,6 +181,7 @@ namespace GMGInventory.Application.Repositories
                                 PurchaseReceivingId = receive.PurchaseReceivingId,
                                 LineNumber = order.LineNumber,
                                 OrderItemId = receive.OrderItemId,
+                                ItemId = order.RequestItem.Item == null ? null : order.RequestItem.Item.Id,
                                 ItemCode = order.RequestItem.Item == null ? null : order.RequestItem.Item.Code,
                                 ItemPartNumber = order.RequestItem.Item == null ? null : order.RequestItem.Item.PartNumber,
                                 ItemDescription = order.RequestItem.ItemDescription,
