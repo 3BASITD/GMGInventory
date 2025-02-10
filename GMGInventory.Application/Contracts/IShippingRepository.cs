@@ -13,6 +13,7 @@ namespace GMGInventory.Application.Contracts
         Task<ShippingVM?> GetDetailsAsync(int Id);
 
         Task<IList<PackItemVM>> GetItemsAsync(int salesOrderId);
+        Task<ShippingPVM> PrintDetailsAsync(JsonShippingModel shipping);
 
         //Task<Select2Model<JsonShippingOptionsModel>> GetInvoicedSalesOrderOptions(string search, int page);
 

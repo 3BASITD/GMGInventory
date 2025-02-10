@@ -1,4 +1,4 @@
-﻿@model ShippingVM
+﻿@model ShippingPVM
 
 @{
     Layout = "";
@@ -42,19 +42,79 @@
     
     </table>
 
+    <br />
+    <p> Received from BINA'S AUTO SUPPLY  the following Goods for shipment and delivery consignee name below: </p>
+    <br />
+
     <table>
-        <thead>
-            <tr>
-                <th style="min-width: 50px;">Quantity</th>
-                <th style="min-width: 25px;">UOM</th>
-                <th>DESCRIPTION OF ARTICLE</th>
-                <th style="min-width: 50px;">VALUE</th>
-                <th style="min-width: 50px;">FREIGHT</th>
-            </tr>
-        </thead>
-        <tbody>
-          
-        </tbody>
+        <tr>
+            <td colspan="7">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="min-width: 50px;">Quantity</th>
+                            <th style="min-width: 25px;">UOM</th>
+                            <th>DESCRIPTION OF ARTICLE</th>
+                            <th style="min-width: 25px;">VALUE</th>
+                            <th class="right-text" style="min-width: 25px;">FREIGHT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td class="center-text">@Model.DescriptionOfArticle</td>
+                            <td class="right-text">@Model.Value</td>
+                            <td></td>
+                        </tr>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="center-text"><nobr>@item.Quantity</nobr></td>
+                                <td class="center-text"><nobr>@item.UOM</nobr></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </td>
+            <td colspan="1">
+                <table>
+                    <tbody>
+                        <tr><td class="right-text">  <strong> @(Model.Freight == "prepaid" ? "/ " : "")  Prepaid </strong> </td> </tr>
+                        <tr><td class="right-text"> <strong> @(Model.Freight == "collect" ? "/ " : "") Collect </strong>  </td></tr>
+                        <tr><td class="right-text">  <strong>@(Model.Freight == "cod" ? "/ " : "") C.O.D </strong></td>  </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+   
+
+    <br />
+
+    <table>
+        <tr>
+            <td>
+                <dl>
+                    <dt><strong>TOTAL:</strong> </dt>
+                    <dt><strong>INVOICE NO./PO NO:</strong> @Model.Details!.PairedInvoices</dt>
+                    <dt><strong>CONSIGNEE:</strong> @Model.Details!.CustomerName</dt>
+                    <dt><strong>ADDRESS:</strong> @Model.Details!.CustomerAddress</dt>
+                    <dt><strong>CONTACT NO:</strong> @Model.Details!.CustomerContactNo </dt>
+                </dl>
+            </td>
+            <td>
+                <dl>
+                    <dt><strong>FORWARDER/SHIPPING CO/TRUCKING CO:</strong> @Model.Details!.Forwarder</dt>
+                    <br />
+                    <br />
+@* 
+                    <dt></dt>
+                    <dt></dt> *@
+                    <dt><strong>RECEIVED BY:</strong> </dt>
+                </dl>
+            </td>
+        </tr>
     </table>
 </body>
 <script type="text/javascript">
