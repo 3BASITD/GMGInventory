@@ -430,7 +430,7 @@ namespace GMGInventory.Application.Repositories
                             {
                                 ItemId = itemId ?? 0,
                                 QuantityFrom = previousCount != null ? previousCount.QuantityTo : itemInventory != null ? itemInventory.Quantity : 0,
-                                QuantityTo = itemInventory!.Quantity + receiving.Quantity,
+                                QuantityTo = previousCount != null ? previousCount.QuantityTo + receiving.Quantity : receiving.Quantity,
                                 Remarks = "Purchase Receiving",
                                 WarehouseId = warehouseId
                             };
