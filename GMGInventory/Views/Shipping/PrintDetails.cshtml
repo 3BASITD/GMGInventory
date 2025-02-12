@@ -48,7 +48,7 @@
 
     <table>
         <tr>
-            <td> 
+            <td style="vertical-align:top">
                 <table>
                     <thead>
                         <tr>
@@ -56,7 +56,7 @@
                             <th style="min-width: 25px;">UOM</th>
                             <th>DESCRIPTION OF ARTICLE</th>
                             <th style="min-width: 25px;">VALUE</th>
-                            <th>FREIGHT</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -76,21 +76,28 @@
                     </tbody>
                 </table>
             </td>
-            <td>
+            <td style="vertical-align:top">
                 <table>
+                    <thead>
+                        <tr>
+                            <th style="min-width: 25px;"></th>
+                            <th class="left-text">FREIGHT</th>
+                        </tr>
+                    </thead>
                     <tbody>
+                        <tr><td></td><td></td></tr>
                         <tr>
                             @if (Model.Freight == "prepaid")
                             {
-                                <td style="padding:0px"> &#10004; </td>
-                                <td>
+                                <td class="right-text" style="padding:0px"> &#10004; </td>
+                                <td class="left-text">
                                     <strong> Prepaid </strong>
                                 </td>
                             }
                             else
                             {
                                 <td style="padding:0px"></td>
-                                <td>
+                                <td class="left-text">
                                     <strong> Prepaid </strong>
                                 </td>
                             }
@@ -98,15 +105,15 @@
                         <tr>
                             @if (Model.Freight == "collect")
                             {
-                                <td style="padding:0px"> &#10004; </td>
-                                <td>
+                                <td class="right-text" style="padding:0px"> &#10004; </td>
+                                <td class="left-text">
                                     <strong> Collect </strong>
                                 </td>
                             }
                             else
                             {
                                 <td style="padding:0px"></td>
-                                <td>
+                                <td class="left-text">
                                     <strong> Collect </strong>
                                 </td>
                             }
@@ -114,15 +121,15 @@
                         <tr>
                             @if (Model.Freight == "cod")
                             {
-                                <td style="padding:0px"> &#10004; </td>
-                                <td>
+                                <td class="right-text" style="padding:0px"> &#10004; </td>
+                                <td class="left-text">
                                     <strong> C.O.D </strong>
                                 </td>
                             }
                             else
                             {
                                 <td style="padding:0px"></td>
-                                <td>
+                                <td class="left-text">
                                     <strong> C.O.D </strong>
                                 </td>
                             }
