@@ -39,6 +39,21 @@ namespace GMGInventory.Application.Repositories
 
                            let shippingAddress = cust.ShippingAddresses.Where(s => s.IsDefault == true).FirstOrDefault()
 
+                           let packaging = context.PackLineItems.Include(x => x.PackType)
+                                        .Where(s => s.Pack.SalesOrderId == so.Id)
+                                         .GroupBy(s => new
+                                         {
+                                             s.PackType.Code
+                                         })
+                                        .Select(s => new
+                                        {
+                                            Id = s.Key,
+                                            Text = s.Select(l => l.BoxNumber).Distinct().Count() + " " + s.Key.Code,
+                                            PackageCount = s.Select(l => l.BoxNumber).Distinct().Count()
+                                        }).ToList()
+
+                           let forwarder = so.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == so.Id).FirstOrDefault()!.Forwarder
+
                            where sts.Code.ToLower() == "invoiced" 
                              && filter.DateFrom <= invs.DateCreated.Date
                             && invs.DateCreated.Date <= filter.DateTo
@@ -52,7 +67,9 @@ namespace GMGInventory.Application.Repositories
                                 CustomerName = cust.Name,
                                 CustomerAddress = shippingAddress == null ? null : shippingAddress.Address,
                                 PackId = pack.Id,
-                                SalesOrderDateD = invs.DateCreated
+                                SalesOrderDateD = invs.DateCreated,
+                                TotalPackageCount = packaging.Sum(s => s.PackageCount),
+                                Forwarder = forwarder == null ? null : forwarder.Name
                             };
 
             return await invoices.ToListAsync();
@@ -73,7 +90,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.SalesOrderDateD.ToString().Contains(form.SearchValue)
                                     || x.SONumber.ToLower().Contains(form.SearchValue)
                                     || x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || x.Forwarder.ToLower().Contains(form.SearchValue));
+                                    || x.Forwarder!.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -121,7 +138,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ShippingVM?> GetDetailsAsync(int Id)
         {
-            var orderVM = (from order in context.SalesOrders
+            var orderVM = (from order in context.SalesOrders.Include(s => s.SalesOrderDeliveryMonitorings).ThenInclude(s => s.Forwarder)
                            let invoices = context.InvoiceLineItems
                              .Where(s => s.Invoice.SalesOrderId == order.Id)
                              .GroupBy(s => s.Invoice.InvoiceNumber)
@@ -140,9 +157,12 @@ namespace GMGInventory.Application.Repositories
                                           .Select(s => new
                                           {
                                               Id = s.Key,
-                                              Text = s.Select(l => l.BoxNumber).Distinct().Count() + " " + s.Key.Code
+                                              Text = s.Select(l => l.BoxNumber).Distinct().Count() + " " + s.Key.Code,
+                                              PackageCount = s.Select(l => l.BoxNumber).Distinct().Count()
                                           }).ToList()
                            let shippingAddress = order.Customer.ShippingAddresses.Where(s => s.IsDefault == true).FirstOrDefault()
+                           let forwarder = order.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == order.Id).FirstOrDefault()!.Forwarder
+
 
                            where order.Id == Id
                            select new ShippingVM
@@ -151,13 +171,14 @@ namespace GMGInventory.Application.Repositories
                                CustomerName = order.Customer.Name,
                                CustomerAddress = shippingAddress == null ? null : shippingAddress.Address,
                                CustomerContactNo = shippingAddress == null ? null : shippingAddress.PhoneNumber,
-                               Forwarder = order.Forwarder.Name,
+                               Forwarder = forwarder == null ? null : forwarder.Name,
                                SalesOrderId = order.Id,
                                SalesOrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,
                                PairedInvoices = string.Join(",", invoices.Select(s => s.Id)),
-                               Packaging = string.Join(", ", packaging.Select(s => s.Text))
-                         //      Value = invoices.Sum(s => s.Value)
+                               Packaging = string.Join(", ", packaging.Select(s => s.Text)),
+                               TotalPackageCount = packaging.Sum(s => s.PackageCount)
+                               //      Value = invoices.Sum(s => s.Value)
                            });
             return await orderVM.FirstOrDefaultAsync();
         }

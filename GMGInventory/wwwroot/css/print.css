@@ -241,3 +241,7 @@ table.formatted {
     table.formatted.receptacle dt {
         font-size: 14px;
     }
+
+    table.formatted.shipping th, table.formatted.shipping td {
+        border: none;
+    }
