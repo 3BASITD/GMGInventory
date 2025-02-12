@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -71,24 +72,34 @@ namespace GMGInventory.Controllers
         //    return Json(await shippingRepository.GetInvoicedSalesOrderOptions(search, page));
         //}
 
-        public async Task<IActionResult> PrintDetails()
+        //public async Task<IActionResult> PrintDetails(int Id, string? Company, string? Desc, string Freight)
+        //{
+        //    var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ShippingList, AccessTypes.Print);
+        //    if (redirectResult != null) return redirectResult;
+
+        //    var shipping = await shippingRepository.PrintDetailsAsync(Id);
+
+
+        //    //var items = await receiveRepository.GetItemListAsync(Id);
+
+        //    if (shipping == null || Company == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    TempData["CompanyLogo"] = Company;
+        //   // ViewData["Items"] = items;
+        //    return View(shipping);
+        //}
+
+        public async Task<IActionResult> PrintDetails(JsonShippingModel shipping)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ShippingList, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
-            //var details = await receiveRepository.GetDetails(Id);
+            TempData["CompanyLogo"] = shipping.Company;
 
-            //var items = await receiveRepository.GetItemListAsync(Id);
-
-            //if (details == null || Company == null)
-            //{
-            //    return NotFound();
-            //}
-
-            TempData["CompanyLogo"] = "GMG";
-           // ViewData["Items"] = items;
-            return View();
+            return View(await shippingRepository.PrintDetailsAsync(shipping));
         }
-
     }
 }

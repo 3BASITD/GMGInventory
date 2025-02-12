@@ -197,6 +197,16 @@ namespace GMGInventory.Common.Models
         public string OrderBy { get; set; }
     }
 
+    public class JsonShippingModel
+    {
+        public int Id { get; set; }
+        public string Company { get; set; }
+        public string? Desc { get; set; }
+        public string Freight { get; set; }
+        public decimal Value { get; set; }
+
+    }
+
     public class JsonCurrencyOptionModel
     {
         public string Id { get; set; }

@@ -15,12 +15,10 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
-
-        [Display(Name = "Customer Address")]
         public string? CustomerAddress { get; set; }
+        public string? CustomerContactNo { get; set; }
 
-        [Display(Name = "Forwarder")]
-        public string? Forwarder { get; set; }
+        public string? Forwarder { get; set; } 
 
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
@@ -32,11 +30,31 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Paired Invoices")]
         public string PairedInvoices { get; set; }
         public string Packaging { get; set; }
-
         public string UOMCount { get; set; }
+
+        [Display(Name = "Total Package #")]
+        public int TotalPackageCount { get; set; }
+        //     public decimal Value { get; set; }
 
         [Display(Name = "Sales Order Date")]
         public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDate);
         public DateTime SalesOrderDateD { get; set; }
+    }
+
+    public class ShippingPVM
+    {
+        public IList<ShippingItemsPVM> Items { get; set; }
+        public ShippingVM? Details { get; set; }
+
+        public string? DescriptionOfArticle { get; set; }
+        public string Freight { get; set; }
+        public decimal? Value { get; set; }
+        public int Total { get; set; }
+
+    }
+
+    public class ShippingItemsPVM {
+        public int Quantity { get; set; }
+        public string UOM { get; set; }
     }
 }

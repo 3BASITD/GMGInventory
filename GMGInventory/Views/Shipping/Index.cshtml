@@ -35,6 +35,12 @@
                     <th>
                         @Html.DisplayNameFor(model => model.SalesOrderDate)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Forwarder)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TotalPackageCount)
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -198,6 +204,8 @@
                 { data: "customerAddress", name: "CustomerAddress" },
                 { data: "packId", name: "PackId" },
                 { data: "salesOrderDate", name: "SalesOrderDate" },
+                { data: "forwarder", name: "Forwarder" },
+                { data: "totalPackageCount", name: "TotalPackageCount" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
