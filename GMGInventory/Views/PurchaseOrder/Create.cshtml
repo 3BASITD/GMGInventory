@@ -152,7 +152,7 @@
 
 <!-- Purchase Order Item Modal -->
 <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Purchase Order Item</h5>
@@ -700,12 +700,12 @@
                 success: function (data, status, xhr) {
                     $("#add-name").select2({
                         data: data,
-                        minimumResultsForSearch: -1,
+                        //minimumResultsForSearch: -1,
                         placeholder: "<empty>",
                         allowClear: true,
                         language: {
                             noResults: function () {
-                                return "No unserved items found";
+                                return "No unordered items found";
                             }
                         },
                         templateResult: function (repo) {
@@ -713,14 +713,37 @@
                                 return repo.text;
                             }
                             return $(
-                                "<strong>" + repo.text + "</strong><br />" +
+                                "<strong>" +
+                                (repo.itemCode != null ? repo.itemCode + " - " : "") +
+                                repo.text + "</strong><br />" +
                                 "<small>" +
                                 "Requested Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
                                 "Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit +
                                 "</small>"
                             );
                         },
-                        dropdownParent: $("#addModal")
+                        dropdownParent: $("#addModal"),
+                        matcher: function (params, data) {
+                            if ($.trim(params.term) === '') {
+                                return data;
+                            }
+
+                            if (!data.text) {
+                                return null;
+                            }
+
+                            // Convert search term to lowercase for case-insensitive matching
+                            var term = params.term.toLowerCase();
+                            var text = data.text.toLowerCase();
+                            var itemCode = data.itemCode ? data.itemCode.toLowerCase() : '';
+
+                            // Check if search term exists in either text or itemCode
+                            if (text.includes(term) || itemCode.includes(term)) {
+                                return data;
+                            }
+
+                            return null;
+                        }
                     }).off("select2:select").on("select2:select", function () {
                         var selected = $(this).select2("data")[0];
                         $("#add-code").val(selected.itemCode);

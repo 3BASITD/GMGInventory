@@ -3350,6 +3350,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("PurchaseOrderId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PurchaseRequestLineItemId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -3368,6 +3371,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("ItemId");
 
                     b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("PurchaseRequestLineItemId");
 
                     b.ToTable("PurchaseOrderLineItems");
                 });
@@ -5723,13 +5728,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5975f7ae-4647-4bb9-be30-96fce31fd341",
+                            ConcurrencyStamp = "50e8f25a-2c95-4776-989c-8e0a432d38bb",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFavNMUKrydiv5Dchu7GF2VMWKizHoBJHXyt4jH7AgV06c4H4CVHkqLHZsaCqSyu6Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG4d+uOZupfHxEqHK5xiPZDUQLCbuWiFiE3BkyyzgklEI5uz3qo0FzXqsCFJC5dyYA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "992b356d-94c3-4aa1-9691-dd2c4ae0efb7",
+                            SecurityStamp = "ef1fa9ac-e022-463a-8013-c44ac71342c5",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5744,13 +5749,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "215ed171-f8f1-46cf-9b91-24d711a60205",
+                            ConcurrencyStamp = "34d60a3b-054e-46cb-979c-ba1214c8ea68",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKKHSxMZh11g4jFPgcbpIsOJDRWfiIyf42n1fSz4w/K5pE654v6nLN+iQUhHeMKLPQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFkRckZQxi1jeVXtoT1X1Lc9gND2yBitfa4g/x4/JAlzxtBvL3cd9WpzPMYNdV2uCg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "90e1c2ba-2de9-45d5-a0c6-cd00d385c67d",
+                            SecurityStamp = "02805ca1-0e4f-4dfc-b391-7a10509176bb",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6247,6 +6252,10 @@ namespace GMGInventory.Data.Migrations
                         .HasForeignKey("PurchaseOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.PurchaseRequestLineItem", null)
+                        .WithMany("PurchaseOrderLineItems")
+                        .HasForeignKey("PurchaseRequestLineItemId");
 
                     b.Navigation("Item");
 
@@ -7164,6 +7173,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseRequestLineItems");
 
                     b.Navigation("PurchaseRequestResubmits");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.PurchaseRequestLineItem", b =>
+                {
+                    b.Navigation("PurchaseOrderLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseRequestPurpose", b =>

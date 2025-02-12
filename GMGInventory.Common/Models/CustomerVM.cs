@@ -179,7 +179,7 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Date Created")]
-        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDate);
         public DateTime DateCreatedD { get; set; }
 
         [Display(Name = "Created By")]

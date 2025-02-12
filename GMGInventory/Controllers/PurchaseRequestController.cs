@@ -1,11 +1,11 @@
-﻿using DocumentFormat.OpenXml.ExtendedProperties;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -13,6 +13,7 @@ namespace GMGInventory.Controllers
     public class PurchaseRequestController(IAccessRepository accessRepository
                                          , IPurchaseRequestRepository requestRepository) : BaseController(accessRepository)
     {
+        private readonly ControllerHelper chelper = new();
 
         public async Task<IActionResult> GetTypeOptions(int? SelectedId)
         {
@@ -35,13 +36,13 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetListDTJson(int? purchaseStatusId)
+        public async Task<IActionResult> GetListDTJson(PurchaseRequestFilter filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             var form = new DataTablesRequestForm(Request.Form);
-            return Json(await requestRepository.GetListDTAsync(form, purchaseStatusId));
+            return Json(await requestRepository.GetListDTAsync(form, filter));
         }
 
         public async Task<IActionResult> Details(int Id)
@@ -176,6 +177,40 @@ namespace GMGInventory.Controllers
             var response = await requestRepository.DisapproveAsync(Id, reason);
             if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
             return Json(response);
+        }
+
+        public async Task<IActionResult> DownloadFile(PurchaseRequestFilter filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Purchase Request");
+            dt.Columns.AddRange([
+                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("DocumentNumber")),
+                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("Type")),
+                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("Purpose")),
+                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("Region")),
+                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("Status")),
+                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("RequestDate"))
+            ]);
+            var requests = await requestRepository.GetListAsync(filter);
+            foreach (var request in requests)
+            {
+                dt.Rows.Add(request.DocumentNumber,
+                            request.Type,
+                            request.Purpose,
+                            request.Region,
+                            request.Status,
+                            request.RequestDate);
+            }
+
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Purchase Request.xlsx");
         }
     }
 }

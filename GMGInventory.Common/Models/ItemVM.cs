@@ -268,6 +268,8 @@ namespace GMGInventory.Common.Models
         public string Unit { get; set; }
         public int Quantity { get; set; }
         public bool IsActive { get; set; }
+        public decimal GrossPrice { get; set; }
+        public decimal NetPrice { get; set; }
     }
 
     public class ItemDetailWarehouseVM

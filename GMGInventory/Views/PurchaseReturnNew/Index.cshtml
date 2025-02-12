@@ -11,12 +11,19 @@
         <div class="card-tools">
             @if (userAccess.CanAdd)
             {
-                <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
                     <span class="fas fa-plus"></span> New Purchase Return
                 </a>
             }
-            <select id="request-status" class="form-select form-select-sm float-right mr-2" style="width: auto;">
-            </select>
+            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -57,9 +64,133 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-supplier" class="form-label mb-0">Supplier</label>
+                            <select id="filter-supplier" style="width:100%"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Return Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="form-label mb-0">Return Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-status" class="form-label mb-0">Status</label>
+                            <select id="filter-status" style="width:100%"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        SetDateFilter();
+        function SetDateFilter() {
+            if ($("#filter-to").val() == "") {
+                if ($("#filter-from").val() == "") {
+                    $("#filter-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter-from").val());
+                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    dt_from.setMonth(dt_from.getMonth() + 1);
+                    $("#filter-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter-from").val() == "") {
+                var dt_to = new Date($("#filter-to").val());
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
+                dt_to.setMonth(dt_to.getMonth() - 1);
+                $("#filter-from").val(DateForInput(dt_to));
+            }
+        }
+
+        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Supplier")",
+            beforeSend: function (xhr, error) {
+                showBatchLoader("supplier");
+            },
+            success: function (data, status, xhr) {
+                $("#filter-supplier").select2({
+                    minimumInputLength: -1,
+                    allowClear: true,
+                    placeholder: "ALL",
+                    templateResult: function (repo) {
+                        if (repo.loading) {
+                            return repo.text;
+                        }
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                    },
+                    data: data
+                });
+            },
+            complete: function (xhr, status) {
+                $("#filter-supplier").val(null).trigger("change");
+                hideBatchLoader("supplier");
+            }
+        });
+
+        // Load status for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "PurchaseStatus")",
+            beforeSend: function (xhr, error) {
+                showBatchLoader("status");
+            },
+            success: function (data, status, xhr) {
+                $("#filter-status").select2({
+                    minimumResultsForSearch: -1,
+                    allowClear: true,
+                    placeholder: "ALL",
+                    data: data
+                });
+            },
+            complete: function (xhr, status) {
+                $("#filter-status").val(null).trigger("change");
+                hideBatchLoader("status");
+            }
+        });
+
+        $(".btnFilter").on("click", function () {
+            returnDT.ajax.reload();
+            $("#filterModal").modal("hide");
+        });
 
         var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -68,7 +199,10 @@
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",
                 data: function (data) {
-                    data.purchaseStatusId = $("#request-status").val();
+                    data.SupplierId = $("#filter-supplier").val();
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+                    data.StatusId = $("#filter-status").val();
                 }
             },
             serverSide: true,
@@ -120,31 +254,18 @@
             hideLoader();
         });
 
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "PurchaseStatus")",
-            success: function (data, status, xhr) {
-                $("#request-status").off("change");
-                $("#request-status").empty();
+        if (user_access.canUploadDownload) {
+            $(".downloadBtn").click(function (e) {
+                var urlQuery = [];
+                if ($("#filter-supplier").val()) { urlQuery.push("SupplierId=" + $("#filter-supplier").val()); }
+                if ($("#filter-status").val()) { urlQuery.push("StatusId=" + $("#filter-status").val()); }
 
-                $("#request-status").append(
-                    $("<option></option>")
-                        .val(null)
-                        .text("ALL")
-                );
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
 
-                $.each(data, function (index, item) {
-                    $("#request-status").append(
-                        $("<option></option>")
-                            .val(item.id)
-                            .text(item.text)
-                    );
-                });
 
-                $("#request-status").on("change", function () {
-                    returnDT.ajax.reload();
-                });
-            }
-        });
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+            });
+        }
     </script>
 }

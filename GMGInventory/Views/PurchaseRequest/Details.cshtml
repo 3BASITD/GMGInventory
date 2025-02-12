@@ -690,8 +690,15 @@
                         if (repo.loading) {
                             return repo.text;
                         }
-                        return $((repo.disabled ? "<s>" : "") + "<strong>" + repo.text + "</strong> " +
-                            (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : "") + (repo.disabled ? "</s>" : ""));
+                        return $(
+                            "<strong>" + repo.text + "</strong> " +
+                            (repo.text != repo.name
+                                ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>"
+                                : "") +
+                            "<br />" +
+                            "<small>" +
+                            "Unserved Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
+                            "</small>");
                     },
                     ajax: {
                         url: "@Url.Action("GetUnservedOptions", "Item")",
@@ -706,10 +713,6 @@
                             };
                         },
                         processResults: function (data, params) {
-                            data.items.forEach(repo => {
-                                repo.disabled = repo.quantity == 0;
-                            });
-
                             params.page = params.page || 1;
                             return {
                                 results: data.items,
@@ -760,7 +763,7 @@
                     return repo.text;
                 },
                 ajax: {
-                    url: "@Url.Action("GetSalesOrderOptions", "SalesOrder")",
+                    url: "@Url.Action("GetSalesOrderUnservedOnlyOptions", "SalesOrder")",
                     dataType: 'json',
                     type: "POST",
                     delay: 500,

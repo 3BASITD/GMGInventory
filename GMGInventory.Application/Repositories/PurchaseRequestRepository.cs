@@ -65,14 +65,15 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        private async Task<IList<PurchaseRequestVM>> GetListAsync(int? purchaseStatusId)
+        public async Task<IList<PurchaseRequestVM>> GetListAsync(PurchaseRequestFilter filter)
         {
             var requestVM = from request in context.PurchaseRequests
-                                                   //.Include(s => s.Type)
-                                                   //.Include(s => s.Purpose)
-                                                   //.Include(s => s.Region)
-                                                   //.Include(s => s.Status)
-                            where purchaseStatusId == null || request.StatusId == purchaseStatusId
+                            where (filter.TypeId == null || request.TypeId == filter.TypeId)
+                            && (filter.PurposeId == null || request.PurposeId == filter.PurposeId)
+                            && (filter.RegionId == null || request.RegionId == filter.RegionId)
+                            && (filter.DateFrom == null || filter.DateFrom <= request.RequestDate)
+                            && (filter.DateTo == null || request.RequestDate <= filter.DateTo)
+                            && (filter.StatusId == null || request.StatusId == filter.StatusId)
                             select new PurchaseRequestVM
                             {
                                 Id = request.Id,
@@ -88,11 +89,11 @@ namespace GMGInventory.Application.Repositories
             return await requestVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId)
+        public async Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseRequestFilter filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync(purchaseStatusId)).AsQueryable();
+            var data = (await GetListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found

@@ -1,9 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using GMGInventory.Common.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
     public class PurchaseRequestLineItem : BaseEntity
     {
+        public PurchaseRequestLineItem()
+        {
+            this.PurchaseOrderLineItems = new HashSet<PurchaseOrderLineItem>();
+        }
+
         [ForeignKey("PurchaseRequestId")]
         public int PurchaseRequestId { get; set; }
 
@@ -30,5 +36,7 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(100)")]
         public string Purpose { get; set; }
+
+        public ICollection<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
     }
 }

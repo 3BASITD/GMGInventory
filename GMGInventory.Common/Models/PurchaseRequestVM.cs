@@ -1,9 +1,18 @@
 ﻿using GMGInventory.Common.Constants;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Common.Models
 {
+    public class PurchaseRequestFilter
+    {
+        public int? TypeId { get; set; }
+        public int? PurposeId { get; set; }
+        public int? RegionId { get; set; }
+        public DateTime? DateFrom { get; set; }
+        public DateTime? DateTo { get; set; }
+        public int? StatusId { get; set; }
+    }
+
     public class PurchaseRequestVM
     {
         public int Id { get; set; }

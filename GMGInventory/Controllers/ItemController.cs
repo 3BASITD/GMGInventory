@@ -230,99 +230,95 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ResponseModel responseModel = new();
-            if (await itemRepository.UploadCombinationExistAsync(itemVM))
+
+            int? CategoryId = await categoryRepository.GetIdAsync(itemVM.Category);
+            if (CategoryId == null)
             {
-                responseModel.Status = "Warning";
-                responseModel.Message = "Nothing to change";
+                responseModel.Status = "Error";
+                responseModel.Message = "Unknown Category";
             }
             else
             {
-                int? CategoryId = await categoryRepository.GetIdAsync(itemVM.Category);
-                if (CategoryId == null)
+                int? ItemTypeId = await itemTypeRepository.GetIdAsync(itemVM.ItemType);
+                if (ItemTypeId == null)
                 {
                     responseModel.Status = "Error";
-                    responseModel.Message = "Unknown Category";
+                    responseModel.Message = "Unknown Item Type";
                 }
                 else
                 {
-                    int? ItemTypeId = await itemTypeRepository.GetIdAsync(itemVM.ItemType);
-                    if (ItemTypeId == null)
+                    int? BrandId = await brandRepository.GetIdAsync(itemVM.Brand);
+                    if (BrandId == null)
                     {
                         responseModel.Status = "Error";
-                        responseModel.Message = "Unknown Item Type";
+                        responseModel.Message = "Unknown Brand";
                     }
                     else
                     {
-                        int? BrandId = await brandRepository.GetIdAsync(itemVM.Brand);
-                        if (BrandId == null)
+                        int? UnitId = await itemRepository.GetUnitIdByNameAsync(itemVM.Unit);
+                        if (UnitId == null)
                         {
                             responseModel.Status = "Error";
-                            responseModel.Message = "Unknown Brand";
+                            responseModel.Message = "Unknown Unit";
                         }
                         else
                         {
-                            int? UnitId = await itemRepository.GetUnitIdByNameAsync(itemVM.Unit);
-                            if (UnitId == null)
+                            int? warehouseId = await warehouseRepository.GetIdAsync(itemVM.Warehouse);
+                            if (warehouseId == null)
                             {
                                 responseModel.Status = "Error";
-                                responseModel.Message = "Unknown Unit";
+                                responseModel.Message = "Unknown Warehouse";
                             }
                             else
                             {
-                                int? warehouseId = await warehouseRepository.GetIdAsync(itemVM.Warehouse);
-                                if (warehouseId == null)
+                                if (await itemRepository.IsCodeExistAsync(itemVM.Code))
                                 {
-                                    responseModel.Status = "Error";
-                                    responseModel.Message = "Unknown Warehouse";
+                                    int itemId = (int)await itemRepository.GetIdAsync(itemVM.Code);
+
+                                    await itemRepository.UpdateAsync(new ItemCommonVM
+                                    {
+                                        BrandId = BrandId.Value,
+                                        CategoryId = CategoryId.Value,
+                                        Id = itemId,
+                                        InterchangeNumber = itemVM.InterchangeNumber,
+                                        ItemTypeId = ItemTypeId.Value,
+                                        ModelNumber = itemVM.ModelNumber,
+                                        Name = itemVM.Name,
+                                        PartNumber = itemVM.PartNumber,
+                                        Size = itemVM.Size,
+                                        UnitId = UnitId.Value
+                                    });
+
+                                    await itemRepository.UpdateOrAddItemWarehouse(itemId, warehouseId.Value, itemVM.Quantity, "Updated through file upload");
+
+                                    await itemRepository.UpdateOrAddItemPrice(itemId, itemVM.GrossPrice, itemVM.NetPrice);
+
+                                    responseModel.Status = "Success";
+                                    responseModel.Message = "Item updated";
                                 }
                                 else
                                 {
-                                    if (await itemRepository.IsCodeExistAsync(itemVM.Code))
+                                    await itemRepository.AddAsync(new ItemCommonVM
                                     {
-                                        int itemId = (int)await itemRepository.GetIdAsync(itemVM.Code);
+                                        BrandId = BrandId.Value,
+                                        CategoryId = CategoryId.Value,
+                                        Code = itemVM.Code,
+                                        InterchangeNumber = itemVM.InterchangeNumber,
+                                        ItemTypeId = ItemTypeId.Value,
+                                        ModelNumber = itemVM.ModelNumber,
+                                        Name = itemVM.Name,
+                                        PartNumber = itemVM.PartNumber,
+                                        Size = itemVM.Size,
+                                        UnitId = UnitId.Value,
 
-                                        await itemRepository.UpdateAsync(new ItemCommonVM
-                                        {
-                                            BrandId = BrandId.Value,
-                                            CategoryId = CategoryId.Value,
-                                            Id = itemId,
-                                            InterchangeNumber = itemVM.InterchangeNumber,
-                                            ItemTypeId = ItemTypeId.Value,
-                                            ModelNumber = itemVM.ModelNumber,
-                                            Name = itemVM.Name,
-                                            PartNumber = itemVM.PartNumber,
-                                            Size = itemVM.Size,
-                                            UnitId = UnitId.Value,
-                                            WarehouseId = warehouseId.Value,
-                                            QuantityD = itemVM.Quantity
-                                        });
+                                        QuantityD = itemVM.Quantity,
+                                        WarehouseId = warehouseId.Value,
 
-                                        await itemRepository.UpdateOrAddItemWarehouse(itemId, warehouseId.Value, itemVM.Quantity, "Updated through file upload");
-
-                                        responseModel.Status = "Success";
-                                        responseModel.Message = "Item updated";
-                                    }
-                                    else
-                                    {
-                                        await itemRepository.AddAsync(new ItemCommonVM
-                                        {
-                                            BrandId = BrandId.Value,
-                                            CategoryId = CategoryId.Value,
-                                            Code = itemVM.Code,
-                                            InterchangeNumber = itemVM.InterchangeNumber,
-                                            ItemTypeId = ItemTypeId.Value,
-                                            ModelNumber = itemVM.ModelNumber,
-                                            Name = itemVM.Name,
-                                            NetPriceD = 0,
-                                            PartNumber = itemVM.PartNumber,
-                                            RetailPriceD = 0,
-                                            Size = itemVM.Size,
-                                            UnitId = UnitId.Value,
-                                            QuantityD = itemVM.Quantity
-                                        });
-                                        responseModel.Status = "Success";
-                                        responseModel.Message = "Item added";
-                                    }
+                                        NetPriceD = itemVM.NetPrice,
+                                        RetailPriceD = itemVM.GrossPrice,
+                                    });
+                                    responseModel.Status = "Success";
+                                    responseModel.Message = "Item added";
                                 }
                             }
                         }
@@ -350,7 +346,9 @@ namespace GMGInventory.Controllers
                 new DataColumn("Brand"),
                 new DataColumn("Size"),
                 new DataColumn("Unit"),
-                new DataColumn("Quantity on Hand")
+                new DataColumn("Quantity on Hand"),
+                new DataColumn("Gross Price"),
+                new DataColumn("Net Price")
             ]);
             //var items = await itemRepository.GetAllFileAsync();
             var items = (await itemRepository.GetAllAsync(filter)).Where(s => s.IsActive == true);
@@ -368,7 +366,9 @@ namespace GMGInventory.Controllers
                             item.Brand,
                             item.Size,
                             item.Unit,
-                            item.Quantity);
+                            item.QuantityD,
+                            item.RetailPriceD,
+                            item.NetPriceD);
             }
 
             using XLWorkbook wb = new();
@@ -544,8 +544,8 @@ namespace GMGInventory.Controllers
                 await itemConversionRepository.DeleteAsync(id);
             }
             else
-            { 
-              await itemConversionRepository.DeleteConversionAsync(conversion.ItemId, conversion.OrderNo);
+            {
+                await itemConversionRepository.DeleteConversionAsync(conversion.ItemId, conversion.OrderNo);
             }
 
             TempData["SuccessMessage"] = "Item conversion successfully deleted";

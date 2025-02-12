@@ -1,10 +1,12 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -12,6 +14,8 @@ namespace GMGInventory.Controllers
     public class PurchaseReceiveController(IAccessRepository accessRepository
                                            , IPurchaseReceiveRepository receiveRepository) : BaseController(accessRepository)
     {
+        private readonly ControllerHelper chelper = new();
+
         public async Task<IActionResult> GetPurchaseOrderOptions(int? SelectedId)
         {
             return Json(await receiveRepository.GetPurchaseOrderOptions(SelectedId));
@@ -29,14 +33,14 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetListDTJson(int? purchaseStatusId)
+        public async Task<IActionResult> GetListDTJson(PurchaseReceiveFilter filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.View);
             var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceivingBasic, AccessTypes.View);
             if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             var form = new DataTablesRequestForm(Request.Form);
-            return Json(await receiveRepository.GetListDTAsync(form, purchaseStatusId));
+            return Json(await receiveRepository.GetListDTAsync(form, filter));
         }
 
         public async Task<IActionResult> Details(int Id)
@@ -165,6 +169,42 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetPurchaseOrderItemOptions(int SelectedId)
         {
             return Json(await receiveRepository.GetPurchaseOrderItemOptions(SelectedId));
+        }
+
+        public async Task<IActionResult> DownloadFile(PurchaseReceiveFilter filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Purchase Receive");
+            dt.Columns.AddRange([
+                new DataColumn(chelper.DisplayName<PurchaseReceiveVM>("DocumentNumber")),
+                new DataColumn(chelper.DisplayName<PurchaseReceiveVM>("Supplier")),
+                new DataColumn(chelper.DisplayName<PurchaseReceiveVM>("Term")),
+                new DataColumn(chelper.DisplayName<PurchaseReceiveVM>("PONumber")),
+                new DataColumn(chelper.DisplayName<PurchaseReceiveVM>("Warehouse")),
+                new DataColumn(chelper.DisplayName<PurchaseReceiveVM>("Status")),
+                new DataColumn(chelper.DisplayName<PurchaseReceiveVM>("ReceiveDate"))
+            ]);
+            var receives = await receiveRepository.GetListAsync(filter);
+            foreach (var receive in receives)
+            {
+                dt.Rows.Add(receive.DocumentNumber,
+                            receive.Supplier,
+                            receive.Term,
+                            receive.PONumber,
+                            receive.Warehouse,
+                            receive.Status,
+                            receive.ReceiveDate);
+            }
+
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Purchase Receive.xlsx");
         }
     }
 }

@@ -6,6 +6,7 @@ namespace GMGInventory.Application.Contracts
     {
         Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page);
         Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderOptions(string search, int page);
+        Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page);
         Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderInvoicedOptions(string search, int page);
         Task<IList<JsonOptionsModel>> GetStatusOptions();
         Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id);

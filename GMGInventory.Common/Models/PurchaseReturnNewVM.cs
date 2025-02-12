@@ -3,6 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
+    public class PurchaseReturnFilter
+    {
+        public int? SupplierId { get; set; }
+        public DateTime? DateFrom { get; set; }
+        public DateTime? DateTo { get; set; }
+        public int? StatusId { get; set; }
+    }
+
     public class PurchaseReturnNewVM
     {
         public int Id { get; set; }

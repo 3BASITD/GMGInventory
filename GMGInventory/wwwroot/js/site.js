@@ -271,21 +271,38 @@ function hideLoader() {
 }
 
 // Use for tabs with datatables content
-var tabLoaderDisplayed = [];
+var batchLoaderDisplayed = [];
+var batchStartTime;
 
-function ShowTabLoader(mod) {
-    if (tabLoaderDisplayed.length === 0) {
+function showBatchLoader(mod) {
+    if (batchLoaderDisplayed.length === 0) {
         $.LoadingOverlay("show", {
             image: "",
             fontawesome: "fa fa-cog fa-spin"
         });
+
+        batchStartTime = new Date();
     }
-    tabLoaderDisplayed.push(mod);
+    batchLoaderDisplayed.push(mod);
 }
 
-function HideTabLoader(mod) {
-    tabLoaderDisplayed = tabLoaderDisplayed.filter(s => s !== mod);
-    if (tabLoaderDisplayed.length === 0) {
+function hideBatchLoader(mod) {
+    batchLoaderDisplayed = batchLoaderDisplayed.filter(s => s !== mod);
+    if (batchLoaderDisplayed.length === 0) {
+        if (batchStartTime) {
+            const endTime = new Date();
+            const timeDifference = endTime - batchStartTime;
+
+            const milliseconds = timeDifference % 1000;
+            const totalSeconds = Math.floor(timeDifference / 1000);
+            const seconds = totalSeconds % 60;
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const minutes = totalMinutes % 60;
+            const hours = Math.floor(totalMinutes / 60);
+
+            console.info(`Batch loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
+            batchStartTime = null;
+        }
         $.LoadingOverlay("hide");
     }
 }
