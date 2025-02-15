@@ -124,6 +124,16 @@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.RequestPurpose)
+                    </span>
+                    <b class="d-block">
+                        @Model?.RequestPurpose
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Supplier)
                     </span>
                     <b class="d-block">
@@ -447,6 +457,7 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var po_status = @Json.Serialize(Model?.Status);
         var request_type_id = @Json.Serialize(Model?.RequestTypeId);
+        var request_purpose_id = @Json.Serialize(Model?.RequestPurposeId);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -630,7 +641,8 @@
                 type: "POST",
                 url: "@Url.Action("GetPurchaseRequestOptions")",
                 data: {
-                    RequestTypeId: request_type_id
+                    RequestTypeId: request_type_id,
+                    RequestPurposeId: request_purpose_id
                 },
                 success: function (data, status, xhr) {
                     $("#add-pr-number").select2({

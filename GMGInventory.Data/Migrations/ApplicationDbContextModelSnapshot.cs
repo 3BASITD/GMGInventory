@@ -3734,9 +3734,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int?>("PurposeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RegionId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Remarks")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
@@ -3769,8 +3766,6 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("DisapproverId");
 
                     b.HasIndex("PurposeId");
-
-                    b.HasIndex("RegionId");
 
                     b.HasIndex("ResubmitId");
 
@@ -5728,13 +5723,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "50e8f25a-2c95-4776-989c-8e0a432d38bb",
+                            ConcurrencyStamp = "0986c126-ebb9-45fe-b1c9-fa116195205f",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-misnet",
-                            PasswordHash = "AQAAAAIAAYagAAAAEG4d+uOZupfHxEqHK5xiPZDUQLCbuWiFiE3BkyyzgklEI5uz3qo0FzXqsCFJC5dyYA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEE5eq07LWzpbokypJsfajViVqPr+qWrDkWehz0p4Kb7sBzv4R1U/bb7m2J19HNGS3g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ef1fa9ac-e022-463a-8013-c44ac71342c5",
+                            SecurityStamp = "c646a47f-0e5b-4944-b222-d0d24ab5e777",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5749,13 +5744,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "34d60a3b-054e-46cb-979c-ba1214c8ea68",
+                            ConcurrencyStamp = "fd8af0e6-3417-423a-bd69-e63dcf5f0c83",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin-gmg",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFkRckZQxi1jeVXtoT1X1Lc9gND2yBitfa4g/x4/JAlzxtBvL3cd9WpzPMYNdV2uCg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDFQYfJs8HdZR0J2GYuGLLMEIlf7JR3oCcwVfPjizP6kBobIZO6zVDN7AvkO1lH5cQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "02805ca1-0e4f-4dfc-b391-7a10509176bb",
+                            SecurityStamp = "9689f8e6-462a-4e56-baeb-da6e2c97e825",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6443,10 +6438,6 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseRequests")
                         .HasForeignKey("PurposeId");
 
-                    b.HasOne("GMGInventory.Data.Region", "Region")
-                        .WithMany("PurchaseRequests")
-                        .HasForeignKey("RegionId");
-
                     b.HasOne("GMGInventory.Data.PurchaseRequest", "Resubmit")
                         .WithMany("PurchaseRequestResubmits")
                         .HasForeignKey("ResubmitId");
@@ -6468,8 +6459,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Disapprover");
 
                     b.Navigation("Purpose");
-
-                    b.Navigation("Region");
 
                     b.Navigation("Resubmit");
 
@@ -7225,8 +7214,6 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Region", b =>
                 {
                     b.Navigation("Areas");
-
-                    b.Navigation("PurchaseRequests");
 
                     b.Navigation("Suppliers");
                 });

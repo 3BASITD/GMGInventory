@@ -106,32 +106,33 @@ namespace GMGInventory.Application.Repositories
         {
             var items = from soitem in context.SalesOrderLineItems
                         join item in context.Items on soitem.ItemId equals item.Id
-                        join ii in context.ItemInventories on item.Id equals ii.ItemId into inv
-                        from ii in inv.DefaultIfEmpty()
                         from price in context.ItemPrices
                                              .Where(s => s.ItemId == item.Id
                                                       && s.DateCreated <= DateTime.Now)
                                              .OrderByDescending(s => s.DateCreated)
                                              .Take(1)
                                              .DefaultIfEmpty()
+                        let ii = context.ItemInventories
+                                        .Where(s=>s.ItemId == item.Id)
+                                        .Select(s=>s.Quantity)
+                                        .Sum()
                         where item.IsActive == true
                            && soitem.SalesOrderId == SalesOrderId
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
                            || item.Name.ToLower().Contains(search.ToLower()))
-                           && ((ii == null && soitem.Quantity > 0) 
-                           || (ii != null && soitem.Quantity > ii.Quantity))
+                           && (soitem.Quantity > 0 || soitem.Quantity > ii)
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {
                             Id = item.Id.ToString(),
-                            InventoryCount = ii != null ? ii.Quantity : 0,
+                            InventoryCount = ii,
                             Text = item.Code,
                             Name = item.Name,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
                             //Quantity = soitem.Quantity - (packedQuantity - returnedQuantity),
-                            Quantity = soitem.Quantity - (ii != null ? ii.Quantity : 0),
+                            Quantity = soitem.Quantity - ii,
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code

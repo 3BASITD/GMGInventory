@@ -81,7 +81,6 @@ namespace GMGInventory.Common.Models
         public int TypeId { get; set; }
         public int? PurposeId { get; set; }
         public string? PurposeDefinition { get; set; }
-        public int? RegionId { get; set; }
         public DateTime DateRequested { get; set; }
         public string Remarks { get; set; }
         public string Status { get; set; }
@@ -118,6 +117,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Quantity")]
         public string Quantity => string.Format("{0:#,##0}", QuantityD);
         public int QuantityD { get; set; }
+        public int MaxQuantityD { get; set; }
+
         public int UnitId { get; set; }
 
         [Display(Name = "UOM")]

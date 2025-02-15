@@ -77,7 +77,7 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? SelectedId)
+        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? SelectedId)
         {
             var requests = from prli in context.PurchaseRequestLineItems
                            let poli = prli.PurchaseOrderLineItems
@@ -91,6 +91,7 @@ namespace GMGInventory.Application.Repositories
             return await context.PurchaseRequests
                                 .Include(s => s.Status)
                                 .Where(s => s.TypeId == RequestTypeId
+                                         && (RequestPurposeId == null || s.PurposeId == RequestPurposeId)
                                          && s.Status.Name.ToLower() == "approved"
                                          && requests.Contains(s.Id))
                                 .Select(s => new JsonOptionsModel
@@ -232,18 +233,13 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
         {
             var details = from order in context.PurchaseOrderNews
-                              //.Include(s => s.Type)
-                              //.Include(s => s.Supplier)
-                              //.Include(s => s.Term)
-                              //.Include(s => s.DeliveryMode)
-                              //.Include(s => s.DeliveryAddress)
-                              //.Include(s => s.Status)
                           let resubmitfrom = context.PurchaseOrderNews
                                                     .Where(s => s.ResubmitId == order.Id)
                                                     .FirstOrDefault()
                           join userc in userManager.Users on order.UserCreated equals userc.Id
                           join userm in userManager.Users on order.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
+                          let item = order.PurchaseOrderLineItems.FirstOrDefault()
                           where order.Id == orderId
                           select new PurchaseOrderNewDetailedVM
                           {
@@ -253,6 +249,12 @@ namespace GMGInventory.Application.Repositories
                               TypeId = order.Type.Id,
                               RequestType = order.Type.RequestType.Name,
                               RequestTypeId = order.Type.RequestType.Id,
+                              RequestPurpose = item == null 
+                                             ? null 
+                                             : item.RequestItem.PurchaseRequest.Purpose.Name,
+                              RequestPurposeId = item == null 
+                                               ? null 
+                                               : item.RequestItem.PurchaseRequest.Purpose.Id,
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
                               SupplierContactPerson = order.Supplier.ContactPerson,

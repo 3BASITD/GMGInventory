@@ -61,6 +61,10 @@ namespace GMGInventory.Common.Models
         public string RequestType { get; set; }
         public int RequestTypeId { get; set; }
 
+        [Display(Name = "Request Purpose")]
+        public string? RequestPurpose { get; set; }
+        public int? RequestPurposeId { get; set; }
+
         [Display(Name = "Currency")]
         public string Currency { get; set; }
         public int CurrencyId { get; set; }

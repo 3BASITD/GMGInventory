@@ -26,9 +26,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PurchaseReturnVM>> GetListAsync(int purchaseOrderId)
         {
             var returnVM = (from rturn in context.PurchaseReturns
-                            join ritem in context.PurchaseReturnLineItems
-                                                 .Include(s => s.PurchaseOrderLineItem)
-                                                    .ThenInclude(s => s.Item) on rturn.Id equals ritem.PurchaseReturnId
+                            join ritem in context.PurchaseReturnLineItems on rturn.Id equals ritem.PurchaseReturnId
                             join user in userManager.Users on rturn.UserCreated equals user.Id
                             where rturn.PurchaseOrderId == purchaseOrderId
                             select new PurchaseReturnVM

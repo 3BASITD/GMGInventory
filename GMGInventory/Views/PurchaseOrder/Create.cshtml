@@ -45,6 +45,12 @@
                         <select id="order-type" name="Type" style="width: 100%"></select>
                     </div>
                 </div>
+                <div class="col-12 col-md-4 col-sm-6 order-purpose-container">
+                    <div class="form-group">
+                        <label for="order-purpose" class="form-label mb-0">Request Purpose</label>
+                        <select id="order-purpose" name="Purpose" style="width: 100%"></select>
+                    </div>
+                </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="order-supplier" class="form-label mb-0">Supplier</label>
@@ -238,6 +244,7 @@
 @section Scripts {
     <script>
         var currentType = -1;
+        var currentPurpose = -1;
         if ($("#resubmitPOId").length) {
             // for resubmitting a disapproved sales order
             $.ajax({
@@ -249,7 +256,8 @@
                 success: function (data, status, xhr) {
                     $("#order-document-number").val(data.documentNumber);
                     currentType = data.typeId;
-                    loadTypeOptions(currentType);
+                    currentPurpose = data.purposeId;
+                    loadTypeOptions(currentType, currentPurpose);
                     $("#order-type").prop("disabled", true);
                     $("#order-currency").val(data.currency);
                     $("#order-currency-rate").val(data.currencyRate);
@@ -276,7 +284,7 @@
                 }
             });
         } else {
-            loadTypeOptions(currentType);
+            loadTypeOptions(currentType, currentPurpose);
             loadSupplier(-1);
             loadCreditTerm(-1);
             loadDeliveryMode(-1);
@@ -449,7 +457,7 @@
         });
 
         // Load order type data for select2
-        function loadTypeOptions(selectedType) {
+        function loadTypeOptions(selectedType, selectedPurpose) {
             if ($.fn.select2 && $("#order-type").hasClass("select2-hidden-accessible")) {
                 $("#order-type").select2("destroy");
                 $("#order-type").empty();
@@ -466,12 +474,51 @@
                         minimumResultsForSearch: -1
                     }).on("select2:select", function () {
                         loadDocumentNumber();
-                        changingType();
+                        var typeText = $("#order-type").select2("data")[0]?.text.toLowerCase() || "";
+                        if (typeText != "maintenance & repair") {
+                            $(".order-purpose-container").toggle(true);
+                            loadPurposeOptions($("#order-type").select2("data")[0].requestTypeId, selectedPurpose);
+                        } else {
+                            $(".order-purpose-container").toggle(false);
+                            $("#order-purpose").val(null).trigger("change");
+                        }
                     });
                 },
                 complete: function (xhr, status) {
                     loadDocumentNumber();
-                    changingType();
+                    var typeText = $("#order-type").select2("data")[0]?.text.toLowerCase() || "";
+                    if (typeText != "maintenance & repair") {
+                        $(".order-purpose-container").toggle(true);
+                        loadPurposeOptions($("#order-type").select2("data")[0].requestTypeId, selectedPurpose);
+                    } else {
+                        $(".order-purpose-container").toggle(false);
+                        $("#order-purpose").val(null).trigger("change");
+                    }
+                }
+            });
+        }
+
+        // Load request purpose data for select2
+        function loadPurposeOptions(selectedType, selectedPurpose) {
+            $("#order-purpose").off("change");
+            $("#order-purpose").empty().trigger('change');
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetPurposeOptions", "PurchaseRequest")",
+                data: {
+                    TypeId: selectedType,
+                    SelectedId: selectedPurpose
+                },
+                success: function (data) {
+                    $("#order-purpose").select2({
+                        data: data,
+                        minimumResultsForSearch: -1
+                    }).on("change", function () {
+                        changingTypeOrPurpose();
+                    });
+                },
+                complete: function (xhr, status) {
+                    changingTypeOrPurpose();
                 }
             });
         }
@@ -491,12 +538,16 @@
             }
         }
 
-        function changingType() {
+        function changingTypeOrPurpose() {
             var selectedType = $("#order-type").val();
-            if (itemDT.data().length > 0 && selectedType != currentType) {
+            var selectedPurpose = $("#order-purpose").val();
+            if (itemDT.data().length > 0 && (selectedType != currentType || selectedPurpose != currentPurpose)) {
+                var changed = selectedType != currentType ? "Order Type"
+                    : selectedPurpose != currentPurpose ? "Order Purpose"
+                        : "Order Type / Purpose";
                 swal({
                     title: "Items not empty",
-                    text: "Changing the selected Order Type will clear the added items. Do you want to continue?",
+                    text: "Changing the selected " + changed + " will clear the added items. Do you want to continue?",
                     icon: "warning",
                     buttons: true,
                     dangerMode: true
@@ -505,12 +556,15 @@
                         swal.close();
                         itemDT.clear().draw();
                         currentType = selectedType;
+                        currentPurpose = selectedPurpose;
                     } else {
                         $("#order-type").val(currentType).trigger("change");
+                        $("#order-purpose").val(currentPurpose).trigger("change");
                     }
                 });
             } else {
                 currentType = selectedType;
+                currentPurpose = selectedPurpose;
             }
 
             var defaultOption = $("#order-mode").find('option').eq(0).val();
@@ -662,6 +716,9 @@
                 data: {
                     RequestTypeId: function () {
                         return $("#order-type").select2("data")[0].requestTypeId;
+                    },
+                    RequestPurposeId: function () {
+                        return $("#order-purpose").val();
                     }//,
                     //SelectedId: ???
                 },

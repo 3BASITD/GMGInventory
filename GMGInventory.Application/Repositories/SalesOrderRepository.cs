@@ -55,7 +55,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderOptions(string search, int page)
         {
             var orders = from order in context.SalesOrders
-                         let quantityOrdered = context.SalesOrderLineItems
                          where order.Status.Code.ToLower() != "submitted"
                          && order.Status.Code.ToLower() != "disapproved"
                          && order.Status.Code.ToLower() != "draft"
@@ -86,13 +85,13 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page)
+        public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page, int? regionId)
         {
             var soWithUnserved = from soli in context.SalesOrderLineItems
-                                         join ii in context.ItemInventories on soli.ItemId equals ii.ItemId into inv
-                                         from ii in inv.DefaultIfEmpty()
-                                         where ii != null && soli.Quantity > ii.Quantity
-                                         select soli.SalesOrderId;
+                                 join ii in context.ItemInventories on soli.ItemId equals ii.ItemId into inv
+                                 from ii in inv.DefaultIfEmpty()
+                                 where ii != null && soli.Quantity > ii.Quantity
+                                 select soli.SalesOrderId;
 
             var orders = from order in context.SalesOrders
                          where order.Status.Code.ToLower() != "submitted"
@@ -101,6 +100,7 @@ namespace GMGInventory.Application.Repositories
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
                          && soWithUnserved.Contains(order.Id)
+                         && (regionId == null || order.Customer.Area.Region.Id == regionId)
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
                          {
@@ -116,7 +116,8 @@ namespace GMGInventory.Application.Repositories
                              SalesOrderDateD = order.SalesOrderDate,
                              ForwarderName = order.SalesOrderDeliveryMonitorings
                                                   .Select(s => s.Forwarder.Name)
-                                                  .FirstOrDefault()
+                                                  .FirstOrDefault(),
+                             RegionId = order.Customer.Area.RegionId
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonSalesOrderOptionsModel>

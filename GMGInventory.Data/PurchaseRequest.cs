@@ -22,11 +22,6 @@ namespace GMGInventory.Data
 
         public virtual PurchaseRequestPurpose Purpose { get; set; }
 
-        [ForeignKey("RegionId")]
-        public int? RegionId { get; set; }
-
-        public virtual Region Region { get; set; }
-
         public DateTime RequestDate { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]

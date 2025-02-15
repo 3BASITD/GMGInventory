@@ -217,8 +217,9 @@
 
 @section Scripts {
     <script>
-        var currentType = -1;
-        var currentPurpose = -1;
+        var currentType = null;
+        var currentPurpose = null;
+        var currentRegion = null;
         if ($("#resubmitPRId").length) {
             // for resubmitting a disapproved sales order
             $.ajax({
@@ -230,6 +231,7 @@
                 success: function (data, status, xhr) {
                     currentType = data.typeId;
                     currentPurpose = data.purposeId;
+                    currentRegion = data.regionId;
                     loadTypeOptions(currentType, currentPurpose);
                     $("#request-purpose-definition").val(data.purposeId == null ? data.purpose : "");
                     $("#request-region").val(data.regionId).trigger("change");
@@ -287,17 +289,17 @@
                 },
                 { data: "itemPartNumber", name: "ItemPartNumber", className: "form-cell" },
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
+                { data: "stockOnHand", name: "StockOnHand", className: "form-cell text-end" },
                 {
                     data: function (data, type, dataToSet) {
-                        //return '<input type="number" min="0" max="1999999" step="1" value="' + data.stockOnHandD + '" class="form-control form-control-sm stock" style="width: 100%;" />';
-                        return data.stockOnHand;
-                    },
-                    name: "StockOnHand",
-                    className: "form-cell text-end"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        var soMax = checkIfRequired("SONumber") ? data.maxQuantityD : 1999999;
+                        if (data.quantityD > soMax) {
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot exceed ' + soMax + ' unserved quantity.</label>';
+                        } else if (data.quantityD == 0) {
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to request.</label>';
+                        } else {
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                        }
                     },
                     name: "Quantity",
                     className: "form-cell text-end"
@@ -318,6 +320,17 @@
 
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
+
+            $(".quantity").off("change").on("change", function () {
+                var row = itemDT.row($(this).closest('tr'));
+                var rowData = row.data();
+
+                var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
+                rowData.quantity = FormatStringInteger(quantityValue);
+                rowData.quantityD = quantityValue;
+
+                row.data(rowData).draw(false);
+            });
 
             $(".btn-remove-item").on("click", function () {
                 itemDT.row($(this).parents('tr')).remove().draw();
@@ -428,22 +441,38 @@
                         data: data,
                         minimumResultsForSearch: -1
                     }).on("change", function () {
-                        changingTypeOrPurpose();
+                        changingTypePurposeOrRegion();
                     });
                 },
                 complete: function (xhr, status) {
-                    changingTypeOrPurpose();
+                    changingTypePurposeOrRegion();
                 }
             });
         }
 
-        function changingTypeOrPurpose() {
+        // Load region for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#request-region").select2({
+                    data: data,
+                    minimumResultsForSearch: -1
+                }).on("change", function () {
+                    changingTypePurposeOrRegion();
+                });
+            }
+        });
+
+        function changingTypePurposeOrRegion() {
             var selectedType = $("#request-type").val();
             var selectedPurpose = $("#request-purpose").val();
-            if (itemDT.data().length > 0 && (selectedType != currentType || selectedPurpose != currentPurpose)) {
+            var selectedRegion = $("#request-region").val();
+            if (itemDT.data().length > 0 && (selectedType != currentType || selectedPurpose != currentPurpose || selectedRegion != currentRegion)) {
                 var changed = selectedType != currentType ? "Request Type"
-                    : selectedPurpose != currentPurpose ? "Request Purpose"
-                        : "Request Type / Purpose";
+                            : selectedPurpose != currentPurpose ? "Request Purpose"
+                            : selectedRegion != currentRegion ? "Region"
+                            : "Request Type / Purpose / Region";
                 swal({
                     title: "Items not empty",
                     text: "Changing the selected " + changed + " will clear the added items. Do you want to continue?",
@@ -454,22 +483,25 @@
                     if (confirm) {
                         swal.close();
                         itemDT.clear().draw();
+                        clearItemForm();
                         currentType = selectedType;
                         currentPurpose = selectedPurpose;
+                        currentRegion = selectedRegion;
                     } else {
                         $("#request-type").val(currentType).trigger("change");
                         $("#request-purpose").val(currentPurpose).trigger("change");
+                        $("#request-region").val(currentRegion).trigger("change");
                     }
                 });
             } else {
                 currentType = selectedType;
                 currentPurpose = selectedPurpose;
+                currentRegion = selectedRegion;
             }
             var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
             var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
             $(".request-purpose-container").toggle(typeText != "maintenance & repair");
             $(".request-purpose-definition-container").toggle(typeText == "maintenance & repair");
-            $("#request-region").val(null).trigger("change");
             $(".request-region-container").toggle(typeText == "automotive" && purposeText == "rush order");
 
             updateColumnVisibility();
@@ -528,20 +560,6 @@
             else if (name == "Purpose") return columnVisibilityMap[key][6];
             else return false;
         }
-
-        // Load region for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Region")",
-            success: function (data, status, xhr) {
-                $("#request-region").select2({
-                    minimumInputLength: -1,
-                    allowClear: true,
-                    placeholder: "<empty>",
-                    data: data
-                });
-            }
-        });
 
         loadAllItemsOptions();
         function loadAllItemsOptions() {
@@ -658,19 +676,15 @@
                 if (checkIfRequired("SONumber")) {
                     $("#add-quantity").val($("#add-code").select2("data")[0].quantity);
                     $("#add-quantity").attr("data-max-quantity", $("#add-code").select2("data")[0].quantity);
+                } else {
+                    $("#add-quantity").val(0);
+                    $("#add-quantity").attr("data-max-quantity", "1999999");
                 }
                 $("#add-code-error").html("");
             });
 
             $("#add-code").off("select2:unselecting").on("select2:unselecting", function (e) {
-                $("#add-part").val("");
-                $("#add-name").val("");
-                $("#add-unit").val("");
-                $("#add-unit").data("Id", "");
-                $(".add-stocks").text("0");
-                $("#add-quantity").val("0");
-                $("#add-quantity").attr("data-max-quantity", "1999999");
-                $("#add-gross-price").val("0.00");
+                clearItemForm();
             });
         }
 
@@ -690,7 +704,8 @@
                 data: function (params) {
                     return {
                         search: params.term,
-                        page: params.page || 1
+                        page: params.page || 1,
+                        regionId: $("#request-region").val()
                     };
                 },
                 processResults: function (data, params) {
@@ -729,7 +744,7 @@
         $(".createBtn").on("click", clearItemForm);
 
         function clearItemForm() {
-            //$("#add-so-number").val("").trigger("change");
+            $("#add-so-number").val("").trigger("change");
             $("#add-code").val("").trigger("change");
             $("#add-part").val("");
             $("#add-name").val("");
@@ -817,13 +832,14 @@
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
-                if (data.itemDescription == $("#add-name").val()) {
+                if (data.itemDescription == $("#add-name").val() && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text) {
                     rowIndexes.push(idx);
                 }
                 return false;
             });
             if (rowIndexes.length > 0) {
-                toastr.warning($("#add-name").val() + " has already been added", "Duplicate");
+                var soMatch = data.salesOrderNumber != "" && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text ? " of " + data.salesOrderNumber : "";
+                toastr.warning($("#add-name").val() + soMatch +" has already been added", "Duplicate");
             } else {
                 var is_for_na_one_time = $("#request-purpose").select2("data")[0]?.text.toLowerCase() == "one-time purchase";
                 var is_for_maintenance_repair = $("#request-type").select2("data")[0]?.text.toLowerCase() == "maintenance & repair";
@@ -837,6 +853,7 @@
                     purpose: $("#add-purpose").val(),
                     quantity: FormatStringInteger($("#add-quantity").val()),
                     quantityD: $("#add-quantity").val() || 0,
+                    maxQuantityD: $("#add-quantity").attr("data-max-quantity") || 1999999,
                     salesOrderId: $("#add-so-number").select2("data")[0].id,
                     salesOrderNumber: $("#add-so-number").select2("data")[0].text,
                     stockOnHand: FormatStringInteger($("#add-stock").val()),
@@ -885,12 +902,6 @@
                     },
                     maxlength: 250
                 },
-                Region: {
-                    required: function () {
-                        return $("#request-type").select2("data")[0]?.text.toLowerCase() == "automotive"
-                            && $("#request-purpose").select2("data")[0]?.text.toLowerCase() == "rush order";
-                    }
-                },
                 DateRequested: {
                     required: true
                 },
@@ -909,9 +920,6 @@
                 PurposeDefinition: {
                     required: "Please enter a purpose.",
                     maxlength: "Purpose can not exceed 250 characters."
-                },
-                Region: {
-                    required: "Please select a region."
                 },
                 DateRequested: {
                     required: "Please enter the date of request."
@@ -944,8 +952,10 @@
             var items = itemDT.data();
             if (items.length == 0) {
                 toastr.warning("No item to request. Add an item to the list to continue", "Warning");
-            } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
+            } else if (items.filter(s => parseInt(s.quantityD) == 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
+            } else if (items.filter(s => parseInt(s.quantityD) > parseInt(s.maxQuantityD)).length > 0) {
+                toastr.warning("Some items have invalid quantity.", "Warning");
             } else {
                 $.ajax({
                     type: "POST",
@@ -954,7 +964,6 @@
                         TypeId: $("#request-type").val(),
                         PurposeId: $("#request-purpose").val(),
                         PurposeDefinition: $("#request-purpose-definition").val(),
-                        RegionId: $("#request-region").val(),
                         DateRequested: $("#request-date-requested").val(),
                         Remarks: $("#request-remarks").val(),
                         Status: $("#action-type").val(),
