@@ -816,7 +816,9 @@
                             || columns.includes("Brand") == false
                             || columns.includes("Size") == false
                             || columns.includes("Unit") == false
-                            || columns.includes("Quantity on Hand") == false) {
+                            || columns.includes("Quantity on Hand") == false
+                            || columns.includes("Gross Price") == false
+                            || columns.includes("Net Price") == false) {
                             row$.append($('<td/>').html("Unexpected columns"));
                             UploadRowDone();
                         } else {
@@ -832,6 +834,8 @@
                                 json_of_excel[i]["Size"],
                                 json_of_excel[i]["Unit"],
                                 json_of_excel[i]["Quantity on Hand"],
+                                json_of_excel[i]["Gross Price"],
+                                json_of_excel[i]["Net Price"],
                                 rowNum);
                             row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
                         }
@@ -840,7 +844,7 @@
                 }
             }
 
-            function SaveXLSX(code, name, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, rownum) {
+            function SaveXLSX(code, name, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, grossprice, netprice, rownum) {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("UploadJson")",
@@ -856,7 +860,9 @@
                         Brand: brand,
                         Unit: unit,
                         Size: size,
-                        Quantity: quantity
+                        Quantity: quantity,
+                        GrossPrice: grossprice,
+                        NetPrice: netprice
                     },
                     success: function (data, status, xhr) {
                         if (data.message == "Nothing to change") {

@@ -77,6 +77,7 @@ namespace GMGInventory.Common.Models
         public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDateTime);
         public DateTime SalesOrderDateD { get; set; }
         public string? ForwarderName { get; set; }
+        public int RegionId { get; set; }
 
     }
     public class JsonShippingOptionsModel : JsonOptionsModel

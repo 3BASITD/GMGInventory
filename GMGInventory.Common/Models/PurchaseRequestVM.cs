@@ -1,9 +1,18 @@
 ﻿using GMGInventory.Common.Constants;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Common.Models
 {
+    public class PurchaseRequestFilter
+    {
+        public int? TypeId { get; set; }
+        public int? PurposeId { get; set; }
+        public int? RegionId { get; set; }
+        public DateTime? DateFrom { get; set; }
+        public DateTime? DateTo { get; set; }
+        public int? StatusId { get; set; }
+    }
+
     public class PurchaseRequestVM
     {
         public int Id { get; set; }
@@ -72,7 +81,6 @@ namespace GMGInventory.Common.Models
         public int TypeId { get; set; }
         public int? PurposeId { get; set; }
         public string? PurposeDefinition { get; set; }
-        public int? RegionId { get; set; }
         public DateTime DateRequested { get; set; }
         public string Remarks { get; set; }
         public string Status { get; set; }
@@ -109,6 +117,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Quantity")]
         public string Quantity => string.Format("{0:#,##0}", QuantityD);
         public int QuantityD { get; set; }
+        public int MaxQuantityD { get; set; }
+
         public int UnitId { get; set; }
 
         [Display(Name = "UOM")]

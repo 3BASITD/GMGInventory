@@ -55,19 +55,19 @@
                 }
             }
             else if (Model.Status.ToLower() == "disapproved"
-            && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy)
-            && Model?.ResubmitId == null)
+            && !string.IsNullOrWhiteSpace(Model.DisapprovedBy)
+            && Model.ResubmitId == null)
             {
                 @if (userAccess.CanAdd)
                 {
-                    <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                    <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
                         <span class="fas fa-edit"></span> Update to Resubmit
                     </a>
                 }
             }
             else if (Model.Status.ToLower() == "approved")
             {
-                <a href="@Url.Action("Create", "PurchaseOrder")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                <a href="@Url.Action("Create", "PurchaseOrder")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
                     <span class="fas fa-box-open"></span> Start Order
                 </a>
             }
@@ -77,30 +77,30 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) || Model?.ResubmitFromId != null)
+        @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) || Model.ResubmitFromId != null)
         {
             <div class="row">
-                @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy))
+                @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
                 {
                     <div class="col-12">
                         <div class="alert alert-danger text-sm" role="alert">
                             <strong>Reason of Disapproval:</strong>
-                            @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                            @(string.IsNullOrWhiteSpace(Model.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
                         </div>
                     </div>
                 }
-                @if (Model?.ResubmitId != null || Model?.ResubmitFromId != null)
+                @if (Model.ResubmitId != null || Model.ResubmitFromId != null)
                 {
                     <div class="col-12">
                         <div class="alert alert-info text-sm" role="alert">
                             <strong>Resubmit Details:</strong>
-                            @if (Model?.ResubmitId != null)
+                            @if (Model.ResubmitId != null)
                             {
-                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseRequest", new {Id = Model?.ResubmitId})" class="alert-link">here</a>.</div>
+                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseRequest", new {Id = Model.ResubmitId})" class="alert-link">here</a>.</div>
                             }
-                            @if (Model?.ResubmitFromId != null)
+                            @if (Model.ResubmitFromId != null)
                             {
-                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseRequest", new {Id = Model?.ResubmitFromId})" class="alert-link">here</a>.</div>
+                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseRequest", new {Id = Model.ResubmitFromId})" class="alert-link">here</a>.</div>
                             }
                         </div>
                     </div>
@@ -114,7 +114,7 @@
                         @Html.DisplayNameFor(model => model.DocumentNumber)
                     </span>
                     <b class="d-block">
-                        @Model?.DocumentNumber
+                        @Model.DocumentNumber
                     </b>
                 </p>
             </div>
@@ -124,7 +124,7 @@
                         @Html.DisplayNameFor(model => model.Type)
                     </span>
                     <b class="d-block">
-                        @Model?.Type
+                        @Model.Type
                     </b>
                 </p>
             </div>
@@ -134,11 +134,11 @@
                         @Html.DisplayNameFor(model => model.Purpose)
                     </span>
                     <b class="d-block">
-                        @Model?.Purpose
+                        @Model.Purpose
                     </b>
                 </p>
             </div>
-            @if (Model?.Type.ToLower() == "automotive" && Model?.Purpose.ToLower() == "rush order")
+            @if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "rush order")
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -146,7 +146,7 @@
                             @Html.DisplayNameFor(model => model.Region)
                         </span>
                         <b class="d-block">
-                            @Model?.Region
+                            @Model.Region
                         </b>
                     </p>
                 </div>
@@ -157,7 +157,7 @@
                         @Html.DisplayNameFor(model => model.RequestDate)
                     </span>
                     <b class="d-block">
-                        @Model?.RequestDate
+                        @Model.RequestDate
                     </b>
                 </p>
             </div>
@@ -167,11 +167,11 @@
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
                     <b class="d-block">
-                        @Model?.Remarks
+                        @Model.Remarks
                     </b>
                 </p>
             </div>
-            @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy1))
+            @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -179,12 +179,12 @@
                             @Html.DisplayNameFor(model => model.ApprovedBy1)
                         </span>
                         <b class="d-block">
-                            @Model?.ApprovedBy1
+                            @Model.ApprovedBy1
                         </b>
                     </p>
                 </div>
             }
-            @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy2))
+            @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy2))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -192,12 +192,12 @@
                             @Html.DisplayNameFor(model => model.ApprovedBy2)
                         </span>
                         <b class="d-block">
-                            @Model?.ApprovedBy2
+                            @Model.ApprovedBy2
                         </b>
                     </p>
                 </div>
             }
-            @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy))
+            @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -205,7 +205,7 @@
                             @Html.DisplayNameFor(model => model.DisapprovedBy)
                         </span>
                         <b class="d-block">
-                            @Model?.DisapprovedBy
+                            @Model.DisapprovedBy
                         </b>
                     </p>
                 </div>
@@ -216,7 +216,7 @@
                         @Html.DisplayNameFor(model => model.Status)
                     </span>
                     <b class="d-block" id="request-status">
-                        @Model?.Status
+                        @Model.Status
                     </b>
                 </p>
             </div>
@@ -226,7 +226,7 @@
                         @Html.DisplayNameFor(model => model.UserCreated)
                     </span>
                     <b class="d-block" id="request-status">
-                        @Model?.UserCreated
+                        @Model.UserCreated
                     </b>
                 </p>
             </div>
@@ -236,11 +236,11 @@
                         @Html.DisplayNameFor(model => model.DateCreated)
                     </span>
                     <b class="d-block" id="request-status">
-                        @Model?.DateCreated
+                        @Model.DateCreated
                     </b>
                 </p>
             </div>
-            @if (!string.IsNullOrWhiteSpace(Model?.UserModified))
+            @if (!string.IsNullOrWhiteSpace(Model.UserModified))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -248,12 +248,12 @@
                             @Html.DisplayNameFor(model => model.UserModified)
                         </span>
                         <b class="d-block">
-                            @Model?.UserModified
+                            @Model.UserModified
                         </b>
                     </p>
                 </div>
             }
-            @if (!string.IsNullOrWhiteSpace(Model?.DateModified))
+            @if (!string.IsNullOrWhiteSpace(Model.DateModified))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -261,7 +261,7 @@
                             @Html.DisplayNameFor(model => model.DateModified)
                         </span>
                         <b class="d-block">
-                            @Model?.DateModified
+                            @Model.DateModified
                         </b>
                     </p>
                 </div>
@@ -272,7 +272,7 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Purchase Request Item(s)</span>
-                        @if (Model!.Status.ToLower() == "draft" && userAccess.CanAdd)
+                        @if (Model.Status.ToLower() == "draft" && userAccess.CanAdd)
                         {
                             <div class="card-tools">
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -318,7 +318,7 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="po-status" value="@Model?.Status" />
+<input type="hidden" id="po-status" value="@Model.Status" />
 
 @if (userAccess.CanAdd)
 {
@@ -416,15 +416,15 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-        var request_type = @Json.Serialize(Model?.Type);
-        var request_purpose = request_type.toLowerCase() == "maintenance & repair" ? "" : @(Json.Serialize(Model?.Purpose ?? ""));
+        var request_type = @Json.Serialize(Model.Type);
+        var request_purpose = request_type.toLowerCase() == "maintenance & repair" ? "" : @(Json.Serialize(Model.Purpose ?? ""));
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemListJson")",
-                data: { purchaseRequestId: @Model?.Id },
+                data: { purchaseRequestId: @Model.Id },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -462,30 +462,24 @@
                 },
                 { data: "itemPartNumber", name: "ItemPartNumber", className: "form-cell" },
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
-                {
-                    data: function (data, type, dataToSet) {
-                        // if (user_access.canEdit && $("#request-status").text().trim().toLowerCase() == "draft") {
-                        //     return '<input type="number" min="0" max="1999999" step="1" value="' + data.stockOnHandD + '" class="form-control form-control-sm stock" style="width: 100%;" />';
-                        // } else {
-                        //     return (data.stockOnHand == 0 ? "<span class='text-danger'>" : "")
-                        //         + data.stockOnHand
-                        //         + (data.stockOnHand == 0 ? "</span>" : "");
-                        // }
-                        return data.stockOnHand;
-                    },
-                    name: "StockOnHand",
-                    className: "form-cell text-end"
-                },
+                { data: "stockOnHand", name: "StockOnHand", className: "form-cell text-end" },
                 {
                     data: function (data, type, dataToSet) {
                         if (user_access.canEdit && $("#request-status").text().trim().toLowerCase() == "draft") {
-                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            var soMax = checkIfRequired("SONumber") ? data.maxQuantityD : 1999999;
+                            if (data.quantityD > soMax) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot exceed ' + soMax + ' unserved quantity.</label>';
+                            } else if (data.quantityD == 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to request.</label>';
+                            } else {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            }
                         } else {
-                            return data.quantity
+                            return data.quantity;
                         }
                     },
                     name: "Quantity",
-                    className: "form-cell text-end"
+                    className: "form-cell text-end a"
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                 { data: "purpose", name: "Purpose", className: "form-cell" }
@@ -505,6 +499,19 @@
 
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
+
+            $(".quantity").off("change").on("change", function () {
+                console.log("test");
+                var row = itemDT.row($(this).closest('tr'));
+                var rowData = row.data();
+
+                var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
+                console.log("test: " + quantityValue);
+                rowData.quantity = FormatStringInteger(quantityValue);
+                rowData.quantityD = quantityValue;
+
+                row.data(rowData).draw(false);
+            });
 
             if (user_access.canAdd) {
                 $(".btn-remove-item").off("click").on("click", function () {
@@ -690,8 +697,15 @@
                         if (repo.loading) {
                             return repo.text;
                         }
-                        return $((repo.disabled ? "<s>" : "") + "<strong>" + repo.text + "</strong> " +
-                            (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : "") + (repo.disabled ? "</s>" : ""));
+                        return $(
+                            "<strong>" + repo.text + "</strong> " +
+                            (repo.text != repo.name
+                                ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>"
+                                : "") +
+                            "<br />" +
+                            "<small>" +
+                            "Unserved Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
+                            "</small>");
                     },
                     ajax: {
                         url: "@Url.Action("GetUnservedOptions", "Item")",
@@ -706,10 +720,6 @@
                             };
                         },
                         processResults: function (data, params) {
-                            data.items.forEach(repo => {
-                                repo.disabled = repo.quantity == 0;
-                            });
-
                             params.page = params.page || 1;
                             return {
                                 results: data.items,
@@ -735,6 +745,9 @@
                     if (checkIfRequired("SONumber")) {
                         $("#add-quantity").val($("#add-code").select2("data")[0].quantity);
                         $("#add-quantity").attr("data-max-quantity", $("#add-code").select2("data")[0].quantity);
+                    } else {
+                        $("#add-quantity").val("0");
+                        $("#add-quantity").attr("data-max-quantity", "1999999");
                     }
                     $("#add-code-error").html("");
                 });
@@ -760,14 +773,15 @@
                     return repo.text;
                 },
                 ajax: {
-                    url: "@Url.Action("GetSalesOrderOptions", "SalesOrder")",
+                    url: "@Url.Action("GetSalesOrderUnservedOnlyOptions", "SalesOrder")",
                     dataType: 'json',
                     type: "POST",
                     delay: 500,
                     data: function (params) {
                         return {
                             search: params.term,
-                            page: params.page || 1
+                            page: params.page || 1,
+                            regionId: @Json.Serialize(Model.RegionId)
                         };
                     },
                     processResults: function (data, params) {
@@ -911,13 +925,14 @@
             function AddItem() {
                 var rowIndexes = [];
                 itemDT.rows(function (idx, data, node) {
-                    if (data.itemDescription == $("#add-name").val()) {
+                        if (data.itemDescription == $("#add-name").val() && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text) {
                         rowIndexes.push(idx);
                     }
                     return false;
                 });
                 if (rowIndexes.length > 0) {
-                    toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
+                    var soMatch = data.salesOrderNumber != "" && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text ? " of " + data.salesOrderNumber : "";
+                    toastr.warning($("#add-name").val() + soMatch + " has already been added", "Duplicate");
                 } else {
                     itemDT.row.add({
                         itemCode: $("#add-code").select2("data")[0].text,
@@ -929,6 +944,7 @@
                         purpose: $("#add-purpose").val(),
                         quantity: FormatStringInteger($("#add-quantity").val()),
                         quantityD: $("#add-quantity").val() || 0,
+                        maxQuantityD: $("#add-quantity").attr("data-max-quantity") || 1999999,
                         salesOrderId: $("#add-so-number").select2("data")[0].id,
                         salesOrderNumber: $("#add-so-number").select2("data")[0].text,
                         stockOnHand: FormatStringInteger($("#add-stock").val()),
@@ -955,14 +971,16 @@
                 var items = itemDT.data();
                 if (items.length == 0) {
                     toastr.warning("No item to request. Add an item to the list to continue", "Warning");
-                } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
+                } else if (items.filter(s => parseInt(s.quantityD) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
+                } else if (items.filter(s => parseInt(s.quantityD) > parseInt(s.maxQuantityD)).length > 0) {
+                    toastr.warning("Some items have invalid quantity.", "Warning");
                 } else {
                     $.ajax({
                         type: "POST",
                         url: "@Url.Action("SaveItemsJson")",
                         data: {
-                            Id: @Model?.Id,
+                            Id: @Model.Id,
                             status: status,
                             items: GetItemsToRequest()
                         },
@@ -991,7 +1009,7 @@
                         $.ajax({
                             url: "@Url.Action("ApproveJson")",
                             type: "POST",
-                            data: { Id: @Model!.Id },
+                            data: { Id: @Model.Id },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
                                     window.location.reload();
@@ -1024,7 +1042,7 @@
                             url: "@Url.Action("DisapproveJson")",
                             type: "POST",
                             data: {
-                                Id: @Model!.Id,
+                                Id: @Model.Id,
                                 reason: confirm
                             },
                             success: function (data, status, xhr) {
@@ -1048,7 +1066,7 @@
                     fontawesome: "fas fa-print"
                 });
                 setTimeout(function () {
-                    let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id + '?Company=' + print_company, '');
+                    let win = window.open('@Url.Action("PrintDetails")/' + @Model.Id + '?Company=' + print_company, '');
                     var wintimer = setInterval(function () {
                         if (win.closed) {
                             clearInterval(wintimer);

@@ -3,6 +3,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
+    public class PurchaseOrderFilter
+    {
+        public int? TypeId { get; set; }
+        public int? ModeId { get; set; }
+        public int? SupplierId { get; set; }
+        public DateTime? DateFrom { get; set; }
+        public DateTime? DateTo { get; set; }
+        public int? StatusId { get; set; }
+    }
+
     public class PurchaseOrderNewVM
     {
         public int Id { get; set; }
@@ -50,6 +60,10 @@ namespace GMGInventory.Common.Models
         public string SupplierAddress { get; set; }
         public string RequestType { get; set; }
         public int RequestTypeId { get; set; }
+
+        [Display(Name = "Request Purpose")]
+        public string? RequestPurpose { get; set; }
+        public int? RequestPurposeId { get; set; }
 
         [Display(Name = "Currency")]
         public string Currency { get; set; }

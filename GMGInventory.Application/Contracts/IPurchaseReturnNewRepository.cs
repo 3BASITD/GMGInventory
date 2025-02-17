@@ -8,7 +8,8 @@ namespace GMGInventory.Application.Contracts
         Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseReceiveItemOptions(int ReceiveId, int? SelectedId);
         Task<IList<PurchaseReturnNewLineItemVM>> GetPurchaseReceiveItemList(int ReceiveId);
         Task<string> GetNewDocumentNumber();
-        Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId);
+        Task<IList<PurchaseReturnNewVM>> GetListAsync(PurchaseReturnFilter filter);
+        Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseReturnFilter filter);
         Task<PurchaseReturnNewDetailedVM?> GetDetails(int returnId);
         Task<IList<PurchaseReturnNewLineItemVM>> GetItemListAsync(int purchaseReturnId);
         Task<ForDataTables<PurchaseReturnNewLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseReturnId);

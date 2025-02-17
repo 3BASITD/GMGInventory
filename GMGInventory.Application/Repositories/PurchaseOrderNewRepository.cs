@@ -77,12 +77,23 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? SelectedId)
+        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? SelectedId)
         {
+            var requests = from prli in context.PurchaseRequestLineItems
+                           let poli = prli.PurchaseOrderLineItems
+                                          .Where(a => a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                          .Select(a => (int?)a.Quantity)
+                                          .Sum() ?? 0
+                           where poli != prli.Quantity
+                           select prli.PurchaseRequestId;
+
+
             return await context.PurchaseRequests
                                 .Include(s => s.Status)
                                 .Where(s => s.TypeId == RequestTypeId
-                                         && s.Status.Name.ToLower() == "approved")
+                                         && (RequestPurposeId == null || s.PurposeId == RequestPurposeId)
+                                         && s.Status.Name.ToLower() == "approved"
+                                         && requests.Contains(s.Id))
                                 .Select(s => new JsonOptionsModel
                                 {
                                     Id = s.Id.ToString(),
@@ -95,29 +106,27 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
         {
-            return await context.PurchaseRequestLineItems
-                                .Include(s => s.Item)
-                                .Where(s => s.PurchaseRequestId == RequestId)
-                                .Select(s => new JsonPurchaseItemOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.ItemDescription,
-                                    ItemId = s.Item == null ? null : s.Item.Id,
-                                    ItemCode = s.Item == null ? null : s.Item.Code,
-                                    PartNumber = s.Item == null ? null : s.Item.PartNumber,
-                                    Quantity = s.Quantity,
-                                    Unit = s.Item == null ? s.Unit.Name : s.Item.Unit.Name,
-                                    UnitId = s.Item == null ? s.Unit.Id : s.Item.Unit.Id,
-                                    Served = context.PurchaseOrderNewLineItems
-                                                    .Include(s => s.PurchaseOrder).ThenInclude(s => s.Status)
-                                                    .Where(a => a.RequestItemId == s.Id
-                                                             && a.PurchaseOrder.Status.Name.ToLower() == "approved")
-                                                    .Select(a => a.Quantity)
-                                                    .Sum(),
-                                    Selected = SelectedId != null && s.Id == SelectedId
-                                })
-                                .OrderBy(s => s.Served)
-                                .ToListAsync();
+                var requests = from prli in context.PurchaseRequestLineItems
+                               let poli = prli.PurchaseOrderLineItems
+                                              .Where(a => a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                              .Select(a => (int?)a.Quantity)
+                                              .Sum() ?? 0
+                               where prli.PurchaseRequestId == RequestId
+                               && poli != prli.Quantity
+                               select new JsonPurchaseItemOptionsModel
+                               {
+                                   Id = prli.Id.ToString(),
+                                   Text = prli.ItemDescription,
+                                   ItemId = prli.Item == null ? null : prli.Item.Id,
+                                   ItemCode = prli.Item == null ? null : prli.Item.Code,
+                                   PartNumber = prli.Item == null ? null : prli.Item.PartNumber,
+                                   Quantity = prli.Quantity,
+                                   Unit = prli.Item == null ? prli.Unit.Name : prli.Item.Unit.Name,
+                                   UnitId = prli.Item == null ? prli.Unit.Id : prli.Item.Unit.Id,
+                                   Served = poli,
+                                   Selected = SelectedId != null && prli.Id == SelectedId
+                               };
+                return await requests.ToListAsync();
         }
 
 
@@ -137,13 +146,15 @@ namespace GMGInventory.Application.Repositories
             return $"{docNumberPrefix}{docNumberLast + 1:D4}";
         }
 
-        private async Task<IList<PurchaseOrderNewVM>> GetListAsync(int? purchaseStatusId)
+        public async Task<IList<PurchaseOrderNewVM>> GetListAsync(PurchaseOrderFilter filter)
         {
             var orderVM = from order in context.PurchaseOrderNews
-                              //join userc in userManager.Users on order.UserCreated equals userc.Id
-                              //join userm in userManager.Users on order.UserModified equals userm.Id into m
-                              //from um in m.DefaultIfEmpty()
-                          where purchaseStatusId == null || order.StatusId == purchaseStatusId
+                          where (filter.TypeId == null || order.TypeId == filter.TypeId)
+                          && (filter.ModeId == null || order.DeliveryModeId == filter.ModeId)
+                          && (filter.SupplierId == null || order.Supplier.Id == filter.SupplierId)
+                          && (filter.DateFrom == null || order.OrderDate >= filter.DateFrom)
+                          && (filter.DateTo == null || order.OrderDate <= filter.DateTo)
+                          && (filter.StatusId == null || order.StatusId == filter.StatusId)
                           select new PurchaseOrderNewVM
                           {
                               Id = order.Id,
@@ -158,11 +169,11 @@ namespace GMGInventory.Application.Repositories
             return await orderVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<PurchaseOrderNewVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId)
+        public async Task<ForDataTables<PurchaseOrderNewVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseOrderFilter filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync(purchaseStatusId)).AsQueryable();
+            var data = (await GetListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -222,18 +233,13 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
         {
             var details = from order in context.PurchaseOrderNews
-                              //.Include(s => s.Type)
-                              //.Include(s => s.Supplier)
-                              //.Include(s => s.Term)
-                              //.Include(s => s.DeliveryMode)
-                              //.Include(s => s.DeliveryAddress)
-                              //.Include(s => s.Status)
                           let resubmitfrom = context.PurchaseOrderNews
                                                     .Where(s => s.ResubmitId == order.Id)
                                                     .FirstOrDefault()
                           join userc in userManager.Users on order.UserCreated equals userc.Id
                           join userm in userManager.Users on order.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
+                          let item = order.PurchaseOrderLineItems.FirstOrDefault()
                           where order.Id == orderId
                           select new PurchaseOrderNewDetailedVM
                           {
@@ -243,6 +249,12 @@ namespace GMGInventory.Application.Repositories
                               TypeId = order.Type.Id,
                               RequestType = order.Type.RequestType.Name,
                               RequestTypeId = order.Type.RequestType.Id,
+                              RequestPurpose = item == null 
+                                             ? null 
+                                             : item.RequestItem.PurchaseRequest.Purpose.Name,
+                              RequestPurposeId = item == null 
+                                               ? null 
+                                               : item.RequestItem.PurchaseRequest.Purpose.Id,
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
                               SupplierContactPerson = order.Supplier.ContactPerson,

@@ -1,4 +1,7 @@
-﻿<style>
+﻿@{
+    var navPages = (List<string>?)ViewData["NavigationPages"];
+}
+<style>
     .modal-xl {
         max-width: 1200px;
     }
@@ -13,243 +16,261 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-4">
-                        <p>
-                            <span class="text-muted">Code</span>
-                            <b class="d-block modal-item-code"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Name</span>
-                            <b class="d-block modal-item-name"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Part Number</span>
-                            <b class="d-block modal-item-part-number"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Interchange Number</span>
-                            <b class="d-block modal-item-interchange-number"></b>
-                        </p>
+                @if (navPages.Contains(PageNames.Item.ToEnumString()) || navPages.Contains(PageNames.ItemBasic.ToEnumString()))
+                {
+                    <div class="row">
+                        <div class="col-4">
+                            <p>
+                                <span class="text-muted">Code</span>
+                                <b class="d-block modal-item-code"></b>
+                            </p>
+                            <p>
+                                <span class="text-muted">Name</span>
+                                <b class="d-block modal-item-name"></b>
+                            </p>
+                            <p>
+                                <span class="text-muted">Part Number</span>
+                                <b class="d-block modal-item-part-number"></b>
+                            </p>
+                            <p>
+                                <span class="text-muted">Interchange Number</span>
+                                <b class="d-block modal-item-interchange-number"></b>
+                            </p>
+                        </div>
+                        <div class="col-4">
+                            <p>
+                                <span class="text-muted">Model Number</span>
+                                <b class="d-block modal-item-model-number"></b>
+                            </p>
+                            <p>
+                                <span class="text-muted">Category</span>
+                                <b class="d-block modal-item-category"></b>
+                            </p>
+                            <p>
+                                <span class="text-muted">Item Type</span>
+                                <b class="d-block modal-item-type"></b>
+                            </p>
+                            <p>
+                                <span class="text-muted">Brand</span>
+                                <b class="d-block modal-item-brand"></b>
+                            </p>
+                        </div>
+                        <div class="col-4">
+                            <p>
+                                <span class="text-muted">Unit Code</span>
+                                <b class="d-block modal-item-unit-code"></b>
+                            </p>
+                            <p>
+                                <span class="text-muted">Size</span>
+                                <b class="d-block modal-item-size"></b>
+                            </p>
+                            @if (navPages.Contains(PageNames.Item.ToEnumString()))
+                            {
+                                <p>
+                                    <span class="text-muted">Gross Price</span>
+                                    <b class="d-block modal-item-gross-price"></b>
+                                </p>
+                                <p>
+                                    <span class="text-muted">Net Price</span>
+                                    <b class="d-block modal-item-net-price"></b>
+                                </p>
+                            }
+                        </div>
                     </div>
-                    <div class="col-4">
-                        <p>
-                            <span class="text-muted">Model Number</span>
-                            <b class="d-block modal-item-model-number"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Category</span>
-                            <b class="d-block modal-item-category"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Item Type</span>
-                            <b class="d-block modal-item-type"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Brand</span>
-                            <b class="d-block modal-item-brand"></b>
-                        </p>
-                    </div>
-                    <div class="col-4">
-                        <p>
-                            <span class="text-muted">Unit Code</span>
-                            <b class="d-block modal-item-unit-code"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Size</span>
-                            <b class="d-block modal-item-size"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Gross Price</span>
-                            <b class="d-block modal-item-gross-price"></b>
-                        </p>
-                        <p>
-                            <span class="text-muted">Net Price</span>
-                            <b class="d-block modal-item-net-price"></b>
-                        </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card card-danger card-tabs">
-                            <div class="card-header p-0 pt-1 pl-2 pr-2">
-                                <ul class="nav nav-tabs nav-fill nav-modal-item" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" id="modal-nav-warehouse-tab" role="tab"
-                                           data-bs-toggle="tab" data-bs-target="#modal-nav-warehouse"
-                                           aria-controls="modal-nav-warehouse" aria-selected="true">
-                                            @*<br />*@Warehouse Details
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="modal-nav-purchase-tab" role="tab"
-                                           data-bs-toggle="tab" data-bs-target="#modal-nav-purchase"
-                                           aria-controls="modal-nav-purchase" aria-selected="true">
-                                            Cost@*<br />*@ History
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="modal-nav-sales-tab" role="tab"
-                                           data-bs-toggle="tab" data-bs-target="#modal-nav-sales"
-                                           aria-controls="modal-nav-sales" aria-selected="true">
-                                            Sales Order@*<br />*@ Details
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="modal-nav-count-tab" role="tab"
-                                           data-bs-toggle="tab" data-bs-target="#modal-nav-count"
-                                           aria-controls="modal-nav-count" aria-selected="true">
-                                            Physical Count@*<br />*@ Adjustment
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="modal-nav-conversion-tab" role="tab"
-                                           data-bs-toggle="tab" data-bs-target="#modal-nav-conversion"
-                                           aria-controls="modal-nav-conversion" aria-selected="true">
-                                            @*<br />*@Conversion Details
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="modal-nav-price-tab" role="tab"
-                                           data-bs-toggle="tab" data-bs-target="#modal-nav-price"
-                                           aria-controls="modal-nav-price" aria-selected="true">
-                                            @*<br />*@Price History
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="modal-nav-transfer-tab" role="tab"
-                                           data-bs-toggle="tab" data-bs-target="#modal-nav-transfer"
-                                           aria-controls="modal-nav-transfer" aria-selected="true">
-                                            Warehouse Transfer@*<br />*@ History
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="modal-nav-return-tab" role="tab"
-                                           data-bs-toggle="tab" data-bs-target="#modal-nav-return"
-                                           aria-controls="modal-nav-return" aria-selected="true">
-                                            Sales Return@*<br />*@ History
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-body">
-                                <div class="tab-content">
-                                    <div class="tab-pane fade show active" id="modal-nav-warehouse" role="tabpanel"
-                                         aria-labelledby="modal-nav-warehouse-tab">
-                                        <table class="table table-head-fixed table-striped table-hover modal-table-warehouse">
-                                            <thead>
-                                                <tr>
-                                                    <th>Code</th>
-                                                    <th>Name</th>
-                                                    <th>Quantity</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                    <div class="tab-pane fade" id="modal-nav-purchase" role="tabpanel" aria-labelledby="modal-nav-purchase-tab">
-                                        <table class="table table-head-fixed table-striped table-hover modal-table-purchase">
-                                            <thead>
-                                                <tr>
-                                                    <th>PO Number</th>
-                                                    <th>Warehouse</th>
-                                                    <th>Supplier</th>
-                                                    <th>Quantity</th>
-                                                    <th>Unit Cost</th>
-                                                    <th>Currency</th>
-                                                    <th>Conversion Factor</th>
-                                                    <th>Converted Unit Price</th>
-                                                    <th>Replenish Date</th>
-                                                    <th>Replenish By</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                    <div class="tab-pane fade" id="modal-nav-sales" role="tabpanel" aria-labelledby="modal-nav-sales-tab">
-                                        <table class="table table-head-fixed table-striped table-hover modal-table-sales">
-                                            <thead>
-                                                <tr>
-                                                    <th>SO Number</th>
-                                                    <th>Customer</th>
-                                                    <th>Unit Price</th>
-                                                    <th>Quantity</th>
-                                                    <th>Packed Quantity</th>
-                                                    <th>Unserved Quantity</th>
-                                                    <th>Discount 1</th>
-                                                    <th>Discount 2</th>
-                                                    <th>Agent</th>
-                                                    <th>Created Date</th>
-                                                    <th>Created By</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                    <div class="tab-pane fade" id="modal-nav-count" role="tabpanel" aria-labelledby="modal-nav-count-tab">
-                                        <table class="table table-head-fixed table-striped table-hover modal-table-count">
-                                            <thead>
-                                                <tr>
-                                                    <th>Warehouse</th>
-                                                    <th>Quantity From</th>
-                                                    <th>Quantity To</th>
-                                                    <th>Quantity Adjusted</th>
-                                                    <th>Adjustment Date</th>
-                                                    <th>Adjustment By</th>
-                                                    <th>Remarks</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                    <div class="tab-pane fade show" id="modal-nav-conversion" role="tabpanel" aria-labelledby="nav-conversion-tab">
-                                        <table class="table table-head-fixed table-striped table-hover modal-table-conversion">
-                                        </table>
-                                    </div>
-                                    <div class="tab-pane fade" id="modal-nav-price" role="tabpanel" aria-labelledby="modal-nav-price-tab">
-                                        <table class="table table-head-fixed table-striped table-hover modal-table-price">
-                                            <thead>
-                                                <tr>
-                                                    <th>Retail Price</th>
-                                                    <th>Net Price</th>
-                                                    <th>Update Date</th>
-                                                    <th>Update By</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                    <div class="tab-pane fade" id="modal-nav-transfer" role="tabpanel" aria-labelledby="modal-nav-transfer-tab">
-                                        <table class="table table-head-fixed table-striped table-hover modal-table-transfer">
-                                            <thead>
-                                                <tr>
-                                                    <th>Transfer Number</th>
-                                                    <th>Source</th>
-                                                    <th>Destination</th>
-                                                    <th>Quantity</th>
-                                                    <th>Transfer Date</th>
-                                                    <th>Transfer By</th>
-                                                    <th>Remarks</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                    <div class="tab-pane fade" id="modal-nav-return" role="tabpanel" aria-labelledby="modal-nav-return-tab">
-                                        <table class="table table-head-fixed table-striped table-hover modal-table-return">
-                                            <thead>
-                                                <tr>
-                                                    <th>SR Number</th>
-                                                    <th>Item Code</th>
-                                                    <th>Item Name</th>
-                                                    <th>Quantity</th>
-                                                    <th>Customer</th>
-                                                    <th>Return Date</th>
-                                                    <th>Return By</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-danger card-tabs">
+                                <div class="card-header p-0 pt-1 pl-2 pr-2">
+                                    <ul class="nav nav-tabs nav-fill nav-modal-item" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="modal-nav-warehouse-tab" role="tab"
+                                               data-bs-toggle="tab" data-bs-target="#modal-nav-warehouse"
+                                               aria-controls="modal-nav-warehouse" aria-selected="true">
+                                                @*<br />*@Warehouse Details
+                                            </a>
+                                        </li>
+                                        @if (navPages.Contains(PageNames.Item.ToEnumString()))
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="modal-nav-purchase-tab" role="tab"
+                                                   data-bs-toggle="tab" data-bs-target="#modal-nav-purchase"
+                                                   aria-controls="modal-nav-purchase" aria-selected="true">
+                                                    Cost@*<br />*@ History
+                                                </a>
+                                            </li>
+                                        }
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="modal-nav-sales-tab" role="tab"
+                                               data-bs-toggle="tab" data-bs-target="#modal-nav-sales"
+                                               aria-controls="modal-nav-sales" aria-selected="true">
+                                                Sales Order@*<br />*@ Details
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="modal-nav-count-tab" role="tab"
+                                               data-bs-toggle="tab" data-bs-target="#modal-nav-count"
+                                               aria-controls="modal-nav-count" aria-selected="true">
+                                                Physical Count@*<br />*@ Adjustment
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="modal-nav-conversion-tab" role="tab"
+                                               data-bs-toggle="tab" data-bs-target="#modal-nav-conversion"
+                                               aria-controls="modal-nav-conversion" aria-selected="true">
+                                                @*<br />*@Conversion Details
+                                            </a>
+                                        </li>
+                                        @if (navPages.Contains(PageNames.Item.ToEnumString()))
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="modal-nav-price-tab" role="tab"
+                                                   data-bs-toggle="tab" data-bs-target="#modal-nav-price"
+                                                   aria-controls="modal-nav-price" aria-selected="true">
+                                                    @*<br />*@Price History
+                                                </a>
+                                            </li>
+                                        }
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="modal-nav-transfer-tab" role="tab"
+                                               data-bs-toggle="tab" data-bs-target="#modal-nav-transfer"
+                                               aria-controls="modal-nav-transfer" aria-selected="true">
+                                                Warehouse Transfer@*<br />*@ History
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="modal-nav-return-tab" role="tab"
+                                               data-bs-toggle="tab" data-bs-target="#modal-nav-return"
+                                               aria-controls="modal-nav-return" aria-selected="true">
+                                                Sales Return@*<br />*@ History
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content">
+                                        <div class="tab-pane fade show active" id="modal-nav-warehouse" role="tabpanel"
+                                             aria-labelledby="modal-nav-warehouse-tab">
+                                            <table class="table table-head-fixed table-striped table-hover modal-table-warehouse">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Code</th>
+                                                        <th>Name</th>
+                                                        <th>Quantity</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        @if (navPages.Contains(PageNames.Item.ToEnumString()))
+                                        {
+                                            <div class="tab-pane fade" id="modal-nav-purchase" role="tabpanel" aria-labelledby="modal-nav-purchase-tab">
+                                                <table class="table table-head-fixed table-striped table-hover modal-table-purchase">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>PO Number</th>
+                                                            <th>Warehouse</th>
+                                                            <th>Supplier</th>
+                                                            <th>Quantity</th>
+                                                            <th>Unit Cost</th>
+                                                            <th>Currency</th>
+                                                            <th>Conversion Factor</th>
+                                                            <th>Converted Unit Price</th>
+                                                            <th>Replenish Date</th>
+                                                            <th>Replenish By</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                        }
+                                        <div class="tab-pane fade" id="modal-nav-sales" role="tabpanel" aria-labelledby="modal-nav-sales-tab">
+                                            <table class="table table-head-fixed table-striped table-hover modal-table-sales">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SO Number</th>
+                                                        <th>Customer</th>
+                                                        <th>Unit Price</th>
+                                                        <th>Quantity</th>
+                                                        <th>Packed Quantity</th>
+                                                        <th>Unserved Quantity</th>
+                                                        <th>Discount 1</th>
+                                                        <th>Discount 2</th>
+                                                        <th>Agent</th>
+                                                        <th>Created Date</th>
+                                                        <th>Created By</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="tab-pane fade" id="modal-nav-count" role="tabpanel" aria-labelledby="modal-nav-count-tab">
+                                            <table class="table table-head-fixed table-striped table-hover modal-table-count">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Warehouse</th>
+                                                        <th>Quantity From</th>
+                                                        <th>Quantity To</th>
+                                                        <th>Quantity Adjusted</th>
+                                                        <th>Adjustment Date</th>
+                                                        <th>Adjustment By</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="tab-pane fade show" id="modal-nav-conversion" role="tabpanel" aria-labelledby="nav-conversion-tab">
+                                            <table class="table table-head-fixed table-striped table-hover modal-table-conversion">
+                                            </table>
+                                        </div>
+                                        @if (navPages.Contains(PageNames.Item.ToEnumString()))
+                                        {
+                                            <div class="tab-pane fade" id="modal-nav-price" role="tabpanel" aria-labelledby="modal-nav-price-tab">
+                                                <table class="table table-head-fixed table-striped table-hover modal-table-price">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Retail Price</th>
+                                                            <th>Net Price</th>
+                                                            <th>Update Date</th>
+                                                            <th>Update By</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                        }
+                                        <div class="tab-pane fade" id="modal-nav-transfer" role="tabpanel" aria-labelledby="modal-nav-transfer-tab">
+                                            <table class="table table-head-fixed table-striped table-hover modal-table-transfer">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Transfer Number</th>
+                                                        <th>Source</th>
+                                                        <th>Destination</th>
+                                                        <th>Quantity</th>
+                                                        <th>Transfer Date</th>
+                                                        <th>Transfer By</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="tab-pane fade" id="modal-nav-return" role="tabpanel" aria-labelledby="modal-nav-return-tab">
+                                            <table class="table table-head-fixed table-striped table-hover modal-table-return">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SR Number</th>
+                                                        <th>Item Code</th>
+                                                        <th>Item Name</th>
+                                                        <th>Quantity</th>
+                                                        <th>Customer</th>
+                                                        <th>Return Date</th>
+                                                        <th>Return By</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -263,7 +284,7 @@
     function LoadItemDetailsModal(id) {
         $.ajax({
             type: "POST",
-            url: "@Url.Action("DetailsJson","Item")",
+            url: "@Url.Action("DetailsJson", "Item")",
             data: {
                 Id: id
             },
@@ -301,11 +322,11 @@
 
                     // Warehouse Details
                     var warehouseDT = $('.modal-table-warehouse').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-warehouse");
+                        showBatchLoader("modal-warehouse");
                     }).DataTable({
                         destroy: true,
                         ajax: {
-                            url: "@Url.Action("GetWarehousesJson","Item")",
+                            url: "@Url.Action("GetWarehousesJson", "Item")",
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
@@ -325,16 +346,16 @@
                         ],
                         order: [[0, "asc"]]
                     }).on("draw.dt", function () {
-                        HideTabLoader("modal-warehouse");
+                        hideBatchLoader("modal-warehouse");
                     });
 
                     // Purchase Order Details
                     var purchaseDT = $('.modal-table-purchase').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-purchase");
+                        showBatchLoader("modal-purchase");
                     }).DataTable({
                         destroy: true,
                         ajax: {
-                            url: "@Url.Action("GetPurchasesJson","Item")",
+                            url: "@Url.Action("GetPurchasesJson", "Item")",
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
@@ -362,17 +383,17 @@
                         ],
                         order: [[9, "desc"]]
                     }).on("draw.dt", function () {
-                        HideTabLoader("modal-purchase");
+                        hideBatchLoader("modal-purchase");
                     });
 
 
                     // Sales Order Details
                     var salesDT = $('.modal-table-sales').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-sales");
+                        showBatchLoader("modal-sales");
                     }).DataTable({
                         destroy: true,
                         ajax: {
-                            url: "@Url.Action("GetSalesJson","Item")",
+                            url: "@Url.Action("GetSalesJson", "Item")",
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
@@ -400,17 +421,17 @@
                         ],
                         order: [[9, "desc"]]
                     }).on("draw.dt", function () {
-                        HideTabLoader("modal-sales");
+                        hideBatchLoader("modal-sales");
                     });
 
 
                     // Physical Count Adjustment
                     var countDT = $('.modal-table-count').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-count");
+                        showBatchLoader("modal-count");
                     }).DataTable({
                         destroy: true,
                         ajax: {
-                            url: "@Url.Action("GetCountsJson","Item")",
+                            url: "@Url.Action("GetCountsJson", "Item")",
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
@@ -434,12 +455,12 @@
                         ],
                         order: [[4, "desc"]]
                     }).on("draw.dt", function () {
-                        HideTabLoader("modal-count");
+                        hideBatchLoader("modal-count");
                     });
 
                     //Conversion Details
                     var conversionDT = $('.modal-table-conversion').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-conversion");
+                        showBatchLoader("modal-conversion");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -482,16 +503,16 @@
                             }
                         }
 
-                        HideTabLoader("modal-conversion");
+                        hideBatchLoader("modal-conversion");
                     });
 
                     // Price History
                     var priceDT = $('.modal-table-price').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-conversion");
+                        showBatchLoader("modal-price");
                     }).DataTable({
                         destroy: true,
                         ajax: {
-                            url: "@Url.Action("GetPricesJson","Item")",
+                            url: "@Url.Action("GetPricesJson", "Item")",
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
@@ -512,19 +533,19 @@
                         ],
                         order: [[3, "desc"]]
                     }).on("draw.dt", function () {
-                        HideTabLoader("modal-price");
+                        hideBatchLoader("modal-price");
 
-                     
+
                     });
 
 
                     // Warehouse Transfer History
                     var transferDT = $('.modal-table-transfer').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-transfer");
+                        showBatchLoader("modal-transfer");
                     }).DataTable({
                         destroy: true,
                         ajax: {
-                            url: "@Url.Action("GetTransfersJson","Item")",
+                            url: "@Url.Action("GetTransfersJson", "Item")",
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
@@ -548,17 +569,17 @@
                         ],
                         order: [[4, "desc"]]
                     }).on("draw.dt", function () {
-                        HideTabLoader("modal-transfer");
+                        hideBatchLoader("modal-transfer");
                     });
 
 
                     // Sales Return Details
                     var returnDT = $('.modal-table-return').on('preXhr.dt', function (e, settings, data) {
-                        ShowTabLoader("modal-return");
+                        showBatchLoader("modal-return");
                     }).DataTable({
                         destroy: true,
                         ajax: {
-                            url: "@Url.Action("GetReturnsJson","Item")",
+                            url: "@Url.Action("GetReturnsJson", "Item")",
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
@@ -582,7 +603,7 @@
                         ],
                         order: [[5, "desc"]]
                     }).on("draw.dt", function () {
-                        HideTabLoader("modal-return");
+                        hideBatchLoader("modal-return");
                     });
 
                     hideLoader();

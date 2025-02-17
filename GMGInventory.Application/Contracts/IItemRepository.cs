@@ -18,7 +18,6 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<ItemCommonVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, ItemFilterVM filter);
         ItemViewVM? GetItemViewVM(int? id);
         Task<IList<ItemFileVM>> GetAllFileAsync();
-        Task<bool> UploadCombinationExistAsync(ItemFileVM itemVM);
         Task<bool> IsCodeExistAsync(string code);
         Task<bool> IsInUseAsync(int id);
         Task<bool> IsIdExistAsync(int id);
@@ -30,6 +29,7 @@ namespace GMGInventory.Application.Contracts
         Task UpdateQuantityAsync(int id, int quantity, string remarks);
         Task DeleteWarehouse(int id);
         Task<bool> UpdateOrAddItemWarehouse(int itemId, int warehouseId, int quantity, string remarks);
+        Task UpdateOrAddItemPrice(int itemId, decimal retailPrice, decimal netPrice);
         Task<ForDataTables<ItemDetailWarehouseVM>> GetItemWarehouseDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailPurchaseVM>> GetItemPurchaseDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailSalesVM>> GetItemSalesDTAsync(DataTablesRequestForm form, int id);

@@ -4,7 +4,8 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IPurchaseReceiveRepository
     {
-        Task<ForDataTables<PurchaseReceiveVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId);
+        Task<IList<PurchaseReceiveVM>> GetListAsync(PurchaseReceiveFilter filter);
+        Task<ForDataTables<PurchaseReceiveVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseReceiveFilter filter);
         Task<PurchaseReceiveDetailsVM?> GetDetails(int receivingId);
         Task<IList<PurchaseReceiveLineItemVM>> GetItemListAsync(int purchaseRequestId);
         Task<ResponseModel> SaveItemsAsync(IList<PurchaseReceiveLineItemVM> Items, int receiveId, string? status = null);

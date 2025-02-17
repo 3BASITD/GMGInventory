@@ -7,7 +7,8 @@ namespace GMGInventory.Application.Contracts
     {
         Task<IList<JsonCodeOptionsModel>> GetTypeOptions(int? SelectedId);
         Task<IList<JsonCodeOptionsModel>> GetPurposeOptions(int TypeId, int? SelectedId);
-        Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId);
+        Task<IList<PurchaseRequestVM>> GetListAsync(PurchaseRequestFilter filter);
+        Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseRequestFilter filter);
         Task<PurchaseRequestDetailedVM?> GetDetails(int requestId);
         Task<IList<PurchaseRequestLineItemVM>> GetItemListAsync(int purchaseRequestId);
         Task<ForDataTables<PurchaseRequestLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseRequestId);

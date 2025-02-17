@@ -65,14 +65,16 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        private async Task<IList<PurchaseRequestVM>> GetListAsync(int? purchaseStatusId)
+        public async Task<IList<PurchaseRequestVM>> GetListAsync(PurchaseRequestFilter filter)
         {
             var requestVM = from request in context.PurchaseRequests
-                                                   //.Include(s => s.Type)
-                                                   //.Include(s => s.Purpose)
-                                                   //.Include(s => s.Region)
-                                                   //.Include(s => s.Status)
-                            where purchaseStatusId == null || request.StatusId == purchaseStatusId
+                            where (filter.TypeId == null || request.TypeId == filter.TypeId)
+                            && (filter.PurposeId == null || request.PurposeId == filter.PurposeId)
+                            && (filter.RegionId == null || request.PurchaseRequestLineItems.Any(s => s.SalesOrder.Customer.Area.Region.Id == filter.RegionId))
+                            && (filter.DateFrom == null || filter.DateFrom <= request.RequestDate)
+                            && (filter.DateTo == null || request.RequestDate <= filter.DateTo)
+                            && (filter.StatusId == null || request.StatusId == filter.StatusId)
+                            let firstitem = request.PurchaseRequestLineItems.FirstOrDefault()
                             select new PurchaseRequestVM
                             {
                                 Id = request.Id,
@@ -81,18 +83,20 @@ namespace GMGInventory.Application.Repositories
                                 Purpose = request.Purpose == null
                                         ? request.PurposeDefinition + ""
                                         : request.Purpose.Name,
-                                Region = request.Region.Name,
+                                Region = firstitem.SalesOrderId != null
+                                       ? firstitem.SalesOrder.Customer.Area.Region.Name
+                                       : "",
                                 Status = request.Status.Code,
                                 RequestDateD = request.RequestDate
                             };
             return await requestVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId)
+        public async Task<ForDataTables<PurchaseRequestVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseRequestFilter filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync(purchaseStatusId)).AsQueryable();
+            var data = (await GetListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -151,13 +155,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<PurchaseRequestDetailedVM?> GetDetails(int requestId)
         {
             var details = from request in context.PurchaseRequests
-                                                 .Include(s => s.Type)
-                                                 .Include(s => s.Purpose)
-                                                 .Include(s => s.Region)
-                                                 .Include(s => s.Status)
                           let resubmitfrom = context.PurchaseRequests
                                                     .Where(s => s.ResubmitId == request.Id)
                                                     .FirstOrDefault()
+                          let firstitem = request.PurchaseRequestLineItems.FirstOrDefault()
                           join userc in userManager.Users on request.UserCreated equals userc.Id
                           join userm in userManager.Users on request.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
@@ -170,8 +171,8 @@ namespace GMGInventory.Application.Repositories
                               TypeId = request.Type.Id,
                               Purpose = request.Purpose == null ? request.PurposeDefinition + "" : request.Purpose.Name,
                               PurposeId = request.Purpose == null ? null : request.Purpose.Id,
-                              Region = request.Region == null ? "" : request.Region.Name,
-                              RegionId = request.Region == null ? (int?)null : request.Region.Id,
+                              Region = firstitem.SalesOrderId == null ? "" : firstitem.SalesOrder.Customer.Area.Region.Name,
+                              RegionId = firstitem.SalesOrderId == null ? (int?)null : firstitem.SalesOrder.Customer.Area.Region.Id,
                               Status = request.Status.Code,
                               RequestDateD = request.RequestDate,
                               Remarks = request.Remarks,
@@ -192,19 +193,21 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PurchaseRequestLineItemVM>> GetItemListAsync(int purchaseRequestId)
         {
             var requestVM = from request in context.PurchaseRequestLineItems
-                                                   .Include(s => s.SalesOrder)
-                                                   .Include(s => s.Item)
-                            let packedQuantity = context.PackLineItems
-                                                        .Where(s => s.ItemId == request.ItemId)
-                                                        .Sum(s => (int?)s.Quantity) ?? 0
-                            let invoicedQuantity = context.InvoiceLineItems
-                                                          .Where(s => s.ItemId == request.ItemId)
-                                                          .Sum(s => (int?)s.Quantity) ?? 0
-                            let returnedQuantity = context.SalesReturnLineItems
-                                                          .Where(s => s.ItemId == request.ItemId)
-                                                          .Sum(s => (int?)s.Quantity) ?? 0
-                            let inventory = context.ItemInventories
-                                                   .Where(s => s.ItemId == request.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
+                            join soli in context.SalesOrderLineItems
+                                      on new
+                                      {
+                                          request.ItemId,
+                                          request.SalesOrderId
+                                      }
+                                      equals new
+                                      {
+                                          ItemId = (int?)soli.ItemId,
+                                          SalesOrderId = (int?)soli.SalesOrderId
+                                      }
+                                      into sg
+                            from soli in sg.DefaultIfEmpty()
+                            let ii = context.ItemInventories
+                                            .Where(s => s.ItemId == request.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
                                                    .Sum(s => (int?)s.Quantity) ?? 0
                             where request.PurchaseRequestId == purchaseRequestId
                             select new PurchaseRequestLineItemVM
@@ -218,8 +221,9 @@ namespace GMGInventory.Application.Repositories
                                 ItemCode = request.Item == null ? null : request.Item.Code,
                                 ItemPartNumber = (request.Item == null ? null : request.Item.PartNumber) + "",
                                 ItemDescription = request.ItemDescription,
-                                StockOnHandD = inventory,
+                                StockOnHandD = ii,
                                 QuantityD = request.Quantity,
+                                MaxQuantityD = (soli == null ? 0 : soli.Quantity) - ii,
                                 UnitId = request.Unit != null ? request.Unit.Id
                                        : request.Item != null ? request.Item.Unit.Id
                                        : 0,
@@ -326,7 +330,6 @@ namespace GMGInventory.Application.Repositories
                         TypeId = form.TypeId,
                         PurposeId = form.PurposeId,
                         PurposeDefinition = form.PurposeDefinition,
-                        RegionId = form.RegionId,
                         RequestDate = form.DateRequested,
                         Remarks = form.Remarks,
                         StatusId = status.Id

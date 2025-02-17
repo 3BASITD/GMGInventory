@@ -362,7 +362,7 @@
 
         // Load List 1 on DataTable
         var salesDT1 = $('.table-sales1').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("sales1");
+            showBatchLoader("sales1");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCustomerSalesDT")",
@@ -400,14 +400,14 @@
 
         // Load functions upon DataTable load
         salesDT1.on("draw", function () {
-            HideTabLoader("sales1");
+            hideBatchLoader("sales1");
 
             //$(".table-sales1 thead th").removeClass("text-end");
         });
 
         // Load List 2 on DataTable
         var salesDT2 = $('.table-sales2').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("sales2");
+            showBatchLoader("sales2");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCustomerSalesDT")",
@@ -445,7 +445,7 @@
 
         // Load functions upon DataTable load
         salesDT2.on("draw", function () {
-            HideTabLoader("sales2");
+            hideBatchLoader("sales2");
 
             //$(".table-sales1 thead th").removeClass("text-end");
         });

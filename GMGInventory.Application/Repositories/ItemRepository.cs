@@ -112,33 +112,27 @@ namespace GMGInventory.Application.Repositories
                                              .OrderByDescending(s => s.DateCreated)
                                              .Take(1)
                                              .DefaultIfEmpty()
-                        let inventory = context.ItemInventories
-                                               .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
-                                               .Sum(s => (int?)s.Quantity) ?? 0
-                        let packedQuantity = context.PackLineItems
-                                                    .Where(s => s.Pack.SalesOrderId == soitem.SalesOrderId
-                                                             && s.ItemId == soitem.ItemId)
-                                                    .Sum(s => (int?)s.Quantity) ?? 0
-                        let returnedQuantity = context.SalesReturnLineItems
-                                                      .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == soitem.SalesOrderId
-                                                               && s.ItemId == soitem.ItemId)
-                                                      .Sum(s => (int?)s.Quantity) ?? 0
+                        let ii = context.ItemInventories
+                                        .Where(s=>s.ItemId == item.Id)
+                                        .Select(s=>s.Quantity)
+                                        .Sum()
                         where item.IsActive == true
                            && soitem.SalesOrderId == SalesOrderId
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
                            || item.Name.ToLower().Contains(search.ToLower()))
+                           && (soitem.Quantity > 0 || soitem.Quantity > ii)
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {
                             Id = item.Id.ToString(),
-                            InventoryCount = inventory,
+                            InventoryCount = ii,
                             Text = item.Code,
                             Name = item.Name,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
                             //Quantity = soitem.Quantity - (packedQuantity - returnedQuantity),
-                            Quantity = inventory <= 0 ? soitem.Quantity - inventory : 0,
+                            Quantity = soitem.Quantity - ii,
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code
@@ -520,26 +514,6 @@ namespace GMGInventory.Application.Repositories
             return await itemsVM.ToListAsync();
         }
 
-        public async Task<bool> UploadCombinationExistAsync(ItemFileVM itemVM)
-        {
-            var itemMatch = from item in context.Items
-                            join inventory in context.ItemInventories on item.Id equals inventory.ItemId
-                            where item.Code == itemVM.Code
-                            && item.Name == itemVM.Name
-                            && item.PartNumber + "" == itemVM.PartNumber + ""
-                            && item.InterchangeNumber + "" == itemVM.InterchangeNumber + ""
-                            && inventory.Warehouse.Name == itemVM.Warehouse
-                            && item.ModelNumber + "" == itemVM.ModelNumber + ""
-                            && item.Category.Name == itemVM.Category
-                            && item.ItemType.Name == itemVM.ItemType
-                            && item.Brand.Name == itemVM.Brand
-                            && item.Size == itemVM.Size
-                            && item.Unit.Name == itemVM.Unit
-                            && inventory.Quantity == itemVM.Quantity
-                            select item;
-            return await itemMatch.AnyAsync();
-        }
-
         public async Task<bool> IsCodeExistAsync(string code)
         {
             return await context.Items.AnyAsync(s => s.Code == code);
@@ -610,16 +584,11 @@ namespace GMGInventory.Application.Repositories
             };
             await context.ItemPrices.AddAsync(itemPrice);
             await context.SaveChangesAsync(currentUserId);
-
-            var defaultWarehouse = await context.Warehouses
-                                                .Where(s => s.Code.ToLower().Contains("main"))
-                                                .Select(s => s.Id)
-                                                .FirstOrDefaultAsync();
             var itemInventories = new ItemInventory
             {
                 ItemId = item.Id,
                 Quantity = itemVM.QuantityD,
-                WarehouseId = defaultWarehouse
+                WarehouseId = itemVM.WarehouseId
             };
             await context.ItemInventories.AddAsync(itemInventories);
             await context.SaveChangesAsync(currentUserId);
@@ -653,7 +622,7 @@ namespace GMGInventory.Application.Repositories
             item.Name = itemVM.Name;
             item.PartNumber = itemVM.PartNumber + "";
             item.Size = itemVM.Size + "";
-            // item.UnitId = itemVM.UnitId;
+            item.UnitId = itemVM.UnitId;
 
             context.Items.Update(item);
             await context.SaveChangesAsync(currentUserId);
@@ -665,6 +634,12 @@ namespace GMGInventory.Application.Repositories
             if (itemInventories.Count > 0)
             {
                 context.ItemInventories.RemoveRange(itemInventories);
+            }
+
+            var itemConversions = context.ItemConversions.Where(s => s.ItemId == id).ToList();
+            if (itemConversions.Count > 0)
+            {
+                context.ItemConversions.RemoveRange(itemConversions);
             }
 
             var itemPrices = context.ItemPrices.Where(s => s.ItemId == id).ToList();
@@ -752,6 +727,33 @@ namespace GMGInventory.Application.Repositories
                 return true;
             }
             return false;
+        }
+
+        public async Task UpdateOrAddItemPrice(int itemId, decimal retailPrice, decimal netPrice)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var price = await context.ItemPrices.Where(s => s.ItemId == itemId).FirstOrDefaultAsync();
+
+            if (price != null)
+            {
+                price.RetailSellingPrice = retailPrice;
+                price.NetSellingPrice = netPrice;
+
+                context.ItemPrices.Update(price);
+            }
+            else
+            {
+                price = new ItemPrice
+                {
+                    ItemId = itemId,
+                    RetailSellingPrice = retailPrice,
+                    NetSellingPrice = netPrice
+                };
+
+                await context.ItemPrices.AddAsync(price);
+            }
+
+            await context.SaveChangesAsync(currentUserId);
         }
 
         private async Task<IList<ItemDetailWarehouseVM>> GetItemWarehouseAsync(int id)

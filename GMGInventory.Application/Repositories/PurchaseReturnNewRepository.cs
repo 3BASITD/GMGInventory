@@ -96,10 +96,13 @@ namespace GMGInventory.Application.Repositories
             return $"{docNumberPrefix}{docNumberLast + 1:D6}";
         }
 
-        private async Task<IList<PurchaseReturnNewVM>> GetListAsync(int? purchaseStatusId)
+        public async Task<IList<PurchaseReturnNewVM>> GetListAsync(PurchaseReturnFilter filter)
         {
             var returnVM = from retrn in context.PurchaseReturnNews
-                           where purchaseStatusId == null || retrn.StatusId == purchaseStatusId
+                           where (filter.SupplierId == null || retrn.PurchaseReceive.PurchaseOrder.SupplierId == filter.SupplierId)
+                           && (filter.DateFrom == null || retrn.ReturnDate >= filter.DateFrom)
+                           && (filter.DateTo == null || retrn.ReturnDate <= filter.DateTo)
+                           && (filter.StatusId == null || retrn.StatusId == filter.StatusId)
                            select new PurchaseReturnNewVM
                            {
                                Id = retrn.Id,
@@ -116,11 +119,11 @@ namespace GMGInventory.Application.Repositories
             return await returnVM.ToListAsync();
         }
 
-        public async Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId)
+        public async Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseReturnFilter filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync(purchaseStatusId)).AsQueryable();
+            var data = (await GetListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found

@@ -184,7 +184,7 @@
         });
 
         var itemDT = $('.table-warehouse-items').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("items");
+            showBatchLoader("items");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson", "Item")",
@@ -210,11 +210,11 @@
         });
 
         itemDT.on("draw", function () {
-            HideTabLoader("items");
+            hideBatchLoader("items");
         });
 
         var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("transfer");
+            showBatchLoader("transfer");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehouseTransferJson", "Transfer")",
@@ -243,7 +243,7 @@
         });
 
         transferDT.on("draw", function () {
-            HideTabLoader("transfer");
+            hideBatchLoader("transfer");
         });
     </script>
 }

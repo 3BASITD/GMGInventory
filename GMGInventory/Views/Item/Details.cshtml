@@ -1079,7 +1079,7 @@
 
         // Warehouse Details
         var warehouseDT = $('.table-warehouse').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("warehouse");
+            showBatchLoader("warehouse");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehousesJson")",
@@ -1113,7 +1113,7 @@
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
 
-            HideTabLoader("warehouse");
+            hideBatchLoader("warehouse");
 
             if (user_access.canEdit) {
                 // Actions upon Display Edit Quantity Modal
@@ -1174,7 +1174,7 @@
         if (user_access.canView) {
             // Purchase Order Details
             var purchaseDT = $('.table-purchase').on('preXhr.dt', function (e, settings, data) {
-                ShowTabLoader("purchase");
+                showBatchLoader("purchase");
             }).DataTable({
                 ajax: {
                     url: "@Url.Action("GetPurchasesJson")",
@@ -1205,14 +1205,14 @@
                 ],
                 order: [[9, "desc"]]
             }).on("draw.dt", function () {
-                HideTabLoader("purchase");
+                hideBatchLoader("purchase");
             });
         }
 
 
         // Sales Order Details
         var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("sales");
+            showBatchLoader("sales");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetSalesJson")",
@@ -1243,13 +1243,13 @@
             ],
             order: [[9, "desc"]]
         }).on("draw.dt", function () {
-            HideTabLoader("sales");
+            hideBatchLoader("sales");
         });
 
 
         // Physical Count Adjustment
         var countDT = $('.table-count').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("count");
+            showBatchLoader("count");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCountsJson")",
@@ -1276,13 +1276,13 @@
             ],
             order: [[4, "desc"]]
         }).on("draw.dt", function () {
-            HideTabLoader("count");
+            hideBatchLoader("count");
         });
 
         if (user_access.canView) {
             // Price History
             var priceDT = $('.table-price').on('preXhr.dt', function (e, settings, data) {
-                ShowTabLoader("price");
+                showBatchLoader("price");
             }).DataTable({
                 ajax: {
                     url: "@Url.Action("GetPricesJson")",
@@ -1306,14 +1306,14 @@
                 ],
                 order: [[3, "desc"]]
             }).on("draw.dt", function () {
-                HideTabLoader("price");
+                hideBatchLoader("price");
             });
         }
 
 
         // Warehouse Transfer History
         var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("transfer");
+            showBatchLoader("transfer");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetTransfersJson")",
@@ -1340,13 +1340,13 @@
             ],
             order: [[4, "desc"]]
         }).on("draw.dt", function () {
-            HideTabLoader("transfer");
+            hideBatchLoader("transfer");
         });
 
 
         // Sales Return Details
         var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
-            ShowTabLoader("return");
+            showBatchLoader("return");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetReturnsJson")",
@@ -1373,7 +1373,7 @@
             ],
             order: [[5, "desc"]]
         }).on("draw.dt", function () {
-            HideTabLoader("return");
+            hideBatchLoader("return");
         });
     </script>
 }

@@ -6,6 +6,7 @@ using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Policy;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -54,12 +55,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderOptions(string search, int page)
         {
             var orders = from order in context.SalesOrders
-                         let quantityOrdered = context.SalesOrderLineItems
-                                                      .Where(s => s.SalesOrderId == order.Id)
-                                                      .Sum(s => (int?)s.Quantity) ?? 0
-                         let quantityPacked = context.PackLineItems
-                                                     .Where(s => s.Pack.SalesOrderId == order.Id)
-                                                     .Sum(s => (int?)s.Quantity) ?? 0
                          where order.Status.Code.ToLower() != "submitted"
                          && order.Status.Code.ToLower() != "disapproved"
                          && order.Status.Code.ToLower() != "draft"
@@ -81,6 +76,48 @@ namespace GMGInventory.Application.Repositories
                              ForwarderName = order.SalesOrderDeliveryMonitorings
                                                   .Select(s => s.Forwarder.Name)
                                                   .FirstOrDefault()
+                         };
+            var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonSalesOrderOptionsModel>
+            {
+                items = ordersFiltered,
+                total_count = orders.Count()
+            };
+        }
+
+        public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page, int? regionId)
+        {
+            var soWithUnserved = from soli in context.SalesOrderLineItems
+                                 join ii in context.ItemInventories on soli.ItemId equals ii.ItemId into inv
+                                 from ii in inv.DefaultIfEmpty()
+                                 where ii != null && soli.Quantity > ii.Quantity
+                                 select soli.SalesOrderId;
+
+            var orders = from order in context.SalesOrders
+                         where order.Status.Code.ToLower() != "submitted"
+                         && order.Status.Code.ToLower() != "disapproved"
+                         && order.Status.Code.ToLower() != "draft"
+                         && (string.IsNullOrWhiteSpace(search)
+                         || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         && soWithUnserved.Contains(order.Id)
+                         && (regionId == null || order.Customer.Area.Region.Id == regionId)
+                         orderby order.SalesOrderNumber ascending
+                         select new JsonSalesOrderOptionsModel
+                         {
+                             Id = order.Id.ToString(),
+                             Text = order.SalesOrderNumber,
+                             CustomerCode = order.Customer.Code,
+                             CustomerName = order.Customer.Name,
+                             CustomerAddress = order.Customer
+                                                    .ShippingAddresses
+                                                    .Where(s => s.IsDefault == true)
+                                                    .Select(s => s.Address)
+                                                    .FirstOrDefault(),
+                             SalesOrderDateD = order.SalesOrderDate,
+                             ForwarderName = order.SalesOrderDeliveryMonitorings
+                                                  .Select(s => s.Forwarder.Name)
+                                                  .FirstOrDefault(),
+                             RegionId = order.Customer.Area.RegionId
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonSalesOrderOptionsModel>

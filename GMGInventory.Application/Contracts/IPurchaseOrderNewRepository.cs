@@ -7,10 +7,11 @@ namespace GMGInventory.Application.Contracts
         Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page);
         Task<IList<JsonOrderTypeOptionsModel>> GetTypeOptions(int? SelectedId);
         Task<IList<JsonOptionsModel>> GetDeliveryModeOptions(int? SelectedId);
-        Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? SelectedId);
+        Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? SelectedId);
         Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId);
         Task<string> GetNewDocumentNumber(int? TypeId);
-        Task<ForDataTables<PurchaseOrderNewVM>> GetListDTAsync(DataTablesRequestForm form, int? purchaseStatusId);
+        Task<IList<PurchaseOrderNewVM>> GetListAsync(PurchaseOrderFilter filter);
+        Task<ForDataTables<PurchaseOrderNewVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseOrderFilter filter);
         Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId);
         Task<IList<PurchaseOrderLineItemVM>> GetItemListAsync(int purchaseOrderId);
         Task<ForDataTables<PurchaseOrderLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseRequestId);
