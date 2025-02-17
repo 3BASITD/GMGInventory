@@ -16,13 +16,9 @@
             @if (userAccess.CanPrint)
             {
                 <div class="dropdown float-right ml-2">
-                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="fas fa-print"></span> Print
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
-                        <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
-                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
-                    </ul>
+                   <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                    <span class="fas fa-print"></span> Print
+            </button>
                 </div>
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index" )">
@@ -93,8 +89,9 @@
         <div class="row">
             <div class="col-12 col-md-4 col-sm-6 ">
                 <div class="form-group">
-                    <label for="shipping-freight" class="form-label mb-0">Freight</label>
-                    <select id="shipping-freight" style="width: 100%" class="custom-select">
+                    <label for="shipping-freight" class="text-muted fw-normal mb-0"> Freight </label>
+
+                    <select id="shipping-freight" style="width: 100%" class="custom-select font-weight-bold">
                         <option value="prepaid">Prepaid</option>
                         <option value="collect">Collect</option>
                         <option value="cod">C.O.D</option>
@@ -103,14 +100,14 @@
             </div>
             <div class="col-12 col-md-4 col-sm-6">
                 <div class="form-group">
-                    <label for="shipping-desc" class="form-label mb-0">Description Of Article</label>
-                    <input type="text" id="shipping-desc" class="form-control form-control-sm" value="SPARE/PARTS" />
+                    <label for="shipping-desc" class="text-muted fw-normal mb-0">Description Of Article</label>
+                    <input type="text" id="shipping-desc" class="form-control form-control-sm font-weight-bold" value="SPARE/PARTS" />
                 </div>
             </div>
             <div class="col-12 col-md-4 col-sm-6">
                 <div class="form-group">
-                    <label for="shipping-value" class="form-label mb-0">Value</label>
-                    <input type="number" step="0.01" min="0" id="shipping-value" class="form-control form-control-sm" />
+                    <label for="shipping-value" class="text-muted fw-normal mb-0">Value</label>
+                    <input type="number" step="0.01" min="0" id="shipping-value" class="form-control form-control-sm font-weight-bold" />
                 </div>
             </div>
         </div>
@@ -213,8 +210,7 @@
             hideLoader();
         });
 
-        $(".btn-details-print").on("click", function () {
-            var print_company = $(this).data("company");
+        $(".printBtn").on("click", function () {
             var print_desc = $('#shipping-desc').val();
             var print_freight = $('#shipping-freight').val();
             var print_value = $('#shipping-value').val();
@@ -227,7 +223,6 @@
             setTimeout(function () {
                 var urlQuery = [];
                 urlQuery.push("Id=" + @Model?.SalesOrderId);
-                urlQuery.push("Company=" + print_company);
                 urlQuery.push("Desc=" + print_desc);
                 urlQuery.push("Freight=" + print_freight);
                 urlQuery.push("Value=" + print_value);

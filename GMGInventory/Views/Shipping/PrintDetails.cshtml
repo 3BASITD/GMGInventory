@@ -19,16 +19,9 @@
     <table class="formatted shipping">
         <tr>
             <td rowspan="2" class="center-text">
-                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
-                {
                     <img src="~/images/BAS-02.png" class="logo" />
-                }
-                else
-                {
-                    <img src="~/images/GMG-01.png" class="logo" />
-                }
             </td>
-            <td style="width: 90%;">
+            <td class="left-text">
                 <div class="column center-text">
                     <dl>
                         <dd>BINA'S AUTO SUPPLY INC</dd>
@@ -37,6 +30,8 @@
                         <dd>SHIPPING LIST</dd>
                     </dl>
                 </div>
+            </td>
+            <td style="width: 10%;">
             </td>
         </tr>
     <tr>
