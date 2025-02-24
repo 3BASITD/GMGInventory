@@ -100,7 +100,7 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.RefNo.ToLower().Contains(form.SearchValue)
                                     || x.Check.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerCode.ToLower().Contains(form.SearchValue)
+                                    || x.CustomerName.ToLower().Contains(form.SearchValue)
                                     || x.Branch!.ToLower().Contains(form.SearchValue)
                                     || x.CollectDate.ToString().ToLower().Contains(form.SearchValue)
                                     || x.CheckNo!.ToLower().ToLower().Contains(form.SearchValue)
@@ -117,7 +117,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "RefNo": data = data.OrderBy(s => s.RefNo); break;
                         case "Check": data = data.OrderBy(s => s.Check); break;
-                        case "CustomerCode": data = data.OrderBy(s => s.CustomerCode); break;
+                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
                         case "Branch": data = data.OrderBy(s => s.Branch); break;
                         case "CollectDate": data = data.OrderBy(s => s.CollectDateD); break;
                         case "CheckNo": data = data.OrderBy(s => s.CheckNo); break;
@@ -133,7 +133,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "RefNo": data = data.OrderByDescending(s => s.RefNo); break;
                         case "Check": data = data.OrderByDescending(s => s.Check); break;
-                        case "CustomerCode": data = data.OrderByDescending(s => s.CustomerCode); break;
+                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
                         case "Branch": data = data.OrderByDescending(s => s.Branch); break;
                         case "CollectDate": data = data.OrderByDescending(s => s.CollectDateD); break;
                         case "CheckNo": data = data.OrderByDescending(s => s.CheckNo); break;
@@ -183,7 +183,7 @@ namespace GMGInventory.Application.Repositories
             return (await GetListAsync()).Any(s =>
             s.CollectDate == chequeVM.CollectDate &&
             s.RefNo == chequeVM.RefNo &&
-            s.CustomerCode == chequeVM.CustomerCode &&
+            s.CustomerName == chequeVM.CustomerName &&
             s.CheckDate == chequeVM.CheckDate &&
             s.Check == chequeVM.Check &&
             s.Branch == chequeVM.Branch &&
@@ -200,7 +200,7 @@ namespace GMGInventory.Application.Repositories
                             {
                                 CollectDateD = cheque.CollectDate,
                                 RefNo = cheque.RefNo,
-                                CustomerCode = cheque.Customer.Code,
+                                CustomerName = cheque.Customer.Name,
                                 CheckDateD = cheque.CheckDate,
                                 Check = cheque.Check,
                                 Branch = cheque.Branch,

@@ -23,7 +23,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
 
-        [Display(Name = "Pack Id")]
+        [Display(Name = "Pack Number")]
         public int PackId { get; set; }
         public int SalesOrderId { get; set; }
 

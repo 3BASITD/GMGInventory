@@ -67,37 +67,10 @@ namespace GMGInventory.Controllers
             return Json(await shippingRepository.GetItemsAsync(salesOrderId));
         }
 
-        //public async Task<IActionResult> GetInvoicedSalesOrderOptions(string search, int page)
-        //{
-        //    return Json(await shippingRepository.GetInvoicedSalesOrderOptions(search, page));
-        //}
-
-        //public async Task<IActionResult> PrintDetails(int Id, string? Company, string? Desc, string Freight)
-        //{
-        //    var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ShippingList, AccessTypes.Print);
-        //    if (redirectResult != null) return redirectResult;
-
-        //    var shipping = await shippingRepository.PrintDetailsAsync(Id);
-
-
-        //    //var items = await receiveRepository.GetItemListAsync(Id);
-
-        //    if (shipping == null || Company == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    TempData["CompanyLogo"] = Company;
-        //   // ViewData["Items"] = items;
-        //    return View(shipping);
-        //}
-
         public async Task<IActionResult> PrintDetails(JsonShippingModel shipping)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ShippingList, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
-
-            TempData["CompanyLogo"] = shipping.Company;
 
             return View(await shippingRepository.PrintDetailsAsync(shipping));
         }

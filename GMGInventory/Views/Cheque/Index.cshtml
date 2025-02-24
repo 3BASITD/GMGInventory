@@ -49,7 +49,7 @@
                         @Html.DisplayNameFor(model => model.RefNo)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.CustomerCode)
+                        @Html.DisplayNameFor(model => model.CustomerName)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.CheckDate)
@@ -252,7 +252,7 @@
                                 <th>Row #</th>
                                 <th>Collect Date</th>
                                 <th>Ref No</th>
-                                <th>Customer Code</th>
+                                <th>Customer Name</th>
                                 <th>Check Date</th>
                                 <th>Check</th>
                                 <th>Branch</th>
@@ -292,8 +292,8 @@
                     <dd class="col-sm-8 modal-detail-collectDate"></dd>
                     <dt class="col-sm-4">Ref No</dt>
                     <dd class="col-sm-8 modal-detail-refNo"></dd>
-                    <dt class="col-sm-4">Customer Code</dt>
-                    <dd class="col-sm-8 modal-detail-customerCode"></dd>
+                    <dt class="col-sm-4">Customer Name</dt>
+                    <dd class="col-sm-8 modal-detail-customerName"></dd>
                     <dt class="col-sm-4">Check Date</dt>
                     <dd class="col-sm-8 modal-detail-checkDate"></dd>
                     <dt class="col-sm-4">Check</dt>
@@ -548,7 +548,7 @@
             columns: [
                 { data: "collectDate", name: "CollectDate" },
                 { data: "refNo", name: "RefNo" },
-                { data: "customerCode", name: "CustomerCode" },
+                { data: "customerName", name: "CustomerName" },
                 { data: "checkDate", name: "CheckDate" },
                 { data: "check", name: "Check" },
                 { data: "branch", name: "Branch" },
@@ -578,7 +578,7 @@
                 var data = chequeDT.row($(this).parents('tr')).data();
                 $(".modal-detail-collectDate").html(data.collectDate);
                 $(".modal-detail-refNo").html(data.refNo);
-                $(".modal-detail-customerCode").html(data.customerCode);
+                $(".modal-detail-customerName").html(data.customerName);
                 $(".modal-detail-checkDate").html(data.checkDate);
                 $(".modal-detail-check").html(data.check);
                 $(".modal-detail-branch").html(data.branch);

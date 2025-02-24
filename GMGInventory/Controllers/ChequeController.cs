@@ -107,7 +107,7 @@ namespace GMGInventory.Controllers
             dt.Columns.AddRange([
                 new DataColumn("CollectDate"),
                 new DataColumn("RefNo"),
-                new DataColumn("CustomerCode"),
+                new DataColumn("CustomerName"),
                 new DataColumn("CheckDate"),
                 new DataColumn("Check"),
                 new DataColumn("Branch"),
@@ -121,7 +121,7 @@ namespace GMGInventory.Controllers
             {
                 dt.Rows.Add(cheque.CollectDate,
                     cheque.RefNo,
-                    cheque.CustomerCode,
+                    cheque.CustomerName,
                     cheque.CheckDate,
                     cheque.Check,
                     cheque.Branch,
