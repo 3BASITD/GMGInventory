@@ -431,16 +431,17 @@ namespace GMGInventory.Application.Repositories
                                Agent = invoice.Invoice.SalesOrder.Agent.FirstName
                                          + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
                                          + invoice.Invoice.SalesOrder.Agent.LastName,
-                               Area = invoice.Invoice.SalesOrder.Customer.Area.Name,
+                               Area = invoice.Invoice.SalesOrder.Agent.Area.Name,
                                InvoiceDateD = invoice.Invoice.InvoiceDate,
                                InvoiceNumber = invoice.Invoice.InvoiceNumber,
                                InvoiceAmountD = invoice.UnitPrice * invoice.Quantity,
-                               CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
-                                               ? invoice.Invoice.SalesOrder.Agent.CommissionRate
+                               CommissionRateD = invoice.Invoice.SalesOrder.Customer.CommissionRate != null
+                                               ? invoice.Invoice.SalesOrder.Customer.CommissionRate.Value
                                                : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
-                               CommissionAmount2D = (invoice.UnitPrice * invoice.Quantity) * (invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
-                                               ? invoice.Invoice.SalesOrder.Agent.CommissionRate
-                                               : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate) / 100,
+                               CommissionAmount2D = (invoice.UnitPrice * invoice.Quantity)
+                                                  * (invoice.Invoice.SalesOrder.Customer.CommissionRate != null
+                                                   ? invoice.Invoice.SalesOrder.Customer.CommissionRate.Value
+                                                   : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate) / 100,
                                Customer = invoice.Invoice.SalesOrder.Customer.Name
                            };
             var invoicelist = await invoices.ToListAsync();
@@ -859,16 +860,15 @@ namespace GMGInventory.Application.Repositories
                                      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) + " "
                                      + invoice.SalesOrder.Agent.LastName,
                                AmountD = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
-                               //CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
-                               //                ? invoice.Invoice.SalesOrder.Agent.CommissionRate
-                               //                : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
                                CustomerCode = invoice.SalesOrder.Customer.Code,
                                CustomerName = invoice.SalesOrder.Customer.Name,
                                InvoiceDateD = invoice.InvoiceDate,
                                InvoiceNumber = invoice.InvoiceNumber,
                                BIRInvoiceNumber = invoice.ControlNumber,
                                Term = invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.SalesOrder.Customer.CreditTerm.Name,
-                               PercentD = invoice.SalesOrder.Agent.CommissionRate
+                               PercentD = invoice.SalesOrder.Customer.CommissionRate != null
+                                        ? invoice.SalesOrder.Customer.CommissionRate.Value
+                                        : invoice.SalesOrder.Agent.Area.CommissionRate
                            };
             return await invoices.ToListAsync();
         }

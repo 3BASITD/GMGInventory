@@ -743,8 +743,8 @@
                     $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
                     $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
                     if (checkIfRequired("SONumber")) {
-                        $("#add-quantity").val($("#add-code").select2("data")[0].quantity);
-                        $("#add-quantity").attr("data-max-quantity", $("#add-code").select2("data")[0].quantity);
+                        $("#add-quantity").val($("#add-code").select2("data")[0].quantityD);
+                        $("#add-quantity").attr("data-max-quantity", $("#add-code").select2("data")[0].quantityD);
                     } else {
                         $("#add-quantity").val("0");
                         $("#add-quantity").attr("data-max-quantity", "1999999");

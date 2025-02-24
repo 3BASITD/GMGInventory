@@ -7,10 +7,7 @@ namespace GMGInventory.Data
         public Invoice()
         {
             this.CustomerPaymentDetails = new HashSet<CustomerPaymentDetail>();
-            //this.CreditDebitMemos = new HashSet<CreditDebitMemo>();
             this.InvoiceLineItems = new HashSet<InvoiceLineItem>();
-            //this.InvoicePayments = new HashSet<InvoicePayment>();
-            //this.PaymentDetails = new HashSet<PaymentDetail>();
             this.SOACRLineItems = new HashSet<SOACRLineItem>();
         }
 
@@ -36,9 +33,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string ControlNumber { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal PaidAmount { get; set; }
-
         [Column(TypeName = "nvarchar(250)")]
         public string Remarks { get; set; }
 
@@ -53,10 +47,7 @@ namespace GMGInventory.Data
         public DateTime? DisapprovedDate { get; set; }
 
         public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
-        //public ICollection<CreditDebitMemo> CreditDebitMemos { get; set; }
         public ICollection<InvoiceLineItem> InvoiceLineItems { get; set; }
-        //public ICollection<InvoicePayment> InvoicePayments { get; set; }
-        //public ICollection<PaymentDetail> PaymentDetails { get; set; }
         public ICollection<SOACRLineItem> SOACRLineItems { get; set; }
 
     }

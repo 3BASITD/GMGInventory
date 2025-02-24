@@ -175,17 +175,13 @@ namespace GMGInventory.Common.Models
         public decimal FreightChargeD { get; set; }
         public string? FreightReferenceNumber { get; set; }
 
-        [Display(Name = "Freight's Waybill")]
-        public string FreightWaybill { get; set; }
-
         private decimal BalanceComputation => InvoiceAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD;
 
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
-        //public decimal BalanceD => Math.Max(0, BalanceComputation);
-        public decimal BalanceD => BalanceComputation; // > 0 ? BalanceComputation : 0;
+        public decimal BalanceD => BalanceComputation;
 
-        public bool IsPaid { get; set; }
+        public bool IsPaid => BalanceComputation <= 0;
     }
 
     public class SOACRItemsForm
@@ -197,7 +193,6 @@ namespace GMGInventory.Common.Models
         public string DebitReference { get; set; }
         public decimal FreightCharge { get; set; }
         public string FreightReference { get; set; }
-        public string FreightWaybill { get; set; }
     }
 
     public class SOACRPaymentDetails

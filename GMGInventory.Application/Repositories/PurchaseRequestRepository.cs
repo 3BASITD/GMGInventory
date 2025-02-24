@@ -207,8 +207,14 @@ namespace GMGInventory.Application.Repositories
                                       into sg
                             from soli in sg.DefaultIfEmpty()
                             let ii = context.ItemInventories
-                                            .Where(s => s.ItemId == request.ItemId && s.Warehouse.Code.ToLower().Contains("main"))
-                                                   .Sum(s => (int?)s.Quantity) ?? 0
+                                            .Where(s => s.ItemId == request.ItemId 
+                                                     && s.Warehouse.Code.ToLower().Contains("main"))
+                                            .Sum(s => (int?)s.Quantity) ?? 0
+                            let requests = context.PurchaseRequestLineItems
+                                                  .Where(s => s.SalesOrderId == soli.SalesOrderId
+                                                           && s.ItemId == soli.ItemId
+                                                           && s.PurchaseRequest.Status.Name.ToLower() == "approved")
+                                                  .Sum(s => (int?)s.Quantity) ?? 0
                             where request.PurchaseRequestId == purchaseRequestId
                             select new PurchaseRequestLineItemVM
                             {
@@ -223,7 +229,7 @@ namespace GMGInventory.Application.Repositories
                                 ItemDescription = request.ItemDescription,
                                 StockOnHandD = ii,
                                 QuantityD = request.Quantity,
-                                MaxQuantityD = (soli == null ? 0 : soli.Quantity) - ii,
+                                MaxQuantityD = (soli == null ? 0 : soli.Quantity) - (ii + requests), 
                                 UnitId = request.Unit != null ? request.Unit.Id
                                        : request.Item != null ? request.Item.Unit.Id
                                        : 0,

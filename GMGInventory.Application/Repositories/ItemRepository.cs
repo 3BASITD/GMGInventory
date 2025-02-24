@@ -65,7 +65,7 @@ namespace GMGInventory.Application.Repositories
                             Name = item.Name,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
-                            Quantity = 0,
+                            QuantityD = 0,
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code
@@ -82,18 +82,18 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonItemOptionsModel>> GetPOItemOptions(int id, string search)
         {
             var items = await context.PurchaseOrderLineItems.Include(s => s.Item)
-                                .Where(s => s.PurchaseOrderId == id &&
-                                            string.IsNullOrWhiteSpace(search)
-                                         || (s.Item.Code.ToLower().Contains(search.ToLower())))
-                                .Select(s => new JsonItemOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.Item.Code,
-                                    Name = s.Item.Name,
-                                    Quantity = 0,
-                                    Unit = s.Item.Unit.Code
-                                })
-                                .ToListAsync();
+                                     .Where(s => s.PurchaseOrderId == id 
+                                              && (string.IsNullOrWhiteSpace(search)
+                                              || (s.Item.Code.ToLower().Contains(search.ToLower()))))
+                                    .Select(s => new JsonItemOptionsModel
+                                    {
+                                        Id = s.Id.ToString(),
+                                        Text = s.Item.Code,
+                                        Name = s.Item.Name,
+                                        QuantityD = 0,
+                                        Unit = s.Item.Unit.Code
+                                    })
+                                    .ToListAsync();
 
             return new Select2Model<JsonItemOptionsModel>
             {
@@ -113,15 +113,20 @@ namespace GMGInventory.Application.Repositories
                                              .Take(1)
                                              .DefaultIfEmpty()
                         let ii = context.ItemInventories
-                                        .Where(s=>s.ItemId == item.Id)
-                                        .Select(s=>s.Quantity)
-                                        .Sum()
+                                        .Where(s => s.ItemId == item.Id
+                                                 && s.Warehouse.Code.ToLower().Contains("main"))
+                                        .Sum(s => s.Quantity)
+                        let requests = context.PurchaseRequestLineItems
+                                              .Where(s => s.SalesOrderId == soitem.SalesOrderId
+                                                       && s.ItemId == soitem.ItemId
+                                                       && s.PurchaseRequest.Status.Name.ToLower() == "approved")
+                                              .Sum(s => (int?)s.Quantity) ?? 0
                         where item.IsActive == true
                            && soitem.SalesOrderId == SalesOrderId
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
                            || item.Name.ToLower().Contains(search.ToLower()))
-                           && (soitem.Quantity > 0 || soitem.Quantity > ii)
+                           && soitem.Quantity > (ii + requests)
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {
@@ -131,8 +136,7 @@ namespace GMGInventory.Application.Repositories
                             Name = item.Name,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
-                            //Quantity = soitem.Quantity - (packedQuantity - returnedQuantity),
-                            Quantity = soitem.Quantity - ii,
+                            QuantityD = soitem.Quantity - (ii + requests),
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code
@@ -224,7 +228,7 @@ namespace GMGInventory.Application.Repositories
                                    Id = item.ItemId.ToString(),
                                    Text = item.Item.Code,
                                    Name = item.Item.Name,
-                                   Quantity = item.Quantity,
+                                   QuantityD = item.Quantity,
                                    Unit = item.Item.Unit.Code
                                }).ToListAsync();
 

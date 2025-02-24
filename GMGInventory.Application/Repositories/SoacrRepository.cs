@@ -180,13 +180,9 @@ namespace GMGInventory.Application.Repositories
                 {
                     SOACRId = soa.Id,
                     InvoiceId = invoice.Id,
-                    InvoiceAmount = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
-                    PaidAmount = 0,
                     CreditAmount = 0,
                     DebitAmount = 0,
-                    FreightCost = 0,
-                    FreightWaybill = "",
-                    IsPaid = false
+                    FreightCost = 0
                 };
                 await context.SOACRLineItems.AddAsync(inv);
                 await context.SaveChangesAsync(currentUserId);
@@ -395,14 +391,9 @@ namespace GMGInventory.Application.Repositories
                 {
                     SOACRId = soa.Id,
                     InvoiceId = invoice.Id,
-                    InvoiceAmount = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
-                    PaidAmount = 0,
-                    //TBRAmount = 0,
                     CreditAmount = 0,
                     DebitAmount = 0,
-                    FreightCost = 0,
-                    FreightWaybill = "",
-                    IsPaid = false
+                    FreightCost = 0
                 };
                 await context.SOACRLineItems.AddAsync(soali);
                 await context.SaveChangesAsync(currentUserId);
@@ -432,26 +423,34 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<SOACRItemsVM>> GetSOACRItemsAsync(int id)
         {
             var soa = from sl in context.SOACRLineItems
-                      let tbr = context.SOACRLineItemTBRs.Where(s => s.SOACRLineItemId == sl.Id).Sum(s => s.Amount)
+                      let inv = sl.Invoice
+                                  .InvoiceLineItems
+                                  .Sum(s => s.Quantity * s.UnitPrice)
+                      let tbr = context.SOACRLineItemTBRs
+                                       .Where(s => s.SOACRLineItemId == sl.Id)
+                                       .Sum(s => s.Amount)
+                      let pay = context.CustomerPaymentDetails
+                                       .Where(s => s.InvoiceId == sl.InvoiceId
+                                                && s.CustomerPayment.SOACR.Id == sl.SOACR.Id)
+                                       .Select(s => (decimal?)s.PaidAmount)
+                                       .FirstOrDefault() ?? 0
                       where sl.SOACR.Id == id
                       select new SOACRItemsVM
                       {
                           Id = sl.Id,
-                          InvoiceDateD = /*sl.Invoice.DateModified ?? */sl.Invoice.DateCreated,
+                          InvoiceDateD = sl.Invoice.DateCreated,
                           InvoiceNumber = sl.Invoice.InvoiceNumber,
-                          InvoiceAmountD = sl.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice),
+                          InvoiceAmountD = inv,
                           InvoiceType = sl.Invoice.InvoiceType.Code,
                           InvoiceId = sl.Invoice.Id,
-                          IsPaid = sl.IsPaid ?? false,
                           TBRD = tbr,
                           CreditD = sl.CreditAmount,
                           CreditReferenceNumber = sl.CreditReferenceNumber,
                           DebitD = sl.DebitAmount,
                           DebitReferenceNumber = sl.DebitReferenceNumber,
-                          PaidAmountD = sl.PaidAmount,
+                          PaidAmountD = pay,
                           FreightChargeD = sl.FreightCost,
-                          FreightReferenceNumber = sl.FreightReferenceNumber,
-                          FreightWaybill = sl.FreightWaybill + ""
+                          FreightReferenceNumber = sl.FreightReferenceNumber
                       };
             return await soa.ToListAsync();
         }
@@ -475,7 +474,6 @@ namespace GMGInventory.Application.Repositories
                                     || x.DebitD.ToString().Contains(form.SearchValue)
                                     || x.PaidAmountD.ToString().Contains(form.SearchValue)
                                     || x.FreightChargeD.ToString().Contains(form.SearchValue)
-                                    || x.FreightWaybill.ToLower().Contains(form.SearchValue)
                                     || x.BalanceD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -496,7 +494,6 @@ namespace GMGInventory.Application.Repositories
                         case "Debit": data = data.OrderBy(s => s.DebitD); break;
                         case "PaidAmount": data = data.OrderBy(s => s.PaidAmountD); break;
                         case "FreightCharge": data = data.OrderBy(s => s.FreightChargeD); break;
-                        case "FreightWaybill": data = data.OrderBy(s => s.FreightWaybill); break;
                         case "Balance": data = data.OrderBy(s => s.BalanceD); break;
                         default: break;
                     }
@@ -514,7 +511,6 @@ namespace GMGInventory.Application.Repositories
                         case "Debit": data = data.OrderByDescending(s => s.DebitD); break;
                         case "PaidAmount": data = data.OrderByDescending(s => s.PaidAmountD); break;
                         case "FreightCharge": data = data.OrderByDescending(s => s.FreightChargeD); break;
-                        case "FreightWaybill": data = data.OrderByDescending(s => s.FreightWaybill); break;
                         case "Balance": data = data.OrderByDescending(s => s.BalanceD); break;
                         default: break;
                     }
@@ -546,12 +542,9 @@ namespace GMGInventory.Application.Repositories
             soa.CreditReferenceNumber = soaVM.CreditReference;
             soa.FreightCost = soaVM.FreightCharge;
             soa.FreightReferenceNumber = soaVM.FreightReference;
-            soa.FreightWaybill = soaVM.FreightWaybill;
 
             context.SOACRLineItems.Update(soa);
             await context.SaveChangesAsync(currentUserId);
-
-            await SetSOACRLineItemIfPaid(soa);
         }
 
         public async Task<bool> IsSOACRLineItemIdExist(int id)
@@ -621,59 +614,50 @@ namespace GMGInventory.Application.Repositories
             {
                 if (PaymentAmount > 0)
                 {
-                    var soacrLineItem = await context.SOACRLineItems
-                                                     .Where(s => s.InvoiceId == InvoiceId)
-                                                     .FirstOrDefaultAsync();
-                    if (soacrLineItem != null)
+                    var invoicePayment = await context.InvoiceLineItems
+                                                      .Where(s => s.InvoiceId == InvoiceId)
+                                                      .SumAsync(s => s.Quantity * s.UnitPrice);
+                    var paymentDetails = await context.CustomerPaymentDetails
+                                                      .Where(s => s.InvoiceId == InvoiceId
+                                                               && s.CustomerPayment.SOACR.Id == soacr.Id)
+                                                      .FirstOrDefaultAsync();
+                    var toPay = 0m;
+                    if (paymentDetails == null)
                     {
-                        var invoice = await context.Invoices.Where(s => s.Id == InvoiceId).FirstAsync();
-                        //if (soacrLineItem.InvoiceAmount >= soacrLineItem.PaidAmount) // check if soa line item can pay
-                        //InvoiceAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD
-                        var tbrs = await context.SOACRLineItemTBRs
-                                                .Where(s => s.SalesReturnLineItemId == soacrLineItem.Id)
-                                                .SumAsync(s => (decimal?)s.Amount) ?? 0;
-                        //if (soacrLineItem.InvoiceAmount >= soacrLineItem.PaidAmount)
-                        if (soacrLineItem.InvoiceAmount >= tbrs + soacrLineItem.CreditAmount - soacrLineItem.DebitAmount + soacrLineItem.PaidAmount - soacrLineItem.FreightCost)
+                        if (invoicePayment <= PaymentAmount)
                         {
-                            //var toPay = soacrLineItem.InvoiceAmount - soacrLineItem.PaidAmount;
-                            var toPay = soacrLineItem.InvoiceAmount - tbrs - soacrLineItem.CreditAmount + soacrLineItem.DebitAmount - soacrLineItem.PaidAmount + soacrLineItem.FreightCost;
-                            if (toPay >= PaymentAmount)
-                            {
-                                soacrLineItem.PaidAmount += PaymentAmount;
-                                invoice.PaidAmount += PaymentAmount;
-                                PaymentAmount = 0;
-                            }
-                            else
-                            {
-                                soacrLineItem.PaidAmount += toPay;
-                                invoice.PaidAmount += toPay;
-                                PaymentAmount -= toPay;
-
-                                //if (payment.InvoiceIds.Last() == InvoiceId) // overpayment to last soa line item
-                                //{
-                                //    //soacrLineItem.PaidAmount += PaymentAmount;
-                                //    //invoice.PaidAmount += PaymentAmount;
-                                //    customerPayment.OverPayment += PaymentAmount;
-                                //    context.CustomerPayments.Update(customerPayment);
-                                //}
-                            }
+                            toPay = invoicePayment;
+                            PaymentAmount -= invoicePayment;
                         }
-
-                        //soacrLineItem.IsPaid = soacrLineItem.PaidAmount >= soacrLineItem.InvoiceAmount;
-                        //context.SOACRLineItems.Update(soacrLineItem);
-                        await SetSOACRLineItemIfPaid(soacrLineItem);
-
-                        context.Invoices.Update(invoice);
-                        await context.SaveChangesAsync(currentUserId);
+                        else
+                        {
+                            toPay = PaymentAmount;
+                            PaymentAmount = 0;
+                        }
+                        paymentDetails = new CustomerPaymentDetail
+                        {
+                            InvoiceId = InvoiceId,
+                            CustomerPaymentId = customerPayment.Id,
+                            PaidAmount = toPay
+                        };
+                        await context.CustomerPaymentDetails.AddAsync(paymentDetails);
                     }
-
-                    var paymentDetails = new CustomerPaymentDetail
+                    else
                     {
-                        CustomerPaymentId = customerPayment.Id,
-                        InvoiceId = InvoiceId
-                    };
-
-                    await context.CustomerPaymentDetails.AddAsync(paymentDetails);
+                        var remainingPayment = invoicePayment - paymentDetails.PaidAmount;
+                        if (remainingPayment <= PaymentAmount)
+                        {
+                            toPay = remainingPayment;
+                            PaymentAmount -= invoicePayment;
+                        }
+                        else
+                        {
+                            toPay = PaymentAmount;
+                            PaymentAmount = 0;
+                        }
+                        paymentDetails.PaidAmount += toPay;
+                        context.CustomerPaymentDetails.Update(paymentDetails);
+                    }
                     await context.SaveChangesAsync(currentUserId);
                 }
             }
@@ -695,7 +679,7 @@ namespace GMGInventory.Application.Repositories
                               CustomerCode = soacr.Customer.Code,
                               CustomerName = soacr.Customer.Name,
                               Contents = items,
-                              TotalInvoiceAmountD = litems.Sum(s => s.InvoiceAmount),
+                              TotalInvoiceAmountD = litems.Sum(s => s.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)),
                               ////TotalTBRD = litems.Sum(s => s.TBRAmount),
                               //TotalTBRD = tbr,
                               //TotalCreditD = litems.Sum(s => s.CreditAmount),
@@ -712,8 +696,7 @@ namespace GMGInventory.Application.Repositories
             var items = (await GetSOACRItemsAsync(id)).OrderByDescending(s => s.InvoiceDateD).ToList();
 
             var soacrVM = from soacr in context.SOACRs
-                          let litems = context.SOACRLineItems.Where(s => s.SOACRId == id).ToList()
-                          //let tbr = context.SOACRLineItemTBRs.Where(s => litems.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
+                          let litems = soacr.SOACRLineItems.Where(s => s.SOACRId == id).ToList()
                           where soacr.Id == id
                           select new SOACRDetailsPVM
                           {
@@ -725,12 +708,7 @@ namespace GMGInventory.Application.Repositories
                               CreditTerm = soacr.Customer.CreditTerm.Name,
                               DateFromD = soacr.SOAFrom,
                               DateToD = soacr.SOATo,
-                              TotalInvoiceAmountD = litems.Sum(s => s.InvoiceAmount),
-                              ////TotalTBRD = litems.Sum(s => s.TBRAmount),
-                              //TotalTBRD = tbr,
-                              //TotalCreditD = litems.Sum(s => s.CreditAmount),
-                              //TotalDebitD = litems.Sum(s => s.DebitAmount),
-                              //TotalPaidAmountD = litems.Sum(s => s.PaidAmount),
+                              TotalInvoiceAmountD = litems.Sum(s => s.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)),
                               TotalFreightCostD = litems.Sum(s => s.FreightCost)
                           };
 
@@ -746,14 +724,9 @@ namespace GMGInventory.Application.Repositories
                 {
                     SOACRId = soaId,
                     InvoiceId = invoiceId,
-                    InvoiceAmount = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
-                    PaidAmount = 0,
-                    //TBRAmount = 0,
                     CreditAmount = 0,
                     DebitAmount = 0,
-                    FreightCost = 0,
-                    FreightWaybill = "",
-                    IsPaid = false
+                    FreightCost = 0
                 };
                 await context.SOACRLineItems.AddAsync(soali);
                 await context.SaveChangesAsync(currentUserId);
@@ -852,7 +825,7 @@ namespace GMGInventory.Application.Repositories
                 }
             }
             //pagination
-            var pageList = form.PageSize == -1 ? data : data.Skip(form.Skip).Take(form.PageSize); // with added pagesize for All
+            var pageList = form.PageSize == -1 ? data : data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
             return new ForDataTables<SOACRInvoiceTBRHistoryVM>
             {
@@ -863,15 +836,6 @@ namespace GMGInventory.Application.Repositories
             };
         }
         #endregion
-
-        private async Task SetSOACRLineItemIfPaid(SOACRLineItem soacrLineItem)
-        {
-            var tbr = await context.SOACRLineItemTBRs.Where(s => s.SOACRLineItemId == soacrLineItem.Id).SumAsync(s => s.Amount);
-            var comp = soacrLineItem.InvoiceAmount - tbr - soacrLineItem.CreditAmount + soacrLineItem.DebitAmount - soacrLineItem.PaidAmount + soacrLineItem.FreightCost;
-            soacrLineItem.IsPaid = comp <= 0;
-            context.SOACRLineItems.Update(soacrLineItem);
-            await context.SaveChangesAsync(currentUserId);
-        }
 
 
 

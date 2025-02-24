@@ -15,7 +15,7 @@
                     <span class="fas fa-plus"></span> New Agent
                 </button>
             }
-            @await Html.PartialAsync("AgentFilter", ViewData["AgentFilter"])
+            @* @await Html.PartialAsync("AgentFilter", ViewData["AgentFilter"]) *@
             @if (userAccess.CanUploadDownload)
             {
                 <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">

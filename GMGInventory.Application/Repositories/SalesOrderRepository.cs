@@ -87,11 +87,14 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page, int? regionId)
         {
-            var soWithUnserved = from soli in context.SalesOrderLineItems
-                                 join ii in context.ItemInventories on soli.ItemId equals ii.ItemId into inv
-                                 from ii in inv.DefaultIfEmpty()
-                                 where ii != null && soli.Quantity > ii.Quantity
-                                 select soli.SalesOrderId;
+            var lackOrders = from soitem in context.SalesOrderLineItems
+                             join inventory in context.ItemInventories on soitem.ItemId equals inventory.ItemId into inv
+                             from inventory in inv.DefaultIfEmpty()
+                             join request in context.PurchaseRequestLineItems on soitem.SalesOrderId equals request.SalesOrderId into req
+                             from request in req.DefaultIfEmpty()
+                             where soitem.Quantity > (inventory == null ? 0 : inventory.Quantity) + (request == null ? 0 : request.Quantity)
+                             select soitem.SalesOrderId
+;
 
             var orders = from order in context.SalesOrders
                          where order.Status.Code.ToLower() != "submitted"
@@ -99,8 +102,8 @@ namespace GMGInventory.Application.Repositories
                          && order.Status.Code.ToLower() != "draft"
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
-                         && soWithUnserved.Contains(order.Id)
                          && (regionId == null || order.Customer.Area.Region.Id == regionId)
+                         && lackOrders.Contains(order.Id)
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
                          {
