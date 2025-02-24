@@ -382,7 +382,7 @@
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
                 columnDTTotalInteger(api, 4);
-                columnDTTotalInteger(api, 7);
+                columnDTTotalDecimal(api, 7);
             }
         });
 
@@ -429,14 +429,26 @@
                     var row = itemDT.row(tr);
                     var rowData = row.data();
 
-                    rowData.quantity = FormatStringInteger(0);
-                    rowData.quantityD = 0;
-                    rowData.totalAmount = FormatStringDecimal(0);
-                    rowData.totalAmountD = 0;
                     if ($(this).prop("checked")) {
+
                         rowData.toReceive = true;
                         tr.removeClass("text-muted");
+
+                        var quantityValue = rowData.orderQuantityD;
+                        var totalValue = quantityValue * rowData.unitCostD;
+
+                        rowData.quantity = FormatStringInteger(quantityValue);
+                        rowData.quantityD = quantityValue;
+
+                        rowData.totalAmount = FormatStringDecimal(totalValue);
+                        rowData.totalAmountD = totalValue;
+
                     } else {
+                        rowData.quantity = FormatStringInteger(0);
+                        rowData.quantityD = 0;
+                        rowData.totalAmount = FormatStringDecimal(0);
+                        rowData.totalAmountD = 0;
+
                         rowData.toReceive = false;
                         tr.addClass("text-muted");
                     }
@@ -460,6 +472,8 @@
                     toastr.warning("No item to receive. Select an item on the list to continue", "Warning");
                 } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't receive an item with 0 quantity", "Warning");
+                } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) > parseInt(s.orderQuantityD)).length > 0) {
+                    toastr.warning("Some items exceed purchase order quantity. Can't receive an item that exceeds purchase order quantity.", "Warning");
                 } else {
                     $.ajax({
                         type: "POST",
@@ -486,7 +500,9 @@
                     var row_data = this.data();
                     row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
                     row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
-                    item_to_receive.push(row_data);
+
+                    if (row_data.toReceive == true)
+                        item_to_receive.push(row_data);
                 });
                 return item_to_receive;
             }
@@ -572,5 +588,7 @@
                 });
             }
         }
+
+       
     </script>
 }

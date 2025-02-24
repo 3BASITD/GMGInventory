@@ -8,6 +8,7 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<PurchaseReceiveVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseReceiveFilter filter);
         Task<PurchaseReceiveDetailsVM?> GetDetails(int receivingId);
         Task<IList<PurchaseReceiveLineItemVM>> GetItemListAsync(int purchaseRequestId);
+        Task<IList<PurchaseReceiveLineItemVM>> GetItemPrintListAsync(int purchaseRequestId);
         Task<ResponseModel> SaveItemsAsync(IList<PurchaseReceiveLineItemVM> Items, int receiveId, string? status = null);
         Task<ResponseModel<int>> AddAsync(PurchaseReceiveSaveVM form, List<PurchaseReceiveLineItemVM> Items);
         Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId);
@@ -15,5 +16,7 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> DisapproveAsync(int requestId, string? reason);
         Task<string> GetNewDocumentNumber();
         Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseOrderItemOptions(int PurchaseOrderId);
+
+
     }
 }

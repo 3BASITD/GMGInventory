@@ -169,17 +169,51 @@ namespace GMGInventory.Application.Repositories
 
             var receiveVM = from order in context.PurchaseOrderNewLineItems
 
-                            join receive in context.PurchaseReceivingLineItems on order.Id equals receive.OrderItemId into rcv
-                            from receive in rcv.DefaultIfEmpty()
+                            let receive = context.PurchaseReceivingLineItems
+                                         .Where(s => s.OrderItemId == order.Id && s.PurchaseReceivingId == purchaseReceivingId).FirstOrDefault()
                             where order.PurchaseOrderId == orderId
-                            && (receive == null || receive.PurchaseReceivingId == purchaseReceivingId)
+
                             select new PurchaseReceiveLineItemVM
                             {
                                 Id = receive == null ? 0 : receive.Id,
                                 ToReceive = receive != null,
-                                PurchaseReceivingId = receive.PurchaseReceivingId,
+                                PurchaseReceivingId = receive != null? receive.PurchaseReceivingId : 0,
                                 LineNumber = order.LineNumber,
-                                OrderItemId = receive.OrderItemId,
+                                OrderItemId = order.Id,
+                                ItemId = order.RequestItem.Item == null ? null : order.RequestItem.Item.Id,
+                                ItemCode = order.RequestItem.Item == null ? null : order.RequestItem.Item.Code,
+                                ItemPartNumber = order.RequestItem.Item == null ? null : order.RequestItem.Item.PartNumber,
+                                ItemDescription = order.RequestItem.ItemDescription,
+                                QuantityD = receive == null ? 0 : receive.Quantity,
+                                OrderQuantityD = order.Quantity,
+                                UnitId = order.RequestItem.Item == null ? order.RequestItem.Unit.Id : order.RequestItem.Item.Unit.Id,
+                                UnitCode = order.RequestItem.Item == null ? order.RequestItem.Unit.Code : order.RequestItem.Item.Unit.Code,
+                                UnitCostD = order.UnitCost
+                            };
+            return await receiveVM.ToListAsync();
+        }
+        public async Task<IList<PurchaseReceiveLineItemVM>> GetItemPrintListAsync(int purchaseReceivingId)
+        {
+            var orderId = await context.PurchaseReceivings
+                                             .Where(s => s.Id == purchaseReceivingId)
+                                             .Select(s => s.PurchaseOrderId)
+                                             .FirstOrDefaultAsync();
+
+            var receiveVM = from order in context.PurchaseOrderNewLineItems
+
+                            join receive in context.PurchaseReceivingLineItems on order.Id equals receive.OrderItemId into rcv
+                            from receive in rcv.DefaultIfEmpty()
+
+                            where order.PurchaseOrderId == orderId
+                            && (receive == null || receive.PurchaseReceivingId == purchaseReceivingId)
+
+                            select new PurchaseReceiveLineItemVM
+                            {
+                                Id = receive == null ? 0 : receive.Id,
+                                ToReceive = receive != null,
+                                PurchaseReceivingId = receive != null ? receive.PurchaseReceivingId : 0,
+                                LineNumber = order.LineNumber,
+                                OrderItemId = order.Id,
                                 ItemId = order.RequestItem.Item == null ? null : order.RequestItem.Item.Id,
                                 ItemCode = order.RequestItem.Item == null ? null : order.RequestItem.Item.Code,
                                 ItemPartNumber = order.RequestItem.Item == null ? null : order.RequestItem.Item.PartNumber,
@@ -336,7 +370,13 @@ namespace GMGInventory.Application.Repositories
                     WarehouseId = purchaseOrder!.DeliveryAddressId
                 };
                 await context.PurchaseReceivings.AddAsync(receive);
-                await context.SaveChangesAsync(currentUserId);
+
+                try {
+                  await context.SaveChangesAsync(currentUserId);
+                }
+                catch (Exception ex) { 
+                
+                }
 
                 if (previousReceive != null)
                 {
