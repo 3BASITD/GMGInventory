@@ -285,7 +285,7 @@ namespace GMGInventory.Application.Repositories
                               InvoiceDateD = pay.Invoice.InvoiceDate,
                               InvoiceType = pay.Invoice.InvoiceType.Name,
                               InvoiceAmountD = pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice),
-                              BalanceAmountD = Math.Max(0, pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice) - pay.Invoice.PaidAmount),
+                              BalanceAmountD = Math.Max(0, pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice) - pay.PaidAmount),
                               PackNo = pay.Invoice.Pack.Id,
                               SalesOrderNo = pay.Invoice.SalesOrder.SalesOrderNumber
                           };

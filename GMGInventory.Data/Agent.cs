@@ -22,11 +22,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string LastName { get; set; }
 
-        public DateTime DateHired { get; set; }
-
-        [Column(TypeName = "decimal(18, 5)")]
-        public decimal CommissionRate { get; set; }
-
         [ForeignKey("AreaId")]
         public int AreaId { get; set; }
         public Area Area { get; set; }

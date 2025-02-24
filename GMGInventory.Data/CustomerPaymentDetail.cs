@@ -16,5 +16,8 @@ namespace GMGInventory.Data
         [ForeignKey("InvoiceId")]
         public int InvoiceId { get; set; }
         public Invoice Invoice { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal PaidAmount { get; set; }
     }
 }

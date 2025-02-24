@@ -35,20 +35,25 @@ namespace GMGInventory.Application.Repositories
                                       on inv.Id equals soali.InvoiceId
                            join soacr in context.SOACRs
                                       on soali.SOACRId equals soacr.Id into soacrs
-                           from soacrsGroup in soacrs.DefaultIfEmpty()
+                           from soacr in soacrs.DefaultIfEmpty()
+                           let pay = context.CustomerPaymentDetails
+                                            .Where(s => s.InvoiceId == inv.Id
+                                                     && s.CustomerPayment.SOACRId == soali.SOACRId)
+                                            .Select(s => s.PaidAmount)
+                                            .Sum()
                            let tbr = context.SOACRLineItemTBRs.Where(s => s.SOACRLineItemId == soali.Id).Sum(s => s.Amount)
                            where (string.IsNullOrWhiteSpace(search)
                               || inv.InvoiceNumber.ToLower().Contains(search.ToLower()))
                            select new JsonInvoiceOptionsModel
                            {
                                Id = inv.Id.ToString(),
-                               Customer = soacrsGroup.Customer.Name,
+                               Customer = soacr.Customer.Name,
                                InvoiceNumber = inv.InvoiceNumber,
                                TotalAmountD = inv.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
                                TBRD = tbr,
                                CreditD = soali.CreditAmount,
                                DebitD = soali.DebitAmount,
-                               PaidAmountD = soali.PaidAmount,
+                               PaidAmountD = pay,
                                FreightChargeD = soali.FreightCost
                            };
             var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();

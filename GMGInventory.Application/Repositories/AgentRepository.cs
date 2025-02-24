@@ -429,7 +429,8 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsAgentInUse(int id)
         {
-            return await context.Areas.AnyAsync(s => s.Id == id);
+            return await context.Customers.AnyAsync(s => s.AgentId == id)
+                || await context.SalesOrders.AnyAsync(s => s.AgentId == id);
         }
 
         public async Task<bool> IsAgentIdExistAsync(int id)

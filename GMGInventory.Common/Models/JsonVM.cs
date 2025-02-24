@@ -100,7 +100,8 @@ namespace GMGInventory.Common.Models
         public string Text { get; set; }
         public string Name { get; set; }
         public string PartNumber { get; set; }
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
         public int UnitId { get; set; }
         public string Unit { get; set; }
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
