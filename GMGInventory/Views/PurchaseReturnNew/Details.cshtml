@@ -583,7 +583,7 @@
                 } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't return an item with 0 quantity", "Warning");
                 } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) > parseInt(s.receivedQuantityD)).length > 0) {
-                    toastr.warning("Some items exceed purchase receive quantity. Can't receive an item that exceeds purchase receive quantity", "Warning");
+                    toastr.warning("Some items exceed purchase receive quantity. Can't return an item that exceeds purchase receive quantity", "Warning");
                 } else {
                     $.ajax({
                         type: "POST",
