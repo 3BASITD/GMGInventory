@@ -303,6 +303,7 @@
         $(".btnFilter").on("click", function () {
             var groupBy = $("#groupby").val();
             if (groupBy == '') {
+                purchaseReceivingDT.columns().visible(true);
                 purchaseReceivingDT.rowGroup().disable().draw();
             }
             else

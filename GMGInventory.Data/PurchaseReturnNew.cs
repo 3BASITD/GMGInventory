@@ -19,7 +19,7 @@ namespace GMGInventory.Data
 
         public DateTime ReturnDate { get; set; }
 
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount1 { get; set; }

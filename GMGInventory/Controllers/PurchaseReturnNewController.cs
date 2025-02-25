@@ -88,7 +88,7 @@ namespace GMGInventory.Controllers
 
             var details = await returnRepository.GetDetails(Id);
 
-            var items = await returnRepository.GetItemListAsync(Id);
+            var items = await returnRepository.GetItemPrintListAsync(Id);
 
             if (details == null || Company == null)
             {

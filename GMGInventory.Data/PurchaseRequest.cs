@@ -28,7 +28,7 @@ namespace GMGInventory.Data
         public string? PurposeDefinition { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [ForeignKey("StatusId")]
         public int? StatusId { get; set; }

@@ -39,7 +39,7 @@ namespace GMGInventory.Data
         public string CanvasSummaryReference { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal OtherCharges { get; set; }

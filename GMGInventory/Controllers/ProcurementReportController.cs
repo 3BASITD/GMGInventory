@@ -48,11 +48,12 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new DataTable("Purchase Order");
-            dt.Columns.AddRange(new DataColumn[9] {
+            dt.Columns.AddRange(new DataColumn[10] {
                 new DataColumn(chelper.DisplayName<PurchaseOrderRVM>("OrderDate")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderRVM>("DocumentNumber")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderRVM>("Supplier")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderRVM>("Item")),
+                new DataColumn(chelper.DisplayName<PurchaseOrderRVM>("ItemDescription")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderRVM>("Quantity")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderRVM>("Unit")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderRVM>("UnitCost")),
@@ -63,20 +64,21 @@ namespace GMGInventory.Controllers
             var pos = await reportProcurementRepository.GetPurchaseOrder(filter);
             if (filter.GroupBy != null)
             {
-                foreach (var grp in pos.GroupBy(x => filter.GroupBy == "item" ? x.Item :
+                foreach (var grp in pos.GroupBy(x => filter.GroupBy == "itemDescription" ? x.ItemDescription :
                                                      filter.GroupBy == "supplier" ? x.Supplier : x.OrderDate))
                 {
-                    dt.Rows.Add(grp.Key, "", "", "", "", "", "", "", "");
+                    dt.Rows.Add(grp.Key, "", "", "", "", "", "", "", "", "");
 
-                    foreach (var po in pos.Where(x => filter.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
+                    foreach (var po in pos.Where(x => filter.GroupBy == "itemDescription" ? x.ItemDescription == grp.FirstOrDefault()!.ItemDescription :
                                        filter.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
-                                       x.OrderDate == grp.FirstOrDefault()!.OrderDate))
+                                       x.OrderDate == grp.FirstOrDefault()!.OrderDate).OrderByDescending(x => x.OrderDateD))
                     {
 
-                        dt.Rows.Add(po.OrderDate,
+                        dt.Rows.Add(po.OrderDateD,
                                     po.DocumentNumber,
                                     po.Supplier,
                                     po.Item,
+                                    po.ItemDescription,
                                     po.Quantity,
                                     po.Unit,
                                     po.UnitCost,
@@ -88,12 +90,13 @@ namespace GMGInventory.Controllers
             }
             else
             {
-                foreach (var po in pos)
+                foreach (var po in pos.OrderByDescending(x => x.OrderDateD))
                 {
-                    dt.Rows.Add(po.OrderDate,
+                    dt.Rows.Add(po.OrderDateD,
                                 po.DocumentNumber,
                                 po.Supplier,
                                 po.Item,
+                                po.ItemDescription,
                                 po.Quantity,
                                 po.Unit,
                                 po.UnitCost,
@@ -177,7 +180,7 @@ namespace GMGInventory.Controllers
 
                     foreach (var preturn in preturns.Where(x => filter.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
                                        filter.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
-                                       x.ReturnDate == grp.FirstOrDefault()!.ReturnDate))
+                                       x.ReturnDate == grp.FirstOrDefault()!.ReturnDate).OrderByDescending(x=>x.ReturnDateD))
                     {
                         dt.Rows.Add(preturn.ReturnDate,
                                     preturn.DocumentNumber,
@@ -197,7 +200,7 @@ namespace GMGInventory.Controllers
             else
             {
 
-                foreach (var preturn in preturns)
+                foreach (var preturn in preturns.OrderByDescending(x => x.ReturnDateD))
                 {
                     dt.Rows.Add(preturn.ReturnDate,
                                 preturn.DocumentNumber,
@@ -288,7 +291,7 @@ namespace GMGInventory.Controllers
 
                     foreach (var preceive in preceives.Where(x => filter.GroupBy == "item" ? x.Item == grp.FirstOrDefault()!.Item :
                                        filter.GroupBy == "supplier" ? x.Supplier == grp.FirstOrDefault()!.Supplier :
-                                       x.ReturnDate == grp.FirstOrDefault()!.ReturnDate))
+                                       x.ReturnDate == grp.FirstOrDefault()!.ReturnDate).OrderByDescending(x => x.ReturnDateD))
 
                     {
                         dt.Rows.Add(preceive.ReturnDate,
@@ -307,7 +310,7 @@ namespace GMGInventory.Controllers
             }
             else
             {
-                foreach (var preceive in preceives)
+                foreach (var preceive in preceives.OrderByDescending(x => x.ReturnDateD))
                 {
                     dt.Rows.Add(preceive.ReturnDate,
                                    preceive.DocumentNumber,

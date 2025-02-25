@@ -238,8 +238,6 @@
                 url: "@Url.Action("GetPurchaseReturnDT")",
                 type: "POST",
                 data: function (data) {
-                    debugger;
-
                     var itemId = $("#filter-item").val();
                     if (itemId) {
                         if (isNaN(itemId)) {
@@ -304,6 +302,7 @@
         $(".btnFilter").on("click", function () {
             var groupBy = $("#groupby").val();
             if (groupBy == '') {
+                purchaseReturnDT.columns().visible(true);
                 purchaseReturnDT.rowGroup().disable().draw();
             }
             else {

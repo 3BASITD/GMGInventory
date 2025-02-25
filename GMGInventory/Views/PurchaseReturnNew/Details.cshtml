@@ -530,15 +530,24 @@
                 var tr = $(this).closest('tr');
                 var row = itemDT.row(tr);
                 var rowData = row.data();
-
-                rowData.quantity = FormatStringInteger(0);
-                rowData.quantityD = 0;
-                rowData.totalAmount = FormatStringDecimal(0);
-                rowData.totalAmountD = 0;
+           
                 if ($(this).prop("checked")) {
+                    var quantityValue = rowData.receivedQuantityD;
+                    var totalValue = quantityValue * rowData.unitCostD;
+
+                    rowData.quantity = FormatStringInteger(quantityValue);
+                    rowData.quantityD = quantityValue;
+                    rowData.totalAmount = FormatStringDecimal(totalValue);
+                    rowData.totalAmountD = totalValue;
+
                     rowData.toReturn = true;
                     tr.removeClass("text-muted");
                 } else {
+                    rowData.quantity = FormatStringInteger(0);
+                    rowData.quantityD = 0;
+                    rowData.totalAmount = FormatStringDecimal(0);
+                    rowData.totalAmountD = 0;
+
                     rowData.toReturn = false;
                     tr.addClass("text-muted");
                 }
@@ -573,6 +582,8 @@
                     toastr.warning("No item to return. Select an item on the list to continue", "Warning");
                 } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't return an item with 0 quantity", "Warning");
+                } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) > parseInt(s.receivedQuantityD)).length > 0) {
+                    toastr.warning("Some items exceed purchase receive quantity. Can't receive an item that exceeds purchase receive quantity", "Warning");
                 } else {
                     $.ajax({
                         type: "POST",

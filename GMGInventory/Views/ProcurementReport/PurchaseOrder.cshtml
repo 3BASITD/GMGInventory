@@ -265,7 +265,6 @@
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     data.Unserved = $('#filter-unserved').is(':checked');
-                   // data.UnservedQty = $('#filter-unservedQty').val();
                     data.Status = $('#filter-status').val();
                 }
             },
@@ -290,9 +289,7 @@
                 { data: "unservedAmount", name: "unservedAmount", className: "text-end" }
 
             ],
-            rowGroup: {
-                dataSrc: ''
-            },
+          
             footerCallback: function (row, data, start, end, display) {
                 var json = purchaseOrderDT.ajax.json();
                 var api = this.api(), data;
@@ -300,7 +297,10 @@
                 $(api.column(7).footer()).html(FormatStringDecimal(json.totalAmount));
                 $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount2));
             },
-            order: [[0, "desc"]]
+            order: [[0, "desc"]],
+            rowGroup: {
+                dataSrc: ''
+            }
         });
 
     // Load functions upon DataTable load
@@ -315,6 +315,7 @@
         $(".btnFilter").on("click", function () {
             var groupBy = $("#groupby").val();
             if (groupBy == '') {
+                purchaseOrderDT.columns().visible(true);
                 purchaseOrderDT.rowGroup().disable().draw();
             }
             else {
@@ -335,7 +336,6 @@
             var urlQuery = [];
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
-          //  urlQuery.push("UnservedQty=" + $("#filter-unservedQty").val());
              urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
              urlQuery.push("Status=" + $("#filter-status").val());
 
@@ -354,7 +354,6 @@
             var urlQuery = [];
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
-          //  urlQuery.push("UnservedQty=" + $("#filter-unservedQty").val());
             urlQuery.push("Status=" + $("#filter-status").val());
             urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
 

@@ -81,7 +81,9 @@ namespace GMGInventory.Application.Repositories
 
             // get total count of records after search
             filterRecord = data.Count();
-            //sort data
+            //sort default data
+            data = data.OrderByDescending(s => s.OrderDateD); 
+
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
                 if (form.SortColumnDirection == "asc")
@@ -98,7 +100,6 @@ namespace GMGInventory.Application.Repositories
                         case "quantity": data = data.OrderBy(s => s.Quantity); break;
                         case "unservedQuantity": data = data.OrderBy(s => s.UnservedQuantity); break;
                         case "unservedAmount": data = data.OrderBy(s => s.UnservedAmount); break;
-                                
                         default: break;
                     }
                 }
@@ -234,7 +235,7 @@ namespace GMGInventory.Application.Repositories
                         case "unit": data = data.OrderBy(s => s.Unit); break;
                         case "documentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
                         case "supplier": data = data.OrderBy(s => s.Supplier); break;
-                        case "returnDate": data = data.OrderBy(s => s.ReturnDate); break;
+                        case "returnDate": data = data.OrderBy(s => s.ReturnDateD); break;
                         case "quantity": data = data.OrderBy(s => s.Quantity); break;
                         case "unitCost": data = data.OrderBy(s => s.UnitCost); break;
                         case "totalAmount": data = data.OrderBy(s => s.TotalAmount); break;
@@ -252,7 +253,7 @@ namespace GMGInventory.Application.Repositories
                         case "unit": data = data.OrderByDescending(s => s.Unit); break;
                         case "documentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
                         case "supplier": data = data.OrderByDescending(s => s.Supplier); break;
-                        case "returnDate": data = data.OrderByDescending(s => s.ReturnDate); break;
+                        case "returnDate": data = data.OrderByDescending(s => s.ReturnDateD); break;
                         case "quantity": data = data.OrderByDescending(s => s.Quantity); break;
                         case "unitCost": data = data.OrderByDescending(s => s.UnitCost); break;
                         case "totalAmount": data = data.OrderByDescending(s => s.TotalAmount); break;
