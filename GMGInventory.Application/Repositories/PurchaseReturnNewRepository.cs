@@ -86,7 +86,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<string> GetNewDocumentNumber()
         {
             var docNumberPrefix = $"RO{DateTime.Now.Year % 100:D2}";
-            var lastDocument = await context.PurchaseRequests
+            var lastDocument = await context.PurchaseReturnNews
                                             .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
                                             .OrderByDescending(s => s.DocumentNumber)
                                             .Select(s => s.DocumentNumber)
