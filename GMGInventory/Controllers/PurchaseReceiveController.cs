@@ -76,9 +76,15 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> GetItemListJson(int purchaseReceiveId)
         {
+            return Json(await receiveRepository.GetWithPOItemsListAsync(purchaseReceiveId));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetItemListForReturnJson(int purchaseReceiveId)
+        {
             return Json(await receiveRepository.GetItemListAsync(purchaseReceiveId));
         }
-   
+
         [HttpPost]
         public async Task<IActionResult> SaveItemsJson(List<PurchaseReceiveLineItemVM> items, int Id, string status)
         {
@@ -100,7 +106,7 @@ namespace GMGInventory.Controllers
 
             var details = await receiveRepository.GetDetails(Id);
 
-            var items = await receiveRepository.GetItemPrintListAsync(Id);
+            var items = await receiveRepository.GetItemListAsync(Id);
 
             if (details == null || Company == null)
             {

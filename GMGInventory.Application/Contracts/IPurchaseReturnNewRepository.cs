@@ -12,7 +12,7 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseReturnFilter filter);
         Task<PurchaseReturnNewDetailedVM?> GetDetails(int returnId);
         Task<IList<PurchaseReturnNewLineItemVM>> GetItemListAsync(int purchaseReturnId);
-        Task<IList<PurchaseReturnNewLineItemVM>> GetItemPrintListAsync(int purchaseReturnId);
+        Task<IList<PurchaseReturnNewLineItemVM>> GetWithPRItemsListAsync(int purchaseReturnId);
         
         Task<ForDataTables<PurchaseReturnNewLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseReturnId);
         Task<ResponseModel<int>> AddAsync(PurchaseReturnNewSaveVM form, List<PurchaseReturnNewLineItemVM> Items);

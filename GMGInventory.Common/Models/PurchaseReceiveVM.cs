@@ -69,7 +69,7 @@ namespace GMGInventory.Common.Models
 
         public string PurchaseRequestType { get; set; }
 
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [Display(Name = "Approved By")]
         public string? ApprovedBy { get; set; }

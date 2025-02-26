@@ -88,7 +88,7 @@ namespace GMGInventory.Controllers
 
             var details = await returnRepository.GetDetails(Id);
 
-            var items = await returnRepository.GetItemPrintListAsync(Id);
+            var items = await returnRepository.GetItemListAsync(Id);
 
             if (details == null || Company == null)
             {
@@ -120,7 +120,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReturnNew, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await returnRepository.GetItemListAsync(purchaseReturnId));
+            return Json(await returnRepository.GetWithPRItemsListAsync(purchaseReturnId));
         }
 
         [HttpPost]

@@ -221,19 +221,13 @@ namespace GMGInventory.Application.Repositories
         }
 
 
-        public async Task<IList<PurchaseReturnNewLineItemVM>> GetItemListAsync(int purchaseReturnId)
+        public async Task<IList<PurchaseReturnNewLineItemVM>> GetWithPRItemsListAsync(int purchaseReturnId) // for create and details
         {
             var receiveId = await context.PurchaseReturnNews
                                          .Where(s => s.Id == purchaseReturnId)
                                          .Select(s => s.PurchaseReceiveId)
                                          .FirstOrDefaultAsync();
             var returnVM = from receive in context.PurchaseReceivingLineItems
-                               //join retrn in context.PurchaseReturnNewLineItems on receive.Id equals retrn.ReceivingItemId into rtrn
-                               //from retrn in rtrn.DefaultIfEmpty()
-
-                               //where receive.PurchaseReceivingId == receiveId
-                               //&& (retrn == null || retrn.PurchaseReturnId == purchaseReturnId)
-
                            let retrn = context.PurchaseReturnNewLineItems
                                         .Where(s => s.ReceivingItemId == receive.Id && s.PurchaseReturnId == purchaseReturnId).FirstOrDefault()
                            let item = receive.OrderItem.RequestItem.Item
@@ -261,19 +255,27 @@ namespace GMGInventory.Application.Repositories
                 rvm.LineNumber = rvms.IndexOf(rvm) + 1;
 
             return rvms;
-        }
-        public async Task<IList<PurchaseReturnNewLineItemVM>> GetItemPrintListAsync(int purchaseReturnId)
+        } 
+        public async Task<IList<PurchaseReturnNewLineItemVM>> GetItemListAsync(int purchaseReturnId)  // for printing 
         {
             var receiveId = await context.PurchaseReturnNews
                                          .Where(s => s.Id == purchaseReturnId)
                                          .Select(s => s.PurchaseReceiveId)
                                          .FirstOrDefaultAsync();
-            var returnVM = from receive in context.PurchaseReceivingLineItems
-                           join retrn in context.PurchaseReturnNewLineItems on receive.Id equals retrn.ReceivingItemId into rtrn
-                           from retrn in rtrn.DefaultIfEmpty()
-                           where receive.PurchaseReceivingId == receiveId
-                           && (retrn == null || retrn.PurchaseReturnId == purchaseReturnId)
+            //var returnVM = from receive in context.PurchaseReceivingLineItems
+            //               join retrn in context.PurchaseReturnNewLineItems on receive.Id equals retrn.ReceivingItemId into rtrn
+            //               from retrn in rtrn.DefaultIfEmpty()
+
+            //               where receive.PurchaseReceivingId == receiveId
+            //               && (retrn == null || retrn.PurchaseReturnId == purchaseReturnId)
+
+            var returnVM = from retrn in context.PurchaseReturnNewLineItems
+                           join receive in context.PurchaseReceivingLineItems on retrn.ReceivingItemId equals receive.Id
+
+                           where retrn.PurchaseReturnId == purchaseReturnId
+
                            let item = receive.OrderItem.RequestItem.Item
+
                            select new PurchaseReturnNewLineItemVM
                            {
                                Id = retrn == null ? 0 : retrn.Id,
@@ -296,7 +298,6 @@ namespace GMGInventory.Application.Repositories
 
             return rvms;
         }
-
 
         public async Task<ForDataTables<PurchaseReturnNewLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseReturnId)
         {

@@ -110,7 +110,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<PurchaseReceiveDetailsVM?> GetDetails(int requestId)
+        public async Task<PurchaseReceiveDetailsVM?> GetDetails(int receivingId)
         {
             var details = from receive in context.PurchaseReceivings
 
@@ -125,7 +125,7 @@ namespace GMGInventory.Application.Repositories
                           join userc in userManager.Users on receive.UserCreated equals userc.Id
                           join userm in userManager.Users on receive.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
-                          where receive.Id == requestId
+                          where receive.Id == receivingId
                           select new PurchaseReceiveDetailsVM
                           {
                               Id = receive.Id,
@@ -160,7 +160,7 @@ namespace GMGInventory.Application.Repositories
             return await details.FirstOrDefaultAsync();
         }
 
-        public async Task<IList<PurchaseReceiveLineItemVM>> GetItemListAsync(int purchaseReceivingId)
+        public async Task<IList<PurchaseReceiveLineItemVM>> GetWithPOItemsListAsync(int purchaseReceivingId) // for create and details
         {
             var orderId = await context.PurchaseReceivings
                                              .Where(s => s.Id == purchaseReceivingId)
@@ -192,20 +192,12 @@ namespace GMGInventory.Application.Repositories
                             };
             return await receiveVM.ToListAsync();
         }
-        public async Task<IList<PurchaseReceiveLineItemVM>> GetItemPrintListAsync(int purchaseReceivingId)
+        public async Task<IList<PurchaseReceiveLineItemVM>> GetItemListAsync(int purchaseReceivingId) // for printing 
         {
-            var orderId = await context.PurchaseReceivings
-                                             .Where(s => s.Id == purchaseReceivingId)
-                                             .Select(s => s.PurchaseOrderId)
-                                             .FirstOrDefaultAsync();
+            var receiveVM = from receive in context.PurchaseReceivingLineItems
+                            join order in context.PurchaseOrderNewLineItems on receive.OrderItemId equals order.Id
 
-            var receiveVM = from order in context.PurchaseOrderNewLineItems
-
-                            join receive in context.PurchaseReceivingLineItems on order.Id equals receive.OrderItemId into rcv
-                            from receive in rcv.DefaultIfEmpty()
-
-                            where order.PurchaseOrderId == orderId
-                            && (receive == null || receive.PurchaseReceivingId == purchaseReceivingId)
+                            where receive.PurchaseReceivingId == purchaseReceivingId
 
                             select new PurchaseReceiveLineItemVM
                             {
@@ -218,7 +210,7 @@ namespace GMGInventory.Application.Repositories
                                 ItemCode = order.RequestItem.Item == null ? null : order.RequestItem.Item.Code,
                                 ItemPartNumber = order.RequestItem.Item == null ? null : order.RequestItem.Item.PartNumber,
                                 ItemDescription = order.RequestItem.ItemDescription,
-                                QuantityD = receive.Quantity,
+                                QuantityD = receive == null ? 0 : receive.Quantity,
                                 OrderQuantityD = order.Quantity,
                                 UnitId = order.RequestItem.Item == null ? order.RequestItem.Unit.Id : order.RequestItem.Item.Unit.Id,
                                 UnitCode = order.RequestItem.Item == null ? order.RequestItem.Unit.Code : order.RequestItem.Item.Unit.Code,
@@ -370,13 +362,7 @@ namespace GMGInventory.Application.Repositories
                     WarehouseId = purchaseOrder!.DeliveryAddressId
                 };
                 await context.PurchaseReceivings.AddAsync(receive);
-
-                try {
-                  await context.SaveChangesAsync(currentUserId);
-                }
-                catch (Exception ex) { 
-                
-                }
+                await context.SaveChangesAsync(currentUserId);
 
                 if (previousReceive != null)
                 {

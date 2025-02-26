@@ -43,7 +43,7 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseRequestDetailedVM : PurchaseRequestVM
     {
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [Display(Name = "Approved By")]
         public string? ApprovedBy1 { get; set; }
