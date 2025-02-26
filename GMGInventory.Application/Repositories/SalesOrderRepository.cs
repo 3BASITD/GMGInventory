@@ -186,12 +186,20 @@ namespace GMGInventory.Application.Repositories
                                        InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
                                    };
 
+            var customerChecks = from chk in context.SOACRChecks
+                                 group chk by chk.CustomerPayment.CustomerId into g
+                                 select new
+                                 {
+                                     CustomerId = g.Key,
+                                     CheckAmount = g.Sum(s => (decimal?)s.CheckAmount) ?? 0
+                                 };
+
             var customerPayments = from pay in context.CustomerPayments
                                    group pay by pay.CustomerId into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       PaymentAmount = g.Sum(s => (decimal?)s.TotalAmountPaid) ?? 0
+                                       PaymentAmount = g.Sum(s => (decimal?)(s.BackLoad + s.CashAdvance + s.Cash + s.Discount + s.OffSet + s.OverPayment + s.Tax + s.TKTSolicitation) ?? 0)
                                    };
 
             var customerSalesReturns = from sr in context.SalesReturnLineItems
@@ -219,6 +227,8 @@ namespace GMGInventory.Application.Repositories
                            from disapprove in userManager.Users.Where(s => s.Id == order.DisapprovedBy).DefaultIfEmpty()
                            let invoiceAmount = customerInvoices.Where(s => s.CustomerId == order.Customer.Id)
                                                                .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                           let checkAmount = customerChecks.Where(s => s.CustomerId == order.Customer.Id)
+                                                           .Sum(s => (decimal?)s.CheckAmount) ?? 0
                            let paymentAmount = customerPayments.Where(s => s.CustomerId == order.Customer.Id)
                                                                .Sum(s => (decimal?)s.PaymentAmount) ?? 0
                            let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == order.Customer.Id)
@@ -264,7 +274,7 @@ namespace GMGInventory.Application.Repositories
                                Id = order.Id,
                                OrderDateD = order.SalesOrderDate,
                                OutstandingBalanceD = invoiceAmount
-                                                    - paymentAmount
+                                                    - (paymentAmount + checkAmount)
                                                     - salesReturnAmount
                                                     - creditAmount
                                                     + debitAmount
