@@ -227,7 +227,8 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        return '<input type="checkbox" class="to-receive" ' + (data.toReceive == true ? 'checked="checked"' : '') + ' />';
+                        return '<input type="checkbox" class="to-receive" ' + (data.toReceive == true ? 'checked="checked"' : '') +
+                                     (data.toReceiveQuantityD == 0 ? 'disabled' : '') + ' />';
                     },
                     className: "form-cell"
                 },
@@ -248,8 +249,8 @@
                 {
                     data: function (data, type, dataToSet) {
                         if (data.toReceive == true) {
-                            if (data.quantityD > data.orderQuantityD) {
-                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.orderQuantityD + ' order quantity.</label>';
+                            if (data.quantityD > data.toReceiveQuantityD) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.toReceiveQuantityD + ' remaining order quantity.</label>';
                             } else if (data.quantityD == 0) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to receive.</label>';
                             } else {
@@ -325,7 +326,7 @@
                     rowData.toReceive = true;
                     tr.removeClass("text-muted");
 
-                    var quantityValue = rowData.orderQuantityD;
+                    var quantityValue = rowData.toReceiveQuantityD;
                     var totalValue = quantityValue * rowData.unitCostD;
 
                     rowData.quantity = FormatStringInteger(quantityValue);
@@ -363,7 +364,7 @@
             // Load Select2 Purchase Order
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetPurchaseOrderOptions", "PurchaseReceive")",
+                url: "@Url.Action("GetPurchaseOrderOptions")",
                 data: {
                     SelectedId:  selectedOrder
                 },
@@ -435,7 +436,7 @@
         function loadRRItems() {
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetItemListJson", "PurchaseOrder")",
+                url: "@Url.Action("GetItemsFromPOListJson")",
                 data: {
                     purchaseOrderId: $("#receive-poNumber").val()
                 },
@@ -447,15 +448,15 @@
                         itemDT.row.add({
                             toReceive: false,
                             lineNumber: v.lineNumber,
-                            orderItemId: v.id,
+                            orderItemId: v.orderItemId,
                             itemCode: v.itemCode,
                             itemId: v.itemId,
                             itemDescription: v.itemDescription,
                             purchaseReceivingId: v.purchaseReceivingId,
-                            quantity: FormatStringInteger(0),// v.quantity,  //FormatStringInteger(0),
-                            quantityD: 0, // v.quantityD,  //0,
-                            orderQuantity: v.quantity,
-                            orderQuantityD: v.quantityD,
+                            quantity: FormatStringInteger(0), 
+                            quantityD: 0,  
+                            toReceiveQuantity: v.toReceiveQuantity,
+                            toReceiveQuantityD: v.toReceiveQuantityD,
                             unitCode: v.unitCode,
                             unitId: v.unitId,
                             unitCost: v.unitCost,
@@ -521,7 +522,7 @@
                 toastr.warning("No item to receive. Add an item to the list to continue", "Warning");
             } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) == 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't receive an item with 0 quantity", "Warning");
-            } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) > parseInt(s.orderQuantityD)).length > 0) {
+            } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) > parseInt(s.toReceiveQuantityD)).length > 0) {
                 toastr.warning("Some items exceed purchase order quantity. Can't receive an item that exceeds purchase order quantity", "Warning");
             } else {
                 $.ajax({

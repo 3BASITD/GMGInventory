@@ -219,9 +219,46 @@ namespace GMGInventory.Application.Repositories
                           };
             return await details.FirstOrDefaultAsync();
         }
+        
+        public async Task<IList<PurchaseReturnNewLineItemVM>> GetItemsFromRRListAsync(int purchaseReceivingId) // for create
+        {
+            var returnVM = from receive in context.PurchaseReceivingLineItems
+                            let retrn = context.PurchaseReturnNewLineItems
+                                         .Where(s => s.ReceivingItemId == receive.Id).FirstOrDefault()
+                           let item = receive.OrderItem.RequestItem.Item
 
+                           where receive.PurchaseReceivingId == purchaseReceivingId
 
-        public async Task<IList<PurchaseReturnNewLineItemVM>> GetWithPRItemsListAsync(int purchaseReturnId) // for create and details
+                           select new PurchaseReturnNewLineItemVM
+                           {
+                               Id = retrn == null ? 0 : retrn.Id,
+                               ToReturn = retrn != null,
+                               ItemId = item == null ? null : item.Id,
+                               ItemCode = item == null ? null : item.Code,
+                               ItemPartNumber = item == null ? null : item.PartNumber,
+                               ItemDescription = receive.OrderItem.RequestItem.ItemDescription,
+                               LineNumber = receive.OrderItem.LineNumber,
+                               QuantityD = retrn == null ? 0 : retrn.Quantity,
+                               ReceivingItemId = receive.Id,
+                               ReceivedQuantityD = receive.Quantity,
+                               ServedQuantityD = context.PurchaseReturnNewLineItems
+                                                       .Where(a => a.PurchaseReturn.Status.Name.ToLower() == "approved"
+                                                                    && a.ReceivingItemId == receive.Id)
+                                                       .Select(a => a.Quantity)
+                                                       .Sum(),
+
+                               UnitId = item == null ? receive.OrderItem.RequestItem.Unit.Id : item.Unit.Id,
+                               UnitCode = item == null ? receive.OrderItem.RequestItem.Unit.Code : item.Unit.Code,
+                               UnitCostD = receive.OrderItem.UnitCost
+                           };
+            var rvms = await returnVM.ToListAsync();
+            foreach (var rvm in rvms)
+                rvm.LineNumber = rvms.IndexOf(rvm) + 1;
+
+            return rvms;
+        }
+
+        public async Task<IList<PurchaseReturnNewLineItemVM>> GetWithRRItemsListAsync(int purchaseReturnId) // details
         {
             var receiveId = await context.PurchaseReturnNews
                                          .Where(s => s.Id == purchaseReturnId)
@@ -246,6 +283,11 @@ namespace GMGInventory.Application.Repositories
                                QuantityD = retrn == null ? 0 : retrn.Quantity,
                                ReceivingItemId = receive.Id,
                                ReceivedQuantityD = receive.Quantity,
+                               ServedQuantityD = context.PurchaseReturnNewLineItems
+                                                       .Where(a => a.PurchaseReturn.Status.Name.ToLower() == "approved"
+                                                                    && a.ReceivingItemId == receive.Id)
+                                                       .Select(a => a.Quantity)
+                                                       .Sum(),
                                UnitId = item == null ? receive.OrderItem.RequestItem.Unit.Id : item.Unit.Id,
                                UnitCode = item == null ? receive.OrderItem.RequestItem.Unit.Code : item.Unit.Code,
                                UnitCostD = receive.OrderItem.UnitCost
@@ -262,12 +304,6 @@ namespace GMGInventory.Application.Repositories
                                          .Where(s => s.Id == purchaseReturnId)
                                          .Select(s => s.PurchaseReceiveId)
                                          .FirstOrDefaultAsync();
-            //var returnVM = from receive in context.PurchaseReceivingLineItems
-            //               join retrn in context.PurchaseReturnNewLineItems on receive.Id equals retrn.ReceivingItemId into rtrn
-            //               from retrn in rtrn.DefaultIfEmpty()
-
-            //               where receive.PurchaseReceivingId == receiveId
-            //               && (retrn == null || retrn.PurchaseReturnId == purchaseReturnId)
 
             var returnVM = from retrn in context.PurchaseReturnNewLineItems
                            join receive in context.PurchaseReceivingLineItems on retrn.ReceivingItemId equals receive.Id

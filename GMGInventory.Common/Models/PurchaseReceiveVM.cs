@@ -127,6 +127,13 @@ namespace GMGInventory.Common.Models
         public string OrderQuantity => string.Format("{0:#,##0}", OrderQuantityD);
         public int OrderQuantityD { get; set; }
 
+        public string ServedQuantity => string.Format("{0:#,##0}", ServedQuantityD);
+        public int ServedQuantityD { get; set; }
+
+        [Display(Name = "To Receive Quantity")]
+        public string ToReceiveQuantity => string.Format("{0:#,##0}", ToReceiveQuantityD);
+        public int ToReceiveQuantityD => OrderQuantityD - ServedQuantityD;
+
         [Display(Name = "Unit Cost")]
         public string UnitCost => string.Format("{0:#,##0.00}", UnitCostD);
         public decimal UnitCostD { get; set; }

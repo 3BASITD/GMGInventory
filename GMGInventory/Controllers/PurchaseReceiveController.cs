@@ -80,10 +80,20 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetItemListForReturnJson(int purchaseReceiveId)
+        public async Task<IActionResult> GetItemsFromPOListJson(int purchaseOrderId)
         {
-            return Json(await receiveRepository.GetItemListAsync(purchaseReceiveId));
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await receiveRepository.GetItemsFromPOListAsync(purchaseOrderId));
         }
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> GetItemListForReturnJson(int purchaseReceiveId)
+        //{
+        //    return Json(await receiveRepository.GetItemListAsync(purchaseReceiveId));
+        //}
 
         [HttpPost]
         public async Task<IActionResult> SaveItemsJson(List<PurchaseReceiveLineItemVM> items, int Id, string status)

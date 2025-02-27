@@ -434,7 +434,8 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         if (ro_status.toLowerCase() == "draft") {
-                            return '<input type="checkbox" class="to-return" ' + (data.toReturn == true ? 'checked="checked"' : '') + ' />';
+                            return '<input type="checkbox" class="to-return" ' + (data.toReturn == true ? 'checked="checked"' : '') +
+                                (data.toReturnQuantityD == 0 ? 'disabled' : '') + ' />';
                         } else {
                             return '';
                         }
@@ -458,8 +459,8 @@
                 {
                     data: function (data, type, dataToSet) {
                         if (ro_status.toLowerCase() == "draft" && data.toReturn == true) {
-                            if (data.quantityD > data.receivedQuantityD) {
-                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.receivedQuantity + ' received quantity.</label>';
+                            if (data.quantityD > data.toReturnQuantityD) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.toReturnQuantity + ' received quantity.</label>';
                             } else if (data.quantityD == 0) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to return.</label>';
                             } else {
@@ -532,7 +533,7 @@
                 var rowData = row.data();
            
                 if ($(this).prop("checked")) {
-                    var quantityValue = rowData.receivedQuantityD;
+                    var quantityValue = rowData.toReturnQuantityD;
                     var totalValue = quantityValue * rowData.unitCostD;
 
                     rowData.quantity = FormatStringInteger(quantityValue);
@@ -582,8 +583,8 @@
                     toastr.warning("No item to return. Select an item on the list to continue", "Warning");
                 } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't return an item with 0 quantity", "Warning");
-                } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) > parseInt(s.receivedQuantityD)).length > 0) {
-                    toastr.warning("Some items exceed purchase receive quantity. Can't return an item that exceeds purchase receive quantity.", "Warning");
+                } else if (items.filter(s => s.toReturn == true && parseInt(s.quantity) > parseInt(s.toReturnQuantityD)).length > 0) {
+                    toastr.warning("Some items exceed purchase receive quantity. Can't return an item that exceeds to return quantity.", "Warning");
                 } else {
                     $.ajax({
                         type: "POST",

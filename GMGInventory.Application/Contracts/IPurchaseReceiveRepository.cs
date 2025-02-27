@@ -7,6 +7,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<PurchaseReceiveVM>> GetListAsync(PurchaseReceiveFilter filter);
         Task<ForDataTables<PurchaseReceiveVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseReceiveFilter filter);
         Task<PurchaseReceiveDetailsVM?> GetDetails(int receivingId);
+        Task<IList<PurchaseReceiveLineItemVM>> GetItemsFromPOListAsync(int purchaseOrderId);
         Task<IList<PurchaseReceiveLineItemVM>> GetWithPOItemsListAsync(int purchaseReceivingId);
         Task<IList<PurchaseReceiveLineItemVM>> GetItemListAsync(int purchaseReceivingId);
         Task<ResponseModel> SaveItemsAsync(IList<PurchaseReceiveLineItemVM> Items, int receiveId, string? status = null);
