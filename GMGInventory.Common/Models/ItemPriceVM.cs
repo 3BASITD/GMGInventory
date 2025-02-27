@@ -48,6 +48,12 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Brand")]
         public string Brand { get; set; }
+
+        [Display(Name = "Brand Name")]
+        public string BrandName { get; set; }
+
+        [Display(Name = "Interchange Number")]
+        public string? InterchangeNumber { get; set; }
     }
 
     public class ItemPriceUpdateVM

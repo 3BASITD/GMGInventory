@@ -61,6 +61,10 @@ namespace GMGInventory.Controllers
             DataTable dt = new("Price List");
             dt.Columns.AddRange([
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("Brand")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("BrandName")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("InterchangeNumber")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Category")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("ItemType")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("ModelNumber")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("Size")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("Code")),
@@ -75,6 +79,10 @@ namespace GMGInventory.Controllers
             foreach (var so in sos)
             {
                 dt.Rows.Add(so.Brand,
+                            so.BrandName,
+                            so.InterchangeNumber,
+                            so.Category,
+                            so.ItemType,
                             so.ModelNumber,
                             so.Size,
                             so.Code,
