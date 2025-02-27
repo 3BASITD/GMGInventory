@@ -48,8 +48,8 @@ namespace GMGInventory.Data
         public int SOACRId { get; set; }
         public SOACR SOACR { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal TotalAmountPaid { get; set; }
+        //[Column(TypeName = "decimal(18, 2)")]
+        //public decimal TotalAmountPaid { get; set; }
 
         //[Column(TypeName = "decimal(18, 2)")]
         //public decimal OverPay { get; set; }

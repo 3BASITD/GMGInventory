@@ -40,12 +40,20 @@ namespace GMGInventory.Application.Repositories
                                        InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
                                    };
 
+            var customerChecks = from chk in context.SOACRChecks
+                                 group chk by chk.CustomerPayment.CustomerId into g
+                                 select new
+                                 {
+                                     CustomerId = g.Key,
+                                     CheckAmount = g.Sum(s => (decimal?)s.CheckAmount) ?? 0
+                                 };
+
             var customerPayments = from pay in context.CustomerPayments
                                    group pay by pay.CustomerId into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       PaymentAmount = g.Sum(s => (decimal?)s.TotalAmountPaid) ?? 0
+                                       PaymentAmount = g.Sum(s => (decimal?)(s.BackLoad + s.CashAdvance + s.Cash + s.Discount + s.OffSet + s.OverPayment + s.Tax + s.TKTSolicitation) ?? 0)
                                    };
 
             var customerSalesReturns = from sr in context.SalesReturnLineItems
@@ -69,6 +77,8 @@ namespace GMGInventory.Application.Repositories
             var customers = from customer in context.Customers
                             let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                            let checkAmount = customerChecks.Where(s=>s.CustomerId == customer.Id)
+                                                            .Sum(s=>(decimal?)s.CheckAmount) ?? 0
                             let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.PaymentAmount) ?? 0
                             let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
@@ -95,7 +105,7 @@ namespace GMGInventory.Application.Repositories
                                 CreditTerm = customer.CreditTerm.Name,
                                 Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
                                 OutstandingBalanceD = invoiceAmount
-                                                    - paymentAmount
+                                                    - (paymentAmount + checkAmount)
                                                     - salesReturnAmount
                                                     - creditAmount
                                                     + debitAmount
@@ -124,12 +134,20 @@ namespace GMGInventory.Application.Repositories
                                        InvoiceAmount = g.Sum(s => s.UnitPrice * s.Quantity)
                                    };
 
+            var customerChecks = from chk in context.SOACRChecks
+                                 group chk by chk.CustomerPayment.CustomerId into g
+                                 select new
+                                 {
+                                     CustomerId = g.Key,
+                                     CheckAmount = g.Sum(s => (decimal?)s.CheckAmount) ?? 0
+                                 };
+
             var customerPayments = from pay in context.CustomerPayments
                                    group pay by pay.CustomerId into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       PaymentAmount = g.Sum(s => s.TotalAmountPaid)
+                                       PaymentAmount = g.Sum(s => (decimal?)(s.BackLoad + s.CashAdvance + s.Cash + s.Discount + s.OffSet + s.OverPayment + s.Tax + s.TKTSolicitation) ?? 0)
                                    };
 
             var customerSalesReturns = from sr in context.SalesReturnLineItems
@@ -153,6 +171,8 @@ namespace GMGInventory.Application.Repositories
             var customers = from customer in context.Customers
                             let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                            let checkAmount = customerChecks.Where(s => s.CustomerId == customer.Id)
+                                                            .Sum(s => (decimal?)s.CheckAmount) ?? 0
                             let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.PaymentAmount) ?? 0
                             let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
@@ -180,7 +200,7 @@ namespace GMGInventory.Application.Repositories
                                 CreditTerm = customer.CreditTerm.Name,
                                 Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
                                 OutstandingBalanceD = invoiceAmount
-                                                    - paymentAmount
+                                                    - (paymentAmount + checkAmount)
                                                     - salesReturnAmount
                                                     - creditAmount
                                                     + debitAmount
@@ -212,12 +232,20 @@ namespace GMGInventory.Application.Repositories
                                        InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
                                    };
 
+            var customerChecks = from chk in context.SOACRChecks
+                                 group chk by chk.CustomerPayment.CustomerId into g
+                                 select new
+                                 {
+                                     CustomerId = g.Key,
+                                     CheckAmount = g.Sum(s => (decimal?)s.CheckAmount) ?? 0
+                                 };
+
             var customerPayments = from pay in context.CustomerPayments
                                    group pay by pay.CustomerId into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       PaymentAmount = g.Sum(s => (decimal?)s.TotalAmountPaid) ?? 0
+                                       PaymentAmount = g.Sum(s => (decimal?)(s.BackLoad + s.CashAdvance + s.Cash + s.Discount + s.OffSet + s.OverPayment + s.Tax + s.TKTSolicitation) ?? 0)
                                    };
 
             var customerSalesReturns = from sr in context.SalesReturnLineItems
@@ -241,6 +269,8 @@ namespace GMGInventory.Application.Repositories
             var customers = from customer in context.Customers
                             let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                            let checkAmount = customerChecks.Where(s => s.CustomerId == customer.Id)
+                                                            .Sum(s => (decimal?)s.CheckAmount) ?? 0
                             let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.PaymentAmount) ?? 0
                             let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
@@ -271,7 +301,7 @@ namespace GMGInventory.Application.Repositories
                                 CreditTerm = customer.CreditTerm.Name,
                                 Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
                                 OutstandingBalanceD = invoiceAmount
-                                                    - paymentAmount
+                                                    - (paymentAmount + checkAmount)
                                                     - salesReturnAmount
                                                     - creditAmount
                                                     + debitAmount
@@ -368,12 +398,20 @@ namespace GMGInventory.Application.Repositories
                                        InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
                                    };
 
+            var customerChecks = from chk in context.SOACRChecks
+                                 group chk by chk.CustomerPayment.CustomerId into g
+                                 select new
+                                 {
+                                     CustomerId = g.Key,
+                                     CheckAmount = g.Sum(s => (decimal?)s.CheckAmount) ?? 0
+                                 };
+
             var customerPayments = from pay in context.CustomerPayments
                                    group pay by pay.CustomerId into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       PaymentAmount = g.Sum(s => (decimal?)s.TotalAmountPaid) ?? 0
+                                       PaymentAmount = g.Sum(s => (decimal?)(s.BackLoad + s.CashAdvance + s.Cash + s.Discount + s.OffSet + s.OverPayment + s.Tax + s.TKTSolicitation) ?? 0)
                                    };
 
             var customerSalesReturns = from sr in context.SalesReturnLineItems
@@ -400,6 +438,8 @@ namespace GMGInventory.Application.Repositories
                             from userm in um.DefaultIfEmpty()
                             let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
+                            let checkAmount = customerChecks.Where(s => s.CustomerId == customer.Id)
+                                                            .Sum(s => (decimal?)s.CheckAmount) ?? 0
                             let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.PaymentAmount) ?? 0
                             let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
@@ -430,7 +470,7 @@ namespace GMGInventory.Application.Repositories
                                 CreditTermName = customer.CreditTerm.Name,
                                 Email = customer.Email,
                                 OutstandingBalanceD = invoiceAmount
-                                                    - paymentAmount
+                                                    - (paymentAmount + checkAmount)
                                                     - salesReturnAmount
                                                     - creditAmount
                                                     + debitAmount
@@ -1055,11 +1095,12 @@ namespace GMGInventory.Application.Repositories
                                            {
                                                Amount = ili.Quantity * ili.UnitPrice
                                            }).ToList()
-                             let invamttotal = invamt.Sum(s => s.Amount) - soalit.Sum(s => s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - cp.TotalAmountPaid
+                             let totalPayment = cp.BackLoad + cp.CashAdvance + cp.Cash + cp.Discount + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + (cp.SOACRChecks.Sum(s=>(decimal?)s.CheckAmount) ?? 0)
+                             let invamttotal = invamt.Sum(s => s.Amount) - soalit.Sum(s => s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - totalPayment
                              where cp.CustomerId == id
                              select new CustomerVM
                              {
-                                 AmountPaidD = cp.TotalAmountPaid,
+                                 AmountPaidD = totalPayment,
                                  CRNo = cp.CRNumber,
                                  PaymentRemarks = cp.Remarks,
                                  OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,

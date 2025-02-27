@@ -5,6 +5,7 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Humanizer.On;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -29,38 +30,51 @@ namespace GMGInventory.Application.Repositories
         #region for SOACR/Index
         private async Task<IList<SOACRVM>> SOACRList()
         {
-            var soacr = from soa in context.SOACRs
-                        let soalit = context.SOACRLineItems.Where(s => s.SOACRId == soa.Id).ToList()
-                        //let over = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.OverPayment)
-                        let paid = context.CustomerPayments.Where(s => s.SOACRId == soa.Id).Sum(s => s.TotalAmountPaid)
-                        let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
-                        let invamt = (from ili in context.InvoiceLineItems
-                                      join inv in context.Invoices on ili.InvoiceId equals inv.Id
-                                      join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
-                                      where sli.SOACRId == soa.Id
-                                      select new
-                                      {
-                                          Amount = ili.Quantity * ili.UnitPrice
-                                      }).ToList()
-                        // where soa.Customer.Name == "ROX - RIX AUTO SUPPLY" // for testing only
-                        select new SOACRVM
-                        {
-                            Id = soa.Id,
-                            Customer = soa.Customer.Name,
-                            Type = soa.SOACRType.Code,
-                            SOAFromD = soa.SOAFrom,
-                            SOAToD = soa.SOATo,
-                            TotalAmountD = invamt.Sum(s => s.Amount),
-                            TBRD = tbr,
-                            CreditD = soalit.Sum(s => s.CreditAmount),
-                            DebitD = soalit.Sum(s => s.DebitAmount),
-                            PaidAmountD = paid,
-                            FreightChargeD = soalit.Sum(s => s.FreightCost),
-                            //OverPaymentD = over
-                            //OverPaymentD = Math.Max(0, paid - soalit.Sum(s => s.Invoice.Amount))
-                            //invoice amount - tbr - credit + debit - paid amount + frieght charge
-                        };
-            return await soacr.ToListAsync();
+            try
+            {
+                var soacr = from soa in context.SOACRs
+                            let chkamt = (from chk in context.SOACRChecks
+                                          join pay in context.CustomerPayments on chk.CustomerPaymentId equals pay.Id
+                                          where pay.SOACRId == soa.Id
+                                          select (decimal?)chk.CheckAmount).Sum() ?? 0
+                            let payamt = (from pay in context.CustomerPayments
+                                          where soa.Id == pay.SOACRId
+                                          select (decimal?)(pay.BackLoad + pay.CashAdvance + pay.Cash + pay.Discount + pay.OffSet + pay.OverPayment + pay.Tax + pay.TKTSolicitation)).Sum() ?? 0
+                            let tbramt = (from tbr in context.SOACRLineItemTBRs
+                                          join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
+                                          where sli.SOACRId == soa.Id
+                                          select (decimal?)tbr.Amount).Sum() ?? 0
+                            let invamt = (from ili in context.InvoiceLineItems
+                                          join inv in context.Invoices on ili.InvoiceId equals inv.Id
+                                          join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                                          where sli.SOACRId == soa.Id
+                                          select (decimal?)(ili.Quantity * ili.UnitPrice)).Sum() ?? 0
+                            // where soa.Customer.Name == "ROX - RIX AUTO SUPPLY" // for testing only
+                            select new SOACRVM
+                            {
+                                Id = soa.Id,
+                                Customer = soa.Customer.Name,
+                                Type = soa.SOACRType.Code,
+                                SOAFromD = soa.SOAFrom,
+                                SOAToD = soa.SOATo,
+                                TotalAmountD = invamt,
+                                TBRD = tbramt,
+                                CreditD = soa.SOACRLineItems.Sum(s => s.CreditAmount),
+                                DebitD = soa.SOACRLineItems.Sum(s => s.DebitAmount),
+                                PaidAmountD = payamt + chkamt,
+                                FreightChargeD = soa.SOACRLineItems.Sum(s => s.FreightCost)
+                            };
+                return await soacr.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return [
+                    new() {
+                        Id = -1,
+                        Customer = ex.Message
+                    }
+                ];
+            }
         }
 
         public async Task<ForDataTables<SOACRVM>> SOACRListDT(DataTablesRequestForm form)
@@ -581,8 +595,7 @@ namespace GMGInventory.Application.Repositories
                 Remarks = payment.Remarks + "",
                 SOACRId = soacr.Id,
                 Tax = payment.Tax,
-                TKTSolicitation = payment.TKTSolicitation,
-                TotalAmountPaid = payment.BackLoad + payment.CashAdvance + payment.CashAmount + payment.Discount + payment.Offset + payment.OverPayment + payment.Tax + payment.TKTSolicitation + totalChecks,
+                TKTSolicitation = payment.TKTSolicitation
             };
 
             await context.CustomerPayments.AddAsync(customerPayment);
@@ -606,20 +619,27 @@ namespace GMGInventory.Application.Repositories
                 }
             }
 
-            var PaymentAmount = customerPayment.TotalAmountPaid;
+            var PaymentAmount = payment.BackLoad
+                              + payment.CashAdvance
+                              + payment.CashAmount
+                              + payment.Discount
+                              + payment.Offset
+                              + payment.OverPayment
+                              + payment.Tax
+                              + payment.TKTSolicitation
+                              + (payment.Checks?.Sum(s => (decimal?)s.CheckAmount) ?? 0);
 
             Array.Sort(payment.InvoiceIds);
-
             foreach (var InvoiceId in payment.InvoiceIds)
             {
                 if (PaymentAmount > 0)
                 {
                     var invoicePayment = await context.InvoiceLineItems
-                                                      .Where(s => s.InvoiceId == InvoiceId)
-                                                      .SumAsync(s => s.Quantity * s.UnitPrice);
+                    .Where(s => s.InvoiceId == InvoiceId)
+                    .SumAsync(s => s.Quantity * s.UnitPrice);
                     var paymentDetails = await context.CustomerPaymentDetails
-                                                      .Where(s => s.InvoiceId == InvoiceId
-                                                               && s.CustomerPayment.SOACR.Id == soacr.Id)
+                    .Where(s => s.InvoiceId == InvoiceId
+                    && s.CustomerPayment.SOACR.Id == soacr.Id)
                                                       .FirstOrDefaultAsync();
                     var toPay = 0m;
                     if (paymentDetails == null)
