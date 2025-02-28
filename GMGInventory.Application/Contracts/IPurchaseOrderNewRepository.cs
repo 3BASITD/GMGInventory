@@ -7,7 +7,7 @@ namespace GMGInventory.Application.Contracts
         Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page);
         Task<IList<JsonOrderTypeOptionsModel>> GetTypeOptions(int? SelectedId);
         Task<IList<JsonOptionsModel>> GetDeliveryModeOptions(int? SelectedId);
-        Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? SelectedId);
+        Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? RegionId, int? SelectedId);
         Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId);
         Task<string> GetNewDocumentNumber(int? TypeId);
         Task<IList<PurchaseOrderNewVM>> GetListAsync(PurchaseOrderFilter filter);

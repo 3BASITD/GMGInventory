@@ -33,9 +33,9 @@ namespace GMGInventory.Controllers
             return Json(await orderRepository.GetDeliveryModeOptions(SelectedId));
         }
 
-        public async Task<IActionResult> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? SelectedId)
+        public async Task<IActionResult> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? RegionId, int? SelectedId)
         {
-            return Json(await orderRepository.GetPurchaseRequestOptions(RequestTypeId, RequestPurposeId, SelectedId));
+            return Json(await orderRepository.GetPurchaseRequestOptions(RequestTypeId, RequestPurposeId, RegionId, SelectedId));
         }
 
         public async Task<IActionResult> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)

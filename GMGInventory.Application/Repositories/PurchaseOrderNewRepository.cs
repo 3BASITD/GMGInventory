@@ -77,7 +77,7 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? SelectedId)
+        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? RegionId, int? SelectedId)
         {
             var requests = from prli in context.PurchaseRequestLineItems
                            let poli = prli.PurchaseOrderLineItems
@@ -85,6 +85,7 @@ namespace GMGInventory.Application.Repositories
                                           .Select(a => (int?)a.Quantity)
                                           .Sum() ?? 0
                            where poli != prli.Quantity
+                           && (RegionId == null || prli.Item.SalesOrderLineItems.First().SalesOrder.Customer.Area.Region.Id == RegionId)
                            select prli.PurchaseRequestId;
 
 
@@ -240,6 +241,7 @@ namespace GMGInventory.Application.Repositories
                           join userm in userManager.Users on order.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
                           let item = order.PurchaseOrderLineItems.FirstOrDefault()
+                          let firstrequest = order.PurchaseOrderLineItems.First().RequestItem.PurchaseRequest.PurchaseRequestLineItems.First()
                           where order.Id == orderId
                           select new PurchaseOrderNewDetailedVM
                           {
@@ -255,6 +257,8 @@ namespace GMGInventory.Application.Repositories
                               RequestPurposeId = item == null 
                                                ? null 
                                                : item.RequestItem.PurchaseRequest.Purpose.Id,
+                              Region = firstrequest.SalesOrderId == null ? "" : firstrequest.SalesOrder.Customer.Area.Region.Name,
+                              RegionId = firstrequest.SalesOrderId == null ? (int?)null : firstrequest.SalesOrder.Customer.Area.Region.Id,
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
                               SupplierContactPerson = order.Supplier.ContactPerson,
@@ -502,6 +506,15 @@ namespace GMGInventory.Application.Repositories
 
                 try
                 {
+                    foreach(var rename in Items)
+                    {
+                        var i = context.PurchaseRequestLineItems.Where(s => s.Id == rename.RequestItemId).FirstOrDefault();
+                        if (i != null && i.ItemDescription != rename.ItemDescription)
+                        {
+                            i.ItemDescription = rename.ItemDescription;
+                        }
+                    }
+
                     var citems = context.PurchaseOrderNewLineItems.Where(s => s.PurchaseOrderId == orderId);
                     // add item
                     // check items not in db

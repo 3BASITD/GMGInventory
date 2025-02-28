@@ -457,7 +457,9 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var po_status = @Json.Serialize(Model?.Status);
         var request_type_id = @Json.Serialize(Model?.RequestTypeId);
+        var request_type = @Json.Serialize(Model?.RequestType);
         var request_purpose_id = @Json.Serialize(Model?.RequestPurposeId);
+        var request_purpose = @Json.Serialize(Model?.RequestPurpose);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -507,7 +509,22 @@
                     name: "ItemPartNumber",
                     className: "form-cell"
                 },
-                { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (po_status.toLowerCase() == "draft" && request_type.toLowerCase() == "non-automotive" && request_purpose.toLowerCase() == "one-time purchase") {
+                            if (data.itemDescription == "") {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description is required.</label>';
+                            } else if (data.itemDescription.length > 100) {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description must not exceed 100 characters.</label>';
+                            } else {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description" style="width: 100%;">' + data.itemDescription + '</textarea>';
+                            }
+                        } else {
+                            return data.itemDescription;
+                        }
+                    },
+                    name: "ItemDescription",
+                    className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
                         if (po_status.toLowerCase() == "draft") {
@@ -614,6 +631,17 @@
 
                     itemDT.draw();
                 });
+
+                if (po_status.toLowerCase() == "draft" && request_type.toLowerCase() == "non-automotive" && request_purpose.toLowerCase() == "one-time purchase") {
+                    $(".description").off("change").on("change", function () {
+                        var row = itemDT.row($(this).closest('tr'));
+                        var rowData = row.data();
+
+                        rowData.itemDescription = $(row.node()).find(".description").val();
+
+                        row.data(rowData).draw(false);
+                    });
+                }
 
                 $(".quantity, .cost").off("change").on("change", function () {
                     var row = itemDT.row($(this).closest('tr'));
@@ -862,6 +890,8 @@
                     toastr.warning("No item to request. Add an item to the list to continue", "Warning");
                 } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
+                } else if (itemDT.rows().nodes().to$().find('.is-invalid').length) {
+                    toastr.warning("Some items have invalid inputs. Please fix it first", "Warning");
                 } else {
                     $.ajax({
                         type: "POST",

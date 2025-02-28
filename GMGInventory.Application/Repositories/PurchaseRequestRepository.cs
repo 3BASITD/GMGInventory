@@ -158,7 +158,7 @@ namespace GMGInventory.Application.Repositories
                           let resubmitfrom = context.PurchaseRequests
                                                     .Where(s => s.ResubmitId == request.Id)
                                                     .FirstOrDefault()
-                          let firstitem = request.PurchaseRequestLineItems.FirstOrDefault()
+                          let firstitem = request.PurchaseRequestLineItems.First()
                           join userc in userManager.Users on request.UserCreated equals userc.Id
                           join userm in userManager.Users on request.UserModified equals userm.Id into m
                           from userm in m.DefaultIfEmpty()
@@ -213,7 +213,8 @@ namespace GMGInventory.Application.Repositories
                             let requests = context.PurchaseRequestLineItems
                                                   .Where(s => s.SalesOrderId == soli.SalesOrderId
                                                            && s.ItemId == soli.ItemId
-                                                           && s.PurchaseRequest.Status.Name.ToLower() == "approved")
+                                                           && s.PurchaseRequest.Status.Name.ToLower() == "approved"
+                                                           && s.PurchaseRequest.Purpose.Name.ToLower() != "one-time purchase")
                                                   .Sum(s => (int?)s.Quantity) ?? 0
                             where request.PurchaseRequestId == purchaseRequestId
                             select new PurchaseRequestLineItemVM
@@ -229,7 +230,9 @@ namespace GMGInventory.Application.Repositories
                                 ItemDescription = request.ItemDescription,
                                 StockOnHandD = ii,
                                 QuantityD = request.Quantity,
-                                MaxQuantityD = (soli == null ? 0 : soli.Quantity) - (ii + requests), 
+                                MaxQuantityD = request.PurchaseRequest.Purpose.Name.ToLower() == "one-time purchase"
+                                             ? 1999999
+                                             : ((soli == null ? 0 : soli.Quantity) - (ii + requests)), 
                                 UnitId = request.Unit != null ? request.Unit.Id
                                        : request.Item != null ? request.Item.Unit.Id
                                        : 0,
@@ -401,6 +404,15 @@ namespace GMGInventory.Application.Repositories
 
                 try
                 {
+                    foreach (var rename in Items)
+                    {
+                        var i = context.PurchaseRequestLineItems.Where(s => s.Id == rename.Id).FirstOrDefault();
+                        if (i != null && i.ItemDescription != rename.ItemDescription)
+                        {
+                            i.ItemDescription = rename.ItemDescription;
+                        }
+                    }
+
                     var citems = context.PurchaseRequestLineItems.Where(s => s.PurchaseRequestId == requestId);
                     // add item
                     // check items not in db

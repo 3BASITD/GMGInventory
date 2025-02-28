@@ -65,12 +65,12 @@
                     </a>
                 }
             }
-            else if (Model.Status.ToLower() == "approved")
+            @* else if (Model.Status.ToLower() == "approved")
             {
                 <a href="@Url.Action("Create", "PurchaseOrder")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
                     <span class="fas fa-box-open"></span> Start Order
                 </a>
-            }
+            } *@
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
@@ -416,6 +416,7 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var pr_status = @Json.Serialize(Model.Status);
         var request_type = @Json.Serialize(Model.Type);
         var request_purpose = request_type.toLowerCase() == "maintenance & repair" ? "" : @(Json.Serialize(Model.Purpose ?? ""));
 
@@ -438,7 +439,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        if (user_access.canEdit && $("#request-status").text().trim().toLowerCase() == "draft") {
+                        if (user_access.canEdit && pr_status.toLowerCase() == "draft") {
                             actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
                             actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
                             actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
@@ -461,11 +462,27 @@
                     className: "form-cell"
                 },
                 { data: "itemPartNumber", name: "ItemPartNumber", className: "form-cell" },
-                { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (pr_status.toLowerCase() == "draft" && request_type.toLowerCase() == "non-automotive" && request_purpose.toLowerCase() == "one-time purchase") {
+                            if (data.itemDescription == "") {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description is required.</label>';
+                            } else if (data.itemDescription.length > 100) {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description must not exceed 100 characters.</label>';
+                            } else {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description" style="width: 100%;">' + data.itemDescription + '</textarea>';
+                            }
+                        } else {
+                            return data.itemDescription;
+                        }
+                    },
+                    name: "ItemDescription",
+                    className: "form-cell"
+                },
                 { data: "stockOnHand", name: "StockOnHand", className: "form-cell text-end" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (user_access.canEdit && $("#request-status").text().trim().toLowerCase() == "draft") {
+                        if (user_access.canEdit && pr_status.toLowerCase() == "draft") {
                             var soMax = checkIfRequired("SONumber") ? data.maxQuantityD : 1999999;
                             if (data.quantityD > soMax) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot exceed ' + soMax + ' unserved quantity.</label>';
@@ -500,13 +517,22 @@
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
 
+            if (pr_status.toLowerCase() == "draft" && request_type.toLowerCase() == "non-automotive" && request_purpose.toLowerCase() == "one-time purchase") {
+                $(".description").off("change").on("change", function () {
+                    var row = itemDT.row($(this).closest('tr'));
+                    var rowData = row.data();
+
+                    rowData.itemDescription = $(row.node()).find(".description").val();
+
+                    row.data(rowData).draw(false);
+                });
+            }
+
             $(".quantity").off("change").on("change", function () {
-                console.log("test");
                 var row = itemDT.row($(this).closest('tr'));
                 var rowData = row.data();
 
                 var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
-                console.log("test: " + quantityValue);
                 rowData.quantity = FormatStringInteger(quantityValue);
                 rowData.quantityD = quantityValue;
 
@@ -836,7 +862,7 @@
             function ComputeTotalQuantity() {
                 total_quantity = 0;
                 itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    if ($("#request-status").text().trim().toLowerCase() == "draft") {
+                    if (pr_status.toLowerCase() == "draft") {
                         total_quantity += parseInt($(this.node()).find(".quantity").val());
                     } else {
                         total_quantity += this.data().quantityD;

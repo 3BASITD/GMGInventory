@@ -359,6 +359,32 @@ p.text-sm {
     margin-bottom: 0.5rem;
 }
 
+.expandable-textarea {
+    margin: 4px;
+    display: inline-block;
+    resize: none;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+    .expandable-textarea.form-control-sm {
+        height: 31px;
+    }
+
+    .expandable-textarea:focus {
+        height: 75px;
+        white-space: normal;
+        overflow-y: auto; /* Vertical scrollbar when needed */
+        overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+
+.center-container {
+    display: inline-block; /* Acts like text for vertical centering */
+    vertical-align: middle; /* Aligns the container vertically */
+    height: 100%; /* Fill cell height */
+}
+
 .swiper-container {
     width: 100%;
     height: 550px;

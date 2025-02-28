@@ -217,6 +217,8 @@
 
 @section Scripts {
     <script>
+        $("#request-date-requested").val(DateForInput(new Date()));
+
         var currentType = null;
         var currentPurpose = null;
         var currentRegion = null;
@@ -288,7 +290,25 @@
                     className: "form-cell"
                 },
                 { data: "itemPartNumber", name: "ItemPartNumber", className: "form-cell" },
-                { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
+                        var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
+                        if (typeText == "non-automotive" && purposeText == "one-time purchase") {
+                            if (data.itemDescription == "") {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description is required.</label>';
+                            } else if (data.itemDescription.length > 100) {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description must not exceed 100 characters.</label>';
+                            } else {
+                                return '<textarea class="form-control form-control-sm expandable-textarea description" style="width: 100%;">' + data.itemDescription + '</textarea>';
+                            }
+                        } else {
+                            return data.itemDescription;
+                        }
+                    },
+                    name: "ItemDescription",
+                    className: "form-cell"
+                },
                 { data: "stockOnHand", name: "StockOnHand", className: "form-cell text-end" },
                 {
                     data: function (data, type, dataToSet) {
@@ -320,6 +340,20 @@
 
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
+
+
+            var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
+            var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
+            if (typeText == "non-automotive" && purposeText == "one-time purchase") {
+                $(".description").off("change").on("change", function () {
+                    var row = itemDT.row($(this).closest('tr'));
+                    var rowData = row.data();
+
+                    rowData.itemDescription = $(row.node()).find(".description").val();
+
+                    row.data(rowData).draw(false);
+                });
+            }
 
             $(".quantity").off("change").on("change", function () {
                 var row = itemDT.row($(this).closest('tr'));
@@ -467,7 +501,10 @@
         function changingTypePurposeOrRegion() {
             var selectedType = $("#request-type").val();
             var selectedPurpose = $("#request-purpose").val();
-            var selectedRegion = $("#request-region").val();
+
+            var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
+            var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
+            var selectedRegion = typeText == "non-automotive" && purposeText == "one-time purchase" ? $("#order-region").val() : null;
             if (itemDT.data().length > 0 && (selectedType != currentType || selectedPurpose != currentPurpose || selectedRegion != currentRegion)) {
                 var changed = selectedType != currentType ? "Request Type"
                             : selectedPurpose != currentPurpose ? "Request Purpose"
@@ -705,7 +742,11 @@
                     return {
                         search: params.term,
                         page: params.page || 1,
-                        regionId: $("#request-region").val()
+                        regionId: function () {
+                            var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
+                            var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
+                            var selectedRegion = typeText == "non-automotive" && purposeText == "one-time purchase" ? $("#request-region").val() : null;
+                        }
                     };
                 },
                 processResults: function (data, params) {
