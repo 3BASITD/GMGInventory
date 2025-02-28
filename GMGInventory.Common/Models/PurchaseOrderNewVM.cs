@@ -85,7 +85,7 @@ namespace GMGInventory.Common.Models
         public string DeliveryContactNumber { get; set; }
 
         [Display(Name = "Remarks")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [Display(Name = "Canvas Summary Reference")]
         public string Reference { get; set; }
@@ -132,7 +132,7 @@ namespace GMGInventory.Common.Models
         public int DeliveryAddressId { get; set; }
         public DateTime DateOrdered { get; set; }
         public string Reference { get; set; }
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
         public string Status { get; set; }
         public int? ResubmitId { get; set; }
         public PurchaseOrderLineItemVM Items { get; set; }

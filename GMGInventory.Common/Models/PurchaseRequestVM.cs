@@ -82,7 +82,7 @@ namespace GMGInventory.Common.Models
         public int? PurposeId { get; set; }
         public string? PurposeDefinition { get; set; }
         public DateTime DateRequested { get; set; }
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
         public string Status { get; set; }
         public int? ResubmitId { get; set; }
         public PurchaseRequestLineItemVM Items { get; set; }

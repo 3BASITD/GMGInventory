@@ -131,6 +131,13 @@ namespace GMGInventory.Common.Models
         public string ReceivedQuantity => string.Format("{0:#,##0}", ReceivedQuantityD);
         public int ReceivedQuantityD { get; set; }
 
+        public string ServedQuantity => string.Format("{0:#,##0}", ServedQuantityD);
+        public int ServedQuantityD { get; set; }
+
+        [Display(Name = "To Return Quantity")]
+        public string ToReturnQuantity => string.Format("{0:#,##0}", ToReturnQuantityD);
+        public int ToReturnQuantityD => ReceivedQuantityD - ServedQuantityD;
+
         [Display(Name = "UOM")]
         public string UnitCode { get; set; }
         public int UnitId { get; set; }

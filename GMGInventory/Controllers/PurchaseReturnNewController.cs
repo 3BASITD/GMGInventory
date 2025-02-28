@@ -120,7 +120,16 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReturnNew, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await returnRepository.GetWithPRItemsListAsync(purchaseReturnId));
+            return Json(await returnRepository.GetWithRRItemsListAsync(purchaseReturnId));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetItemsFromRRListJson(int purchaseReceiveId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await returnRepository.GetItemsFromRRListAsync(purchaseReceiveId));
         }
 
         [HttpPost]

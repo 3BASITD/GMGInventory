@@ -9,6 +9,8 @@ using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Threading.Tasks.Dataflow;
+using static Humanizer.On;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -160,7 +162,41 @@ namespace GMGInventory.Application.Repositories
             return await details.FirstOrDefaultAsync();
         }
 
-        public async Task<IList<PurchaseReceiveLineItemVM>> GetWithPOItemsListAsync(int purchaseReceivingId) // for create and details
+        public async Task<IList<PurchaseReceiveLineItemVM>> GetItemsFromPOListAsync(int purchaseOrderId) // for create
+        {
+            var receiveVM = from order in context.PurchaseOrderNewLineItems
+                            let receive = context.PurchaseReceivingLineItems
+                                         .Where(s => s.OrderItemId == order.Id).FirstOrDefault()
+
+                            where order.PurchaseOrderId == purchaseOrderId
+
+                            select new PurchaseReceiveLineItemVM
+                            {
+                                Id = receive == null ? 0 : receive.Id,
+                                ToReceive = receive != null,
+                                PurchaseReceivingId = receive != null ? receive.PurchaseReceivingId : 0,
+                                LineNumber = order.LineNumber,
+                                OrderItemId = order.Id,
+                                ItemId = order.RequestItem.Item == null ? null : order.RequestItem.Item.Id,
+                                ItemCode = order.RequestItem.Item == null ? null : order.RequestItem.Item.Code,
+                                ItemPartNumber = order.RequestItem.Item == null ? null : order.RequestItem.Item.PartNumber,
+                                ItemDescription = order.RequestItem.ItemDescription,
+                                QuantityD = receive == null ? 0 : receive.Quantity,
+                                OrderQuantityD = order.Quantity,
+                                ServedQuantityD = context.PurchaseReceivingLineItems
+                                                       .Where(a => a.PurchaseReceiving.Status.Name.ToLower() == "approved"
+                                                                    && a.OrderItemId == order.Id)
+                                                       .Select(a => a.Quantity)
+                                                       .Sum(),
+
+                                UnitId = order.RequestItem.Item == null ? order.RequestItem.Unit.Id : order.RequestItem.Item.Unit.Id,
+                                UnitCode = order.RequestItem.Item == null ? order.RequestItem.Unit.Code : order.RequestItem.Item.Unit.Code,
+                                UnitCostD = order.UnitCost
+                            };
+            return await receiveVM.ToListAsync();
+        }
+     
+        public async Task<IList<PurchaseReceiveLineItemVM>> GetWithPOItemsListAsync(int purchaseReceivingId) // for details
         {
             var orderId = await context.PurchaseReceivings
                                              .Where(s => s.Id == purchaseReceivingId)
@@ -168,10 +204,10 @@ namespace GMGInventory.Application.Repositories
                                              .FirstOrDefaultAsync();
 
             var receiveVM = from order in context.PurchaseOrderNewLineItems
-
                             let receive = context.PurchaseReceivingLineItems
                                          .Where(s => s.OrderItemId == order.Id && s.PurchaseReceivingId == purchaseReceivingId).FirstOrDefault()
-                            where order.PurchaseOrderId == orderId
+                          
+                            where order.PurchaseOrderId == orderId 
 
                             select new PurchaseReceiveLineItemVM
                             {
@@ -186,6 +222,12 @@ namespace GMGInventory.Application.Repositories
                                 ItemDescription = order.RequestItem.ItemDescription,
                                 QuantityD = receive == null ? 0 : receive.Quantity,
                                 OrderQuantityD = order.Quantity,
+                                ServedQuantityD = context.PurchaseReceivingLineItems
+                                                       .Where(a => a.PurchaseReceiving.Status.Name.ToLower() == "approved"
+                                                                    && a.OrderItemId == order.Id)
+                                                       .Select(a => a.Quantity)
+                                                       .Sum(),
+                         
                                 UnitId = order.RequestItem.Item == null ? order.RequestItem.Unit.Id : order.RequestItem.Item.Unit.Id,
                                 UnitCode = order.RequestItem.Item == null ? order.RequestItem.Unit.Code : order.RequestItem.Item.Unit.Code,
                                 UnitCostD = order.UnitCost
@@ -387,24 +429,30 @@ namespace GMGInventory.Application.Repositories
 
             return response;
         }
-
+      
         public async Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId)
         {
-            var pos = from porder in context.PurchaseOrderNews
+            var orders = from orderItems in context.PurchaseOrderNewLineItems
+                           let receivingItems = orderItems.PurchaseReceivingLineItems
+                                          .Where(a => a.PurchaseReceiving.Status.Name.ToLower() == "approved")
+                                          .Select(a => (int?)a.Quantity)
+                                          .Sum() ?? 0
+                           where receivingItems != orderItems.Quantity
+                           select orderItems.PurchaseOrderId;
 
-                      let receiving = context.PurchaseReceivings
-                                            .Where(s => s.PurchaseOrderId == porder.Id)
-                                            .Select(s => s.Status.Name).FirstOrDefault()
 
-                      where porder.Status.Name.ToLower() == "approved" && receiving.ToLower() != "approved"
-                      select new JsonOptionsModel
-                      {
-                          Id = porder.Id.ToString(),
-                          Text = porder.DocumentNumber,
-                          Selected = SelectedId != null && porder.Id == SelectedId
-                      };
-
-            return await pos.OrderBy(s => s.Text).ToListAsync();
+            return await context.PurchaseOrderNews
+                                .Include(s => s.Status)
+                                .Where(s => s.Status.Name.ToLower() == "approved"
+                                         && orders.Contains(s.Id))
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.DocumentNumber,
+                                    Selected = SelectedId != null && s.Id == SelectedId
+                                })
+                                .OrderBy(s => s.Text)
+                                .ToListAsync();
         }
 
         public async Task<ResponseModel> ApproveAsync(int receivingId)

@@ -126,6 +126,8 @@ namespace GMGInventory.Application.Repositories
                             select new ItemPriceVM
                             {
                                 Brand = item.Brand.Code,
+                                BrandName = item.Brand.Name,
+                                InterchangeNumber = item.InterchangeNumber,
                                 Category = item.Category.Code,
                                 Code = item.Code,
                                 Id = item.Id,

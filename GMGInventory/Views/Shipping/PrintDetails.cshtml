@@ -3,7 +3,6 @@
 @{
     Layout = "";
     var title = "Shipping Report";
-    // var items = ViewData["Items"] as List<ShippingVM> ?? new List<ShippingVM>();
 }
 
 <!DOCTYPE html>
@@ -18,7 +17,7 @@
 <body>
     <table class="formatted shipping">
         <tr>
-            <td rowspan="2" class="center-text">
+            <td rowspan="2" class="left-text" style="width: 23%;">
                     <img src="~/images/BAS-02.png" class="logo" />
             </td>
             <td class="left-text">
@@ -31,10 +30,12 @@
                     </dl>
                 </div>
             </td>
-            <td style="width: 10%;">
-            </td>
+          @*   <td style="width: 10%;">
+            </td> *@
         </tr>
     <tr>
+            <td></td>
+           @*  <td></td> *@
             <td class="right-text"><strong>Date: @DateTime.Now.ToString("MM/dd/yyyy") </strong></td>
     </tr>
     </table>
