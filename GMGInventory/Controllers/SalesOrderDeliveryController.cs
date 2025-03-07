@@ -68,12 +68,19 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("SONumber")),
                 new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("CustomerCode")),
                 new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("CustomerName")),
+                new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("CustomerAddress")),
                 new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("DatePickup")),
                 new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("DateDeliver")),
                 new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("Forwarder")),
                 new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("WaybillNumber")),
                 new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("Remarks")),
-                new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("PONumber"))
+                new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("PONumber")),
+                new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("ServiceLevelAgreement")),
+                new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("SalesOrderStatus")),
+                new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("RequiredDeliveryDate")),
+                new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("Representative")),
+                new DataColumn(chelper.DisplayName<SalesOrderDeliveryVM>("DateReceive"))
+
 
             ]);
             var sos = await salesOrderDeliveryRepository.GetListAsync(filter);
@@ -83,12 +90,18 @@ namespace GMGInventory.Controllers
                             so.SONumber,
                             so.CustomerCode,
                             so.CustomerName,
+                            so.CustomerAddress,
                             so.DatePickup,
                             so.DateDeliver,
                             so.Forwarder,
                             so.WaybillNumber,
                             so.Remarks,
-                            so.PONumber);
+                            so.PONumber,
+                            so.ServiceLevelAgreement,
+                            so.SalesOrderStatus,
+                            so.RequiredDeliveryDate,
+                            so.Representative,
+                            so.DateReceive);
             }
 
             using XLWorkbook wb = new();

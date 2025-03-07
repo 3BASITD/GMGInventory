@@ -27,10 +27,19 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetPurchaseReceivingOptions(int? SelectedId)
         {
+            var receivings = from receiveItems in context.PurchaseReceivingLineItems
+                         let returnItems = receiveItems.PurchaseReturnLineItem
+                                        .Where(a => a.PurchaseReturn.Status.Name.ToLower() == "approved")
+                                        .Select(a => (int?)a.Quantity)
+                                        .Sum() ?? 0
+                         where returnItems != receiveItems.Quantity
+                         select receiveItems.PurchaseReceivingId;
+
+
             return await context.PurchaseReceivings
                                 .Include(s => s.Status)
-                                .Include(s => s.PurchaseOrder)
-                                .Where(s => s.Status.Name.ToLower() == "approved")
+                                .Where(s => s.Status.Name.ToLower() == "approved"
+                                         && receivings.Contains(s.Id))
                                 .Select(s => new JsonOptionsModel
                                 {
                                     Id = s.Id.ToString(),

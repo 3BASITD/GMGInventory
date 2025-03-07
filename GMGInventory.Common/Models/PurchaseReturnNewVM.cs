@@ -58,7 +58,7 @@ namespace GMGInventory.Common.Models
 
 
         [Display(Name = "Remarks")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [Display(Name = "Canvas Summary Reference")]
         public string Reference { get; set; }

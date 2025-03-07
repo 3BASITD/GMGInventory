@@ -24,6 +24,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
 
+        [Display(Name = "Customer Address")]
+        public string CustomerAddress { get; set; }
+
         [Display(Name = "Pick-up Date")]
         public string? DatePickup => DatePickupD == null ? null : DatePickupD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DatePickupD { get; set; }
