@@ -111,6 +111,33 @@
                         <input type="text" id="order-remarks" name="Remarks" class="form-control form-control-sm" />
                     </div>
                 </div>
+
+                <div class="col-12 col-md-4 col-sm-6 order-discount1-container">
+                    <div class="form-group">
+                        <label for="order-discount1" class="form-label mb-0">Discount 1</label>
+                        <input type="number" min="0" max="1999999" id="order-discount1" name="Discount1" class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4 col-sm-6 order-discount2-container">
+                    <div class="form-group">
+                        <label for="order-discount2" class="form-label mb-0"> Discount 2</label>
+                        <input type="number" min="0" max="1999999" id="order-discount2" name="Discount2" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6 order-discount3-container">
+                    <div class="form-group">
+                        <label for="order-discount3" class="form-label mb-0"> Discount 3</label>
+                        <input type="number" min="0" max="1999999" id="order-discount3" name="Discount3" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6 order-vat-container">
+                    <div class="form-group">
+                        <label class="control-label mb-0 d-block" for="filter-unserved"> VAT Included?</label>
+                        <input class="form-check-input" type="checkbox" id="order-vat">
+                    </div>
+                </div>
+
             </div>
             <div class="row">
                 <div class="col-12">
@@ -635,10 +662,22 @@
             var defaultOption = $("#order-mode").find('option').eq(0).val();
             $("#order-mode").val(defaultOption).trigger('change');
             $("#order-reference").val("");
+            $("#order-discount1").val(0);
+            $("#order-discount2").val(0);
+            $("#order-discount3").val(0);
+
+            $("#order-vat").prop("checked") == false
 
             if (typeText == "non-automotive") {
                 $(".order-mode-container").toggle(true);
                 $(".order-reference-container").toggle(false);
+
+                $(".order-vat-container").toggle(true);
+                $(".order-discount1-container").toggle(true);
+                $(".order-discount2-container").toggle(false);
+                $(".order-discount3-container").toggle(false);
+
+
                 itemDT.column(3).visible(true);
                 itemDT.column(4).visible(false);
                 $(".order-region-container").toggle(false);
@@ -652,6 +691,22 @@
                 } else {
                     $(".order-region-container").toggle(false);
                 }
+
+                if(typeText == "international purchase order")
+                {
+                     $(".order-vat-container").toggle(true);
+                     $(".order-discount2-container").toggle(false);
+                     $(".order-discount3-container").toggle(false);
+                }
+             
+                if(typeText == "local purchase order")
+                {
+                     $(".order-vat-container").toggle(true);
+                     $(".order-discount1-container").toggle(true);
+                     $(".order-discount2-container").toggle(true);
+                     $(".order-discount3-container").toggle(true);
+                }
+
             } else if (typeText == "maintenance & repair") {
                 var deliveryOption = $("#order-mode").find('option').filter(function () {
                     return $(this).text().toLowerCase() == "delivery";
@@ -665,6 +720,10 @@
                 itemDT.column(3).visible(false);
                 itemDT.column(4).visible(false);
                 $(".order-region-container").toggle(false);
+                $(".order-vat-container").toggle(false);
+                $(".order-discount1-container").toggle(false);
+                $(".order-discount2-container").toggle(false);
+                $(".order-discount3-container").toggle(false);
             }
 
             loadSupplier();
@@ -1140,6 +1199,10 @@
                         Remarks: $("#order-remarks").val(),
                         Status: $("#action-type").val(),
                         ResubmitId: $("#resubmitPOId").val(),
+                        Discount1: $("#order-discount1").val(),
+                        Discount2: $("#order-discount2").val(),
+                        Discount3: $("#order-discount3").val(),
+                        IsVATIncluded: $("#order-vat").prop("checked"),
                         Items: itemDT.rows().data().toArray()
                     },
                     success: function (data, status, xhr) {

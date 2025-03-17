@@ -120,7 +120,6 @@
                 </p>
             </div>
 
-
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -134,13 +133,26 @@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Remarks)
+                        @Html.DisplayNameFor(model => model.SINumber)
                     </span>
-                    <b class="d-block">
-                        @Model?.Remarks
+                    <b class="d-block" id="receive-siNumber">
+                        @Model?.SINumber
                     </b>
                 </p>
             </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DRNumber)
+                    </span>
+                    <b class="d-block" id="receive-drNumber">
+                        @Model?.DRNumber
+                    </b>
+                </p>
+            </div>
+
+
+
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -151,6 +163,17 @@
                     </b>
                 </p>
             </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </span>
+                    <b class="d-block">
+                        @Model?.Remarks
+                    </b>
+                </p>
+            </div>
+
             @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy))
             {
                 <div class="col-12 col-md-4 col-sm-6">
@@ -178,46 +201,7 @@
                     </p>
                 </div>
             }
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Currency)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Currency
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CurrencyRate)
-                    </span>
-                    <b class="d-block">
-                        @Model?.CurrencyRate
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Discount1)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Discount1
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Discount2)
-                    </span>
-                    <b class="d-block">
-                        @Model?.Discount2
-                    </b>
-                </p>
-            </div>
+
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -590,6 +574,6 @@
             }
         }
 
-       
+
     </script>
 }

@@ -111,6 +111,21 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
+                        <label for="receive-discount3" class="form-label mb-0">Discount 3</label>
+                        <div class="input-group input-group-sm">
+                            <input type="number" step="0.01" min="0" max="100" id="receive-discount3" name="Discount3" class="form-control form-control-sm" readonly="readonly" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="receive-isVATIncluded" class="form-label mb-0">Is VAT Included</label>
+                        <input type="text" id="receive-isVATIncluded" name="Term" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
                         <label for="date-received" class="form-label mb-0">Date Received</label>
                         <input type="date" id="date-received" name="DateReceived" class="form-control form-control-sm" />
                     </div>
@@ -194,6 +209,8 @@
                     $("#receive-currencyRate").val(data.currencyRate);
                     $("#receive-discount1").val(data.discount1);
                     $("#receive-discount2").val(data.discount2);
+                    $("#receive-discount3").val(data.discount3);
+                    $("#receive-isVATIncluded").val(data.isVATIncluded);
 
                     loadPONumberOptions(data.poId);
                 },
@@ -383,6 +400,8 @@
                         $("#receive-currencyRate").val("0");
                         $("#receive-discount1").val("0");
                         $("#receive-discount2").val("0");
+                        $("#receive-discount3").val("0");
+                        $("#receive-isVATIncluded").val("");
 
                         $("#add-orderItem").val("").trigger("change");
 
@@ -412,6 +431,8 @@
                     $("#receive-currencyRate").val(data.currencyRate);
                     $("#receive-discount1").val(data.discount1);
                     $("#receive-discount2").val(data.discount2);
+                    $("#receive-discount3").val(data.discount3);
+                    $("#receive-isVATIncluded").val(data.isVATIncluded);
                 },
                 complete: function (xhr, status) {
                     loadRRItems();

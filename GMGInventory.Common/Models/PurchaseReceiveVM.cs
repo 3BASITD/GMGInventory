@@ -35,14 +35,26 @@ namespace GMGInventory.Common.Models
         public string Warehouse { get; set; }
         public int WarehouseId { get; set; }
 
-        [Display(Name = "DR Number")]
+        [Display(Name = "Delivery Receipt Number")]
         public string DRNumber { get; set; }
 
-        [Display(Name = "SI Number")]
+        [Display(Name = "Sales Invoice Number")]
         public string SINumber { get; set; }
 
-        public decimal Discount1 { get; set; }
-        public decimal Discount2 { get; set; }
+        [Display(Name = "Discount 1")]
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
+        public decimal Discount1D { get; set; }
+
+        [Display(Name = "Discount 2")]
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
+        public decimal Discount2D { get; set; }
+
+        [Display(Name = "Discount 3")]
+        public string Discount3 => string.Format(SystemFormat.StringDecimalComma, Discount3D);
+        public decimal Discount3D { get; set; }
+
+        [Display(Name = "Is VAT Included?")]
+        public string IsVATIncluded { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }
@@ -68,6 +80,7 @@ namespace GMGInventory.Common.Models
         public decimal CurrencyRateD { get; set; }
 
         public string PurchaseRequestType { get; set; }
+        public string PurchaseOrderType { get; set; }
 
         public string? Remarks { get; set; }
 
@@ -76,6 +89,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Disapproved By")]
         public string? DisapprovedBy { get; set; }
+
+      
 
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }

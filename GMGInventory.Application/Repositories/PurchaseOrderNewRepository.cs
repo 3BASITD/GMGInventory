@@ -277,6 +277,8 @@ namespace GMGInventory.Application.Repositories
                               OrderDateD = order.OrderDate,
                               Discount1D = order.Discount1,
                               Discount2D = order.Discount2,
+                              Discount3D = order.Discount3,
+                              IsVATIncluded = order.IsVATIncluded ? "Yes" : "No",
                               Currency = order.Supplier.Currency.Code,
                               CurrencyId = order.Supplier.Currency.Id,
                               CurrencyRateD = order.Supplier.Currency.Rate,
@@ -453,7 +455,10 @@ namespace GMGInventory.Application.Repositories
                         OrderDate = form.DateOrdered,
                         CanvasSummaryReference = form.Reference + "",
                         Remarks = form.Remarks,
-                        StatusId = status.Id
+                        StatusId = status.Id,
+                        Discount1 = form.Discount1,
+                        Discount2 = form.Discount2,
+                        IsVATIncluded = form.IsVATIncluded
                     };
                     await context.PurchaseOrderNews.AddAsync(order);
                     await context.SaveChangesAsync(currentUserId);

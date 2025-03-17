@@ -50,6 +50,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount2 { get; set; }
 
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Discount3 { get; set; }
+
         [ForeignKey("StatusId")]
         public int? StatusId { get; set; }
         public virtual PurchaseStatus Status { get; set; }
@@ -67,6 +70,8 @@ namespace GMGInventory.Data
         [ForeignKey("ResubmitId")]
         public int? ResubmitId { get; set; }
         public virtual PurchaseOrderNew Resubmit { get; set; }
+
+        public bool IsVATIncluded { get; set; }
 
         public ICollection<PurchaseOrderNew> PurchaseOrderResubmits { get; set; }
         public ICollection<PurchaseOrderNewLineItem> PurchaseOrderLineItems { get; set; }
