@@ -204,7 +204,7 @@
 
                             @{
                                 var totalD = items.Sum(s => s.TotalAmountD);
-                                var total = string.Format("{0}{1:#,##1.11}", Model.Currency , totalD);
+                                var total = Model.Currency + " " + string.Format("{0:#,##0.00}", totalD);
 
                                 var vatD = totalD * (decimal)(0.12);
                                 var vat = string.Format("{0:#,##0.00}", vatD);
@@ -317,7 +317,7 @@
             </tr>
             <tr class="text-center">
                 <td colspan="7" class="bt-0">
-                    <p class="center-text" style="color:gray"> Bina's Auto Supply | 1034 Kusang Loob St. Brgy. 330 Zone 033 Sta. Cruz, Manila | Tel. No.8731-3923,8741-5537/39 </p>
+                    <p class="footer center-text"> Bina's Auto Supply | 1034 Kusang Loob St. Brgy. 330 Zone 033 Sta. Cruz, Manila | Tel. No.8731-3923,8741-5537/39 </p>
                 </td>
             </tr>
         </tbody>
