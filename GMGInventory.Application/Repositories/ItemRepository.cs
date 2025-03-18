@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using System.Xml.Linq;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -82,7 +83,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonItemOptionsModel>> GetPOItemOptions(int id, string search)
         {
             var items = await context.PurchaseOrderLineItems.Include(s => s.Item)
-                                     .Where(s => s.PurchaseOrderId == id 
+                                     .Where(s => s.PurchaseOrderId == id
                                               && (string.IsNullOrWhiteSpace(search)
                                               || (s.Item.Code.ToLower().Contains(search.ToLower()))))
                                     .Select(s => new JsonItemOptionsModel
@@ -192,7 +193,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Code)
         {
-            var item = await context.Items.Where(s => s.Code == Code).FirstOrDefaultAsync();
+            var item = await context.Items
+                                    .Where(s => s.Code.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Code + "").ToLower().Replace("\n", "").Replace("\r", "").Trim())
+                                    .FirstOrDefaultAsync();
             return item?.Id;
         }
 
@@ -256,13 +259,17 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetUnitIdAsync(string? Code)
         {
-            var unit = await context.Units.Where(s => s.Code.ToLower() == Code.ToLower()).FirstOrDefaultAsync();
+            var unit = await context.Units
+                                    .Where(s => s.Code.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Code + "").ToLower().Replace("\n", "").Replace("\r", "").Trim())
+                                    .FirstOrDefaultAsync();
             return unit?.Id;
         }
 
         public async Task<int?> GetUnitIdByNameAsync(string? Name)
         {
-            var unit = await context.Units.Where(s => s.Name.ToLower() == Name.ToLower()).FirstOrDefaultAsync();
+            var unit = await context.Units
+                                    .Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim())
+                                    .FirstOrDefaultAsync();
             return unit?.Id;
         }
 
@@ -343,16 +350,17 @@ namespace GMGInventory.Application.Repositories
                           select new ItemCommonVM
                           {
                               Id = item.Id,
-                              Code = item.Code,
-                              Name = item.Name,
-                              PartNumber = item.PartNumber,
-                              InterchangeNumber = item.InterchangeNumber,
-                              ModelNumber = item.ModelNumber,
-                              Category = item.Category.Name,
-                              ItemType = item.ItemType.Name,
-                              Brand = item.Brand.Name,
-                              Size = item.Size,
-                              Unit = item.Unit.Name,
+                              Code = item.Code.Replace("\n", "").Replace("\r", "").Trim(),
+                              Name = item.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              PartNumber = (item.PartNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                              InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                              ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                              LocationCode = item.LocationCode == null ? "" : item.LocationCode.Code.Replace("\n", "").Replace("\r", "").Trim(),
+                              Category = item.Category.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              ItemType = item.ItemType.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              Brand = item.Brand.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
+                              Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
                               QuantityD = inventory.Quantity,
                               RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                               NetPriceD = price == null ? 0 : price.NetSellingPrice,
@@ -520,7 +528,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsCodeExistAsync(string code)
         {
-            return await context.Items.AnyAsync(s => s.Code == code);
+            return await context.Items.AnyAsync(s => s.Code.ToLower().Replace("\n", "").Replace("\r", "").Trim() == code.ToLower().Replace("\n", "").Replace("\r", "").Trim());
         }
 
         public async Task<bool> IsInUseAsync(int id)

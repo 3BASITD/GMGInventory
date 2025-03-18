@@ -11,7 +11,8 @@ namespace GMGInventory.Application.Contracts
         Task<bool> IsLocationCodeInUse(int id);
 
         Task<bool> IsLocationCodeExist(string code);
-        Task AddAsync(LocationCodeVM locationCodeVM);
+        Task<int> AddAsync(LocationCodeVM locationCodeVM);
         Task UpdateAsync(LocationCodeVM locationCodeVM);
+        Task<int?> GetIdAsync(string? Name);
     }
 }

@@ -44,7 +44,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var itemType = await context.ItemTypes.Where(s => s.Name.ToLower() == Name.ToLower()).FirstOrDefaultAsync();
+            var itemType = await context.ItemTypes.Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim()).FirstOrDefaultAsync();
             return itemType?.Id;
         }
 

@@ -135,7 +135,7 @@ namespace GMGInventory.Application.Repositories
             return await context.LocationCodes.AnyAsync(c => c.Code == code);
         }
 
-        public async Task AddAsync(LocationCodeVM LocationCodeVM)
+        public async Task<int> AddAsync(LocationCodeVM LocationCodeVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var location = new LocationCode
@@ -146,6 +146,8 @@ namespace GMGInventory.Application.Repositories
             };
             await context.LocationCodes.AddAsync(location);
             await context.SaveChangesAsync(currentUserId);
+
+            return location.Id;
         }
 
         public async Task UpdateAsync(LocationCodeVM LocationCodeVM)
@@ -165,6 +167,10 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-
+        public async Task<int?> GetIdAsync(string? Name)
+        {
+            var locationCode = await context.LocationCodes.Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim()).FirstOrDefaultAsync();
+            return locationCode?.Id;
+        }
     }
 }

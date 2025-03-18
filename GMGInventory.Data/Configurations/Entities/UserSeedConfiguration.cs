@@ -14,7 +14,7 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                     UserName = "admin-misnet",
-                    NormalizedUserName = "admin-misnet",
+                    NormalizedUserName = "ADMIN-MISNET",
                     FirstName = "MISNet",
                     LastName = "Administrator",
                     Nickname = "MISNet",
@@ -28,7 +28,7 @@ namespace GMGInventory.Data.Configurations.Entities
                 {
                     Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                     UserName = "admin-gmg",
-                    NormalizedUserName = "admin-gmg",
+                    NormalizedUserName = "ADMIN-GMG",
                     FirstName = "GMG",
                     LastName = "Administrator",
                     Nickname = "GMG",

@@ -99,7 +99,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var warehouse = await context.Warehouses.Where(s => s.Name == Name).FirstOrDefaultAsync();
+            var warehouse = await context.Warehouses
+                                         .Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim())
+                                         .FirstOrDefaultAsync();
             return warehouse?.Id;
         }
 

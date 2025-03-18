@@ -16,6 +16,7 @@ namespace GMGInventory.Controllers
                               , IItemTypeRepository itemTypeRepository
                               , IItemConversionRepository itemConversionRepository
                               , IBrandRepository brandRepository
+                              , ILocationCodeRepository locationCodeRepository
                               , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(string search, int page)
@@ -271,6 +272,31 @@ namespace GMGInventory.Controllers
                             }
                             else
                             {
+                                int? LocationCodeId = null;
+                                if (!string.IsNullOrWhiteSpace(itemVM.LocationCode))
+                                {
+                                    LocationCodeId = await locationCodeRepository.GetIdAsync(itemVM.LocationCode);
+                                    if (LocationCodeId == null)
+                                    {
+                                        LocationCodeId = await locationCodeRepository.AddAsync(new LocationCodeVM
+                                        {
+                                            Code = itemVM.LocationCode,
+                                            Name = itemVM.LocationCode,
+                                            IsActive = true
+                                        });
+                                    }
+                                    else
+                                    {
+                                        await locationCodeRepository.UpdateAsync(new LocationCodeVM
+                                        {
+                                            Id = LocationCodeId.Value,
+                                            Code = itemVM.LocationCode,
+                                            Name = itemVM.LocationCode,
+                                            IsActive = true
+                                        });
+                                    }
+                                }
+
                                 if (await itemRepository.IsCodeExistAsync(itemVM.Code))
                                 {
                                     int itemId = (int)await itemRepository.GetIdAsync(itemVM.Code);
@@ -283,6 +309,7 @@ namespace GMGInventory.Controllers
                                         InterchangeNumber = itemVM.InterchangeNumber,
                                         ItemTypeId = ItemTypeId.Value,
                                         ModelNumber = itemVM.ModelNumber,
+                                        LocationCodeId = LocationCodeId,
                                         Name = itemVM.Name,
                                         PartNumber = itemVM.PartNumber,
                                         Size = itemVM.Size,
@@ -306,6 +333,7 @@ namespace GMGInventory.Controllers
                                         InterchangeNumber = itemVM.InterchangeNumber,
                                         ItemTypeId = ItemTypeId.Value,
                                         ModelNumber = itemVM.ModelNumber,
+                                        LocationCodeId = LocationCodeId,
                                         Name = itemVM.Name,
                                         PartNumber = itemVM.PartNumber,
                                         Size = itemVM.Size,
@@ -341,6 +369,7 @@ namespace GMGInventory.Controllers
                 new DataColumn("Interchange Number"),
                 new DataColumn("Warehouse"),
                 new DataColumn("Model Number"),
+                new DataColumn("Location Code"),
                 new DataColumn("Category"),
                 new DataColumn("Item Type"),
                 new DataColumn("Brand"),
@@ -361,6 +390,7 @@ namespace GMGInventory.Controllers
                             item.InterchangeNumber,
                             item.Warehouse,
                             item.ModelNumber,
+                            item.LocationCode,
                             item.Category,
                             item.ItemType,
                             item.Brand,

@@ -188,7 +188,7 @@
                                 </div>
                             </div>
                         </div>
-                       
+
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">
@@ -323,8 +323,14 @@
                     <div class="form-group">
                         <label class="form-label mb-0" for="upload-file">Excel File</label>
                         <input type="file" id="upload-file" name="file"
-                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                        class="form-control form-control-sm" />
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Items to upload</div>
+                        <div class="col-9 upload-item-count"></div>
+                        <div class="col-3">Done uploaded</div>
+                        <div class="col-9 upload-done-count"></div>
                     </div>
                     <table class="table table-striped" id="upload-table">
                         <thead>
@@ -751,7 +757,7 @@
         if (user_access.canUploadDownload) {
             var json_of_excel_headers;
             var json_of_excel;
-            var colnumber = 10; // number of columns required for upload
+            var colnumber = 15; // number of columns required for upload
             var done_upload_excel = 0;
             var duplicate_upload = 0;
 
@@ -772,6 +778,8 @@
             // Actions upon file selection
             $("#upload-file").on("change", function () {
                 done_upload_excel = 0;
+                $(".upload-item-count").html("0");
+                $(".upload-done-count").html("0");
                 $("#upload-table tbody").html("");
                 $("#upload-table").hide();
             });
@@ -780,71 +788,87 @@
             $(".uploadBtn").click(function (e) {
                 done_upload_excel = 0;
                 $("#upload-file").val("");
+                $(".upload-item-count").html("0");
+                $(".upload-done-count").html("0");
                 $("#upload-table tbody").html("");
                 $("#upload-table").hide();
             });
 
-            function DoUpload() {
-                if (!$("#upload-file").val()) {
-                    toastr.warning("Please select a file first", "Warning");
-                } if (json_of_excel.length == 0) {
-                    toastr.warning("The excel file is empty", "Warning");
-                } else {
-                    var columns = Object.keys(json_of_excel[0]);
-                    $("#upload-table tbody").html("");
-                    $("#upload-table").show();
-                    duplicate_upload = 0;
-                    for (var i = 0; i < json_of_excel.length; i++) {
-                        var rowNum = json_of_excel[i].__rowNum__;
-                        var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
-                        row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
-                        for (var colIndex = 0; colIndex < colnumber; colIndex++) {
-                            var cellValue = json_of_excel[i][columns[colIndex]];
-                            if (cellValue == null)
-                                cellValue = "";
-                            if (colIndex == 0 || colIndex == 1)
-                                row$.append($('<td/>').html(cellValue));
-                        }
-                        if (columns.includes("Code") == false
-                            || columns.includes("Name") == false
-                            || columns.includes("Part Number") == false
-                            || columns.includes("Interchange Number") == false
-                            || columns.includes("Warehouse") == false
-                            || columns.includes("Model Number") == false
-                            || columns.includes("Category") == false
-                            || columns.includes("Item Type") == false
-                            || columns.includes("Brand") == false
-                            || columns.includes("Size") == false
-                            || columns.includes("Unit") == false
-                            || columns.includes("Quantity on Hand") == false
-                            || columns.includes("Gross Price") == false
-                            || columns.includes("Net Price") == false) {
-                            row$.append($('<td/>').html("Unexpected columns"));
-                            UploadRowDone();
-                        } else {
-                            SaveXLSX(json_of_excel[i]["Code"],
-                                json_of_excel[i]["Name"],
-                                json_of_excel[i]["Part Number"],
-                                json_of_excel[i]["Interchange Number"],
-                                json_of_excel[i]["Warehouse"],
-                                json_of_excel[i]["Model Number"],
-                                json_of_excel[i]["Category"],
-                                json_of_excel[i]["Item Type"],
-                                json_of_excel[i]["Brand"],
-                                json_of_excel[i]["Size"],
-                                json_of_excel[i]["Unit"],
-                                json_of_excel[i]["Quantity on Hand"],
-                                json_of_excel[i]["Gross Price"],
-                                json_of_excel[i]["Net Price"],
-                                rowNum);
-                            row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
-                        }
-                        $("#upload-table").append(row$);
+                    function DoUpload() {if (!$("#upload-file").val()) {
+            toastr.warning("Please select a file first", "Warning");
+        } else if (json_of_excel.length == 0) {
+            toastr.warning("The excel file is empty", "Warning");
+        } else {
+            var columns = Object.keys(json_of_excel[0]);
+            $(".upload-item-count").html("0");
+            $(".upload-done-count").html("0");
+            $("#upload-table tbody").html("");
+            $("#upload-table").show();
+            duplicate_upload = 0;
+
+            var batchSize = 10;
+            var index = 0;
+
+            var requiredColumns = [
+                "Code", "Name", "Part Number", "Interchange Number", "Warehouse",
+                "Model Number", "Location Code", "Category", "Item Type", "Brand",
+                "Size", "Unit", "Quantity on Hand", "Gross Price", "Net Price"
+            ];
+
+            var uploadInterval = setInterval(function () {
+                for (var i = 0; i < batchSize && index < json_of_excel.length; i++, index++) {
+                    var rowNum = json_of_excel[index].__rowNum__;
+                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                    row$.append($('<td/>').html(rowNum));
+
+                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                        var cellValue = json_of_excel[index][columns[colIndex]] || "";
+                        if (colIndex == 0 || colIndex == 1)
+                            row$.append($('<td/>').html(cellValue));
                     }
+
+                    var hasUnexpectedColumns = requiredColumns.some(col => !columns.includes(col));
+
+                    if (hasUnexpectedColumns) {
+                        row$.append($('<td/>').html("Unexpected columns detected! Stopping upload."));
+                        $("#upload-table").append(row$);
+                        clearInterval(uploadInterval);
+                        toastr.error("Unexpected columns found. Upload stopped.", "Error");
+                        return;
+                    } else {
+                        SaveXLSX(
+                            json_of_excel[index]["Code"],
+                            json_of_excel[index]["Name"],
+                            json_of_excel[index]["Part Number"],
+                            json_of_excel[index]["Interchange Number"],
+                            json_of_excel[index]["Warehouse"],
+                            json_of_excel[index]["Model Number"],
+                            json_of_excel[index]["Location Code"],
+                            json_of_excel[index]["Category"],
+                            json_of_excel[index]["Item Type"],
+                            json_of_excel[index]["Brand"],
+                            json_of_excel[index]["Size"],
+                            json_of_excel[index]["Unit"],
+                            json_of_excel[index]["Quantity on Hand"],
+                            json_of_excel[index]["Gross Price"],
+                            json_of_excel[index]["Net Price"],
+                            rowNum
+                        );
+                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                    }
+
+                    $("#upload-table").append(row$);
                 }
+
+                if (index >= json_of_excel.length) {
+                    clearInterval(uploadInterval);
+                }
+            }, 1000);
+        }
+
             }
 
-            function SaveXLSX(code, name, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, grossprice, netprice, rownum) {
+            function SaveXLSX(code, name, part, interchange, warehouse, model, locationcode, category, itemtype, brand, size, unit, quantity, grossprice, netprice, rownum) {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("UploadJson")",
@@ -855,6 +879,7 @@
                         InterchangeNumber: interchange,
                         Warehouse: warehouse,
                         ModelNumber: model,
+                        LocationCode: locationcode,
                         Category: category,
                         ItemType: itemtype,
                         Brand: brand,
@@ -880,6 +905,8 @@
 
             function UploadRowDone() {
                 done_upload_excel++;
+                $(".upload-item-count").html(json_of_excel.length);
+                $(".upload-done-count").html(done_upload_excel);
                 $.LoadingOverlay("progress", parseInt((done_upload_excel / json_of_excel.length) * 100));
                 if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
                     $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');

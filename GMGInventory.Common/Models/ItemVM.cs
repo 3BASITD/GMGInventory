@@ -140,7 +140,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Location Code")]
         public string LocationCode { get; set; }
-        public int LocationCodeId { get; set; }
+        public int? LocationCodeId { get; set; }
 
         [Display(Name = "Quantity")]
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
@@ -260,6 +260,7 @@ namespace GMGInventory.Common.Models
         public string PartNumber { get; set; }
         public string InterchangeNumber { get; set; }
         public string Warehouse { get; set; }
+        public string LocationCode { get; set; }
         public string ModelNumber { get; set; }
         public string Category { get; set; }
         public string ItemType { get; set; }

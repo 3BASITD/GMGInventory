@@ -225,7 +225,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<int?> GetIdAsync(string? Name)
         {
             var brand = await context.Brands
-                                     .Where(s => s.Name.ToLower() == Name.ToLower())
+                                     .Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim())
                                      .FirstOrDefaultAsync();
             return brand?.Id;
         }

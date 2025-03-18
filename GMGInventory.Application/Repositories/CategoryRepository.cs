@@ -44,33 +44,33 @@ namespace GMGInventory.Application.Repositories
         public async Task<int?> GetIdAsync(string? Name)
         {
             var category = await context.Categories
-                                        .Where(s => s.Name.ToLower() == Name.ToLower())
+                                        .Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim())
                                         .FirstOrDefaultAsync();
             return category?.Id;
         }
 
 
-        
+
         public async Task<IList<CategoryVM>> GetAllCategoryAsync()
         {
 
             var categories = from category in context.Categories
-                        
-                         join userc in userManager.Users on category.UserCreated equals userc.Id
-                         join userm in userManager.Users on category.UserModified equals userm.Id into m
-                         from userm in m.DefaultIfEmpty()
 
-                         select new CategoryVM
-                         {
-                             Id = category.Id,
-                             CategoryName = category.Name,
-                             CategoryCode = category.Code,
-                             IsActive = category.IsActive,
-                             DateCreatedD = category.DateCreated,
-                             DateModifiedD = category.DateModified == null ? null : category.DateModified.Value,
-                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
-                         };
+                             join userc in userManager.Users on category.UserCreated equals userc.Id
+                             join userm in userManager.Users on category.UserModified equals userm.Id into m
+                             from userm in m.DefaultIfEmpty()
+
+                             select new CategoryVM
+                             {
+                                 Id = category.Id,
+                                 CategoryName = category.Name,
+                                 CategoryCode = category.Code,
+                                 IsActive = category.IsActive,
+                                 DateCreatedD = category.DateCreated,
+                                 DateModifiedD = category.DateModified == null ? null : category.DateModified.Value,
+                                 UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                 UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
+                             };
             return await categories.ToListAsync();
         }
 
