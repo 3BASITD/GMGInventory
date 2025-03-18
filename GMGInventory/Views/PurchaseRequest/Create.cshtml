@@ -745,7 +745,9 @@
                         regionId: function () {
                             var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
                             var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
-                            var selectedRegion = typeText == "non-automotive" && purposeText == "one-time purchase" ? $("#request-region").val() : null;
+                            var selectedRegion = typeText == "automotive" && purposeText == "rush order" ? $("#request-region").val() : null;
+                            
+                            return selectedRegion;
                         }
                     };
                 },

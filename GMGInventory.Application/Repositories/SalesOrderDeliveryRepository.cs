@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,10 @@ namespace GMGInventory.Application.Repositories
                                  CreatedDateD = sdm.DateCreated,
                                  CustomerCode = so.Customer.Code,
                                  CustomerName = so.Customer.Name,
+                                 CustomerAddress = so.Customer.ShippingAddresses
+                                                  .Where(s => s.IsDefault == true)
+                                                  .Select(s => s.Address)
+                                                  .FirstOrDefault() ?? "N/A",
                                  DateDeliverD = sdm.DateDeliver,
                                  DatePickupD = sdm.DatePickup,
                                  Forwarder = sdm.Forwarder.Name,

@@ -90,6 +90,7 @@
                 <th style="min-width: 50px;">QTY</th>
                 <th style="min-width: 25px;">UOM</th>
                 <th style="min-width: 50px;">SOH</th>
+                <th style="min-width: 50px;">PURPOSE</th>
                 <th style="min-width: 50px;">REF.SO#</th>
             </tr>
         </thead>
@@ -110,6 +111,7 @@
                     <td class="right-text"><nobr>@item.Quantity</nobr></td>
                     <td>@item.UnitCode</td>
                     <td class="right-text"><nobr>@item.StockOnHand</nobr></td>
+                    <td>@item.Purpose</td>
                     <td><nobr>@(string.IsNullOrWhiteSpace(item.SalesOrderNumber) ? "-" : item.SalesOrderNumber)</nobr></td>
                 </tr>
             }
@@ -121,6 +123,7 @@
                 <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
                 <td></td>
                 <td>* * NOTHING FOLLOWS * *</td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -138,11 +141,12 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                     </tr>
                 }
             }
             <tr>
-                <td colspan="7">
+                <td colspan="8">
                     <dl>
                         <dt>Remarks:</dt>
                         <dd>@Model.Remarks</dd>
@@ -150,7 +154,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="7">
+                <td colspan="8">
                     <br />
                     <br />
                     <div class="two-column">

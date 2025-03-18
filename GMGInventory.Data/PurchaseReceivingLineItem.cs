@@ -6,7 +6,7 @@ namespace GMGInventory.Data
     {
         public PurchaseReceivingLineItem()
         {
-            PurchaseReturnLineItems = new HashSet<PurchaseReturnLineItem>();
+            PurchaseReturnLineItem = new HashSet<PurchaseReturnNewLineItem>();
         }
 
         [ForeignKey("PurchaseReceivingId")]
@@ -19,6 +19,6 @@ namespace GMGInventory.Data
 
         public int Quantity { get; set; }
 
-        public ICollection<PurchaseReturnLineItem> PurchaseReturnLineItems { get; set; }
+        public ICollection<PurchaseReturnNewLineItem> PurchaseReturnLineItem { get; set; }
     }
 }

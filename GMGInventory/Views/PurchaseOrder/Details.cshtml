@@ -224,6 +224,64 @@
                     </p>
                 </div>
             }
+            @if (!new[] {
+            "maintenance & repair"
+            }.Contains(Model?.Type?.ToLower()))
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Discount1)
+                        </span>
+                        <b class="d-block">
+                            @(Model?.Discount1 ?? "-")
+                        </b>
+                    </p>
+                </div>
+            }
+            @if (new[] {
+            "local purchase order"
+            }.Contains(Model?.Type?.ToLower()))
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Discount2)
+                        </span>
+                        <b class="d-block">
+                            @(Model?.Discount2 ?? "-")
+                        </b>
+                    </p>
+                </div>
+
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Discount3)
+                        </span>
+                        <b class="d-block">
+                            @(Model?.Discount3 ?? "-")
+                        </b>
+                    </p>
+                </div>
+            }
+
+            @if (!new[] {
+            "maintenance & repair"
+            }.Contains(Model?.Type?.ToLower()))
+            {
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.IsVATIncluded)
+                        </span>
+                        <b class="d-block">
+                            @Model?.IsVATIncluded
+                        </b>
+                    </p>
+                </div>
+            }
+
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">

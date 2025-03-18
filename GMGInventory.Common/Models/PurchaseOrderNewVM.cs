@@ -44,6 +44,14 @@ namespace GMGInventory.Common.Models
         public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
+        [Display(Name = "Discount 3")]
+        public string Discount3 => string.Format(SystemFormat.StringDecimalComma, Discount3D);
+        public decimal Discount3D { get; set; }
+
+
+        [Display(Name = "Is VAT Included?")]
+        public string IsVATIncluded { get; set; }
+
         [Display(Name = "Status")]
         public string Status { get; set; }
 
@@ -101,6 +109,8 @@ namespace GMGInventory.Common.Models
         public int? ResubmitId { get; set; }
         public int? ResubmitFromId { get; set; }
 
+       
+
         public string PurchaseRequestNumber { get; set; }
         public string DateReceived => DateReceivedD == null ? "N/A" : DateReceivedD.Value.ToString("MMMM dd, yyyy");
         public string TimeReceived => DateReceivedD == null ? "N/A" : DateReceivedD.Value.ToString("hh:mm tt");
@@ -135,6 +145,12 @@ namespace GMGInventory.Common.Models
         public string? Remarks { get; set; }
         public string Status { get; set; }
         public int? ResubmitId { get; set; }
+        public decimal Discount1 { get; set; }
+        public decimal Discount2 { get; set; }
+        public decimal Discount3 { get; set; }
+
+        public bool IsVATIncluded { get; set; }
+
         public PurchaseOrderLineItemVM Items { get; set; }
     }
 
