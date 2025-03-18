@@ -458,6 +458,7 @@ namespace GMGInventory.Application.Repositories
                         StatusId = status.Id,
                         Discount1 = form.Discount1,
                         Discount2 = form.Discount2,
+                        Discount3 = form.Discount3,
                         IsVATIncluded = form.IsVATIncluded
                     };
                     await context.PurchaseOrderNews.AddAsync(order);
