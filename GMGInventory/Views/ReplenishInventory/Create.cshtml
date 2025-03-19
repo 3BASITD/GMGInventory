@@ -233,7 +233,7 @@
                         if (repo.loading) {
                             return repo.text;
                         }
-                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
                     }
                 });
                 $("#replenish-address1").val($("#replenish-supplier").select2("data")[0].address1);
@@ -258,7 +258,7 @@
                         if (repo.loading) {
                             return repo.text;
                         }
-                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
                     },
                 });
             },
@@ -291,7 +291,7 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
             },
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")",

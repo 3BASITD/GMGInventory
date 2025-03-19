@@ -54,9 +54,10 @@ namespace GMGInventory.Application.Repositories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
                                                .Sum(s => (int?)s.Quantity) ?? 0
                         where item.IsActive == true
-                           && (string.IsNullOrWhiteSpace(search)
+                           && string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
-                           || item.Name.ToLower().Contains(search.ToLower()))
+                           || item.Name.ToLower().Contains(search.ToLower())
+                           || (item.PartNumber + "").ToLower().Contains(search.ToLower())
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {
@@ -84,8 +85,13 @@ namespace GMGInventory.Application.Repositories
         {
             var items = await context.PurchaseOrderLineItems.Include(s => s.Item)
                                      .Where(s => s.PurchaseOrderId == id
-                                              && (string.IsNullOrWhiteSpace(search)
-                                              || (s.Item.Code.ToLower().Contains(search.ToLower()))))
+                                              && (
+                                                string.IsNullOrWhiteSpace(search)
+                                                || s.Item.Code.ToLower().Contains(search.ToLower())
+                                                || s.Item.Name.ToLower().Contains(search.ToLower())
+                                                || (s.Item.PartNumber + "").ToLower().Contains(search.ToLower())
+                                              )
+                                           )
                                     .Select(s => new JsonItemOptionsModel
                                     {
                                         Id = s.Id.ToString(),
@@ -126,7 +132,8 @@ namespace GMGInventory.Application.Repositories
                            && soitem.SalesOrderId == SalesOrderId
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
-                           || item.Name.ToLower().Contains(search.ToLower()))
+                           || item.Name.ToLower().Contains(search.ToLower())
+                           || (item.PartNumber + "").ToLower().Contains(search.ToLower()))
                            && soitem.Quantity > (ii + requests)
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
@@ -223,7 +230,8 @@ namespace GMGInventory.Application.Repositories
                                && item.Item.IsActive == true
                                && (search == null
                                || item.Item.Code.ToLower().Contains(search.ToLower())
-                               || item.Item.Name.ToLower().Contains(search.ToLower()))
+                               || item.Item.Name.ToLower().Contains(search.ToLower())
+                               || (item.Item.PartNumber + "").ToLower().Contains(search.ToLower()))
                                && item.Quantity > 0
                                orderby item.Item.Code ascending
                                select new JsonItemOptionsModel
