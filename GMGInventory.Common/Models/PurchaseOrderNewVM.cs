@@ -112,8 +112,8 @@ namespace GMGInventory.Common.Models
        
 
         public string PurchaseRequestNumber { get; set; }
-        public string DateReceived => DateReceivedD == null ? "N/A" : DateReceivedD.Value.ToString("MMMM dd, yyyy");
-        public string TimeReceived => DateReceivedD == null ? "N/A" : DateReceivedD.Value.ToString("hh:mm tt");
+        public string DateReceived => DateReceivedD == null ? "" : DateReceivedD.Value.ToString("MMMM dd, yyyy");
+        public string TimeReceived => DateReceivedD == null ? "" : DateReceivedD.Value.ToString("hh:mm tt");
         public DateTime? DateReceivedD { get; set; }
 
         [Display(Name = "Created By")]
