@@ -436,24 +436,27 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<SOACRItemsVM>> GetSOACRItemsAsync(int id)
         {
             var soa = from sl in context.SOACRLineItems
+                      let srq = (from srli in context.SalesReturnLineItems
+                                 join ili in context.InvoiceLineItems on srli.InvoiceLineItemId equals ili.Id
+                                 where ili.InvoiceId == sl.InvoiceId
+                                 select (decimal?)srli.Quantity * ili.UnitPrice).Sum() ?? 0
                       let inv = sl.Invoice
                                   .InvoiceLineItems
                                   .Sum(s => s.Quantity * s.UnitPrice)
                       let tbr = context.SOACRLineItemTBRs
                                        .Where(s => s.SOACRLineItemId == sl.Id)
-                                       .Sum(s => s.Amount)
+                                       .Sum(s => (decimal?)s.Amount) ?? 0
                       let pay = context.CustomerPaymentDetails
                                        .Where(s => s.InvoiceId == sl.InvoiceId
                                                 && s.CustomerPayment.SOACR.Id == sl.SOACR.Id)
-                                       .Select(s => (decimal?)s.PaidAmount)
-                                       .FirstOrDefault() ?? 0
+                                       .Sum(s => (decimal?)s.PaidAmount) ?? 0
                       where sl.SOACR.Id == id
                       select new SOACRItemsVM
                       {
                           Id = sl.Id,
                           InvoiceDateD = sl.Invoice.DateCreated,
                           InvoiceNumber = sl.Invoice.InvoiceNumber,
-                          InvoiceAmountD = inv,
+                          InvoiceAmountD = inv - srq,
                           InvoiceType = sl.Invoice.InvoiceType.Code,
                           InvoiceId = sl.Invoice.Id,
                           TBRD = tbr,
@@ -631,54 +634,46 @@ namespace GMGInventory.Application.Repositories
             Array.Sort(payment.InvoiceIds);
             foreach (var InvoiceId in payment.InvoiceIds)
             {
-                if (PaymentAmount > 0)
+                var soali = from sl in context.SOACRLineItems
+                            let srq = (from srli in context.SalesReturnLineItems
+                                       join ili in context.InvoiceLineItems on srli.InvoiceLineItemId equals ili.Id
+                                       where ili.InvoiceId == sl.InvoiceId
+                                       select (decimal?)srli.Quantity * ili.UnitPrice).Sum() ?? 0
+                            let inv = sl.Invoice
+                                        .InvoiceLineItems
+                                        .Sum(s => s.Quantity * s.UnitPrice)
+                            let tbr = context.SOACRLineItemTBRs
+                                             .Where(s => s.SOACRLineItemId == sl.Id)
+                                             .Sum(s => (decimal?)s.Amount) ?? 0
+                            let pay = context.CustomerPaymentDetails
+                                             .Where(s => s.InvoiceId == sl.InvoiceId
+                                                      && s.CustomerPayment.SOACR.Id == sl.SOACR.Id)
+                                             .Sum(s => (decimal?)s.PaidAmount) ?? 0
+                            where sl.SOACR.Id == payment.SOACRId
+                            && sl.InvoiceId == InvoiceId
+                            select inv - srq - tbr - sl.CreditAmount + sl.DebitAmount - pay + sl.FreightCost;
+
+                var forPayment = soali.FirstOrDefault();
+                var toPay = 0m;
+                if (forPayment <= PaymentAmount)
                 {
-                    var invoicePayment = await context.InvoiceLineItems
-                    .Where(s => s.InvoiceId == InvoiceId)
-                    .SumAsync(s => s.Quantity * s.UnitPrice);
-                    var paymentDetails = await context.CustomerPaymentDetails
-                    .Where(s => s.InvoiceId == InvoiceId
-                    && s.CustomerPayment.SOACR.Id == soacr.Id)
-                                                      .FirstOrDefaultAsync();
-                    var toPay = 0m;
-                    if (paymentDetails == null)
-                    {
-                        if (invoicePayment <= PaymentAmount)
-                        {
-                            toPay = invoicePayment;
-                            PaymentAmount -= invoicePayment;
-                        }
-                        else
-                        {
-                            toPay = PaymentAmount;
-                            PaymentAmount = 0;
-                        }
-                        paymentDetails = new CustomerPaymentDetail
-                        {
-                            InvoiceId = InvoiceId,
-                            CustomerPaymentId = customerPayment.Id,
-                            PaidAmount = toPay
-                        };
-                        await context.CustomerPaymentDetails.AddAsync(paymentDetails);
-                    }
-                    else
-                    {
-                        var remainingPayment = invoicePayment - paymentDetails.PaidAmount;
-                        if (remainingPayment <= PaymentAmount)
-                        {
-                            toPay = remainingPayment;
-                            PaymentAmount -= invoicePayment;
-                        }
-                        else
-                        {
-                            toPay = PaymentAmount;
-                            PaymentAmount = 0;
-                        }
-                        paymentDetails.PaidAmount += toPay;
-                        context.CustomerPaymentDetails.Update(paymentDetails);
-                    }
-                    await context.SaveChangesAsync(currentUserId);
+                    toPay = forPayment;
+                    PaymentAmount -= forPayment;
                 }
+                else
+                {
+                    toPay = PaymentAmount;
+                    PaymentAmount = 0;
+                }
+
+                var paymentDetails = new CustomerPaymentDetail
+                {
+                    InvoiceId = InvoiceId,
+                    CustomerPaymentId = customerPayment.Id,
+                    PaidAmount = toPay
+                };
+                await context.CustomerPaymentDetails.AddAsync(paymentDetails);
+                await context.SaveChangesAsync(currentUserId);
             }
 
             return true;

@@ -192,9 +192,9 @@
                         return repo.text;
                     }
                     if (repo.name) {
-                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
                     }
-                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Customer")",
@@ -236,7 +236,7 @@
                     if (repo.name) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Item")",
@@ -297,7 +297,7 @@
                     if (repo.name) {
                         return repo.name;
                     }
-                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Item")",
@@ -360,7 +360,7 @@
                             if (repo.element) {
                                 return repo.text;
                             }
-                            return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                            return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                         },
                         dropdownParent: $("#filterModal")
                     });
@@ -381,7 +381,7 @@
                             if (repo.element) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                    return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                         dropdownParent: $("#filterModal")
                     });
@@ -402,7 +402,7 @@
                             if (repo.element) {
                                 return repo.text;
                             }
-                            return $("<strong>" + repo.text + "</strong> <em class='fw-light text-secondary'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+                            return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                         },
                         dropdownParent: $("#filterModal")
                     });

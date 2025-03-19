@@ -291,6 +291,9 @@ namespace GMGInventory.Application.Repositories
             //return await customerVM.ToListAsync();
 
             var payment = from pay in context.CustomerPaymentDetails
+                          let paid = context.CustomerPaymentDetails
+                                            .Where(s=>s.InvoiceId == pay.InvoiceId)
+                                            .Sum(s=>(decimal?) s.PaidAmount) ?? 0
                           where pay.CustomerPayment.Id == id
                           select new PaymentVM
                           {
@@ -298,7 +301,7 @@ namespace GMGInventory.Application.Repositories
                               InvoiceDateD = pay.Invoice.InvoiceDate,
                               InvoiceType = pay.Invoice.InvoiceType.Name,
                               InvoiceAmountD = pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice),
-                              BalanceAmountD = Math.Max(0, pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice) - pay.PaidAmount),
+                              BalanceAmountD = Math.Max(0, pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice) - paid),
                               PackNo = pay.Invoice.Pack.Id,
                               SalesOrderNo = pay.Invoice.SalesOrder.SalesOrderNumber
                           };

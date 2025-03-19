@@ -613,7 +613,7 @@
                     if (repo.loading) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>" : ""));
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Item")",
@@ -668,7 +668,7 @@
                     return $(
                         "<strong>" + repo.text + "</strong> " +
                         (repo.text != repo.name
-                            ? "<em class='fw-light text-secondary'> - " + repo.name + "</em>"
+                            ? "<em class='fw-light'> - " + repo.name + "</em>"
                             : "") +
                         "<br />" +
                         "<small>" +
