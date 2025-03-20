@@ -1177,6 +1177,21 @@
         });
 
         function SaveOrder() {
+            if($("#order-discount3").val() > 0) 
+            {
+                if($("#order-discount1").val() == 0 || $("#order-discount2").val() == 0)
+                {
+                   toastr.warning("Discount 3 has value, Discount 1 and 2 should not be 0", "Warning");
+                }
+            }
+            else if($("#order-discount2").val() > 0)
+            {
+                if($("#order-discount1").val() == 0)
+                {
+                   toastr.warning("Discount 2 has value, Discount 1 should not be 0", "Warning");
+                }
+            }
+
             var items = itemDT.data();
             if (items.length == 0) {
                 toastr.warning("No item to order. Add an item to the list to continue", "Warning");

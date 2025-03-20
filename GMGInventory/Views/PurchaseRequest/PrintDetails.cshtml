@@ -82,16 +82,25 @@
                 {
                     <th style="min-width: 50px;">PART NUMBER</th>
                 }
-                else
+                @if (Model.Type.ToLower() == "non-automotive" && Model.Purpose.ToLower() == "office supplies")
                 {
                     <th style="min-width: 50px;">ITEM CODE</th>
                 }
                 <th>ITEM DESCRIPTION</th>
                 <th style="min-width: 50px;">QTY</th>
                 <th style="min-width: 25px;">UOM</th>
-                <th style="min-width: 50px;">SOH</th>
-                <th style="min-width: 50px;">PURPOSE</th>
-                <th style="min-width: 50px;">REF.SO#</th>
+                @if (Model.Type.ToLower() == "automotive")
+                {
+                    <th style="min-width: 50px;">SOH</th>
+                }
+                @if (Model.Type.ToLower() == "maintenance & repair" || (Model.Type.ToLower() == "non-automotive" && Model.Purpose.ToLower() == "one-time purchase"))
+                {
+                    <th>PURPOSE</th>
+                }
+                @if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "rush order")
+                {
+                    <th style="min-width: 50px;">REF.SO#</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -101,18 +110,27 @@
                     <td class="center-text"><nobr>@item.LineNumber</nobr></td>
                     @if (Model.Type.ToLower() == "automotive")
                     {
-                        <td>@item.ItemPartNumber</td>
+                        <td class="center-text">@item.ItemPartNumber</td>
                     }
-                    else
+                    @if (Model.Type.ToLower() == "non-automotive" && Model.Purpose.ToLower() == "office supplies")
                     {
-                        <td>@item.ItemCode</td>
+                        <td class="center-text">@item.ItemCode</td>
                     }
                     <td>@item.ItemDescription</td>
-                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
-                    <td>@item.UnitCode</td>
-                    <td class="right-text"><nobr>@item.StockOnHand</nobr></td>
-                    <td>@item.Purpose</td>
-                    <td><nobr>@(string.IsNullOrWhiteSpace(item.SalesOrderNumber) ? "-" : item.SalesOrderNumber)</nobr></td>
+                    <td class="center-text"><nobr>@item.Quantity</nobr></td>
+                    <td class="center-text">@item.UnitCode</td>
+                    @if (Model.Type.ToLower() == "automotive")
+                    {
+                        <td class="center-text"><nobr>@item.StockOnHand</nobr></td>
+                    }
+                    @if (Model.Type.ToLower() == "maintenance & repair" || (Model.Type.ToLower() == "non-automotive" && Model.Purpose.ToLower() == "one-time purchase"))
+                    {
+                        <td class="center-text">@item.Purpose</td>
+                    }
+                    @if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "rush order")
+                    {
+                        <td class="center-text"><nobr>@(string.IsNullOrWhiteSpace(item.SalesOrderNumber) ? "-" : item.SalesOrderNumber)</nobr></td>
+                    }
                 </tr>
             }
             @{
@@ -121,47 +139,98 @@
             }
             <tr>
                 <td class="center-text" style="min-width: 10px;">@(lastLineNumber + 1)</td>
+                @if (Model.Type.ToLower() == "automotive")
+                {
+                    <td></td>
+                }
+                @if (Model.Type.ToLower() == "non-automotive" && Model.Purpose.ToLower() == "office supplies")
+                {
+                    <td></td>
+                }
+                <td class="center-text">* * NOTHING FOLLOWS * *</td>
                 <td></td>
-                <td>* * NOTHING FOLLOWS * *</td>
                 <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                @if (Model.Type.ToLower() == "automotive")
+                {
+                    <td></td>
+                }
+                @if (Model.Type.ToLower() == "maintenance & repair" || (Model.Type.ToLower() == "non-automotive" && Model.Purpose.ToLower() == "one-time purchase"))
+                {
+                    <td></td>
+                }
+                @if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "rush order")
+                {
+                    <td></td>
+                }
             </tr>
-            @if (itemCount < 23)
+            @if (itemCount < 20)
             {
-                for (var ctr = 2; ctr <= 23 - itemCount; ctr++)
+                for (var ctr = 2; ctr <= 20 - itemCount; ctr++)
                 {
                     <tr>
                         <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
+                        @if (Model.Type.ToLower() == "automotive")
+                        {
+                            <td></td>
+                        }
+                        @if (Model.Type.ToLower() == "non-automotive" && Model.Purpose.ToLower() == "office supplies")
+                        {
+                            <td></td>
+                        }
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        @if (Model.Type.ToLower() == "automotive")
+                        {
+                            <td></td>
+                        }
+                        @if (Model.Type.ToLower() == "maintenance & repair" || (Model.Type.ToLower() == "non-automotive" && Model.Purpose.ToLower() == "one-time purchase"))
+                        {
+                            <td></td>
+                        }
+                        @if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "rush order")
+                        {
+                            <td></td>
+                        }
                     </tr>
                 }
             }
+            @{
+                var cspan = 5;
+                if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "stocking")
+                {
+                    cspan = 6;
+                }
+                else if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "rush order")
+                {
+                    cspan = 7;
+                }
+            }
+
             <tr>
-                <td colspan="8">
+                <td colspan=@cspan>
                     <dl>
-                        <dt>Remarks:</dt>
+                        @if (Model.Type.ToLower() == "maintenance & repair")
+                        {
+                            <dt> INITIAL DIAGNOSIS:</dt>
+                        }
+                        else
+                        {
+                            <dt> REMARKS:</dt>
+                        }
                         <dd>@Model.Remarks</dd>
                     </dl>
                 </td>
             </tr>
             <tr>
-                <td colspan="8">
+                <td colspan=@cspan class="bb-0">
                     <br />
                     <br />
                     <div class="two-column">
                         <div class="column center-text">
                             <dl>
                                 <dd>@Model.UserCreated</dd>
-                                <dt>Prepared By</dt>
+                                <dt>Prepared By:</dt>
                             </dl>
                         </div>
                         @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1) || !string.IsNullOrWhiteSpace(Model.ApprovedBy2))
@@ -176,7 +245,7 @@
                                     {
                                         <dd>@Model.ApprovedBy2</dd>
                                     }
-                                    <dt>Approved By</dt>
+                                    <dt>Approved By:</dt>
                                 </dl>
                             </div>
                         }
@@ -185,11 +254,16 @@
                             <div class="column center-text">
                                 <dl>
                                     <dd>@Model.DisapprovedBy</dd>
-                                    <dt>Disapproved By</dt>
+                                    <dt>Disapproved By:</dt>
                                 </dl>
                             </div>
                         }
                     </div>
+                </td>
+            </tr>
+            <tr class="text-center">
+                <td colspan=@cspan class="bt-0">
+                    <p class="footer center-text"> Bina's Auto Supply | 1034 Kusang Loob St. Brgy. 330 Zone 033 Sta. Cruz, Manila | Tel. No.8731-3923,8741-5537/39 </p>
                 </td>
             </tr>
         </tbody>
