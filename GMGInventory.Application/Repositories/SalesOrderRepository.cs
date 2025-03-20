@@ -324,8 +324,8 @@ namespace GMGInventory.Application.Repositories
             var users = userManager.Users;
 
             var orderVM = (from order in context.SalesOrders
-                                                .Include(s => s.Customer)
-                                                .Include(s => s.Status)
+                               //.Include(s => s.Customer)
+                               //.Include(s => s.Status)
                            join user in users on order.UserCreated equals user.Id
                            join approvedby in users on order.ApprovedBy equals approvedby.Id into ab
                            from approvedby in ab.DefaultIfEmpty()
@@ -346,6 +346,18 @@ namespace GMGInventory.Application.Repositories
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
                                TotalAmountD = order.SalesOrderLineItems.Sum(s => (s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100),
+                               CustomerAddress = order.Customer
+                                                      .ShippingAddresses
+                                                      .Where(s => s.IsDefault == true)
+                                                      .Select(s => s.Address)
+                                                      .FirstOrDefault() ?? "N/A",
+                               Region = order.Customer.Area.Region.Name,
+                               Area = order.Customer.Area.Name,
+                               RequiredDeliveryDateD = order.RequiredDeliveryDate,
+                               Forwarder = order.SalesOrderDeliveryMonitorings
+                                                .OrderByDescending(s => s.DateCreated)
+                                                .Select(s => s.Forwarder.Name)
+                                                .FirstOrDefault() ?? "",
                                ApprovedDisapprovedBy = approvedby != null ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname) : disapprovedby != null ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname) : "-",
                                ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate
                            });
@@ -366,7 +378,12 @@ namespace GMGInventory.Application.Repositories
                                     || x.OrderDate.ToLower().Contains(form.SearchValue)
                                     || x.SONumber.ToLower().Contains(form.SearchValue)
                                     || x.Status.ToLower().Contains(form.SearchValue)
-                                    || x.TotalAmount.ToLower().Contains(form.SearchValue));
+                                    || x.TotalAmount.ToLower().Contains(form.SearchValue)
+                                    || x.CustomerAddress.ToLower().Contains(form.SearchValue)
+                                    || x.Region.ToLower().Contains(form.SearchValue)
+                                    || x.Area.ToLower().Contains(form.SearchValue)
+                                    || x.RequiredDeliveryDate.ToLower().Contains(form.SearchValue)
+                                    || x.Forwarder.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -382,6 +399,11 @@ namespace GMGInventory.Application.Repositories
                         case "SONumber": data = data.OrderBy(s => s.SONumber); break;
                         case "Status": data = data.OrderBy(s => s.Status); break;
                         case "TotalAmount": data = data.OrderBy(s => s.TotalAmountD); break;
+                        case "CustomerAddress": data = data.OrderBy(s => s.CustomerAddress); break;
+                        case "Region": data = data.OrderBy(s => s.Region); break;
+                        case "Area": data = data.OrderBy(s => s.Area); break;
+                        case "RequiredDeliveryDate": data = data.OrderBy(s => s.RequiredDeliveryDateD); break;
+                        case "Forwarder": data = data.OrderBy(s => s.Forwarder); break;
                         default: break;
                     }
                 }
@@ -394,6 +416,11 @@ namespace GMGInventory.Application.Repositories
                         case "SONumber": data = data.OrderByDescending(s => s.SONumber); break;
                         case "Status": data = data.OrderByDescending(s => s.Status); break;
                         case "TotalAmount": data = data.OrderByDescending(s => s.TotalAmountD); break;
+                        case "CustomerAddress": data = data.OrderByDescending(s => s.CustomerAddress); break;
+                        case "Region": data = data.OrderByDescending(s => s.Region); break;
+                        case "Area": data = data.OrderByDescending(s => s.Area); break;
+                        case "RequiredDeliveryDate": data = data.OrderByDescending(s => s.RequiredDeliveryDateD); break;
+                        case "Forwarder": data = data.OrderByDescending(s => s.Forwarder); break;
                         default: break;
                     }
                 }

@@ -24,6 +24,22 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Status")]
         public string Status { get; set; }
 
+        [Display(Name = "Customer Address")]
+        public string CustomerAddress { get; set; }
+
+        [Display(Name = "Region")]
+        public string Region { get; set; }
+
+        [Display(Name = "Area")]
+        public string Area { get; set; }
+
+        [Display(Name = "Required Delivery Date")]
+        public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
+        public DateTime RequiredDeliveryDateD { get; set; }
+
+        [Display(Name = "Forwarder")]
+        public string Forwarder { get; set; }
+
         [Display(Name = "Approved / Disapproved By")]
         public string ApprovedDisapprovedBy { get; set; }
 

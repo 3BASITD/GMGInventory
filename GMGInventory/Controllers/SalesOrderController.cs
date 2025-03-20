@@ -280,22 +280,30 @@ namespace GMGInventory.Controllers
             dt.Columns.AddRange([
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("SONumber")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("Customer")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("CustomerAddress")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Area")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Region")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("OrderDate")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("RequiredDeliveryDate")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Forwarder")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("TotalAmount")),
-                new DataColumn(chelper.DisplayName<SalesOrderVM>("Status")),
-                new DataColumn(chelper.DisplayName<SalesOrderVM>("ApprovedDisapprovedBy")),
-                new DataColumn(chelper.DisplayName<SalesOrderVM>("ApprovedDisapprovedDate"))
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Status"))
+                //new DataColumn(chelper.DisplayName<SalesOrderVM>("ApprovedDisapprovedBy")),
+                //new DataColumn(chelper.DisplayName<SalesOrderVM>("ApprovedDisapprovedDate"))
             ]);
             var sos = await salesOrderRepository.GetListAsync(filter);
             foreach (var so in sos)
             {
                 dt.Rows.Add(so.SONumber,
                             so.Customer,
+                            so.CustomerAddress,
+                            so.Area,
+                            so.Region,
                             so.OrderDate,
+                            so.RequiredDeliveryDate,
+                            so.Forwarder,
                             so.TotalAmount,
-                            so.Status,
-                            so.ApprovedDisapprovedBy,
-                            so.ApprovedDisapprovedDate);
+                            so.Status);
             }
 
             using XLWorkbook wb = new();
