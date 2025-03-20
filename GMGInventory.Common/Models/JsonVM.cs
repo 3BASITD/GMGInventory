@@ -150,7 +150,7 @@ namespace GMGInventory.Common.Models
         public string Unit { get; set; }
         public decimal UnitCost { get; set; }
         public int Served { get; set; }
-        public int UnorderedQuantity => Quantity - Served;
+        public int UnorderedQuantity => Math.Max(0, Quantity - Served);
         public bool Selected { get; set; } = false;
     }
 

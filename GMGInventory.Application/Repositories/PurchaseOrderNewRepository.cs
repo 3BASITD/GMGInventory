@@ -108,12 +108,13 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
         {
                 var requests = from prli in context.PurchaseRequestLineItems
-                               let poli = prli.PurchaseOrderLineItems
-                                              .Where(a => a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                               let poli = context.PurchaseOrderNewLineItems
+                                              .Where(a => a.RequestItemId == prli.Id
+                                                       && a.PurchaseOrder.Status.Name.ToLower() == "approved")
                                               .Select(a => (int?)a.Quantity)
                                               .Sum() ?? 0
                                where prli.PurchaseRequestId == RequestId
-                               && poli != prli.Quantity
+                               && poli < prli.Quantity
                                select new JsonPurchaseItemOptionsModel
                                {
                                    Id = prli.Id.ToString(),
