@@ -231,7 +231,7 @@
                                 var discounted3 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted3D);
                                 totalD = totalD - discounted3D;
 
-                                var vatD = totalD * (decimal)(0.12);
+                                var vatD = totalD - (totalD / (decimal)(1.12));
                                 var vat = string.Format("{0:#,##0.00}", vatD);
                                 var total2 = Model.Currency + " " + string.Format("{0:#,##0.00}", totalD);
                             }
