@@ -38,19 +38,28 @@
                         @Html.DisplayNameFor(model => model.Customer)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.CustomerAddress)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Area)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Region)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.OrderDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Forwarder)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.TotalAmount)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Status)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ApprovedDisapprovedBy)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ApprovedDisapprovedDate)
                     </th>
                     <th></th>
                 </tr>
@@ -343,11 +352,14 @@
             columns: [
                 { data: "soNumber", name: "SONumber" },
                 { data: "customer", name: "Customer" },
+                { data: "customerAddress", name: "CustomerAddress" },
+                { data: "area", name: "Area" },
+                { data: "region", name: "Region" },
                 { data: "orderDate", name: "OrderDate" },
+                { data: "requiredDeliveryDate", name: "RequiredDeliveryDate" },
+                { data: "forwarder", name: "Forwarder" },
                 { data: "totalAmount", name: "TotalAmount", className: "text-end" },
                 { data: "status", name: "Status" },
-                { data: "approvedDisapprovedBy", name: "ApprovedDisapprovedBy" },
-                { data: "approvedDisapprovedDate", name: "ApprovedDisapprovedDate" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -364,7 +376,7 @@
                     }
                 }
             ],
-            order: [[2, "desc"]]
+            order: [[5, "desc"], [6, "desc"]]
         });
 
         orderDT.on("draw", function () {
