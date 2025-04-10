@@ -15,11 +15,17 @@
             <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
-            @if (userAccess.CanPrint)
+            @if (userAccess.CanUploadDownload)
             {
-                <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
-                    <span class="fas fa-print"></span> Print
-                </button>
+                <div class="dropdown float-right ml-2">
+                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-file-pdf"></span> PDF
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
+                        <li><a class="dropdown-item btn-details-pdf" data-company="GMG">Use GMG Header</a></li>
+                        <li><a class="dropdown-item btn-details-pdf" data-company="BAS">Use BAS Header</a></li>
+                    </ul>
+                </div>
             }
         </div>
     </div>
@@ -1015,28 +1021,36 @@
             hideLoader();
         });
 
-        $(".printBtn").on("click", function () {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fas fa-print"
-            });
-            setTimeout(function () {
-                var printLink = "";
-                if ($(".SoacrType").text().trim() == "Statement of Account") {
-                    printLink = '@Url.Action("PrintSOADetails")/@Model?.Id';
-                }
-                else if ($(".SoacrType").text().trim() == "Counter Receipt") {
-                    printLink = '@Url.Action("PrintCRDetails")/@Model?.Id';
-                }
-                let win = window.open(printLink, '');
-                var wintimer = setInterval(function () {
-                    if (win.closed) {
-                        clearInterval(wintimer);
-                        hideLoader();
+        if (user_access.canUploadDownload) {
+            $(".btn-details-pdf").on("click", function () {
+                var pdf_company = $(this).data("company");
+                $.LoadingOverlay("show", {
+                    image: "",
+                fontawesome: "fas fa-file-pdf"
+                });
+                setTimeout(function () {
+                    var pdfLink = "";
+                    if ($(".SoacrType").text().trim().toLowerCase() == "statement of account") {
+                        pdfLink = '@Url.Action("PDFSOADetails")';
                     }
-                }, 100);
-            }, 500);
-        });
+                    else if ($(".SoacrType").text().trim().toLowerCase() == "counter receipt") {
+                        pdfLink = '@Url.Action("PDFCRDetails")';
+                    }
+                if(pdfLink != "") {
+                    let win = window.open(pdfLink + '/' + @Model?.Id + '?Company=' + pdf_company, '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                } else {
+                        toastr.error("Unknown type. Please reload this page and try again", "Error");
+                        hideLoader();
+                }
+                }, 500);
+            });
+        }
 
         function GetInvoiceSelected() {
             var invoice_selected = [];

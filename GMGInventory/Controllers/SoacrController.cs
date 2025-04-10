@@ -4,6 +4,9 @@ using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MigraDocCore.DocumentObjectModel;
+using MigraDocCore.DocumentObjectModel.Tables;
+using MigraDocCore.Rendering;
 
 namespace GMGInventory.Controllers
 {
@@ -73,16 +76,16 @@ namespace GMGInventory.Controllers
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SOACR)).Convert();
 
             return View();
-		}
+        }
 
-		[HttpPost]
-		public async Task<IActionResult> GetInvoiceJson(ListFilterSalesModel filter)
-		{
+        [HttpPost]
+        public async Task<IActionResult> GetInvoiceJson(ListFilterSalesModel filter)
+        {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-			return Json(await soaRepository.GetInvoiceListDTAsync(form, filter));
+            return Json(await soaRepository.GetInvoiceListDTAsync(form, filter));
         }
 
         public async Task<IActionResult> PrintInvoice(ListFilterSalesModel filter)
@@ -244,7 +247,7 @@ namespace GMGInventory.Controllers
             if (payment.CollectorReceiptNumber == null || payment.CollectorReceiptNumber.Length > 500)
             {
                 responseModel.Status = "Warning";
-                responseModel.Message = payment.CollectorReceiptNumber == null 
+                responseModel.Message = payment.CollectorReceiptNumber == null
                                       ? "Collector Receipt Number cannot be empty"
                                       : "Collector Receipt Number cannot exceed 50 characters";
             }
@@ -285,6 +288,372 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             return View(await soaRepository.PrintSOADetails(id));
+        }
+
+        public async Task<IActionResult> PDFCRDetails(int Id, string Company)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var details = await soaRepository.PrintCRDetails(Id);
+            var document = new Document();
+
+            var section = document.AddSection();
+
+            section.PageSetup.TopMargin = Unit.FromCentimeter(5.25);
+            section.PageSetup.HeaderDistance = Unit.FromCentimeter(2);
+            var headerTable = section.Headers.Primary.AddTable();
+            headerTable.AddColumn(Unit.FromCentimeter(4));
+            headerTable.AddColumn(Unit.FromCentimeter(4));
+            headerTable.AddColumn(Unit.FromCentimeter(4));
+            headerTable.AddColumn(Unit.FromCentimeter(4));
+
+            var headerRow = headerTable.AddRow();
+
+            var titleCell = headerRow.Cells[0];
+            titleCell.MergeRight = 2;
+
+            var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS EXPRESS";
+            var titleParagraph = titleCell.AddParagraph(comp);
+            titleParagraph.Format = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Left,
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 10, Bold = true }
+            };
+
+            var pageCell = headerRow.Cells[3];
+            var pageParagraph = pageCell.AddParagraph();
+            pageParagraph.AddText("Page ");
+            pageParagraph.AddPageField();
+            pageParagraph.AddText(" of ");
+            pageParagraph.AddNumPagesField();
+            pageParagraph.Format = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Right,
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8 }
+            };
+
+            var subtitleRow = headerTable.AddRow();
+            var subtitleCell = subtitleRow.Cells[0];
+            subtitleCell.MergeRight = 3;
+            var subtitleParagraph1 = subtitleCell.AddParagraph("Counter Receipt");
+            subtitleParagraph1.Format = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Center,
+                LineSpacingRule = LineSpacingRule.Single,
+                Font = new Font { Size = 8, Bold = true }
+            };
+            var subtitleParagraph2 = subtitleCell.AddParagraph($"CR No.: {string.Format("{0:##00000}", details.SOACRNumber)}");
+            subtitleParagraph2.Format = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Center,
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8 }
+            };
+
+            var row1 = headerTable.AddRow();
+            row1.Cells[0].AddParagraph("Customer Code:").Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Single,
+                Font = new Font { Size = 8 }
+            };
+            row1.Cells[1].AddParagraph(details.CustomerCode).Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Single,
+                Font = new Font { Size = 8, Bold = true }
+            };
+            row1.Cells[2].AddParagraph("Counter Receipt Date:").Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Single,
+                Font = new Font { Size = 8 }
+            };
+            row1.Cells[3].AddParagraph(details.DateFrom).Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Single,
+                Font = new Font { Size = 8, Bold = true }
+            };
+
+            var row2 = headerTable.AddRow();
+            row2.Cells[0].AddParagraph("Customer Name:").Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8 }
+            };
+            row2.Cells[1].AddParagraph(details.CustomerName).Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8, Bold = true }
+            };
+            row2.Cells[2].AddParagraph("Date to be Collected:").Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8 }
+            };
+            row2.Cells[3].AddParagraph(details.DateTo).Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8, Bold = true }
+            };
+
+            var tableHeader = section.Headers.Primary.AddTable();
+            tableHeader.Borders.Bottom.Width = 0.75;
+
+            var columnWidth = new double[] { 3.0, 2.6, 2.3, 2.7, 2.7, 2.7 };
+
+            foreach (var w in columnWidth)
+            {
+                tableHeader.AddColumn(Unit.FromCentimeter(w));
+            }
+
+            var header = tableHeader.AddRow();
+            var columnHeader = new string[] { "Invoice Date", "Invoice No.", "Trans Cod", "Open Amount", "Freight Cost", "Total" };
+            for (var chctr = 0; chctr < columnHeader.Length; chctr++)
+            {
+                var chcell = header.Cells[chctr].AddParagraph(columnHeader[chctr]);
+                chcell.Format = new ParagraphFormat
+                {
+                    Alignment = chctr < 3 ? ParagraphAlignment.Center : ParagraphAlignment.Right,
+                    Font = new Font { Size = 8, Bold = true }
+                };
+            }
+
+            var table = section.AddTable();
+
+            foreach (var w in columnWidth)
+            {
+                table.AddColumn(Unit.FromCentimeter(w));
+            }
+
+            foreach (var item in details.Contents)
+            {
+
+                var cellFormatCenter = new ParagraphFormat
+                {
+                    Alignment = ParagraphAlignment.Center,
+                    LineSpacingRule = LineSpacingRule.OnePtFive,
+                    Font = new Font { Size = 8 }
+                };
+                var cellFormatRight = new ParagraphFormat
+                {
+                    Alignment = ParagraphAlignment.Right,
+                    LineSpacingRule = LineSpacingRule.OnePtFive,
+                    Font = new Font { Size = 8 }
+                };
+                var row = table.AddRow();
+                row.Cells[0].AddParagraph(item.InvoiceDate2).Format = cellFormatCenter.Clone();
+                row.Cells[1].AddParagraph(item.InvoiceNumber).Format = cellFormatCenter.Clone();
+                row.Cells[2].AddParagraph(item.InvoiceType).Format = cellFormatCenter.Clone();
+                row.Cells[3].AddParagraph(item.InvoiceAmount).Format = cellFormatRight.Clone();
+                row.Cells[4].AddParagraph(item.FreightCharge).Format = cellFormatRight.Clone();
+                row.Cells[5].AddParagraph(item.Balance).Format = cellFormatRight.Clone();
+            }
+
+            var cellFormatRightBold = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Right,
+                Font = new Font { Size = 8, Bold = true }
+            };
+            var footerRow = table.AddRow();
+            footerRow.Borders.Top.Width = 0.75;
+            footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[1].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
+            footerRow.Cells[4].AddParagraph(details.TotalFreightCost).Format = cellFormatRightBold.Clone();
+            footerRow.Cells[5].AddParagraph(details.TotalBalance).Format = cellFormatRightBold.Clone();
+
+            //var footer = section.Footers.Primary.AddParagraph();
+            //footer.AddText("This is the footer of the table");
+
+            var renderer = new PdfDocumentRenderer(true)
+            {
+                Document = document
+            };
+            renderer.RenderDocument();
+
+            await using var stream = new MemoryStream();
+            renderer.PdfDocument.Save(stream, false);
+            stream.Position = 0;
+
+            Response.Headers["Content-Disposition"] = "inline; filename=PDFCRDetails.pdf";
+            return File(stream.ToArray(), "application/pdf");
+        }
+
+        public async Task<IActionResult> PDFSOADetails(int Id, string Company)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var details = await soaRepository.PrintSOADetails(Id);
+            var document = new Document();
+
+            var section = document.AddSection();
+
+            section.PageSetup.TopMargin = Unit.FromCentimeter(5.25);
+            section.PageSetup.HeaderDistance = Unit.FromCentimeter(2);
+            var headerTable = section.Headers.Primary.AddTable();
+            headerTable.AddColumn(Unit.FromCentimeter(4));
+            headerTable.AddColumn(Unit.FromCentimeter(4));
+            headerTable.AddColumn(Unit.FromCentimeter(4));
+            headerTable.AddColumn(Unit.FromCentimeter(4));
+
+            var headerRow = headerTable.AddRow();
+
+            var titleCell = headerRow.Cells[0];
+            titleCell.MergeRight = 2;
+
+            var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS EXPRESS";
+            var titleParagraph = titleCell.AddParagraph(comp);
+            titleParagraph.Format = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Left,
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 10, Bold = true }
+            };
+
+            var pageCell = headerRow.Cells[3];
+            var pageParagraph = pageCell.AddParagraph();
+            pageParagraph.AddText("Page ");
+            pageParagraph.AddPageField();
+            pageParagraph.AddText(" of ");
+            pageParagraph.AddNumPagesField();
+            pageParagraph.Format = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Right,
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8 }
+            };
+
+            var subtitleRow = headerTable.AddRow();
+            var subtitleCell = subtitleRow.Cells[0];
+            subtitleCell.MergeRight = 3;
+            var subtitleParagraph1 = subtitleCell.AddParagraph("Customer Statement of Accounts");
+            subtitleParagraph1.Format = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Center,
+                LineSpacingRule = LineSpacingRule.Single,
+                Font = new Font { Size = 8, Bold = true }
+            };
+            var subtitleParagraph2 = subtitleCell.AddParagraph($"From: {details.DateFrom2} To: {details.DateTo2}, SOA No.: {string.Format("{0:##00000}", details.SOACRNumber)}, Agent: {details.AgentCode}");
+            subtitleParagraph2.Format = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Center,
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8 }
+            };
+
+            var row1 = headerTable.AddRow();
+            row1.Cells[0].AddParagraph("Customer:").Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Single,
+                Font = new Font { Size = 8 }
+            };
+            var row1Cell = row1.Cells[1];
+            row1Cell.AddParagraph($"{details.CustomerCode} - {details.CustomerName}").Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Single,
+                Font = new Font { Size = 8, Bold = true }
+            };
+            row1Cell.MergeRight = 2;
+
+            var row2 = headerTable.AddRow();
+            row2.Cells[0].AddParagraph("Terms:").Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8 }
+            };
+            var row2Cell = row2.Cells[1];
+            row2Cell.AddParagraph(details.CreditTerm).Format = new ParagraphFormat
+            {
+                LineSpacingRule = LineSpacingRule.Double,
+                Font = new Font { Size = 8, Bold = true }
+            };
+            row2Cell.MergeRight = 2;
+
+            var tableHeader = section.Headers.Primary.AddTable();
+            tableHeader.Borders.Bottom.Width = 0.75;
+
+            var columnWidth = new double[] { 2.5, 2.5, 1.0, 2.5, 2.5, 2.5, 2.5 };
+
+            foreach (var w in columnWidth)
+            {
+                tableHeader.AddColumn(Unit.FromCentimeter(w));
+            }
+
+            var header = tableHeader.AddRow();
+            var columnHeader = new string[] { "Invoice Date", "Invoice No.", "Type", "Trans Amount", "Waybill No", "Freight Cost", "Total" };
+            for (var chctr = 0; chctr < columnHeader.Length; chctr++)
+            {
+                var chcell = header.Cells[chctr].AddParagraph(columnHeader[chctr]);
+                chcell.Format = new ParagraphFormat
+                {
+                    Alignment = chctr < 3 || chctr == 4 ? ParagraphAlignment.Center : ParagraphAlignment.Right,
+                    Font = new Font { Size = 8, Bold = true }
+                };
+            }
+
+            var table = section.AddTable();
+
+            foreach (var w in columnWidth)
+            {
+                table.AddColumn(Unit.FromCentimeter(w));
+            }
+
+            foreach (var item in details.Contents)
+            {
+                var cellFormatCenter = new ParagraphFormat
+                {
+                    Alignment = ParagraphAlignment.Center,
+                    LineSpacingRule = LineSpacingRule.OnePtFive,
+                    Font = new Font { Size = 8 }
+                };
+                var cellFormatRight = new ParagraphFormat
+                {
+                    Alignment = ParagraphAlignment.Right,
+                    LineSpacingRule = LineSpacingRule.OnePtFive,
+                    Font = new Font { Size = 8 }
+                };
+                var row = table.AddRow();
+                row.Cells[0].AddParagraph(item.InvoiceDate2).Format = cellFormatCenter.Clone();
+                row.Cells[1].AddParagraph(item.InvoiceNumber).Format = cellFormatCenter.Clone();
+                row.Cells[2].AddParagraph(item.InvoiceType).Format = cellFormatCenter.Clone();
+                row.Cells[3].AddParagraph(item.InvoiceAmount).Format = cellFormatRight.Clone();
+                row.Cells[4].AddParagraph(item.FreightReferenceNumber + "").Format = cellFormatCenter.Clone();
+                row.Cells[5].AddParagraph(item.Balance).Format = cellFormatRight.Clone();
+                row.Cells[6].AddParagraph(item.Balance).Format = cellFormatRight.Clone();
+            }
+            var cellFormatRightBold = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Right,
+                Font = new Font { Size = 8, Bold = true }
+            };
+            var footerRow = table.AddRow();
+            footerRow.Borders.Top.Width = 0.75;
+            footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[1].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
+            footerRow.Cells[4].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[5].AddParagraph(details.TotalFreightCost).Format = cellFormatRightBold.Clone();
+            footerRow.Cells[6].AddParagraph(details.TotalBalance).Format = cellFormatRightBold.Clone();
+
+            //var footer = section.Footers.Primary.AddParagraph();
+            //footer.AddText("This is the footer of the table");
+
+            var renderer = new PdfDocumentRenderer(true)
+            {
+                Document = document
+            };
+            renderer.RenderDocument();
+
+            await using var stream = new MemoryStream();
+            renderer.PdfDocument.Save(stream, false);
+            stream.Position = 0;
+
+            Response.Headers["Content-Disposition"] = "inline; filename=PDFSOADetails.pdf";
+            return File(stream.ToArray(), "application/pdf");
         }
 
         [HttpPost]

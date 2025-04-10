@@ -4,7 +4,7 @@
     Layout = "";
     var title = "Purchase Order";
     var items = ViewData["Items"] as List<PurchaseOrderLineItemVM> ?? new List<PurchaseOrderLineItemVM>();
-
+    var colcount = Model.Type.ToLower() != "non-automotive" ? 7 : 6;
 }
 
 <!DOCTYPE html>
@@ -18,101 +18,96 @@
 </head>
 <body>
     <table class="formatted">
-        <tr>
-            <td rowspan="2" class="center-text" style="width: 100px;">
-                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
-                {
-                    <img src="~/images/BAS-02.png" class="logo" />
-                }
-                else
-                {
-                    <img src="~/images/GMG-01.png" class="logo" />
-                }
-            </td>
-            <td rowspan="2" style="width: 60%;">
-                <dl>
-                    <dt>Document Classification:</dt>
-                    <dd>@title.ToUpper()</dd>
-                    @if (Model.Status.ToLower() != "approved")
-                    {
-                        <dd>@("(" + Model.Status + ")")</dd>
-                    }
-                </dl>
-            </td>
-            <td style="width: 40%;">
-                <dl>
-                    <dt>PO Date:</dt>
-                    <dd>@Model.OrderDate</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <dl>
-                    <dt>PO No.:</dt>
-                    <dd>@Model.DocumentNumber</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <div class="two-column">
-                    <div class="column">
-                        <strong>Supplier Details</strong>
-                        <div class="label">
-                            <span>Name:</span>
-                            <strong class="detail">@Model.Supplier</strong>
-                        </div>
-                        <div class="label">
-                            <span>Contact Person:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierContactPerson) ? "N/A" : Model.SupplierContactPerson)</strong>
-                        </div>
-                        <div class="label">
-                            <span>Contact Number:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierContactNumber) ? "N/A" : Model.SupplierContactNumber)</strong>
-                        </div>
-                        <div class="label">
-                            <span>Address:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierAddress) ? "N/A" : Model.SupplierAddress)</strong>
-                        </div>
-                        @*<div class="label">
-                        <span>Email Address:</span>
-                        <strong class="detail">?</strong>
-                        </div>*@
-                        <div class="label">
-                            <span>Payment Terms:</span>
-                            <strong class="detail">@Model.Term</strong>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <strong>Delivery Details</strong>
-                        <div class="label">
-                            <span>Ship To:</span>
-                            <strong class="detail">@Model.DeliveryName</strong>
-                        </div>
-                        <div class="label">
-                            <span>Contact Person:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryContactPerson) ? "N/A" : Model.DeliveryContactPerson)</strong>
-                        </div>
-                        <div class="label">
-                            <span>Contact Number:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryContactNumber) ? "N/A" : Model.DeliveryContactNumber)</strong>
-                        </div>
-                        <div class="label">
-                            <span>Address:</span>
-                            <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryAddress) ? "N/A" : Model.DeliveryAddress)</strong>
-                        </div>
-                        <div class="label">
-                            <span>Receiving Time:</span>
-                            <strong class="detail">@Model.TimeReceived</strong>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
-    <table class="formatted">
         <thead>
+            <tr>
+                <td colspan="@colcount" style="padding:0;">
+                    <div class="sub-header">
+                        <div class="sub-col center w-150px">
+                            @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                            {
+                                <img src="~/images/BAS-02.png" class="logo" />
+                            }
+                            else
+                            {
+                                <img src="~/images/GMG-01.png" class="logo" />
+                            }
+                        </div>
+                        <div class="sub-col center w-60pc p-50">
+                            <span class="title">Document Classification:</span>
+                            <span class="desc">
+                                @title.ToUpper()
+                                @if (Model.Status.ToLower() != "approved")
+                                {
+                                    @("(" + Model.Status + ")")
+                                }
+                            </span>
+                        </div>
+                        <div class="sub-col center w-40pc">
+                            <span class="title">PO Date:</span>
+                            <span class="desc">@Model.OrderDate</span>
+                            <hr />
+                            <span class="title">PO No.:</span>
+                            <span class="desc">@Model.DocumentNumber</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="@colcount" style="padding:0;">
+                    <div class="sub-header">
+                        <div class="sub-col w-50pc">
+                            <strong>Supplier Details</strong>
+                            <div class="label">
+                                <span>Name:</span>
+                                <strong class="detail">@Model.Supplier</strong>
+                            </div>
+                            <div class="label">
+                                <span>Contact Person:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierContactPerson) ? "N/A" : Model.SupplierContactPerson)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Contact Number:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierContactNumber) ? "N/A" : Model.SupplierContactNumber)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Address:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.SupplierAddress) ? "N/A" : Model.SupplierAddress)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Payment Terms:</span>
+                                <strong class="detail">@Model.Term</strong>
+                            </div>
+                        </div>
+                        <div class="sub-col w-50pc">
+                            <strong>Delivery Details</strong>
+                            <div class="label">
+                                <span>Ship To:</span>
+                                <strong class="detail">@Model.DeliveryName</strong>
+                            </div>
+                            <div class="label">
+                                <span>Mode:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryMode) ? "N/A" : Model.DeliveryMode)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Contact Person:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryContactPerson) ? "N/A" : Model.DeliveryContactPerson)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Contact Number:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryContactNumber) ? "N/A" : Model.DeliveryContactNumber)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Address:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.DeliveryAddress) ? "N/A" : Model.DeliveryAddress)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Receiving Time:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.TimeReceived) ? "N/A" : Model.TimeReceived)</strong>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <th style="min-width: 10px;">#</th>
                 @if (Model.Type.ToLower() != "non-automotive")
@@ -152,11 +147,7 @@
                 {
                     <td></td>
                 }
-                <td>* * NOTHING FOLLOWS * *</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td colspan="5">* * NOTHING FOLLOWS * *</td>
             </tr>
             @if (itemCount < 15)
             {
@@ -176,129 +167,92 @@
                     </tr>
                 }
             }
+        </tbody>
+        <tfoot>
             <tr>
-                <td colspan="4" class="bb-0 br-0" style="vertical-align:top; padding:0px;">
-                    <table class="formatted">
-                        <tbody>
-                            <tr>
-                                <td class="bb-0 bl-0 bt-0" colspan="4"></td>
-                            </tr>
-                            <tr>
-                                <td class="bl-0 bb-0" colspan="2">PURCHASE REQUEST NUMBER:</td>
-                                <td class="bl-0 bb-0" colspan="2">@Model.PurchaseRequestNumber</td>
-                            </tr>
+                <td colspan="2">PURCHASE REQUEST NUMBER:</td>
+                <td colspan="2">@Model.PurchaseRequestNumber</td>
+                <td rowspan="4"></td>
+                @{
+                    var totalD = items.Sum(s => s.TotalAmountD);
+                    var total = Model.Currency + " " + string.Format("{0:#,##0.00}", totalD);
 
-                            <tr>
-                                <td class="bl-0 bb-0" colspan="2">DATE PO SENT:</td>
-                                <td class="bl-0 bb-0" colspan="2">@Model.DateModified</td>
-                            </tr>
+                    var discounted1D = totalD * Model.Discount1D / 100;
+                    var discounted1 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted1D);
 
-                            <tr>
-                                <td class="bl-0 bb-0" colspan="2">DATE RECEIVED:</td>
-                                <td class="bl-0 bb-0" colspan="2">@Model.DateReceived</td>
-                            </tr>
-                            <tr>
-                                <td class="bl-0" colspan="4" rowspan="2">
-                                    <dl>
-                                        <dt>Remarks:</dt>
-                                        <dd>@Model.Remarks</dd>
-                                    </dl>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    totalD = totalD - discounted1D;
+
+                    var discounted2D = totalD * Model.Discount2D / 100;
+                    var discounted2 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted2D);
+                    totalD = totalD - discounted2D;
+
+                    var discounted3D = totalD * Model.Discount3D / 100;
+                    var discounted3 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted3D);
+                    totalD = totalD - discounted3D;
+
+                    var vatD = totalD * (decimal)(0.12);
+                    var vat = string.Format("{0:#,##0.00}", vatD);
+                    var total2 = Model.Currency + " " + string.Format("{0:#,##0.00}", totalD);
+                }
+                <td rowspan="4" style="vertical-align: top;">
+                    <span class="sub-col w-50pc d-ib">TOTAL PURCHASE</span>
+                    <strong class="sub-col w-50pc d-ib right">@total</strong>
+
+                    @if (Model.Type.ToLower() != "maintenance & repair")
+                    {
+                        <span class="sub-col w-50pc d-ib">@(Model.Type.ToLower() != "maintenance & repair" ? "DISCOUNT 1 %" : "")</span>
+                        <strong class="sub-col w-50pc d-ib right">@(Model.Type.ToLower() != "maintenance & repair" ? Model.Discount1 + "%" : "")</strong>
+
+                        <span class="sub-col w-50pc d-ib">@(Model.Type.ToLower() != "maintenance & repair" ? "DISCOUNT AMOUNT" : "")</span>
+                        <strong class="sub-col w-50pc d-ib right">@(Model.Type.ToLower() != "maintenance & repair" ? discounted1 : "")</strong>
+                    }
+
+                    @if (Model.Type.ToLower() == "local purchase order")
+                    {
+                        if (Model.Discount2D > 0)
+                        {
+                            <span class="sub-col w-50pc d-ib">@(Model.Type.ToLower() == "local purchase order" ? "Discount 2 %" : "")</span>
+                            <strong class="sub-col w-50pc d-ib right">@(Model.Type.ToLower() == "local purchase order" ? Model.Discount2 + "%" : "")</strong>
+
+                            <span class="sub-col w-50pc d-ib">DISCOUNT AMOUNT</span>
+                            <strong class="sub-col w-50pc d-ib right">@discounted2</strong>
+                        }
+                        if (Model.Discount3D > 0)
+                        {
+                            <span class="sub-col w-50pc d-ib">@(Model.Type.ToLower() == "local purchase order" ? "Discount 3 %" : "")</span>
+                            <strong class="sub-col w-50pc d-ib right">@(Model.Type.ToLower() == "local purchase order" ? Model.Discount3 + "%" : "")</strong>
+
+                            <span class="sub-col w-50pc d-ib">DISCOUNT AMOUNT</span>
+                            <strong class="sub-col w-50pc d-ib right">@discounted3</strong>
+                        }
+                    }
+
+                    @if (Model.IsVATIncluded == "Yes")
+                    {
+                        <span class="sub-col w-50pc d-ib">VAT AMOUNT</span>
+                        <strong class="sub-col w-50pc d-ib right">@vat</strong>
+                    }
+                    <hr class="sum" />
+                    <span class="sub-col w-50pc d-ib">TOTAL AMOUNT</span>
+                    <strong class="sub-col w-50pc d-ib right">@total2</strong>
                 </td>
-
-                <td class="bl-0 bb-0 bt-0 br-0"></td>
-                <td class="bb-0 bl-0" colspan="2" style="vertical-align:top; padding:0px">
-                    <table class="formatted">
-                        <tbody>
-
-                            @{
-                                var totalD = items.Sum(s => s.TotalAmountD);
-                                var total = Model.Currency + " " + string.Format("{0:#,##0.00}", totalD);
-
-                                var discounted1D = totalD * Model.Discount1D / 100;
-                                var discounted1 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted1D);
-
-                                totalD = totalD - discounted1D;
-
-                                var discounted2D = totalD * Model.Discount2D / 100;
-                                var discounted2 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted2D);
-                                totalD = totalD - discounted2D;
-
-                                var discounted3D = totalD * Model.Discount3D / 100;
-                                var discounted3 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted3D);
-                                totalD = totalD - discounted3D;
-
-                                var vatD = totalD * (decimal)(0.12);
-                                var vat = string.Format("{0:#,##0.00}", vatD);
-                                var total2 = Model.Currency + " " + string.Format("{0:#,##0.00}", totalD);
-                            }
-
-                            <tr>
-                                <td class="br-0 bt-0 bb-0 bl-0 ">TOTAL PURCHASE   </td>
-                                <td class="right-text br-0 bb-0 bt-0 bl-0"><strong>  @total </strong></td>
-                            </tr>
-
-                            @if (Model.Type.ToLower() != "maintenance & repair")
-                            {
-                                <tr>
-                                    <td class="b-0"> @(Model.Type.ToLower() != "maintenance & repair" ? "DISCOUNT 1 %" : "")</td>
-                                    <td class="right-text  br-0  bt-0 bb-0 bl-0">@(Model.Type.ToLower() != "maintenance & repair" ? Model.Discount1 + "%" : "")</td>
-                                </tr>
-                                <tr>
-                                    <td class="b-0">  @(Model.Type.ToLower() != "maintenance & repair" ? "DISCOUNT AMOUNT" : "")</td>
-                                    <td class="right-text  br-0  bt-0 bb-0 bl-0">@(Model.Type.ToLower() != "maintenance & repair" ? discounted1 : "") </td>
-                                </tr>
-
-                            }
-
-                            @if (Model.Type.ToLower() == "local purchase order")
-                            {
-                                if (Model.Discount2D > 0)
-                                {
-                                    <tr>
-                                        <td class="b-0"> @(Model.Type.ToLower() == "local purchase order" ? "Discount 2 %" : "")</td>
-                                        <td class="right-text br-0  bt-0 bb-0 bl-0">@(Model.Type.ToLower() == "local purchase order" ? Model.Discount2 + "%" : "")</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="b-0">DISCOUNT AMOUNT</td>
-                                        <td class="right-text br-0  bt-0 bb-0 bl-0">@discounted2</td>
-                                    </tr>
-                                }
-                                if (Model.Discount3D > 0)
-                                {
-
-                                    <tr>
-                                        <td class="b-0"> @(Model.Type.ToLower() == "local purchase order" ? "Discount 3 %" : "")</td>
-                                        <td class="right-text br-0  bt-0 bb-0 bl-0">@(Model.Type.ToLower() == "local purchase order" ? Model.Discount3 + "%" : "")</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td class="b-0">DISCOUNT AMOUNT</td>
-                                        <td class="right-text br-0  bt-0 bb-0 bl-0">@discounted3</td>
-                                    </tr>
-                                }
-                            }
-
-                            @if (Model.IsVATIncluded == "Yes")
-                            {
-                                <tr>
-                                    <td class="bt-0 br-0 bl-0">VAT AMOUNT</td>
-                                    <td class="right-text br-0  bt-0 bl-0">@vat</td>
-                                </tr>
-                            }
-                            <tr>
-                                <td class="br-0 bl-0 bb-0"><strong> TOTAL AMOUNT </strong></td>
-                                <td class="right-text br-0  bl-0 bb-0"><strong>@total2</strong></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-           </tr>
+            </tr>
             <tr>
-                <td colspan="7" class="bt-0 bb-0">
+                <td colspan="2">DATE PO SENT:</td>
+                <td colspan="2">@Model.DateModified</td>
+            </tr>
+            <tr>
+                <td colspan="2">DATE RECEIVED:</td>
+                <td colspan="2">@(string.IsNullOrWhiteSpace(Model.DateReceived) ? "N/A" : Model.DateReceived)</td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <span style="display:block;">Remarks:</span>
+                    <span>@(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="@colcount">
                     <br />
                     <br />
                     <div class="two-column">
@@ -329,12 +283,12 @@
                     </div>
                 </td>
             </tr>
-            <tr class="text-center">
-                <td colspan="7" class="bt-0">
+            <tr>
+                <td colspan="@colcount">
                     <p class="footer center-text"> Bina's Auto Supply | 1034 Kusang Loob St. Brgy. 330 Zone 033 Sta. Cruz, Manila | Tel. No.8731-3923,8741-5537/39 </p>
                 </td>
             </tr>
-        </tbody>
+        </tfoot>
     </table>
 </body>
 </html>

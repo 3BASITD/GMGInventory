@@ -1,0 +1,72 @@
+@media print {
+    @page {
+        margin-left: 0.6in;
+        margin-right: 0.6in;
+        margin-top: 0.1in;
+        margin-bottom: 0.1in;
+        counter-increment: page;
+        /*@top-left {
+            content: "BINAS AUTO SUPPLY INC.";*/ /**gmg auto parts express*/
+        /*}
+
+        @top-right {
+            content: "Page " counter(page) " of " target-counter('#last-element-in-pub', page);
+        }*/
+    }
+
+    .page::after {
+        content: " " counter(page) " of " target-counter('#last-element-in-pub', page);
+    }
+
+    @page :first {
+        counter-reset: page;
+    }
+
+    /*body {
+        margin-top: 50px;
+        overflow: visible !important;
+    }*/
+
+    body * {
+        opacity: 1;
+    }
+
+    body::before,
+    body::after {
+        display: none !important;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-row-group;
+        break-before: avoid;
+        page-break-before: avoid;
+    }
+}
+
+@media screen {
+    body:not(.pagedjs) * {
+        opacity: 0;
+    }
+
+    body::before, body::after {
+        opacity: 1;
+        position: fixed;
+        white-space: pre;
+        content: "This page is for printing only.\A Click Ctrl+P if Print Dialog did not open automatically.\A Close this tab if done printing.";
+        writing-mode: vertical-rl;
+        top: 10px;
+        pointer-events: none;
+        color: black;
+        background: white;
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    body::before {
+        right: 10px;
+    }
+}

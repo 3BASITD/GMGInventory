@@ -6,13 +6,11 @@ namespace GMGInventory.Common.Models
     {
         [Required]
         [StringLength(10)]
-        [Display(Name = "Code")]
-        public string CategoryCode { get; set; }
+        public new string Code { get; set; }
 
         [Required]
         [StringLength(100)]
         [MinLength(5)]
-        [Display(Name = "Name")]
-        public string CategoryName { get; set; }
+        public new string Name { get; set; }
     }
 }

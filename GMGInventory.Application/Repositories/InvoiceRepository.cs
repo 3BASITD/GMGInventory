@@ -288,7 +288,12 @@ namespace GMGInventory.Application.Repositories
                                PackNumber = inv.PackId,
                                SONumber = inv.SalesOrder.SalesOrderNumber,
                                Status = inv.Status.Code,
-                               TotalAmountD = inv.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
+                               TotalAmountD = (from invli in inv.InvoiceLineItems
+                                               join order in context.SalesOrders on invli.Invoice.SalesOrderId equals order.Id
+                                               join orderli in context.SalesOrderLineItems on order.Id equals orderli.SalesOrderId
+                                               where invli.ItemId == orderli.ItemId
+                                               select (invli.Quantity * invli.UnitPrice * (100 - orderli.Discount1) / 100) * (100 - orderli.Discount2) / 100).Sum(),
+                               
                            };
 
             return await invoices.ToListAsync();

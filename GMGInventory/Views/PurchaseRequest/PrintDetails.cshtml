@@ -17,65 +17,75 @@
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
 </head>
 <body>
-    <table class="formatted">
-        <tr>
-            <td rowspan="2" class="center-text" style="width: 100px;">
-                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
-                {
-                    <img src="~/images/BAS-02.png" class="logo" />
-                }
-                else
-                {
-                    <img src="~/images/GMG-01.png" class="logo" />
-                }
-            </td>
-            <td rowspan="2" style="width: 60%;">
-                <dl>
-                    <dt>Document Classification:</dt>
-                    <dd>@title.ToUpper()</dd>
-                    @if (Model.Status.ToLower() != "approved")
-                    {
-                        <dd>@("(" + Model.Status + ")")</dd>
-                    }
-                </dl>
-            </td>
-            <td style="width: 40%;">
-                <dl>
-                    <dt>PR Date:</dt>
-                    <dd>@Model.RequestDate</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <dl>
-                    <dt>PR No.:</dt>
-                    <dd>@Model.DocumentNumber</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <div class="label">
-                    <span>Type of Request:</span>
-                    <strong class="detail">@Model.Type</strong>
-                </div>
-                <div class="label">
-                    <span>Purpose:</span>
-                    <strong class="detail">@Model.Purpose</strong>
-                </div>
-                @if (!string.IsNullOrWhiteSpace(Model.Region))
-                {
-                    <div class="label">
-                        <span>Region:</span>
-                        <strong class="detail">@Model.Region</strong>
-                    </div>
-                }
-            </td>
-        </tr>
-    </table>
+    @{
+        var cspan = 5;
+        if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "stocking")
+        {
+            cspan = 6;
+        }
+        else if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "rush order")
+        {
+            cspan = 7;
+        }
+    }
     <table class="formatted">
         <thead>
+            <tr>
+                <td colspan="@cspan" style="padding:0;">
+                    <div class="sub-header">
+                        <div class="sub-col center w-150px">
+                            @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                            {
+                                <img src="~/images/BAS-02.png" class="logo" />
+                            }
+                            else
+                            {
+                                <img src="~/images/GMG-01.png" class="logo" />
+                            }
+                        </div>
+                        <div class="sub-col center w-60pc p-50">
+                            <span class="title">Document Classification:</span>
+                            <span class="desc">
+                                @title.ToUpper()
+                                @if (Model.Status.ToLower() != "approved")
+                                {
+                                    @("(" + Model.Status + ")")
+                                }
+                            </span>
+                        </div>
+                        <div class="sub-col center w-40pc">
+                            <span class="title">PR Date:</span>
+                            <span class="desc">@Model.RequestDate</span>
+                            <hr />
+                            <span class="title">PR No.:</span>
+                            <span class="desc">@Model.DocumentNumber</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="@cspan" style="padding:0;">
+                    <div class="sub-header">
+                        <div class="sub-col w-50pc">
+                            <div class="label">
+                                <span>Type of Request:</span>
+                                <strong class="detail">@Model.Type</strong>
+                            </div>
+                            <div class="label">
+                                <span>Purpose:</span>
+                                <strong class="detail">@Model.Purpose</strong>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(Model.Region))
+                            {
+                                <div class="label">
+                                    <span>Region:</span>
+                                    <strong class="detail">@Model.Region</strong>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <th style="min-width: 10px;">#</th>
                 @if (Model.Type.ToLower() == "automotive")
@@ -195,18 +205,8 @@
                     </tr>
                 }
             }
-            @{
-                var cspan = 5;
-                if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "stocking")
-                {
-                    cspan = 6;
-                }
-                else if (Model.Type.ToLower() == "automotive" && Model.Purpose.ToLower() == "rush order")
-                {
-                    cspan = 7;
-                }
-            }
-
+        </tbody>
+        <tfoot>
             <tr>
                 <td colspan=@cspan>
                     <dl>
@@ -266,7 +266,7 @@
                     <p class="footer center-text"> Bina's Auto Supply | 1034 Kusang Loob St. Brgy. 330 Zone 033 Sta. Cruz, Manila | Tel. No.8731-3923,8741-5537/39 </p>
                 </td>
             </tr>
-        </tbody>
+        </tfoot>
     </table>
 </body>
 <script type="text/javascript">

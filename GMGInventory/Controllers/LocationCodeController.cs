@@ -44,7 +44,27 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var responseModel = new ResponseModel();
-            if (await locationCodeRepository.IsLocationCodeExist(locationCodeVM.LocationCode))
+            if (string.IsNullOrWhiteSpace(locationCodeVM.LocationCode))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Location code is required";
+            }
+            else if (locationCodeVM.LocationCode.Length > 10)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Location code should be 10 characters";
+            }
+            else if (string.IsNullOrWhiteSpace(locationCodeVM.LocationName))
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Location name is required";
+            }
+            else if (locationCodeVM.LocationName.Length > 100)
+            {
+                responseModel.Status = "Error";
+                responseModel.Message = "Location name should be 100 characters";
+            }
+            else if (await locationCodeRepository.IsLocationCodeExist(locationCodeVM.LocationCode))
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Location code already in use";

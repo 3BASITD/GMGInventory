@@ -120,9 +120,11 @@
                             <div class="form-group">
                                 <label for="edit-code" class="control-label mb-0 d-block">Code</label>
                                 <input name="code" id="edit-code" class="form-control form-control-sm" />
+                            </div>
                             <div class="form-group">
                                 <label for="edit-name" class="control-label mb-0 d-block">Name</label>
                                 <input name="name" id="edit-name" class="form-control form-control-sm" />
+                            </div>
                             <input type="hidden" id="edit-id" />
                         </div>
                     </div>
@@ -142,7 +144,7 @@
 
 <!-- Details Modal -->
 <div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Category Details</h5>
@@ -234,8 +236,8 @@
                 return: true,
             },
             columns: [
-                { data: "categoryCode", name: "CategoryCode" },
-                { data: "categoryName", name: "CategoryName" },
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
                 { data: "userModified", name: "UserModified" },
@@ -320,6 +322,7 @@
 
                 $("#edit-id").val(data.id);
                 $("#edit-code").val(data.code);
+                $("#edit-name").val(data.name);
 
 
             });

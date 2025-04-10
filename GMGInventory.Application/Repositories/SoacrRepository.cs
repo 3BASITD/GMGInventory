@@ -684,22 +684,13 @@ namespace GMGInventory.Application.Repositories
             var items = (await GetSOACRItemsAsync(id)).OrderByDescending(s => s.InvoiceDateD).ToList();
 
             var soacrVM = from soacr in context.SOACRs
-                          let litems = context.SOACRLineItems.Where(s => s.SOACRId == id).ToList()
-                          //let tbr = context.SOACRLineItemTBRs.Where(s=>litems.Select(a=>a.Id).Contains(s.SOACRLineItemId)).Sum(s=>s.Amount)
                           where soacr.Id == id
                           select new SOACRDetailsPVM
                           {
                               SOACRNumber = soacr.Id,
                               CustomerCode = soacr.Customer.Code,
                               CustomerName = soacr.Customer.Name,
-                              Contents = items,
-                              TotalInvoiceAmountD = litems.Sum(s => s.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)),
-                              ////TotalTBRD = litems.Sum(s => s.TBRAmount),
-                              //TotalTBRD = tbr,
-                              //TotalCreditD = litems.Sum(s => s.CreditAmount),
-                              //TotalDebitD = litems.Sum(s => s.DebitAmount),
-                              //TotalPaidAmountD = litems.Sum(s => s.PaidAmount),
-                              TotalFreightCostD = litems.Sum(s => s.FreightCost)
+                              Contents = items
                           };
 
             return await soacrVM.FirstAsync();
@@ -716,14 +707,13 @@ namespace GMGInventory.Application.Repositories
                           {
                               SOACRNumber = soacr.Id,
                               Agent = litems.First().Invoice.SalesOrder.Agent.FirstName + " " + litems.First().Invoice.SalesOrder.Agent.LastName,
+                              AgentCode = litems.First().Invoice.SalesOrder.Agent.Code,
                               CustomerCode = soacr.Customer.Code,
                               CustomerName = soacr.Customer.Name,
                               Contents = items,
                               CreditTerm = soacr.Customer.CreditTerm.Name,
                               DateFromD = soacr.SOAFrom,
-                              DateToD = soacr.SOATo,
-                              TotalInvoiceAmountD = litems.Sum(s => s.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)),
-                              TotalFreightCostD = litems.Sum(s => s.FreightCost)
+                              DateToD = soacr.SOATo
                           };
 
             return await soacrVM.FirstAsync();

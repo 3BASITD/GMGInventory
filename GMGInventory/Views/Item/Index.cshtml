@@ -329,7 +329,7 @@
                     <div class="row">
                         <div class="col-3">Items to upload</div>
                         <div class="col-9 upload-item-count"></div>
-                        <div class="col-3">Done uploaded</div>
+                        <div class="col-3">Done upload attempt</div>
                         <div class="col-9 upload-done-count"></div>
                     </div>
                     <table class="table table-striped" id="upload-table">
@@ -597,6 +597,7 @@
                     });
                 });
             }
+
             if (user_access.canEdit) {
                 // Actions upon Display Edit Modal
                 $(".editBtn").click(function (e) {
@@ -609,6 +610,7 @@
                     $("#edit-interchange-number").val(data.interchangeNumber);
                     $("#edit-model-number").val(data.modelNumber);
                     $("#edit-size").val(data.size);
+                    console.log(data);
                     $("#edit-category").val(data.categoryId).trigger("change");
                     $("#edit-item-type").val(data.itemTypeId).trigger("change");
                     $("#edit-brand").val(data.brandId).trigger("change");
@@ -899,6 +901,10 @@
                     },
                     complete: function (xhr, status) {
                         UploadRowDone();
+                    },
+                    error: function (xhr, status, error) {
+                        let message = xhr.responseText.match(/(?<=:\s)(.*?)(?=\s*--->|\r?\n)/)?.[0] || "An error occurred.";
+                        $("#upload-row" + rownum + "td").html(message);
                     }
                 });
             }
@@ -911,6 +917,7 @@
                 if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
                     $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
                     $("#upload-file").val("");
+                    itemDT.ajax.reload();
                 }
             }
 

@@ -16,128 +16,98 @@
 </head>
 <body>
     <table class="formatted">
-        <tr>
-            <td rowspan="2" class="center-text" style="width: 100px;">
-                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
-                {
-                    <img src="~/images/BAS-02.png" class="logo" />
-                }
-                else
-                {
-                    <img src="~/images/GMG-01.png" class="logo" />
-                }
-            </td>
-            <td rowspan="2" style="width: 60%;">
-                <dl>
-                    <dt>Document Classification:</dt>
-                    <dd>@title.ToUpper()</dd>
-                    @if (Model.Status.ToLower() != "approved")
-                    {
-                        <dd>@("(" + Model.Status + ")")</dd>
-                    }
-                </dl>
-            </td>
-            <td style="width: 40%;">
-                <dl>
-                    <dt>SO Date:</dt>
-                    <dd>@Model.OrderDate</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <dl>
-                    <dt>SO No.:</dt>
-                    <dd>@Model.SONumber</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <div class="row-of-6">
-                    <div class="col-1">
-                        <span>Contact Person:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactPerson) ? "N/A" : Model.CustomerContactPerson)</strong>
-                    </div>
-                    <div class="col-1">
-                        <span>Ship to:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">?</strong>
-                    </div>
-                </div>
-                <div class="row-of-6">
-                    <div class="col-1">
-                        <span>Contact No.:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactNumber) ? "N/A" : Model.CustomerContactNumber)</strong>
-                    </div>
-                    <div class="col-1">
-                        <span>Address:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">?</strong>
-                    </div>
-                </div>
-                <div class="row-of-6">
-                    <div class="col-1">
-                        <span>Address:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</strong>
-                    </div>
-                    <div class="col-1">
-                        <span>Agent Name:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@Model.AgentName</strong>
-                    </div>
-                </div>
-                <div class="row-of-6">
-                    <div class="col-1">
-                        <span>Payment Terms:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@Model.CreditTerms</strong>
-                    </div>
-                    <div class="col-1">
-                        <span>Forwarder:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@Model.Forwarder</strong>
-                    </div>
-                </div>
-                <div class="row-of-6">
-                    <div class="col-1">
-                        <span>Purchase Order #:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)</strong>
-                    </div>
-                    <div class="col-1">
-                        <span>Region:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@Model.Region</strong>
-                    </div>
-                </div>
-                <div class="row-of-6">
-                    <div class="col-3"></div>
-                    <div class="col-1">
-                        <span>RDD:</span>
-                    </div>
-                    <div class="col-2">
-                        <strong class="detail">@Model.RequiredDeliveryDate</strong>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
-    <table class="formatted">
         <thead>
+            <tr>
+                <td colspan="9" style="padding:0;">
+                    <div class="sub-header">
+                        <div class="sub-col center w-150px">
+                            @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                            {
+                                <img src="~/images/BAS-02.png" class="logo" />
+                            }
+                            else
+                            {
+                                <img src="~/images/GMG-01.png" class="logo" />
+                            }
+                        </div>
+                        <div class="sub-col center w-60pc p-50">
+                            <span class="title">Document Classification:</span>
+                            <span class="desc">
+                                @title.ToUpper()
+                                @if (Model.Status.ToLower() != "approved")
+                                {
+                                    @("(" + Model.Status + ")")
+                                }
+                            </span>
+                        </div>
+                        <div class="sub-col center w-40pc">
+                            <span class="title">SO Date:</span>
+                            <span class="desc">@Model.OrderDate</span>
+                            <hr />
+                            <span class="title">SO No.:</span>
+                            <span class="desc">@Model.SONumber</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="9" style="padding:0;">
+                    <div class="sub-header">
+                        <div class="sub-col w-50pc">
+                            <div class="label">
+                                <span>Customer Name:</span>
+                                <strong class="detail">@Model.CustomerName</strong>
+                            </div>
+                            <div class="label">
+                                <span>Contact Person:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactPerson) ? "N/A" : Model.CustomerContactPerson)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Contact No.:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactNumber) ? "N/A" : Model.CustomerContactNumber)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Address:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Payment Terms:</span>
+                                <strong class="detail">@Model.CreditTerms</strong>
+                            </div>
+                            <div class="label">
+                                <span>Purchase Order #:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)</strong>
+                            </div>
+                        </div>
+                        <div class="sub-col w-50pc">
+                            <div class="label">
+                                <span>Ship To:</span>
+                                <strong class="detail">?</strong>
+                            </div>
+                            <div class="label">
+                                <span>Address:</span>
+                                <strong class="detail">?</strong>
+                            </div>
+                            <div class="label">
+                                <span>Agent Name:</span>
+                                <strong class="detail">@Model.AgentName</strong>
+                            </div>
+                            <div class="label">
+                                <span>Forwarder:</span>
+                                <strong class="detail">@Model.Forwarder</strong>
+                            </div>
+                            <div class="label">
+                                <span>Region:</span>
+                                <strong class="detail">@Model.Region</strong>
+                            </div>
+                            <div class="label">
+                                <span>RDD:</span>
+                                <strong class="detail">@Model.RequiredDeliveryDate</strong>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <th style="min-width: 10px;">#</th>
                 <th style="min-width: 50px;">PART NUMBER</th>

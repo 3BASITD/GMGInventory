@@ -2,7 +2,7 @@
 
 @{
     Layout = "";
-    var title = "Customer Counter Receipt";
+    var title = "Counter Receipt";
 }
 
 <!DOCTYPE html>
@@ -12,59 +12,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GMGInventory | @title</title>
     <link rel="icon" href="~/images/box.ico" />
-    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/print_bas.css" asp-append-version="true" />
 </head>
 <body>
-    <h3>@title</h3>
-    <p>
-        <strong>CR Number:</strong>
-        <span>@Model.SOACRNumber</span>
-        <br />
-        <strong>Customer Code:</strong>
-        <span>@Model.CustomerCode</span>
-        <br />
-        <strong>Customer Name:</strong>
-        <span>@Model.CustomerName</span>
-        @*<br />
-        <strong>Counter Receipt Date: </strong>
-        <span>@Model.CRDate</span>
-        <br />
-        <strong>Date to be Collected: </strong>
-        <span> </span>*@
-    </p>
     <table class="table-items">
         <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceNumber)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceType)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().InvoiceAmount)
-                </th>
-                @*<th>
-                    @Html.DisplayNameFor(model => model.Contents.First().TBR)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().Credit)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().Debit)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().PaidAmount)
-                </th>*@
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().FreightCharge)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().Balance)
-                </th>
+                <td colspan="6">
+                    <div class="text-center">@title</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <div class="text-center">@title</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <div class="text-center">CR No. @Model.SOACRNumber</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <span>Customer Code:</span>
+                    <strong>@Model.CustomerCode</strong>
+                    <span>Counter Receipt Date:</span>
+                    <strong>@Model.DateFrom</strong>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <span>Customer Name:</span>
+                    <strong>@Model.CustomerName</strong>
+                    <span>Date to be Collected:</span>
+                    <strong>@Model.DateTo</strong>
+                </td>
+            </tr>
+            <tr>
+                <th>Invoice Date</th>
+                <th>Invoice Number</th>
+                <th>Trans Code</th>
+                <th>Open Amount</th>
+                <th>Freight Cost</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
@@ -75,10 +65,6 @@
                     <td>@item.InvoiceNumber</td>
                     <td>@item.InvoiceType</td>
                     <td class="right-text">@item.InvoiceAmount</td>
-                    @*<td class="right-text">@item.TBR</td>
-                    <td class="right-text">@item.Credit</td>
-                    <td class="right-text">@item.Debit</td>
-                    <td class="right-text">@item.PaidAmount</td>*@
                     <td class="right-text">@item.FreightCharge</td>
                     <td class="right-text">@item.Balance</td>
                 </tr>
@@ -86,15 +72,11 @@
             <tr>
                 <th colspan="3" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalInvoiceAmount</nobr></th>
-                @*<th class="right-text"><nobr>@Model.TotalTBR</nobr></th>
-                <th class="right-text"><nobr>@Model.TotalCredit</nobr></th>
-                <th class="right-text"><nobr>@Model.TotalDebit</nobr></th>
-                <th class="right-text"><nobr>@Model.TotalPaidAmount</nobr></th>*@
                 <th class="right-text"><nobr>@Model.TotalFreightCost</nobr></th>
                 <th class="right-text"><nobr>@Model.TotalBalance</nobr></th>
             </tr>
             <tr>
-                <td colspan="10" class="signatory">
+                <td colspan="6" class="signatory">
                     <div>
                         <span>
                             Authorized Signature
@@ -109,14 +91,16 @@
         <tfoot>
         </tfoot>
     </table>
+    <p id="last-element-in-pub"> </p>
+@* 
+    <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script> *@
+    <script type="text/javascript">
+        window.print();
+        window.onafterprint = function () {
+            setTimeout(function () {
+                window.close();
+            }, 100);
+        };
+    </script>
 </body>
-
-<script type="text/javascript">
-    window.print();
-    window.onafterprint = function () {
-        setTimeout(function () {
-            window.close();
-        }, 100); 
-    };
-</script>
 </html>

@@ -13,7 +13,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(10)")]
         public string Code { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string Name { get; set; }
 
         [ForeignKey("CategoryId")]

@@ -224,6 +224,7 @@ namespace GMGInventory.Application.Repositories
                                 LineNumber = request.LineNumber,
                                 SalesOrderId = request.SalesOrderId,
                                 SalesOrderNumber = request.SalesOrder.SalesOrderNumber,
+                                Customer = request.SalesOrder.Customer.Name,
                                 ItemId = request.ItemId,
                                 ItemCode = request.Item == null ? null : request.Item.Code,
                                 ItemPartNumber = (request.Item == null ? null : request.Item.PartNumber) + "",
@@ -258,6 +259,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     s.LineNumber + "",
                     s.SalesOrderNumber,
+                    s.Customer,
                     s.ItemCode,
                     s.ItemPartNumber,
                     s.ItemDescription,

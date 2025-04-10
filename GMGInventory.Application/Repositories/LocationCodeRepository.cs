@@ -140,8 +140,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var location = new LocationCode
             {
-                Code = LocationCodeVM.Code,
-                Name = LocationCodeVM.Name,
+                Code = LocationCodeVM.Code.Length > 10 ? LocationCodeVM.Code[..10] : LocationCodeVM.Code,
+                Name = LocationCodeVM.Name.Length > 100 ? LocationCodeVM.Name[..100] : LocationCodeVM.Name,
                 IsActive = true
             };
             await context.LocationCodes.AddAsync(location);
@@ -158,18 +158,25 @@ namespace GMGInventory.Application.Repositories
                 throw new DbUpdateConcurrencyException();
             }
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            location.Id = LocationCodeVM.Id;
 
-            location.Code = LocationCodeVM.Code;
-            location.Name = LocationCodeVM.Name;
+            location.Id = LocationCodeVM.Id;
+            location.Code = LocationCodeVM.Code.Length > 10 ? LocationCodeVM.Code[..10] : LocationCodeVM.Code;
+            location.Name = LocationCodeVM.Name.Length > 100 ? LocationCodeVM.Name[..100] : LocationCodeVM.Name;
             location.IsActive = true;
+
             context.LocationCodes.Update(location);
             await context.SaveChangesAsync(currentUserId);
         }
 
         public async Task<int?> GetIdAsync(string? Name)
         {
-            var locationCode = await context.LocationCodes.Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim()).FirstOrDefaultAsync();
+            var _name = (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim();
+            var name = _name.Length > 100 ? _name[..100] : _name;
+            var code = _name.Length > 10 ? _name[..10] : _name;
+            var locationCode = await context.LocationCodes
+                                            .Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == name
+                                                     || s.Code.ToLower().Replace("\n", "").Replace("\r", "").Trim() == code)
+                                            .FirstOrDefaultAsync();
             return locationCode?.Id;
         }
     }

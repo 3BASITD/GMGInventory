@@ -364,15 +364,21 @@ namespace GMGInventory.Application.Repositories
                               InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                               ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                               LocationCode = item.LocationCode == null ? "" : item.LocationCode.Code.Replace("\n", "").Replace("\r", "").Trim(),
+                              LocationCodeId = item.LocationCodeId,
                               Category = item.Category.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              CategoryId = item.CategoryId,
                               ItemType = item.ItemType.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              ItemTypeId = item.ItemTypeId,
                               Brand = item.Brand.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              BrandId = item.BrandId,
                               Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
                               Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              UnitId = item.UnitId,
                               QuantityD = inventory.Quantity,
                               RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                               NetPriceD = price == null ? 0 : price.NetSellingPrice,
                               Warehouse = inventory.Warehouse.Name,
+                              WarehouseId = inventory.WarehouseId,
                               IsActive = item.IsActive
                           };
             return await itemsVM.ToListAsync();
@@ -453,15 +459,22 @@ namespace GMGInventory.Application.Repositories
                                    PartNumber = j.PartNumber,
                                    InterchangeNumber = j.InterchangeNumber,
                                    ModelNumber = j.ModelNumber,
+                                   LocationCode = j.LocationCode,
+                                   LocationCodeId = j.LocationCodeId,
                                    Category = j.Category,
+                                   CategoryId = j.CategoryId,
                                    ItemType = j.ItemType,
+                                   ItemTypeId = j.ItemTypeId,
                                    Brand = j.Brand,
+                                   BrandId = j.BrandId,
                                    Size = j.Size,
                                    Unit = j.Unit,
+                                   UnitId = j.UnitId,
                                    QuantityD = j.QuantityD,
                                    RetailPriceD = j.RetailPriceD,
                                    NetPriceD = j.NetPriceD,
                                    Warehouse = j.Warehouse,
+                                   WarehouseId = j.WarehouseId,
                                    IsActive = j.IsActive,
                                    GiveAction = i == 0
                                }))
@@ -642,7 +655,6 @@ namespace GMGInventory.Application.Repositories
             item.Name = itemVM.Name;
             item.PartNumber = itemVM.PartNumber + "";
             item.Size = itemVM.Size + "";
-            item.UnitId = itemVM.UnitId;
 
             context.Items.Update(item);
             await context.SaveChangesAsync(currentUserId);

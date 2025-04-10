@@ -43,8 +43,12 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<int?> GetIdAsync(string? Name)
         {
+            var _name = (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim();
+            var name = _name.Length > 100 ? _name[..100] : _name;
+            var code = _name.Length > 10 ? _name[..10] : _name;
             var category = await context.Categories
-                                        .Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim())
+                                        .Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == name
+                                                    || s.Code.ToLower().Replace("\n", "").Replace("\r", "").Trim() == code)
                                         .FirstOrDefaultAsync();
             return category?.Id;
         }
@@ -63,8 +67,8 @@ namespace GMGInventory.Application.Repositories
                              select new CategoryVM
                              {
                                  Id = category.Id,
-                                 CategoryName = category.Name,
-                                 CategoryCode = category.Code,
+                                 Name = category.Name,
+                                 Code = category.Code,
                                  IsActive = category.IsActive,
                                  DateCreatedD = category.DateCreated,
                                  DateModifiedD = category.DateModified == null ? null : category.DateModified.Value,
@@ -84,8 +88,8 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.CategoryCode.ToLower().Contains(form.SearchValue)
-                                    || x.CategoryName.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                    || x.Name.ToLower().Contains(form.SearchValue)
                                     || x.UserCreated.ToLower().Contains(form.SearchValue)
                                     || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
                                     || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
@@ -100,8 +104,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "CategoryCode": data = data.OrderBy(s => s.CategoryCode); break;
-                        case "CategoryName": data = data.OrderBy(s => s.CategoryName); break;
+                        case "Code": data = data.OrderBy(s => s.Code); break;
+                        case "Name": data = data.OrderBy(s => s.Name); break;
                         case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
                         case "UserModified": data = data.OrderBy(s => s.UserModified); break;
@@ -113,8 +117,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "CategoryCode": data = data.OrderByDescending(s => s.CategoryCode); break;
-                        case "CategoryName": data = data.OrderByDescending(s => s.CategoryName); break;
+                        case "Code": data = data.OrderByDescending(s => s.Code); break;
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
                         case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
                         case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
@@ -192,8 +196,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var category = new Category
             {
-                Code = categoryVM.CategoryCode,
-                Name = categoryVM.CategoryName,
+                Code = categoryVM.Code,
+                Name = categoryVM.Name,
                 IsActive = true
 
             };
@@ -211,8 +215,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             category.Id = categoryVM.Id;
 
-            category.Code = categoryVM.CategoryCode;
-            category.Name = categoryVM.CategoryName;
+            category.Code = categoryVM.Code;
+            category.Name = categoryVM.Name;
             category.IsActive = true;
             context.Categories.Update(category);
             await context.SaveChangesAsync(currentUserId);
@@ -221,14 +225,22 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> UploadCombinationExistAsync(CategoryVM categoryVM)
         {
-            return (await GetAllGenericVMAsync()).Any(s => s.Code.ToLower() == categoryVM.CategoryCode.ToLower()
-                                                        && s.Name.ToLower() == categoryVM.CategoryName.ToLower());
+            var _code = categoryVM.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim();
+            var code = _code.Length > 10 ? _code[..10] : _code;
+            var _name = categoryVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
+            var name = _name.Length > 100 ? _name[..100] : _name;
+
+            return (await GetAllGenericVMAsync()).Any(s => s.Code.ToLower().Replace("\r","").Replace("\n","").Trim() == code
+                                                        && s.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim() == name);
         }
 
 
-        public async Task<bool> IsCodeExist(string code)
+        public async Task<bool> IsCodeExist(string Code)
         {
-            return await context.Categories.AnyAsync(c => c.Code == code);
+            var _code = Code.ToLower().Replace("\r", "").Replace("\n", "").Trim();
+            var code = _code.Length > 10 ? _code[..10] : _code;
+
+            return await context.Categories.AnyAsync(c => c.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim() == code);
         }
 
     }

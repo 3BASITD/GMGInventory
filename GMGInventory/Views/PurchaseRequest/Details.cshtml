@@ -288,6 +288,7 @@
                                     <th></th>
                                     <th>#</th>
                                     <th>SO Number</th>
+                                    <th>Customer</th>
                                     <th>Item Code</th>
                                     <th>Part Number</th>
                                     <th>Item Name</th>
@@ -299,6 +300,7 @@
                             </thead>
                             <tfoot>
                                 <tr>
+                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>
@@ -341,6 +343,12 @@
                                     <select id="add-so-number" name="SONumber" style="width: 100%;">
                                         <option></option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 add-so-number-container">
+                                <div class="form-group">
+                                    <label for="add-customer" class="form-label mb-0">Customer</label>
+                                    <input type="text" id="add-customer" class="form-control form-control-sm" readonly="readonly" />
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-code-container">
@@ -450,6 +458,7 @@
                 },
                 { data: "lineNumber", name: "LineNumber", className: "form-cell" },
                 { data: "salesOrderNumber", name: "SalesOrderNumber", className: "form-cell" },
+                { data: "customer", name: "Customer", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.itemId == null || data.itemCode == null) {
@@ -702,6 +711,7 @@
             }
 
             function loadSOItemsOptions() {
+                $("#add-customer").val("");
                 $("#add-code").val(null).trigger("change");
                 $("#add-part").val("");
                 $("#add-name").val("");

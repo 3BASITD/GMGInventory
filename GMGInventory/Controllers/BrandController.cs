@@ -134,7 +134,7 @@ namespace GMGInventory.Controllers
             dt.Columns.AddRange([
                 new DataColumn("Code"),
                 new DataColumn("Name"),
-                new DataColumn("Item Type")
+                new DataColumn("ItemType")
             ]);
             var brands = (await brandRepository.GetListAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var brand in brands)

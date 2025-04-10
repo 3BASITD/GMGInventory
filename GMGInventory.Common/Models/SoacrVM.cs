@@ -227,23 +227,26 @@ namespace GMGInventory.Common.Models
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
         public string Agent { get; set; }
+        public string AgentCode { get; set; }
         public string CreditTerm { get; set; }
-        public string DateFrom => DateFromD == null ? "-" : DateFromD.Value.ToString(SystemFormat.StringDate);
+        public string DateFrom => DateFromD == null ? "" : DateFromD.Value.ToString(SystemFormat.StringDate);
+        public string DateFrom2 => DateFromD == null ? "" : DateFromD.Value.ToString(SystemFormat.StringDate2);
         public DateTime? DateFromD { get; set; }
-        public string DateTo => DateToD == null ? "-" : DateToD.Value.ToString(SystemFormat.StringDate);
+        public string DateTo => DateToD == null ? "" : DateToD.Value.ToString(SystemFormat.StringDate);
+        public string DateTo2 => DateToD == null ? "" : DateToD.Value.ToString(SystemFormat.StringDate2);
         public DateTime? DateToD { get; set; }
         public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
-        public decimal TotalInvoiceAmountD { get; set; }
+        public decimal TotalInvoiceAmountD => Contents.Sum(s => s.InvoiceAmountD);
         public string TotalTBR => string.Format(SystemFormat.StringDecimalComma, TotalTBRD);
-        public decimal TotalTBRD { get; set; }
+        public decimal TotalTBRD => Contents.Sum(s => s.TBRD);
         public string TotalCredit => string.Format(SystemFormat.StringDecimalComma, TotalCreditD);
-        public decimal TotalCreditD { get; set; }
+        public decimal TotalCreditD => Contents.Sum(s => s.CreditD);
         public string TotalDebit => string.Format(SystemFormat.StringDecimalComma, TotalDebitD);
-        public decimal TotalDebitD { get; set; }
+        public decimal TotalDebitD => Contents.Sum(s => s.DebitD);
         public string TotalPaidAmount => string.Format(SystemFormat.StringDecimalComma, TotalPaidAmountD);
-        public decimal TotalPaidAmountD { get; set; }
+        public decimal TotalPaidAmountD => Contents.Sum(s => s.PaidAmountD);
         public string TotalFreightCost => string.Format(SystemFormat.StringDecimalComma, TotalFreightCostD);
-        public decimal TotalFreightCostD { get; set; }
+        public decimal TotalFreightCostD => Contents.Sum(s => s.FreightChargeD);
         public string TotalBalance => string.Format(SystemFormat.StringDecimalComma, TotalBalanceD);
         public decimal TotalBalanceD => TotalInvoiceAmountD - TotalTBRD - TotalCreditD + TotalDebitD - TotalPaidAmountD + TotalFreightCostD;
         public IList<SOACRItemsVM> Contents { get; set; }

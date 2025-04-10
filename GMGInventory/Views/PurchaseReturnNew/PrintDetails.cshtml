@@ -18,79 +18,74 @@
 </head>
 <body>
     <table class="formatted">
-        <tr>
-            <td rowspan="2" class="center-text" style="width: 100px;">
-                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
-                {
-                    <img src="~/images/BAS-02.png" class="logo" />
-                }
-                else
-                {
-                    <img src="~/images/GMG-01.png" class="logo" />
-                }
-            </td>
-            <td rowspan="2" style="width: 60%;">
-                <dl>
-                    <dt>Document Classification:</dt>
-                    <dd>@title.ToUpper()</dd>
-                    @if (Model.Status.ToLower() != "approved")
-                    {
-                        <dd>@("(" + Model.Status + ")")</dd>
-                    }
-                </dl>
-            </td>
-            <td style="width: 40%;">
-                <dl>
-                    <dt>Date Return:</dt>
-                    <dd>@Model.ReturnDate</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <dl>
-                    <dt>Return Number.:</dt>
-                    <dd>@Model.DocumentNumber</dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <div class="two-column">
-                    <div class="column">
-                        <div class="label">
-                            <span>Supplier Name:</span>
-                            <strong class="detail">@Model.Supplier</strong>
-                        </div>
-                        <div class="label">
-                            <span>Ref. PO Number:</span>
-                            <strong class="detail">@Model.PONumber</strong>
-                        </div>
-                        <div class="label">
-                            <span>Warehouse:</span>
-                            <strong class="detail">@Model.Warehouse</strong>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="label">
-                            <span>Delivery Receipt #:</span>
-                            <strong class="detail">@Model.DRNumber</strong>
-                        </div>
-                        <div class="label">
-                            <span>Sales Invoice #:</span>
-                            <strong class="detail">@Model.SINumber</strong>
-                        </div>
-                        <div class="label">
-                            <span>Remarks:</span>
-                            <strong class="detail">@Model.Remarks</strong>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
-    <table class="formatted">
         <thead>
+            <tr>
+                <td colspan="7" style="padding:0;">
+                    <div class="sub-header">
+                        <div class="sub-col center w-150px">
+                            @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                            {
+                                <img src="~/images/BAS-02.png" class="logo" />
+                            }
+                            else
+                            {
+                                <img src="~/images/GMG-01.png" class="logo" />
+                            }
+                        </div>
+                        <div class="sub-col center w-60pc p-50">
+                            <span class="title">Document Classification:</span>
+                            <span class="desc">
+                                @title.ToUpper()
+                                @if (Model.Status.ToLower() != "approved")
+                                {
+                                    @("(" + Model.Status + ")")
+                                }
+                            </span>
+                        </div>
+                        <div class="sub-col center w-40pc">
+                            <span class="title">Date Return:</span>
+                            <span class="desc">@Model.ReturnDate</span>
+                            <hr />
+                            <span class="title">Return No.:</span>
+                            <span class="desc">@Model.DocumentNumber</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7" style="padding:0;">
+                    <div class="sub-header">
+                        <div class="sub-col w-50pc">
+                            <div class="label">
+                                <span>Supplier Name:</span>
+                                <strong class="detail">@Model.Supplier</strong>
+                            </div>
+                            <div class="label">
+                                <span>Ref. PO Number:</span>
+                                <strong class="detail">@Model.PONumber</strong>
+                            </div>
+                            <div class="label">
+                                <span>Warehouse:</span>
+                                <strong class="detail">@Model.Warehouse</strong>
+                            </div>
+                        </div>
+                        <div class="sub-col w-50pc">
+                            <div class="label">
+                                <span>Delivery Receipt #:</span>
+                                <strong class="detail">@Model.DRNumber</strong>
+                            </div>
+                            <div class="label">
+                                <span>Sales Invoice #:</span>
+                                <strong class="detail">@Model.SINumber</strong>
+                            </div>
+                            <div class="label">
+                                <span>Remarks:</span>
+                                <strong class="detail">@Model.Remarks</strong>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <th style="min-width: 10px;">#</th>
                 <th style="min-width: 50px;">PART NUMBER</th>

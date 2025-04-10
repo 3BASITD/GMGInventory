@@ -10,6 +10,47 @@
         margin-top: 50px;
         overflow: visible !important;
     }
+
+        body * {
+            opacity: 1;
+        }
+
+        body::before, body::after {
+            opacity: 0;
+        }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-row-group;
+        break-before: avoid;
+        page-break-before: avoid;
+    }
+}
+
+@media screen {
+    body * {
+        opacity: 0;
+    }
+
+    body::before, body::after {
+        opacity: 1;
+        position: fixed;
+        white-space: pre;
+        content: "This page is for printing only.\A Click Ctrl+P if Print Dialog did not open automatically.\A Close this tab if done printing.";
+        writing-mode: vertical-rl;
+        top: 10px;
+    }
+
+    body::before {
+        right: 10px;
+    }
+
+    body::after {
+        left: 10px;
+    }
 }
 
 * {
@@ -62,6 +103,7 @@ h3 {
         border: none;
         padding: 2px;
     }
+
 .right-text {
     text-align: right;
 }
@@ -238,15 +280,101 @@ table.formatted {
         margin-right: auto;
     }
 
-    table.formatted.receptacle dt,
-    table.formatted.receptacle dd {
-        margin: 10px;
-    }
+        table.formatted.receptacle dt,
+        table.formatted.receptacle dd {
+            margin: 10px;
+        }
 
-    table.formatted.receptacle dt {
-        font-size: 14px;
-    }
+        table.formatted.receptacle dt {
+            font-size: 14px;
+        }
 
     table.formatted.shipping th, table.formatted.shipping td {
         border: none;
     }
+
+.sub-header {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+    .sub-header .sub-col {
+        display: table-cell;
+        padding: 5px;
+        border-right: 1px solid black;
+        font-weight: bold;
+    }
+
+.sub-col.center {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.sub-col img {
+    vertical-align: top;
+    height: 75px;
+}
+
+.sub-col .desc {
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+}
+
+.sub-col.w-200px {
+    width: 200px;
+}
+
+.sub-col.w-150px {
+    width: 150px;
+}
+
+.sub-col.w-100px {
+    width: 100px;
+}
+
+.sub-col.w-100pc {
+    width: 100%;
+}
+
+.sub-col.w-60pc {
+    width: 60%;
+}
+
+.sub-col.w-50pc {
+    width: 50%;
+}
+
+.sub-col.w-40pc {
+    width: 40%;
+}
+
+.sub-col.d-ib {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.sub-col.right {
+    float: right;
+    text-align: right;
+}
+
+.sub-col:last-child {
+    border-right: none;
+}
+
+.sub-col hr {
+    border: none;
+    height: 1px;
+    background-color: black;
+    margin: 5px -5px;
+}
+
+hr.sum {
+    border: none;
+    height: 1px;
+    background-color: black;
+    box-shadow: 0 3px 0 #000;
+    margin: 0px -5px 5px -5px;
+}

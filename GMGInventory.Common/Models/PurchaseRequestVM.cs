@@ -99,6 +99,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "SO Number")]
         public string? SalesOrderNumber { get; set; }
+
+        [Display(Name = "Customer")]
+        public string? Customer { get; set; }
         public int? ItemId { get; set; }
 
         [Display(Name = "Item Code")]
