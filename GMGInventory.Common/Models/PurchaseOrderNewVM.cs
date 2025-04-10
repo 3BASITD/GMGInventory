@@ -26,6 +26,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
+
+        [Display(Name = "SupplierName")]
+        public string SupplierName { get; set; }
         public int SupplierId { get; set; }
 
         [Display(Name = "Term")]
