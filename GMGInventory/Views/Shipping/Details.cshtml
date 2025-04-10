@@ -16,9 +16,13 @@
             @if (userAccess.CanPrint)
             {
                 <div class="dropdown float-right ml-2">
-                   <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
-                    <span class="fas fa-print"></span> Print
-            </button>
+                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-print"></span> Print
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
+                        <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
+                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
+                    </ul>
                 </div>
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index" )">
@@ -210,7 +214,8 @@
             hideLoader();
         });
 
-        $(".printBtn").on("click", function () {
+        $(".btn-details-print").on("click", function () {
+            var print_company = $(this).data("company");
             var print_desc = $('#shipping-desc').val();
             var print_freight = $('#shipping-freight').val();
             var print_value = $('#shipping-value').val();
@@ -223,6 +228,7 @@
             setTimeout(function () {
                 var urlQuery = [];
                 urlQuery.push("Id=" + @Model?.SalesOrderId);
+                urlQuery.push("Company=" + print_company);
                 urlQuery.push("Desc=" + print_desc);
                 urlQuery.push("Freight=" + print_freight);
                 urlQuery.push("Value=" + print_value);

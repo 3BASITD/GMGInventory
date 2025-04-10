@@ -114,7 +114,7 @@
                 <div class="row">
                     <div class="col-12 col-sm-4">
                         <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Package Number</label>
-                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" />
+                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" readonly="readonly"  />
                     </div>
                     <div class="col-12 col-sm-4">
                         <label for="add-type" col-form-label pt-0" style="margin-bottom: 5px;">Package Type</label>
@@ -449,7 +449,11 @@
                     var row_data = this.data();
                     if (row_data.id == rowdata.id) {
                         row_data.remainingQuantity = parseInt(row_data.remainingQuantity) + parseInt(rowdata.quantityToPack);
+                        row_data.remainingQuantityD = row_data.remainingQuantity;
+
                         row_data.packedQuantity = parseInt(row_data.packedQuantity) - parseInt(rowdata.quantityToPack);
+                        row_data.packedQuantityD = row_data.packedQuantity;
+
                         this.data(row_data);
                         if (row_data.remainingQuantity == 0) {
                             $(this.node()).addClass("text-muted");

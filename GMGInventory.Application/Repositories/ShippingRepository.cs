@@ -54,7 +54,7 @@ namespace GMGInventory.Application.Repositories
 
                            let forwarder = so.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == so.Id).FirstOrDefault()!.Forwarder
 
-                           where sts.Code.ToLower() == "invoiced" 
+                           where sts.Code.ToLower() == "invoiced" || sts.Code.ToLower() == "draft"
                              && filter.DateFrom <= invs.DateCreated.Date
                             && invs.DateCreated.Date <= filter.DateTo
                             && (filter.Customer == null || filter.Customer == so.CustomerId)

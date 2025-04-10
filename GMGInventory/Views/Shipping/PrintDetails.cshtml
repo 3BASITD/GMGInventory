@@ -18,7 +18,14 @@
     <table class="formatted shipping">
         <tr>
             <td rowspan="2" class="left-text" style="width: 23%;">
+                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                {
                     <img src="~/images/BAS-02.png" class="logo" />
+                }
+                else
+                {
+                    <img src="~/images/GMG-01.png" class="logo" />
+                }
             </td>
             <td class="left-text">
                 <div class="column center-text">
@@ -30,12 +37,12 @@
                     </dl>
                 </div>
             </td>
-          @*   <td style="width: 10%;">
-            </td> *@
+            <td class="right-text" style="vertical-align: top">
+               Sales Order No: @Model.Details?.SONumber 
+            </td>
         </tr>
     <tr>
             <td></td>
-           @*  <td></td> *@
             <td class="right-text"><strong>Date: @DateTime.Now.ToString("MM/dd/yyyy") </strong></td>
     </tr>
     </table>
