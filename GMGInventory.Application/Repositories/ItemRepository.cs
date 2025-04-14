@@ -54,10 +54,10 @@ namespace GMGInventory.Application.Repositories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.Code.ToLower().Contains("main"))
                                                .Sum(s => (int?)s.Quantity) ?? 0
                         where item.IsActive == true
-                           && string.IsNullOrWhiteSpace(search)
+                           && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
                            || item.Name.ToLower().Contains(search.ToLower())
-                           || (item.PartNumber + "").ToLower().Contains(search.ToLower())
+                           || (item.PartNumber + "").ToLower().Contains(search.ToLower()))
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {
@@ -66,11 +66,11 @@ namespace GMGInventory.Application.Repositories
                             Text = item.Code,
                             Name = item.Name,
                             PartNumber = item.PartNumber + "",
-                            NetPriceD = price.NetSellingPrice,
+                            NetPriceD = price == null ? -999999 : price.NetSellingPrice,
                             QuantityD = 0,
-                            RetailPriceD = price.RetailSellingPrice,
-                            UnitId = item.Unit.Id,
-                            Unit = item.Unit.Code
+                            RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
+                            UnitId = item.Unit == null ? -1 : item.Unit.Id,
+                            Unit = item.Unit == null ? "" : item.Unit.Code
                         };
             var itemsFiltered = await items.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonItemOptionsModel>

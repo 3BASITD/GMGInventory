@@ -4362,9 +4362,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("DisapprovedReason")
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<int?>("ForwarderId")
-                        .HasColumnType("int");
-
                     b.Property<string>("PurchaseOrder")
                         .HasColumnType("nvarchar(max)");
 
@@ -4374,7 +4371,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime>("RequiredDeliveryDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ResubmittedSalesOrderId")
+                    b.Property<int?>("ResubmitId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("SalesOrderDate")
@@ -4400,7 +4397,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("ForwarderId");
+                    b.HasIndex("ResubmitId");
 
                     b.HasIndex("StatusId");
 
@@ -5699,13 +5696,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "dab5a1c0-143f-4388-82e2-2f26a518c419",
+                            ConcurrencyStamp = "2a07116f-3b50-4cd1-91d0-945008e2a74f",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMPw7HpcENmo+pCWg7EsVzULFX/MEij2GKKBH4rT5v2WxOLqQ9zyerbt+VFmqJhWIQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJz3JxTZ+AzY3o6gGrIRyZsIo9Pm27vkHo7KUNNGRpr6fcjb2fhB4j8o7cf9dyJLug==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e4b6c020-218f-4500-8fef-39da52251fef",
+                            SecurityStamp = "af1ebe46-6f6c-476f-9a51-996706a45f3c",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5720,13 +5717,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b6fa4c48-1cb7-4fe9-b246-299d25ab4eb8",
+                            ConcurrencyStamp = "cc2ed6ea-1cda-4df4-a06d-ea50df95443c",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMVCWz0Nw5AYJcCzNSWpniLpez/eWFa+hbAyUnLweZpCYtkSj9gX73LJDM3pFPJiOQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBWAM9pcMI3pYCT9DX0vspI53uQ3vFa9Zf/ako3e6UGV212Zs8vdJiYCWhjmV9KHFA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e35ff840-5b07-4656-82ec-98e9bf65cf50",
+                            SecurityStamp = "14d3a33b-c9c5-4a19-b268-7633d3c87993",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6606,9 +6603,9 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.Forwarder", null)
-                        .WithMany("SalesOrders")
-                        .HasForeignKey("ForwarderId");
+                    b.HasOne("GMGInventory.Data.SalesOrder", "Resubmit")
+                        .WithMany("SalesOrderResubmits")
+                        .HasForeignKey("ResubmitId");
 
                     b.HasOne("GMGInventory.Data.Status", "Status")
                         .WithMany("SalesOrders")
@@ -6619,6 +6616,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Agent");
 
                     b.Navigation("Customer");
+
+                    b.Navigation("Resubmit");
 
                     b.Navigation("Status");
                 });
@@ -6988,8 +6987,6 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Forwarder", b =>
                 {
                     b.Navigation("SalesOrderDeliveryMonitorings");
-
-                    b.Navigation("SalesOrders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
@@ -7201,6 +7198,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesOrderDeliveryMonitorings");
 
                     b.Navigation("SalesOrderLineItems");
+
+                    b.Navigation("SalesOrderResubmits");
 
                     b.Navigation("SalesReturns");
                 });

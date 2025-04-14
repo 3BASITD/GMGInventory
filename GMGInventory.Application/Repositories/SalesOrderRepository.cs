@@ -282,7 +282,7 @@ namespace GMGInventory.Application.Repositories
                                PONumber = order.PurchaseOrder,
                                Remarks = order.Remarks + "",
                                RequiredDeliveryDateD = order.RequiredDeliveryDate,
-                               ResubmitId = order.ResubmittedSalesOrderId,
+                               ResubmitId = order.ResubmitId,
                                ShippingAddress = "",
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
@@ -822,12 +822,12 @@ namespace GMGInventory.Application.Repositories
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);
 
-                var delivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == salesOrderId).FirstOrDefaultAsync();
-                if (delivery != null)
-                {
-                    context.SalesOrderDeliveryMonitorings.Remove(delivery);
-                    await context.SaveChangesAsync(currentUserId);
-                }
+                //var delivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == salesOrderId).FirstOrDefaultAsync();
+                //if (delivery != null)
+                //{
+                //    context.SalesOrderDeliveryMonitorings.Remove(delivery);
+                //    await context.SaveChangesAsync(currentUserId);
+                //}
 
                 return true;
             }

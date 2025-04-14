@@ -7,7 +7,6 @@ namespace GMGInventory.Data
         public Forwarder()
         {
             this.SalesOrderDeliveryMonitorings = new HashSet<SalesOrderDeliveryMonitoring>();
-            this.SalesOrders = new HashSet<SalesOrder>();
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -29,6 +28,5 @@ namespace GMGInventory.Data
         public bool IsActive { get; set; }
 
         public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
-        public ICollection<SalesOrder> SalesOrders { get; set; }
     }
 }

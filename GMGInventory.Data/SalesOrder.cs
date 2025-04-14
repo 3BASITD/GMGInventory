@@ -6,6 +6,7 @@ namespace GMGInventory.Data
     {
         public SalesOrder()
         {
+            this.SalesOrderResubmits = new HashSet<SalesOrder>();
             this.Invoices = new HashSet<Invoice>();
             this.Packs = new HashSet<Pack>();
             this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
@@ -48,8 +49,12 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(150)")]
         public string? DisapprovedReason { get; set; }
 
-        public int? ResubmittedSalesOrderId { get; set; }
 
+        [ForeignKey("ResubmitId")]
+        public int? ResubmitId { get; set; }
+        public virtual SalesOrder Resubmit { get; set; }
+
+        public ICollection<SalesOrder> SalesOrderResubmits { get; set; }
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<Pack> Packs { get; set; }
         public ICollection<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }

@@ -204,7 +204,7 @@
                     return repo.text;
                 }
                 if (repo.name) {
-                    return repo.text;
+                    return $("<strong>" + repo.text + "</strong> - " + repo.name + "<br /><small>Part Number: " + repo.partNumber + "</small>");
                 }
                 return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
             },
