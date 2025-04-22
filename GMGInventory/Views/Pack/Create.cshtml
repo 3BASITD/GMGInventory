@@ -114,7 +114,7 @@
                 <div class="row">
                     <div class="col-12 col-sm-4">
                         <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Package Number</label>
-                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" readonly="readonly"  />
+                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" readonly="readonly" />
                     </div>
                     <div class="col-12 col-sm-4">
                         <label for="add-type" col-form-label pt-0" style="margin-bottom: 5px;">Package Type</label>
@@ -313,12 +313,16 @@
                             if (row_data.inventoryCountD < parseInt($("#add-quantity").val())) {
                                 $("#add-quantity").val(parseInt(row_data.inventoryCountD));
                                 alertMessage = "Partial Quantity exceed the Inventory Quantity. Auto adjusted";
+                            } else if (row_data.inventoryCountD< row_data.quantityD) {
+                                alertMessage = "Ordered Quantity exceed the Inventory Quantity. Packing available quantity";
                             }
 
                             var quantityToPack = 0;
                             if ($("#add-partial").prop("checked")) {
                                 quantityToPack = parseInt($("#add-quantity").val());
-                            } else {
+                            } else if (row_data.inventoryCountD < row_data.quantityD) {
+                                quantityToPack = row_data.inventoryCountD;
+                            }else {
                                 quantityToPack = row_data.quantityD;
                             }
                             var tempInventoryCount = row_data.inventoryCountD - quantityToPack;
@@ -448,14 +452,30 @@
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
                     if (row_data.id == rowdata.id) {
-                        row_data.remainingQuantity = parseInt(row_data.remainingQuantity) + parseInt(rowdata.quantityToPack);
-                        row_data.remainingQuantityD = row_data.remainingQuantity;
+                        console.log("=====================================");
+                        console.log("remainingQuantity");
+                        console.log(row_data.remainingQuantity);
+                        console.log(rowdata.remainingQuantity);
+                        console.log("quantityToPack");
+                        console.log(row_data.quantityToPack);
+                        console.log(rowdata.quantityToPack);
+                        console.log("packedQuantity");
+                        console.log(row_data.packedQuantity);
+                        console.log(rowdata.packedQuantity);
+                        row_data.remainingQuantityD = parseInt(row_data.remainingQuantity) + parseInt(rowdata.quantityToPack);
+                        row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
 
-                        row_data.packedQuantity = parseInt(row_data.packedQuantity) - parseInt(rowdata.quantityToPack);
-                        row_data.packedQuantityD = row_data.packedQuantity;
+                        row_data.packedQuantityD = parseInt(row_data.packedQuantity) - parseInt(rowdata.quantityToPack);
+                        row_data.packedQuantity = FormatStringInteger(row_data.packedQuantityD);
 
+                        console.log("new remainingQuantity");
+                        console.log(row_data.remainingQuantity);
+                        console.log(rowdata.remainingQuantity);
+                        console.log("new packedQuantity");
+                        console.log(row_data.packedQuantity);
+                        console.log(rowdata.packedQuantity);
                         this.data(row_data);
-                        if (row_data.remainingQuantity == 0) {
+                        if (row_data.remainingQuantityD == 0) {
                             $(this.node()).addClass("text-muted");
                         } else {
                             $(this.node()).removeClass("text-muted");
