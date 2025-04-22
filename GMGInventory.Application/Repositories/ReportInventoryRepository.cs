@@ -377,32 +377,25 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ReceivingSummaryRVM>> GetReceivingSummary(ListFilterInventoryModel filter)
         {
-            var temp = from purchase in context.PurchaseOrderNewLineItems
-                       select new
+            var receives = from preceive in context.PurchaseReceivingLineItems.Include(s => s.PurchaseReceiving)
+                   
+                       where preceive.PurchaseReceiving.Status.Name == "Approved"
+                       && filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
+                       && (filter.Brand == null || preceive.OrderItem.RequestItem.Item.Brand.Id == filter.Brand)
+
+                       select new ReceivingSummaryRVM
                        {
-                           ReplenishDate = purchase.DateModified == null ? purchase.DateCreated : purchase.DateModified.Value,
-                           Quantity = purchase.Quantity,
-                           Item = purchase.RequestItem.Item
+                           Brand = preceive.OrderItem.RequestItem.Item.Brand.Name,
+                           ItemCode = preceive.OrderItem.RequestItem.Item.Code,
+                           ItemName = preceive.OrderItem.RequestItem.Item.Name,
+                           ItemType = preceive.OrderItem.RequestItem.Item.ItemType.Code,
+                           PartNumber = preceive.OrderItem.RequestItem.Item.PartNumber,
+                           QuantityD = preceive.Quantity,
+                           Unit = preceive.OrderItem.RequestItem.Item.Unit.Code
                        };
 
-            var purchases = from purchase in await temp.ToListAsync()
-                            where filter.DateFrom <= purchase.ReplenishDate.Date
-                            && purchase.ReplenishDate.Date <= filter.DateTo
-                            && (filter.Brand == null || purchase.Item.Brand.Id == filter.Brand)
-                            group purchase by purchase.Item into p
-                            orderby p.Key.Brand.Code ascending, p.Key.Code ascending
-                            select new ReceivingSummaryRVM
-                            {
-                                Brand = p.Key.Brand.Code,
-                                ItemCode = p.Key.Code,
-                                ItemName = p.Key.Name,
-                                ItemType = p.Key.ItemType.Code,
-                                PartNumber = p.Key.PartNumber + "",
-                                QuantityD = p.Sum(s => s.Quantity),
-                                Unit = p.Key.Unit.Code
-                            };
 
-            return purchases.ToList();
+            return await receives.ToListAsync();  
         }
 
         public async Task<ForDataTables<ReceivingSummaryRVM>> GetReceivingSummaryDT(DataTablesRequestForm form, ListFilterInventoryModel filter)

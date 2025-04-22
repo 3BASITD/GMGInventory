@@ -190,7 +190,6 @@ namespace GMGInventory.Application.Repositories
                         join packItems in context.PackLineItems on pack.Id equals packItems.PackId
 
                         where invs.SalesOrderId == salesOrderId &&
-                        invs.Status.Code.ToLower() != "draft" &&
                         invs.Status.Code.ToLower() != "submitted" &&
                         invs.Status.Code.ToLower() != "disapproved"
 
