@@ -743,26 +743,42 @@
                 isLocal = typeText.includes("purchase order") == false ? null : typeText != "international purchase order";
                 isForeign = typeText.includes("purchase order") == false ? null : typeText != "local purchase order";
             }
-            $.ajax({
+
+        $("#order-supplier").select2({
+            //minimumInputLength: 1,
+            placeholder: '<empty>',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Supplier")",
+                dataType: 'json',
                 type: "POST",
-                url: "@Url.Action("GetOptions", "Supplier")",
-                data: {
-                    IncludeId: selectedSupplier,
-                    IsLocal: isLocal,
-                    IsForeign: isForeign
+                delay: 500,
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        includeId: selectedSupplier,
+                        isLocal: isLocal,
+                        isForeign: isForeign
+                    };
                 },
-                success: function (data, status, xhr) {
-                    $("#order-supplier").select2({
-                        minimumInputLength: -1,
-                        placeholder: "<empty>",
-                        templateResult: function (repo) {
-                            if (repo.loading) {
-                                return repo.text;
-                            }
-                            return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
-                        },
-                        data: data
-                    }).on("select2:select", function () {
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            }
+        }).on("select2:select", function () {
                         var selectedSupplier = $("#order-supplier").select2("data")[0];
                         $("#order-currency").val(selectedSupplier.currency);
                         $("#order-currency-rate").val(selectedSupplier.currencyRate);
@@ -771,9 +787,7 @@
                         var selectedSupplier = $("#order-supplier").select2("data")[0];
                         $("#order-currency").val(selectedSupplier.currency);
                         $("#order-currency-rate").val(selectedSupplier.currencyRate);
-                    }
-                }
-            });
+                    };
         }
 
         // Load terms for select2

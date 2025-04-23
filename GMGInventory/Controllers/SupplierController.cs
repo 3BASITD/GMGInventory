@@ -24,6 +24,10 @@ namespace GMGInventory.Controllers
             return Json(await supplierRepository.GetOptions(IncludeId, IsLocal, IsForeign));
         }
 
+        public async Task<IActionResult> GetOptions2(string search,int page, int? includeId, bool? isLocal, bool? isForeign)
+        {
+            return Json(await supplierRepository.GetOptions2(search, page, includeId, isLocal, isForeign));
+        }
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Suppliers, AccessTypes.View);
