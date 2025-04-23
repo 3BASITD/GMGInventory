@@ -75,6 +75,36 @@ namespace GMGInventory.Application.Repositories
                                 .OrderBy(s => s.Text)
                                 .ToListAsync();
         }
+        public async Task<Select2Model<JsonSupplierOptionsModel>> GetOptions2(string search, int page, int? includeId, bool? isLocal, bool? isForeign)
+        {
+            var suppliers =  await context.Suppliers
+                                .Where(s => (s.IsActive || s.Id == includeId)
+                                         && ((isLocal == null || (isLocal == true && s.Currency.Name.ToLower().Contains("peso")))
+                                                     || (isForeign == null || (isForeign == true && !s.Currency.Name.ToLower().Contains("peso"))))
+                                         && (string.IsNullOrWhiteSpace(search) || s.Code.ToLower().Contains(search.ToLower()) || s.Name.ToLower().Contains(search.ToLower()))
+                                      )
+                                .Select(s => new JsonSupplierOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Code.Trim(),
+                                    Name = s.Name.Trim(),
+                                    Selected = includeId != null && includeId == s.Id,
+                                    Address1 = s.AddressLine1,
+                                    Address2 = s.AddressLine2,
+                                    Currency = s.Currency.Code,
+                                    CurrencyRateD = s.Currency.Rate
+                                })
+                                .OrderBy(s => s.Text)
+                                .ToListAsync();
+            var supplierFilterd = suppliers.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonSupplierOptionsModel>
+            {
+                //incomplete_results = false,
+                items = supplierFilterd,
+                total_count = suppliers.Count
+            };
+        }
+
 
         public async Task<IList<SupplierViewVM>> GetAllSupplierAsync()
         {
