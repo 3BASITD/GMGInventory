@@ -442,7 +442,7 @@
         itemDT.on("draw", function () {
             $(".btn-remove-item").off("click").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
-                var quantityToPack = parseInt(rowdata.quantityToPack);
+                var quantityToPack = parseInt(rowdata.quantity);
                 var deletedBoxNumber = rowdata.boxNumber;
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();

@@ -508,11 +508,11 @@
 
             $(".btn-remove-item").off("click").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
-                var quantityToPack = parseInt(rowdata.quantityToPack);
+                var quantityToPack = parseInt(rowdata.quantity);
                 var deletedBoxNumber = rowdata.boxNumber;
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
-                    if (row_data.id == rowdata.id) {
+                    if (row_data.id == rowdata.salesOrderLineItemId) {
                         row_data.remainingQuantityD = parseInt(row_data.remainingQuantityD) + quantityToPack;
                         row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
                         row_data.packedQuantityD = parseInt(row_data.packedQuantityD) - quantityToPack;
