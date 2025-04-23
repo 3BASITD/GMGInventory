@@ -68,6 +68,9 @@
                                         @Html.DisplayNameFor(model => model.InvoiceNumber)
                                     </th>
                                     <th>
+                                        @Html.DisplayNameFor(model => model.ControlNumber)
+                                    </th>
+                                    <th>
                                         @Html.DisplayNameFor(model => model.InvoiceType)
                                     </th>
                                     <th>
@@ -152,6 +155,7 @@
                 },
                 { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "invoiceNumber", name: "InvoiceNumber" },
+                { data: "controlNumber", name: "ControlNumber" },
                 { data: "invoiceType", name: "InvoiceType" },
                 { data: "totalAmount", name: "TotalAmount", className: "text-end" }
             ],

@@ -316,18 +316,9 @@
                                 quantityToPack = parseInt($("#add-quantity").val());
                             } else if (row_data.inventoryCountD < row_data.remainingQuantityD) {
                                 quantityToPack = row_data.inventoryCountD;
-                            }else {
+                            } else {
                                 quantityToPack = row_data.quantityD;
                             }
-                            // var tempInventoryCount = row_data.inventoryCountD - quantityToPack;
-                            // row_data.inventoryCountD = tempInventoryCount;
-                            // row_data.inventoryCount = FormatStringInteger(tempInventoryCount);
-                            // var tempPackedQuantity = row_data.packedQuantityD + quantityToPack;
-                            // row_data.packedQuantityD = tempPackedQuantity;
-                            // row_data.packedQuantity = FormatStringInteger(tempPackedQuantity);
-                            // var tempRemainingQuantity = row_data.quantityD - tempPackedQuantity;
-                            // row_data.remainingQuantityD = tempRemainingQuantity;
-                            // row_data.remainingQuantity = FormatStringInteger(tempRemainingQuantity);
 
                             row_data.inventoryCountD = parseInt(row_data.inventoryCountD) - quantityToPack;
                             row_data.inventoryCount = FormatStringInteger(row_data.inventoryCountD);
@@ -344,7 +335,7 @@
                                 itemId: row_data.itemId,
                                 itemCode: row_data.itemCode,
                                 itemName: row_data.itemName,
-                                quantityToPack: quantityToPack
+                                quantity: quantityToPack
                             };
 
                             hasItemToAdd = true;
@@ -424,7 +415,7 @@
                 { data: "packTypeName", name: "PackTypeName", visible: false },
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemName", name: "ItemName" },
-                { data: "quantityToPack", name: "QuantityToPack", className: "text-end" }
+                { data: "quantity", name: "Quantity", className: "text-end" }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
@@ -441,7 +432,7 @@
                 endRender: function (rows, group) {
                     return $('<tr/>')
                         .append('<td colspan="3" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
-                        .append('<td class="text-end">' + rows.data().pluck("quantityToPack").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
+                        .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
                 dataSrc: function (row) {
                     return "#" + row.boxNumber + " (" + row.packTypeName + ")";
@@ -451,9 +442,6 @@
         itemDT.on("draw", function () {
             $(".btn-remove-item").off("click").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
-                console.clear();
-                console.log($(this).parents('tr'));
-                console.log(rowdata);
                 var quantityToPack = parseInt(rowdata.quantityToPack);
                 var deletedBoxNumber = rowdata.boxNumber;
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -563,38 +551,6 @@
 
         itemDT.clear().draw();
 
-        function dtCheckboxes() {
-            $(".chkclassorderall").off("change").on("change", function () {
-                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    $(this.node()).find(".chkclassorder").prop("checked", $(".chkclassorderall").prop("checked"));
-                });
-            });
-
-            $(".chkclassorder").off("change").on("change", function () {
-                var rows_checked = 0;
-                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    if ($(this.node()).find(".chkclassorder").prop("checked")) {
-                        rows_checked++;
-                    }
-                });
-
-                if (rows_checked == 0) {
-                    $(".chkclassorderall").prop("checked", false);
-                    $(".chkclassorderall").prop("indeterminate", false);
-                } else if (rows_checked == orderDT.rows().count()) {
-                    $(".chkclassorderall").prop("checked", true);
-                    $(".chkclassorderall").prop("indeterminate", false);
-                } else if (rows_checked == 0) {
-                    $(".chkclassorderall").prop("checked", false);
-                    $(".chkclassorderall").prop("indeterminate", false);
-                } else {
-                    $(".chkclassorderall").prop("checked", false);
-                    $(".chkclassorderall").prop("indeterminate", true);
-                }
-            });
-        }
-
-
         function GetItemsToPack() {
             var item_to_pack = [];
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -603,7 +559,7 @@
                     boxNumber: row_data.boxNumber,
                     packType: row_data.packType,
                     item: row_data.itemId,
-                    quantity: row_data.quantityToPack,
+                    quantity: row_data.quantity,
                 });
             });
             return item_to_pack;

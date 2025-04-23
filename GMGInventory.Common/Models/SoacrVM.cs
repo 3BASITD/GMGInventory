@@ -145,6 +145,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
 
+        [Display(Name = "BIR Invoice Number")]
+        public string ControlNumber { get; set; }
+
         [Display(Name = "Invoice Type")]
         public string InvoiceType { get; set; }
 
@@ -263,6 +266,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
+
+        [Display(Name = "BIR Invoice Number")]
+        public string ControlNumber { get; set; }
 
         [Display(Name = "Invoice Type")]
         public string InvoiceType { get; set; }

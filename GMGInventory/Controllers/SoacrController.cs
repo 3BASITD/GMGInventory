@@ -443,7 +443,7 @@ namespace GMGInventory.Controllers
                 };
                 var row = table.AddRow();
                 row.Cells[0].AddParagraph(item.InvoiceDate2).Format = cellFormatCenter.Clone();
-                row.Cells[1].AddParagraph(item.InvoiceNumber).Format = cellFormatCenter.Clone();
+                row.Cells[1].AddParagraph(item.ControlNumber).Format = cellFormatCenter.Clone();
                 row.Cells[2].AddParagraph(item.InvoiceType).Format = cellFormatCenter.Clone();
                 row.Cells[3].AddParagraph(item.InvoiceAmount).Format = cellFormatRight.Clone();
                 row.Cells[4].AddParagraph(item.FreightCharge).Format = cellFormatRight.Clone();
@@ -617,7 +617,7 @@ namespace GMGInventory.Controllers
                 };
                 var row = table.AddRow();
                 row.Cells[0].AddParagraph(item.InvoiceDate2).Format = cellFormatCenter.Clone();
-                row.Cells[1].AddParagraph(item.InvoiceNumber).Format = cellFormatCenter.Clone();
+                row.Cells[1].AddParagraph(item.ControlNumber).Format = cellFormatCenter.Clone();
                 row.Cells[2].AddParagraph(item.InvoiceType).Format = cellFormatCenter.Clone();
                 row.Cells[3].AddParagraph(item.InvoiceAmount).Format = cellFormatRight.Clone();
                 row.Cells[4].AddParagraph(item.FreightReferenceNumber + "").Format = cellFormatCenter.Clone();

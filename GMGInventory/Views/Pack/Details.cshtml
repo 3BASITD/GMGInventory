@@ -280,15 +280,15 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
-                        if (data.remainingQuantity > 0) {
-                            //actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-plus"></i></button>';
-                            if (user_access.canEdit) {
-                                if ($("#add-partial").prop("checked")) {
-                                    actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
-                                } else {
-                                    actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
-                                }
+                        if (data.inventoryCountD > 0 && data.remainingQuantityD > 0) {
+                            if ($("#add-partial").prop("checked")) {
+                                actions += '<input class="chkclassorder" type="radio" value="' + data.invoiceId + '" name="orderitemchk" />';
+                            } else {
+                                actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
                             }
+                        }
+                        if(data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
+                            actions += '<strong data-microtip-title="Empty inventory, nothing to pack" data-microtip-position="right" role="tooltip"><i class="fas fa-exclamation"></i></strong>';
                         }
                         return actions;
                     }
@@ -312,8 +312,10 @@
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {
-                if (data.remainingQuantity == 0) {
+                if (data.remainingQuantityD == 0) {
                     $(row).addClass("text-muted");
+                } else if (data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
+                    $(row).addClass("text-danger");
                 }
             }
         });
@@ -345,22 +347,30 @@
                     var row_data = this.data();
                     var itemchk = $(this.node()).find(".chkclassorder");
                     if (itemchk.prop("checked")) {
-                        if (parseInt(row_data.remainingQuantity) > 0) {
-                            if (parseInt(row_data.remainingQuantity) < parseInt($("#add-quantity").val())) {
-                                $("#add-quantity").val(parseInt(row_data.remainingQuantity));
-                                alertMessage = "Partial Quantity exceed the Remaining Quantity. Auto adjusted";
+                        if (row_data.inventoryCountD > 0) {
+                            if (row_data.inventoryCountD < parseInt($("#add-quantity").val())) {
+                                $("#add-quantity").val(parseInt(row_data.inventoryCountD));
+                                alertMessage = "Partial Quantity exceed the Inventory Quantity. Auto adjusted";
+                            } else if (row_data.inventoryCountD < row_data.quantityD) {
+                                alertMessage = "Ordered Quantity exceed the Inventory Quantity. Packing available quantity";
                             }
-                            var quantityToPack = 0;
 
+                            var quantityToPack = 0;
                             if ($("#add-partial").prop("checked")) {
                                 quantityToPack = parseInt($("#add-quantity").val());
-                                row_data.remainingQuantity = parseInt(row_data.remainingQuantity) - parseInt($("#add-quantity").val());
-                                row_data.packedQuantity = parseInt(row_data.packedQuantity) + parseInt($("#add-quantity").val());
+                            } else if (row_data.inventoryCountD < row_data.remainingQuantityD) {
+                                quantityToPack = row_data.inventoryCountD;
                             } else {
-                                quantityToPack = parseInt(row_data.remainingQuantity);
-                                row_data.packedQuantity = parseInt(row_data.remainingQuantity) + parseInt(row_data.packedQuantity);
-                                row_data.remainingQuantity = 0;
+                                quantityToPack = row_data.quantityD;
                             }
+
+                            row_data.inventoryCountD = parseInt(row_data.inventoryCountD) - quantityToPack;
+                            row_data.inventoryCount = FormatStringInteger(row_data.inventoryCountD);
+                            row_data.packedQuantityD = parseInt(row_data.packedQuantityD) + quantityToPack;
+                            row_data.packedQuantity = FormatStringInteger(row_data.packedQuantityD);
+                            row_data.remainingQuantityD = parseInt(row_data.remainingQuantityD) - quantityToPack;
+                            row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
+
                             var toItem = {
                                 id: row_data.id,
                                 salesOrderLineItemId: row_data.id,
@@ -390,10 +400,10 @@
                     toastr.success("Added " + successItem.join(", ") + " on Packed Item(s)", "Success");
                 }
                 if (alertMessage != "") {
-                    toastr.info(alertMessage, "Remaining Quantity");
+                    toastr.info(alertMessage, "Inventory Quantity");
                 }
                 if (warningItem.length > 0) {
-                    toastr.warning(warningItem.join(", ") + " has 0 remaining quantity", "Remaining Quantity");
+                    toastr.warning(warningItem.join(", ") + " has 0 inventory quantity", "Inventory Quantity");
                 }
 
                 if (hasItemToAdd) {
@@ -440,8 +450,8 @@
             filter: true,
             responsive: true,
             autoWidth: false,
-            paging: false,
             searching: false,
+            paging: false,
             search: {
                 return: true,
             },
@@ -498,20 +508,32 @@
 
             $(".btn-remove-item").off("click").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
+                var quantityToPack = parseInt(rowdata.quantityToPack);
                 var deletedBoxNumber = rowdata.boxNumber;
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
-                    if (row_data.id == rowdata.salesOrderLineItemId) {
-                        row_data.remainingQuantity = parseInt(row_data.remainingQuantity) + parseInt(rowdata.quantity);
-                        row_data.packedQuantity = parseInt(row_data.packedQuantity) - parseInt(rowdata.quantity);
+                    if (row_data.id == rowdata.id) {
+                        row_data.remainingQuantityD = parseInt(row_data.remainingQuantityD) + quantityToPack;
+                        row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
+                        row_data.packedQuantityD = parseInt(row_data.packedQuantityD) - quantityToPack;
+                        row_data.packedQuantity = FormatStringInteger(row_data.packedQuantityD);
+                        row_data.inventoryCountD = parseInt(row_data.inventoryCountD) + quantityToPack;
+                        row_data.inventoryCount = FormatStringInteger(row_data.inventoryCountD);
+
                         this.data(row_data);
-                        if (row_data.remainingQuantity == 0) {
+                        if (row_data.remainingQuantityD == 0) {
                             $(this.node()).addClass("text-muted");
                         } else {
                             $(this.node()).removeClass("text-muted");
                         }
+                        if (row_data.inventoryCountD == 0 && row_data.remainingQuantityD > 0) {
+                            $(this.node()).addClass("text-danger");
+                        } else {
+                            $(this.node()).removeClass("text-danger");
+                        }
                     }
                 });
+
 
                 dtCheckboxes();
                 itemDT.row($(this).parents('tr')).remove().draw();

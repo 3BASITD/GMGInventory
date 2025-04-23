@@ -323,6 +323,7 @@ namespace GMGInventory.Application.Repositories
                               Id = inv.Id,
                               InvoiceDateD = inv.InvoiceDate,
                               InvoiceNumber = inv.InvoiceNumber,
+                              ControlNumber = inv.ControlNumber,
                               InvoiceType = inv.InvoiceType.Name,
                               TotalAmountD = inv.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice)
                           };
@@ -342,6 +343,7 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.InvoiceDate.ToLower().Contains(form.SearchValue)
                                     || x.InvoiceNumber.ToLower().Contains(form.SearchValue)
+                                    || x.ControlNumber.ToLower().Contains(form.SearchValue)
                                     || x.InvoiceType.ToLower().Contains(form.SearchValue)
                                     || x.TotalAmountD.ToString().Contains(form.SearchValue));
             }
@@ -356,6 +358,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDateD); break;
                         case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
+                        case "ControlNumber": data = data.OrderBy(s => s.ControlNumber); break;
                         case "InvoiceType": data = data.OrderBy(s => s.InvoiceType); break;
                         case "TotalAmount": data = data.OrderBy(s => s.TotalAmountD); break;
                         default: break;
@@ -367,6 +370,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDateD); break;
                         case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
+                        case "ControlNumber": data = data.OrderByDescending(s => s.ControlNumber); break;
                         case "InvoiceType": data = data.OrderByDescending(s => s.InvoiceType); break;
                         case "TotalAmount": data = data.OrderByDescending(s => s.TotalAmountD); break;
                         default: break;
@@ -456,6 +460,7 @@ namespace GMGInventory.Application.Repositories
                           Id = sl.Id,
                           InvoiceDateD = sl.Invoice.DateCreated,
                           InvoiceNumber = sl.Invoice.InvoiceNumber,
+                          ControlNumber = sl.Invoice.ControlNumber,
                           InvoiceAmountD = inv - srq,
                           InvoiceType = sl.Invoice.InvoiceType.Code,
                           InvoiceId = sl.Invoice.Id,
@@ -483,6 +488,7 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.InvoiceDate.ToLower().Contains(form.SearchValue)
                                     || x.InvoiceNumber.ToLower().Contains(form.SearchValue)
+                                    || x.ControlNumber.ToLower().Contains(form.SearchValue)
                                     || x.InvoiceAmountD.ToString().Contains(form.SearchValue)
                                     || x.InvoiceType.ToLower().Contains(form.SearchValue)
                                     || x.TBRD.ToString().Contains(form.SearchValue)
@@ -503,6 +509,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDateD); break;
                         case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
+                        case "ControlNumber": data = data.OrderBy(s => s.ControlNumber); break;
                         case "InvoiceAmount": data = data.OrderBy(s => s.InvoiceAmountD); break;
                         case "InvoiceType": data = data.OrderBy(s => s.InvoiceType); break;
                         case "TBR": data = data.OrderBy(s => s.TBRD); break;
@@ -520,6 +527,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDateD); break;
                         case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
+                        case "ControlNumber": data = data.OrderByDescending(s => s.ControlNumber); break;
                         case "InvoiceAmount": data = data.OrderByDescending(s => s.InvoiceAmountD); break;
                         case "InvoiceType": data = data.OrderByDescending(s => s.InvoiceType); break;
                         case "TBR": data = data.OrderByDescending(s => s.TBRD); break;
