@@ -114,7 +114,7 @@
                 <div class="row">
                     <div class="col-12 col-sm-4">
                         <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Package Number</label>
-                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" readonly="readonly"  />
+                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" readonly="readonly" />
                     </div>
                     <div class="col-12 col-sm-4">
                         <label for="add-type" col-form-label pt-0" style="margin-bottom: 5px;">Package Type</label>
@@ -247,6 +247,9 @@
                                 actions += '<input class="chkclassorder" type="checkbox" value="' + data.invoiceId + '" name="orderitemchk" />';
                             }
                         }
+                        if(data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
+                            actions += '<strong data-microtip-title="Empty inventory, nothing to pack" data-microtip-position="right" role="tooltip"><i class="fas fa-exclamation"></i></strong>';
+                        }
                         return actions;
                     }
                 },
@@ -269,9 +272,11 @@
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {
-                // if (data.remainingQuantity == 0) {
-                //     $(row).addClass("text-muted");
-                // }
+                if (data.remainingQuantityD == 0) {
+                    $(row).addClass("text-muted");
+                } else if (data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
+                    $(row).addClass("text-danger");
+                }
             }
         });
 
@@ -279,17 +284,6 @@
             $(".table-order thead th").removeClass("text-end");
             dtCheckboxes();
         });
-
-        //$(".createBtn").on("click", function () {
-        //    orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-        //        var row_data = this.data();
-        //        if (row_data.remainingQuantity == 0) {
-        //            $(this.node()).addClass("text-muted");
-        //        } else {
-        //            $(this.node()).removeClass("text-muted");
-        //        }
-        //    });
-        //});
 
         $(".btn-add-item").on("click", function () {
             if ($("#add-box").val() == 0) {
@@ -313,23 +307,34 @@
                             if (row_data.inventoryCountD < parseInt($("#add-quantity").val())) {
                                 $("#add-quantity").val(parseInt(row_data.inventoryCountD));
                                 alertMessage = "Partial Quantity exceed the Inventory Quantity. Auto adjusted";
+                            } else if (row_data.inventoryCountD < row_data.quantityD) {
+                                alertMessage = "Ordered Quantity exceed the Inventory Quantity. Packing available quantity";
                             }
 
                             var quantityToPack = 0;
                             if ($("#add-partial").prop("checked")) {
                                 quantityToPack = parseInt($("#add-quantity").val());
-                            } else {
+                            } else if (row_data.inventoryCountD < row_data.remainingQuantityD) {
+                                quantityToPack = row_data.inventoryCountD;
+                            }else {
                                 quantityToPack = row_data.quantityD;
                             }
-                            var tempInventoryCount = row_data.inventoryCountD - quantityToPack;
-                            row_data.inventoryCountD = tempInventoryCount;
-                            row_data.inventoryCount = FormatStringDecimal(tempInventoryCount);
-                            var tempPackedQuantity = row_data.packedQuantityD + quantityToPack;
-                            row_data.packedQuantityD = tempPackedQuantity;
-                            row_data.packedQuantity = FormatStringDecimal(tempPackedQuantity);
-                            var tempRemainingQuantity = row_data.quantityD - tempPackedQuantity;
-                            row_data.remainingQuantityD = tempRemainingQuantity;
-                            row_data.remainingQuantity = FormatStringDecimal(tempRemainingQuantity);
+                            // var tempInventoryCount = row_data.inventoryCountD - quantityToPack;
+                            // row_data.inventoryCountD = tempInventoryCount;
+                            // row_data.inventoryCount = FormatStringInteger(tempInventoryCount);
+                            // var tempPackedQuantity = row_data.packedQuantityD + quantityToPack;
+                            // row_data.packedQuantityD = tempPackedQuantity;
+                            // row_data.packedQuantity = FormatStringInteger(tempPackedQuantity);
+                            // var tempRemainingQuantity = row_data.quantityD - tempPackedQuantity;
+                            // row_data.remainingQuantityD = tempRemainingQuantity;
+                            // row_data.remainingQuantity = FormatStringInteger(tempRemainingQuantity);
+
+                            row_data.inventoryCountD = parseInt(row_data.inventoryCountD) - quantityToPack;
+                            row_data.inventoryCount = FormatStringInteger(row_data.inventoryCountD);
+                            row_data.packedQuantityD = parseInt(row_data.packedQuantityD) + quantityToPack;
+                            row_data.packedQuantity = FormatStringInteger(row_data.packedQuantityD);
+                            row_data.remainingQuantityD = parseInt(row_data.remainingQuantityD) - quantityToPack;
+                            row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
 
                             var toItem = {
                                 id: row_data.id,
@@ -349,6 +354,8 @@
                             this.data(row_data);
                             if (row_data.remainingQuantityD == 0) {
                                 $(this.node()).addClass("text-muted");
+                            } else if (row_data.inventoryCountD == 0 && row_data.remainingQuantityD > 0) {
+                                $(this.node()).addClass("text-danger");
                             }
                         } else {
                             warningItem.push(row_data.itemCode);
@@ -442,23 +449,33 @@
             }
         });
         itemDT.on("draw", function () {
-            $(".btn-remove-item").on("click", function () {
+            $(".btn-remove-item").off("click").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
+                console.clear();
+                console.log($(this).parents('tr'));
+                console.log(rowdata);
+                var quantityToPack = parseInt(rowdata.quantityToPack);
                 var deletedBoxNumber = rowdata.boxNumber;
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();
                     if (row_data.id == rowdata.id) {
-                        row_data.remainingQuantity = parseInt(row_data.remainingQuantity) + parseInt(rowdata.quantityToPack);
-                        row_data.remainingQuantityD = row_data.remainingQuantity;
-
-                        row_data.packedQuantity = parseInt(row_data.packedQuantity) - parseInt(rowdata.quantityToPack);
-                        row_data.packedQuantityD = row_data.packedQuantity;
+                        row_data.remainingQuantityD = parseInt(row_data.remainingQuantityD) + quantityToPack;
+                        row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
+                        row_data.packedQuantityD = parseInt(row_data.packedQuantityD) - quantityToPack;
+                        row_data.packedQuantity = FormatStringInteger(row_data.packedQuantityD);
+                        row_data.inventoryCountD = parseInt(row_data.inventoryCountD) + quantityToPack;
+                        row_data.inventoryCount = FormatStringInteger(row_data.inventoryCountD);
 
                         this.data(row_data);
-                        if (row_data.remainingQuantity == 0) {
+                        if (row_data.remainingQuantityD == 0) {
                             $(this.node()).addClass("text-muted");
                         } else {
                             $(this.node()).removeClass("text-muted");
+                        }
+                        if (row_data.inventoryCountD == 0 && row_data.remainingQuantityD > 0) {
+                            $(this.node()).addClass("text-danger");
+                        } else {
+                            $(this.node()).removeClass("text-danger");
                         }
                     }
                 });
@@ -487,7 +504,7 @@
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
 
-            $(".quantity").on("input", function () {
+            $(".quantity").off("input").on("input", function () {
                 CheckQuantityServed();
                 ComputeTotalQuantity();
             });
