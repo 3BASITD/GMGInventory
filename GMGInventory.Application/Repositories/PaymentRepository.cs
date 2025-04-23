@@ -81,11 +81,15 @@ namespace GMGInventory.Application.Repositories
                                                  join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
                                                  where sli.SOACRId == cp.SOACRId
                                                  select (decimal?)tbr.Amount).Sum() ?? 0
-                                   let invamt = (from ili in context.InvoiceLineItems
-                                                 join inv in context.Invoices on ili.InvoiceId equals inv.Id
-                                                 join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
-                                                 where sli.SOACRId == cp.SOACRId
-                                                 select (decimal?)ili.Quantity * ili.UnitPrice).Sum() ?? 0
+                                   //let invamt = (from ili in context.InvoiceLineItems
+                                   //              join inv in context.Invoices on ili.InvoiceId equals inv.Id
+                                   //              join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                                   //              where sli.SOACRId == cp.SOACRId
+                                   //              select (decimal?)ili.Quantity * ili.UnitPrice).Sum() ?? 0
+                                   let invamt = (from paydetails in context.CustomerPaymentDetails
+                                                 where paydetails.CustomerPayment.Id == cp.Id
+                                                 select (decimal?)paydetails.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)).FirstOrDefault() ?? 0
+
                                    let chkamt = (from chk in context.SOACRChecks
                                                  where chk.CustomerPaymentId == cp.Id
                                                  select (decimal?)chk.CheckAmount).Sum() ?? 0
@@ -98,7 +102,7 @@ namespace GMGInventory.Application.Repositories
                                        CRNumber = cp.CRNumber,
                                        SOANo = cp.SOACRId,
                                        CustomerName = cp.Customer.Name,
-                                       TotalInvoiceAmountD = invamttotal,
+                                       TotalInvoiceAmountD = invamt,
                                        AmountPaidD = payamt,
                                        OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
                                        TransactionDateD = cp.DateCreated,
