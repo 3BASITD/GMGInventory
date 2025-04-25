@@ -304,9 +304,9 @@
                     var itemchk = $(this.node()).find(".chkclassorder");
                     if (itemchk.prop("checked")) {
                         if (row_data.inventoryCountD > 0) {
-                            if (row_data.inventoryCountD < parseInt($("#add-quantity").val())) {
-                                $("#add-quantity").val(parseInt(row_data.inventoryCountD));
-                                alertMessage = "Partial Quantity exceed the Inventory Quantity. Auto adjusted";
+                            if ($("#add-partial").prop("checked") && row_data.remainingQuantityD < parseInt($("#add-quantity").val())) {
+                                $("#add-quantity").val(parseInt(row_data.remainingQuantityD));
+                                alertMessage = "Partial Quantity exceed the Remaining Quantity. Auto adjusted";
                             } else if (row_data.inventoryCountD < row_data.quantityD) {
                                 alertMessage = "Ordered Quantity exceed the Inventory Quantity. Packing available quantity";
                             }
@@ -476,14 +476,17 @@
                 })[0].length;
 
                 if (!sameBoxNumber) {
+                    var lastBox = 0;
                     itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                         var row_data = this.data();
                         if (row_data.boxNumber > deletedBoxNumber) {
                             row_data.boxNumber = parseInt(row_data.boxNumber) - 1;
                             this.data(row_data);
                         }
+                        lastBox = row_data.boxNumber;
                     });
-                        itemDT.draw(false);
+                    itemDT.draw(false);
+                    $("#add-box").val(parseInt(lastBox) + 1);
                 }
 
                 toastr.warning("Removed " + rowdata.itemCode + " on Packed Item(s)", "Warning");
