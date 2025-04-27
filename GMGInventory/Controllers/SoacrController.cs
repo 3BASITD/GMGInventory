@@ -458,7 +458,7 @@ namespace GMGInventory.Controllers
             var footerRow = table.AddRow();
             footerRow.Borders.Top.Width = 0.75;
             footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
-            footerRow.Cells[1].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[1].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatRightBold.Clone();
             footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
             footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
             footerRow.Cells[4].AddParagraph(details.TotalFreightCost).Format = cellFormatRightBold.Clone();
@@ -632,7 +632,7 @@ namespace GMGInventory.Controllers
             var footerRow = table.AddRow();
             footerRow.Borders.Top.Width = 0.75;
             footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
-            footerRow.Cells[1].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[1].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatRightBold.Clone();
             footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
             footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
             footerRow.Cells[4].AddParagraph("").Format = cellFormatRightBold.Clone();
