@@ -25,7 +25,6 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Status")]
         public string Status { get; set; }
-        
         public bool CurrentUsersDraft { get; set; }
     }
 

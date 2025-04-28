@@ -443,7 +443,7 @@ namespace GMGInventory.Controllers
                 };
                 var row = table.AddRow();
                 row.Cells[0].AddParagraph(item.InvoiceDate2).Format = cellFormatCenter.Clone();
-                row.Cells[1].AddParagraph(item.InvoiceNumber).Format = cellFormatCenter.Clone();
+                row.Cells[1].AddParagraph(item.ControlNumber).Format = cellFormatCenter.Clone();
                 row.Cells[2].AddParagraph(item.InvoiceType).Format = cellFormatCenter.Clone();
                 row.Cells[3].AddParagraph(item.InvoiceAmount).Format = cellFormatRight.Clone();
                 row.Cells[4].AddParagraph(item.FreightCharge).Format = cellFormatRight.Clone();
@@ -458,7 +458,7 @@ namespace GMGInventory.Controllers
             var footerRow = table.AddRow();
             footerRow.Borders.Top.Width = 0.75;
             footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
-            footerRow.Cells[1].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[1].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatRightBold.Clone();
             footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
             footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
             footerRow.Cells[4].AddParagraph(details.TotalFreightCost).Format = cellFormatRightBold.Clone();
@@ -617,7 +617,7 @@ namespace GMGInventory.Controllers
                 };
                 var row = table.AddRow();
                 row.Cells[0].AddParagraph(item.InvoiceDate2).Format = cellFormatCenter.Clone();
-                row.Cells[1].AddParagraph(item.InvoiceNumber).Format = cellFormatCenter.Clone();
+                row.Cells[1].AddParagraph(item.ControlNumber).Format = cellFormatCenter.Clone();
                 row.Cells[2].AddParagraph(item.InvoiceType).Format = cellFormatCenter.Clone();
                 row.Cells[3].AddParagraph(item.InvoiceAmount).Format = cellFormatRight.Clone();
                 row.Cells[4].AddParagraph(item.FreightReferenceNumber + "").Format = cellFormatCenter.Clone();
@@ -632,7 +632,7 @@ namespace GMGInventory.Controllers
             var footerRow = table.AddRow();
             footerRow.Borders.Top.Width = 0.75;
             footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
-            footerRow.Cells[1].AddParagraph("").Format = cellFormatRightBold.Clone();
+            footerRow.Cells[1].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatRightBold.Clone();
             footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
             footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
             footerRow.Cells[4].AddParagraph("").Format = cellFormatRightBold.Clone();

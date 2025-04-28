@@ -323,6 +323,13 @@ namespace GMGInventory.Application.Repositories
 
             var users = userManager.Users;
 
+            var orderIncompletePack = from soli in context.SalesOrderLineItems
+                                      join pli in context.PackLineItems on soli.ItemId equals pli.ItemId
+                                      where soli.SalesOrderId == pli.Pack.SalesOrderId
+                                      && soli.Quantity > pli.Quantity
+                                      select soli.Id;
+
+
             var orderVM = (from order in context.SalesOrders
                                //.Include(s => s.Customer)
                                //.Include(s => s.Status)
@@ -359,7 +366,8 @@ namespace GMGInventory.Application.Repositories
                                                 .Select(s => s.Forwarder.Name)
                                                 .FirstOrDefault() ?? "",
                                ApprovedDisapprovedBy = approvedby != null ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname) : disapprovedby != null ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname) : "-",
-                               ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate
+                               ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate,
+                               IsAllPacked = !orderIncompletePack.Contains(order.Id)
                            });
             return await orderVM.ToListAsync();
         }

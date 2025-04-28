@@ -46,6 +46,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Approved / Disapproved Date")]
         public string ApprovedDisapprovedDate => ApprovedDisapprovedDateD == null ? "-" : ApprovedDisapprovedDateD.Value.ToString(SystemFormat.StringDate);
         public DateTime? ApprovedDisapprovedDateD { get; set; }
+        public bool IsAllPacked { get; set; }
     }
 
     public class SalesOrderFilterVM : ListFilterCommonModel
