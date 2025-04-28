@@ -56,8 +56,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Over Payment")]
         public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
-        //public decimal OverPaymentD { get; set; }
-        public decimal OverPaymentD => BalanceComputation < 0 ? Math.Abs(BalanceComputation) : 0;
+        public decimal OverPaymentD { get; set; }
+        //public decimal OverPaymentD => BalanceComputation < 0 ? Math.Abs(BalanceComputation) : 0;
     }
 
     public class GenerateSOAVM
