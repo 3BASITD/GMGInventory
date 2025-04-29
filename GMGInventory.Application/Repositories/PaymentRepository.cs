@@ -34,7 +34,7 @@ namespace GMGInventory.Application.Repositories
                                  //let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
                              let sliamt = (from sli in context.SOACRLineItems
                                            where sli.SOACRId == cp.SOACRId
-                                           select (decimal?)(sli.CreditAmount + sli.DebitAmount + sli.FreightCost)).Sum() ?? 0
+                                           select (decimal?)(sli.DebitAmount + sli.FreightCost - sli.CreditAmount)).Sum() ?? 0
                              let tbramt = (from tbr in context.SOACRLineItemTBRs
                                            join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
                                            where sli.SOACRId == cp.SOACRId
@@ -47,8 +47,8 @@ namespace GMGInventory.Application.Repositories
                              let chkamt = (from chk in context.SOACRChecks
                                            where chk.CustomerPaymentId == cp.Id
                                            select (decimal?)chk.CheckAmount).Sum() ?? 0
-                             let payamt = cp.BackLoad + cp.CashAdvance + cp.Cash + cp.Discount + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + chkamt
-                             let invamttotal = invamt - sliamt - tbramt - payamt
+                             let payamt = cp.BackLoad + cp.CashAdvance + cp.Cash  + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + chkamt //+ cp.Discount
+                             let invamttotal = invamt - sliamt - tbramt - payamt 
                              where cp.Id == id
                              select new PaymentVM
                              {
@@ -56,7 +56,7 @@ namespace GMGInventory.Application.Repositories
                                  CRNumber = cp.CRNumber,
                                  SOANo = cp.SOACRId,
                                  CustomerName = cp.Customer.Name,
-                                 OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
+                                 OverPaymentD =  cp.OverPayment, //0 > invamttotal ? invamttotal * -1 : 0,
                                  TaxD = cp.Tax,
                                  DiscountD = cp.Discount,
                                  TKTD = cp.TKTSolicitation,
@@ -66,7 +66,7 @@ namespace GMGInventory.Application.Repositories
                                  CashAdvancedD = cp.CashAdvance,
                                  Remarks = cp.Remarks,
                                  AmountPaidD = payamt,
-                                 TotalInvoiceAmountD = invamt
+                                 TotalInvoiceAmountD = invamttotal
                              }).FirstOrDefault();
             return paymentVM;
         }
@@ -76,25 +76,27 @@ namespace GMGInventory.Application.Repositories
             var customerPayment = (from cp in context.CustomerPayments
                                    let sliamt = (from sli in context.SOACRLineItems
                                                  where sli.SOACRId == cp.SOACRId
-                                                 select (decimal?)(sli.CreditAmount + sli.DebitAmount + sli.FreightCost)).Sum() ?? 0
+                                                 select (decimal?)(sli.DebitAmount + sli.FreightCost - sli.CreditAmount)).Sum() ?? 0
                                    let tbramt = (from tbr in context.SOACRLineItemTBRs
                                                  join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
                                                  where sli.SOACRId == cp.SOACRId
                                                  select (decimal?)tbr.Amount).Sum() ?? 0
-                                   //let invamt = (from ili in context.InvoiceLineItems
-                                   //              join inv in context.Invoices on ili.InvoiceId equals inv.Id
-                                   //              join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
-                                   //              where sli.SOACRId == cp.SOACRId
-                                   //              select (decimal?)ili.Quantity * ili.UnitPrice).Sum() ?? 0
-                                   let invamt = (from paydetails in context.CustomerPaymentDetails
-                                                 where paydetails.CustomerPayment.Id == cp.Id
-                                                 select (decimal?)paydetails.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)).FirstOrDefault() ?? 0
+                                   let invamt = (from ili in context.InvoiceLineItems
+                                                 join inv in context.Invoices on ili.InvoiceId equals inv.Id
+                                                 join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                                                 where sli.SOACRId == cp.SOACRId
+                                                 select (decimal?)ili.Quantity * ili.UnitPrice).Sum() ?? 0
+                                   //let invamt = (from paydetails in context.CustomerPaymentDetails
+                                   //              where paydetails.CustomerPayment.Id == cp.Id
+                                   //              select (decimal?)paydetails.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)).FirstOrDefault() ?? 0
 
                                    let chkamt = (from chk in context.SOACRChecks
                                                  where chk.CustomerPaymentId == cp.Id
                                                  select (decimal?)chk.CheckAmount).Sum() ?? 0
-                                   let payamt = cp.BackLoad + cp.CashAdvance + cp.Cash + cp.Discount + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + chkamt
-                                   let invamttotal = invamt - sliamt - tbramt - payamt
+                                   let payamt = cp.BackLoad + cp.CashAdvance + cp.Cash  + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + chkamt // + cp.Discount
+                                   let invamttotal = invamt - tbramt 
+                                   let overpaytotal = invamt - tbramt + sliamt - payamt 
+
                                    join user in userManager.Users on cp.UserCreated equals user.Id
                                    select new PaymentVM
                                    {
@@ -102,9 +104,9 @@ namespace GMGInventory.Application.Repositories
                                        CRNumber = cp.CRNumber,
                                        SOANo = cp.SOACRId,
                                        CustomerName = cp.Customer.Name,
-                                       TotalInvoiceAmountD = invamt,
+                                       TotalInvoiceAmountD = invamttotal,
                                        AmountPaidD = payamt,
-                                       OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
+                                       OverPaymentD =  0 > overpaytotal + cp.Discount ? overpaytotal * -1 + cp.Discount: 0,
                                        TransactionDateD = cp.DateCreated,
                                        CreatedBy = user.FirstName + " " + user.LastName,
                                        Remarks = cp.Remarks
