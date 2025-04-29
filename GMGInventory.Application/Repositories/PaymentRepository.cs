@@ -34,7 +34,7 @@ namespace GMGInventory.Application.Repositories
                                  //let tbr = context.SOACRLineItemTBRs.Where(s => soalit.Select(a => a.Id).Contains(s.SOACRLineItemId)).Sum(s => s.Amount)
                              let sliamt = (from sli in context.SOACRLineItems
                                            where sli.SOACRId == cp.SOACRId
-                                           select (decimal?)(sli.CreditAmount + sli.DebitAmount + sli.FreightCost)).Sum() ?? 0
+                                           select (decimal?)(sli.DebitAmount + sli.FreightCost - sli.CreditAmount)).Sum() ?? 0
                              let tbramt = (from tbr in context.SOACRLineItemTBRs
                                            join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
                                            where sli.SOACRId == cp.SOACRId
@@ -76,7 +76,7 @@ namespace GMGInventory.Application.Repositories
             var customerPayment = (from cp in context.CustomerPayments
                                    let sliamt = (from sli in context.SOACRLineItems
                                                  where sli.SOACRId == cp.SOACRId
-                                                 select (decimal?)(sli.CreditAmount + sli.DebitAmount + sli.FreightCost)).Sum() ?? 0
+                                                 select (decimal?)(sli.DebitAmount + sli.FreightCost - sli.CreditAmount)).Sum() ?? 0
                                    let tbramt = (from tbr in context.SOACRLineItemTBRs
                                                  join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
                                                  where sli.SOACRId == cp.SOACRId
