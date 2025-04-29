@@ -48,16 +48,17 @@ namespace GMGInventory.Common.Models
         public string FreightCharge => string.Format(SystemFormat.StringDecimalComma, FreightChargeD);
         public decimal FreightChargeD { get; set; }
 
-        private decimal BalanceComputation => TotalAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD;
+        //private decimal BalanceComputation => TotalAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD;
 
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
-        public decimal BalanceD => BalanceComputation > 0 ? BalanceComputation : 0;
+        //public decimal BalanceD => BalanceComputation > 0 ? BalanceComputation : 0;
+        public decimal BalanceD { get; set; }
 
         [Display(Name = "Over Payment")]
         public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
-        public decimal OverPaymentD { get; set; }
         //public decimal OverPaymentD => BalanceComputation < 0 ? Math.Abs(BalanceComputation) : 0;
+        public decimal OverPaymentD { get; set; }
     }
 
     public class GenerateSOAVM
@@ -180,9 +181,18 @@ namespace GMGInventory.Common.Models
 
         private decimal BalanceComputation => InvoiceAmountD - TBRD - CreditD + DebitD - PaidAmountD + FreightChargeD;
 
+        //[Display(Name = "Balance")]
+        //public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
+        //public decimal BalanceD => BalanceComputation;
+
+
         [Display(Name = "Balance")]
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
-        public decimal BalanceD => BalanceComputation;
+        public decimal BalanceD => BalanceComputation > 0 ? BalanceComputation : 0;
+
+        [Display(Name = "Over Payment")]
+        public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
+        public decimal OverPaymentD => BalanceComputation < 0 ? Math.Abs(BalanceComputation) : 0;
 
         public bool IsPaid => BalanceComputation <= 0;
     }

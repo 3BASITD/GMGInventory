@@ -33,44 +33,22 @@ namespace GMGInventory.Application.Repositories
             {
 
                 var soacr = from soa in context.SOACRs
-                            let chkamt = (from chk in context.SOACRChecks
-                                          join pay in context.CustomerPayments on chk.CustomerPaymentId equals pay.Id
-                                          where pay.SOACRId == soa.Id
-                                          select (decimal?)chk.CheckAmount).Sum() ?? 0
-                            let payamt = (from pay in context.CustomerPayments
-                                          where soa.Id == pay.SOACRId
-                                          select (decimal?)(pay.BackLoad + pay.CashAdvance + pay.Cash + pay.Discount + pay.OffSet + pay.OverPayment + pay.Tax + pay.TKTSolicitation)).Sum() ?? 0
-                            let tbramt = (from tbr in context.SOACRLineItemTBRs
-                                          join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
-                                          where sli.SOACRId == soa.Id
-                                          select (decimal?)tbr.Amount).Sum() ?? 0
-                            let invamt = (from ili in context.InvoiceLineItems
-                                          join inv in context.Invoices on ili.InvoiceId equals inv.Id
-                                          join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
-                                          where sli.SOACRId == soa.Id
-                                          select (decimal?)(ili.Quantity * ili.UnitPrice)).Sum() ?? 0
-                            let sliamt = (from sli in context.SOACRLineItems
-                                          where sli.SOACRId == soa.Id
-                                          select (decimal?)(sli.CreditAmount + sli.DebitAmount + sli.FreightCost)).Sum() ?? 0
-
-                            let invamt2 = (from paydetails in context.CustomerPaymentDetails
-                                           join pay in context.CustomerPayments on paydetails.CustomerPaymentId equals pay.Id
-                                           where pay.SOACRId == soa.Id  
-                                          select (decimal?)paydetails.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)).FirstOrDefault() ?? 0
-
-                            let op = (from pay in context.CustomerPayments
-                                      join paydetails in context.CustomerPaymentDetails on pay.Id equals paydetails.CustomerPaymentId
-                                           where soa.Id == pay.SOACRId &&  paydetails.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice) < (decimal?)(pay.BackLoad + pay.CashAdvance + pay.Cash + pay.Discount + pay.OffSet + pay.OverPayment + pay.Tax + pay.TKTSolicitation)
-                                      select (decimal?)(pay.Cash)).Sum() ?? 0
-                      
-                            let op2 = (from pay in context.CustomerPayments
-                                                 join paydetails in context.CustomerPaymentDetails on pay.Id equals paydetails.CustomerPaymentId
-                                                 where soa.Id == pay.SOACRId && paydetails.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice) < (decimal?)(pay.BackLoad + pay.CashAdvance + pay.Cash + pay.Discount + pay.OffSet + pay.OverPayment + pay.Tax + pay.TKTSolicitation)
-                                                 select (decimal?)paydetails.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)).FirstOrDefault() ?? 0
-
-                             let invamttotal = op - op2 // - invamt2 - sliamt - tbramt - payamt
-
-                            // where soa.Customer.Name == "ROX - RIX AUTO SUPPLY" // for testing only
+                            //let chkamt = (from chk in context.SOACRChecks
+                            //              join pay in context.CustomerPayments on chk.CustomerPaymentId equals pay.Id
+                            //              where pay.SOACRId == soa.Id
+                            //              select (decimal?)chk.CheckAmount).Sum() ?? 0
+                            //let payamt = (from pay in context.CustomerPayments
+                            //              where soa.Id == pay.SOACRId
+                            //              select (decimal?)(pay.BackLoad + pay.CashAdvance + pay.Cash + pay.Discount + pay.OffSet + pay.OverPayment + pay.Tax + pay.TKTSolicitation)).Sum() ?? 0
+                            //let tbramt = (from tbr in context.SOACRLineItemTBRs
+                            //              join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
+                            //              where sli.SOACRId == soa.Id
+                            //              select (decimal?)tbr.Amount).Sum() ?? 0
+                            //let invamt = (from ili in context.InvoiceLineItems
+                            //              join inv in context.Invoices on ili.InvoiceId equals inv.Id
+                            //              join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                            //              where sli.SOACRId == soa.Id
+                            //              select (decimal?)(ili.Quantity * ili.UnitPrice)).Sum() ?? 0
                             select new SOACRVM
                             {
                                 Id = soa.Id,
@@ -78,15 +56,27 @@ namespace GMGInventory.Application.Repositories
                                 Type = soa.SOACRType.Code,
                                 SOAFromD = soa.SOAFrom,
                                 SOAToD = soa.SOATo,
-                                TotalAmountD = invamt,
-                                TBRD = tbramt,
-                                CreditD = soa.SOACRLineItems.Sum(s => s.CreditAmount),
-                                DebitD = soa.SOACRLineItems.Sum(s => s.DebitAmount),
-                                PaidAmountD = payamt + chkamt,
-                                FreightChargeD = soa.SOACRLineItems.Sum(s => s.FreightCost),
-                                OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
+                                //TotalAmountD = invamt,
+                                //TBRD = tbramt,
+                                //CreditD = soa.SOACRLineItems.Sum(s => s.CreditAmount),
+                                //DebitD = soa.SOACRLineItems.Sum(s => s.DebitAmount),
+                                //PaidAmountD = payamt + chkamt,
+                                //FreightChargeD = soa.SOACRLineItems.Sum(s => s.FreightCost)
                             };
-                return await soacr.ToListAsync();
+                var soacrl = await soacr.ToListAsync();
+                foreach(var scl in soacrl)
+                {
+                    var soadetails = await GetSOACRItemsAsync(scl.Id);
+                    scl.TotalAmountD = soadetails.Sum(s => s.InvoiceAmountD);
+                    scl.TBRD = soadetails.Sum(s => s.TBRD);
+                    scl.CreditD = soadetails.Sum(s => s.CreditD);
+                    scl.DebitD = soadetails.Sum(s => s.DebitD);
+                    scl.PaidAmountD = soadetails.Sum(s => s.PaidAmountD);
+                    scl.FreightChargeD = soadetails.Sum(s => s.FreightChargeD);
+                    scl.BalanceD = soadetails.Sum(s => s.BalanceD);
+                    scl.OverPaymentD = soadetails.Sum(s => s.OverPaymentD);
+                }
+                return soacrl;
             }
             catch (Exception ex)
             {

@@ -78,6 +78,7 @@ namespace GMGInventory.Common.Models
         public DateTime SalesOrderDateD { get; set; }
         public string? ForwarderName { get; set; }
         public int RegionId { get; set; }
+        public string Invoices { get; set; }
 
     }
     public class JsonShippingOptionsModel : JsonOptionsModel

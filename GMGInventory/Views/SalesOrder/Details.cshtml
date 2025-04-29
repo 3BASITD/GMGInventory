@@ -55,7 +55,7 @@
                 {
                     if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy) && Model.ApprovedDate != null)
                     {
-                        if (Model?.Status.ToLower() == "approved")
+                        if (Model?.IsAllPacked != true && Model?.Status.ToLower() != "draft" && Model?.Status.ToLower() != "submitted" && Model?.Status.ToLower() != "disapproved")
                         {
                             <a href="@Url.Action("Create", "Pack")/@Model?.Id?page=SalesOrder" target="_blank" class="btn btn-primary btn-sm float-right ml-2">
                                 <span class="fas fa-box-open"></span> Start Packing

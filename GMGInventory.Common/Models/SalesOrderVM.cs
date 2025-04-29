@@ -127,6 +127,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Status")]
         public string Status { get; set; }
+        public bool IsAllPacked { get; set; }
 
         [Display(Name = "Approved By")]
         public string ApprovedBy { get; set; }

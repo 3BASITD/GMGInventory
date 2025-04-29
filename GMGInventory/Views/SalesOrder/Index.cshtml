@@ -368,7 +368,7 @@
                         if (data.status.toLowerCase() == "submitted" && data.orderBy == $("#current-user-nickname").val() && user_access.canDelete) {
                             actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button"  data-microtip-title="Delete Sales Order" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }
-                        if  (user_access.canAdd &&  data.isAllPacked != true) {
+                        if  (user_access.canAdd &&  data.isAllPacked != true && data.status.toLowerCase() != "draft" && data.status.toLowerCase() != "submitted" && data.status.toLowerCase() != "disapproved") {
                             //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></button>';
                             actions += '<a href="@Url.Action("Create", "Pack")/' + data.id + '?page=SalesOrder" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></a>';
                         }

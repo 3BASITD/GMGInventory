@@ -133,9 +133,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderInvoicedOptions(string search, int page)
         {
             var orders = from order in context.SalesOrders
-                         where order.Status.Code.ToLower() == "invoiced"
+                         where order.Invoices.Any(s => s.Status.Code.ToLower() == "invoiced")
                          && (string.IsNullOrWhiteSpace(search)
-                         || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         || order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())
+                         || order.Invoices.Any(s=>s.InvoiceNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
                          {
@@ -151,7 +152,8 @@ namespace GMGInventory.Application.Repositories
                              SalesOrderDateD = order.SalesOrderDate,
                              ForwarderName = order.SalesOrderDeliveryMonitorings
                                                   .Select(s => s.Forwarder.Name)
-                                                  .FirstOrDefault()
+                                                  .FirstOrDefault(),
+                             Invoices = string.Join(", ", order.Invoices.Select(s => s.InvoiceNumber))
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonSalesOrderOptionsModel>
@@ -219,6 +221,13 @@ namespace GMGInventory.Application.Repositories
                                     DebitMemoAmount = g.Sum(s => (decimal?)s.DebitAmount) ?? 0,
                                     FreightAmount = g.Sum(s => (decimal?)s.FreightCost) ?? 0
                                 };
+
+            var orderIncompletePack = from soli in context.SalesOrderLineItems
+                                      join pli in context.PackLineItems on new { soli.SalesOrderId, soli.ItemId } equals new { pli.Pack.SalesOrderId, pli.ItemId } into p
+                                      from pli in p.DefaultIfEmpty()
+                                      where soli.Quantity > (pli == null ? 0 : pli.Quantity)
+                                      select soli.SalesOrderId;
+
             var orderVM = (from order in context.SalesOrders
                            join userc in userManager.Users on order.UserCreated equals userc.Id
                            join userm in userManager.Users on order.UserModified equals userm.Id into um
@@ -288,6 +297,7 @@ namespace GMGInventory.Application.Repositories
                                Status = order.Status.Code,
                                AccountStatus = order.Customer.CustomerAccountStatus.Name,
                                Region = order.Customer.Area.Region.Name,
+                               IsAllPacked = !orderIncompletePack.Contains(order.Id),
                                UserCreated = userc.FirstName + " " + userc.LastName,
                                DateCreatedD = order.DateCreated,
                                UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
@@ -318,28 +328,23 @@ namespace GMGInventory.Application.Repositories
         {
             var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
             var currentUserId = currentUser.Id;
-            //var currentUserRoles = await userManager.GetRolesAsync(currentUser);
-            //var isAdminOrManager = currentUserRoles.Contains(Roles.SystemAdmin) || currentUserRoles.Contains(Roles.SalesDirector);
 
             var users = userManager.Users;
 
             var orderIncompletePack = from soli in context.SalesOrderLineItems
-                                      join pli in context.PackLineItems on soli.ItemId equals pli.ItemId
-                                      where soli.SalesOrderId == pli.Pack.SalesOrderId
-                                      && soli.Quantity > pli.Quantity
-                                      select soli.Id;
+                                      join pli in context.PackLineItems on new { soli.SalesOrderId, soli.ItemId} equals new { pli.Pack.SalesOrderId, pli.ItemId } into p
+                                      from pli in p.DefaultIfEmpty()
+                                      where soli.Quantity > (pli == null ? 0 : pli.Quantity)
+                                      select soli.SalesOrderId;
 
 
             var orderVM = (from order in context.SalesOrders
-                               //.Include(s => s.Customer)
-                               //.Include(s => s.Status)
                            join user in users on order.UserCreated equals user.Id
                            join approvedby in users on order.ApprovedBy equals approvedby.Id into ab
                            from approvedby in ab.DefaultIfEmpty()
                            join disapprovedby in users on order.DisapprovedBy equals disapprovedby.Id into db
                            from disapprovedby in db.DefaultIfEmpty()
-                           where /*(order.UserCreated == currentUserId || isAdminOrManager)
-                           &&*/ (filter.AgentId == null || order.AgentId == filter.AgentId)
+                           where (filter.AgentId == null || order.AgentId == filter.AgentId)
                            && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
                            && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
                            && filter.DateFrom <= order.DateCreated.Date

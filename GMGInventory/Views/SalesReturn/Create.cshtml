@@ -266,10 +266,16 @@
         $("#return-sales-order").select2({
             minimumInputLength: -1,
             placeholder: '<empty>',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong><br /><small>Invoice(s): " + repo.invoices + "</small>");
+            },
             ajax: {
                 url: "@Url.Action("GetSalesOrderInvoicedOptions", "SalesOrder")",
                 dataType: 'json',
-                type: "POST",
+                type: "POST", 
                 delay: 500,
                 data: function (params) {
                     return {
