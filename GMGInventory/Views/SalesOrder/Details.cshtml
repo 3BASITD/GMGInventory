@@ -477,8 +477,8 @@
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-unit-price" class="form-label mb-0">Unit Price <span class="add-price-source"></span></label>
-                                    @*<input type="number" step="0.01" min="0" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />*@
-                                    <input type="text" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" readonly="readonly" />
+                                    <input type="number" step="0.01" min="0" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
+                                    @*<input type="text" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" readonly="readonly" />*@
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">
@@ -656,13 +656,13 @@
 
             $("#order-agent-code").on("select2:select", function () {
                 $(".order-agent-name").text($(this).select2("data")[0].name);
-                $("#order-customer-code").val(null).trigger("change");
-                $(".order-customer-name").text("N/A");
-                $(".order-customer-address").text("N/A");
-                $(".order-customer-balance").text("N/A");
-                $(".order-credit-term").text("N/A");
-                $(".order-region").text("N/A");
-                $(".order-customer-status").text("N/A");
+                // $("#order-customer-code").val(null).trigger("change");
+                // $(".order-customer-name").text("N/A");
+                // $(".order-customer-address").text("N/A");
+                // $(".order-customer-balance").text("N/A");
+                // $(".order-credit-term").text("N/A");
+                // $(".order-region").text("N/A");
+                // $(".order-customer-status").text("N/A");
             });
 
             // Load customer data for select2
@@ -712,6 +712,24 @@
                 $(".order-credit-term").text($(this).select2("data")[0].creditTerm);
                 $(".order-region").text($(this).select2("data")[0].region);
                 $(".order-customer-status").text($(this).select2("data")[0].customerStatus);
+
+                if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
+                    toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance");
+                }
+
+                if ($("#order-agent-code").val() == null) {
+                    var agentId = $(this).select2("data")[0].id;
+                    var agentCode = $(this).select2("data")[0].agentCode;
+                    var agentName = $(this).select2("data")[0].agent;
+                    var agentOption = new Option(agentCode, agentId, true, true);
+                    $(agentOption).data('data', {
+                      id: agentId,
+                      text: agentCode,
+                      name: agentName
+                    });
+                    $("#order-agent-code").append(agentOption).trigger("change");
+                    $("#order-agent-name").val(agentName);
+                }
             });
 
             // Load forwarder data for select2
@@ -999,7 +1017,11 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return Round2Decimal(data.sellingPriceD);
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
+                            return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.sellingPriceD) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
+                        } else {
+                            return Round2Decimal(data.sellingPriceD)
+                        }
                     },
                     name: "SellingPrice",
                     className: "form-cell text-end"
@@ -1084,14 +1106,15 @@
 
             //ComputeTotalQuantity();
             //ComputeTotalGrossPrice();
-            $(".quantity, .discount1, .discount2").on("input", function () {
+            $(".quantity, .discount1, .discount2, .unitprice").on("input", function () {
                 var row = itemDT.row($(this).closest('tr'));
                 var rowData = row.data();
 
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
-                var unit_price = rowData.sellingPriceD;
+                //var unit_price = rowData.sellingPriceD;
+                var unit_price = parseFloat($(this).parents("tr").find(".unitprice").val());
 
                 //var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
                 var gross_price = FormatStringDecimal(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));

@@ -10,7 +10,7 @@ namespace GMGInventory.Application.Contracts
         Task<UserInformationVM> GetUserInformationVMAsync(string name);
         Task<UserInformationVM?> GetUserInformationVMByIdAsync(string id);
         Task<UserInformationForUpdateVM?> GetUserInformationVMToEditAsync(string id);
-        Task<bool> IsUserInUseAsync(string id);
+        Task<IList<string>> IsUserInUseAsync(string id);
         Task<bool?> IsUserIdExistAsync(string? id);
         Task<bool?> IsUsernameExistAsync(string? username);
         Task<int> AddAsync(UserInformationVM userInformationVM);

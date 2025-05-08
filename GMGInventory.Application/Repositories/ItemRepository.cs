@@ -363,8 +363,7 @@ namespace GMGInventory.Application.Repositories
                               PartNumber = (item.PartNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                               InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                               ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
-                              LocationCode = item.LocationCode == null ? "" : item.LocationCode.Code.Replace("\n", "").Replace("\r", "").Trim(),
-                              LocationCodeId = item.LocationCodeId,
+                              BeginningCostD = item.BeginningCost,
                               Category = item.Category.Name.Replace("\n", "").Replace("\r", "").Trim(),
                               CategoryId = item.CategoryId,
                               ItemType = item.ItemType.Name.Replace("\n", "").Replace("\r", "").Trim(),
@@ -459,8 +458,7 @@ namespace GMGInventory.Application.Repositories
                                    PartNumber = j.PartNumber,
                                    InterchangeNumber = j.InterchangeNumber,
                                    ModelNumber = j.ModelNumber,
-                                   LocationCode = j.LocationCode,
-                                   LocationCodeId = j.LocationCodeId,
+                                   BeginningCostD = j.BeginningCostD,
                                    Category = j.Category,
                                    CategoryId = j.CategoryId,
                                    ItemType = j.ItemType,
@@ -504,7 +502,7 @@ namespace GMGInventory.Application.Repositories
                               InterchangeNumber = item.InterchangeNumber + "",
                               ItemType = item.ItemType.Name,
                               IsActive = item.IsActive,
-                              LocationCode = item.LocationCode == null ? null : item.LocationCode.Code,
+                              BeginningCostD = item.BeginningCost,
                               ModelNumber = item.ModelNumber + "",
                               Name = item.Name,
                               NetPriceD = price == null ? 0 : price.NetSellingPrice,
@@ -599,7 +597,7 @@ namespace GMGInventory.Application.Repositories
                 InterchangeNumber = itemVM.InterchangeNumber + "",
                 IsActive = true,
                 ItemTypeId = itemVM.ItemTypeId,
-                LocationCodeId = itemVM.LocationCodeId,
+                BeginningCost = itemVM.BeginningCostD == 0 ? null : itemVM.BeginningCostD,
                 ModelNumber = itemVM.ModelNumber + "",
                 Name = itemVM.Name,
                 PartNumber = itemVM.PartNumber + "",
@@ -617,11 +615,14 @@ namespace GMGInventory.Application.Repositories
             };
             await context.ItemPrices.AddAsync(itemPrice);
             await context.SaveChangesAsync(currentUserId);
+
             var itemInventories = new ItemInventory
             {
                 ItemId = item.Id,
                 Quantity = itemVM.QuantityD,
-                WarehouseId = itemVM.WarehouseId
+                WarehouseId = itemVM.WarehouseId == 0
+                            ? context.Warehouses.Where(s => s.Name.ToLower() == "main").Select(s => s.Id).FirstOrDefault()
+                            : itemVM.WarehouseId
             };
             await context.ItemInventories.AddAsync(itemInventories);
             await context.SaveChangesAsync(currentUserId);
@@ -650,7 +651,7 @@ namespace GMGInventory.Application.Repositories
             item.CategoryId = itemVM.CategoryId;
             item.InterchangeNumber = itemVM.InterchangeNumber + "";
             item.ItemTypeId = itemVM.ItemTypeId;
-            item.LocationCodeId = itemVM.LocationCodeId;
+            item.BeginningCost = itemVM.BeginningCostD == 0 ? null : itemVM.BeginningCostD;
             item.ModelNumber = itemVM.ModelNumber + "";
             item.Name = itemVM.Name;
             item.PartNumber = itemVM.PartNumber + "";

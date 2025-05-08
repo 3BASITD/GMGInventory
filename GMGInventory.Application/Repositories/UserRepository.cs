@@ -137,52 +137,56 @@ namespace GMGInventory.Application.Repositories
             return await userVM.FirstOrDefaultAsync();
         }
 
-        public async Task<bool> IsUserInUseAsync(string id)
+        public async Task<IList<string>> IsUserInUseAsync(string id)
         {
-            return await context.Agents.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.Areas.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.AuditLogs.AnyAsync(s => s.UserId == id)
-                || await context.Brands.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.Categories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.CreditTerms.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.CustomerPayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.CustomerPaymentDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.Customers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.Forwarders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.InvoiceLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                //|| await context.InvoicePayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.Invoices.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.ItemInventories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.ItemPrices.AnyAsync(s => s.UserCreated == id)
-                || await context.Items.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.ItemTypes.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.PackLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.PackReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.PackReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.Packs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                //|| await context.PaymentDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                //|| await context.Payments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.PhysicalCountHistories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.PurchaseOrderLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.PurchaseOrders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.PurchaseReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.PurchaseReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SalesOrderLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SalesOrders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                //|| await context.SalesReturnAppliedAmounts.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SalesReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SalesReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                //|| await context.SalesReturnTotalReturnAmounts.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.ShippingAddresses.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SOACRChecks.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SOACRLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SOACRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.SOACRLineItemTBRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.Suppliers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.TransferItemDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.TransferItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)
-                || await context.Warehouses.AnyAsync(s => s.UserCreated == id || s.UserModified == id);
+            List<string> tables = new List<string>();
+
+             if(await context.Agents.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Agents"); }
+            if (await context.Areas.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Areas"); }
+            if (await context.AuditLogs.AnyAsync(s => s.UserId == id)) { tables.Add("Audit Logs"); }
+            if (await context.Brands.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Brands"); }
+            if (await context.Categories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Categories"); }
+            if (await context.CreditTerms.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Credit Terms"); }
+            if (await context.CustomerPayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Customer Payments"); }
+            if (await context.CustomerPaymentDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Customer Payment Details"); }
+            if (await context.Customers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Customers"); }
+            if (await context.Forwarders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Forwarders"); }
+            if (await context.InvoiceLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Invoice Line Items"); }
+            //if( await context.InvoicePayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Invoice Payments"); }
+            if (await context.Invoices.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Invoices"); }
+            if (await context.ItemInventories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Item Inventories"); }
+            if (await context.ItemPrices.AnyAsync(s => s.UserCreated == id)) { tables.Add("Item Prices"); }
+            if (await context.Items.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Items"); }
+            if (await context.ItemTypes.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Item Types"); }
+            if (await context.PackLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Pack Line Items"); }
+            if (await context.PackReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Pack Return Line Items"); }
+            if (await context.PackReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Pack Returns"); }
+            if (await context.Packs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Packs"); }
+            //if(await context.PaymentDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Payment Details"); }
+            //if(await context.Payments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Payments"); }
+            if (await context.PhysicalCountHistories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Physical Count Histories"); }
+            if (await context.PurchaseOrderLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Order Line Items"); }
+            if (await context.PurchaseOrders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Orders"); }
+            if (await context.PurchaseReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Return Line Items"); }
+            if (await context.PurchaseReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Returns"); }
+            if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Delivery Monitorings"); }
+            if (await context.SalesOrderLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Line Items"); }
+            if (await context.SalesOrders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Orders"); }
+            //if(await context.SalesReturnAppliedAmounts.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Return Applied Amounts"); }
+            if (await context.SalesReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Return Line Items"); }
+            if (await context.SalesReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Returns"); }
+            //if(await context.SalesReturnTotalReturnAmounts.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales REturn To"); }
+            if (await context.ShippingAddresses.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Shipping Addresses"); }
+            if (await context.SOACRChecks.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOA CR Checks"); }
+            if (await context.SOACRLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOA CR Line Items"); }
+            if (await context.SOACRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOACRs"); }
+            if (await context.SOACRLineItemTBRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOA CR Line Item TBRs"); }
+            if (await context.Suppliers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Suppliers"); }
+            if (await context.TransferItemDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Transfer Item Details"); }
+            if (await context.TransferItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Transfer Items"); }
+            if (await context.Warehouses.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Warehouses"); }
+
+            return tables;
         }
 
         public async Task<bool?> IsUserIdExistAsync(string? id)

@@ -1756,6 +1756,9 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<decimal?>("BeginningCost")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("BrandId")
                         .HasColumnType("int");
 
@@ -1779,9 +1782,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("ItemTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LocationCodeId")
                         .HasColumnType("int");
 
                     b.Property<string>("ModelNumber")
@@ -1815,8 +1815,6 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ItemTypeId");
-
-                    b.HasIndex("LocationCodeId");
 
                     b.HasIndex("UnitId");
 
@@ -1909,6 +1907,42 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("WarehouseId");
 
                     b.ToTable("ItemInventories");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ItemLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LocationCodeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("LocationCodeId");
+
+                    b.ToTable("ItemLocation");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemPrice", b =>
@@ -5696,13 +5730,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2a07116f-3b50-4cd1-91d0-945008e2a74f",
+                            ConcurrencyStamp = "d49a87a8-1e06-4a39-94b1-887746fce3b4",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJz3JxTZ+AzY3o6gGrIRyZsIo9Pm27vkHo7KUNNGRpr6fcjb2fhB4j8o7cf9dyJLug==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENT34ERv80J63qqwKAxGbTTVErCuzTm41fg1/oJOwwgd2ZzbduXpw64AvQQjlRwL0Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "af1ebe46-6f6c-476f-9a51-996706a45f3c",
+                            SecurityStamp = "7dc661e3-247c-443d-beb7-1d821402f5fc",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5717,13 +5751,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cc2ed6ea-1cda-4df4-a06d-ea50df95443c",
+                            ConcurrencyStamp = "7315efd4-a059-4a03-a155-58c212085765",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBWAM9pcMI3pYCT9DX0vspI53uQ3vFa9Zf/ako3e6UGV212Zs8vdJiYCWhjmV9KHFA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAT6X/d4K7FUvg1Wowst4Jwlo2oj6kov9JX28ol0K/aho2rTyCix4tmhKWW8LvCPOw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "14d3a33b-c9c5-4a19-b268-7633d3c87993",
+                            SecurityStamp = "e57f4103-0f42-4a3b-b4cc-9402c0dce02a",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5971,10 +6005,6 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GMGInventory.Data.LocationCode", "LocationCode")
-                        .WithMany("Items")
-                        .HasForeignKey("LocationCodeId");
-
                     b.HasOne("GMGInventory.Data.Unit", "Unit")
                         .WithMany("Items")
                         .HasForeignKey("UnitId")
@@ -5986,8 +6016,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("ItemType");
-
-                    b.Navigation("LocationCode");
 
                     b.Navigation("Unit");
                 });
@@ -6038,6 +6066,25 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Item");
 
                     b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ItemLocation", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Item", "Item")
+                        .WithMany("ItemLocations")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.LocationCode", "LocationCode")
+                        .WithMany("ItemLocations")
+                        .HasForeignKey("LocationCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("LocationCode");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemPrice", b =>
@@ -7014,6 +7061,8 @@ namespace GMGInventory.Data.Migrations
 
                     b.Navigation("ItemInventories");
 
+                    b.Navigation("ItemLocations");
+
                     b.Navigation("ItemPrices");
 
                     b.Navigation("PackLineItems");
@@ -7042,7 +7091,7 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.LocationCode", b =>
                 {
-                    b.Navigation("Items");
+                    b.Navigation("ItemLocations");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Pack", b =>

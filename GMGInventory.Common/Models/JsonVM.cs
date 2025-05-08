@@ -164,6 +164,8 @@ namespace GMGInventory.Common.Models
         public string CreditTerm { get; set; }
         public string Region { get; set; }
         public string Agent { get; set; }
+        public string AgentCode { get; set; }
+        public int AgentId { get; set; }
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
         public decimal OutstandingBalanceD { get; set; }
         public string CustomerStatus { get; set; }

@@ -36,72 +36,6 @@ namespace GMGInventory.Common.Models
 
     public class ItemCommonVM
     {
-        //public int Id { get; set; }
-
-        //[Display(Name = "Code")]
-        //public string Code { get; set; }
-
-        //[Display(Name = "Name")]
-        //public string Name { get; set; }
-
-        //[Display(Name = "Part Number")]
-        //public string PartNumber { get; set; }
-
-        //[Display(Name = "Interchange Number")]
-        //public string InterchangeNumber { get; set; }
-
-        //[Display(Name = "Model Number")]
-        //public string ModelNumber { get; set; }
-
-        //[Display(Name = "Size")]
-        //public string Size { get; set; }
-
-        //[Display(Name = "Quantity on Hand")]
-        //public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityTotalD);
-        //public int QuantityD { get; set; }
-        //public int QuantityTotalD => QuantityInventoryD 
-        //                           + (QuantityServedD != null && Warehouse.ToLower().Contains("main") ? (int)QuantityServedD : 0) 
-        //                           - (QuantityInvoiceD != null && Warehouse.ToLower().Contains("main") ? (int)QuantityInvoiceD : 0);
-        //public int QuantityInventoryD { get; set; }
-        //public int? QuantityServedD { get; set; }
-        //public int? QuantityInvoiceD { get; set; }
-
-        //[Display(Name = "Unit")]
-        //public string Unit { get; set; }
-        //public int UnitId { get; set; }
-
-        //[Display(Name = "Category")]
-        //public string Category { get; set; }
-        //public int CategoryId { get; set; }
-
-        //[Display(Name = "Item Type")]
-        //public string ItemType { get; set; }
-        //public int ItemTypeId { get; set; }
-
-        //[Display(Name = "Brand")]
-        //public string Brand { get; set; }
-        //public int BrandId { get; set; }
-
-        //[Display(Name = "Location Code")]
-        //public string? LocationCode { get; set; }
-        //public int? LocationCodeId { get; set; }
-
-
-        //[Display(Name = "Gross Price")]
-        //public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
-        //public decimal RetailPriceD { get; set; }
-
-        //[Display(Name = "Net Price")]
-        //public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
-        //public decimal NetPriceD { get; set; }
-
-        //[Display(Name = "Warehouse")]
-        //public string Warehouse { get; set; }
-        //public int WarehouseId { get; set; }
-
-        //public bool IsActive { get; set; }
-        //public bool GiveAction { get; set; }
-
         public int Id { get; set; }
 
         [Display(Name = "Code")]
@@ -138,9 +72,9 @@ namespace GMGInventory.Common.Models
         public string Unit { get; set; }
         public int UnitId { get; set; }
 
-        [Display(Name = "Location Code")]
-        public string LocationCode { get; set; }
-        public int? LocationCodeId { get; set; }
+        [Display(Name = "Beginning Cost")]
+        public string? BeginningCost => BeginningCostD == null ? null : string.Format(SystemFormat.StringDecimalComma, BeginningCostD.Value);
+        public decimal? BeginningCostD { get; set; }
 
         [Display(Name = "Quantity")]
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
@@ -233,8 +167,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Category")]
         public string Category { get; set; }
 
-        [Display(Name = "Location Code")]
-        public string? LocationCode { get; set; }
+        [Display(Name = "BeginningCost")]
+        public string? BeginningCost => BeginningCostD == null ? null : string.Format(SystemFormat.StringDecimalComma, BeginningCostD.Value);
+        public decimal? BeginningCostD { get; set; }
 
         [Display(Name = "Gross Price")]
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
@@ -260,7 +195,7 @@ namespace GMGInventory.Common.Models
         public string PartNumber { get; set; }
         public string InterchangeNumber { get; set; }
         public string Warehouse { get; set; }
-        public string LocationCode { get; set; }
+        public decimal BeginningCost { get; set; }
         public string ModelNumber { get; set; }
         public string Category { get; set; }
         public string ItemType { get; set; }

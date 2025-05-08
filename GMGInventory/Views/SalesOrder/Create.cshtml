@@ -192,8 +192,8 @@
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-unit-price" class="form-label mb-0">Unit Price <span class="add-price-source"></span></label>
-                                    @*<input type="number" step="0.01" min="0.00" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />*@
-                                    <input type="text" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" readonly="readonly" />
+                                    <input type="number" step="0.01" min="0.00" max="1999999.99" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" />
+                                    @*<input type="text" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" readonly="readonly" />*@
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">
@@ -283,13 +283,13 @@
 
         $("#order-agent-code").on("select2:select", function () {
             $("#order-agent-name").val($(this).select2("data")[0].name);
-            $("#order-customer-code").val(null).trigger("change");
-            $("#order-customer-name").val("");
-            $("#order-customer-address").val("");
-            $("#order-customer-balance").val("");
-            $("#order-credit-term").val("");
-            $("#order-region").val("");
-            $("#order-customer-status").val("");
+            // $("#order-customer-code").val(null).trigger("change");
+            // $("#order-customer-name").val("");
+            // $("#order-customer-address").val("");
+            // $("#order-customer-balance").val("");
+            // $("#order-credit-term").val("");
+            // $("#order-region").val("");
+            // $("#order-customer-status").val("");
         });
 
         // Load customer data for select2
@@ -342,6 +342,20 @@
 
             if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
                 toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance");
+            }
+
+            if ($("#order-agent-code").val() == null) {
+                var agentId = $(this).select2("data")[0].id;
+                var agentCode = $(this).select2("data")[0].agentCode;
+                var agentName = $(this).select2("data")[0].agent;
+                var agentOption = new Option(agentCode, agentId, true, true);
+                $(agentOption).data('data', {
+                  id: agentId,
+                  text: agentCode,
+                  name: agentName
+                });
+                $("#order-agent-code").append(agentOption).trigger("change");
+                $("#order-agent-name").val(agentName);
             }
         });
 
@@ -609,7 +623,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return FormatStringDecimal(data.unitPrice);
+                        return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.unitPrice) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
                     },
                     name: "UnitPrice",
                     className: "form-cell text-end"
@@ -643,14 +657,15 @@
             $(".table-item thead th").removeClass("form-cell");
             //$(".table-item thead th").removeClass("text-end");
 
-            $(".quantity, .discount1, .discount2").on("input", function () {
+            $(".quantity, .discount1, .discount2, .unitprice").on("input", function () {
                 var row = itemDT.row($(this).closest('tr'));
                 var rowData = row.data();
 
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
-                var unit_price = rowData.unitPrice;
+                //var unit_price = rowData.unitPrice;
+                var unit_price = parseFloat($(this).parents("tr").find(".unitprice").val());
 
                 //var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
                 var gross_price = FormatStringDecimal(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
@@ -683,8 +698,8 @@
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
-                //var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
-                var row_unitprice = row_data.unitPrice;
+                //var row_unitprice = row_data.unitPrice;
+                var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
                 item_to_order.push({

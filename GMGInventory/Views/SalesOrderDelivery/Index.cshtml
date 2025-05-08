@@ -206,7 +206,7 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="delivery-representative" class="form-label mb-0">@Html.DisplayNameFor(model => model.Representative)</label>
-                                    <input type="text" id="delivery-representative" name="Waybill" class="form-control form-control-sm" />
+                                    <input type="text" id="delivery-representative" name="Representative" class="form-control form-control-sm" />
                                 </div>
                             </div>
                         </div>
@@ -562,7 +562,7 @@
                 {
                     data: function (data, type, dataToSet) {
                         return data.dateReceive == null ? "N/A" : data.dateReceive;
-                    }, 
+                    },
                     name: "DateReceive"
                 },
                 {
@@ -571,7 +571,7 @@
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<button class="btn btn-primary btn-xs viewBtn" onclick="ShowItemList(' + data.id + ')" data-microtip-title="View Item(s)" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
                         if (user_access.canEdit) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs editBtn" onclick="ShowEdit(' + data.id + ')" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                         }
                         actions += '<button class="btn btn-info btn-xs actionBtn" onclick="ShowAction(\'' + data.createdBy + '\', \'' + data.createdDate + '\', \'' + data.modifiedBy + '\', \'' + data.modifiedDate + '\')" data-microtip-title="History" data-microtip-position="top-left" role="tooltip"><i class="fas fa-history"></i></button>';
                         return actions + "</div>";
@@ -586,95 +586,72 @@
             hideLoader();
 
             LoadFilterSelect2();
+        });
 
-            if (user_access.canEdit) {
-                // Actions upon Display Edit Modal
-                $(".editBtn").click(function (e) {
-                    var data = deliveryDT.row($(this).parents('tr')).data();
+        if (user_access.canEdit) {
+            function ShowEdit(id){
+                var datas = deliveryDT.rows().data().toArray().filter(row => row.id === id);
+                var data = datas[0];
+                $("#delivery-sales-order-id").val(data.id);
+                $("#delivery-date").val(DateForInput(data.dateDeliverD));
+                $("#delivery-pickup-date").val(DateForInput(data.datePickupD));
+                $("#delivery-waybill").val(data.waybillNumber == "-" ? "" : data.waybillNumber);
+                $("#delivery-remarks").val(data.remarks == "-" ? "" : data.remarks);
+                $("#delivery-sla-date").val(DateForInput(data.serviceLevelAgreement));
+                $("#delivery-representative").val(data.representative);
+                $("#delivery-receive-date").val(DateForInput(data.dateReceive));
+                $("#delivery-forwarder").val(data.forwarderId);
+                $("#delivery-forwarder").trigger("change");
+            }
 
-                    $("#delivery-sales-order-id").val(data.id);
-                    $("#delivery-date").val(DateForInput(data.dateDeliverD));
-                    $("#delivery-pickup-date").val(DateForInput(data.datePickupD));
-                    $("#delivery-waybill").val(data.waybillNumber == "-" ? "" : data.waybillNumber);
-                    $("#delivery-remarks").val(data.remarks == "-" ? "" : data.remarks);
-                    $("#delivery-sla-date").val(DateForInput(data.serviceLevelAgreement));
-                    $("#delivery-representative").val(DateForInput(data.representative));
-                    $("#delivery-receive-date").val(DateForInput(data.dateReceive));
+            // Validation for Edit Modal
+            var validateEdit = $("#editForm").validate({
+                rules: {
+                    Forwarder: { required: true },
+                    Waybill: { required: true, maxlength: 150 },
+                    Remarks: { maxlength: 250 },
+                    Representative: { maxlength: 150 }
+                },
+                messages: {
+                    Forwarder: { required: "Please select a forwarder." },
+                    Waybill: { required: "Please enter waybill number.", maxlength: "Waybill must not exceed 150 characters." },
+                    Remarks: { maxlength: "Remarks must not exceed 250 characters." },
+                    Representative: { maxlength: "Driver / Representative must not exceed 150 characters." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoEdit();
+                }
+            });
 
-                    // Load forwarder data for select2 on edit
-                    //if ($("#delivery-forwarder").attr("data-select2-id")) {
-                    //    $("#delivery-forwarder").select2("destroy");
-                    //    $("#delivery-forwarder").empty();
-                    //}
-                    //$.ajax({
-                    //    type: "POST",
-                    //    url: "@Url.Action("GetOptions", "Forwarder")",
-                    //    data: { includeId: data.forwarderId },
-                    //    success: function (data, status, xhr) {
-                    //        $("#delivery-forwarder").select2({
-                    //            data: data,
-                    //            allowClear: true,
-                    //            placeholder: {
-                    //                id: "",
-                    //                text: "<empty>"
-                    //            },
-                    //            dropdownParent: $("#editModal")
-                    //        });
-                    //    }
-                    //});
-                    $("#delivery-forwarder").val(data.forwarderId);
-                    $("#delivery-forwarder").trigger("change");
-                });
-
-                // Validation for Edit Modal
-                var validateEdit = $("#editForm").validate({
-                    rules: {
-                        Forwarder: { required: true },
-                        Waybill: { required: true, maxlength: 150 },
-                        Remarks: { maxlength: 250 },
-                        Representative: { maxlength: 150 }
+            // Send Edit to Controller
+            function DoEdit() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EditJson")",
+                    data: {
+                        SalesOrderId: $("#delivery-sales-order-id").val(),
+                        DateDeliver: $("#delivery-date").val(),
+                        DatePickup: $("#delivery-pickup-date").val(),
+                        Forwarder: $("#delivery-forwarder").val(),
+                        Waybill: $("#delivery-waybill").val(),
+                        Remarks: $("#delivery-remarks").val(),
+                        ServiceLevelAgreement: $("#delivery-sla-date").val(),
+                        Representative: $("#delivery-representative").val(),
+                        DateReceive: $("#delivery-receive-date").val()
                     },
-                    messages: {
-                        Forwarder: { required: "Please select a forwarder." },
-                        Waybill: { required: "Please enter waybill number.", maxlength: "Waybill must not exceed 150 characters." },
-                        Remarks: { maxlength: "Remarks must not exceed 250 characters." },
-                        Representative: { maxlength: "Driver / Representative must not exceed 150 characters." }
-                    },
-                    submitHandler: function (form, event) {
-                        event.preventDefault();
-                        DoEdit();
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#editModal").modal("hide");
+                            deliveryDT.ajax.reload();
+                        }
                     }
                 });
-
-                // Send Edit to Controller
-                function DoEdit() {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("EditJson")",
-                        data: {
-                            SalesOrderId: $("#delivery-sales-order-id").val(),
-                            DateDeliver: $("#delivery-date").val(),
-                            DatePickup: $("#delivery-pickup-date").val(),
-                            Forwarder: $("#delivery-forwarder").val(),
-                            Waybill: $("#delivery-waybill").val(),
-                            Remarks: $("#delivery-remarks").val(),
-                            ServiceLevelAgreement: $("#delivery-sla-date").val(),
-                            Representative: $("#delivery-representative").val(),
-                            DateReceive: $("#delivery-receive-date").val()
-                        },
-                        success: function (data, status, xhr) {
-                            if (data.status == "Error") {
-                                toastr.error(data.message, "Error");
-                            } else {
-                                toastr.success(data.message, "Success");
-                                $("#editModal").modal("hide");
-                                deliveryDT.ajax.reload();
-                            }
-                        }
-                    });
-                }
             }
-        });
+        }
 
         function ShowItemList(soId) {
             if ($.fn.dataTable.isDataTable('.table-item')) {

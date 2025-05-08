@@ -853,7 +853,7 @@ namespace GMGInventory.Controllers
         #region Unserved Items
         public async Task<IActionResult> UnservedItem()
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItemReport, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             return View();
@@ -861,7 +861,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> PrintUnservedItem(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.Print);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItemReport, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
             return View(await reportSalesRepository.PrintUnservedItem(filter));
@@ -870,7 +870,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> GetUnservedItemDT(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItemReport, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
@@ -879,7 +879,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadUnservedItem(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItem, AccessTypes.UploadDownload);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.UnservedItemReport, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new("Unserved Item "

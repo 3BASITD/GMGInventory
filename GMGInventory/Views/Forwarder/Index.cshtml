@@ -371,16 +371,16 @@
                 // Validation for Edit Modal
                 var validateEdit = $("#editForm").validate({
                     rules: {
-                        name: { required: true, maxlength: 10 },
-                        address: { required: true, maxlength: 100 },
-                        phone: { required: true, maxlength: 20 },
-                        fax: { maxlength: 20 }
+                        name: { required: true, maxlength: 50 },
+                        address: { required: true, maxlength: 150 },
+                        phone: { required: true, maxlength: 50 },
+                        fax: { maxlength: 50 }
                     },
                     messages: {
-                        name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
-                        address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
-                        phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
-                        fax: { maxlength: "Fax number must not exceed 20 characters." }
+                        name: { required: "Please enter Name.", maxlength: "Name must not exceed 50 characters." },
+                        address: { required: "Please enter Address.", maxlength: "Address must not exceed 150 characters." },
+                        phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 50 characters." },
+                        fax: { maxlength: "Fax number must not exceed 50 characters." }
                     },
                     submitHandler: function (form, event) {
                         event.preventDefault();
@@ -427,16 +427,16 @@
             // Validation for Create Modal
             var validateCreate = $("#createForm").validate({
                 rules: {
-                    name: { required: true, maxlength: 10 },
-                    address: { required: true, maxlength: 100 },
-                    phone: { required: true, maxlength: 20 },
-                    fax: { maxlength: 20 }
+                    name: { required: true, maxlength: 50 },
+                    address: { required: true, maxlength: 150 },
+                    phone: { required: true, maxlength: 50 },
+                    fax: { maxlength: 50 }
                 },
                 messages: {
-                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 10 characters." },
-                    address: { required: "Please enter Address.", maxlength: "Address must not exceed 100 characters." },
-                    phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 20 characters." },
-                    fax: { maxlength: "Fax number must not exceed 20 characters." }
+                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 50 characters." },
+                    address: { required: "Please enter Address.", maxlength: "Address must not exceed 150 characters." },
+                    phone: { required: "Please enter Phone Number.", maxlength: "Phone number must not exceed 50 characters." },
+                    fax: { maxlength: "Fax number must not exceed 50 characters." }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();

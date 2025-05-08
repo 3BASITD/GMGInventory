@@ -100,10 +100,10 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.LocationCode)
+                        @Html.DisplayNameFor(model => model.BeginningCost)
                     </span>
                     <b class="d-block form-gayahin">
-                        @(string.IsNullOrWhiteSpace(Model?.LocationCode) ? "N/A" : Model.LocationCode)
+                        @(string.IsNullOrWhiteSpace(Model?.BeginningCost) ? "N/A" : Model.BeginningCost)
                     </b>
                 </p>
             </div>
@@ -552,11 +552,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="quantity-current" class="control-label mb-0 d-block">Current Quantity</label>
-                                <input type="number" step="1" min="0" max="1999999" name="Current" id="quantity-current" class="form-control form-control-sm" readonly="readonly" />
+                                <input type="number" step="1" max="1999999" name="Current" id="quantity-current" class="form-control form-control-sm" readonly="readonly" />
                             </div>
                             <div class="form-group">
                                 <label for="quantity-new" class="control-label mb-0 d-block">New Quantity</label>
-                                <input type="number" step="1" min="0" max="1999999" name="New" id="quantity-new" class="form-control form-control-sm" />
+                                <input type="number" step="1" max="1999999" name="New" id="quantity-new" class="form-control form-control-sm" />
                             </div>
                             <div class="form-group">
                                 <label for="quantity-remarks" class="control-label mb-0 d-block">Remarks</label>
@@ -1161,6 +1161,9 @@
                             if (data.status == "Error") {
                                 toastr.error(data.message, "Error");
                             } else {
+                                if($("#quantity-new").val() < 0) {
+                                    toastr.info("New quantity saved was below 0", "Information");
+                                }
                                 toastr.success(data.message, "Success");
                                 $("#quantityModal").modal("hide");
                                 warehouseDT.ajax.reload();

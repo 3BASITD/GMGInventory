@@ -140,6 +140,20 @@
         }*/
 }
 
+#toast-container {
+    z-index: 2147483646 !important;
+}
+
+.reloader {
+    display: none;
+    z-index: 2147483647;
+    position: sticky;
+    bottom: 0;
+    padding: 10px;
+    text-align: center;
+    background-color: orange;
+    color: black;
+}
 
 .main-header .sticked-hide {
     display: none;

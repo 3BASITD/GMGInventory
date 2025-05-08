@@ -95,7 +95,7 @@
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 @if (ViewContext.RouteData.Values["controller"]?.ToString() != "Home"
-                                                                                                   @*&& ViewContext.RouteData.Values["action"]?.ToString() != "Index"*@)
+                                                                                                                                                                      @*&& ViewContext.RouteData.Values["action"]?.ToString() != "Index"*@)
                                 {
                                     <li class="breadcrumb-item">
                                         <a asp-controller="Home" asp-action="Index">Home</a>
@@ -135,6 +135,14 @@
             </div>
             Copyright © 2022 MISNet
         </footer>
+    </div>
+
+    <div class="reloader">
+        There seems to be a problem while loading.
+        <button id="btn-reload" onclick="location.reload()" style="text-decoration: underline; color: blue; background: none; border: none;">
+            Reload the page.
+        </button>
+        If the problem persists, consult IT.
     </div>
 
     <partial name="_ItemDetailsPartial" />

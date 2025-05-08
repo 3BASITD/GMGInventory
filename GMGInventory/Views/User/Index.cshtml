@@ -18,7 +18,7 @@
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover">
+        <table class="table table-head-fixed table-striped table-hover table-user">
             <thead>
                 <tr>
                     <th>
@@ -139,49 +139,54 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        $('.table').DataTable({
+        var userDT = $('.table-user').DataTable({
             columnDefs: [
                 { orderable: false, targets: -1 },
             ],
             order: [[2, "asc"]]
         });
 
-        if (user_access.canDelete) {
-            $('.deleteBtn').click(function (e) {
-                swal({
-                    title: "Delete / Deactivate User",
-                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#deleteUserId').val(id);
-                        $('#deleteUserForm').submit();
-                    }
-                });
-            });
-        }
+        loadButton();
+        userDT.on("draw", loadButton);
 
-        if (user_access.canAdd || user_access.canEdit) {
-            $('.reactivateBtn').click(function (e) {
-                swal({
-                    title: "Reactivate User",
-                    text: "Are you sure you want to reactivate this record?",
-                    icon: "info",
-                    buttons: true,
-                    infoMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#reactivateUserId').val(id);
-                        $('#reactivateUserForm').submit();
-                    }
+        function loadButton() {
+            if (user_access.canDelete) {
+                $('.deleteBtn').off("click").on("click", function (e) {
+                    swal({
+                        title: "Delete / Deactivate User",
+                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#deleteUserId').val(id);
+                            $('#deleteUserForm').submit();
+                        }
+                    });
                 });
-            });
+            }
+
+            if (user_access.canAdd || user_access.canEdit) {
+                $('.reactivateBtn').off("click").on("click", function (e) {
+                    swal({
+                        title: "Reactivate User",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#reactivateUserId').val(id);
+                            $('#reactivateUserForm').submit();
+                        }
+                    });
+                });
+            }
         }
     </script>
 }

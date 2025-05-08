@@ -213,8 +213,7 @@ namespace GMGInventory.Application.Repositories
                             let requests = context.PurchaseRequestLineItems
                                                   .Where(s => s.SalesOrderId == soli.SalesOrderId
                                                            && s.ItemId == soli.ItemId
-                                                           && s.PurchaseRequest.Status.Name.ToLower() == "approved"
-                                                           && s.PurchaseRequest.Purpose.Name.ToLower() != "one-time purchase")
+                                                           && s.PurchaseRequest.Status.Name.ToLower() == "approved")
                                                   .Sum(s => (int?)s.Quantity) ?? 0
                             where request.PurchaseRequestId == purchaseRequestId
                             select new PurchaseRequestLineItemVM
@@ -231,9 +230,9 @@ namespace GMGInventory.Application.Repositories
                                 ItemDescription = request.ItemDescription,
                                 StockOnHandD = ii,
                                 QuantityD = request.Quantity,
-                                MaxQuantityD = request.PurchaseRequest.Purpose.Name.ToLower() == "one-time purchase"
-                                             ? 1999999
-                                             : ((soli == null ? 0 : soli.Quantity) - (ii + requests)), 
+                                MaxQuantityD = request.PurchaseRequest.Purpose.Name.ToLower() == "rush order"
+                                             ? ((soli == null ? 0 : soli.Quantity) - (ii + requests))
+                                             : 1999999, 
                                 UnitId = request.Unit != null ? request.Unit.Id
                                        : request.Item != null ? request.Item.Unit.Id
                                        : 0,

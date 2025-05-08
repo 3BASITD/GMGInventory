@@ -167,7 +167,7 @@
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
                     <b class="d-block">
-                        @Model.Remarks
+                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)
                     </b>
                 </p>
             </div>
@@ -641,7 +641,7 @@
                 });
 
                 $(".add-so-number-container").toggle(columnVisibilityMap[key][0]);
-                if (columnVisibilityMap[key][1]) {
+                if (columnVisibilityMap[key][2]) {
                     $(".add-code-container").toggle(true);
                     $("#add-name").prop("readonly", true);
                     $(".add-unit-container").toggle(true);
@@ -996,6 +996,7 @@
                     toastr.warning($("#add-name").val() + soMatch + " has already been added", "Duplicate");
                 } else {
                     itemDT.row.add({
+                        customer: $("#add-so-customer").val(),
                         itemCode: $("#add-code").select2("data")[0].text,
                         itemDescription: $("#add-name").val(),
                         itemPartNumber: $("#add-part").val(),

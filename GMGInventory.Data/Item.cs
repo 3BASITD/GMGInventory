@@ -16,8 +16,9 @@ namespace GMGInventory.Data
             this.PurchaseOrderLineItems = new HashSet<PurchaseOrderLineItem>();
             this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
             this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
-            this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>(); 
+            this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
             this.TransferItemDetails = new HashSet<TransferItemDetail>();
+            this.ItemLocations = new HashSet<ItemLocation>();
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -54,13 +55,13 @@ namespace GMGInventory.Data
         public int BrandId { get; set; }
         public Brand Brand { get; set; }
 
-        [ForeignKey("LocationCodeId")]
-        public int? LocationCodeId { get; set; }
-        public LocationCode LocationCode { get; set; }
-
         //public int? MinimumQuantity { get; set; }
         //public int? MaximumQuantity { get; set; }
         //public bool IsNonInventory { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal? BeginningCost { get; set; }
+
         public bool IsActive { get; set; }
         //public bool IsDeleted { get; set; }
 
@@ -76,5 +77,6 @@ namespace GMGInventory.Data
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
         //public ICollection<StockCard> StockCards { get; set; }
         public ICollection<TransferItemDetail> TransferItemDetails { get; set; }
+        public ICollection<ItemLocation> ItemLocations { get; set; }
     }
 }

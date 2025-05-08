@@ -41,7 +41,7 @@ namespace GMGInventory.Common.Models
         public string AreaName { get; set; }
 
         [Display(Name = "Commission Rate")]
-        public string CommissionRate => string.Format(SystemFormat.StringDecimalComma, CommissionRateD * 100) + "%";
+        public string CommissionRate => string.Format(SystemFormat.StringDecimalComma, CommissionRateD) + "%";
         public decimal? CommissionRateD { get; set; }
 
         public bool CommissionRateIsArea { get; set; }

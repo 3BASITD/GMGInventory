@@ -1,4 +1,8 @@
 ﻿$(document).ready(function () {
+    $.fn.dataTable.ext.errMode = function (settings, helpPage, message) {
+        console.error('DataTables error:', message);
+    };
+
     toastr.options = {
         "closeButton": true,
         "debug": false,
@@ -86,7 +90,8 @@
         $.LoadingOverlay("show", {
             image: "",
             fontawesome: "fa fa-compact-disc fa-spin",
-            progress: true
+            progress: true,
+            zIndex: 2147483645
         });
     });
 
@@ -181,6 +186,7 @@
     //    });
     //});
 });
+
 $.validator.setDefaults({
     errorClass: 'text-danger text-xs fw-lighter fst-italic m-0',
     highlight: function (element) {
@@ -246,7 +252,8 @@ var startTime;
 function showLoader() {
     $.LoadingOverlay("show", {
         image: "",
-        fontawesome: "fa fa-cog fa-spin"
+        fontawesome: "fa fa-cog fa-spin",
+        zIndex: 2147483645
     });
 
     startTime = new Date();
@@ -270,6 +277,22 @@ function hideLoader() {
     $.LoadingOverlay("hide");
 }
 
+window.onerror = function (message, source, lineno, colno, error) {
+    displayReloader();
+};
+
+window.onunhandledrejection = function (event) {
+    displayReloader();
+};
+
+function displayReloader() {
+    setTimeout(function () {
+        if (startTime) {
+            $(".reloader").slideDown(1000);
+        }
+    }, 1000);
+}
+
 // Use for tabs with datatables content
 var batchLoaderDisplayed = [];
 var batchStartTime;
@@ -278,7 +301,8 @@ function showBatchLoader(mod) {
     if (batchLoaderDisplayed.length === 0) {
         $.LoadingOverlay("show", {
             image: "",
-            fontawesome: "fa fa-cog fa-spin"
+            fontawesome: "fa fa-cog fa-spin",
+            zIndex: 2147483645
         });
 
         batchStartTime = new Date();

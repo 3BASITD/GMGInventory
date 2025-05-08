@@ -272,31 +272,6 @@ namespace GMGInventory.Controllers
                             }
                             else
                             {
-                                int? LocationCodeId = null;
-                                if (!string.IsNullOrWhiteSpace(itemVM.LocationCode))
-                                {
-                                    LocationCodeId = await locationCodeRepository.GetIdAsync(itemVM.LocationCode);
-                                    if (LocationCodeId == null)
-                                    {
-                                        LocationCodeId = await locationCodeRepository.AddAsync(new LocationCodeVM
-                                        {
-                                            Code = itemVM.LocationCode,
-                                            Name = itemVM.LocationCode,
-                                            IsActive = true
-                                        });
-                                    }
-                                    else
-                                    {
-                                        await locationCodeRepository.UpdateAsync(new LocationCodeVM
-                                        {
-                                            Id = LocationCodeId.Value,
-                                            Code = itemVM.LocationCode,
-                                            Name = itemVM.LocationCode,
-                                            IsActive = true
-                                        });
-                                    }
-                                }
-
                                 if (await itemRepository.IsCodeExistAsync(itemVM.Code))
                                 {
                                     int itemId = (int)await itemRepository.GetIdAsync(itemVM.Code);
@@ -309,7 +284,7 @@ namespace GMGInventory.Controllers
                                         InterchangeNumber = itemVM.InterchangeNumber,
                                         ItemTypeId = ItemTypeId.Value,
                                         ModelNumber = itemVM.ModelNumber,
-                                        LocationCodeId = LocationCodeId,
+                                        BeginningCostD = itemVM.BeginningCost,
                                         Name = itemVM.Name,
                                         PartNumber = itemVM.PartNumber,
                                         Size = itemVM.Size,
@@ -333,15 +308,13 @@ namespace GMGInventory.Controllers
                                         InterchangeNumber = itemVM.InterchangeNumber,
                                         ItemTypeId = ItemTypeId.Value,
                                         ModelNumber = itemVM.ModelNumber,
-                                        LocationCodeId = LocationCodeId,
+                                        BeginningCostD = itemVM.BeginningCost,
                                         Name = itemVM.Name,
                                         PartNumber = itemVM.PartNumber,
                                         Size = itemVM.Size,
                                         UnitId = UnitId.Value,
-
                                         QuantityD = itemVM.Quantity,
                                         WarehouseId = warehouseId.Value,
-
                                         NetPriceD = itemVM.NetPrice,
                                         RetailPriceD = itemVM.GrossPrice,
                                     });
@@ -369,13 +342,13 @@ namespace GMGInventory.Controllers
                 new DataColumn("Interchange Number"),
                 new DataColumn("Warehouse"),
                 new DataColumn("Model Number"),
-                new DataColumn("Location Code"),
                 new DataColumn("Category"),
                 new DataColumn("Item Type"),
                 new DataColumn("Brand"),
                 new DataColumn("Size"),
                 new DataColumn("Unit"),
                 new DataColumn("Quantity on Hand"),
+                new DataColumn("Beginning Cost"),
                 new DataColumn("Gross Price"),
                 new DataColumn("Net Price")
             ]);
@@ -390,13 +363,13 @@ namespace GMGInventory.Controllers
                             item.InterchangeNumber,
                             item.Warehouse,
                             item.ModelNumber,
-                            item.LocationCode,
                             item.Category,
                             item.ItemType,
                             item.Brand,
                             item.Size,
                             item.Unit,
                             item.QuantityD,
+                            item.BeginningCostD,
                             item.RetailPriceD,
                             item.NetPriceD);
             }

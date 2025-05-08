@@ -140,10 +140,11 @@ namespace GMGInventory.Controllers
 
             if (await userRepository.IsUserIdExistAsync(id) != true) return NotFound();
 
-            if (await userRepository.IsUserInUseAsync(id))
+            var tablesUsingUser = await userRepository.IsUserInUseAsync(id);
+            if (tablesUsingUser.Count() > 0)
             {
                 await userRepository.DeactivateUserAsync(id);
-                TempData["WarningMessage"] = "User has been deactivated";
+                TempData["WarningMessage"] = "Users is in use by other records. User has been deactivated instead. <br />Records: " + string.Join(", ", tablesUsingUser);
             }
             else
             {

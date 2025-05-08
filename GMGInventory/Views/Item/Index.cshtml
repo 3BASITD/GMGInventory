@@ -167,9 +167,8 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="create-location-code" class="control-label mb-0 d-block">Location Code</label>
-                                        <select name="LocationCode" id="create-location-code" class="form-control" style="width: 100%">
-                                        </select>
+                                        <label for="create-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><i class="fas fa-info-circle"></i></small></label>
+                                        <input type="number" step="0.01" min="0" max="1999999.99" name="BeginningCost" id="create-beginning-cost" class="form-control form-control-sm" />
                                     </div>
                                 </div>
                             </div>
@@ -285,9 +284,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="edit-location-code" class="control-label mb-0 d-block">Location Code</label>
-                                    <select name="LocationCode" id="edit-location-code" class="form-control" style="width: 100%">
-                                    </select>
+                                    <label for="edit-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><i class="fas fa-info-circle"></i></small></label>
+                                    <input type="number" step="0.01" min="0" max="1999999.99" name="BeginningCost" id="edit-beginning-cost" class="form-control form-control-sm empty-if-zero" />
                                 </div>
                             </div>
                         </div>
@@ -456,37 +454,6 @@
                         }
                     }
                 });
-
-                // Load Select2 Location Code
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "LocationCode")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                        $("#create-location-code").select2({
-                            data: data,
-                            allowClear: true,
-                            placeholder: {
-                                id: "",
-                                text: "<N/A>"
-                            },
-                            dropdownParent: $("#createModal")
-                            });
-                        }
-
-                        if (user_access.canEdit) {
-                            $("#edit-location-code").select2({
-                                data: data,
-                                allowClear: true,
-                                placeholder: {
-                                    id: "",
-                                    text: "<N/A>"
-                                },
-                                dropdownParent: $("#editModal")
-                            });
-                        }
-                    }
-                });
             }
         }
 
@@ -614,7 +581,7 @@
                     $("#edit-category").val(data.categoryId).trigger("change");
                     $("#edit-item-type").val(data.itemTypeId).trigger("change");
                     $("#edit-brand").val(data.brandId).trigger("change");
-                    $("#edit-location-code").val(data.locationCodeId).trigger("change");
+                    $("#edit-beginning-cost").val(data.beginningCostD);
                 });
 
                 // Validation for Edit Modal
@@ -657,7 +624,7 @@
                             CategoryId: $("#edit-category").val(),
                             ItemTypeId: $("#edit-item-type").val(),
                             BrandId: $("#edit-brand").val(),
-                            LocationCodeId: $("#edit-location-code").val()
+                            BeginningCostD: $("#edit-beginning-cost").val()
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Error") {
@@ -685,7 +652,7 @@
                 $("#create-category").prop("selectedIndex", 0).trigger("change");
                 $("#create-item-type").prop("selectedIndex", 0).trigger("change");
                 $("#create-brand").prop("selectedIndex", 0).trigger("change");
-                $("#create-location-code").prop("selectedIndex", "").trigger("change");
+                $("#create-beginning-cost").val("");
                 $("#create-retail-price").val("");
                 $("#create-net-price").val("");
             });
@@ -736,11 +703,11 @@
                         CategoryId: $("#create-category").val(),
                         ItemTypeId: $("#create-item-type").val(),
                         BrandId: $("#create-brand").val(),
-                        LocationCodeId: $("#create-location-code").val()
+                        BeginningCostD: $("#create-beginning-cost").val()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
-                            toastr.success(data.message, "Error");
+                            toastr.error(data.message, "Error");
                         } else {
                             toastr.success(data.message, "Success");
                             $("#createModal").modal("hide");
@@ -796,7 +763,8 @@
                 $("#upload-table").hide();
             });
 
-                    function DoUpload() {if (!$("#upload-file").val()) {
+    function DoUpload() {
+        if (!$("#upload-file").val()) {
             toastr.warning("Please select a file first", "Warning");
         } else if (json_of_excel.length == 0) {
             toastr.warning("The excel file is empty", "Warning");
@@ -813,8 +781,8 @@
 
             var requiredColumns = [
                 "Code", "Name", "Part Number", "Interchange Number", "Warehouse",
-                "Model Number", "Location Code", "Category", "Item Type", "Brand",
-                "Size", "Unit", "Quantity on Hand", "Gross Price", "Net Price"
+                "Model Number", "Category", "Item Type", "Brand",
+                "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price"
             ];
 
             var uploadInterval = setInterval(function () {
@@ -845,13 +813,13 @@
                             json_of_excel[index]["Interchange Number"],
                             json_of_excel[index]["Warehouse"],
                             json_of_excel[index]["Model Number"],
-                            json_of_excel[index]["Location Code"],
                             json_of_excel[index]["Category"],
                             json_of_excel[index]["Item Type"],
                             json_of_excel[index]["Brand"],
                             json_of_excel[index]["Size"],
                             json_of_excel[index]["Unit"],
                             json_of_excel[index]["Quantity on Hand"],
+                            json_of_excel[index]["Beginning Cost"],
                             json_of_excel[index]["Gross Price"],
                             json_of_excel[index]["Net Price"],
                             rowNum
@@ -870,7 +838,7 @@
 
             }
 
-            function SaveXLSX(code, name, part, interchange, warehouse, model, locationcode, category, itemtype, brand, size, unit, quantity, grossprice, netprice, rownum) {
+            function SaveXLSX(code, name, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, beginningcost, grossprice, netprice, rownum) {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("UploadJson")",
@@ -881,13 +849,13 @@
                         InterchangeNumber: interchange,
                         Warehouse: warehouse,
                         ModelNumber: model,
-                        LocationCode: locationcode,
                         Category: category,
                         ItemType: itemtype,
                         Brand: brand,
                         Unit: unit,
                         Size: size,
                         Quantity: quantity,
+                        BeginningCost: beginningcost,
                         GrossPrice: grossprice,
                         NetPrice: netprice
                     },

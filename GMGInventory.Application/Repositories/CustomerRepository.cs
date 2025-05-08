@@ -199,6 +199,8 @@ namespace GMGInventory.Application.Repositories
                                                   .FirstOrDefault() ?? "N/A",
                                 CreditTerm = customer.CreditTerm.Name,
                                 Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
+                                AgentCode = customer.Agent.Code,
+                                AgentId = customer.Agent.Id,
                                 OutstandingBalanceD = invoiceAmount
                                                     - (paymentAmount + checkAmount)
                                                     - salesReturnAmount
