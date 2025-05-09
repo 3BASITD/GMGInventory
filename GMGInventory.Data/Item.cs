@@ -27,13 +27,13 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(200)")]
         public string Name { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(200)")]
         public string? PartNumber { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(200)")]
         public string? InterchangeNumber { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(200)")]
         public string? ModelNumber { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
