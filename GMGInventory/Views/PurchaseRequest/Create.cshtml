@@ -802,10 +802,10 @@
         function clearItemForm() {
             if(itemDT.rows().data().length > 0) {
                 $("#add-so-number").val(itemDT.rows().data()[0].salesOrderId).trigger("change");
-                $("#add-so-number").prop("disabled", true);
+                //$("#add-so-number").prop("disabled", true);
             } else {
                 $("#add-so-number").val("").trigger("change");
-                $("#add-so-number").prop("disabled", false);
+                //$("#add-so-number").prop("disabled", false);
             }
             $("#add-so-customer").val("");
             $("#add-code").val("").trigger("change");

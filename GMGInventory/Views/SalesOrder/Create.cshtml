@@ -345,7 +345,7 @@
             }
 
             if ($("#order-agent-code").val() == null) {
-                var agentId = $(this).select2("data")[0].id;
+                var agentId = $(this).select2("data")[0].agentId;
                 var agentCode = $(this).select2("data")[0].agentCode;
                 var agentName = $(this).select2("data")[0].agent;
                 var agentOption = new Option(agentCode, agentId, true, true);

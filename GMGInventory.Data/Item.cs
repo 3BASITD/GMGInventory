@@ -24,7 +24,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
 
-        [Column(TypeName = "nvarchar(100)")]
+        [Column(TypeName = "nvarchar(200)")]
         public string Name { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]

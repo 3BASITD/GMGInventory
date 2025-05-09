@@ -136,7 +136,7 @@ namespace GMGInventory.Application.Repositories
                          where order.Invoices.Any(s => s.Status.Code.ToLower() == "invoiced")
                          && (string.IsNullOrWhiteSpace(search)
                          || order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())
-                         || order.Invoices.Any(s=>s.InvoiceNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         || order.Invoices.Any(s => s.InvoiceNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
                          {
@@ -332,7 +332,7 @@ namespace GMGInventory.Application.Repositories
             var users = userManager.Users;
 
             var orderIncompletePack = from soli in context.SalesOrderLineItems
-                                      join pli in context.PackLineItems on new { soli.SalesOrderId, soli.ItemId} equals new { pli.Pack.SalesOrderId, pli.ItemId } into p
+                                      join pli in context.PackLineItems on new { soli.SalesOrderId, soli.ItemId } equals new { pli.Pack.SalesOrderId, pli.ItemId } into p
                                       from pli in p.DefaultIfEmpty()
                                       where soli.Quantity > (pli == null ? 0 : pli.Quantity)
                                       select soli.SalesOrderId;
@@ -499,7 +499,7 @@ namespace GMGInventory.Application.Repositories
                                     ServedQuantityD = packedQuantity - returnedQuantity,
                                     Unit = order.Item.Unit.Code,
                                     //UnservedQuantityD = order.Quantity - (packedQuantity - returnedQuantity)
-                                    UnservedQuantityD = order.Quantity - inventory > 0 ? order.Quantity - inventory : 0
+                                    //UnservedQuantityD = order.Quantity - inventory > 0 ? order.Quantity - inventory : 0
                                 }).ToListAsync();
 
             int newLineNumber = 1;
@@ -603,104 +603,123 @@ namespace GMGInventory.Application.Repositories
             ResponseModel<int> response = new();
 
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
 
-            int statusId = context.Statuses
-                                  .Where(s => (form.Status.ToLower().Contains("submit") && s.Name.ToLower() == "sales order submitted")
-                                           || (form.Status.ToLower().Contains("draft") && s.Name.ToLower() == "sales order draft"))
-                                  .Select(s => s.Id)
-                                  .First();
-            if (orderVM == null)
+            var agent = await context.Agents.Where(s => s.Id == form.Agent).FirstOrDefaultAsync();
+            if (agent == null)
             {
-
-                var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
-                string soNumber = "";
-                if (previous == null)
-                {
-                    var latestOrder = context.SalesOrders
-                                             .Where(s => s.SalesOrderNumber.StartsWith("SO"))
-                                             .OrderByDescending(s => s.SalesOrderNumber)
-                                             .Select(s => s.SalesOrderNumber)
-                                             .FirstOrDefault();
-                    var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
-                    soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
-                }
-                else
-                {
-                    soNumber = previous.SalesOrderNumber;
-                }
-
-                orderVM = new SalesOrder
-                {
-                    AgentId = form.Agent,
-                    CustomerId = form.Customer,
-                    RequiredDeliveryDate = form.DeliveryDate,
-                    PurchaseOrder = form.PurchaseOrder,
-                    Remarks = form.Remarks,
-                    SalesOrderDate = form.OrderDate,
-                    SalesOrderNumber = soNumber,
-                    StatusId = statusId
-                };
-                await context.SalesOrders.AddAsync(orderVM);
-                await context.SaveChangesAsync(currentUserId);
-
-                if (previous != null)
-                {
-                    var soLineItems = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
-                    if (soLineItems != null)
-                    {
-                        context.SalesOrderLineItems.RemoveRange(soLineItems);
-                        await context.SaveChangesAsync(currentUserId);
-                    }
-
-
-                    var soDelivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
-                    if (soDelivery != null)
-                    {
-                        context.SalesOrderDeliveryMonitorings.RemoveRange(soDelivery);
-                        await context.SaveChangesAsync(currentUserId);
-                    }
-
-                    context.SalesOrders.Remove(previous);
-                    await context.SaveChangesAsync(currentUserId);
-                }
-
-                SalesOrderDeliveryMonitoring salesOrderDelivery = new()
-                {
-                    ForwarderId = form.Forwarder,
-                    SalesOrderId = orderVM.Id
-                };
-
-                await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
-                await context.SaveChangesAsync(currentUserId);
+                response.Status = "Error";
+                response.Message = "Agent is invalid";
             }
             else
             {
-                orderVM.AgentId = form.Agent;
-                orderVM.CustomerId = form.Customer;
-                orderVM.RequiredDeliveryDate = form.DeliveryDate;
-                orderVM.Remarks = form.Remarks;
-                orderVM.SalesOrderDate = form.OrderDate;
-                orderVM.StatusId = statusId;
-
-                context.SalesOrders.Update(orderVM);
-                await context.SaveChangesAsync(currentUserId);
-
-                var salesOrderDelivery = await context.SalesOrderDeliveryMonitorings
-                                                      .Where(s => s.SalesOrderId == orderVM.Id)
-                                                      .FirstOrDefaultAsync();
-                if (salesOrderDelivery != null)
+                var customer = await context.Customers.Where(s => s.Id == form.Customer).FirstOrDefaultAsync();
+                if (customer == null)
                 {
-                    salesOrderDelivery.ForwarderId = form.Forwarder;
+                    response.Status = "Error";
+                    response.Message = "Customer is invalid";
+                }
+                else
+                {
+
+                    var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+
+                    int statusId = context.Statuses
+                                          .Where(s => (form.Status.ToLower().Contains("submit") && s.Name.ToLower() == "sales order submitted")
+                                                   || (form.Status.ToLower().Contains("draft") && s.Name.ToLower() == "sales order draft"))
+                                          .Select(s => s.Id)
+                                          .First();
+                    if (orderVM == null)
+                    {
+
+                        var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
+                        string soNumber = "";
+                        if (previous == null)
+                        {
+                            var latestOrder = context.SalesOrders
+                                                     .Where(s => s.SalesOrderNumber.StartsWith("SO"))
+                                                     .OrderByDescending(s => s.SalesOrderNumber)
+                                                     .Select(s => s.SalesOrderNumber)
+                                                     .FirstOrDefault();
+                            var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
+                            soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
+                        }
+                        else
+                        {
+                            soNumber = previous.SalesOrderNumber;
+                        }
+
+                        orderVM = new SalesOrder
+                        {
+                            AgentId = agent.Id,
+                            CustomerId = customer.Id,
+                            RequiredDeliveryDate = form.DeliveryDate,
+                            PurchaseOrder = form.PurchaseOrder,
+                            Remarks = form.Remarks,
+                            SalesOrderDate = form.OrderDate,
+                            SalesOrderNumber = soNumber,
+                            StatusId = statusId
+                        };
+                        await context.SalesOrders.AddAsync(orderVM);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        if (previous != null)
+                        {
+                            var soLineItems = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
+                            if (soLineItems != null)
+                            {
+                                context.SalesOrderLineItems.RemoveRange(soLineItems);
+                                await context.SaveChangesAsync(currentUserId);
+                            }
+
+
+                            var soDelivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
+                            if (soDelivery != null)
+                            {
+                                context.SalesOrderDeliveryMonitorings.RemoveRange(soDelivery);
+                                await context.SaveChangesAsync(currentUserId);
+                            }
+
+                            context.SalesOrders.Remove(previous);
+                            await context.SaveChangesAsync(currentUserId);
+                        }
+
+                        SalesOrderDeliveryMonitoring salesOrderDelivery = new()
+                        {
+                            ForwarderId = form.Forwarder,
+                            SalesOrderId = orderVM.Id
+                        };
+
+                        await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+                    else
+                    {
+                        orderVM.AgentId = agent.Id;
+                        orderVM.CustomerId = customer.Id;
+                        orderVM.RequiredDeliveryDate = form.DeliveryDate;
+                        orderVM.Remarks = form.Remarks;
+                        orderVM.SalesOrderDate = form.OrderDate;
+                        orderVM.StatusId = statusId;
+
+                        context.SalesOrders.Update(orderVM);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        var salesOrderDelivery = await context.SalesOrderDeliveryMonitorings
+                                                              .Where(s => s.SalesOrderId == orderVM.Id)
+                                                              .FirstOrDefaultAsync();
+                        if (salesOrderDelivery != null)
+                        {
+                            salesOrderDelivery.ForwarderId = form.Forwarder;
+                        }
+                    }
+
+                    await SaveItemsAsync(form.Items, orderVM.Id);
+
+                    response.Status = "Success";
+                    response.Message = form.Status.ToLower() == "draft" ? "Sales order saved as draft." : "Sales order successfully submitted.";
+                    response.NewRow = orderVM.Id;
                 }
             }
-
-            await SaveItemsAsync(form.Items, orderVM.Id);
-
-            response.Status = "Success";
-            response.Message = form.Status.ToLower() == "draft" ? "Sales order saved as draft." : "Sales order successfully submitted.";
-            response.NewRow = orderVM.Id;
-
             return response;
         }
 

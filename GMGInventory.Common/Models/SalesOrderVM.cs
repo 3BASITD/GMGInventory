@@ -244,7 +244,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Unserved Quantity")]
         public string UnservedQuantity => string.Format(SystemFormat.StringIntegerComma, UnservedQuantityD);
-        public int UnservedQuantityD { get; set; }
+        public int UnservedQuantityD => QuantityD - ServedQuantityD;
 
         [Display(Name = "Packed Quantity")]
         public string PackedQuantity => string.Format(SystemFormat.StringIntegerComma, PackedQuantityD);

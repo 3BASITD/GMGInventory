@@ -565,7 +565,7 @@ namespace GMGInventory.Controllers
         #region Sales Invoice
         public async Task<IActionResult> SalesInvoice()
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoiceListingReport, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             return View();
@@ -573,7 +573,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> PrintSalesInvoice(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Print);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoiceListingReport, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
             return View(await reportSalesRepository.PrintSalesInvoice(filter));
@@ -582,7 +582,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> GetSalesInvoiceDT(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoiceListingReport, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
@@ -591,7 +591,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadSalesInvoice(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.UploadDownload);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoiceListingReport, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new DataTable("Sales Invoice Listing");
