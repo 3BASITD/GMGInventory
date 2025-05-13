@@ -142,6 +142,7 @@ namespace GMGInventory.Application.Repositories
                          {
                              Id = order.Id.ToString(),
                              Text = order.SalesOrderNumber,
+                             CustomerId = order.Customer.Id,
                              CustomerCode = order.Customer.Code,
                              CustomerName = order.Customer.Name,
                              CustomerAddress = order.Customer

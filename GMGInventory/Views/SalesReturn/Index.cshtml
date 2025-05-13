@@ -25,6 +25,9 @@
                         @Html.DisplayNameFor(model => model.SRNumber)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.SONumber)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.CustomerCode)
                     </th>
                     <th>
@@ -63,10 +66,27 @@
             },
             columns: [
                 { data: "srNumber", name: "SRNumber" },
-                { data: "customerCode", name: "CustomerCode" },
-                { data: "customerName", name: "CustomerName" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return !data.soNumber ? '<span class="text-muted">N/A</span>' : data.soNumber;
+                    },
+                    name: "SONumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return !data.customerCode ? '<span class="text-muted">N/A</span>' : data.customerCode;
+                    },
+                    name: "CustomerCode" },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return !data.customerName ? '<span class="text-muted">N/A</span>' : data.customerName;
+                    },
+                    name: "CustomerName" },
                 { data: "returnDate", name: "ReturnDate" },
-                { data: "remarks", name: "Remarks" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return !data.remarks ? '<span class="text-muted">N/A</span>' : data.remarks;
+                    },
+                    name: "Remarks" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -76,7 +96,7 @@
                     }
                 }
             ],
-            order: [[3, "desc"]]
+            order: [[4, "desc"]]
         });
 
         // Load functions upon DataTable load

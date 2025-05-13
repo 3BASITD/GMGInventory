@@ -13,8 +13,12 @@ namespace GMGInventory.Data
         public string SalesReturnNumber { get; set; }
 
         [ForeignKey("SalesOrderId")]
-        public int SalesOrderId { get; set; }
-        public SalesOrder SalesOrder { get; set; }
+        public int? SalesOrderId { get; set; }
+        public SalesOrder? SalesOrder { get; set; }
+
+        [ForeignKey("CustomerId")]
+        public int? CustomerId { get; set; }
+        public Customer? Customer { get; set; }
         public DateTime ReturnDate { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]

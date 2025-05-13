@@ -4554,6 +4554,9 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -4567,7 +4570,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime>("ReturnDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SalesOrderId")
+                    b.Property<int?>("SalesOrderId")
                         .HasColumnType("int");
 
                     b.Property<string>("SalesReturnNumber")
@@ -4582,6 +4585,8 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("SalesOrderId");
 
@@ -5730,13 +5735,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "960ba283-ba3c-4243-b672-c453edbd6a59",
+                            ConcurrencyStamp = "2bcb71f7-9316-4370-9b5d-02fb5f3e0c70",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBfLTxd5k1sQiNbwAsfhsQMFjVyqs9Q7fpTbHi3MSWxjRP+8kd+29xT9++5IAitZFg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIxvUH98eRoBcEn7YQio87GFnDm+vUXzRWVfTagq/APrVJji9wRM3WfiqmpkAqqrjg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0daedfe5-1fa0-4b81-9a78-77a51e188bdf",
+                            SecurityStamp = "d7c16163-f0a6-46f3-8f10-8923d5b8412c",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5751,13 +5756,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ef86fb88-91c7-471a-8bf4-609c4cf221e3",
+                            ConcurrencyStamp = "830e665b-222a-4064-ab82-5cb6505a8872",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIo7Pr3RdJLjXYj3MALL7bqtQ0/Me7MFliStX4XzlNPc6Gth66VMyk7AiJUIv3BgcA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEZbuKc/BZhBrPqvY4cYaexrO8vRiRRu2lVJ8aCzXQCUygblOEFnBvS4d5KEhvHQ4g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "be0a1035-3b9c-4999-82fe-2b2a038e87b0",
+                            SecurityStamp = "2d3066ee-2d65-4273-9dfe-d8fd4a880360",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6709,11 +6714,15 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
                 {
+                    b.HasOne("GMGInventory.Data.Customer", "Customer")
+                        .WithMany("SalesReturns")
+                        .HasForeignKey("CustomerId");
+
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
                         .WithMany("SalesReturns")
-                        .HasForeignKey("SalesOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SalesOrderId");
+
+                    b.Navigation("Customer");
 
                     b.Navigation("SalesOrder");
                 });
@@ -7010,6 +7019,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SOACRs");
 
                     b.Navigation("SalesOrders");
+
+                    b.Navigation("SalesReturns");
 
                     b.Navigation("ShippingAddresses");
                 });

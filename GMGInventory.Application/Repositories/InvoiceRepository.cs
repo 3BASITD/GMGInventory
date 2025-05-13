@@ -105,20 +105,23 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonOptionsModel>> GetInvoiceBySalesOrder(string search, int page, int salesOrderId)
+        public async Task<Select2Model<JsonNameOptionsModel>> GetInvoiceBySalesOrder(string search, int page, int? salesOrderId)
         {
             var invoices = from invoice in context.Invoices
-                           where invoice.SalesOrder.Id == salesOrderId
+                           where (salesOrderId == null
+                              || invoice.SalesOrder.Id == salesOrderId)
                               && (string.IsNullOrWhiteSpace(search)
+                              || invoice.InvoiceNumber.ToLower().Contains(search.ToLower())
                               || invoice.ControlNumber.ToLower().Contains(search.ToLower()))
                            orderby invoice.ControlNumber ascending
-                           select new JsonOptionsModel
+                           select new JsonNameOptionsModel
                            {
                                Id = invoice.Id.ToString(),
-                               Text = invoice.ControlNumber
+                               Text = invoice.InvoiceNumber,
+                               Name = invoice.ControlNumber
                            };
             var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
-            return new Select2Model<JsonOptionsModel>
+            return new Select2Model<JsonNameOptionsModel>
             {
                 //incomplete_results = false,
                 items = invoicesFiltered,
@@ -293,7 +296,7 @@ namespace GMGInventory.Application.Repositories
                                                join orderli in context.SalesOrderLineItems on order.Id equals orderli.SalesOrderId
                                                where invli.ItemId == orderli.ItemId
                                                select (invli.Quantity * invli.UnitPrice * (100 - orderli.Discount1) / 100) * (100 - orderli.Discount2) / 100).Sum(),
-                               
+
                            };
 
             return await invoices.ToListAsync();

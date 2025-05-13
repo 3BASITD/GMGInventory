@@ -48,7 +48,9 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="return-customer-code" class="form-label mb-0">Customer Code</label>
-                        <input type="text" id="return-customer-code" class="form-control form-control-sm" readonly="readonly" />
+                        <select id="return-customer-code" name="Customer" style="width: 100%;">
+                            <option></option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -255,6 +257,44 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
+        $("#return-customer-code").select2({
+            minimumInputLength: 1,
+            placeholder: '<empty>',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Customer")",
+                dataType: 'json',
+                type: "POST",
+                delay: 500,
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $("#return-customer-code").on("select2:select", function () {
+            $("#return-customer-name").val($(this).select2("data")[0].name);
+            $("#return-customer-address").val($(this).select2("data")[0].address);
+        });
+
         $.ajax({
             type: "POST",
             url: "@Url.Action("GetNextFormattedNumberJson")",
@@ -266,6 +306,7 @@
         $("#return-sales-order").select2({
             minimumInputLength: -1,
             placeholder: '<empty>',
+            allowClear: true,
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -275,7 +316,7 @@
             ajax: {
                 url: "@Url.Action("GetSalesOrderInvoicedOptions", "SalesOrder")",
                 dataType: 'json',
-                type: "POST", 
+                type: "POST",
                 delay: 500,
                 data: function (params) {
                     return {
@@ -297,10 +338,24 @@
         });
 
         $("#return-sales-order").on("select2:select", function () {
-            $("#return-customer-code").val($(this).select2("data")[0].customerCode);
+            $("#return-customer-code").prop("disabled", true);
+            var selectedOption = new Option($(this).select2("data")[0].customerCode, $(this).select2("data")[0].customerId, true, true);
+            $("#return-customer-code").append(selectedOption).trigger("change");
             $("#return-customer-name").val($(this).select2("data")[0].customerName);
             $("#return-customer-address").val($(this).select2("data")[0].customerAddress);
 
+            LoadInvoiceOption();
+        });
+
+        $("#return-sales-order").on("select2:unselecting", function () {
+            $("#return-customer-code").prop("disabled", false);
+            $("#return-customer-code").val("").trigger("change");
+            $("#return-customer-name").val("");
+            $("#return-customer-address").val("");
+        });
+
+        LoadInvoiceOption();
+        function LoadInvoiceOption() {
             if ($.fn.select2 && $("#invoice-invoice").hasClass("select2-hidden-accessible")) {
                 $("#invoice-invoice").select2("destroy");
                 $("#invoice-invoice").empty();
@@ -309,6 +364,12 @@
             $("#invoice-invoice").select2({
                 minimumInputLength: -1,
                 placeholder: '<empty>',
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong><br /><small>BIR Invoice Number: " + repo.name + "</small>");
+                },
                 ajax: {
                     url: "@Url.Action("GetInvoiceBySalesOrder", "SalesInvoice")",
                     dataType: 'json',
@@ -343,7 +404,7 @@
             $("#invoice-invoice").on("select2:select", function () {
                 invoiceDT.ajax.reload();
             });
-        });
+        }
 
         function LoadReasonOnItems() {
                 $(".isdefective").each(function () {
@@ -363,23 +424,23 @@
         }
 
         $(".btn-invoice").on("click", function () {
-            if ($("#return-sales-order").val() == "") {
-                toastr.warning("Please select sales order first", "Warning");
-            } else {
+            // if ($("#return-sales-order").val() == "") {
+            //     toastr.warning("Please select sales order first", "Warning");
+            // } else {
                 $("#invoice-invoice").html("");
                 invoiceDT.ajax.reload();
                 $("#invoiceModal").modal("show");
-            }
+            //}
         });
 
         $(".btn-tbr").on("click", function () {
-            if ($("#return-sales-order").val() == "") {
-                toastr.warning("Please select sales order first", "Warning");
-            } else {
+            // if ($("#return-sales-order").val() == "") {
+            //     toastr.warning("Please select sales order first", "Warning");
+            // } else {
                 $("#item-code").val("").trigger("change");
                 ResetTBR();
                 $("#tbrModal").modal("show");
-            }
+            // }
         });
 
         // Load item for select2
@@ -489,7 +550,7 @@
 
             returnDT.row.add(item).draw();
             LoadReasonOnItems();
-            $("#item-code").val("").trigger("change"); 
+            $("#item-code").val("").trigger("change");
             ResetTBR();
         }
 
@@ -659,13 +720,13 @@
         var validateCreate = $("#form-return").validate({
             rules: {
                 ReturnNumber: { required: true, maxlength: 50 },
-                SalesOrder: { required: true },
+                Customer: { required: true },
                 Remarks: { maxlength: 250 },
                 ReturnDate: { required: true }
             },
             messages: {
                 ReturnNumber: { required: "Please enter Sales Return Number", maxlength: "Sales Return Number must not exceed 50 characters" },
-                SalesOrder: { required: "Please select Sales Order" },
+                Customer: { required: "Please select Customer" },
                 Remarks: { maxlength: "Sales Return must not exceed 250 characters" },
                 ReturnDate: { required: "Please select the Return Date" }
             },
@@ -688,6 +749,7 @@
                     data: {
                         ReturnNumber: $("#return-number").val(),
                         SalesOrder: $("#return-sales-order").val(),
+                        Customer: $("#return-customer-code").val(),
                         Remarks: $("#return-remarks").val(),
                         ReturnDate: $("#return-date").val(),
                         Items: itemsToReturn

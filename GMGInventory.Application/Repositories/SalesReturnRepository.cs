@@ -33,19 +33,23 @@ namespace GMGInventory.Application.Repositories
                            where ret.Id == Id
                            select new SalesReturnVM
                            {
-                               CustomerId = ret.SalesOrder.CustomerId,
-                               CustomerCode = ret.SalesOrder.Customer.Code,
-                               CustomerName = ret.SalesOrder.Customer.Name,
-                               CustomerAddress = ret.SalesOrder
-                                                    .Customer
-                                                    .ShippingAddresses
-                                                    .Where(s=>s.IsDefault == true)
-                                                    .Select(s=>s.Address)
-                                                    .FirstOrDefault(),
+                               CustomerId = ret.SalesOrder != null ? ret.SalesOrder.Customer.Id : ret.Customer != null ? ret.Customer.Id : null,
+                               CustomerCode = ret.SalesOrder != null ? ret.SalesOrder.Customer.Code : ret.Customer != null ? ret.Customer.Code : null,
+                               CustomerName = ret.SalesOrder != null ? ret.SalesOrder.Customer.Name : ret.Customer != null ? ret.Customer.Name : null,
+                               CustomerAddress = ret.SalesOrder != null ? ret.SalesOrder
+                                                                             .Customer
+                                                                             .ShippingAddresses
+                                                                             .Where(s => s.IsDefault == true)
+                                                                             .Select(s => s.Address)
+                                                                             .FirstOrDefault() : ret.Customer != null ? ret.Customer
+                                                                                                                           .ShippingAddresses
+                                                                                                                           .Where(s => s.IsDefault == true)
+                                                                                                                           .Select(s => s.Address)
+                                                                                                                           .FirstOrDefault() : null,
                                Id = ret.Id,
                                Remarks = ret.Remarks,
-                               SOId = ret.SalesOrder.Id,
-                               SONumber = ret.SalesOrder.SalesOrderNumber,
+                               SOId = ret.SalesOrder == null ? null : ret.SalesOrder.Id,
+                               SONumber = ret.SalesOrder == null ? null : ret.SalesOrder.SalesOrderNumber,
                                SRNumber = ret.SalesReturnNumber,
                                ReturnDateD = ret.ReturnDate,
                                UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
@@ -62,12 +66,13 @@ namespace GMGInventory.Application.Repositories
                           join user in userManager.Users on ret.UserCreated equals user.Id
                           select new SalesReturnVM
                           {
-                              CustomerId = ret.SalesOrder.CustomerId,
-                              CustomerCode = ret.SalesOrder.Customer.Code,
-                              CustomerName = ret.SalesOrder.Customer.Name,
+                              CustomerId = ret.SalesOrder != null ? ret.SalesOrder.Customer.Id : ret.Customer != null ? ret.Customer.Id : null,
+                              CustomerCode = ret.SalesOrder != null ? ret.SalesOrder.Customer.Code : ret.Customer != null ? ret.Customer.Code : null,
+                              CustomerName = ret.SalesOrder != null ? ret.SalesOrder.Customer.Name : ret.Customer != null ? ret.Customer.Name : null,
                               Id = ret.Id,
                               Remarks = string.IsNullOrWhiteSpace(ret.Remarks) ? null : ret.Remarks,
                               ReturnDateD = ret.ReturnDate,
+                              SONumber = ret.SalesOrder == null ? null : ret.SalesOrder.SalesOrderNumber,
                               SRNumber = ret.SalesReturnNumber
                           };
 
@@ -168,7 +173,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel<int>> SaveAsync(SalesReturnFormVM form)
         {
-            ResponseModel<int> response= new ();
+            ResponseModel<int> response = new();
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
             if (await context.SalesReturns.Where(s => s.Id != form.Id && s.SalesReturnNumber == form.ReturnNumber).AnyAsync())
@@ -186,6 +191,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         SalesReturnNumber = form.ReturnNumber,
                         SalesOrderId = form.SalesOrder,
+                        CustomerId = form.SalesOrder == null ? form.Customer : null,
                         Remarks = form.Remarks + "",
                         ReturnDate = form.ReturnDate
                     };
@@ -219,6 +225,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     salesReturn.SalesReturnNumber = form.ReturnNumber;
                     salesReturn.SalesOrderId = form.SalesOrder;
+                    salesReturn.CustomerId = form.SalesOrder == null ? form.Customer : null;
                     salesReturn.ReturnDate = form.ReturnDate;
                     salesReturn.Remarks = form.Remarks + "";
 
