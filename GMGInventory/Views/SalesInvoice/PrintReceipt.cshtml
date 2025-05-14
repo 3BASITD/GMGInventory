@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="~/css/printreceipt.css" asp-append-version="true" />
 </head>
 <body>
-    @if (Model?.InvoiceType == "Sales Invoice")
+    @if (Model.InvoiceType == "Sales Invoice")
     {
         <!-- SALES INVOICE -->
         var topMargin = 125;
@@ -32,14 +32,14 @@
             <tbody>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
-                    <td>@Model?.CustomerName</td>
-                    <td style="width: 130px;">@Model?.InvoiceDateD.ToString("MMMM dd")</td>
-                    <td style="width: 50px;">@Model?.InvoiceDateD.ToString("yy")</td>
+                    <td>@Model.CustomerName</td>
+                    <td style="width: 130px;">@Model.InvoiceDateD.ToString("MMMM dd")</td>
+                    <td style="width: 50px;">@Model.InvoiceDateD.ToString("yy")</td>
                 </tr>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
-                    <td>@(Model?.TIN == "0" ? "" : Model?.TIN)</td>
-                    <td style="width: 180px;" colspan="2">@Model?.PaymentTerms</td>
+                    <td>@(Model.TIN == "0" || string.IsNullOrWhiteSpace(Model.TIN) ? "N/A" : Model.TIN)</td>
+                    <td style="width: 180px;" colspan="2">@Model.PaymentTerms</td>
                 </tr>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
@@ -48,8 +48,8 @@
                 </tr>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
-                    <td>@Model?.CustomerAddress</td>
-                    <td style="width: 180px;" colspan="2">@Model?.Agent</td>
+                    <td>@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
+                    <td style="width: 180px;" colspan="2">@Model.Agent</td>
                 </tr>
             </tbody>
         </table>
@@ -171,24 +171,25 @@
     else
     {
         <!-- DELIVERY RECEIPT -->
-        @*<table style="margin-top: 115px;">*@
-        <table style="margin-top: 140px;">
+        <span style="font-size: 25px;">@Model.SONumber</span>
+        <table style="margin-top: 115px;">
+            @*<table style="margin-top: 140px;">*@
         @* <table style="margin-top: 160px;"> *@
             <tbody>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
-                    <td>@Model?.CustomerName</td>
-                    <td style="width: 180px;">@Model?.InvoiceDateD.ToString("MM/dd/yy")</td>
+                    <td>@Model.CustomerName</td>
+                    <td style="width: 180px;">@Model.InvoiceDateD.ToString("MM/dd/yy")</td>
                 </tr>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
-                    <td>@(Model?.TIN == "0" ? "" : Model?.CustomerAddress)</td>
-                    <td style="width: 180px;" colspan="2">@Model?.PaymentTerms</td>
+                    <td>@(string.IsNullOrEmpty(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
+                    <td style="width: 180px;" colspan="2">@(string.IsNullOrWhiteSpace(Model.PaymentTerms) ? "N/A" : Model.PaymentTerms)</td>
                 </tr>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
                     <td></td>
-                    <td style="width: 180px;" colspan="2">@Model?.Agent</td>
+                    <td style="width: 180px;" colspan="2">@Model.Agent</td>
                 </tr>
             </tbody>
         </table>

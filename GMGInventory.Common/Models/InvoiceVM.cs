@@ -87,13 +87,13 @@ namespace GMGInventory.Common.Models
         public string CustomerName { get; set; }
 
         [Display(Name = "Customer Address")]
-        public string CustomerAddress { get; set; }
+        public string? CustomerAddress { get; set; }
 
         [Display(Name = "TIN")]
-        public string TIN { get; set; }
+        public string? TIN { get; set; }
 
         [Display(Name = "Payment Terms")]
-        public string PaymentTerms { get; set; }
+        public string? PaymentTerms { get; set; }
 
         [Display(Name = "Agent")]
         public string Agent { get; set; }
@@ -116,7 +116,7 @@ namespace GMGInventory.Common.Models
         public DateTime InvoiceDateD { get; set; }
 
         [Display(Name = "Remarks")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         public int InvoiceTypeId { get; set; }
 

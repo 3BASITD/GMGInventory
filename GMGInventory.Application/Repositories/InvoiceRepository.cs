@@ -163,7 +163,7 @@ namespace GMGInventory.Application.Repositories
                                                           .ShippingAddresses
                                                           .Where(s => s.IsDefault == true)
                                                           .Select(s => s.Address)
-                                                          .FirstOrDefault() ?? "N/A",
+                                                          .FirstOrDefault(),
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  Id = invoice.Id,
@@ -172,16 +172,16 @@ namespace GMGInventory.Application.Repositories
                                  InvoiceType = invoice.InvoiceType.Name,
                                  InvoiceTypeId = invoice.InvoiceType.Id,
                                  PackNumber = invoice.PackId,
-                                 PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? "-" : invoice.SalesOrder.Customer.CreditTerm.Name,
+                                 PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? null : invoice.SalesOrder.Customer.CreditTerm.Name,
                                  PONumber = invoice.SalesOrder.PurchaseOrder,
-                                 Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
+                                 Remarks = invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
-                                 TIN = invoice.SalesOrder.Customer.TIN + "",
+                                 TIN = invoice.SalesOrder.Customer.TIN,
                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  DateCreatedD = invoice.DateCreated,
                                  UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                                 DateModifiedD = invoice.DateModified == null ? null : invoice.DateModified.Value
+                                 DateModifiedD = invoice.DateModified.Value
                              });
             return await invoiceVM.FirstOrDefaultAsync();
         }
@@ -206,7 +206,7 @@ namespace GMGInventory.Application.Repositories
                                                           .ShippingAddresses
                                                           .Where(s => s.IsDefault == true)
                                                           .Select(s => s.Address)
-                                                          .FirstOrDefault() ?? "N/A",
+                                                          .FirstOrDefault(),
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  Id = invoice.Id,
@@ -215,23 +215,23 @@ namespace GMGInventory.Application.Repositories
                                  InvoiceType = invoice.InvoiceType.Name,
                                  InvoiceTypeId = invoice.InvoiceTypeId,
                                  PackNumber = invoice.PackId,
-                                 PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? "-" : invoice.SalesOrder.Customer.CreditTerm.Name,
+                                 PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? null : invoice.SalesOrder.Customer.CreditTerm.Name,
                                  PONumber = invoice.SalesOrder.PurchaseOrder,
-                                 Remarks = string.IsNullOrWhiteSpace(invoice.Remarks) ? "-" : invoice.Remarks,
+                                 Remarks = invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
-                                 TIN = invoice.SalesOrder.Customer.TIN + "",
+                                 TIN = invoice.SalesOrder.Customer.TIN,
                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  DateCreatedD = invoice.DateCreated,
                                  UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                                 DateModifiedD = invoice.DateModified == null ? null : invoice.DateModified.Value
+                                 DateModifiedD = invoice.DateModified
                              });
             var invoiceDetails = await invoiceVM.FirstAsync();
             var items = await GetItemsAsync(Id);
             invoiceDetails.Items = items;
             invoiceDetails.TotalD = items.Sum(s => s.GrossPriceNoDiscountD);
             invoiceDetails.DiscountedTotalD = items.Sum(s => s.GrossPriceD);
-            invoiceDetails.DiscountPercentD = items.Count() > 0
+            invoiceDetails.DiscountPercentD = items.Count() > 0 && items.Sum(s => s.GrossPriceD + s.GrossPriceNoDiscountD) > 0
                                             ? (100 - (items.Sum(s => s.GrossPriceD) / items.Sum(s => s.GrossPriceNoDiscountD) * 100))
                                             : 0;
             invoiceDetails.TotalAmountD = items.Sum(s => s.GrossPriceNoDiscountD);
@@ -254,16 +254,16 @@ namespace GMGInventory.Application.Repositories
                                                     .ShippingAddresses
                                                     .Where(s => s.IsDefault == true)
                                                     .Select(s => s.Address)
-                                                    .FirstOrDefault() ?? "N/A",
+                                                    .FirstOrDefault(),
                               CustomerCode = pack.SalesOrder.Customer.Code,
                               CustomerName = pack.SalesOrder.Customer.Name,
                               Id = pack.Id,
                               PackNumber = pack.Id,
-                              PaymentTerms = pack.SalesOrder.Customer.CreditTerm == null ? "-" : pack.SalesOrder.Customer.CreditTerm.Name,
+                              PaymentTerms = pack.SalesOrder.Customer.CreditTerm == null ? null : pack.SalesOrder.Customer.CreditTerm.Name,
                               PONumber = pack.SalesOrder.PurchaseOrder,
                               SONumber = pack.SalesOrder.SalesOrderNumber,
                               Status = pack.Status.Code,
-                              TIN = pack.SalesOrder.Customer.TIN + ""
+                              TIN = pack.SalesOrder.Customer.TIN
                           });
             return await packVM.FirstOrDefaultAsync();
         }
@@ -666,7 +666,7 @@ namespace GMGInventory.Application.Repositories
                     invoice.ControlNumber = form.BIRInvoiceNumber;
                     invoice.InvoiceTypeId = form.InvoiceType;
                     invoice.InvoiceDate = form.InvoiceDate;
-                    invoice.Remarks = form.Remarks + "";
+                    invoice.Remarks = form.Remarks;
                     context.Invoices.Update(invoice);
                     await context.SaveChangesAsync(currentUserId);
 
@@ -693,7 +693,7 @@ namespace GMGInventory.Application.Repositories
                     invoice.ControlNumber = form.BIRInvoiceNumber;
                     invoice.InvoiceTypeId = form.InvoiceType;
                     invoice.InvoiceDate = form.InvoiceDate;
-                    invoice.Remarks = form.Remarks + "";
+                    invoice.Remarks = form.Remarks;
                     context.Invoices.Update(invoice);
                     await context.SaveChangesAsync(currentUserId);
 
