@@ -181,7 +181,7 @@ namespace GMGInventory.Application.Repositories
                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  DateCreatedD = invoice.DateCreated,
                                  UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                                 DateModifiedD = invoice.DateModified.Value
+                                 DateModifiedD = invoice.DateModified
                              });
             return await invoiceVM.FirstOrDefaultAsync();
         }
@@ -515,7 +515,7 @@ namespace GMGInventory.Application.Repositories
                     InvoiceNumber = $"{invoiceNumberPrefix}{invoiceNumberLast + 1:D7}",
                     InvoiceTypeId = form.InvoiceType,
                     PackId = form.PackId,
-                    Remarks = form.Remarks + "",
+                    Remarks = form.Remarks,
                     SalesOrderId = packVM.SalesOrderId,
                     StatusId = statusId
                 };
