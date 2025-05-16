@@ -16,7 +16,10 @@ namespace GMGInventory.Controllers
         {
             return Json(await locationCodeRepository.GetOptions(IncludeId));
         }
-
+        public async Task<IActionResult> GetOptions2(int? IncludeId, int itemId)
+        {
+            return Json(await locationCodeRepository.GetOptions2(IncludeId, itemId));
+        }
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.LocationCodes, AccessTypes.View);

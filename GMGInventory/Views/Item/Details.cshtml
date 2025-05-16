@@ -106,6 +106,17 @@
                         @(string.IsNullOrWhiteSpace(Model?.BeginningCost) ? "N/A" : Model.BeginningCost)
                     </b>
                 </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Location Codes
+                    </span>
+                    <div style="display:flex">
+                        <b class="d-block form-gayahin">
+                            @Model?.LocationCodes
+                        </b>
+                        <button class="btn btn-warning btn-xs locationCodeBtn ml-2" data-bs-toggle="modal" data-bs-target="#addLocationCodeModal" data-microtip-title="Edit Location Codes"><i class="fas fa-pencil-alt"></i></button>
+                    </div>
+                </p>
             </div>
             <div class="col-4">
                 <p class="text-sm">
@@ -523,12 +534,84 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="addLocationCodeModal" role="dialog" aria-labelledby="addLocationCodeModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Location Code(s)</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form-item">
+                    <div class="modal-body">
+                        <button id="addLocationBtn" type="button" class="btn btn-primary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#addLocationModal">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <table class="table table-head-fixed table-striped table-hover table-location">
+                            <thead>
+                                <tr>
+                                    <th> Code</th>
+                                    <th> Name</th>
+                                    <th style="width:40px"></th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btnCloseLocation">
+                            <span class="fas fa-times"></span> Close
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addLocationModal" role="dialog" aria-labelledby="addLocationModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Item Location Code</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="createItemLocationForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="create-location" class="control-label mb-0 d-block">Location</label>
+
+                                    <select name="LocationCode" id="create-location" class="form-control" style="width: 100%">
+                                    </select>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 }
 
 @if (userAccess.CanDelete)
 {
     <form id="deleteConversionForm" asp-action="DeleteConversion">
         <input type="hidden" id="deleteConversionId" name="Id" />
+    </form>
+
+    <form id="deleteLocationForm" asp-action="DeleteItemLocation">
+        <input type="hidden" id="deleteLocationId" name="Id" />
     </form>
 }
 
@@ -721,6 +804,8 @@
             }
         });
 
+     
+
         function clearItemForm() {
             $("#add-quantity").val("0");
             $("#add-equivalent-quantity").val("0");
@@ -794,6 +879,132 @@
             if (selectedTab == "#nav-transfer") transferDT.ajax.reload();
             if (selectedTab == "#nav-return") returnDT.ajax.reload();
         });
+
+        
+        // Item Location
+        var locationDT = $('.table-location').on('preXhr.dt', function (e, settings, data) {
+              showBatchLoader("location");
+        }).DataTable({
+            ajax: {
+                 url: "@Url.Action("GetLocationListJson")",
+                type: "POST",
+                data: function (data) {
+                        data.Id = @Model?.Id;
+                 },
+            },
+            serverSide: true,
+            filter: false,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: false,
+            },
+            columns: [
+                 { data: "locationCode", name: "Code" },
+                 { data: "locationName", name: "Name" },
+                 {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<a data-id="' + data.id + '" class="btn btn-danger btn-xs deleteLocationBtn" data-microtip-title="Delete Location" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></a>';
+                        actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
+                        return actions + "</div>";
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
+             }).on("draw.dt", function () {
+                    hideBatchLoader("location");
+
+            if (user_access.canAdd) {
+             // Actions upon Display Create Modal
+
+                $("#btnCloseLocation").click(function (e) {
+                  $('#product-options').modal('hide');
+                  location.reload();
+                });
+
+                $("#addLocationBtn").click(function (e) {
+                   $('#create-location').val(null).empty();
+
+                     // Load Select2 Location Code
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetOptions2", "LocationCode")",
+                        data: { itemId: @Model?.Id },
+                        success: function (data, status, xhr) {
+                            $("#create-location").select2({
+                                data: data,
+                                allowClear: true,
+                                placeholder: {
+                                    id: "",
+                                    text: "<empty>"
+                                },
+                                dropdownParent: $('#addLocationModal')
+                            });
+                        }
+                    });
+            });
+
+            // Validation for Create Modal
+            var validateCreate = $("#createItemLocationForm").validate({
+                rules: {
+                     LocationCode: { required: true }
+                },
+                messages: {
+                    LocationCode: { required: "Please select location code" },
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoCreateLocation();
+                }
+            });
+
+            // Send Create to Controller
+            function DoCreateLocation() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("CreateItemLocationJson")",
+                    data: {
+                        ItemId: @Model?.Id,
+                        LocationCodeId: $("#create-location").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#addLocationModal").modal("hide");
+                            locationDT.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+            if (user_access.canDelete) {
+                // Actions upon Display Edit Quantity Modal
+                $(".deleteLocationBtn").click(function (e) {
+                    var data = locationDT.row($(this).parents('tr')).data();
+                    swal({
+                             title: "Delete Item Location",
+                              text:  "Are you sure you want to delete this record?",
+                             icon: "warning",
+                             buttons: true,
+                             dangerMode: true
+                         }).then((confirm) => {
+                             if (confirm) {
+                                 var btn = $(this);
+                                 var id = btn.data("id");
+                                 $('#deleteLocationId').val(id);
+                                 $('#deleteLocationForm').submit();
+                             }
+                         });
+                });
+            }
+         });
+        
+        
 
         //Conversion Details
         var conversionDT = $('.table-conversion').on('preXhr.dt', function (e, settings, data) {

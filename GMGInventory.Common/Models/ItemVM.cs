@@ -185,6 +185,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Warehouse")]
         public string Warehouse { get; set; }
+
+        [Display(Name = "Location Codes")]
+        public string LocationCodes { get; set; }
     }
 
     public class ItemFileVM
@@ -327,5 +330,23 @@ namespace GMGInventory.Common.Models
         public string EquivalentUnitName { get; set; }
 
         public int OrderNo { get; set; }
+    }
+
+    public class ItemDetailLocationVM
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public int ItemId { get; set; }
+
+        [Required]
+        public int LocationCodeId { get; set; }
+
+        [Display(Name = "Location Code")]
+        public string LocationCode { get; set; }
+
+        [Display(Name = "Location Name")]
+        public string LocationName { get; set; }
+
     }
 }
