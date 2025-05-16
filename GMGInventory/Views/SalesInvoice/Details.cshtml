@@ -14,12 +14,12 @@
         <div class="card-header">
             <span class="card-title po-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                @if (Model!.Status != "Cancelled")
+                @if (Model.Status != "Cancelled")
                 {
                     <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
                         <span class="fas fa-trash"></span> Cancel
                     </button>
-                    @if (Model!.CurrentUsersDraft == true)
+                    @if (Model.CurrentUsersDraft == true)
                     {
                         @if (userAccess.CanAdd)
                         {
@@ -76,7 +76,7 @@
                             @Html.DisplayNameFor(model => model.InvoiceNumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.InvoiceNumber
+                            @Model.InvoiceNumber
                         </b>
                     </p>
                 </div>
@@ -86,18 +86,18 @@
                             @Html.DisplayNameFor(model => model.PackNumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.PackNumber
+                            @Model.PackNumber
                         </b>
                     </p>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status.ToLower() == "draft")
+                        @*@if (Model.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status.ToLower() != "cancelled")
+                        @if (Model.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceDate1)</label>
-                            <input type="date" id="invoice-date" class="form-control form-control-sm" value="@(Model?.InvoiceDate3)" />
+                            <input type="date" id="invoice-date" class="form-control form-control-sm" value="@(Model.InvoiceDate3)" />
                         }
                         else
                         {
@@ -105,19 +105,19 @@
                                 @Html.DisplayNameFor(model => model.InvoiceDate1)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.InvoiceDate1
+                                @Model.InvoiceDate1
                             </b>
                         }
                     </p>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status.ToLower() == "draft")
+                        @*@if (Model.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status.ToLower() != "cancelled")
+                        @if (Model.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-control-number" class="form-label fw-normal mb-0">BIR Invoice Number</label>
-                            <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" value="@Model?.ControlNumber" />
+                            <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" value="@Model.ControlNumber" />
                         }
                         else
                         {
@@ -125,16 +125,16 @@
                                 @Html.DisplayNameFor(model => model.ControlNumber)
                             </span>
                             <b class="d-block">
-                                @Model?.ControlNumber
+                                @Model.ControlNumber
                             </b>
                         }
                     </p>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status.ToLower() == "draft")
+                        @*@if (Model.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status.ToLower() != "cancelled")
+                        @if (Model.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-invoice-type" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceType)</label>
                             <select id="invoice-invoice-type" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
@@ -145,19 +145,19 @@
                                 @Html.DisplayNameFor(model => model.InvoiceType)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.InvoiceType
+                                @Model.InvoiceType
                             </b>
                         }
                     </p>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status.ToLower() == "draft")
+                        @*@if (Model.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status.ToLower() != "cancelled")
+                        @if (Model.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
-                            <input type="text" id="invoice-remarks" class="form-control form-control-sm" value="@(Model?.Remarks == "-" ? "" : Model?.Remarks)" />
+                            <input type="text" id="invoice-remarks" class="form-control form-control-sm" value="@Model.Remarks" />
                         }
                         else
                         {
@@ -165,7 +165,7 @@
                                 @Html.DisplayNameFor(model => model.Remarks)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.Remarks
+                                @(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)
                             </b>
                         }
                     </p>
@@ -176,7 +176,7 @@
                             @Html.DisplayNameFor(model => model.CustomerCode)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.CustomerCode
+                            @Model.CustomerCode
                         </b>
                     </p>
                 </div>
@@ -186,7 +186,7 @@
                             @Html.DisplayNameFor(model => model.CustomerName)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.CustomerName
+                            @Model.CustomerName
                         </b>
                     </p>
                 </div>
@@ -196,7 +196,7 @@
                             @Html.DisplayNameFor(model => model.CustomerAddress)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.CustomerAddress
+                            @(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)
                         </b>
                     </p>
                 </div>
@@ -206,7 +206,7 @@
                             @Html.DisplayNameFor(model => model.SONumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.SONumber
+                            @Model.SONumber
                         </b>
                     </p>
                 </div>
@@ -216,7 +216,7 @@
                             @Html.DisplayNameFor(model => model.PONumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.PONumber
+                            @(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)
                         </b>
                     </p>
                 </div>
@@ -226,15 +226,15 @@
                             @Html.DisplayNameFor(model => model.PaymentTerms)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.PaymentTerms
+                            @(string.IsNullOrWhiteSpace(Model.PaymentTerms) ? "N/A" : Model.PaymentTerms)
                         </b>
                     </p>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
-                        @*@if (Model?.Status.ToLower() == "draft")
+                        @*@if (Model.Status.ToLower() == "draft")
                         {*@
-                        @if (Model!.Status.ToLower() != "cancelled")
+                        @if (Model.Status.ToLower() != "cancelled")
                         {
                             <label for="invoice-agent" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Agent)</label>
                             <select id="invoice-agent" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
@@ -245,7 +245,7 @@
                                 @Html.DisplayNameFor(model => model.Agent)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.Agent
+                                @Model.Agent
                             </b>
                         }
                     </p>
@@ -256,9 +256,9 @@
                             @Html.DisplayNameFor(model => model.Status)
                         </span>
                         <b class="d-block form-gayahin invoice-status">
-                            @Model?.Status
+                            @Model.Status
                         </b>
-                        <input type="hidden" id="invoice-status" value="@Model?.Status" />
+                        <input type="hidden" id="invoice-status" value="@Model.Status" />
                     </p>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -267,7 +267,7 @@
                             @Html.DisplayNameFor(model => model.UserCreated)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.UserCreated
+                            @Model.UserCreated
                         </b>
                     </p>
                 </div>
@@ -277,11 +277,11 @@
                             @Html.DisplayNameFor(model => model.DateCreated)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.DateCreated
+                            @Model.DateCreated
                         </b>
                     </p>
                 </div>
-                @if (Model?.UserModified != null)
+                @if (Model.UserModified != null)
                 {
                     <div class="col-12 col-md-4 col-sm-6">
                         <p class="text-sm">
@@ -289,12 +289,12 @@
                                 @Html.DisplayNameFor(model => model.UserModified)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.UserModified
+                                @Model.UserModified
                             </b>
                         </p>
                     </div>
                 }
-                @if (Model?.DateModified != null)
+                @if (Model.DateModified != null)
                 {
                     <div class="col-12 col-md-4 col-sm-6">
                         <p class="text-sm">
@@ -302,7 +302,7 @@
                                 @Html.DisplayNameFor(model => model.DateModified)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.DateModified
+                                @Model.DateModified
                             </b>
                         </p>
                     </div>
@@ -313,7 +313,7 @@
                     <div class="card">
                         <div class="card-header bg-light">
                             <span class="card-title">Invoice Item(s)</span>
-                            @if (Model!.Status.ToLower() == "draft")
+                            @if (Model.Status.ToLower() == "draft")
                             {
                                 @if (userAccess.CanAdd)
                                 {
@@ -398,11 +398,12 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var invoice_data = @Html.Raw(Json.Serialize(Model));
 
         // Load agent data for select2
         $("#invoice-agent").select2({
             //minimumInputLength: 1,
-            placeholder: '@Model.Agent',
+            placeholder: invoice_data.agent,
             templateSelection: function (item) {
                 if (item.name) {
                     return item.name;
@@ -450,19 +451,19 @@
                 });
             },
             complete: function (xhr, status) {
-                $("#invoice-invoice-type").val(@Model?.InvoiceTypeId);
-                $("#invoice-invoice-type").data("current-invoice-type", @Model?.InvoiceTypeId);
+                $("#invoice-invoice-type").val(invoice_data.invoiceTypeId);
+                $("#invoice-invoice-type").data("current-invoice-type", invoice_data.invoiceTypeId);
                 $("#invoice-invoice-type").trigger("change");
             }
         });
-        $("#invoice-control-number").data("current-control-number", "@Model?.ControlNumber");
-        $("#invoice-remarks").data("current-remarks", "@(Model?.Remarks == "-" ? "" : Model?.Remarks)");
+        $("#invoice-control-number").data("current-control-number", invoice_data.controlNumber);
+        $("#invoice-remarks").data("current-remarks", invoice_data.remarks);
 
 
         var packDT = $('.table-pack').DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsWithPriceJson", "Pack")",
-                data: { packId: @Model?.PackNumber },
+                data: { packId: invoice_data.packNumber },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -552,7 +553,7 @@
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
-                data: { invoiceId: @Model?.Id },
+                data: { invoiceId: invoice_data.id },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -690,11 +691,11 @@
         var validateCreate = $("#form-invoice").validate({
             rules: {
                 ControlNumber: { required: true, maxlength: 50 },
-                AgentCode: { maxlength: 250 }
+                Remarks: { maxlength: 250 }
             },
             messages: {
                 ControlNumber: { required: "Please enter BIR Invoice Number", maxlength: "BIR Invoice Number must not exceed 50 characters." },
-                Remarks: { maxlength: "BIR Invoice Number must not exceed 250 characters." }
+                Remarks: { maxlength: "Remarks must not exceed 250 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -740,7 +741,7 @@
                     type: "POST",
                     url: "@Url.Action("UpdateJson")",
                     data: {
-                        Id: @Model?.Id,
+                        Id: invoice_data.id,
                         BIRInvoiceNumber: $("#invoice-control-number").val(),
                         InvoiceType: $("#invoice-invoice-type").val(),
                         InvoiceDate: $("#invoice-date").val(),
@@ -754,7 +755,7 @@
                             if (data.status == "Error") {
                                 toastr.error(data.message, "Error");
                             } else {
-                                if ($("#invoice-invoice-type").val() != @Model!.InvoiceTypeId) {
+                                if ($("#invoice-invoice-type").val() != invoice_data.invoiceTypeId) {
                                     window.location.reload();
                                 } else {
                                     toastr.success(data.message, "Success");
@@ -791,7 +792,7 @@
                         fontawesome: "fas fa-print"
                     });
                     setTimeout(function () {
-                        let win = window.open('@Url.Action("PrintReceipt")/' + @Model?.Id + '?Company=' + print_company, '');
+                        let win = window.open('@Url.Action("PrintReceipt")/' + invoice_data.id + (print_company ? '?Company=' + print_company : ''), '');
                         var wintimer = setInterval(function () {
                             if (win.closed) {
                                 clearInterval(wintimer);
@@ -804,147 +805,3 @@
         }
     </script>
 }
-@*<div class="row">
-            <div class="col-12 col-md-4 col-sm-6">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.InvoiceNumber)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.InvoiceNumber
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.CustomerCode)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.CustomerCode
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.CustomerName)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.CustomerName
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.CustomerAddress)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.CustomerAddress
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.Agent)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.Agent
-            </b>
-            </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.ControlNumber)
-            </span>
-            <b class="d-block">
-            @Model?.ControlNumber
-            </b>
-            <label for="invoice-control-number" class="form-label fw-normal mb-0">BIR Invoice Number</label>
-            <input type="text" id="invoice-control-number" name="ControlNumber" class="form-control form-control-sm" value="@Model?.ControlNumber" />
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.PaymentTerms)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.PaymentTerms
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.SONumber)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.SONumber
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.PONumber)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.PONumber
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.PackNumber)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.PackNumber
-            </b>
-            </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.Status)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.Status
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.InvoiceDate)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.InvoiceDate
-            </b>
-            <label for="invoice-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceDate)</label>
-            <input type="date" id="invoice-date" class="form-control form-control-sm" value="@(Model?.InvoiceDate)" />
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.DateCreated)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.DateCreated
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.InvoiceBy)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.InvoiceBy
-            </b>
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.Remarks)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.Remarks
-            </b>
-            <label for="invoice-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
-            <input type="text" id="invoice-remarks" class="form-control form-control-sm" value="@(Model?.Remarks == "-" ? "" : Model?.Remarks)" />
-            </p>
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.InvoiceType)
-            </span>
-            <b class="d-block form-gayahin">
-            @Model?.InvoiceType
-            </b>
-            <label for="invoice-invoice-type" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceType)</label>
-            <select id="invoice-invoice-type" class="form-control form-control-sm s2-bold s2ph-bold s2ph-dark"></select>
-            </p>
-            </div>
-            </div>*@

@@ -11,16 +11,16 @@ namespace GMGInventory.Common.Models
         public string SRNumber { get; set; }
 
         [Display(Name = "Sales Order Number")]
-        public string SONumber { get; set; }
-        public int SOId { get; set; }
+        public string? SONumber { get; set; }
+        public int? SOId { get; set; }
 
-        public int CustomerId { get; set; }
+        public int? CustomerId { get; set; }
 
         [Display(Name = "Customer Code")]
-        public string CustomerCode { get; set; }
+        public string? CustomerCode { get; set; }
 
         [Display(Name = "Customer Name")]
-        public string CustomerName { get; set; }
+        public string? CustomerName { get; set; }
 
         [Display(Name = "Customer Address")]
         public string? CustomerAddress { get; set; }
@@ -102,7 +102,8 @@ namespace GMGInventory.Common.Models
     {
         public int? Id { get; set; }
         public string ReturnNumber { get; set; }
-        public int SalesOrder { get; set; }
+        public int? SalesOrder { get; set; }
+        public int? Customer { get; set; }
         public string Remarks { get; set; }
         public DateTime ReturnDate { get; set; }
         public IList<SalesReturnFormItemVM> Items { get; set; }

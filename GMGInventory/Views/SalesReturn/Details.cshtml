@@ -39,7 +39,7 @@
                         @if (userAccess.CanEdit)
                         {
                             <label for="return-number" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.SRNumber)</label>
-                            <input type="text" id="return-number" name="ReturnNumber" class="form-control form-control-sm" value="@(Model?.SRNumber)" />
+                            <input type="text" id="return-number" name="ReturnNumber" class="form-control form-control-sm" value="@Model.SRNumber" />
                         }
                         else
                         {
@@ -47,7 +47,7 @@
                                 @Html.DisplayNameFor(model => model.SRNumber)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.SRNumber
+                                @Model.SRNumber
                             </b>
                         }
                     </p>
@@ -58,7 +58,7 @@
                             @Html.DisplayNameFor(model => model.SONumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.SONumber
+                            @(string.IsNullOrWhiteSpace(Model.SONumber) ? "N/A" : Model.SONumber)
                         </b>
                     </p>
                 </div>
@@ -67,7 +67,7 @@
                         @if (userAccess.CanEdit)
                         {
                             <label for="return-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.ReturnDate)</label>
-                            <input type="date" id="return-date" name="ReturnDate" class="form-control form-control-sm" value="@(Model?.ReturnDate3)" />
+                            <input type="date" id="return-date" name="ReturnDate" class="form-control form-control-sm" value="@Model.ReturnDate3" />
                         }
                         else
                         {
@@ -75,7 +75,7 @@
                                 @Html.DisplayNameFor(model => model.ReturnDate)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.ReturnDate
+                                @Model.ReturnDate
                             </b>
                         }
                     </p>
@@ -86,7 +86,7 @@
                             @Html.DisplayNameFor(model => model.CustomerCode)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.CustomerCode
+                            @(string.IsNullOrWhiteSpace(Model.CustomerCode) ? "N/A" : Model.CustomerCode)
                         </b>
                     </p>
                 </div>
@@ -96,7 +96,7 @@
                             @Html.DisplayNameFor(model => model.CustomerName)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.CustomerName
+                            @(string.IsNullOrWhiteSpace(Model.CustomerName) ? "N/A" : Model.CustomerName)
                         </b>
                     </p>
                 </div>
@@ -106,7 +106,7 @@
                             @Html.DisplayNameFor(model => model.CustomerAddress)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.CustomerAddress
+                            @(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)
                         </b>
                     </p>
                 </div>
@@ -115,7 +115,7 @@
                         @if (userAccess.CanEdit)
                         {
                             <label for="return-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
-                            <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" value="@(Model?.Remarks)" />
+                            <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" value="@Model.Remarks" />
                         }
                         else
                         {
@@ -123,7 +123,7 @@
                                 @Html.DisplayNameFor(model => model.Remarks)
                             </span>
                             <b class="d-block form-gayahin">
-                                @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "-" : Model.Remarks)
+                                @(string.IsNullOrWhiteSpace(Model.Remarks) ? "-" : Model.Remarks)
                             </b>
                         }
                     </p>
@@ -134,7 +134,7 @@
                             @Html.DisplayNameFor(model => model.UserCreated)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.UserCreated
+                            @Model.UserCreated
                         </b>
                     </p>
                 </div>
@@ -144,11 +144,11 @@
                             @Html.DisplayNameFor(model => model.DateCreated)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.DateCreated
+                            @Model.DateCreated
                         </b>
                     </p>
                 </div>
-                @if (Model?.UserModified != null)
+                @if (Model.UserModified != null)
                 {
                     <div class="col-12 col-md-4 col-sm-6">
                         <p class="text-sm">
@@ -156,12 +156,12 @@
                                 @Html.DisplayNameFor(model => model.UserModified)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.UserModified
+                                @Model.UserModified
                             </b>
                         </p>
                     </div>
                 }
-                @if (Model?.DateModified != null)
+                @if (Model.DateModified != null)
                 {
                     <div class="col-12 col-md-4 col-sm-6">
                         <p class="text-sm">
@@ -169,7 +169,7 @@
                                 @Html.DisplayNameFor(model => model.DateModified)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model?.DateModified
+                                @Model.DateModified
                             </b>
                         </p>
                     </div>
@@ -221,10 +221,11 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var return_details = @Html.Raw(Json.Serialize(Model));
 
         $("#return-customer").select2({
             minimumInputLength: 1,
-            placeholder: '@Model?.CustomerCode',
+            placeholder: return_details.customerCode,
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -264,7 +265,9 @@
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
-                data: { salesReturnId: @Model?.Id },
+                data: { 
+                    salesReturnId: return_details.id
+                },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -327,9 +330,9 @@
                 type: "POST",
                 url: "@Url.Action("SaveJson")",
                 data: {
-                    Id: @Model?.Id,
+                    Id: return_details.id,
                     ReturnNumber: $("#return-number").val(),
-                    SalesOrder: @Model?.SOId,
+                    SalesOrder: return_details.soId,
                     ReturnDate: $("#return-date").val(),
                     Remarks: $("#return-remarks").val()
                 },
@@ -345,10 +348,10 @@
 
         if (user_access.canPrint) {
             $(".btn-details-print").on("click", function () {
-                if ($("#return-number").val() != '@Model?.SRNumber'
+                if ($("#return-number").val() != return_details.srNumber
                     || $("#return-customer").val() != ''
-                    || $("#return-date").val() != '@Model?.ReturnDate3'
-                    || $("#return-remarks").val() != '@Model?.Remarks') {
+                    || $("#return-date").val() != return_details.returnDate3
+                    || $("#return-remarks").val() != return_details.remarks) {
                     $("#form-return").submit();
                 }
                 $.LoadingOverlay("show", {
@@ -356,7 +359,7 @@
                     fontawesome: "fas fa-print"
                 });
                 setTimeout(function () {
-                    let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id, '');
+                    let win = window.open('@Url.Action("PrintDetails")/' + return_details.id, '');
                     var wintimer = setInterval(function () {
                         if (win.closed) {
                             clearInterval(wintimer);

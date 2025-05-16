@@ -34,7 +34,7 @@ namespace GMGInventory.Data
         public string ControlNumber { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         public DateTime InvoiceDate { get; set; }
 
