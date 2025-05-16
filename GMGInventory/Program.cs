@@ -82,6 +82,7 @@ builder.Services.AddScoped(typeof(IReportProcurementRepository), typeof(ReportPr
 builder.Services.AddScoped(typeof(IChequeRepository), typeof(ChequeRepository));
 builder.Services.AddScoped(typeof(IShippingRepository), typeof(ShippingRepository));
 builder.Services.AddScoped(typeof(IChequeStatusRepository), typeof(ChequeStatusRepository));
+builder.Services.AddScoped(typeof(IItemLocationRepository), typeof(ItemLocationRepository));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

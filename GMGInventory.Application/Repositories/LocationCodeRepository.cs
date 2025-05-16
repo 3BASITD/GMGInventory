@@ -42,6 +42,23 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
+        public async Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId, int itemId)
+        {
+            var itemLocationIds = context.ItemLocation.Where(x => x.ItemId == itemId).Select(x => x.LocationCodeId).ToList();
+
+            return await context.LocationCodes
+
+                .Where(s => !itemLocationIds.Contains(s.Id) && s.IsActive || s.Id == IncludeId)
+                .Select(s => new JsonOptionsModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
+                    Selected = IncludeId != null && IncludeId == s.Id
+                })
+                .OrderBy(s => s.Text)
+                .ToListAsync();
+        }
+
         public async Task<ForDataTables<LocationCodeVM>> GetAllForDataTablesAsync(DataTablesRequestForm form)
         {
             int totalRecord = 0;
@@ -140,8 +157,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var location = new LocationCode
             {
-                Code = LocationCodeVM.Code.Length > 10 ? LocationCodeVM.Code[..10] : LocationCodeVM.Code,
-                Name = LocationCodeVM.Name.Length > 100 ? LocationCodeVM.Name[..100] : LocationCodeVM.Name,
+                Code = LocationCodeVM.LocationCode.Length > 10 ? LocationCodeVM.LocationCode[..10] : LocationCodeVM.LocationCode,
+                Name = LocationCodeVM.LocationName.Length > 100 ? LocationCodeVM.LocationName[..100] : LocationCodeVM.LocationName,
                 IsActive = true
             };
             await context.LocationCodes.AddAsync(location);
@@ -160,8 +177,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
             location.Id = LocationCodeVM.Id;
-            location.Code = LocationCodeVM.Code.Length > 10 ? LocationCodeVM.Code[..10] : LocationCodeVM.Code;
-            location.Name = LocationCodeVM.Name.Length > 100 ? LocationCodeVM.Name[..100] : LocationCodeVM.Name;
+            location.Code = LocationCodeVM.LocationCode.Length > 10 ? LocationCodeVM.Code[..10] : LocationCodeVM.LocationCode;
+            location.Name = LocationCodeVM.LocationName.Length > 100 ? LocationCodeVM.Name[..100] : LocationCodeVM.LocationName;
             location.IsActive = true;
 
             context.LocationCodes.Update(location);

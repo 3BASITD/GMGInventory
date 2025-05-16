@@ -1,9 +1,12 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -23,16 +26,16 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetWarehouseTransferJson(int? WarehouseId)
+        public async Task<IActionResult> GetWarehouseTransferJson(int? WarehouseId, ListFilterCommonModel filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.WarehouseTransfer, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
             if (WarehouseId == null)
-                return Json(await itemTransferRepository.GetWarehouseTransfersDTAsync(form));
+                return Json(await itemTransferRepository.GetWarehouseTransfersDTAsync(form, filter));
             else
-                return Json(await itemTransferRepository.GetWarehouseTransfersDTAsync(form, WarehouseId.Value));
+                return Json(await itemTransferRepository.GetWarehouseTransfersDTAsync(form, WarehouseId.Value, filter));
         }
 
         public async Task<IActionResult> Details(int? Id)
@@ -91,5 +94,43 @@ namespace GMGInventory.Controllers
             responseModel.NewRow = transferId;
             return Json(responseModel);
         }
+
+        public async Task<IActionResult> DownloadFile(ListFilterChequeModel filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.WarehouseTransfer, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("WarehouseTransfer");
+            dt.Columns.AddRange([
+                new DataColumn("Transfer Number"),
+                new DataColumn("Source Warehouse"),
+                new DataColumn("Destination Warehouse"),
+                new DataColumn("ItemCount"),
+                new DataColumn("Transfer Date"),
+                new DataColumn("Remarks"),
+                new DataColumn("CreatedBy")
+
+            ]);
+            var transfers = (await itemTransferRepository.GetAllTransferAsync(filter)).ToList();
+            foreach (var transfer in transfers)
+            {
+                dt.Rows.Add(
+                    transfer.Id,
+                    transfer.Source,
+                    transfer.Destination,
+                    transfer.ItemCount,
+                    transfer.TransferDate,
+                    transfer.Remarks,
+                    transfer.CreatedBy);
+            }
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            DateTime.Now.ToString("yyyyMMdd") + " WarehouseTransfers.xlsx");
+        }
+
     }
 }

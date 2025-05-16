@@ -316,7 +316,7 @@
                     },
                     messages: {
                         code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
-                        name: { required: "Please enter Name.", maxlength: "Name must not exceed 100 characters." }
+                        name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." }
                     },
                     submitHandler: function (form, event) {
                         event.preventDefault();
@@ -331,8 +331,8 @@
                         url: "@Url.Action("EditJson")",
                         data: {
                             Id: $("#edit-id").val(),
-                            Code: $("#edit-code").val(),
-                            Name: $("#edit-name").val()
+                            LocationCode: $("#edit-code").val(),
+                            LocationName: $("#edit-name").val()
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Error") {
@@ -365,7 +365,7 @@
                 },
                 messages: {
                     code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
-                    name: { required: "Please enter Name.", maxlength: "Name must not exceed 100 characters." }
+                    name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -379,8 +379,8 @@
                     type: "POST",
                     url: "@Url.Action("CreateJson")",
                     data: {
-                        Code: $("#create-code").val(),
-                        Name: $("#create-name").val(),
+                        LocationCode: $("#create-code").val(),
+                        LocationName: $("#create-name").val(),
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {

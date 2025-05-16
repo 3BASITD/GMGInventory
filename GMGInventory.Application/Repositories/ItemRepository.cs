@@ -492,6 +492,15 @@ namespace GMGInventory.Application.Repositories
             var itemVM = (from item in context.Items
                           from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated <= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
                           join inventory in context.ItemInventories on item.Id equals inventory.ItemId
+
+                          let locationCodes = context.ItemLocation
+                                    .Where(s => s.ItemId == item.Id)
+                                    .GroupBy(s => s.LocationCode.Code)
+                                    .Select(x => new
+                                    {
+                                        Id = x.Key
+                                    }).ToList()
+
                           where item.Id == id
                           select new ItemViewVM
                           {
@@ -511,7 +520,8 @@ namespace GMGInventory.Application.Repositories
                               RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                               Size = item.Size,
                               UnitCode = item.Unit.Name,
-                              Warehouse = inventory.Warehouse.Name
+                              Warehouse = inventory.Warehouse.Name,
+                              LocationCodes =  string.Join(",", locationCodes.Select(s => s.Id))
                           }).FirstOrDefault();
             return itemVM;
         }

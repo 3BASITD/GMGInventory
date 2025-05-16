@@ -16,7 +16,7 @@ namespace GMGInventory.Controllers
                               , IItemTypeRepository itemTypeRepository
                               , IItemConversionRepository itemConversionRepository
                               , IBrandRepository brandRepository
-                              , ILocationCodeRepository locationCodeRepository
+                              , IItemLocationRepository itemLocationRepository
                               , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(string search, int page)
@@ -553,6 +553,49 @@ namespace GMGInventory.Controllers
 
             TempData["SuccessMessage"] = "Item conversion successfully deleted";
             return RedirectToAction("Details", new { Id = conversion.ItemId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetLocationListJson(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
+            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
+
+            DataTablesRequestForm form = new(Request.Form);
+            return Json(await itemLocationRepository.GetAllForDataTablesAsync(form, id));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteItemLocation(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var location = await itemLocationRepository.GetAsync(id);
+            if (location == null)
+            {
+                return NotFound();
+            }
+
+            await itemLocationRepository.DeleteAsync(id);
+            TempData["SuccessMessage"] = "Item location successfully deleted";
+            return RedirectToAction("Details", new { Id = location.ItemId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateItemLocationJson(ItemDetailLocationVM itemLocationVM)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            ResponseModel responseModel = new();
+
+            await itemLocationRepository.AddAsync(itemLocationVM);
+            responseModel.Status = "Success";
+            responseModel.Message = "Item location successfully added";
+            return Json(responseModel);
         }
     }
 }
