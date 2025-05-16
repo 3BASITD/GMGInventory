@@ -652,26 +652,6 @@ namespace GMGInventory.Application.Repositories
                         return -3;
                     }
                 }
-                else if (form.SavingAs == "update")
-                {
-                    if (await context.Agents.AnyAsync(s => s.Id == form.Agent))
-                    {
-                        var so = await context.SalesOrders.Where(s => s.Id == invoice.SalesOrderId).FirstOrDefaultAsync();
-                        if (so != null)
-                        {
-                            so.AgentId = form.Agent;
-                            context.SalesOrders.Update(so);
-                        }
-                    }
-                    invoice.ControlNumber = form.BIRInvoiceNumber;
-                    invoice.InvoiceTypeId = form.InvoiceType;
-                    invoice.InvoiceDate = form.InvoiceDate;
-                    invoice.Remarks = form.Remarks;
-                    context.Invoices.Update(invoice);
-                    await context.SaveChangesAsync(currentUserId);
-
-                    return invoice.Id;
-                }
                 else
                 {
                     await DeleteInvoiceItems(form, true);
@@ -684,12 +664,15 @@ namespace GMGInventory.Application.Repositories
                             context.SalesOrders.Update(so);
                         }
                     }
-                    int statusId = await context.Statuses
+                    if (form.SavingAs != "update")
+                    {
+                        int statusId = await context.Statuses
                                                 .Where(s => ((s.Name.ToLower() == "invoice draft" && form.SavingAs.ToLower() == "save")
                                                           || (s.Name.ToLower() == "invoice submitted" && form.SavingAs.ToLower() == "post")))
                                                 .Select(s => s.Id)
                                                 .FirstAsync();
-                    invoice.StatusId = statusId;
+                        invoice.StatusId = statusId;
+                    }
                     invoice.ControlNumber = form.BIRInvoiceNumber;
                     invoice.InvoiceTypeId = form.InvoiceType;
                     invoice.InvoiceDate = form.InvoiceDate;
