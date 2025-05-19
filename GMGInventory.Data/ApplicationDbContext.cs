@@ -173,6 +173,7 @@ namespace GMGInventory.Data
         public DbSet<ItemInventory> ItemInventories { get; set; }
         public DbSet<ItemPrice> ItemPrices { get; set; }
         public DbSet<ItemType> ItemTypes { get; set; }
+        public DbSet<ItemLocation> ItemLocation { get; set; }
         public DbSet<Pack> Packs { get; set; }
         public DbSet<PackLineItem> PackLineItems { get; set; }
         public DbSet<PackReturn> PackReturns { get; set; }
