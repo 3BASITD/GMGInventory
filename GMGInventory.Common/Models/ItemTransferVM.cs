@@ -79,6 +79,8 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public int Quantity { get; set; }
+        public int? LocationCodeId { get; set; }
+
     }
 
     public class NewTransferSourceVM

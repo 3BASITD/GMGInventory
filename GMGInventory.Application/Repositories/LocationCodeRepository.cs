@@ -44,7 +44,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId, int itemId)
         {
-            var itemLocationIds = context.ItemLocation.Where(x => x.ItemId == itemId).Select(x => x.LocationCodeId).ToList();
+            var itemLocationIds = context.ItemLocations.Where(x => x.ItemId == itemId).Select(x => x.LocationCodeId).ToList();
 
             return await context.LocationCodes
 

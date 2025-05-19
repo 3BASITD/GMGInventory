@@ -5208,6 +5208,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("LocationCodeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -5224,6 +5227,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ItemId");
+
+                    b.HasIndex("LocationCodeId");
 
                     b.HasIndex("TransferItemId");
 
@@ -5734,13 +5739,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5c5596b9-0e70-4a05-a8b1-cf78bb4dccf1",
+                            ConcurrencyStamp = "7be083fc-0392-44bb-9ecb-6f0bfb403f8d",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBRpDmg2ybE0iPCzQ66f9ijTN7XQBzf+nZsxj777p1tu+FxU+GyyMrPZvR49Q9oFOQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFjW5yK+ZzQ8avYwbGTTZaqUrl1fE/an+yrJqpu8bCFnCprZbpXF4rY0tQIP49VV5A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5376de64-f11a-43f2-911b-b398d80246a2",
+                            SecurityStamp = "4801088c-be59-44f3-b50c-daaf4a05038c",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -5755,13 +5760,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "452588c7-48d1-46a6-9567-5821b8839497",
+                            ConcurrencyStamp = "fd266446-e7c6-47d5-865e-89512be376db",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAELdBqdGtPlwmNRS/GbZLGMxmC//5mDMr4DkW1afmrfXHM14aklY3cJmzwk1AdRsnhw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECZUNtRzba6KYEshDJtBhzTYzCQVfJA8VthLfIYSvXHOWaHmSmGy05P/+XZCJOYaqQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6eaf5c53-5a1d-4cfe-b681-be66d875177f",
+                            SecurityStamp = "3899afaa-32e4-4691-b798-a74690b0c40f",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6900,6 +6905,10 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.LocationCode", "LocationCode")
+                        .WithMany()
+                        .HasForeignKey("LocationCodeId");
+
                     b.HasOne("GMGInventory.Data.TransferItem", "TransferItem")
                         .WithMany("TransferItemDetails")
                         .HasForeignKey("TransferItemId")
@@ -6907,6 +6916,8 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Item");
+
+                    b.Navigation("LocationCode");
 
                     b.Navigation("TransferItem");
                 });
