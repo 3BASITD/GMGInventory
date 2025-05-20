@@ -5,6 +5,7 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -27,22 +28,22 @@ namespace GMGInventory.Application.Repositories
         {
             var transfers = from transfer in context.TransferItems
 
-                          join userc in userManager.Users on transfer.UserCreated equals userc.Id
-                          join userm in userManager.Users on transfer.UserModified equals userm.Id into m
-                          from um in m.DefaultIfEmpty()
+                            join userc in userManager.Users on transfer.UserCreated equals userc.Id
+                            join userm in userManager.Users on transfer.UserModified equals userm.Id into m
+                            from um in m.DefaultIfEmpty()
 
-                          where filter.DateFrom <= transfer.TransferDate.Date && transfer.TransferDate.Date <= filter.DateTo
+                            where filter.DateFrom <= transfer.TransferDate.Date && transfer.TransferDate.Date <= filter.DateTo
 
-                          select new WarehouseTransferVM
-                          {
-                              Destination = transfer.Destination.Name,
-                              Id = transfer.Id,
-                              ItemCount = transfer.TransferItemDetails.Count,
-                              Remarks = transfer.Remarks,
-                              Source = transfer.Source.Name,
-                              CreatedBy = userc.FirstName + " " + userc.LastName,
-                              TransferDateD = transfer.TransferDate
-                          };
+                            select new WarehouseTransferVM
+                            {
+                                Destination = transfer.Destination.Name,
+                                Id = transfer.Id,
+                                ItemCount = transfer.TransferItemDetails.Count,
+                                Remarks = transfer.Remarks,
+                                Source = transfer.Source.Name,
+                                CreatedBy = userc.FirstName + " " + userc.LastName,
+                                TransferDateD = transfer.TransferDate
+                            };
             return await transfers.ToListAsync();
         }
 
@@ -164,7 +165,7 @@ namespace GMGInventory.Application.Repositories
                               join user in userManager.Users on transfer.UserCreated equals user.Id
                               where transfer.DestinationId == WarehouseId
                                  || transfer.SourceId == WarehouseId
-                            
+
                                  && filter.DateFrom <= transfer.TransferDate.Date && transfer.TransferDate.Date <= filter.DateTo
                               select new WarehouseTransferVM
                               {
@@ -185,7 +186,7 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetWarehouseTransfersAsync(WarehouseId,filter)).AsQueryable();
+            var data = (await GetWarehouseTransfersAsync(WarehouseId, filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -364,9 +365,10 @@ namespace GMGInventory.Application.Repositories
 
             foreach (var item in formVM.Items)
             {
+                #region ItemInventories
                 var sourceItem = await context.ItemInventories
-                                              .Where(s => s.WarehouseId == formVM.Source && s.ItemId == item.Id)
-                                              .FirstAsync();
+                                               .Where(s => s.WarehouseId == formVM.Source && s.ItemId == item.Id)
+                                               .FirstAsync();
                 sourceItem.Quantity -= item.Quantity;
                 context.ItemInventories.Update(sourceItem);
                 await context.SaveChangesAsync(currentUserId);
@@ -390,6 +392,24 @@ namespace GMGInventory.Application.Repositories
                     await context.ItemInventories.AddAsync(destinationItem);
                 }
                 await context.SaveChangesAsync(currentUserId);
+                #endregion
+
+                #region LocationCode
+                var locationCodes = await context.ItemLocations.Where(x => x.ItemId == item.Id && x.LocationCodeId == item.LocationCodeId).Select(x => x.LocationCodeId).ToListAsync();
+                if (!locationCodes.Contains(item.LocationCodeId.GetValueOrDefault()))
+                {
+                    if (item.LocationCodeId != null)
+                    {
+                        var itemLoc = new ItemLocation
+                        {
+                            ItemId = item.Id,
+                            LocationCodeId = item.LocationCodeId ?? 0
+                        };
+                        await context.ItemLocations.AddAsync(itemLoc);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+                }
+                #endregion
             }
 
             return transferVM.Id;

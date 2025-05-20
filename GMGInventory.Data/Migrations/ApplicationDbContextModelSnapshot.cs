@@ -5208,6 +5208,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("LocationCodeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -5224,6 +5227,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ItemId");
+
+                    b.HasIndex("LocationCodeId");
 
                     b.HasIndex("TransferItemId");
 
@@ -6900,6 +6905,10 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.LocationCode", "LocationCode")
+                        .WithMany()
+                        .HasForeignKey("LocationCodeId");
+
                     b.HasOne("GMGInventory.Data.TransferItem", "TransferItem")
                         .WithMany("TransferItemDetails")
                         .HasForeignKey("TransferItemId")
@@ -6907,6 +6916,8 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Item");
+
+                    b.Navigation("LocationCode");
 
                     b.Navigation("TransferItem");
                 });

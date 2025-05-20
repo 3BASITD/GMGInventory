@@ -76,6 +76,7 @@
                                         <th>Source Quantity</th>
                                         <th>Transfer Quantity</th>
                                         <th>Unit</th>
+                                        <th>Location Code</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -120,6 +121,10 @@
                         <div class="form-group">
                             <label for="source-unit" class="form-label mb-0">Unit</label>
                             <input type="text" id="source-unit" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                        <div class="form-group">
+                            <label for="source-location-" class="form-label mb-0">Location Code</label>
+                            <select id="source-location" name="LocationCode" style="width: 100%;"></select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -206,6 +211,11 @@
                 $("#source-code").select2("destroy");
                 $("#source-code").empty();
             }
+
+            if ($("#source-location").attr("data-select2-id")) {
+                $("#source-location").select2("destroy");
+                $("#source-location").empty();
+            }
             $("#source-code").select2({
                 //minimumInputLength: 1,
                 placeholder: '<empty>',
@@ -247,8 +257,24 @@
                 $("#source-transfer-quantity").val($("#source-code").select2("data")[0].quantity);
                 $("#source-unit").val($("#source-code").select2("data")[0].unit);
             });
-        }
 
+            // Load Select2 Location Code
+             $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetOptions", "LocationCode")",
+                        success: function (data, status, xhr) {
+                            $("#source-location").select2({
+                                data: data,
+                                allowClear: true,
+                                placeholder: {
+                                    id: "",
+                                    text: "<empty>"
+                                },
+                                dropdownParent: $('#addModal')
+                            });
+                        }
+              });
+         }
         // Validation for Add Item Modal
         var validateAdd = $("#form-item").validate({
             rules: {
@@ -290,11 +316,13 @@
                     name: $("#source-code").select2("data")[0].name,
                     sourceQuantity: $("#source-code").select2("data")[0].quantity,
                     transferQuantity: $("#source-transfer-quantity").val() || 0,
-                    unit: $("#source-code").select2("data")[0].unit
+                    unit: $("#source-code").select2("data")[0].unit,
+                    locationCode: $("#source-location").select2("data")[0].text,
+                    locationCodeId: $("#source-location").select2("data")[0].id,
                 }).draw();
-                AddItemFormReset();
 
                 toastr.success("Added " + $("#source-code").select2("data")[0].text + " on Transfer Item(s)", "Success");
+                AddItemFormReset();
             }
         }
 
@@ -304,6 +332,7 @@
             $("#source-current-quantity").val("0");
             $("#source-transfer-quantity").val("0");
             $("#source-unit").val("");
+            $("#source-location").val("").trigger("change");
         }
 
         if (user_access.canAdd) {
@@ -350,7 +379,9 @@
                     },
                     name: "TransferQuantity"
                 },
-                { data: "unit", name: "Name", className: "form-cell" }
+                { data: "unit", name: "Name", className: "form-cell" },
+                { data: "locationCode", name: "LocationCode", className: "form-cell" },
+                { data: "locationCodeId", name: "LocationCodeId", className: "form-cell",visible: false },
             ]
         });
 
@@ -368,7 +399,8 @@
                 var row_input = parseInt($(this.node()).find("input").val());
                 item_to_transfer.push({
                     id: row_data.id,
-                    quantity: row_input
+                    quantity: row_input,
+                    locationCodeId: row_data.locationCodeId
                 });
             });
             return item_to_transfer;
