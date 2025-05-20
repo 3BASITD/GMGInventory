@@ -493,7 +493,7 @@ namespace GMGInventory.Application.Repositories
                           from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated <= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
                           join inventory in context.ItemInventories on item.Id equals inventory.ItemId
 
-                          let locationCodes = context.ItemLocation
+                          let locationCodes = context.ItemLocations
                                     .Where(s => s.ItemId == item.Id)
                                     .GroupBy(s => s.LocationCode.Code)
                                     .Select(x => new

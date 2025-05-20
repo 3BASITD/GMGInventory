@@ -42,7 +42,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ItemDetailLocationVM>> GetAllLocationAsync(int id)
         {
-            var locs = from loc in context.ItemLocation
+            var locs = from loc in context.ItemLocations
                               where loc.ItemId == id
                               select new ItemDetailLocationVM
                               {
@@ -85,14 +85,14 @@ namespace GMGInventory.Application.Repositories
                 ItemId = itemDetailLocationVM.ItemId,
                 LocationCodeId = itemDetailLocationVM.LocationCodeId
             };
-            await context.ItemLocation.AddAsync(location);
+            await context.ItemLocations.AddAsync(location);
             await context.SaveChangesAsync(currentUserId);
         }
 
         public async Task DeleteAsync(int itemId, int locationCodeId)
         {
-            var location = context.ItemLocation.Where(s => s.ItemId == itemId && s.LocationCodeId >= locationCodeId).First();
-            context.ItemLocation.Remove(location);
+            var location = context.ItemLocations.Where(s => s.ItemId == itemId && s.LocationCodeId >= locationCodeId).First();
+            context.ItemLocations.Remove(location);
             await context.SaveChangesAsync(currentUser);
         }
     }
