@@ -64,6 +64,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }
+
+        [Display(Name = "Location Code")]
+        public string LocationCode { get; set; }
     }
 
     public class TransferFormVM

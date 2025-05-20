@@ -264,7 +264,8 @@ namespace GMGInventory.Application.Repositories
                                   Source = transfer.TransferItem.Source.Code,
                                   CreatedBy = user.FirstName + " " + user.LastName,
                                   TransferDateD = transfer.TransferItem.TransferDate,
-                                  Unit = transfer.Item.Unit.Code
+                                  Unit = transfer.Item.Unit.Code,
+                                  LocationCode = transfer.LocationCode.Code
                               });
             return await transferVM.ToListAsync();
         }
@@ -288,7 +289,8 @@ namespace GMGInventory.Application.Repositories
                                     || x.Source.ToLower().Contains(form.SearchValue)
                                     || x.CreatedBy.ToLower().Contains(form.SearchValue)
                                     || x.TransferDate.ToLower().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue));
+                                    || x.Unit.ToLower().Contains(form.SearchValue)
+                                    || x.LocationCode.ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -309,6 +311,7 @@ namespace GMGInventory.Application.Repositories
                         case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
                         case "TransferDate": data = data.OrderBy(s => s.TransferDateD); break;
                         case "Unit": data = data.OrderBy(s => s.Unit); break;
+                        case "LocationCode": data = data.OrderBy(s => s.LocationCode); break;
                         default: break;
                     }
                 }
@@ -326,6 +329,7 @@ namespace GMGInventory.Application.Repositories
                         case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
                         case "TransferDate": data = data.OrderByDescending(s => s.TransferDateD); break;
                         case "Unit": data = data.OrderByDescending(s => s.Unit); break;
+                        case "LocationCode": data = data.OrderByDescending(s => s.LocationCode); break;
                         default: break;
                     }
                 }
@@ -358,7 +362,8 @@ namespace GMGInventory.Application.Repositories
             {
                 ItemId = s.Id,
                 Quantity = s.Quantity,
-                TransferItemId = transferVM.Id
+                TransferItemId = transferVM.Id,
+                LocationCodeId = s.LocationCodeId
             });
             await context.AddRangeAsync(itemsVM);
             await context.SaveChangesAsync(currentUserId);
