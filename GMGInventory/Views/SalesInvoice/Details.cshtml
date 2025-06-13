@@ -14,11 +14,12 @@
         <div class="card-header">
             <span class="card-title po-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                @if (Model.Status != "Cancelled")
+                @if (Model.Status.ToLower() != "cancelled")
                 {
                     <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
                         <span class="fas fa-trash"></span> Cancel
                     </button>
+                    @Model.CurrentUsersDraft
                     @if (Model.CurrentUsersDraft == true)
                     {
                         @if (userAccess.CanAdd)
@@ -691,11 +692,11 @@
         var validateCreate = $("#form-invoice").validate({
             rules: {
                 ControlNumber: { required: true, maxlength: 50 },
-                Remarks: { maxlength: 250 }
+                Remarks: { maxlength: 500 }
             },
             messages: {
                 ControlNumber: { required: "Please enter BIR Invoice Number", maxlength: "BIR Invoice Number must not exceed 50 characters." },
-                Remarks: { maxlength: "Remarks must not exceed 250 characters." }
+                Remarks: { maxlength: "Remarks must not exceed 500 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();

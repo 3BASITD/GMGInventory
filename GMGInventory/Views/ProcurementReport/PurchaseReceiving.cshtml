@@ -203,7 +203,16 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                return $(
+                    "<strong>" + repo.text + "</strong> " +
+                    (repo.text != repo.name
+                        ? "<em class='fw-light'> - " + repo.name + "</em>"
+                        : "") +
+                    "<br />" +
+                    "<small class='text-muted'>" +
+                    (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                    (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
+                    "</small>");
             },
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")",

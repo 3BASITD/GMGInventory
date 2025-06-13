@@ -232,7 +232,7 @@ namespace GMGInventory.Application.Repositories
                                 QuantityD = request.Quantity,
                                 MaxQuantityD = request.PurchaseRequest.Purpose.Name.ToLower() == "rush order"
                                              ? ((soli == null ? 0 : soli.Quantity) - (ii + requests))
-                                             : 1999999, 
+                                             : 1999999,
                                 UnitId = request.Unit != null ? request.Unit.Id
                                        : request.Item != null ? request.Item.Unit.Id
                                        : 0,

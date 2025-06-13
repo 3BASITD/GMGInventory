@@ -44,6 +44,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Name")]
         public string Name { get; set; }
 
+        [Display(Name = "Old SKU / Code")]
+        public string? OldCode { get; set; }
+
         [Display(Name = "Part Number")]
         public string? PartNumber { get; set; }
 
@@ -111,6 +114,11 @@ namespace GMGInventory.Common.Models
         [MinLength(5)]
         [Display(Name = "Name")]
         public string Name { get; set; }
+
+        [Required]
+        [StringLength(20)]
+        [Display(Name = "Old SKU / Code")]
+        public string? OldCode { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -195,6 +203,7 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
+        public string? OldCode { get; set; }
         public string PartNumber { get; set; }
         public string InterchangeNumber { get; set; }
         public string Warehouse { get; set; }

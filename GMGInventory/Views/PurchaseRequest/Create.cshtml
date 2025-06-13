@@ -179,6 +179,7 @@
                             <div class="form-group">
                                 <label for="add-quantity" class="form-label mb-0">Quantity</label>
                                 <input type="number" min="0" max="1999999" data-max-quantity="2999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                <label class="text-warning text-xs fw-lighter fst-italic m-0 add-quantity-warning"></label>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-unit-container">
@@ -230,8 +231,11 @@
         var currentType = null;
         var currentPurpose = null;
         var currentRegion = null;
+
+        var itemDT;
+
         if ($("#resubmitPRId").length) {
-            // for resubmitting a disapproved sales order
+            // for resubmitting a disapproved purchase request
             $.ajax({
                 type: "post",
                 url: "@Url.Action("DetailsJson")",
@@ -242,24 +246,24 @@
                     currentType = data.typeId;
                     currentPurpose = data.purposeId;
                     currentRegion = data.regionId;
-                    loadTypeOptions(currentType, currentPurpose);
-                    $("#request-purpose-definition").val(data.purposeId == null ? data.purpose : "");
-                    $("#request-region").val(data.regionId).trigger("change");
-                    $("#request-date-requested").val(data.requestDate3);
-                    $("#request-remarks").val(data.remarks);
-                },
-                complete: function (xhr, status) {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("GetItemListJson")",
-                        data: {
-                            purchaseRequestId: $("#resubmitPRId").val()
-                        },
-                        success: function (data, status, xhr) {
-                            $.each(data, function (i, v) {
-                                itemDT.row.add(v).draw();
-                            });
-                        }
+                    loadTypeOptions(currentType, currentPurpose).then(() => {
+                        $("#request-purpose-definition").val(data.purposeId == null ? data.purpose : "");
+                        $("#request-region").val(data.regionId).trigger("change");
+                        $("#request-date-requested").val(data.requestDate3);
+                        $("#request-remarks").val(data.remarks);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("GetItemListJson")",
+                            data: {
+                                purchaseRequestId: $("#resubmitPRId").val()
+                            },
+                            success: function (data, status, xhr) {
+                                $.each(data, function (i, v) {
+                                    itemDT.row.add(v).draw();
+                                });
+                            }
+                        });
                     });
                 }
             });
@@ -267,7 +271,7 @@
             loadTypeOptions(currentType, currentPurpose);
         }
 
-        var itemDT = $('.table-item').DataTable({
+        itemDT = $('.table-item').DataTable({
             data: [],
             filter: true,
             responsive: true,
@@ -323,7 +327,7 @@
                     data: function (data, type, dataToSet) {
                         var soMax = checkIfRequired("SONumber") ? data.maxQuantityD : 1999999;
                         if (data.quantityD > soMax) {
-                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot exceed ' + soMax + ' unserved quantity.</label>';
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-warning" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Requesting higher than ' + soMax + ' unserved quantity.</label>';
                         } else if (data.quantityD == 0) {
                             return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to request.</label>';
                         } else {
@@ -445,51 +449,58 @@
 
         // Load request type data for select2
         function loadTypeOptions(selectedType, selectedPurpose) {
-            $("#request-type").off("change");
-            $("#request-type").empty().trigger('change');
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetTypeOptions")",
-                data: {
-                    SelectedId: selectedType
-                },
-                success: function (data, status, xhr) {
-                    $("#request-type").select2({
-                        data: data,
-                        minimumResultsForSearch: -1
-                    }).on("change", function () {
-                        var selectedTypeId = $(this).val();
-                        loadPurposeOptions(selectedTypeId, -1);
-                    });
-                },
-                complete: function (xhr, status) {
-                    loadPurposeOptions($("#request-type").val(), selectedPurpose);
-                }
+            return new Promise((resolve) => {
+                $("#request-type").off("change");
+                $("#request-type").empty().trigger('change');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetTypeOptions")",
+                    data: {
+                        SelectedId: selectedType
+                    },
+                    success: function (data, status, xhr) {
+                        $("#request-type").select2({
+                            data: data,
+                            minimumResultsForSearch: -1
+                        }).on("change", function () {
+                            var selectedTypeId = $(this).val();
+                            loadPurposeOptions(selectedTypeId, -1);
+                        });
+                    },
+                    complete: function (xhr, status) {
+                        loadPurposeOptions($("#request-type").val(), selectedPurpose).then(() => {
+                            resolve();
+                        });;
+                    }
+                });
             });
         }
 
         // Load request purpose data for select2
         function loadPurposeOptions(selectedType, selectedPurpose) {
-            $("#request-purpose").off("change");
-            $("#request-purpose").empty().trigger('change');
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetPurposeOptions")",
-                data: {
-                    TypeId: selectedType,
-                    SelectedId: selectedPurpose
-                },
-                success: function (data) {
-                    $("#request-purpose").select2({
-                        data: data,
-                        minimumResultsForSearch: -1
-                    }).on("change", function () {
+            return new Promise((resolve) => {
+                $("#request-purpose").off("change");
+                $("#request-purpose").empty().trigger('change');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetPurposeOptions")",
+                    data: {
+                        TypeId: selectedType,
+                        SelectedId: selectedPurpose
+                    },
+                    success: function (data) {
+                        $("#request-purpose").select2({
+                            data: data,
+                            minimumResultsForSearch: -1
+                        }).on("change", function () {
+                            changingTypePurposeOrRegion();
+                        });
+                    },
+                    complete: function (xhr, status) {
                         changingTypePurposeOrRegion();
-                    });
-                },
-                complete: function (xhr, status) {
-                    changingTypePurposeOrRegion();
-                }
+                        resolve();
+                    }
+                });
             });
         }
 
@@ -502,7 +513,9 @@
                     data: data,
                     minimumResultsForSearch: -1
                 }).on("change", function () {
-                    changingTypePurposeOrRegion();
+                    if ($.fn.select2 && $("#request-type").hasClass("select2-hidden-accessible") && $("#request-purpose").hasClass("select2-hidden-accessible")) {
+                        changingTypePurposeOrRegion();
+                    }
                 });
             }
         });
@@ -510,7 +523,7 @@
         function changingTypePurposeOrRegion() {
             var selectedType = $("#request-type").val();
             var selectedPurpose = $("#request-purpose").val();
-
+            console.log(selectedType + " " + selectedPurpose);
             var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
             var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
             var selectedRegion = typeText == "non-automotive" && purposeText == "one-time purchase" ? $("#order-region").val() : null;
@@ -622,7 +635,16 @@
                     if (repo.loading) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                    return $(
+                        "<strong>" + repo.text + "</strong> " +
+                        (repo.text != repo.name
+                            ? "<em class='fw-light'> - " + repo.name + "</em>"
+                            : "") +
+                        "<br />" +
+                        "<small class='text-muted'>" +
+                        (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                        (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
+                        "</small>");
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Item")",
@@ -659,6 +681,8 @@
             $("#add-stock").val(0);
             $("#add-quantity").val(0);
             $("#add-quantity").attr("data-max-quantity", "1999999");
+            $(".add-quantity-warning").toggle(false);
+            $(".add-quantity-warning").text("");
             $("#add-unit").val("");
 
             if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
@@ -734,6 +758,19 @@
                 clearItemForm();
             });
         }
+
+        $("#add-quantity").on("change", function() {
+            var quantity = parseInt($(this).val());
+            var max_quantity = parseInt($(this).attr("data-max-quantity"));
+            console.log(quantity + " " + max_quantity)
+            if(quantity > max_quantity) {
+                $(".add-quantity-warning").toggle(true);
+                $(".add-quantity-warning").text("Requesting higher than " + max_quantity + " unserved quantity.");
+            } else {
+                $(".add-quantity-warning").toggle(false);
+                $(".add-quantity-warning").text("");
+            }
+        });
 
         // Load so for select2
         $("#add-so-number").select2({
@@ -839,7 +876,7 @@
                 },
                 Name: {
                     required: function () { return checkIfRequired("Name"); },
-                    maxlength: 100
+                    maxlength: 250
                 },
                 // Stock: {
                 //     number: true
@@ -848,10 +885,10 @@
                     required: function () { return checkIfRequired("Quantity"); },
                     number: true,
                     isNotZero: true,
-                    max: function () {
-                        const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
-                        return maxValue;
-                    }
+                    // max: function () {
+                    //     const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
+                    //     return maxValue;
+                    // }
                 },
                 Purpose: {
                     required: function () { return checkIfRequired("Purpose"); },
@@ -867,7 +904,7 @@
                 },
                 Name: {
                     required: "Please enter the name of item.",
-                    maxlength: "Name must not exceed 100 characters."
+                    maxlength: "Name must not exceed 250 characters."
                 },
                 // Stock: {
                 //     number: "Please enter a valid number."
@@ -876,10 +913,10 @@
                     required: "Please enter a quantity.",
                     number: "Please enter a valid number.",
                     isNotZero: "Can not request an item with 0 quantity.",
-                    max: function () {
-                        const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
-                        return "Cannot exceed " + maxValue + " unserved quantity.";
-                    }
+                    // max: function () {
+                    //     const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
+                    //     return "Cannot exceed " + maxValue + " unserved quantity.";
+                    // }
                 },
                 Purpose: {
                     required: "Please enter the purpose.",
@@ -970,7 +1007,7 @@
                     required: true
                 },
                 Remarks: {
-                    maxlength: 100
+                    maxlength: 500
                 }
             },
             messages: {
@@ -988,7 +1025,7 @@
                     required: "Please enter the date of request."
                 },
                 Remarks: {
-                    maxlength: "Remarks can not exceed 100 characters."
+                    maxlength: "Remarks can not exceed 500 characters."
                 }
             },
             submitHandler: function (form, event) {
@@ -1017,8 +1054,23 @@
             } else if (items.filter(s => parseInt(s.quantityD) == 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
             } else if (items.filter(s => parseInt(s.quantityD) > parseInt(s.maxQuantityD)).length > 0) {
-                toastr.warning("Some items have invalid quantity.", "Warning");
+                // toastr.warning("Some items have invalid quantity.", "Warning");
+                swal({
+                    title: "Purchase Request Quantity",
+                    text: "Some of the quantity has exceeded unserved quantity. Continue this purchase request?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm != null) {
+                        DoSaveRequest();
+                    }
+                });
             } else {
+                DoSaveRequest();
+            }
+
+            function DoSaveRequest() {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("AddJson")",

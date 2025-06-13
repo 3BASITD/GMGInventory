@@ -380,7 +380,16 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                return $(
+                    "<strong>" + repo.text + "</strong> " +
+                    (repo.text != repo.name
+                        ? "<em class='fw-light'> - " + repo.name + "</em>"
+                        : "") +
+                    "<br />" +
+                    "<small class='text-muted'>" +
+                    (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                    (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
+                    "</small>");
             },
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")",
@@ -723,7 +732,8 @@
                 CustomerCode: { required: true },
                 AgentCode: { required: true },
                 OrderDate: { required: true },
-                DeliveryDate: { required: true, greaterThanOrEqualDate: "#order-date" }
+                DeliveryDate: { required: true, greaterThanOrEqualDate: "#order-date" },
+                Remarks: { maxlength: 500 }
             },
             messages: {
                 CustomerCode: { required: "Please select customer" },
@@ -732,7 +742,8 @@
                 DeliveryDate: {
                     required: "Please select date of delivery",
                     greaterThanOrEqualDate: "Required delivery date must be on or after the order date"
-                }
+                },
+                Remarks: { maxlength: "Remarks must not exceed 500 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();

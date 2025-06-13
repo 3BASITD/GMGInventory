@@ -35,14 +35,15 @@ namespace GMGInventory.Application.Repositories
             return currency?.Id;
         }
 
-        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonCurrencyOptionModel>> GetOptions(int? IncludeId)
         {
             return await context.Currencies
                 //.Where(s => s.IsActive || s.Id == IncludeId)
-                .Select(s => new JsonOptionsModel
+                .Select(s => new JsonCurrencyOptionModel
                 {
                     Id = s.Id.ToString(),
                     Text = s.Name,
+                    Rate = s.Rate,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
                 .OrderBy(s => s.Text)

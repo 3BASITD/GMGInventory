@@ -112,7 +112,7 @@
                     </span>
                     <div style="display:flex">
                         <b class="d-block form-gayahin">
-                            @Model?.LocationCodes
+                            @(string.IsNullOrWhiteSpace(Model?.LocationCodes) ? "N/A" : Model?.LocationCodes)
                         </b>
                         <button class="btn btn-warning btn-xs locationCodeBtn ml-2" data-bs-toggle="modal" data-bs-target="#addLocationCodeModal" data-microtip-title="Edit Location Codes"><i class="fas fa-pencil-alt"></i></button>
                     </div>
@@ -719,7 +719,16 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                return $(
+                    "<strong>" + repo.text + "</strong> " +
+                    (repo.text != repo.name
+                        ? "<em class='fw-light'> - " + repo.name + "</em>"
+                        : "") +
+                    "<br />" +
+                    "<small class='text-muted'>" +
+                    (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                    (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
+                    "</small>");
             },
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")",
@@ -755,7 +764,16 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                return $(
+                    "<strong>" + repo.text + "</strong> " +
+                    (repo.text != repo.name
+                        ? "<em class='fw-light'> - " + repo.name + "</em>"
+                        : "") +
+                    "<br />" +
+                    "<small class='text-muted'>" +
+                    (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                    (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
+                    "</small>");
             },
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")",
@@ -1110,7 +1128,16 @@
                                 if (repo.loading) {
                                     return repo.text;
                                 }
-                                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                                return $(
+                                    "<strong>" + repo.text + "</strong> " +
+                                    (repo.text != repo.name
+                                        ? "<em class='fw-light'> - " + repo.name + "</em>"
+                                        : "") +
+                                    "<br />" +
+                                    "<small class='text-muted'>" +
+                                    (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                                    (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
+                                    "</small>");
                             },
                             ajax: {
                                 url: "@Url.Action("GetOptions", "Item")",
@@ -1344,13 +1371,15 @@
                         New: {
                             required: true,
                             notEqualTo: "#quantity-current"
-                        }
+                        },
+                        Remarks: { maxlength: 500 }
                     },
                     messages: {
                         New: {
                             required: "Please enter new quantity.",
                             notEqualTo: "Equal quantity. No change will be done."
-                        }
+                        },
+                        Remarks: { maxlength: "Remarks must not exceed 500 characters." }
                     },
                     submitHandler: function (form) {
                         DoQuantity();

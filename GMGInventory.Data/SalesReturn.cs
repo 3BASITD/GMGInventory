@@ -21,7 +21,7 @@ namespace GMGInventory.Data
         public Customer? Customer { get; set; }
         public DateTime ReturnDate { get; set; }
 
-        [Column(TypeName = "nvarchar(250)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string Remarks { get; set; }
 
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }

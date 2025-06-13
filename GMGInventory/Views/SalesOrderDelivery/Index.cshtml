@@ -609,13 +609,13 @@
                 rules: {
                     Forwarder: { required: true },
                     Waybill: { required: true, maxlength: 150 },
-                    Remarks: { maxlength: 250 },
+                    Remarks: { maxlength: 500 },
                     Representative: { maxlength: 150 }
                 },
                 messages: {
                     Forwarder: { required: "Please select a forwarder." },
                     Waybill: { required: "Please enter waybill number.", maxlength: "Waybill must not exceed 150 characters." },
-                    Remarks: { maxlength: "Remarks must not exceed 250 characters." },
+                    Remarks: { maxlength: "Remarks must not exceed 500 characters." },
                     Representative: { maxlength: "Driver / Representative must not exceed 150 characters." }
                 },
                 submitHandler: function (form, event) {

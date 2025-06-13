@@ -170,6 +170,27 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> UpdateCostJson(POItemCostVM cost)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await orderRepository.UpdateCostAsync(cost);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetCostUpdateListJson(int OrderItemId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await orderRepository.GetCostUpdateListAsync(OrderItemId);
+            return Json(response);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> ApproveJson(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.ApproveDisapprove);

@@ -25,7 +25,7 @@ namespace GMGInventory.Data
         public int? ItemId { get; set; }
         public virtual Item Item { get; set; }
 
-        [Column(TypeName = "nvarchar(100)")]
+        [Column(TypeName = "nvarchar(250)")]
         public string ItemDescription { get; set; }
 
         [ForeignKey("UnitId")]

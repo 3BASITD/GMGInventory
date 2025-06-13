@@ -20,7 +20,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(150)")]
         public string? Waybill { get; set; }
 
-        [Column(TypeName = "nvarchar(250)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
         public DateTime? DatePickup { get; set; }

@@ -15,7 +15,7 @@ namespace GMGInventory.Data
         public int QuantityFrom { get; set; }
         public int QuantityTo { get; set; }
 
-        [Column(TypeName = "nvarchar(250)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
     }
 }

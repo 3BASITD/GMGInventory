@@ -30,7 +30,7 @@ namespace GMGInventory.Application.Repositories
                                               .Include(s => s.Status)
                          join user in userManager.Users on order.UserCreated equals user.Id
                          where string.IsNullOrWhiteSpace(search)
-                         && order.Status.Code != "Draft"
+                         && order.Status.Code.ToLower() != "draft"
                             || (order.PONumber.ToLower().Contains(search.ToLower()))
                          orderby order.PONumber ascending
                          select new JsonPurchaseOrderOptionsModel
@@ -423,12 +423,12 @@ namespace GMGInventory.Application.Repositories
 
             int success = 0;
             var poItems = await context.PurchaseOrderLineItems.Where(s => s.PurchaseOrderId == form.Id).ToListAsync();
-            foreach(var item in poItems)
+            foreach (var item in poItems)
             {
-                var formItem = form.Items.Where(s=>s.Item == item.ItemId).FirstOrDefault();
-                if(formItem != null && (item.UnitPrice != formItem.UnitPrice 
-                                     || item.Discount1 != formItem.Discount1 
-                                     || item.Discount2 != formItem.Discount2 
+                var formItem = form.Items.Where(s => s.Item == item.ItemId).FirstOrDefault();
+                if (formItem != null && (item.UnitPrice != formItem.UnitPrice
+                                     || item.Discount1 != formItem.Discount1
+                                     || item.Discount2 != formItem.Discount2
                                      || item.Discount3 != formItem.Discount3))
                 {
                     item.UnitPrice = formItem.UnitPrice;

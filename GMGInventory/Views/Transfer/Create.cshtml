@@ -144,6 +144,23 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
+        // Load Select2 Location Code
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "LocationCode")",
+            success: function (data, status, xhr) {
+                $("#source-location").select2({
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "<none>"
+                    },
+                    dropdownParent: $('#addModal')
+                });
+            }
+        });
+
         // Load warehouse data for select2
         var warehouseOption;
         $.ajax({
@@ -203,6 +220,7 @@
         function ReloadTransferItem() {
             LoadSourceItems();
             destinationDT.clear().draw();
+            $("#source-location").val("").trigger("change");
         }
 
         function LoadSourceItems() {
@@ -212,10 +230,6 @@
                 $("#source-code").empty();
             }
 
-            if ($("#source-location").attr("data-select2-id")) {
-                $("#source-location").select2("destroy");
-                $("#source-location").empty();
-            }
             $("#source-code").select2({
                 //minimumInputLength: 1,
                 placeholder: '<empty>',
@@ -257,24 +271,8 @@
                 $("#source-transfer-quantity").val($("#source-code").select2("data")[0].quantity);
                 $("#source-unit").val($("#source-code").select2("data")[0].unit);
             });
-
-            // Load Select2 Location Code
-             $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("GetOptions", "LocationCode")",
-                        success: function (data, status, xhr) {
-                            $("#source-location").select2({
-                                data: data,
-                                allowClear: true,
-                                placeholder: {
-                                    id: "",
-                                    text: "<empty>"
-                                },
-                                dropdownParent: $('#addModal')
-                            });
-                        }
-              });
          }
+
         // Validation for Add Item Modal
         var validateAdd = $("#form-item").validate({
             rules: {
@@ -343,10 +341,12 @@
         // Validation for Create Modal
         var validateCreate = $("#form-transfer").validate({
             rules: {
-                TransferDate: { required: true }
+                TransferDate: { required: true },
+                Remarks: { maxlength: 500 }
             },
             messages: {
-                TransferDate: { required: "Please enter date of transfer." }
+                TransferDate: { required: "Please enter date of transfer." },
+                Remarks: { maxlength: "Sales Return must not exceed 500 characters" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();

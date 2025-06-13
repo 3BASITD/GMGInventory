@@ -90,7 +90,7 @@ namespace GMGInventory.Application.Repositories
             var lackOrders = from soitem in context.SalesOrderLineItems
                              join inventory in context.ItemInventories on soitem.ItemId equals inventory.ItemId into inv
                              from inventory in inv.DefaultIfEmpty()
-                             join request in context.PurchaseRequestLineItems on soitem.SalesOrderId equals request.SalesOrderId into req
+                             join request in context.PurchaseRequestLineItems.Where(s => s.PurchaseRequest.Status.Code.ToLower() != "disapproved") on soitem.SalesOrderId equals request.SalesOrderId into req
                              from request in req.DefaultIfEmpty()
                              where soitem.Quantity > (inventory == null ? 0 : inventory.Quantity) + (request == null ? 0 : request.Quantity)
                              select soitem.SalesOrderId

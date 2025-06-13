@@ -29,6 +29,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string SalesInvoiceNumber { get; set; }
 
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
         [ForeignKey("StatusId")]

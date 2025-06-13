@@ -799,6 +799,12 @@
         $("#edit-area").select2({
             //minimumInputLength: 1,
             placeholder: "",
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.name + "</strong><span> - " + repo.text + "</span>");
+            },
             ajax: {
                 url: "@Url.Action("GetByRegionOptions", "Area")",
                 dataType: 'json',
@@ -1237,6 +1243,7 @@
                 // ContactPerson: { maxlength: 150 },
                 // ContactNumber: { maxlength: 100 },
                 // FaxNumber: { maxlength: 100 },
+                Remarks: { maxlength: 500 }
             },
             messages: {
                 Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
@@ -1246,7 +1253,8 @@
                 // Address: { required: "Please enter address." },
                 // ContactPerson: { maxlength: "Contact Person must not exceed 150 characters." },
                 // ContactNumber: { maxlength: "Contact Number number must not exceed 100 characters." },
-                // FaxNumber: { maxlength: "Fax Number number must not exceed 100 characters." }
+                // FaxNumber: { maxlength: "Fax Number number must not exceed 100 characters." },
+                Remarks: { maxlength: "Remarks must not exceed 500 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();

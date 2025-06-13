@@ -19,6 +19,7 @@ namespace GMGInventory.Data
 
         public DateTime ReturnDate { get; set; }
 
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]

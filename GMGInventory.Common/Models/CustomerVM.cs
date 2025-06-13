@@ -127,7 +127,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Region")]
         public string RegionName { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(500)]
         [MinLength(3)]
         //[Display(Name = "Customer Status")] bakit customer status?
         [Display(Name = "Remarks")]

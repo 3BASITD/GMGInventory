@@ -449,6 +449,12 @@
         $("#create-area").select2({
             //minimumInputLength: 1,
             placeholder: "",
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.name + "</strong><span> - " + repo.text + "</span>");
+            },
             ajax: {
                 url: "@Url.Action("GetByRegionOptions", "Area")",
                 dataType: 'json',
@@ -653,7 +659,8 @@
                 ContactNumber: { maxlength: 50 },
                 Email: { maxlength: 50 },
                 Address: { required: true },
-                CreditLimit: { required: true, range: [0, 1999999.99] }
+                CreditLimit: { required: true, range: [0, 1999999.99] },
+                Remarks: { maxlength: 500 }
             },
             messages: {
                 Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
@@ -663,7 +670,8 @@
                 ContactNumber: { maxlength: "Contact Number number must not exceed 50 characters." },
                 Email: { maxlength: "Email number must not exceed 50 characters." },
                 Address: { required: "Please enter address." },
-                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." }
+                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
+                Remarks: { maxlength: "Remarks must not exceed 500 characters." }
 
             },
             submitHandler: function (form, event) {

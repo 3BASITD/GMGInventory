@@ -57,7 +57,7 @@ namespace GMGInventory.Data
         //[Column(TypeName = "decimal(18, 2)")]
         //public decimal OutstandingBalance { get; set; }
 
-        [Column(TypeName = "nvarchar(250)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]

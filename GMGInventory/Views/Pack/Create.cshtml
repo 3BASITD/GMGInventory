@@ -155,6 +155,10 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <div class="form-check form-switch mt-2" style="position: absolute; left: 0;">
+                    <input class="form-check-input mr-2" type="checkbox" id="hide-completed">
+                    <label class="form-check-label" for="hide-completed">Hide Completed Items</label>
+                </div>
                 <button type="button" class="btn btn-primary btn-add-item">
                     <span class="fas fa-plus"></span> Add
                 </button>
@@ -271,18 +275,47 @@
                 { data: "grossPrice", name: "GrossPrice", className: "text-end" }
             ],
             order: [[1, "asc"]],
-            createdRow: function (row, data, dataIndex) {
-                if (data.remainingQuantityD == 0) {
-                    $(row).addClass("text-muted");
-                } else if (data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
-                    $(row).addClass("text-danger");
-                }
+            // createdRow: function (row, data, dataIndex) {
+            //     if (data.remainingQuantityD == 0) {
+            //         $(row).addClass("text-muted");
+            //         if($("#hide-completed").prop("checked")) {
+            //             $(row).hide();
+            //         } else {
+            //             $(row).show();
+            //         }
+            //     } else if (data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
+            //         $(row).addClass("text-danger");
+            //     }
+            // }
+            drawCallback: function (settings) {
+                var api = this.api();
+                api.rows().every(function () {
+                    var data = this.data();
+                    var row = this.node();
+
+                    if (data.remainingQuantityD == 0) {
+                        $(row).addClass("text-muted");
+                        if ($("#hide-completed").prop("checked")) {
+                            $(row).hide();
+                        } else {
+                            $(row).show();
+                        }
+                    } else if (data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
+                        $(row).addClass("text-danger");
+                    } else {
+                        $(row).removeClass("text-muted text-danger").show(); // reset styles
+                    }
+                });
             }
         });
 
         orderDT.on("draw", function () {
             $(".table-order thead th").removeClass("text-end");
             dtCheckboxes();
+        });
+
+        $("#hide-completed").on("change", function() {
+            orderDT.draw();
         });
 
         $(".btn-add-item").on("click", function () {
@@ -439,8 +472,9 @@
                 }
             }
         });
+
         itemDT.on("draw", function () {
-            $(".btn-remove-item").off("click").on("click", function () {
+            $(".btn-remove-item").off("click").on("click",  function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
                 var quantityToPack = parseInt(rowdata.quantity);
                 var deletedBoxNumber = rowdata.boxNumber;

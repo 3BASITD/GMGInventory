@@ -121,4 +121,19 @@ namespace GMGInventory.Common.Models
         public decimal Discount2 { get; set; }
         public decimal Discount3 { get; set; }
     }
+
+    public class POItemCostVM
+    {
+        public int Id { get; set; }
+        public int POItemId { get; set; }
+        public string Item { get; set; }
+        public string OldCost => string.Format(SystemFormat.StringDecimalComma, OldCostD);
+        public decimal OldCostD { get; set; }
+        public string NewCost => string.Format(SystemFormat.StringDecimalComma, NewCostD);
+        public decimal NewCostD { get; set; }
+        public string Remarks { get; set; }
+        public string UserCreated { get; set; }
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+    }
 }

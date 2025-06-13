@@ -21,7 +21,12 @@ namespace GMGInventory.Data
         public int SupplierId { get; set; }
         public virtual Supplier Supplier { get; set; }
 
-        [ForeignKey("TermId")]
+        [ForeignKey("CurrencyId")]
+        public int CurrencyId { get; set; }
+        public virtual Currency Currency { get; set; }
+
+        [Column(TypeName = "decimal(18, 5)")]
+        public decimal CurrencyRate { get; set; }
         public int TermId { get; set; }
         public virtual CreditTerm Term { get; set; }
 
@@ -38,7 +43,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string CanvasSummaryReference { get; set; }
 
-        [Column(TypeName = "nvarchar(250)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]

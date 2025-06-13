@@ -85,7 +85,7 @@ namespace GMGInventory.Application.Repositories
                                           .Select(a => (int?)a.Quantity)
                                           .Sum() ?? 0
                            where poli != prli.Quantity
-                           && (RegionId == null || prli.Item.SalesOrderLineItems.First().SalesOrder.Customer.Area.Region.Id == RegionId)
+                           && (RegionId == null || prli.SalesOrder.SalesOrderLineItems.First().SalesOrder.Customer.Area.Region.Id == RegionId)
                            select prli.PurchaseRequestId;
 
 
@@ -107,28 +107,28 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
         {
-                var requests = from prli in context.PurchaseRequestLineItems
-                               let poli = context.PurchaseOrderNewLineItems
-                                              .Where(a => a.RequestItemId == prli.Id
-                                                       && a.PurchaseOrder.Status.Name.ToLower() == "approved")
-                                              .Select(a => (int?)a.Quantity)
-                                              .Sum() ?? 0
-                               where prli.PurchaseRequestId == RequestId
-                               && poli < prli.Quantity
-                               select new JsonPurchaseItemOptionsModel
-                               {
-                                   Id = prli.Id.ToString(),
-                                   Text = prli.ItemDescription,
-                                   ItemId = prli.Item == null ? null : prli.Item.Id,
-                                   ItemCode = prli.Item == null ? null : prli.Item.Code,
-                                   PartNumber = prli.Item == null ? null : prli.Item.PartNumber,
-                                   Quantity = prli.Quantity,
-                                   Unit = prli.Item == null ? prli.Unit.Name : prli.Item.Unit.Name,
-                                   UnitId = prli.Item == null ? prli.Unit.Id : prli.Item.Unit.Id,
-                                   Served = poli,
-                                   Selected = SelectedId != null && prli.Id == SelectedId
-                               };
-                return await requests.ToListAsync();
+            var requests = from prli in context.PurchaseRequestLineItems
+                           let poli = context.PurchaseOrderNewLineItems
+                                          .Where(a => a.RequestItemId == prli.Id
+                                                   && a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                          .Select(a => (int?)a.Quantity)
+                                          .Sum() ?? 0
+                           where prli.PurchaseRequestId == RequestId
+                           && poli < prli.Quantity
+                           select new JsonPurchaseItemOptionsModel
+                           {
+                               Id = prli.Id.ToString(),
+                               Text = prli.ItemDescription,
+                               ItemId = prli.Item == null ? null : prli.Item.Id,
+                               ItemCode = prli.Item == null ? null : prli.Item.Code,
+                               PartNumber = prli.Item == null ? null : prli.Item.PartNumber,
+                               Quantity = prli.Quantity,
+                               Unit = prli.Item == null ? prli.Unit.Name : prli.Item.Unit.Name,
+                               UnitId = prli.Item == null ? prli.Unit.Id : prli.Item.Unit.Id,
+                               Served = poli,
+                               Selected = SelectedId != null && prli.Id == SelectedId
+                           };
+            return await requests.ToListAsync();
         }
 
 
@@ -254,11 +254,11 @@ namespace GMGInventory.Application.Repositories
                               TypeId = order.Type.Id,
                               RequestType = order.Type.RequestType.Name,
                               RequestTypeId = order.Type.RequestType.Id,
-                              RequestPurpose = item == null 
-                                             ? null 
+                              RequestPurpose = item == null
+                                             ? null
                                              : item.RequestItem.PurchaseRequest.Purpose.Name,
-                              RequestPurposeId = item == null 
-                                               ? null 
+                              RequestPurposeId = item == null
+                                               ? null
                                                : item.RequestItem.PurchaseRequest.Purpose.Id,
                               Region = firstrequest.SalesOrderId == null ? "" : firstrequest.SalesOrder.Customer.Area.Region.Name,
                               RegionId = firstrequest.SalesOrderId == null ? (int?)null : firstrequest.SalesOrder.Customer.Area.Region.Id,
@@ -282,9 +282,9 @@ namespace GMGInventory.Application.Repositories
                               Discount2D = order.Discount2,
                               Discount3D = order.Discount3,
                               IsVATIncluded = order.IsVATIncluded ? "Yes" : "No",
-                              Currency = order.Supplier.Currency.Code,
-                              CurrencyId = order.Supplier.Currency.Id,
-                              CurrencyRateD = order.Supplier.Currency.Rate,
+                              Currency = order.Currency.Code,
+                              CurrencyId = order.Currency.Id,
+                              CurrencyRateD = order.CurrencyRate,
                               Remarks = order.Remarks,
                               ApprovedBy = order.ApproverId == null ? null : order.Approver.FirstName + " " + order.Approver.LastName,
                               DisapprovedBy = order.DisapproverId == null ? null : order.Disapprover.FirstName + " " + order.Disapprover.LastName,
@@ -453,6 +453,8 @@ namespace GMGInventory.Application.Repositories
                         TypeId = form.TypeId,
                         SupplierId = form.SupplierId,
                         TermId = form.TermsId,
+                        CurrencyId = form.CurrencyId,
+                        CurrencyRate = form.CurrencyRate,
                         DeliveryModeId = form.DeliveryModeId,
                         DeliveryAddressId = form.DeliveryAddressId,
                         OrderDate = form.DateOrdered,
@@ -515,7 +517,7 @@ namespace GMGInventory.Application.Repositories
 
                 try
                 {
-                    foreach(var rename in Items)
+                    foreach (var rename in Items)
                     {
                         var i = context.PurchaseRequestLineItems.Where(s => s.Id == rename.RequestItemId).FirstOrDefault();
                         if (i != null && i.ItemDescription != rename.ItemDescription)
@@ -574,6 +576,98 @@ namespace GMGInventory.Application.Repositories
                 }
             }
             return response;
+        }
+
+        public async Task<ResponseModel> UpdateCostAsync(POItemCostVM cost)
+        {
+            var response = new ResponseModel();
+
+            if (cost.OldCostD == cost.NewCostD)
+            {
+                response.Status = "Error";
+                response.Message = "No change for cost, nothing so save";
+            }
+            else
+            {
+                var poitem = await context.PurchaseOrderNewLineItems
+                                          .Include(s => s.RequestItem)
+                                          .Where(s => s.Id == cost.POItemId)
+                                          .FirstOrDefaultAsync();
+
+                if (poitem == null)
+                {
+                    response.Status = "Error";
+                    response.Message = "Invalid Item Record";
+                }
+                else if (poitem.UnitCost != cost.OldCostD)
+                {
+                    response.Status = "Error";
+                    response.Message = "Invalid Old Cost";
+                }
+                else
+                {
+                    var po = await context.PurchaseOrderNews
+                                          .Include(s => s.Status)
+                                          .Where(s => s.Id == poitem.PurchaseOrderId)
+                                          .FirstOrDefaultAsync();
+                    if (po == null)
+                    {
+                        response.Status = "Error";
+                        response.Message = "Invalid Record";
+                    }
+                    else if (po.Status.Name.ToLower() != "approved")
+                    {
+                        response.Status = "Error";
+                        response.Message = "This function is only available for approved PO";
+                    }
+                    else if (await context.PurchaseOrderNewLineItemNewCosts
+                                          .Where(s => s.OrderItemId == poitem.Id)
+                                          .CountAsync() >= 3)
+                    {
+                        response.Status = "Error";
+                        response.Message = "You are only allowed to update the cost for a maximum of 3 times only.";
+                    }
+                    else
+                    {
+                        var newcost = new PurchaseOrderNewLineItemNewCost
+                        {
+                            OrderItemId = poitem.Id,
+                            PreviousCost = poitem.UnitCost,
+                            NewCost = cost.NewCostD,
+                            Remarks = cost.Remarks
+                        };
+                        string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                        await context.PurchaseOrderNewLineItemNewCosts.AddAsync(newcost);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        poitem.UnitCost = cost.NewCostD;
+                        context.PurchaseOrderNewLineItems.Update(poitem);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        response.Status = "Success";
+                        response.Message = "Unit cost for " + poitem.RequestItem.ItemDescription + " is now changed to " + cost.NewCost;
+                    }
+                }
+            }
+            return response;
+        }
+
+        public async Task<IList<POItemCostVM>> GetCostUpdateListAsync(int orderItemId)
+        {
+            var item = from pocost in context.PurchaseOrderNewLineItemNewCosts
+                       join user in userManager.Users on pocost.UserCreated equals user.Id
+                       where pocost.OrderItemId == orderItemId
+                       select new POItemCostVM
+                       {
+                           Id = pocost.Id,
+                           Item = pocost.OrderItem.RequestItem.ItemDescription,
+                           OldCostD = pocost.PreviousCost,
+                           NewCostD = pocost.NewCost,
+                           Remarks = pocost.Remarks,
+                           UserCreated = user.FirstName + " " + user.LastName,
+                           DateCreatedD = pocost.DateCreated
+                       };
+            return await item.ToListAsync();
         }
 
         public async Task<ResponseModel> ApproveAsync(int orderId)

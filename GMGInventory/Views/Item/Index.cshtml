@@ -39,6 +39,9 @@
                         @Html.DisplayNameFor(model => model.Name)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.OldCode)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.PartNumber)
                     </th>
                     <th>
@@ -107,32 +110,38 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        <label for="create-old-code" class="control-label mb-0 d-block">Old SKU / Code</label>
+                                        <input type="text" name="OldCode" id="create-old-code" class="form-control form-control-sm" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                         <label for="create-part-number" class="control-label mb-0 d-block">Part Number</label>
                                         <input type="text" name="PartNumber" id="create-part-number" class="form-control form-control-sm" />
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-interchange-number" class="control-label mb-0 d-block">Interchange Number</label>
                                         <input type="text" name="InterchangeNumber" id="create-interchange-number" class="form-control form-control-sm" />
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-model-number" class="control-label mb-0 d-block">Model Number</label>
                                         <input type="text" name="ModelNumber" id="create-model-number" class="form-control form-control-sm" />
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-size" class="control-label mb-0 d-block">Size</label>
                                         <input type="text" name="Size" id="create-size" class="form-control form-control-sm" />
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-unit" class="control-label mb-0 d-block">Unit</label>
@@ -140,6 +149,8 @@
                                         </select>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-category" class="control-label mb-0 d-block">Category</label>
@@ -147,8 +158,6 @@
                                         </select>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-item-type" class="control-label mb-0 d-block">Item Type</label>
@@ -156,6 +165,8 @@
                                         </select>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-brand" class="control-label mb-0 d-block">Brand</label>
@@ -163,8 +174,6 @@
                                         </select>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><i class="fas fa-info-circle"></i></small></label>
@@ -233,32 +242,38 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label for="edit-old-code" class="control-label mb-0 d-block">Old SKU / Code</label>
+                                    <input type="text" name="OldCode" id="edit-old-code" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label for="edit-part-number" class="control-label mb-0 d-block">Part Number</label>
                                     <input type="text" name="PartNumber" id="edit-part-number" class="form-control form-control-sm" />
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-interchange-number" class="control-label mb-0 d-block">Interchange Number</label>
                                     <input type="text" name="InterchangeNumber" id="edit-interchange-number" class="form-control form-control-sm" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-model-number" class="control-label mb-0 d-block">Model Number</label>
                                     <input type="text" name="ModelNumber" id="edit-model-number" class="form-control form-control-sm" />
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-size" class="control-label mb-0 d-block">Size</label>
                                     <input type="text" name="Size" id="edit-size" class="form-control form-control-sm" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-category" class="control-label mb-0 d-block">Category</label>
@@ -266,6 +281,8 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-item-type" class="control-label mb-0 d-block">Item Type</label>
@@ -273,8 +290,6 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-brand" class="control-label mb-0 d-block">Brand</label>
@@ -282,6 +297,8 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><i class="fas fa-info-circle"></i></small></label>
@@ -351,553 +368,568 @@
 }
 @section Scripts {
     <script>
-        var user_access = @Html.Raw(Json.Serialize(userAccess));
+            var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        var loadselect2loaded = false;
-        function LoadSelect2() {
-            if (loadselect2loaded) return;
-            loadselect2loaded = true;
+            var loadselect2loaded = false;
+            function LoadSelect2() {
+                if (loadselect2loaded) return;
+                loadselect2loaded = true;
 
-            $('.select2filter').select2({
-                allowClear: true,
-                placeholder: {
-                    id: "",
-                    text: "<empty>"
-                },
-                width: 'resolve',
-                dropdownParent: $("#filterModal")
-            });
+                $('.select2filter').select2({
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "<empty>"
+                    },
+                    width: 'resolve',
+                    dropdownParent: $("#filterModal")
+                });
 
-            if (user_access.canAdd || user_access.canEdit) {
-                // Load Select2 Unit
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetUnitOptions", "Item")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                            $("#create-unit").select2({
+                if (user_access.canAdd || user_access.canEdit) {
+                    // Load Select2 Unit
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetUnitOptions", "Item")",
+                        success: function (data, status, xhr) {
+                            if (user_access.canAdd) {
+                                $("#create-unit").select2({
+                                    data: data,
+                                    dropdownParent: $("#createModal")
+                                });
+                            }
+
+                            if (user_access.canEdit) {
+                                $("#edit-unit").select2({
+                                    data: data,
+                                    dropdownParent: $("#editModal")
+                                });
+                            }
+                        }
+                    });
+
+                    // Load Select2 Category
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetOptions", "Category")",
+                        success: function (data, status, xhr) {
+                            if (user_access.canAdd) {
+                            $("#create-category").select2({
                                 data: data,
                                 dropdownParent: $("#createModal")
-                            });
-                        }
+                                });
+                            }
 
-                        if (user_access.canEdit) {
-                            $("#edit-unit").select2({
-                                data: data,
-                                dropdownParent: $("#editModal")
-                            });
+                            if (user_access.canEdit) {
+                                $("#edit-category").select2({
+                                    data: data,
+                                    dropdownParent: $("#editModal")
+                                });
+                            }
                         }
-                    }
-                });
+                    });
 
-                // Load Select2 Category
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "Category")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                        $("#create-category").select2({
-                            data: data,
-                            dropdownParent: $("#createModal")
-                            });
-                        }
-
-                        if (user_access.canEdit) {
-                            $("#edit-category").select2({
-                                data: data,
-                                dropdownParent: $("#editModal")
-                            });
-                        }
-                    }
-                });
-
-                // Load Select2 Item Type
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "ItemType")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                        $("#create-item-type").select2({
-                            data: data,
-                            //theme: "bootstrap-5",
-                            dropdownParent: $("#createModal")
-                            });
-                        }
-
-                        if (user_access.canEdit) {
-                            $("#edit-item-type").select2({
+                    // Load Select2 Item Type
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetOptions", "ItemType")",
+                        success: function (data, status, xhr) {
+                            if (user_access.canAdd) {
+                            $("#create-item-type").select2({
                                 data: data,
                                 //theme: "bootstrap-5",
-                                dropdownParent: $("#editModal")
-                            });
-                        }
-                    }
-                });
+                                dropdownParent: $("#createModal")
+                                });
+                            }
 
-                // Load Select2 Brand
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "Brand")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                        $("#create-brand").select2({
-                            data: data,
-                            dropdownParent: $("#createModal")
-                            });
+                            if (user_access.canEdit) {
+                                $("#edit-item-type").select2({
+                                    data: data,
+                                    //theme: "bootstrap-5",
+                                    dropdownParent: $("#editModal")
+                                });
+                            }
                         }
+                    });
 
-                        if (user_access.canEdit) {
-                            $("#edit-brand").select2({
+                    // Load Select2 Brand
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetOptions", "Brand")",
+                        success: function (data, status, xhr) {
+                            if (user_access.canAdd) {
+                            $("#create-brand").select2({
                                 data: data,
-                                dropdownParent: $("#editModal")
-                            });
+                                dropdownParent: $("#createModal")
+                                });
+                            }
+
+                            if (user_access.canEdit) {
+                                $("#edit-brand").select2({
+                                    data: data,
+                                    dropdownParent: $("#editModal")
+                                });
+                            }
                         }
-                    }
-                });
-            }
-        }
-
-        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
-        }).DataTable({
-            ajax: {
-                url: "@Url.Action("GetListJson")",
-                type: "POST",
-                data: function (data) {
-                    var categoryId = $("#CategoryId").val();
-                    var itemTypeId = $("#ItemTypeId").val();
-                    var brandId = $("#BrandId").val();
-                    var warehouseId = $("#WarehouseId").val();
-
-                    if (categoryId) data.CategoryId = categoryId;
-                    if (itemTypeId) data.ItemTypeId = itemTypeId;
-                    if (brandId) data.BrandId = brandId;
-                    if (warehouseId) data.WarehouseId = warehouseId;
+                    });
                 }
-            },
-            serverSide: true,
-            filter: true,
-            responsive: true,
-            autoWidth: false,
-            search: {
-                return: true,
-            },
-            columns: [
-                { data: "code", name: "Code" },
-                { data: "name", name: "Name" },
-                { data: "partNumber", name: "PartNumber" },
-                { data: "interchangeNumber", name: "InterchangeNumber" },
-                { data: "warehouse", name: "Warehouse" },
-                { data: "retailPrice", name: "RetailPrice", className: "text-end", visible: user_access.canView },
-                { data: "netPrice", name: "NetPrice", className: "text-end", visible: user_access.canView },
-                {
-                    data: function (data, type, dataToSet) {
-                        //return '<span data-microtip-title="[Inventory:' + FormatStringInteger(data.quantityInventoryD) + ']+[Served:' + FormatStringInteger(data.quantityServedD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityServedD) + ']-[Invoiced:' + FormatStringInteger(data.quantityInvoiceD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityInvoiceD) + ']" data-microtip-position="top-left" role="tooltip">' + data.quantity + '</span>';
-                        return data.quantity;
-                    },
-                    name: "Quantity",
-                    className: "text-end"
+            }
+
+            var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
+                showLoader();
+            }).DataTable({
+                ajax: {
+                    url: "@Url.Action("GetListJson")",
+                    type: "POST",
+                    data: function (data) {
+                        var categoryId = $("#CategoryId").val();
+                        var itemTypeId = $("#ItemTypeId").val();
+                        var brandId = $("#BrandId").val();
+                        var warehouseId = $("#WarehouseId").val();
+
+                        if (categoryId) data.CategoryId = categoryId;
+                        if (itemTypeId) data.ItemTypeId = itemTypeId;
+                        if (brandId) data.BrandId = brandId;
+                        if (warehouseId) data.WarehouseId = warehouseId;
+                    }
                 },
-                {
-                    orderable: false,
-                    data: function (data, type, dataToSet) {
-                        var actions = '<div class="btn-group" role="group">';
-                        if (data.giveAction) { // check if first item specially for multiple warehouse
-                            actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-                                if (data.isActive) {
-                                    if (user_access.canEdit) {
-                                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                serverSide: true,
+                filter: true,
+                responsive: true,
+                autoWidth: false,
+                search: {
+                    return: true,
+                },
+                columns: [
+                    { data: "code", name: "Code" },
+                    { data: "name", name: "Name" },
+                    {
+                        data: function (data, type, dataToSet) {
+                            return data.oldCode ?? '<em class="text-muted">N/A</em>';
+                        },
+                        name: "OldCode"
+                    },
+                    { data: "partNumber", name: "PartNumber" },
+                    { data: "interchangeNumber", name: "InterchangeNumber" },
+                    { data: "warehouse", name: "Warehouse" },
+                    { data: "retailPrice", name: "RetailPrice", className: "text-end", visible: user_access.canView },
+                    { data: "netPrice", name: "NetPrice", className: "text-end", visible: user_access.canView },
+                    {
+                        data: function (data, type, dataToSet) {
+                            //return '<span data-microtip-title="[Inventory:' + FormatStringInteger(data.quantityInventoryD) + ']+[Served:' + FormatStringInteger(data.quantityServedD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityServedD) + ']-[Invoiced:' + FormatStringInteger(data.quantityInvoiceD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityInvoiceD) + ']" data-microtip-position="top-left" role="tooltip">' + data.quantity + '</span>';
+                            return data.quantity;
+                        },
+                        name: "Quantity",
+                        className: "text-end"
+                    },
+                    {
+                        orderable: false,
+                        data: function (data, type, dataToSet) {
+                            var actions = '<div class="btn-group" role="group">';
+                            if (data.giveAction) { // check if first item specially for multiple warehouse
+                                actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                                    if (data.isActive) {
+                                        if (user_access.canEdit) {
+                                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                        }
+                                        if (user_access.canDelete) {
+                                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                        }
+                                    } else {
+                                        if (user_access.canAdd || user_access.canEdit) {
+                                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                        }
                                     }
-                                    if (user_access.canDelete) {
-                                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
-                                    }
-                                } else {
-                                    if (user_access.canAdd || user_access.canEdit) {
-                                        actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
-                                    }
-                                }
+                            }
+                            return actions + "</div>";
                         }
-                        return actions + "</div>";
+                    }
+                ]
+            });
+
+            //itemDT.on("init.dt", function () {
+            itemDT.on("draw", function () {
+                hideLoader();
+
+                LoadSelect2();
+                if (user_access.canDelete) {
+                    $('.deleteBtn').click(function (e) {
+                        swal({
+                            title: "Delete / Deactivate Item",
+                            text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true
+                        }).then((confirm) => {
+                            if (confirm) {
+                                var btn = $(this);
+                                var id = btn.data("id");
+                                $('#deleteItemId').val(id);
+                                $('#deleteItemForm').submit();
+                            }
+                        });
+                    });
+                }
+                if (user_access.canAdd || user_access.canEdit) {
+                    $('.reactivateBtn').click(function (e) {
+                        swal({
+                            title: "Reactivate Item",
+                            text: "Are you sure you want to reactivate this record?",
+                            icon: "info",
+                            buttons: true,
+                            infoMode: true
+                        }).then((confirm) => {
+                            if (confirm) {
+                                var btn = $(this);
+                                var id = btn.data("id");
+                                $('#reactivateItemId').val(id);
+                                $('#reactivateItemForm').submit();
+                            }
+                        });
+                    });
+                }
+
+                if (user_access.canEdit) {
+                    // Actions upon Display Edit Modal
+                    $(".editBtn").click(function (e) {
+                        var data = itemDT.row($(this).parents('tr')).data();
+
+                        $("#edit-id").val(data.id);
+                        $("#edit-code").val(data.code);
+                        $("#edit-name").val(data.name);
+                        $("#edit-old-code").val(data.oldCode);
+                        $("#edit-part-number").val(data.partNumber);
+                        $("#edit-interchange-number").val(data.interchangeNumber);
+                        $("#edit-model-number").val(data.modelNumber);
+                        $("#edit-size").val(data.size);
+                        $("#edit-category").val(data.categoryId).trigger("change");
+                        $("#edit-item-type").val(data.itemTypeId).trigger("change");
+                        $("#edit-brand").val(data.brandId).trigger("change");
+                        $("#edit-beginning-cost").val(data.beginningCostD);
+                    });
+
+                    // Validation for Edit Modal
+                    var validateEdit = $("#editForm").validate({
+                        rules: {
+                            Code: { required: true, maxlength: 50 },
+                            Name: { required: true, maxlength: 200 },
+                            OldCode: { maxlength: 50 },
+                            PartNumber: { maxlength: 200 },
+                            InterchangeNumber: { maxlength: 200 },
+                            ModelNumber: { maxlength: 200 },
+                            Size: { required: true, maxlength: 50 }
+                        },
+                        messages: {
+                            Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
+                            Name: { required: "Please enter name.", maxlength: "Name must not exceed 200 characters." },
+                            OldCode: { maxlength: "Old Code must not exceed 50 characters." },
+                            PartNumber: { maxlength: "Part number must not exceed 200 characters." },
+                            InterchangeNumber: { maxlength: "Interchange number must not exceed 200 characters." },
+                            ModelNumber: { maxlength: "Model number must not exceed 200 characters." },
+                            Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." }
+                        },
+                        submitHandler: function (form, event) {
+                            event.preventDefault();
+                            DoEdit();
+                        }
+                    });
+
+                    // Send Edit to Controller
+                    function DoEdit() {
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("EditJson")",
+                            data: {
+                                Id: $("#edit-id").val(),
+                                Code: $("#edit-code").val(),
+                                Name: $("#edit-name").val(),
+                                OldCode: $("#edit-old-code").val(),
+                                PartNumber: $("#edit-part-number").val(),
+                                InterchangeNumber: $("#edit-interchange-number").val(),
+                                ModelNumber: $("#edit-model-number").val(),
+                                Size: $("#edit-size").val(),
+                                CategoryId: $("#edit-category").val(),
+                                ItemTypeId: $("#edit-item-type").val(),
+                                BrandId: $("#edit-brand").val(),
+                                BeginningCostD: $("#edit-beginning-cost").val()
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Error") {
+                                    toastr.error(data.message, "Error");
+                                } else {
+                                    toastr.success(data.message, "Success");
+                                    $("#editModal").modal("hide");
+                                    itemDT.ajax.reload();
+                                }
+                            }
+                        });
                     }
                 }
-            ]
-        });
-
-        //itemDT.on("init.dt", function () {
-        itemDT.on("draw", function () {
-            hideLoader();
-
-            LoadSelect2();
-            if (user_access.canDelete) {
-                $('.deleteBtn').click(function (e) {
-                    swal({
-                        title: "Delete / Deactivate Item",
-                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                        icon: "warning",
-                        buttons: true,
-                        dangerMode: true
-                    }).then((confirm) => {
-                        if (confirm) {
-                            var btn = $(this);
-                            var id = btn.data("id");
-                            $('#deleteItemId').val(id);
-                            $('#deleteItemForm').submit();
-                        }
-                    });
-                });
-            }
-            if (user_access.canAdd || user_access.canEdit) {
-                $('.reactivateBtn').click(function (e) {
-                    swal({
-                        title: "Reactivate Item",
-                        text: "Are you sure you want to reactivate this record?",
-                        icon: "info",
-                        buttons: true,
-                        infoMode: true
-                    }).then((confirm) => {
-                        if (confirm) {
-                            var btn = $(this);
-                            var id = btn.data("id");
-                            $('#reactivateItemId').val(id);
-                            $('#reactivateItemForm').submit();
-                        }
-                    });
-                });
-            }
-
-            if (user_access.canEdit) {
-                // Actions upon Display Edit Modal
-                $(".editBtn").click(function (e) {
-                    var data = itemDT.row($(this).parents('tr')).data();
-
-                    $("#edit-id").val(data.id);
-                    $("#edit-code").val(data.code);
-                    $("#edit-name").val(data.name);
-                    $("#edit-part-number").val(data.partNumber);
-                    $("#edit-interchange-number").val(data.interchangeNumber);
-                    $("#edit-model-number").val(data.modelNumber);
-                    $("#edit-size").val(data.size);
-                    console.log(data);
-                    $("#edit-category").val(data.categoryId).trigger("change");
-                    $("#edit-item-type").val(data.itemTypeId).trigger("change");
-                    $("#edit-brand").val(data.brandId).trigger("change");
-                    $("#edit-beginning-cost").val(data.beginningCostD);
+            });
+            if (user_access.canAdd) {
+                // Actions upon Display Create Modal
+                $(".createBtn").click(function (e) {
+                    $("#create-code").val("");
+                    $("#create-name").val("");
+                    $("#create-old-code").val("");
+                    $("#create-part-number").val("");
+                    $("#create-interchange-number").val("");
+                    $("#create-model-number").val("");
+                    $("#create-size").val("");
+                    $("#create-unit").prop("selectedIndex", 0).trigger("change");
+                    $("#create-category").prop("selectedIndex", 0).trigger("change");
+                    $("#create-item-type").prop("selectedIndex", 0).trigger("change");
+                    $("#create-brand").prop("selectedIndex", 0).trigger("change");
+                    $("#create-beginning-cost").val("");
+                    $("#create-retail-price").val("");
+                    $("#create-net-price").val("");
                 });
 
-                // Validation for Edit Modal
-                var validateEdit = $("#editForm").validate({
+                // Validation for Create Modal
+                var validateCreate = $("#createForm").validate({
                     rules: {
                         Code: { required: true, maxlength: 50 },
                         Name: { required: true, maxlength: 200 },
+                        OldCode: { maxlength: 50 },
                         PartNumber: { maxlength: 200 },
                         InterchangeNumber: { maxlength: 200 },
                         ModelNumber: { maxlength: 200 },
-                        Size: { required: true, maxlength: 50 }
+                        Size: { required: true, maxlength: 50 },
+                        RetailPrice: { required: true, range: [0, 1999999.99] },
+                        NetPrice: { required: true, range: [0, 1999999.99] }
                     },
                     messages: {
                         Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                         Name: { required: "Please enter name.", maxlength: "Name must not exceed 200 characters." },
+                        OldCode: { maxlength: "Old Code must not exceed 50 characters." },
                         PartNumber: { maxlength: "Part number must not exceed 200 characters." },
                         InterchangeNumber: { maxlength: "Interchange number must not exceed 200 characters." },
                         ModelNumber: { maxlength: "Model number must not exceed 200 characters." },
-                        Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." }
+                        Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." },
+                        RetailPrice: { required: "Please enter new Retail Price.", range: "Price must be between 0-1999999.99." },
+                        NetPrice: { required: "Please enter new Net Price.", range: "Price must be between 0-1999999.99." }
                     },
                     submitHandler: function (form, event) {
                         event.preventDefault();
-                        DoEdit();
+                        DoCreate();
                     }
                 });
 
-                // Send Edit to Controller
-                function DoEdit() {
+                // Send Create to Controller
+                function DoCreate() {
                     $.ajax({
                         type: "POST",
-                        url: "@Url.Action("EditJson")",
+                        url: "@Url.Action("CreateJson")",
                         data: {
-                            Id: $("#edit-id").val(),
-                            Code: $("#edit-code").val(),
-                            Name: $("#edit-name").val(),
-                            PartNumber: $("#edit-part-number").val(),
-                            InterchangeNumber: $("#edit-interchange-number").val(),
-                            ModelNumber: $("#edit-model-number").val(),
-                            Size: $("#edit-size").val(),
-                            CategoryId: $("#edit-category").val(),
-                            ItemTypeId: $("#edit-item-type").val(),
-                            BrandId: $("#edit-brand").val(),
-                            BeginningCostD: $("#edit-beginning-cost").val()
+                            Code: $("#create-code").val(),
+                            Name: $("#create-name").val(),
+                            OldCode: $("#create-old-code").val(),
+                            PartNumber: $("#create-part-number").val(),
+                            InterchangeNumber: $("#create-interchange-number").val(),
+                            ModelNumber: $("#create-model-number").val(),
+                            NetPriceD: $("#create-net-price").val(),
+                            RetailPriceD: $("#create-retail-price").val(),
+                            Size: $("#create-size").val(),
+                            UnitId: $("#create-unit").val(),
+                            CategoryId: $("#create-category").val(),
+                            ItemTypeId: $("#create-item-type").val(),
+                            BrandId: $("#create-brand").val(),
+                            BeginningCostD: $("#create-beginning-cost").val()
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Error") {
                                 toastr.error(data.message, "Error");
                             } else {
                                 toastr.success(data.message, "Success");
-                                $("#editModal").modal("hide");
+                                $("#createModal").modal("hide");
                                 itemDT.ajax.reload();
                             }
                         }
                     });
                 }
             }
-        });
-        if (user_access.canAdd) {
-            // Actions upon Display Create Modal
-            $(".createBtn").click(function (e) {
-                $("#create-code").val("");
-                $("#create-name").val("");
-                $("#create-part-number").val("");
-                $("#create-interchange-number").val("");
-                $("#create-model-number").val("");
-                $("#create-size").val("");
-                $("#create-unit").prop("selectedIndex", 0).trigger("change");
-                $("#create-category").prop("selectedIndex", 0).trigger("change");
-                $("#create-item-type").prop("selectedIndex", 0).trigger("change");
-                $("#create-brand").prop("selectedIndex", 0).trigger("change");
-                $("#create-beginning-cost").val("");
-                $("#create-retail-price").val("");
-                $("#create-net-price").val("");
-            });
 
-            // Validation for Create Modal
-            var validateCreate = $("#createForm").validate({
-                rules: {
-                    Code: { required: true, maxlength: 50 },
-                    Name: { required: true, maxlength: 200 },
-                    PartNumber: { maxlength: 200 },
-                    InterchangeNumber: { maxlength: 200 },
-                    ModelNumber: { maxlength: 200 },
-                    Size: { required: true, maxlength: 50 },
-                    RetailPrice: { required: true, range: [0, 1999999.99] },
-                    NetPrice: { required: true, range: [0, 1999999.99] }
-                },
-                messages: {
-                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
-                    Name: { required: "Please enter name.", maxlength: "Name must not exceed 200 characters." },
-                    PartNumber: { maxlength: "Part number must not exceed 200 characters." },
-                    InterchangeNumber: { maxlength: "Interchange number must not exceed 200 characters." },
-                    ModelNumber: { maxlength: "Model number must not exceed 200 characters." },
-                    Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." },
-                    RetailPrice: { required: "Please enter new Retail Price.", range: "Price must be between 0-1999999.99." },
-                    NetPrice: { required: "Please enter new Net Price.", range: "Price must be between 0-1999999.99." }
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    DoCreate();
-                }
-            });
+            function ApplyFilter() {
+                itemDT.ajax.reload();
+                $("#filterModal").modal("hide");
+            }
 
-            // Send Create to Controller
-            function DoCreate() {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("CreateJson")",
-                    data: {
-                        Code: $("#create-code").val(),
-                        Name: $("#create-name").val(),
-                        PartNumber: $("#create-part-number").val(),
-                        InterchangeNumber: $("#create-interchange-number").val(),
-                        ModelNumber: $("#create-model-number").val(),
-                        NetPriceD: $("#create-net-price").val(),
-                        RetailPriceD: $("#create-retail-price").val(),
-                        Size: $("#create-size").val(),
-                        UnitId: $("#create-unit").val(),
-                        CategoryId: $("#create-category").val(),
-                        ItemTypeId: $("#create-item-type").val(),
-                        BrandId: $("#create-brand").val(),
-                        BeginningCostD: $("#create-beginning-cost").val()
-                    },
-                    success: function (data, status, xhr) {
-                        if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
-                        } else {
-                            toastr.success(data.message, "Success");
-                            $("#createModal").modal("hide");
-                            itemDT.ajax.reload();
+            if (user_access.canUploadDownload) {
+                var json_of_excel_headers;
+                var json_of_excel;
+                var colnumber = 16; // number of columns required for upload
+                var done_upload_excel = 0;
+                var duplicate_upload = 0;
+
+                var opts = {
+                    readAsDefault: 'ArrayBuffer',
+                    dragClass: 'drag',
+                    on: {
+                        load: function (e, file) {
+                            var result = new Uint8Array(e.target.result);
+
+                            var xlsread = XLSX.read(result, { type: 'array' });
+                            json_of_excel = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
                         }
                     }
+                };
+                $("#upload-file").fileReaderJS(opts);
+
+                // Actions upon file selection
+                $("#upload-file").on("change", function () {
+                    done_upload_excel = 0;
+                    $(".upload-item-count").html("0");
+                    $(".upload-done-count").html("0");
+                    $("#upload-table tbody").html("");
+                    $("#upload-table").hide();
                 });
-            }
-        }
 
-        function ApplyFilter() {
-            itemDT.ajax.reload();
-            $("#filterModal").modal("hide");
-        }
-
-        if (user_access.canUploadDownload) {
-            var json_of_excel_headers;
-            var json_of_excel;
-            var colnumber = 15; // number of columns required for upload
-            var done_upload_excel = 0;
-            var duplicate_upload = 0;
-
-            var opts = {
-                readAsDefault: 'ArrayBuffer',
-                dragClass: 'drag',
-                on: {
-                    load: function (e, file) {
-                        var result = new Uint8Array(e.target.result);
-
-                        var xlsread = XLSX.read(result, { type: 'array' });
-                        json_of_excel = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
-                    }
-                }
-            };
-            $("#upload-file").fileReaderJS(opts);
-
-            // Actions upon file selection
-            $("#upload-file").on("change", function () {
-                done_upload_excel = 0;
-                $(".upload-item-count").html("0");
-                $(".upload-done-count").html("0");
-                $("#upload-table tbody").html("");
-                $("#upload-table").hide();
-            });
-
-            // Actions upon Display Upload Modal
-            $(".uploadBtn").click(function (e) {
-                done_upload_excel = 0;
-                $("#upload-file").val("");
-                $(".upload-item-count").html("0");
-                $(".upload-done-count").html("0");
-                $("#upload-table tbody").html("");
-                $("#upload-table").hide();
-            });
-
-    function DoUpload() {
-        if (!$("#upload-file").val()) {
-            toastr.warning("Please select a file first", "Warning");
-        } else if (json_of_excel.length == 0) {
-            toastr.warning("The excel file is empty", "Warning");
-        } else {
-            var columns = Object.keys(json_of_excel[0]);
-            $(".upload-item-count").html("0");
-            $(".upload-done-count").html("0");
-            $("#upload-table tbody").html("");
-            $("#upload-table").show();
-            duplicate_upload = 0;
-
-            var batchSize = 10;
-            var index = 0;
-
-            var requiredColumns = [
-                "Code", "Name", "Part Number", "Interchange Number", "Warehouse",
-                "Model Number", "Category", "Item Type", "Brand",
-                "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price"
-            ];
-
-            var uploadInterval = setInterval(function () {
-                for (var i = 0; i < batchSize && index < json_of_excel.length; i++, index++) {
-                    var rowNum = json_of_excel[index].__rowNum__;
-                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
-                    row$.append($('<td/>').html(rowNum));
-
-                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
-                        var cellValue = json_of_excel[index][columns[colIndex]] || "";
-                        if (colIndex == 0 || colIndex == 1)
-                            row$.append($('<td/>').html(cellValue));
-                    }
-
-                    var hasUnexpectedColumns = requiredColumns.some(col => !columns.includes(col));
-
-                    if (hasUnexpectedColumns) {
-                        row$.append($('<td/>').html("Unexpected columns detected! Stopping upload."));
-                        $("#upload-table").append(row$);
-                        clearInterval(uploadInterval);
-                        toastr.error("Unexpected columns found. Upload stopped.", "Error");
-                        return;
-                    } else {
-                        SaveXLSX(
-                            json_of_excel[index]["Code"],
-                            json_of_excel[index]["Name"],
-                            json_of_excel[index]["Part Number"],
-                            json_of_excel[index]["Interchange Number"],
-                            json_of_excel[index]["Warehouse"],
-                            json_of_excel[index]["Model Number"],
-                            json_of_excel[index]["Category"],
-                            json_of_excel[index]["Item Type"],
-                            json_of_excel[index]["Brand"],
-                            json_of_excel[index]["Size"],
-                            json_of_excel[index]["Unit"],
-                            json_of_excel[index]["Quantity on Hand"],
-                            json_of_excel[index]["Beginning Cost"],
-                            json_of_excel[index]["Gross Price"],
-                            json_of_excel[index]["Net Price"],
-                            rowNum
-                        );
-                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
-                    }
-
-                    $("#upload-table").append(row$);
-                }
-
-                if (index >= json_of_excel.length) {
-                    clearInterval(uploadInterval);
-                }
-            }, 1000);
-        }
-
-            }
-
-            function SaveXLSX(code, name, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, beginningcost, grossprice, netprice, rownum) {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("UploadJson")",
-                    data: {
-                        Code: code,
-                        Name: name,
-                        PartNumber: part,
-                        InterchangeNumber: interchange,
-                        Warehouse: warehouse,
-                        ModelNumber: model,
-                        Category: category,
-                        ItemType: itemtype,
-                        Brand: brand,
-                        Unit: unit,
-                        Size: size,
-                        Quantity: quantity,
-                        BeginningCost: beginningcost,
-                        GrossPrice: grossprice,
-                        NetPrice: netprice
-                    },
-                    success: function (data, status, xhr) {
-                        if (data.message == "Nothing to change") {
-                            $("#upload-row" + rownum + "tr").remove();
-                            duplicate_upload++;
-                        } else {
-                            $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
-                        }
-                    },
-                    complete: function (xhr, status) {
-                        UploadRowDone();
-                    },
-                    error: function (xhr, status, error) {
-                        let message = xhr.responseText.match(/(?<=:\s)(.*?)(?=\s*--->|\r?\n)/)?.[0] || "An error occurred.";
-                        $("#upload-row" + rownum + "td").html(message);
-                    }
-                });
-            }
-
-            function UploadRowDone() {
-                done_upload_excel++;
-                $(".upload-item-count").html(json_of_excel.length);
-                $(".upload-done-count").html(done_upload_excel);
-                $.LoadingOverlay("progress", parseInt((done_upload_excel / json_of_excel.length) * 100));
-                if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
-                    $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                // Actions upon Display Upload Modal
+                $(".uploadBtn").click(function (e) {
+                    done_upload_excel = 0;
                     $("#upload-file").val("");
-                    itemDT.ajax.reload();
-                }
+                    $(".upload-item-count").html("0");
+                    $(".upload-done-count").html("0");
+                    $("#upload-table tbody").html("");
+                    $("#upload-table").hide();
+                });
+
+        function DoUpload() {
+            if (!$("#upload-file").val()) {
+                toastr.warning("Please select a file first", "Warning");
+            } else if (json_of_excel.length == 0) {
+                toastr.warning("The excel file is empty", "Warning");
+            } else {
+                var columns = Object.keys(json_of_excel[0]);
+                $(".upload-item-count").html("0");
+                $(".upload-done-count").html("0");
+                $("#upload-table tbody").html("");
+                $("#upload-table").show();
+                duplicate_upload = 0;
+
+                var batchSize = 10;
+                var index = 0;
+
+                var requiredColumns = [
+                    "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse",
+                    "Model Number", "Category", "Item Type", "Brand",
+                    "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price"
+                ];
+
+                var uploadInterval = setInterval(function () {
+                    for (var i = 0; i < batchSize && index < json_of_excel.length; i++, index++) {
+                        var rowNum = json_of_excel[index].__rowNum__;
+                        var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                        row$.append($('<td/>').html(rowNum));
+
+                        for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                            var cellValue = json_of_excel[index][columns[colIndex]] || "";
+                            if (colIndex == 0 || colIndex == 1)
+                                row$.append($('<td/>').html(cellValue));
+                        }
+
+                        var hasUnexpectedColumns = requiredColumns.some(col => !columns.includes(col));
+
+                        if (hasUnexpectedColumns) {
+                            row$.append($('<td/>').html("Unexpected columns detected! Stopping upload."));
+                            $("#upload-table").append(row$);
+                            clearInterval(uploadInterval);
+                            toastr.error("Unexpected columns found. Upload stopped.", "Error");
+                            return;
+                        } else {
+                            SaveXLSX(
+                                json_of_excel[index]["Code"],
+                                json_of_excel[index]["Name"],
+                                json_of_excel[index]["Old SKU"],
+                                json_of_excel[index]["Part Number"],
+                                json_of_excel[index]["Interchange Number"],
+                                json_of_excel[index]["Warehouse"],
+                                json_of_excel[index]["Model Number"],
+                                json_of_excel[index]["Category"],
+                                json_of_excel[index]["Item Type"],
+                                json_of_excel[index]["Brand"],
+                                json_of_excel[index]["Size"],
+                                json_of_excel[index]["Unit"],
+                                json_of_excel[index]["Quantity on Hand"],
+                                json_of_excel[index]["Beginning Cost"],
+                                json_of_excel[index]["Gross Price"],
+                                json_of_excel[index]["Net Price"],
+                                rowNum
+                            );
+                            row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                        }
+
+                        $("#upload-table").append(row$);
+                    }
+
+                    if (index >= json_of_excel.length) {
+                        clearInterval(uploadInterval);
+                    }
+                }, 1000);
             }
 
-            $(".downloadBtn").click(function (e) {
-                //window.location = "@Url.Action("DownloadFile")";
-                var urlQuery = [];
-                if ($("#CategoryId").val()) { urlQuery.push("CategoryId=" + $("#CategoryId").val()); }
-                if ($("#ItemTypeId").val()) { urlQuery.push("ItemTypeId=" + $("#ItemTypeId").val()); }
-                if ($("#BrandId").val()) { urlQuery.push("BrandId=" + $("#BrandId").val()); }
-                if ($("#WarehouseId").val()) { urlQuery.push("WarehouseId=" + $("#WarehouseId").val()); }
-                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
-            });
-        }
+                }
+
+                function SaveXLSX(code, name, oldcode, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, beginningcost, grossprice, netprice, rownum) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("UploadJson")",
+                        data: {
+                            Code: code,
+                            Name: name,
+                            OldCode: oldcode,
+                            PartNumber: part,
+                            InterchangeNumber: interchange,
+                            Warehouse: warehouse,
+                            ModelNumber: model,
+                            Category: category,
+                            ItemType: itemtype,
+                            Brand: brand,
+                            Unit: unit,
+                            Size: size,
+                            Quantity: quantity,
+                            BeginningCost: beginningcost,
+                            GrossPrice: grossprice,
+                            NetPrice: netprice
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.message == "Nothing to change") {
+                                $("#upload-row" + rownum + "tr").remove();
+                                duplicate_upload++;
+                            } else {
+                                $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                            }
+                        },
+                        complete: function (xhr, status) {
+                            UploadRowDone();
+                        },
+                        error: function (xhr, status, error) {
+                            let message = xhr.responseText.match(/(?<=:\s)(.*?)(?=\s*--->|\r?\n)/)?.[0] || "An error occurred.";
+                            $("#upload-row" + rownum + "td").html(message);
+                        }
+                    });
+                }
+
+                function UploadRowDone() {
+                    done_upload_excel++;
+                    $(".upload-item-count").html(json_of_excel.length);
+                    $(".upload-done-count").html(done_upload_excel);
+                    $.LoadingOverlay("progress", parseInt((done_upload_excel / json_of_excel.length) * 100));
+                    if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                        $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                        $("#upload-file").val("");
+                        itemDT.ajax.reload();
+                    }
+                }
+
+                $(".downloadBtn").click(function (e) {
+                    //window.location = "@Url.Action("DownloadFile")";
+                    var urlQuery = [];
+                    if ($("#CategoryId").val()) { urlQuery.push("CategoryId=" + $("#CategoryId").val()); }
+                    if ($("#ItemTypeId").val()) { urlQuery.push("ItemTypeId=" + $("#ItemTypeId").val()); }
+                    if ($("#BrandId").val()) { urlQuery.push("BrandId=" + $("#BrandId").val()); }
+                    if ($("#WarehouseId").val()) { urlQuery.push("WarehouseId=" + $("#WarehouseId").val()); }
+                    window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+                });
+            }
     </script>
 }

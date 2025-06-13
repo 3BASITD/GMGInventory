@@ -64,6 +64,7 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
+        public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public string CurrencyRate => string.Format("{0:#,##0.00}", CurrencyRateD);
         public decimal CurrencyRateD { get; set; }
@@ -101,6 +102,7 @@ namespace GMGInventory.Common.Models
         public string Id { get; set; }
         public string Text { get; set; }
         public string Name { get; set; }
+        public string? OldCode { get; set; }
         public string PartNumber { get; set; }
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }

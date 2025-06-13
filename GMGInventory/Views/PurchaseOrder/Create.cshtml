@@ -72,13 +72,14 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="order-currency" class="form-label mb-0">Currency</label>
-                        <input type="text" id="order-currency" name="Currency" class="form-control form-control-sm" readonly="readonly" />
+                        <select id="order-currency" name="Currency" style="width: 100%"></select>
+                        @* <input type="text" id="order-currency" name="Currency" class="form-control form-control-sm" readonly="readonly" /> *@
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="order-currency-rate" class="form-label mb-0">Currency Rate</label>
-                        <input type="text" id="order-currency-rate" name="CurrencyRate" class="form-control form-control-sm" readonly="readonly" />
+                        <input type="number" value="1" step="0.01" min="0.01" max="1999999" id="order-currency-rate" name="CurrencyRate" class="form-control form-control-sm" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6 order-mode-container">
@@ -234,6 +235,7 @@
                             <div class="form-group">
                                 <label for="add-quantity" class="form-label mb-0">Quantity</label>
                                 <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                <label class="text-warning text-xs fw-lighter fst-italic m-0 add-quantity-warning"></label>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-unit-container">
@@ -281,6 +283,9 @@
         var currentType = null;
         var currentPurpose = null;
         var currentRegion = null;
+
+        var itemDT;
+
         if ($("#resubmitPOId").length) {
             // for resubmitting a disapproved sales order
             $.ajax({
@@ -294,42 +299,44 @@
                     currentType = data.typeId;
                     currentPurpose = data.purposeId;
                     currentRegion = data.regionId;
-                    loadTypeOptions(currentType, currentPurpose);
-                    $("#order-type").prop("disabled", true);
-                    $("#order-region").val(data.regionId).trigger("change");
-                    $("#order-currency").val(data.currency);
-                    $("#order-currency-rate").val(data.currencyRate);
-                    $("#order-date-ordered").val(data.orderDate3);
-                    $("#order-remarks").val(data.remarks);
-                    loadSupplier(data.supplierId);
-                    loadCreditTerm(data.termId);
-                    loadDeliveryMode(data.deliveryModeId);
-                    loadDeliveryAddress(data.deliveryAddressId);
-                },
-                complete: function (xhr, status) {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("GetItemListJson")",
-                        data: {
-                            purchaseOrderId: $("#resubmitPOId").val()
-                        },
-                        success: function (data, status, xhr) {
-                            $.each(data, function (i, v) {
-                                itemDT.row.add(v).draw();
-                            });
-                        }
+
+                    loadTypeOptions(currentType, currentPurpose).then(() => {
+                        $("#order-type").prop("disabled", true);
+                        $("#order-purpose").prop("disabled", true);
+                        $("#order-region").val(data.regionId).trigger("change");
+                        $("#order-currency").val(data.currencyId).trigger("change");
+                        $("#order-currency-rate").val(data.currencyRate);
+                        $("#order-date-ordered").val(data.orderDate3);
+                        $("#order-remarks").val(data.remarks);
+                        loadSupplier(data.supplierId, data.supplier);
+                        loadCreditTerm(data.termId);
+                        loadDeliveryMode(data.deliveryModeId);
+                        loadDeliveryAddress(data.deliveryAddressId);
+                        
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("GetItemListJson")",
+                            data: {
+                                purchaseOrderId: $("#resubmitPOId").val()
+                            },
+                            success: function (data, status, xhr) {
+                                $.each(data, function (i, v) {
+                                    itemDT.row.add(v).draw();
+                                });
+                            }
+                        });
                     });
                 }
             });
         } else {
             loadTypeOptions(currentType, currentPurpose);
-            loadSupplier(null);
+            loadSupplier(null, null);
             loadCreditTerm(null);
             loadDeliveryMode(null);
             loadDeliveryAddress(null);
         }
 
-        var itemDT = $('.table-item').DataTable({
+        itemDT = $('.table-item').DataTable({
             data: [],
             filter: true,
             responsive: true,
@@ -382,7 +389,9 @@
                 {
                     data: function (data, type, dataToSet) {
                         if (data.quantityD > data.unorderedQuantityD) {
-                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.unorderedQuantity + ' unordered quantity.</label>';
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-warning" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Order higher than ' + data.unorderedQuantity  + ' unordered quantity.</label>';
+                        } else if (data.quantityD == 0) {
+                            return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to request.</label>';
                         } else {
                             return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         }
@@ -527,68 +536,76 @@
 
         // Load order type data for select2
         function loadTypeOptions(selectedType, selectedPurpose) {
-            if ($.fn.select2 && $("#order-type").hasClass("select2-hidden-accessible")) {
-                $("#order-type").select2("destroy");
-                $("#order-type").empty();
-            }
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetTypeOptions")",
-                data: {
-                    SelectedId: selectedType
-                },
-                success: function (data, status, xhr) {
-                    $("#order-type").select2({
-                        data: data,
-                        minimumResultsForSearch: -1
-                    }).on("select2:select", function () {
+            return new Promise((resolve) => {
+                if ($.fn.select2 && $("#order-type").hasClass("select2-hidden-accessible")) {
+                    $("#order-type").select2("destroy");
+                    $("#order-type").empty();
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetTypeOptions")",
+                    data: {
+                        SelectedId: selectedType
+                    },
+                    success: function (data, status, xhr) {
+                        $("#order-type").select2({
+                            data: data,
+                            minimumResultsForSearch: -1
+                        }).on("select2:select", function () {
+                            loadDocumentNumber();
+                            var typeText = $("#order-type").select2("data")[0]?.text.toLowerCase() || "";
+                            if (typeText != "maintenance & repair") {
+                                $(".order-purpose-container").toggle(true);
+                                loadPurposeOptions($("#order-type").select2("data")[0].requestTypeId, selectedPurpose);
+                            } else {
+                                $(".order-purpose-container").toggle(false);
+                                $("#order-purpose").val(null).trigger("change");
+                            }
+                        });
+                    },
+                    complete: function (xhr, status) {
                         loadDocumentNumber();
                         var typeText = $("#order-type").select2("data")[0]?.text.toLowerCase() || "";
                         if (typeText != "maintenance & repair") {
                             $(".order-purpose-container").toggle(true);
-                            loadPurposeOptions($("#order-type").select2("data")[0].requestTypeId, selectedPurpose);
+                            loadPurposeOptions($("#order-type").select2("data")[0].requestTypeId, selectedPurpose).then(() => {
+                                resolve();
+                            });
                         } else {
                             $(".order-purpose-container").toggle(false);
                             $("#order-purpose").val(null).trigger("change");
+                            resolve();
                         }
-                    });
-                },
-                complete: function (xhr, status) {
-                    loadDocumentNumber();
-                    var typeText = $("#order-type").select2("data")[0]?.text.toLowerCase() || "";
-                    if (typeText != "maintenance & repair") {
-                        $(".order-purpose-container").toggle(true);
-                        loadPurposeOptions($("#order-type").select2("data")[0].requestTypeId, selectedPurpose);
-                    } else {
-                        $(".order-purpose-container").toggle(false);
-                        $("#order-purpose").val(null).trigger("change");
                     }
-                }
+                });
             });
         }
 
         // Load request purpose data for select2
         function loadPurposeOptions(selectedType, selectedPurpose) {
-            $("#order-purpose").off("change");
-            $("#order-purpose").empty().trigger('change');
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetPurposeOptions", "PurchaseRequest")",
-                data: {
-                    TypeId: selectedType,
-                    SelectedId: selectedPurpose
-                },
-                success: function (data) {
-                    $("#order-purpose").select2({
-                        data: data,
-                        minimumResultsForSearch: -1
-                    }).on("change", function () {
+            return new Promise((resolve) => {
+                $("#order-purpose").off("change");
+                $("#order-purpose").empty().trigger('change');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetPurposeOptions", "PurchaseRequest")",
+                    data: {
+                        TypeId: selectedType,
+                        SelectedId: selectedPurpose
+                    },
+                    success: function (data) {
+                        $("#order-purpose").select2({
+                            data: data,
+                            minimumResultsForSearch: -1
+                        }).on("change", function () {
+                            changingTypePurposeOrRegion();
+                        });
+                    },
+                    complete: function (xhr, status) {
                         changingTypePurposeOrRegion();
-                    });
-                },
-                complete: function (xhr, status) {
-                    changingTypePurposeOrRegion();
-                }
+                        resolve();
+                    }
+                });
             });
         }
 
@@ -607,20 +624,38 @@
             }
         }
 
+        // Load currency data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Currency")",
+            success: function (data, status, xhr) {
+                $("#order-currency").select2({
+                    data: data,
+                    minimumResultsForSearch: -1
+                }).on("change", function () {
+                    $("#order-currency-rate").val($("#order-currency").select2("data")[0]?.rate);
+                });
+            },
+            complete: function (xhr, status) {
+                $("#order-currency-rate").val($("#order-currency").select2("data")[0]?.rate);
+            }
+        });
 
         // Load region data for select2
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Region")",
-                success: function (data, status, xhr) {
-                    $("#order-region").select2({
-                        data: data,
-                        minimumResultsForSearch: -1
-                    }).on("change", function () {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#order-region").select2({
+                    data: data,
+                    minimumResultsForSearch: -1
+                }).on("change", function () {
+                    if ($.fn.select2 && $("#request-type").hasClass("select2-hidden-accessible") && $("#request-purpose").hasClass("select2-hidden-accessible")) {
                         changingTypePurposeOrRegion();
-                    });
-                }
-            });
+                    }
+                });
+            }
+        });
 
         function changingTypePurposeOrRegion() {
             var selectedType = $("#order-type").val();
@@ -725,13 +760,12 @@
                 $(".order-discount2-container").toggle(false);
                 $(".order-discount3-container").toggle(false);
             }
-
-            loadSupplier();
+            loadSupplier(null, null);
             loadPurchaseRequestOptions();
         }
 
         // Load supplier for select2
-        function loadSupplier(selectedSupplier) {
+        function loadSupplier(selectedSupplier, supplierCode) {
             if ($.fn.select2 && $("#order-supplier").hasClass("select2-hidden-accessible")) {
                 $("#order-supplier").select2("destroy");
                 $("#order-supplier").empty();
@@ -780,8 +814,8 @@
                 }
             }).on("select2:select", function () {
                 var selectedSupplier = $("#order-supplier").select2("data")[0];
-                $("#order-currency").val(selectedSupplier.currency);
-                $("#order-currency-rate").val(selectedSupplier.currencyRate);
+                $("#order-currency").val(selectedSupplier.currencyId).trigger("change");
+                $("#order-currency-rate").val(selectedSupplier.currencyRateD);
             });
 
             if ($("#order-supplier").val() != null) {
@@ -789,6 +823,11 @@
                 $("#order-currency").val(selectedSupplier.currency);
                 $("#order-currency-rate").val(selectedSupplier.currencyRate);
             };
+
+            if (selectedSupplier && supplierCode) {
+                var selectedOption = new Option(supplierCode, selectedSupplier, true, true);
+                $("#order-supplier").append(selectedOption).trigger('change');
+            }
         }
 
         // Load terms for select2
@@ -958,6 +997,8 @@
                         $("#add-part").val(selected.partNumber);
                         $("#add-quantity").val(selected.unorderedQuantity);
                         $("#add-quantity").data("max", selected.unorderedQuantity);
+                        $(".add-quantity-warning").toggle(false);
+                        $(".add-quantity-warning").text("");
                         $("#add-unit").val(selected.unit);
                         $("#add-unit").data("Id", selected.unitId);
                         $("#add-unit-cost").val(0);
@@ -967,6 +1008,8 @@
                         $("#add-part").val("");
                         $("#add-quantity").val(0);
                         $("#add-quantity").data("max", 0);
+                        $(".add-quantity-warning").toggle(false);
+                        $(".add-quantity-warning").text("");
                         $("#add-unit").val("");
                         $("#add-unit").data("Id", -1);
                         $("#add-unit-cost").val("0.00");
@@ -987,6 +1030,18 @@
 
             $("#add-total-amount").val(FormatStringDecimal(quantity * cost));
         }
+
+        $("#add-quantity").on("change", function() {
+            var quantity = parseInt($(this).val());
+            var max_quantity = parseInt($(this).attr("data-max-quantity"));
+            if(quantity > max_quantity) {
+                $(".add-quantity-warning").toggle(true);
+                $(".add-quantity-warning").text("Order higher than " + max_quantity + " unordered quantity.");
+            } else {
+                $(".add-quantity-warning").toggle(false);
+                $(".add-quantity-warning").text("");
+            }
+        });
 
 
         // Load unit for select2
@@ -1013,6 +1068,8 @@
             $("#add-part").val("");
             $("#add-name").val("").trigger("change");
             $("#add-quantity").val("0");
+            $(".add-quantity-warning").toggle(false);
+            $(".add-quantity-warning").text("");
             $("#add-unit").val("");
             $("#add-unit2").val("").trigger("change");
             $("#add-unit").data("Id", "");
@@ -1034,9 +1091,9 @@
                     required: true,
                     number: true,
                     isNotZero: true,
-                    max: function () {
-                        return $("#add-quantity").data("max");
-                    }
+                    // max: function () {
+                    //     return $("#add-quantity").data("max");
+                    // }
                 },
                 UnitCost: {
                     required: true,
@@ -1055,9 +1112,9 @@
                     required: "Please enter a quantity.",
                     number: "Please enter a valid number.",
                     isNotZero: "Can not request an item with 0 quantity.",
-                    max: function () {
-                        return "Can not exceed " + $("#add-quantity").data("max") + " unordered quantity.";
-                    }
+                    // max: function () {
+                    //     return "Can not exceed " + $("#add-quantity").data("max") + " unordered quantity.";
+                    // }
                 },
                 UnitCost: {
                     required: "Please enter the unit cost.",
@@ -1082,7 +1139,7 @@
                 toastr.warning($("#add-name").select2("data")[0].text + " has already been added", "Duplicate");
             } else {
                 itemDT.row.add({
-                    purchaseOrderId: 0,
+                    purchaseOrderId: 0, 
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
                     purchaseRequestId: $("#add-pr-number").select2("data")[0].id,
                     purchaseRequestNumber: $("#add-pr-number").select2("data")[0].text,
@@ -1149,7 +1206,7 @@
                     maxlength: 50
                 },
                 Remarks: {
-                    maxlength: 250
+                    maxlength: 500
                 }
             },
             messages: {
@@ -1182,7 +1239,7 @@
                     maxlength: "Canvas summary reference can not exceed 50 characters."
                 },
                 Remarks: {
-                    maxlength: "Remarks can not exceed 250 characters."
+                    maxlength: "Remarks can not exceed 500 characters."
                 }
             },
             submitHandler: function (form, event) {
@@ -1196,54 +1253,72 @@
             {
                 if($("#order-discount1").val() == 0 || $("#order-discount2").val() == 0)
                 {
-                   toastr.warning("Discount 3 has value, Discount 1 and 2 should not be 0", "Warning");
+                   toastr.error("Discount 3 has value, Discount 1 and 2 should not be 0", "Error");
                 }
             }
             else if($("#order-discount2").val() > 0)
             {
                 if($("#order-discount1").val() == 0)
                 {
-                   toastr.warning("Discount 2 has value, Discount 1 should not be 0", "Warning");
+                   toastr.error("Discount 2 has value, Discount 1 should not be 0", "Error");
                 }
             }
 
             var items = itemDT.data();
             if (items.length == 0) {
-                toastr.warning("No item to order. Add an item to the list to continue", "Warning");
+                toastr.error("No item to order. Add an item to the list to continue", "Error");
             } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
-                toastr.warning("Some items have 0 quantity. Can't order an item with 0 quantity", "Warning");
+                toastr.error("Some items have 0 quantity. Can't order an item with 0 quantity", "Error");
             } else if (itemDT.rows().nodes().to$().find('.is-invalid').length) {
-                toastr.warning("Some items have invalid inputs. Please fix it first", "Warning");
-            } else {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("AddJson")",
-                    data: {
-                        TypeId: $("#order-type").val(),
-                        SupplierId: $("#order-supplier").val(),
-                        TermsId: $("#order-terms").val(),
-                        DeliveryModeId: $("#order-mode").val(),
-                        DeliveryAddressId: $("#order-delivery-address").val(),
-                        DateOrdered: $("#order-date-ordered").val(),
-                        Reference: $("#order-reference").val(),
-                        Remarks: $("#order-remarks").val(),
-                        Status: $("#action-type").val(),
-                        ResubmitId: $("#resubmitPOId").val(),
-                        Discount1: $("#order-discount1").val(),
-                        Discount2: $("#order-discount2").val(),
-                        Discount3: $("#order-discount3").val(),
-                        IsVATIncluded: $("#order-vat").prop("checked"),
-                        Items: itemDT.rows().data().toArray()
-                    },
-                    success: function (data, status, xhr) {
-                        if (data.status == "Error") {
-                            toastr.error(data.message, "Error");
-                        } else {
-                            window.location = "@Url.Action("Details")/" + data.newRow;
-                        }
+                toastr.error("Some items have invalid inputs. Please fix it first", "Error");
+            } else if (items.filter(s => parseInt(s.quantityD) > parseInt(s.maxQuantityD)).length > 0) {
+                swal({
+                    title: "Purchase Order Quantity",
+                    text: "Some of the quantity has exceeded unordered quantity. Continue this purchase order?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm != null) {
+                        DoSaveOrder();
                     }
                 });
+            } else {
+                DoSaveOrder();
             }
+        }
+
+        function DoSaveOrder() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("AddJson")",
+                data: {
+                    TypeId: $("#order-type").val(),
+                    SupplierId: $("#order-supplier").val(),
+                    TermsId: $("#order-terms").val(),
+                    DeliveryModeId: $("#order-mode").val(),
+                    DeliveryAddressId: $("#order-delivery-address").val(),
+                    DateOrdered: $("#order-date-ordered").val(),
+                    CurrencyId: $("#order-currency").val(),
+                    CurrencyRate: $("#order-currency-rate").val(),
+                    Reference: $("#order-reference").val(),
+                    Remarks: $("#order-remarks").val(),
+                    Status: $("#action-type").val(),
+                    ResubmitId: $("#resubmitPOId").val(),
+                    Discount1: $("#order-discount1").val(),
+                    Discount2: $("#order-discount2").val(),
+                    Discount3: $("#order-discount3").val(),
+                    IsVATIncluded: $("#order-vat").prop("checked"),
+                    Items: itemDT.rows().data().toArray()
+                },
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        window.location = "@Url.Action("Details")/" + data.newRow;
+                    }
+                }
+            });
         }
     </script>
 }

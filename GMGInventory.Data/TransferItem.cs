@@ -17,7 +17,7 @@ namespace GMGInventory.Data
         public int DestinationId { get; set; }
         public Warehouse Destination { get; set; }
 
-        [Column(TypeName = "nvarchar(250)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string Remarks { get; set; }
 
         public DateTime TransferDate { get; set; }

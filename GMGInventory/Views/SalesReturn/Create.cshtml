@@ -452,7 +452,16 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                return $(
+                    "<strong>" + repo.text + "</strong> " +
+                    (repo.text != repo.name
+                        ? "<em class='fw-light'> - " + repo.name + "</em>"
+                        : "") +
+                    "<br />" +
+                    "<small class='text-muted'>" +
+                    (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                    (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
+                    "</small>");
             },
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")",
@@ -721,13 +730,13 @@
             rules: {
                 ReturnNumber: { required: true, maxlength: 50 },
                 Customer: { required: true },
-                Remarks: { maxlength: 250 },
+                Remarks: { maxlength: 500 },
                 ReturnDate: { required: true }
             },
             messages: {
                 ReturnNumber: { required: "Please enter Sales Return Number", maxlength: "Sales Return Number must not exceed 50 characters" },
                 Customer: { required: "Please select Customer" },
-                Remarks: { maxlength: "Sales Return must not exceed 250 characters" },
+                Remarks: { maxlength: "Sales Return must not exceed 500 characters" },
                 ReturnDate: { required: "Please select the Return Date" }
             },
             submitHandler: function (form, event) {

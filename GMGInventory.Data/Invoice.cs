@@ -33,7 +33,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string ControlNumber { get; set; }
 
-        [Column(TypeName = "nvarchar(250)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
         public DateTime InvoiceDate { get; set; }

@@ -69,6 +69,7 @@ namespace GMGInventory.Application.Repositories
                                     Selected = IncludeId != null && IncludeId == s.Id,
                                     Address1 = s.AddressLine1,
                                     Address2 = s.AddressLine2,
+                                    CurrencyId = s.Currency.Id,
                                     Currency = s.Currency.Code,
                                     CurrencyRateD = s.Currency.Rate
                                 })
@@ -92,6 +93,7 @@ namespace GMGInventory.Application.Repositories
                                               Selected = includeId != null && includeId == s.Id,
                                               Address1 = s.AddressLine1,
                                               Address2 = s.AddressLine2,
+                                              CurrencyId = s.Currency.Id,
                                               Currency = s.Currency.Code,
                                               CurrencyRateD = s.Currency.Rate
                                           })
@@ -122,6 +124,7 @@ namespace GMGInventory.Application.Repositories
                                              Selected = includeId != null && includeId == s.Id,
                                              Address1 = s.AddressLine1,
                                              Address2 = s.AddressLine2,
+                                             CurrencyId = s.Currency.Id,
                                              Currency = s.Currency.Code,
                                              CurrencyRateD = s.Currency.Rate
                                          })

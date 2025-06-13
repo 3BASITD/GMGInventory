@@ -190,6 +190,7 @@ namespace GMGInventory.Data
         public DbSet<PurchaseOrderNew> PurchaseOrderNews { get; set; }
         public DbSet<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
         public DbSet<PurchaseOrderNewLineItem> PurchaseOrderNewLineItems { get; set; }
+        public DbSet<PurchaseOrderNewLineItemNewCost> PurchaseOrderNewLineItemNewCosts { get; set; }
         public DbSet<PurchaseOrderType> PurchaseOrderTypes { get; set; }
         public DbSet<PurchaseReceiving> PurchaseReceivings { get; set; }
         public DbSet<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }

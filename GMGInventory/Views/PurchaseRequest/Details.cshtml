@@ -381,6 +381,7 @@
                                 <div class="form-group">
                                     <label for="add-quantity" class="form-label mb-0">Quantity</label>
                                     <input type="number" min="0" max="1999999" data-max-quantity="2999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                    <label class="text-warning text-xs fw-lighter fst-italic m-0 add-quantity-warning"></label>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-unit-container">
@@ -424,16 +425,17 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-        var pr_status = @Json.Serialize(Model.Status);
-        var request_type = @Json.Serialize(Model.Type);
-        var request_purpose = request_type.toLowerCase() == "maintenance & repair" ? "" : @(Json.Serialize(Model.Purpose ?? ""));
+        var request_data = @Html.Raw(Json.Serialize(Model));
+        var pr_status = request_data.status;
+        var request_type = request_data.type;
+        var request_purpose = request_type.toLowerCase() == "maintenance & repair" ? "" : request_data.purpose;
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemListJson")",
-                data: { purchaseRequestId: @Model.Id },
+                data: { purchaseRequestId: request_data.id },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -494,7 +496,7 @@
                         if (user_access.canEdit && pr_status.toLowerCase() == "draft") {
                             var soMax = checkIfRequired("SONumber") ? data.maxQuantityD : 1999999;
                             if (data.quantityD > soMax) {
-                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot exceed ' + soMax + ' unserved quantity.</label>';
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-warning" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Requesting higher than ' + soMax + ' unserved quantity.</label>';
                             } else if (data.quantityD == 0) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to request.</label>';
                             } else {
@@ -693,7 +695,9 @@
                                 ? "<em class='fw-light'> - " + repo.name + "</em>"
                                 : "") +
                             "<br />" +
-                            "<small>" +
+                            "<small class='text-muted'>" +
+                            (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                            (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
                             "Unserved Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
                             "</small>");
                     },
@@ -733,6 +737,8 @@
                 $("#add-stock").val(0);
                 $("#add-quantity").val(0);
                 $("#add-quantity").attr("data-max-quantity", "1999999");
+                $(".add-quantity-warning").toggle(false);
+                $(".add-quantity-warning").text("");
                 $("#add-unit").val("");
 
                 if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
@@ -811,9 +817,24 @@
                     $(".add-stocks").text("0");
                     $("#add-quantity").val("0");
                     $("#add-quantity").attr("data-max-quantity", "1999999");
+                    $(".add-quantity-warning").toggle(false);
+                    $(".add-quantity-warning").text("");
                     $("#add-gross-price").val("0.00");
                 });
             }
+
+            $("#add-quantity").on("change", function() {
+                var quantity = parseInt($(this).val());
+                var max_quantity = parseInt($(this).attr("data-max-quantity"));
+                console.log(quantity + " " + max_quantity)
+                if(quantity > max_quantity) {
+                    $(".add-quantity-warning").toggle(true);
+                    $(".add-quantity-warning").text("Requesting higher than " + max_quantity + " unserved quantity.");
+                } else {
+                    $(".add-quantity-warning").toggle(false);
+                    $(".add-quantity-warning").text("");
+                }
+            });
 
             // Load so for select2
             $("#add-so-number").select2({
@@ -835,7 +856,7 @@
                         return {
                             search: params.term,
                             page: params.page || 1,
-                            regionId: @Json.Serialize(Model.RegionId)
+                            regionId: request_data.regionId
                         };
                     },
                     processResults: function (data, params) {
@@ -930,19 +951,19 @@
                     },
                     Name: {
                         required: function () { return checkIfRequired("Name"); },
-                        maxlength: 100
+                        maxlength: 250
                     },
-                    Stock: {
-                        number: true
-                    },
+                    // Stock: {
+                    //     number: true
+                    // },
                     Quantity: {
                         required: function () { return checkIfRequired("Quantity"); },
                         number: true,
                         isNotZero: true,
-                        max: function () {
-                            const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
-                            return maxValue;
-                        }
+                        // max: function () {
+                        //     const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
+                        //     return maxValue;
+                        // }
                     },
                     Purpose: {
                         required: function () { return checkIfRequired("Purpose"); },
@@ -958,19 +979,19 @@
                     },
                     Name: {
                         required: "Please enter the name of item.",
-                        maxlength: "Name must not exceed 100 characters."
+                        maxlength: "Name must not exceed 250 characters."
                     },
-                    Stock: {
-                        number: "Please enter a valid number."
-                    },
+                    // Stock: {
+                    //     number: "Please enter a valid number."
+                    // },
                     Quantity: {
                         required: "Please enter a quantity.",
                         number: "Please enter a valid number.",
                         isNotZero: "Can not request an item with 0 quantity.",
-                        max: function () {
-                            const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
-                            return "Cannot exceed " + maxValue + " unserved quantity.";
-                        }
+                        // max: function () {
+                        //     const maxValue = parseFloat($("#add-quantity").attr("data-max-quantity")) || 0;
+                        //     return "Cannot exceed " + maxValue + " unserved quantity.";
+                        // }
                     },
                     Purpose: {
                         required: "Please enter the purpose.",
@@ -1036,25 +1057,40 @@
                 } else if (items.filter(s => parseInt(s.quantityD) == 0).length > 0) {
                     toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
                 } else if (items.filter(s => parseInt(s.quantityD) > parseInt(s.maxQuantityD)).length > 0) {
-                    toastr.warning("Some items have invalid quantity.", "Warning");
-                } else {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("SaveItemsJson")",
-                        data: {
-                            Id: @Model.Id,
-                            status: status,
-                            items: GetItemsToRequest()
-                        },
-                        success: function (data, status, xhr) {
-                            if (data.status == "Success") {
-                                window.location.reload();
-                            } else {
-                                toastr.error(data.message, data.status);
-                            }
+                    //toastr.warning("Some items have invalid quantity.", "Warning");
+                    swal({
+                        title: "Purchase Request Quantity",
+                        text: "Some of the quantity has exceeded unserved quantity. Continue to " + (status == "Submitted" ? "submit" : "save") + " this purchase request?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm != null) {
+                            DoSaveRequest(status);
                         }
                     });
+                } else {
+                    DoSaveRequest(status);
                 }
+            }
+
+            function DoSaveRequest(status) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveItemsJson")",
+                    data: {
+                        Id: request_data.id,
+                        status: status,
+                        items: GetItemsToRequest()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Success") {
+                            window.location.reload();
+                        } else {
+                            toastr.error(data.message, data.status);
+                        }
+                    }
+                });
             }
         }
 
@@ -1071,7 +1107,7 @@
                         $.ajax({
                             url: "@Url.Action("ApproveJson")",
                             type: "POST",
-                            data: { Id: @Model.Id },
+                            data: { Id: request_data.id },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
                                     window.location.reload();
@@ -1104,7 +1140,7 @@
                             url: "@Url.Action("DisapproveJson")",
                             type: "POST",
                             data: {
-                                Id: @Model.Id,
+                                Id: request_data.id,
                                 reason: confirm
                             },
                             success: function (data, status, xhr) {
@@ -1128,7 +1164,7 @@
                     fontawesome: "fas fa-print"
                 });
                 setTimeout(function () {
-                    let win = window.open('@Url.Action("PrintDetails")/' + @Model.Id + '?Company=' + print_company, '');
+                    let win = window.open('@Url.Action("PrintDetails")/' + request_data.id + '?Company=' + print_company, '');
                     var wintimer = setInterval(function () {
                         if (win.closed) {
                             clearInterval(wintimer);

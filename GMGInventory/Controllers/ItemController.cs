@@ -278,14 +278,15 @@ namespace GMGInventory.Controllers
 
                                     await itemRepository.UpdateAsync(new ItemCommonVM
                                     {
+                                        BeginningCostD = itemVM.BeginningCost,
                                         BrandId = BrandId.Value,
                                         CategoryId = CategoryId.Value,
                                         Id = itemId,
                                         InterchangeNumber = itemVM.InterchangeNumber,
                                         ItemTypeId = ItemTypeId.Value,
                                         ModelNumber = itemVM.ModelNumber,
-                                        BeginningCostD = itemVM.BeginningCost,
                                         Name = itemVM.Name,
+                                        OldCode = itemVM.OldCode,
                                         PartNumber = itemVM.PartNumber,
                                         Size = itemVM.Size,
                                         UnitId = UnitId.Value
@@ -302,14 +303,15 @@ namespace GMGInventory.Controllers
                                 {
                                     await itemRepository.AddAsync(new ItemCommonVM
                                     {
+                                        BeginningCostD = itemVM.BeginningCost,
                                         BrandId = BrandId.Value,
                                         CategoryId = CategoryId.Value,
                                         Code = itemVM.Code,
                                         InterchangeNumber = itemVM.InterchangeNumber,
                                         ItemTypeId = ItemTypeId.Value,
                                         ModelNumber = itemVM.ModelNumber,
-                                        BeginningCostD = itemVM.BeginningCost,
                                         Name = itemVM.Name,
+                                        OldCode = itemVM.OldCode,
                                         PartNumber = itemVM.PartNumber,
                                         Size = itemVM.Size,
                                         UnitId = UnitId.Value,
@@ -338,6 +340,7 @@ namespace GMGInventory.Controllers
             dt.Columns.AddRange([
                 new DataColumn("Code"),
                 new DataColumn("Name"),
+                new DataColumn("Old SKU"),
                 new DataColumn("Part Number"),
                 new DataColumn("Interchange Number"),
                 new DataColumn("Warehouse"),
@@ -359,6 +362,7 @@ namespace GMGInventory.Controllers
             {
                 dt.Rows.Add(item.Code,
                             item.Name,
+                            item.OldCode,
                             item.PartNumber,
                             item.InterchangeNumber,
                             item.Warehouse,

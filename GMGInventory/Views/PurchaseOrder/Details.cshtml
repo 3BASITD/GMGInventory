@@ -288,7 +288,7 @@
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
                     <b class="d-block">
-                        @Model?.Remarks
+                        @(string.IsNullOrWhiteSpace(Model?.Remarks) ? "N/A" : Model.Remarks)
                     </b>
                 </p>
             </div>
@@ -403,6 +403,7 @@
                                     <th>Unit</th>
                                     <th>Unit Cost</th>
                                     <th>Total Amount</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tfoot>
@@ -417,6 +418,7 @@
                                     <th></th>
                                     <th></th>
                                     <th class="total-amount">0</th>
+                                    <th></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -474,6 +476,7 @@
                                 <div class="form-group">
                                     <label for="add-quantity" class="form-label mb-0">Quantity</label>
                                     <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
+                                    <label class="text-warning text-xs fw-lighter fst-italic m-0 add-quantity-warning"></label>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 add-unit-container">
@@ -505,6 +508,112 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+}
+
+
+@if (userAccess.CanEdit)
+{
+    <!-- Cost Modal Update Cost of already Approved Purchase Order -->
+    <div class="modal fade" id="costModal" role="dialog" aria-labelledby="costModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Cost of already Approved Purchase Order</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form-cost">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="cost-item" class="form-label mb-0">Item Description</label>
+                                    <input type="text" id="cost-item" name="Item" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="cost-old" class="form-label mb-0">Old (Ordered) Unit Cost</label>
+                                    <input type="text" id="cost-old" name="OldCode" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="cost-new" class="form-label mb-0">New (Received) Unit Cost</label>
+                                    <input type="number" min="0" max="1999999" step="0.01" id="cost-new" name="NewCost" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="cost-quantity" class="form-label mb-0">Quantity</label>
+                                    <input type="text" id="cost-quantity" name="Quantity" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="cost-total" class="form-label mb-0">Total Amount</label>
+                                    <input type="text" id="cost-total" name="Total" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="cost-remarks" class="form-label mb-0">Remarks</label>
+                                    <input type="text" id="cost-remarks" name="Remarks" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info btn-cost-history">
+                            <span class="fas fa-history"></span> History
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cost Modal Update Cost History -->
+    <div class="modal fade" id="costHistoryModal" role="dialog" aria-labelledby="costHistoryModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Cost History for <span class="cost-item-history"></span></h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                    <div class="modal-body">
+                        <table class="table table-striped table-hover table-cost-history">
+                            <thead>
+                                <tr>
+                                    <th>Previous Cost</th>
+                                    <th>New Cost</th>
+                                    <th>Remarks</th>
+                                    <th>Created By</th>
+                                    <th>Date Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
             </div>
         </div>
     </div>
@@ -587,7 +696,9 @@
                     data: function (data, type, dataToSet) {
                         if (po_status.toLowerCase() == "draft") {
                             if (data.quantityD > data.unorderedQuantityD) {
-                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.unorderedQuantity + ' unordered quantity.</label>';
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-warning" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Order higher than ' + data.unorderedQuantity  + ' unordered quantity.</label>';
+                            } else if (data.quantityD == 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to request.</label>';
                             } else {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                             }
@@ -610,7 +721,18 @@
                     name: "UnitCost",
                     className: "form-cell text-end"
                 },
-                { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
+                { data: "totalAmount", name: "TotalAmount", className: "form-cell" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        if (po_status.toLowerCase() == "approved") {
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-update-cost" data-microtip-title="Update Cost" data-microtip-position="left" role="tooltip"><i class="fas fa-money-bill-wave"></i></button>';
+                        }
+                        return actions + '</div>';
+                    },
+                    className: "form-cell"
+                },
             ],
             order: [[1, "asc"]],
             footerCallback: function (row, data, start, end, display) {
@@ -720,6 +842,23 @@
                     row.data(rowData).draw(false);
                 });
             }
+
+            if (user_access.canEdit) {
+                $(".btn-update-cost").off("click").on("click", function () {
+                    var row = $(this).parents('tr');
+                    var rowData = itemDT.row(row).data();
+
+                    $("#cost-item").val(rowData.itemDescription);
+                    $("#cost-item").data("POItemId", rowData.id);
+                    $("#cost-old").val(rowData.unitCost);
+                    $("#cost-new").val(rowData.unitCostD);
+                    $("#cost-quantity").val(rowData.quantity);
+                    $("#cost-total").val(rowData.totalAmount);
+                    $("#cost-remarks").val("");
+
+                    $("#costModal").modal("show");
+                });
+            }
         });
 
         if (user_access.canAdd) {
@@ -791,6 +930,8 @@
                             $("#add-part").val(selected.partNumber);
                             $("#add-quantity").val(selected.unorderedQuantity);
                             $("#add-quantity").data("max", selected.unorderedQuantity);
+                            $(".add-quantity-warning").toggle(false);
+                            $(".add-quantity-warning").text("");
                             $("#add-unit").val(selected.unit);
                             $("#add-unit").data("Id", selected.unitId);
                             $("#add-unit-cost").val(0);
@@ -800,6 +941,8 @@
                             $("#add-part").val("");
                             $("#add-quantity").val(0);
                             $("#add-quantity").data("max", 0);
+                            $(".add-quantity-warning").toggle(false);
+                            $(".add-quantity-warning").text("");
                             $("#add-unit").val("");
                             $("#add-unit").data("Id", -1);
                             $("#add-unit-cost").val("0.00");
@@ -820,6 +963,20 @@
 
                 $("#add-total-amount").val(FormatStringDecimal(quantity * cost));
             }
+
+            $("#add-quantity").on("change", function() {
+                var quantity = parseInt($(this).val());
+                var max_quantity = parseInt($(this).attr("data-max-quantity"));
+                console.log(quantity + " " + max_quantity)
+                if(quantity > max_quantity) {
+                    $(".add-quantity-warning").toggle(true);
+                    $(".add-quantity-warning").text("Order higher than " + max_quantity + " unordered quantity.");
+                } else {
+                    $(".add-quantity-warning").toggle(false);
+                    $(".add-quantity-warning").text("");
+                }
+            });
+
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetOptions", "Unit")",
@@ -844,6 +1001,8 @@
                 $("#add-part").val("");
                 $("#add-name").html("");
                 $("#add-quantity").val("0");
+                $(".add-quantity-warning").toggle(false);
+                $(".add-quantity-warning").text("");
                 $("#add-unit").val("");
                 $("#add-unit").data("Id", "");
                 $("#add-unit-cost").val("0.00");
@@ -864,9 +1023,9 @@
                         required: true,// function () { return checkIfRequired("Quantity"); },
                         number: true,
                         isNotZero: true,
-                        max: function () {
-                            return $("#add-quantity").data("max");
-                        }
+                        // max: function () {
+                        //     return $("#add-quantity").data("max");
+                        // }
                     },
                     UnitCost: {
                         required: true,// function () { return checkIfRequired("Purpose"); },
@@ -950,25 +1109,135 @@
                     toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
                 } else if (itemDT.rows().nodes().to$().find('.is-invalid').length) {
                     toastr.warning("Some items have invalid inputs. Please fix it first", "Warning");
-                } else {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("SaveItemsJson")",
-                        data: {
-                            Id: @Model?.Id,
-                            status: status,
-                            items: itemDT.rows().data().toArray()
-                        },
-                        success: function (data, status, xhr) {
-                            if (data.status == "Success") {
-                                window.location.reload();
-                            } else {
-                                toastr.error(data.message, data.status);
-                            }
+                } else if (items.filter(s => parseInt(s.quantityD) > parseInt(s.maxQuantityD)).length > 0) {
+                    swal({
+                        title: "Purchase Order Quantity",
+                        text: "Some of the quantity has exceeded unordered quantity. Continue this purchase order?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm != null) {
+                            DoSaveOrder(status);
                         }
                     });
+                } else {
+                    DoSaveOrder(status);
                 }
             }
+
+            function DoSaveOrder(status) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveItemsJson")",
+                    data: {
+                        Id: @Model?.Id,
+                        status: status,
+                        items: itemDT.rows().data().toArray()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Success") {
+                            window.location.reload();
+                        } else {
+                            toastr.error(data.message, data.status);
+                        }
+                    }
+                });
+            }
+        }
+
+        if (user_access.canEdit) {
+            $("#cost-new").on("change", function() {
+                var new_cost = parseFloat($("#cost-new").val()) || parseFloat($("#cost-new").val().replace(/[^\d.]/g, '')) || 0;
+                $("#cost-new").val(new_cost);
+                $("#cost-total").val(FormatStringDecimal(new_cost * parseInt($("#cost-quantity").val())));
+            });
+            
+            // Validation for Cost Modal
+            var validateCost = $("#form-cost").validate({
+                rules: {
+                    NewCost: {
+                        required: true,
+                        notEqualTo: "#cost-old"
+                    },
+                    Remarks: {
+                        required: true,
+                        maxlength: 500
+                    }
+                },
+                messages: {
+                    NewCost: {
+                        required: "Please enter the new Cost.",
+                        notEqualTo: "Please enter new Cost different to the old Cost"
+                    },
+                    Remarks: {
+                        required: "Please enter a Remarks.",
+                        maxlength: "Remarks must not exceed 500 characters."
+                    }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    UpdateCost();
+                }
+            });
+
+            function UpdateCost() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateCostJson")",
+                    data: {
+                        POItemId: $("#cost-item").data("POItemId"),
+                        OldCostD: parseFloat($("#cost-old").val()),
+                        NewCostD: parseFloat($("#cost-new").val()),
+                        Remarks: $("#cost-remarks").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Success") {
+                            window.location.reload();
+                        } else {
+                            toastr.error(data.message, data.status);
+                        }
+                    }
+                });
+            }
+
+            $(".btn-cost-history").on("click", function() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetCostUpdateListJson")",
+                    data: {
+                        OrderItemId: $("#cost-item").data("POItemId")
+                    },
+                    beforeSend: function (xhr, error) {
+                        $(".cost-item-history").text($("#cost-item").val());
+                        $(".table-cost-history tbody").html("");
+                    },
+                    success: function (data, status, xhr) {
+                        $.each(data, function (i, v) {
+                            $(".table-cost-history tbody").append(
+                                "<tr>" +
+                                    "<td>" + v.oldCost + "</td>" +
+                                    "<td>" + v.newCost + "</td>" +
+                                    "<td>" + v.remarks + "</td>" +
+                                    "<td>" + v.userCreated + "</td>" +
+                                    "<td>" + v.dateCreated + "</td>" +
+                                "</tr>"
+                            );
+                        });
+                        if(data.length == 0) {
+                            $(".table-cost-history tbody").append(
+                                "<tr>" +
+                                    "<td colspan='5' class='text-center'>No change for cost have been made</td>" +
+                                "</tr>"
+                            );
+                        }
+                    },
+                    complete: function (xhr, status) {
+                        $("#costModal").modal("hide");
+                        $("#costHistoryModal").modal("show");
+                    }
+                });
+            });
         }
 
         if (user_access.canApproveDisapprove) {

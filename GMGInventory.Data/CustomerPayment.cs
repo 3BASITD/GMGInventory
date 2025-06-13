@@ -41,7 +41,7 @@ namespace GMGInventory.Data
         [Column(TypeName = "decimal(18, 2)")]
         public decimal CashAdvance { get; set; }
 
-        [Column(TypeName = "nvarchar(500)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string Remarks { get; set; }
 
         [ForeignKey("SOACRId")]

@@ -30,7 +30,7 @@ namespace GMGInventory.Data
         public string? DisapprovedBy { get; set; }
         public DateTime? DisapprovedDate { get; set; }
 
-        [Column(TypeName = "nvarchar(150)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
         public ICollection<Invoice> Invoices { get; set; }

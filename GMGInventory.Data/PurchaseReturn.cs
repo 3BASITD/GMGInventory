@@ -13,7 +13,7 @@ namespace GMGInventory.Data
         public int PurchaseOrderId { get; set; }
         public PurchaseOrder PurchaseOrder { get; set; }
 
-        [Column(TypeName = "nvarchar(250)")]
+        [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
         public ICollection<PurchaseReturnLineItem> PurchaseReturnLineItems { get; set; }

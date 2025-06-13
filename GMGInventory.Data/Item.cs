@@ -22,6 +22,9 @@ namespace GMGInventory.Data
         }
 
         [Column(TypeName = "nvarchar(50)")]
+        public string? OldCode { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
 
         [Column(TypeName = "nvarchar(200)")]

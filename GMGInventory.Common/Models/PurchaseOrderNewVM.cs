@@ -141,6 +141,8 @@ namespace GMGInventory.Common.Models
         public int TypeId { get; set; }
         public int SupplierId { get; set; }
         public int TermsId { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal CurrencyRate { get; set; }
         public int DeliveryModeId { get; set; }
         public int DeliveryAddressId { get; set; }
         public DateTime DateOrdered { get; set; }

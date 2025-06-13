@@ -524,38 +524,40 @@ namespace GMGInventory.Application.Repositories
 
                 var packItems = await context.PackLineItems.Where(s => s.PackId == invoice.PackId).ToListAsync();
 
-                foreach (var packItem in packItems)
-                {
-                    var warehouseId = context.Warehouses.Where(x => x.Code.ToLower() == "main").Select(x => x.Id).FirstOrDefault();
-                    var itemInventory = await context.ItemInventories.Where(s => s.WarehouseId == warehouseId && s.ItemId == packItem.ItemId).FirstOrDefaultAsync();
-                    var previousCount = await context.PhysicalCountHistories.Where(s => s.WarehouseId == warehouseId && s.ItemId == packItem.ItemId).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
+                //foreach (var packItem in packItems)
+                //{
+                //    var warehouseId = context.Warehouses.Where(x => x.Code.ToLower() == "main").Select(x => x.Id).FirstOrDefault();
+                //    var itemInventory = await context.ItemInventories.Where(s => s.WarehouseId == warehouseId && s.ItemId == packItem.ItemId).FirstOrDefaultAsync();
+                //    var previousCount = await context.PhysicalCountHistories.Where(s => s.WarehouseId == warehouseId && s.ItemId == packItem.ItemId).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
 
-                    var countHistory = new PhysicalCountHistory
-                    {
-                        ItemId = packItem.ItemId,
-                        QuantityFrom = previousCount != null ? previousCount.QuantityTo : itemInventory != null ? itemInventory.Quantity : 0,
-                        QuantityTo = previousCount != null ? previousCount.QuantityTo - packItem.Quantity : packItem.Quantity,
-                        Remarks = "Sales Invoice Posting",
-                        WarehouseId = warehouseId
-                    };
-                    context.PhysicalCountHistories.Add(countHistory);
+                //    var countHistory = new PhysicalCountHistory
+                //    {
+                //        ItemId = packItem.ItemId,
+                //        //QuantityFrom = previousCount != null ? previousCount.QuantityTo : itemInventory != null ? itemInventory.Quantity : 0,
+                //        QuantityFrom = 0,
+                //        //QuantityTo = previousCount != null ? previousCount.QuantityTo - packItem.Quantity : packItem.Quantity,
+                //        QuantityTo = packItem.Quantity,
+                //        Remarks = "Sales Invoice Posting",
+                //        WarehouseId = warehouseId
+                //    };
+                //    context.PhysicalCountHistories.Add(countHistory);
 
-                    if (itemInventory != null)
-                    {
-                        itemInventory.Quantity -= packItem.Quantity;
-                        context.ItemInventories.Update(itemInventory);
-                    }
-                    else
-                    {
-                        var newItemInventory = new ItemInventory
-                        {
-                            ItemId = packItem.ItemId,
-                            Quantity = packItem.Quantity,
-                            WarehouseId = warehouseId
-                        };
-                        await context.ItemInventories.AddAsync(newItemInventory);
-                    }
-                }
+                //    if (itemInventory != null)
+                //    {
+                //        itemInventory.Quantity -= packItem.Quantity;
+                //        context.ItemInventories.Update(itemInventory);
+                //    }
+                //    else
+                //    {
+                //        var newItemInventory = new ItemInventory
+                //        {
+                //            ItemId = packItem.ItemId,
+                //            Quantity = packItem.Quantity,
+                //            WarehouseId = warehouseId
+                //        };
+                //        await context.ItemInventories.AddAsync(newItemInventory);
+                //    }
+                //}
 
                 await context.SaveChangesAsync(currentUserId);
 

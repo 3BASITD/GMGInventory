@@ -311,12 +311,12 @@
             rules: {
                 ReturnNumber: { required: true, maxlength: 50 },
                 ReturnDate: { required: true },
-                Remarks: { maxlength: 250 }
+                Remarks: { maxlength: 500 }
             },
             messages: {
                 ReturnNumber: { required: "Please enter Sales Return Number", maxlength: "Sales Return Number must not exceed 50 characters" },
                 ReturnDate: { required: "Please select the Return Date" },
-                Remarks: { maxlength: "Sales Return must not exceed 250 characters" }
+                Remarks: { maxlength: "Sales Return must not exceed 500 characters" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();

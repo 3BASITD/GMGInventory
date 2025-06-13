@@ -57,6 +57,7 @@ namespace GMGInventory.Application.Repositories
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
                            || item.Name.ToLower().Contains(search.ToLower())
+                           || (item.OldCode + "").ToLower().Contains(search.ToLower())
                            || (item.PartNumber + "").ToLower().Contains(search.ToLower()))
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
@@ -65,6 +66,7 @@ namespace GMGInventory.Application.Repositories
                             InventoryCount = inventory,
                             Text = item.Code,
                             Name = item.Name,
+                            OldCode = item.OldCode,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price == null ? -999999 : price.NetSellingPrice,
                             QuantityD = 0,
@@ -89,6 +91,7 @@ namespace GMGInventory.Application.Repositories
                                                 string.IsNullOrWhiteSpace(search)
                                                 || s.Item.Code.ToLower().Contains(search.ToLower())
                                                 || s.Item.Name.ToLower().Contains(search.ToLower())
+                                                || (s.Item.OldCode + "").ToLower().Contains(search.ToLower())
                                                 || (s.Item.PartNumber + "").ToLower().Contains(search.ToLower())
                                               )
                                            )
@@ -97,6 +100,7 @@ namespace GMGInventory.Application.Repositories
                                         Id = s.Id.ToString(),
                                         Text = s.Item.Code,
                                         Name = s.Item.Name,
+                                        OldCode = s.Item.OldCode,
                                         QuantityD = 0,
                                         Unit = s.Item.Unit.Code
                                     })
@@ -133,8 +137,9 @@ namespace GMGInventory.Application.Repositories
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
                            || item.Name.ToLower().Contains(search.ToLower())
+                           || (item.OldCode + "").ToLower().Contains(search.ToLower())
                            || (item.PartNumber + "").ToLower().Contains(search.ToLower()))
-                           && soitem.Quantity > (ii + requests)
+                           //&& soitem.Quantity > (ii + requests)
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {
@@ -142,6 +147,7 @@ namespace GMGInventory.Application.Repositories
                             InventoryCount = ii,
                             Text = item.Code,
                             Name = item.Name,
+                            OldCode = item.OldCode,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
                             QuantityD = soitem.Quantity - (ii + requests),
@@ -208,29 +214,13 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetInWarehouseOptions(string search, int warehouse, int page)
         {
-            //var items = await context.ItemInventories.Include(s => s.Item).ThenInclude(s => s.Unit)
-            //                    .Where(s => s.WarehouseId == warehouse
-            //                             && (string.IsNullOrWhiteSpace(search)
-            //                             || (s.Item.Code.ToLower().Contains(search.ToLower()))
-            //                             || (s.Item.Name.ToLower().Contains(search.ToLower()))))
-            //                    .Select(s => new JsonItemOptionsModel
-            //                    {
-            //                        Id = s.Item.Id.ToString(),
-            //                        Text = s.Item.Code,
-            //                        Name = s.Item.Name,
-            //                        Quantity = s.Quantity,
-            //                        Unit = s.Item.Unit.Code
-            //                    })
-            //                    .OrderBy(s => s.Text)
-            //                    .ToListAsync();
-
-            var whouse = context.Warehouses.Where(s => s.Id == warehouse).FirstOrDefault();
             var items = await (from item in context.ItemInventories
                                where item.WarehouseId == warehouse
                                && item.Item.IsActive == true
                                && (search == null
                                || item.Item.Code.ToLower().Contains(search.ToLower())
                                || item.Item.Name.ToLower().Contains(search.ToLower())
+                               || (item.Item.OldCode + "").ToLower().Contains(search.ToLower())
                                || (item.Item.PartNumber + "").ToLower().Contains(search.ToLower()))
                                && item.Quantity > 0
                                orderby item.Item.Code ascending
@@ -239,6 +229,7 @@ namespace GMGInventory.Application.Repositories
                                    Id = item.ItemId.ToString(),
                                    Text = item.Item.Code,
                                    Name = item.Item.Name,
+                                   OldCode = item.Item.OldCode,
                                    QuantityD = item.Quantity,
                                    Unit = item.Item.Unit.Code
                                }).ToListAsync();
@@ -355,11 +346,13 @@ namespace GMGInventory.Application.Repositories
                               && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
                               && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
                               && (filter.BrandId == null || filter.BrandId == item.BrandId)
+                              && (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
                           select new ItemCommonVM
                           {
                               Id = item.Id,
                               Code = item.Code.Replace("\n", "").Replace("\r", "").Trim(),
                               Name = item.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                              OldCode = item.OldCode == null ? null : item.OldCode.Replace("\n", "").Replace("\r", "").Trim(),
                               PartNumber = (item.PartNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                               InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                               ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
@@ -397,6 +390,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     s.Code,
                     s.Name,
+                    s.OldCode,
                     s.PartNumber,
                     s.InterchangeNumber + "",
                     s.ModelNumber + "",
@@ -455,6 +449,7 @@ namespace GMGInventory.Application.Repositories
                                    Id = j.Id,
                                    Code = j.Code,
                                    Name = j.Name,
+                                   OldCode = j.OldCode,
                                    PartNumber = j.PartNumber,
                                    InterchangeNumber = j.InterchangeNumber,
                                    ModelNumber = j.ModelNumber,
@@ -521,7 +516,8 @@ namespace GMGInventory.Application.Repositories
                               Size = item.Size,
                               UnitCode = item.Unit.Name,
                               Warehouse = inventory.Warehouse.Name,
-                              LocationCodes =  string.Join(",", locationCodes.Select(s => s.Id))
+                              LocationCodes =  string.Join(",", locationCodes.Select(s => s.Id)),
+                              OldCode = item.OldCode
                           }).FirstOrDefault();
             return itemVM;
         }
@@ -550,7 +546,8 @@ namespace GMGInventory.Application.Repositories
                               Size = item.Size,
                               Unit = item.Unit.Code,
                               Quantity = inventory,
-                              IsActive = item.IsActive
+                              IsActive = item.IsActive,
+                              OldCode = item.OldCode
                           };
             return await itemsVM.ToListAsync();
         }
@@ -609,6 +606,7 @@ namespace GMGInventory.Application.Repositories
                 ItemTypeId = itemVM.ItemTypeId,
                 BeginningCost = itemVM.BeginningCostD == 0 ? null : itemVM.BeginningCostD,
                 ModelNumber = itemVM.ModelNumber + "",
+                OldCode = itemVM.OldCode,
                 Name = itemVM.Name,
                 PartNumber = itemVM.PartNumber + "",
                 Size = itemVM.Size + "",
@@ -664,6 +662,7 @@ namespace GMGInventory.Application.Repositories
             item.BeginningCost = itemVM.BeginningCostD == 0 ? null : itemVM.BeginningCostD;
             item.ModelNumber = itemVM.ModelNumber + "";
             item.Name = itemVM.Name;
+            item.OldCode = itemVM.OldCode;
             item.PartNumber = itemVM.PartNumber + "";
             item.Size = itemVM.Size + "";
 

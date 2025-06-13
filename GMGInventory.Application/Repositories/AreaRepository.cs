@@ -76,8 +76,8 @@ namespace GMGInventory.Application.Repositories
                                      .Select(s => new JsonCustomerOptionsModel
                                      {
                                          Id = s.Id.ToString(),
-                                         Text = s.Code,
-                                         Name = s.Name
+                                         Text = s.Name,
+                                         Name = s.Code
                                      })
                                      .OrderBy(s => s.Text)
                                      .ToListAsync();

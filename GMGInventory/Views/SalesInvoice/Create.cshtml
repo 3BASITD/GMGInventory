@@ -432,12 +432,12 @@
             rules: {
                 ControlNumber: { required: true, maxlength: 50 },
                 InvoiceDate: { required: true },
-                Remarks: { maxlength: 250 }
+                Remarks: { maxlength: 500 }
             },
             messages: {
                 ControlNumber: { required: "Please enter BIR Invoice Number", maxlength: "BIR Invoice Number must not exceed 50 characters." },
                 InvoiceDate: { required: "Please enter Invoice Date." },
-                Remarks: { maxlength: "Remarks must not exceed 250 characters." }
+                Remarks: { maxlength: "Remarks must not exceed 500 characters." }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
