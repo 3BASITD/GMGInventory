@@ -136,4 +136,19 @@ namespace GMGInventory.Common.Models
         public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
         public DateTime DateCreatedD { get; set; }
     }
+
+    public class POItemQuantityVM
+    {
+        public int Id { get; set; }
+        public int POItemId { get; set; }
+        public string Item { get; set; }
+      //  public string OldQuantity => string.Format(SystemFormat.StringDecimalComma, OldQuantityD);
+        public int OldQuantity { get; set; }
+      //  public string NewQuantity => string.Format(SystemFormat.StringDecimalComma, NewQuantityD);
+        public int NewQuantity { get; set; }
+        public string Remarks { get; set; }
+        public string UserCreated { get; set; }
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+    }
 }

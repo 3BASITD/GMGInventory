@@ -2,6 +2,7 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -652,6 +653,7 @@ namespace GMGInventory.Application.Repositories
             return response;
         }
 
+
         public async Task<IList<POItemCostVM>> GetCostUpdateListAsync(int orderItemId)
         {
             var item = from pocost in context.PurchaseOrderNewLineItemNewCosts
@@ -670,6 +672,98 @@ namespace GMGInventory.Application.Repositories
             return await item.ToListAsync();
         }
 
+        public async Task<ResponseModel> UpdateQuantityAsync(POItemQuantityVM quantity)
+        {
+            var response = new ResponseModel();
+
+            if (quantity.OldQuantity == quantity.NewQuantity)
+            {
+                response.Status = "Error";
+                response.Message = "No change for quantity, nothing so save";
+            }
+            else
+            {
+                var poitem = await context.PurchaseOrderNewLineItems
+                                          .Include(s => s.RequestItem)
+                                          .Where(s => s.Id == quantity.POItemId)
+                                          .FirstOrDefaultAsync();
+                if (poitem == null)
+                {
+                    response.Status = "Error";
+                    response.Message = "Invalid Item Record";
+                }
+                else if (poitem.Quantity != quantity.OldQuantity)
+                {
+                    response.Status = "Error";
+                    response.Message = "Invalid Old Quantity";
+                }
+                else
+                {
+                    var po = await context.PurchaseOrderNews
+                                          .Include(s => s.Status)
+                                          .Where(s => s.Id == poitem.PurchaseOrderId)
+                                          .FirstOrDefaultAsync();
+                    if (po == null)
+                    {
+                        response.Status = "Error";
+                        response.Message = "Invalid Record";
+                    }
+                    else if (po.Status.Name.ToLower() != "approved")
+                    {
+                        response.Status = "Error";
+                        response.Message = "This function is only available for approved PO";
+                    }
+                    else if (await context.PurchaseOrderNewLineItemNewQuantities
+                                          .Where(s => s.OrderItemId == poitem.Id)
+                                          .CountAsync() >= 3)
+                    {
+                        response.Status = "Error";
+                        response.Message = "You are only allowed to update the quantity for a maximum of 3 times only.";
+                    }
+                    else
+                    {
+                        var qty = new PurchaseOrderNewLineItemNewQuantity
+                        {
+                            OrderItemId = poitem.Id,
+                            PreviousQuantity = poitem.Quantity,
+                            NewQuantity = quantity.NewQuantity,
+                            Remarks = quantity.Remarks
+                        };
+                        string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                        await context.PurchaseOrderNewLineItemNewQuantities.AddAsync(qty);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        var itemId = poitem.RequestItem.ItemId;  
+
+                        poitem.Quantity = quantity.NewQuantity;
+                        context.PurchaseOrderNewLineItems.Update(poitem);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        response.Status = "Success";
+                        response.Message = "Quantity for " + poitem.RequestItem.ItemDescription + " is now changed to " + quantity.NewQuantity;
+                    }
+                }
+            }
+            return response;
+        }
+
+        public async Task<IList<POItemQuantityVM>> GetQuantityUpdateListAsync(int orderItemId)
+        {
+            var item = from poqty in context.PurchaseOrderNewLineItemNewQuantities
+                       join user in userManager.Users on poqty.UserCreated equals user.Id
+                       where poqty.OrderItemId == orderItemId
+                       select new POItemQuantityVM
+                       {
+                           Id = poqty.Id,
+                           Item = poqty.OrderItem.RequestItem.ItemDescription,
+                           OldQuantity = poqty.PreviousQuantity,
+                           NewQuantity = poqty.NewQuantity,
+                           Remarks = poqty.Remarks,
+                           UserCreated = user.FirstName + " " + user.LastName,
+                           DateCreatedD = poqty.DateCreated
+                       };
+            return await item.ToListAsync();
+        }
         public async Task<ResponseModel> ApproveAsync(int orderId)
         {
             var response = new ResponseModel();

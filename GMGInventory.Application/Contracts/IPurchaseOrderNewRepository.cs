@@ -18,7 +18,9 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel<int>> AddAsync(PurchaseOrderSaveVM form, List<PurchaseOrderLineItemVM> Items);
         Task<ResponseModel> SaveItemsAsync(IList<PurchaseOrderLineItemVM> Items, int orderId, string? status = null);
         Task<ResponseModel> UpdateCostAsync(POItemCostVM cost);
+        Task<ResponseModel> UpdateQuantityAsync(POItemQuantityVM qty);
         Task<IList<POItemCostVM>> GetCostUpdateListAsync(int orderItemId);
+        Task<IList<POItemQuantityVM>> GetQuantityUpdateListAsync(int orderItemId);
         Task<ResponseModel> ApproveAsync(int orderId);
         Task<ResponseModel> DisapproveAsync(int orderId, string? reason);
         Task<ResponseModel> DeleteAsync(int requestId);

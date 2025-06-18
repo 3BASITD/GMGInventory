@@ -617,6 +617,110 @@
             </div>
         </div>
     </div>
+
+     <!-- Quantity Modal Update Quantity of already Approved Purchase Order -->
+    <div class="modal fade" id="quantityModal" role="dialog" aria-labelledby="quantityModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Quantity of already Approved Purchase Order</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form-quantity">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="quantity-item" class="form-label mb-0">Item Description</label>
+                                    <input type="text" id="quantity-item" name="Item" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="quantity-old" class="form-label mb-0">Old (Ordered) Quantity</label>
+                                    <input type="text" id="quantity-old" name="OldQuantity" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="quantity-new" class="form-label mb-0">New (Received) Quantity</label>
+                                    <input type="number" min="0" max="1999999" step="1" id="quantity-new" name="NewQuantity" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="quantity-cost" class="form-label mb-0">Cost</label>
+                                    <input type="text" id="quantity-cost" name="Cost" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="quantity-total" class="form-label mb-0">Total Amount</label>
+                                    <input type="text" id="quantity-total" name="Total" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="quantity-remarks" class="form-label mb-0">Remarks</label>
+                                    <input type="text" id="quantity-remarks" name="Remarks" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info btn-quantity-history">
+                            <span class="fas fa-history"></span> History
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+      <!-- Quantity Modal Update Quantity History -->
+    <div class="modal fade" id="quantityHistoryModal" role="dialog" aria-labelledby="quantityHistoryModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Quantity History for <span class="quantity-item-history"></span></h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                    <div class="modal-body">
+                        <table class="table table-striped table-hover table-quantity-history">
+                            <thead>
+                                <tr>
+                                    <th>Previous Quantity</th>
+                                    <th>New Quantity</th>
+                                    <th>Remarks</th>
+                                    <th>Created By</th>
+                                    <th>Date Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+  
 }
 
 @section Scripts {
@@ -727,7 +831,8 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         if (po_status.toLowerCase() == "approved") {
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-update-cost" data-microtip-title="Update Cost" data-microtip-position="left" role="tooltip"><i class="fas fa-money-bill-wave"></i></button>';
+                            actions += '<button type="button" class="btn btn-warning btn-xs btn-update-quantity" data-microtip-title="Update Quantity" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-update-cost ml-2" data-microtip-title="Update Cost" data-microtip-position="left" role="tooltip"><i class="fas fa-money-bill-wave"></i></button>';
                         }
                         return actions + '</div>';
                     },
@@ -858,6 +963,21 @@
 
                     $("#costModal").modal("show");
                 });
+                  $(".btn-update-quantity").off("click").on("click", function () {
+                    var row = $(this).parents('tr');
+                    var rowData = itemDT.row(row).data();
+
+                    $("#quantity-item").val(rowData.itemDescription);
+                    $("#quantity-item").data("POItemId", rowData.id);
+                    $("#quantity-old").val(rowData.quantity);
+                    $("#quantity-new").val(rowData.quantity);
+                    $("#quantity-cost").val(rowData.unitCost);
+                    $("#quantity-total").val(rowData.totalAmount);
+                    $("#quantity-remarks").val("");
+
+                    $("#quantityModal").modal("show");
+                });
+                
             }
         });
 
@@ -1152,6 +1272,13 @@
                 $("#cost-new").val(new_cost);
                 $("#cost-total").val(FormatStringDecimal(new_cost * parseInt($("#cost-quantity").val())));
             });
+
+              $("#quantity-new").on("change", function() {
+                var new_quantity = parseInt($("#quantity-new").val());
+            //    $("#quantity-new").val(new_quantity);
+                $("#quantity-total").val(FormatStringDecimal(new_quantity * parseFloat($("#quantity-cost").val())));
+            });
+            
             
             // Validation for Cost Modal
             var validateCost = $("#form-cost").validate({
@@ -1235,6 +1362,93 @@
                     complete: function (xhr, status) {
                         $("#costModal").modal("hide");
                         $("#costHistoryModal").modal("show");
+                    }
+                });
+            });
+
+
+               // Validation for Quantity Modal
+            var validateQuantity = $("#form-quantity").validate({
+                rules: {
+                    NewQuantity: {
+                        required: true,
+                        notEqualTo: "#quantity-old"
+                    },
+                    Remarks: {
+                        required: true,
+                        maxlength: 500
+                    }
+                },
+                messages: {
+                    NewCost: {
+                        required: "Please enter the new Quantity.",
+                        notEqualTo: "Please enter new Quantity different to the old Quantity"
+                    },
+                    Remarks: {
+                        required: "Please enter a Remarks.",
+                        maxlength: "Remarks must not exceed 500 characters."
+                    }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    UpdateQuantity();
+                }
+            });
+
+            function UpdateQuantity() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateQuantityJson")",
+                    data: {
+                        POItemId: $("#quantity-item").data("POItemId"),
+                        OldQuantity: parseFloat($("#quantity-old").val()),
+                        NewQuantity: parseFloat($("#quantity-new").val()),
+                        Remarks: $("#quantity-remarks").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Success") {
+                            window.location.reload();
+                        } else {
+                            toastr.error(data.message, data.status);
+                        }
+                    }
+                });
+            }
+
+             $(".btn-quantity-history").on("click", function() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetQuantityUpdateListJson")",
+                    data: {
+                        OrderItemId: $("#quantity-item").data("POItemId")
+                    },
+                    beforeSend: function (xhr, error) {
+                        $(".quantity-item-history").text($("#quantity-item").val());
+                        $(".table-quantity-history tbody").html("");
+                    },
+                    success: function (data, status, xhr) {
+                        $.each(data, function (i, v) {
+                            $(".table-quantity-history tbody").append(
+                                "<tr>" +
+                                    "<td>" + v.oldQuantity + "</td>" +
+                                    "<td>" + v.newQuantity + "</td>" +
+                                    "<td>" + v.remarks + "</td>" +
+                                    "<td>" + v.userCreated + "</td>" +
+                                    "<td>" + v.dateCreated + "</td>" +
+                                "</tr>"
+                            );
+                        });
+                        if(data.length == 0) {
+                            $(".table-quantity-history tbody").append(
+                                "<tr>" +
+                                    "<td colspan='5' class='text-center'>No change for quantity have been made</td>" +
+                                "</tr>"
+                            );
+                        }
+                    },
+                    complete: function (xhr, status) {
+                        $("#quantityModal").modal("hide");
+                        $("#quantityHistoryModal").modal("show");
                     }
                 });
             });

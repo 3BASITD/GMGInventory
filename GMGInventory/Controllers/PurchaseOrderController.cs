@@ -191,6 +191,27 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> UpdateQuantityJson(POItemQuantityVM qty)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await orderRepository.UpdateQuantityAsync(qty);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetQuantityUpdateListJson(int OrderItemId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await orderRepository.GetQuantityUpdateListAsync(OrderItemId);
+            return Json(response);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> ApproveJson(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.ApproveDisapprove);
