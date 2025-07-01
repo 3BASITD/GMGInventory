@@ -37,6 +37,19 @@ namespace GMGInventory.Application.Repositories
         public async Task AddAsync(ItemDetailConversionVM ItemDetailConversionVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var hasConversion = await context.ItemConversions.AnyAsync(s => s.ItemId == ItemDetailConversionVM.ItemId);
+
+            if (!hasConversion)
+            {
+                var item = await context.Items.Where(x => x.Id == ItemDetailConversionVM.ItemId).FirstOrDefaultAsync();
+                if (item != null)
+                {
+                    item.UnitId = ItemDetailConversionVM.UnitId ?? 0;
+                    context.Items.Update(item);
+                    await context.SaveChangesAsync(currentUserId);
+                }
+            }
+
             var conversion = new ItemConversion
             {
                 ItemId = ItemDetailConversionVM.ItemId,
@@ -111,6 +124,18 @@ namespace GMGInventory.Application.Repositories
 
             context.ItemConversions.Update(conversion);
             await context.SaveChangesAsync(currentUserId);
+
+
+            if (itemDetailConversionVM.OrderNo == 1)
+            {
+                var item = await context.Items.Where(x => x.Id == itemDetailConversionVM.ItemId).FirstOrDefaultAsync();
+                if (item != null)
+                {
+                    item.UnitId = itemDetailConversionVM.UnitId ?? 0;
+                    context.Items.Update(item);
+                    await context.SaveChangesAsync(currentUserId);
+                }
+            }
         }
 
         public async Task<bool> IsIdExistAsync(int id)
