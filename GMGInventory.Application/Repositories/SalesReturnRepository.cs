@@ -199,6 +199,11 @@ namespace GMGInventory.Application.Repositories
                     context.SalesReturns.Add(salesReturn);
                     await context.SaveChangesAsync(currentUserId);
 
+                    var warehouseId = await context.Warehouses
+                                                   .Where(s => s.Code.ToLower().Contains("main"))
+                                                   .Select(s => s.Id)
+                                                   .FirstAsync();
+
                     foreach (var item in form.Items)
                     {
                         var salesReturnLineItem = new SalesReturnLineItem
@@ -214,6 +219,51 @@ namespace GMGInventory.Application.Repositories
                         };
 
                         context.SalesReturnLineItems.Add(salesReturnLineItem);
+
+                        var itemInventory = await context.ItemInventories
+                                                         .Where(s => s.ItemId == item.Item && s.WarehouseId == warehouseId)
+                                                         .FirstOrDefaultAsync();
+
+                        if (itemInventory != null)
+                        {
+                            var oldInventoryQuantity = itemInventory.Quantity;
+                            itemInventory.Quantity += item.Quantity;
+                            context.ItemInventories.Update(itemInventory);
+                            await context.SaveChangesAsync(currentUserId);
+
+                            var countHistory = new PhysicalCountHistory
+                            {
+                                ItemId = item.Item,
+                                QuantityFrom = oldInventoryQuantity,
+                                QuantityTo = itemInventory.Quantity,
+                                Remarks = "Sales Return",
+                                WarehouseId = warehouseId
+                            };
+                            context.PhysicalCountHistories.Add(countHistory);
+                            await context.SaveChangesAsync(currentUserId);
+                        }
+                        else
+                        {
+                            itemInventory = new ItemInventory
+                            {
+                                ItemId = item.Item,
+                                Quantity = item.Quantity,
+                                WarehouseId = warehouseId
+                            };
+                            await context.ItemInventories.AddAsync(itemInventory);
+                            await context.SaveChangesAsync(currentUserId);
+
+                            var countHistory = new PhysicalCountHistory
+                            {
+                                ItemId = item.Item,
+                                QuantityFrom = 0,
+                                QuantityTo = item.Quantity,
+                                Remarks = "Sales Return",
+                                WarehouseId = warehouseId
+                            };
+                            context.PhysicalCountHistories.Add(countHistory);
+                            await context.SaveChangesAsync(currentUserId);
+                        }
                     }
                     await context.SaveChangesAsync(currentUserId);
 

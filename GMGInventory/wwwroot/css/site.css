@@ -502,3 +502,8 @@ body.dark-mode .temp-carousel .caption {
 a.btn-details-print {
     cursor: pointer;
 }
+
+.ui-state-disabled[role=tooltip] {
+    pointer-events: auto !important;
+    cursor: not-allowed !important;
+}

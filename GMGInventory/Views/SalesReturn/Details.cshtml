@@ -6,7 +6,7 @@
 }
 
 @section Breadcrumb {
-    <li class="breadcrumb-item"><a asp-controller="Sales Return" asp-action="Index">Sales Returns</a></li>
+    <li class="breadcrumb-item"><a asp-controller="SalesReturn" asp-action="Index">Sales Returns</a></li>
 }
 
 <div class="card card-default">
@@ -20,10 +20,22 @@
                         <span class="fas fa-save"></span> Update
                     </button>
                 }
+                else
+                {
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                        <span class="fas fa-save"></span> Update
+                    </button>
+                }
 
                 @if (userAccess.CanPrint)
                 {
                     <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
+                        <span class="fas fa-print"></span> Print
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="top-left" role="tooltip">
                         <span class="fas fa-print"></span> Print
                     </button>
                 }

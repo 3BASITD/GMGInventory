@@ -25,6 +25,12 @@
                     </ul>
                 </div>
             }
+            else
+            {
+                <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="top-left" role="tooltip">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
             @if (Model.Status.ToLower() == "draft")
             {
                 @if (userAccess.CanEdit)
@@ -32,10 +38,16 @@
                     <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
                         <span class="fas fa-save"></span> Save as Draft
                     </button>
-                }
-                @if (userAccess.CanAdd)
-                {
                     <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
+                        <span class="fas fa-paper-plane"></span> Submit
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
                         <span class="fas fa-paper-plane"></span> Submit
                     </button>
                 }
@@ -53,6 +65,15 @@
                         <span class="fas fa-times"></span> Disapprove
                     </button>
                 }
+                else
+                {
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="top-left" role="tooltip">
+                        <span class="fas fa-check"></span> Approve
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                        <span class="fas fa-times"></span> Disapprove
+                    </button>
+                }
             }
             else if (Model.Status.ToLower() == "disapproved"
             && !string.IsNullOrWhiteSpace(Model.DisapprovedBy)
@@ -63,6 +84,12 @@
                     <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
                         <span class="fas fa-edit"></span> Update to Resubmit
                     </a>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="top-left" role="tooltip">
+                        <span class="fas fa-edit"></span> Update to Resubmit
+                    </button>
                 }
             }
             @* else if (Model.Status.ToLower() == "approved")

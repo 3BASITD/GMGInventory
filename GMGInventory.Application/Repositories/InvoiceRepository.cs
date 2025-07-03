@@ -634,7 +634,7 @@ namespace GMGInventory.Application.Repositories
                 form.PackId = invoice.PackId;
                 if (form.SavingAs == "delete")
                 {
-                    if (invoice.Status.Name != "Invoice Draft")
+                    if (invoice.Status.Name.ToLower() != "invoice draft")
                     {
                         await DeleteInvoiceItems(form, false);
                         int statusId = await context.Statuses

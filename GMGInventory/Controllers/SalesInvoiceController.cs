@@ -162,7 +162,10 @@ namespace GMGInventory.Controllers
                 }
                 else
                 {
-                    var submitMessage = "Sales Invoice successfully " + (form.SavingAs == "post" ? "posted" : form.SavingAs == "delete" ? "cancelled" : form.SavingAs == "update" ? "updated" : "saved");
+                    var submitMessage = "Sales Invoice successfully " + (form.SavingAs == "post" ? "posted" 
+                                                                       : form.SavingAs == "delete" ? "cancelled" 
+                                                                       : form.SavingAs == "update" ? "updated" 
+                                                                       : "saved");
                     responseModel.Status = "Success";
                     responseModel.Message = submitMessage;
                     TempData["SuccessMessage"] = submitMessage;
