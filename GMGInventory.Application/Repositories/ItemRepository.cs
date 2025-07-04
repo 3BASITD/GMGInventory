@@ -150,7 +150,7 @@ namespace GMGInventory.Application.Repositories
                             OldCode = item.OldCode,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
-                            QuantityD = soitem.Quantity - (ii + requests),
+                            QuantityD = Math.Max(0, soitem.Quantity - (ii + requests)),
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code

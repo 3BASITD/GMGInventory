@@ -266,6 +266,19 @@
         var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
             showBatchLoader("orderdt");
         }).DataTable({
+        //         stateSave: true,
+        //         stateSaveParams: function (settings, data) {
+        //     data.customFilters = {
+        //         selectVal: $('#yourSelect').val(),
+        //         inputVal: $('#yourInput').val()
+        //     };
+        // },
+        // stateLoadParams: function (settings, data) {
+        //     if (data.customFilters) {
+        //         $('#yourSelect').val(data.customFilters.selectVal).trigger('change');
+        //         $('#yourInput').val(data.customFilters.inputVal);
+        //     }
+        // },
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",

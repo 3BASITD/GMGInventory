@@ -1066,7 +1066,7 @@
                                     "<strong>" + repo.text + "</strong><br />" +
                                     "<small>" +
                                     "Requested Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
-                                    "Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit +
+                                    (repo.disabled ? ("Already Ordered On: " + repo.orderedOn) : ("Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit)) +
                                     "</small>"
                                 );
                             },
