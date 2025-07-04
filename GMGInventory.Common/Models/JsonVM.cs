@@ -156,6 +156,8 @@ namespace GMGInventory.Common.Models
         public int Served { get; set; }
         public int UnorderedQuantity => Math.Max(0, Quantity - Served);
         public bool Selected { get; set; } = false;
+        public string? OrderedOn { get; set; }
+        public bool Disabled { get; set; }
     }
 
     public class JsonCustomerOptionsModel
