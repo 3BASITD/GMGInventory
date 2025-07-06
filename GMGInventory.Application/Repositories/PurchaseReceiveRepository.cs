@@ -244,6 +244,7 @@ namespace GMGInventory.Application.Repositories
                             join order in context.PurchaseOrderNewLineItems on receive.OrderItemId equals order.Id
 
                             where receive.PurchaseReceivingId == purchaseReceivingId
+                            orderby order.LineNumber
 
                             select new PurchaseReceiveLineItemVM
                             {
