@@ -473,6 +473,7 @@
                                 <div class="col-12 col-sm-6">
                                     <div class="form-group">
                                         <input type="hidden" id="edit-id" />
+                                        <input type="hidden" id="edit-orderNo" />
 
                                         <label for="edit-quantity" class="form-label mb-0">Quantity</label>
                                         <input type="number" min="0" max="1999999" id="edit-quantity" name="Quantity" class="form-control form-control-sm" />
@@ -1112,8 +1113,11 @@
                     $("#edit-id").val(data.id);
                     $("#edit-quantity").val(data.quantity);
                     $("#edit-equivalent-quantity").val(data.equivalentQuantity);
-                    $("#edit-unit").val(data.unitId);
-                    $("#edit-equivalent-unit").val(data.equivalentUnitId);
+                    $("#edit-unit").val(data.unitId).trigger("change");
+                    $("#edit-equivalent-unit").val(data.equivalentUnitId).trigger("change");
+                    $("#edit-orderNo").val(data.orderNo);
+
+                    var data = conversionDT.row($(this).parents('tr')).data();
 
                     if (data != null && data.subItemId != null) {
                         $(".divItem").show();
@@ -1201,12 +1205,13 @@
                         url: "@Url.Action("EditConversionJson")",
                         data: {
                             Id: $("#edit-id").val(),
-                            SubItemId: $("#edit-item").val(), // $("#edit-item-hidden").val(),
+                            SubItemId: $("#edit-item").val(),  
                             ItemId: @Model?.Id,
                             Quantity: $("#edit-item-hidden").val() != "" ? $("#edit-item-quantity").val() : $("#edit-quantity").val(),
                             UnitId: $("#edit-unit").val(),
                             EquivalentQuantity: $("#edit-equivalent-quantity").val(),
-                            EquivalentUnitId: $("#edit-equivalent-unit").val()
+                            EquivalentUnitId: $("#edit-equivalent-unit").val(),
+                            OrderNo: $("#edit-orderNo").val()
                         },
                         success: function (data, status, xhr) {
                             if (data.status == "Error") {
@@ -1214,8 +1219,15 @@
                             } else {
                                 toastr.success(data.message, "Success");
                                 $("#editModal").modal("hide");
-                                conversionDT.ajax.reload();
-                                hideLoader()
+                                if($("#edit-orderNo").val() == 1)
+                                {
+                                    window.location.reload();
+                                }
+                                else
+                                {
+                                 conversionDT.ajax.reload();
+                                }
+                                 hideLoader();
                             }
                         }
                     });
@@ -1293,7 +1305,6 @@
                                     for (var i = 2; i < 5; i++) {
                                         conversionDT.column(i).visible(false, false);
                                     }
-                                    debugger;
                                     conversionDT.column(0).visible(true, true);
                                 }
                                 else {  

@@ -188,6 +188,7 @@
 @section Scripts {
     <script>
         var user_accessBasic = @Html.Raw(Json.Serialize(userAccessBasic));
+        $("#date-received").val(DateForInput(new Date()));
 
         if ($("#resubmitPRId").length) {
             $("#receive-poNumber").prop('disabled', true);
