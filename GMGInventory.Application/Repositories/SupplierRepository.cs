@@ -191,11 +191,11 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
-                                    || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
-                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
-                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Name.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue.ToLower())
                                     || x.DateModified.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -455,14 +455,14 @@ namespace GMGInventory.Application.Repositories
                 data = data.Where(x => x.ConversionFactorD.ToString().Contains(form.SearchValue)
                                     || x.ConvertedUnitPriceD.ToString().Contains(form.SearchValue)
                                     || x.Currency.ToString().Contains(form.SearchValue)
-                                    || x.PurchaseNumber.ToLower().Contains(form.SearchValue)
+                                    || x.PurchaseNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.ReplenishBy.ToLower().Contains(form.SearchValue)
-                                    || x.ReplenishDate.ToLower().Contains(form.SearchValue)
-                                    || x.Status.ToLower().Contains(form.SearchValue)
+                                    || x.ReplenishBy.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ReplenishDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.UnitCostD.ToString().Contains(form.SearchValue)
                                     || x.UnitPriceD.ToString().Contains(form.SearchValue)
-                                    || x.Warehouse.ToLower().Contains(form.SearchValue));
+                                    || x.Warehouse.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();

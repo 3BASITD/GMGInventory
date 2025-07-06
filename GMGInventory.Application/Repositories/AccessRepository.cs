@@ -398,7 +398,7 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(s => s.Name.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => s.Name.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -447,7 +447,7 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(s => s.Name.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => s.Name.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();

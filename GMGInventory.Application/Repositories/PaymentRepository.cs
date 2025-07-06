@@ -125,15 +125,15 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.CRNumber.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.CRNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.SOANo.ToString().Contains(form.SearchValue)
-                                    || x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || x.TotalInvoiceAmount.ToLower().Contains(form.SearchValue)
-                                    || x.AmountPaid.ToLower().Contains(form.SearchValue)
-                                    || x.OverPayment.ToLower().Contains(form.SearchValue)
-                                    || x.TransactionDate.ToLower().Contains(form.SearchValue)
-                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
-                                    || x.Remarks.ToLower().Contains(form.SearchValue));
+                                    || x.CustomerName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.TotalInvoiceAmount.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.AmountPaid.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.OverPayment.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.TransactionDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Remarks.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -326,7 +326,7 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.InvoiceNumber.ToString().Contains(form.SearchValue)
                                     || x.InvoiceDateD.ToString().Contains(form.SearchValue)
-                                    || x.InvoiceType.ToLower().Contains(form.SearchValue)
+                                    || x.InvoiceType.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.InvoiceAmountD.ToString().Contains(form.SearchValue)
                                     || x.BalanceAmountD.ToString().Contains(form.SearchValue)
                                     || x.PackNo.ToString().Contains(form.SearchValue)

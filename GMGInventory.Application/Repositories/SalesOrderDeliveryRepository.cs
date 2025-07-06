@@ -81,21 +81,21 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.CustomerCode.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || (x.DateDeliver + "").ToLower().Contains(form.SearchValue)
-                                    || (x.DatePickup + "").ToLower().Contains(form.SearchValue)
-                                    || (x.Forwarder + "").ToLower().Contains(form.SearchValue)
-                                    || (x.Remarks + "").ToLower().Contains(form.SearchValue)
-                                    || (x.PONumber + "").ToLower().Contains(form.SearchValue)
-                                    || x.SalesOrderDate.ToLower().Contains(form.SearchValue)
-                                    || x.SONumber.ToLower().Contains(form.SearchValue)
-                                    || (x.WaybillNumber + "").ToLower().Contains(form.SearchValue)
-                                    || (x.ServiceLevelAgreement + "").ToLower().Contains(form.SearchValue)
-                                    || x.SalesOrderStatus.ToLower().Contains(form.SearchValue)
-                                    || x.RequiredDeliveryDate.ToLower().Contains(form.SearchValue)
-                                    || (x.Representative + "").ToLower().Contains(form.SearchValue)
-                                    || (x.DateReceive + "").ToLower().Contains(form.SearchValue));
+                data = data.Where(x => x.CustomerCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.CustomerName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.DateDeliver + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.DatePickup + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.Forwarder + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.Remarks + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.PONumber + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.SalesOrderDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.SONumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.WaybillNumber + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.ServiceLevelAgreement + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.SalesOrderStatus.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.RequiredDeliveryDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.Representative + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.DateReceive + "").ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();

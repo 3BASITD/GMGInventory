@@ -312,15 +312,15 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.BIRInvoiceNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Customer.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.BIRInvoiceNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Customer.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Id.ToString().Contains(form.SearchValue)
-                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceType.ToLower().Contains(form.SearchValue)
+                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.InvoiceType.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.PackNumber.ToString().Contains(form.SearchValue)
-                                    || x.SONumber.ToLower().Contains(form.SearchValue)
-                                    || x.Status.ToLower().Contains(form.SearchValue)
+                                    || x.SONumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.TotalAmountD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -416,8 +416,8 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.Discount1D.ToString().Contains(form.SearchValue)
                                     || x.Discount2D.ToString().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.NetPriceD.ToString().Contains(form.SearchValue)
                                     || x.Quantity.ToString().Contains(form.SearchValue));
             }

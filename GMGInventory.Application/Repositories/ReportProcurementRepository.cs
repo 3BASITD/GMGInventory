@@ -67,17 +67,13 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x =>   x.Item != null && x.Item.ToLower().Contains(form.SearchValue)
-                                      || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue)
-                                      || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue)
-                                      || x.DocumentNumber.ToLower().Contains(form.SearchValue)
-                                      || x.Supplier!.ToLower().Contains(form.SearchValue)
-                                      || x.OrderDate.ToString().ToLower().Contains(form.SearchValue));
+                data = data.Where(x =>   x.Item != null && x.Item.ToLower().Contains(form.SearchValue.ToLower())
+                                      || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue.ToLower())
+                                      || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue.ToLower())
+                                      || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                      || x.Supplier!.ToLower().Contains(form.SearchValue.ToLower())
+                                      || x.OrderDate.ToString().ToLower().Contains(form.SearchValue.ToLower()));
             }
-
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.UnitCost);
-            totalAmount2 = data.Sum(s => s.UnservedAmount);
 
             // get total count of records after search
             filterRecord = data.Count();
@@ -121,6 +117,10 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.UnitCost);
+            totalAmount2 = data.Sum(s => s.UnservedAmount);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -208,18 +208,14 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Item.ToLower().Contains(form.SearchValue)
-                                    || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue)
-                                    || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue)
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Supplier.ToLower().Contains(form.SearchValue)
-                                    || x.ReturnDate.ToString().ToLower().Contains(form.SearchValue));
+                data = data.Where(x => x.Item.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ReturnDate.ToString().ToLower().Contains(form.SearchValue.ToLower()));
 
             }
-
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.UnitCost);
-            totalAmount2 = data.Sum(s => s.ReturnTotalAmount);
 
             // get total count of records after search
             filterRecord = data.Count();
@@ -263,6 +259,10 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.UnitCost);
+            totalAmount2 = data.Sum(s => s.ReturnTotalAmount);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -342,17 +342,13 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Item != null && x.Item.ToLower().Contains(form.SearchValue)
-                                    || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue)
-                                    || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue)
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Supplier.ToLower().Contains(form.SearchValue)
-                                    || x.ReturnDate.ToString().ToLower().Contains(form.SearchValue));
+                data = data.Where(x => x.Item != null && x.Item.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ReturnDate.ToString().ToLower().Contains(form.SearchValue.ToLower()));
             }
-
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.TotalAmount);
-            totalUnservedAmount = data.Sum(u => u.UnservedAmount);
 
             // get total count of records after search
             filterRecord = data.Count();
@@ -398,6 +394,10 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.TotalAmount);
+            totalUnservedAmount = data.Sum(u => u.UnservedAmount);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();

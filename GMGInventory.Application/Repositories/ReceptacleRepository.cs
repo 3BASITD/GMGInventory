@@ -69,7 +69,7 @@ namespace GMGInventory.Application.Repositories
                     s.Customer,
                     s.Destination,
                     s.DeliveryDate
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -204,7 +204,7 @@ namespace GMGInventory.Application.Repositories
                     s.PrintDate,
                     s.PrintBy,
                     s.CompanyAs
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();

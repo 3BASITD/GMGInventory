@@ -180,13 +180,13 @@ namespace GMGInventory.Application.Repositories
         public async Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
             var customerInvoices = from inv in context.InvoiceLineItems
-                                   where inv.Invoice.Status.Name.ToLower() != "invoice draft"
-                                      && inv.Invoice.Status.Name.ToLower() != "cancelled invoice"
-                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   where inv.Invoice.Status.Code.ToLower() == "invoiced"
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
+                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
                                    };
 
             var customerChecks = from chk in context.SOACRChecks
@@ -388,16 +388,16 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue)
-                                    || x.OrderDate.ToLower().Contains(form.SearchValue)
-                                    || x.SONumber.ToLower().Contains(form.SearchValue)
-                                    || x.Status.ToLower().Contains(form.SearchValue)
-                                    || x.TotalAmount.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerAddress.ToLower().Contains(form.SearchValue)
-                                    || x.Region.ToLower().Contains(form.SearchValue)
-                                    || x.Area.ToLower().Contains(form.SearchValue)
-                                    || x.RequiredDeliveryDate.ToLower().Contains(form.SearchValue)
-                                    || x.Forwarder.ToLower().Contains(form.SearchValue));
+                data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.OrderDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.SONumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.TotalAmount.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.CustomerAddress.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Region.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Area.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.RequiredDeliveryDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Forwarder.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -522,18 +522,18 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Discount1.ToLower().Contains(form.SearchValue)
-                                    || x.Discount2.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Discount1.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Discount2.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.InventoryCount.ToString().Contains(form.SearchValue)
                                     || x.InvoicedQuantity.ToString().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.NetPriceD.ToString().Contains(form.SearchValue)
                                     || x.PackedQuantity.ToString().Contains(form.SearchValue)
                                     || x.Quantity.ToString().Contains(form.SearchValue)
                                     || x.RetailPriceD.ToString().Contains(form.SearchValue)
                                     || x.SellingPriceD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue)
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.GrossPriceD.ToString().Contains(form.SearchValue)
                                     || x.ServedQuantityD.ToString().Contains(form.SearchValue)
                                     || x.UnservedQuantityD.ToString().Contains(form.SearchValue));

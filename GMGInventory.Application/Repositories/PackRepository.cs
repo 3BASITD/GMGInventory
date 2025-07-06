@@ -152,13 +152,13 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Id.ToString().Contains(form.SearchValue)
-                                    || x.PackedBy.ToLower().Contains(form.SearchValue)
+                                    || x.PackedBy.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.PackedDateD.ToString().Contains(form.SearchValue)
-                                    || x.PackNumber.ToLower().Contains(form.SearchValue)
-                                    || x.SONumber.ToLower().Contains(form.SearchValue)
-                                    || x.Status.ToLower().Contains(form.SearchValue));
+                                    || x.PackNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.SONumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -274,9 +274,9 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.BoxNumber.ToString().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.PackTypeName.ToLower().Contains(form.SearchValue)
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.PackTypeName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Quantity.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search

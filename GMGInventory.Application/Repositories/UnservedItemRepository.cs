@@ -72,17 +72,17 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue)
-                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
-                                    || x.Customer.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Customer.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Discount1D.ToString().Contains(form.SearchValue)
                                     || x.Discount2D.ToString().Contains(form.SearchValue)
-                                    || x.Item.ToLower().Contains(form.SearchValue)
-                                    || x.OrderDate.ToLower().Contains(form.SearchValue)
+                                    || x.Item.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.OrderDate.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.PackedQuantityD.ToString().Contains(form.SearchValue)
                                     || x.QuantityD.ToString().Contains(form.SearchValue)
                                     || x.QuantityOnHandD.ToString().Contains(form.SearchValue)
-                                    || x.SalesOrderNumber.ToLower().Contains(form.SearchValue)
+                                    || x.SalesOrderNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.UnitPriceD.ToString().Contains(form.SearchValue)
                                     || x.UnservedQuantityD.ToString().Contains(form.SearchValue));
             }

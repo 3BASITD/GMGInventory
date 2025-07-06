@@ -62,20 +62,16 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetBelowMaintaining(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total maintaining quantity of data in table
-            totalQuantityOnHand = data.Sum(s => s.MaintainingQuantityD);
-            //get total quantity on hand of data in table
-            totalQuantityOnHand = data.Sum(s => s.QuantityOnHandD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.MaintainingQuantityD.ToString().Contains(form.SearchValue)
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue)
+                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.QuantityOnHandD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue));
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -111,6 +107,10 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            //get total maintaining quantity of data in table
+            totalQuantityOnHand = data.Sum(s => s.MaintainingQuantityD);
+            //get total quantity on hand of data in table
+            totalQuantityOnHand = data.Sum(s => s.QuantityOnHandD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -178,20 +178,18 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetReceiving(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total quantity of data in table
-            totalQuantity = data.Sum(s => s.QuantityD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.Date.ToLower().Contains(form.SearchValue)
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.ItemType.ToLower().Contains(form.SearchValue)
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Date.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemType.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue));
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -231,6 +229,8 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            //get total quantity of data in table
+            totalQuantity = data.Sum(s => s.QuantityD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -294,18 +294,16 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetReceivingSupplier(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.Date.ToLower().Contains(form.SearchValue)
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Item.ToLower().Contains(form.SearchValue)
+                                    || x.Date.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Item.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Quantity.ToString().Contains(form.SearchValue)
-                                    || x.Supplier.ToLower().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue)
+                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.UnitCostD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -344,6 +342,8 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -407,18 +407,16 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetReceivingSummary(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total quantity of data in table
-            totalQuantity = data.Sum(s => s.QuantityD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.ItemType.ToLower().Contains(form.SearchValue)
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemType.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Quantity.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue));
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -454,6 +452,8 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            //get total quantity of data in table
+            totalQuantity = data.Sum(s => s.QuantityD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -598,19 +598,15 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetStockCard(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total quantity of in in table
-            totalQuantityIn = data.Sum(s => s.InD);
-            //get total quantity of out in table
-            totalQuantityOut = data.Sum(s => s.OutD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Date.ToLower().Contains(form.SearchValue)
-                                    || x.DetailsRemarks.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Date.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DetailsRemarks.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.InD.ToString().Contains(form.SearchValue)
-                                    || x.Item.ToLower().Contains(form.SearchValue)
+                                    || x.Item.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.OutD.ToString().Contains(form.SearchValue)
-                                    || x.TransactionType.ToLower().Contains(form.SearchValue));
+                                    || x.TransactionType.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -644,6 +640,10 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            //get total quantity of in in table
+            totalQuantityIn = data.Sum(s => s.InD);
+            //get total quantity of out in table
+            totalQuantityOut = data.Sum(s => s.OutD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -757,14 +757,14 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.ItemType.ToLower().Contains(form.SearchValue)
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemType.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.QuantityOnHand.ToString().Contains(form.SearchValue)
                                     || x.TotalCostD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue)
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.UnitCostD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -871,22 +871,18 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetSupplierPurchase(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total quantity of data in table
-            totalQuantity = data.Sum(s => s.QuantityD);
-            //get total price of data in table
-            totalPrice = data.Sum(s => s.TotalPriceD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.Currency.ToLower().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.PurchaseDate.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Currency.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.PurchaseDate.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.Supplier.ToLower().Contains(form.SearchValue)
+                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.TotalPriceD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue)
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.UnitPriceD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -929,6 +925,10 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            //get total quantity of data in table
+            totalQuantity = data.Sum(s => s.QuantityD);
+            //get total price of data in table
+            totalPrice = data.Sum(s => s.TotalPriceD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();

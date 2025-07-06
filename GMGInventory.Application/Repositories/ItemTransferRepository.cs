@@ -104,12 +104,12 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.Id.ToString().Contains(form.SearchValue)
-                                    || x.Source.ToLower().Contains(form.SearchValue)
-                                    || x.Destination.ToLower().Contains(form.SearchValue)
+                                    || x.Source.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Destination.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.ItemCount.ToString().Contains(form.SearchValue)
-                                    || x.TransferDate.ToLower().Contains(form.SearchValue)
-                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
-                                    || x.Remarks.ToLower().Contains(form.SearchValue));
+                                    || x.TransferDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Remarks.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -192,14 +192,14 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Quantity.ToString().Contains(form.SearchValue)
-                                    || x.Source.ToLower().Contains(form.SearchValue)
-                                    || x.Destination.ToLower().Contains(form.SearchValue)
-                                    || x.TransferDate.ToLower().Contains(form.SearchValue)
-                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
-                                    || x.Remarks.ToLower().Contains(form.SearchValue));
+                                    || x.Source.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Destination.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.TransferDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Remarks.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -284,13 +284,13 @@ namespace GMGInventory.Application.Repositories
                                     || x.Destination.ToString().Contains(form.SearchValue)
                                     || x.Id.ToString().Contains(form.SearchValue)
                                     || x.Name.ToString().Contains(form.SearchValue)
-                                    || x.Quantity.ToLower().Contains(form.SearchValue)
-                                    || x.Remarks.ToLower().Contains(form.SearchValue)
-                                    || x.Source.ToLower().Contains(form.SearchValue)
-                                    || x.CreatedBy.ToLower().Contains(form.SearchValue)
-                                    || x.TransferDate.ToLower().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue)
-                                    || x.LocationCode.ToLower().Contains(form.SearchValue));
+                                    || x.Quantity.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Remarks.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Source.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.TransferDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.LocationCode.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();

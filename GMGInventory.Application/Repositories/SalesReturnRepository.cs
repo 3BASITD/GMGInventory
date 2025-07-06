@@ -97,7 +97,7 @@ namespace GMGInventory.Application.Repositories
                     s.Remarks + "",
                     s.ReturnDate,
                     s.SRNumber
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();

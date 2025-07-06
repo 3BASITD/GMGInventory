@@ -20,25 +20,23 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<AgentSalesPerItemRVM>> GetAgentSalesPerItem(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
-                           && (filter.Brand == null || invoice.Item.Brand.Id == filter.Brand)
-                           && (filter.Item == null || invoice.Item.Id == filter.Item)
-                           && invoice.Invoice.Status.Code.ToLower() == "invoiced"
+            var invoices = from ili in context.InvoiceLineItems
+                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
+                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
+                           && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
+                           && (filter.Item == null || ili.Item.Id == filter.Item)
+                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new AgentSalesPerItemRVM
                            {
-                               Agent = invoice.Invoice.SalesOrder.Agent.FirstName
-                                     + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
-                                     + invoice.Invoice.SalesOrder.Agent.LastName,
-                               Brand = invoice.Item.Brand.Name,
-                               ItemCode = invoice.Item.Code,
-                               ItemName = invoice.Item.Name,
-                               ItemType = invoice.Item.ItemType.Name,
-                               PriceD = invoice.UnitPrice,
-                               QuantityD = invoice.Quantity,
-                               DateInvoiceD = invoice.DateCreated
+                               Agent = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
+                               Brand = ili.Item.Brand.Name,
+                               ItemCode = ili.Item.Code,
+                               ItemName = ili.Item.Name,
+                               ItemType = ili.Item.ItemType.Name,
+                               PriceD = ili.UnitPrice,
+                               QuantityD = ili.Quantity,
+                               DateInvoiceD = ili.Invoice.InvoiceDate
                            };
             return await invoices.ToListAsync();
         }
@@ -53,58 +51,42 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetAgentSalesPerItem(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total quantity of data in table
-            totalQuantity = data.Sum(s => s.QuantityD);
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(s => new[]
                 {
                     s.Agent,
+                    s.Amount,
                     s.AmountD.ToString(),
                     s.Brand,
                     s.ItemCode,
                     s.ItemName,
                     s.ItemType,
+                    s.Price,
                     s.PriceD.ToString(),
+                    s.Quantity,
                     s.QuantityD.ToString()
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumn == "Amount" || form.SortColumn == "Price" || form.SortColumn == "Quantity")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    if (form.SortColumnDirection == "asc")
-                    {
-                        switch (form.SortColumn)
-                        {
-                            case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                            case "Price": data = data.OrderBy(s => s.PriceD); break;
-                            case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                            default: break;
-                        }
-                    }
-                    else if (form.SortColumnDirection == "desc")
-                    {
-                        switch (form.SortColumn)
-                        {
-                            case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                            case "Price": data = data.OrderByDescending(s => s.PriceD); break;
-                            case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                            default: break;
-                        }
-                    }
-                }
-                else
-                {
-                    data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
-                }
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    "Price" => isAsc ? data.OrderBy(s => s.PriceD) : data.OrderByDescending(s => s.PriceD),
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total quantity of data in table
+            totalQuantity = data.Sum(s => s.QuantityD);
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -144,20 +126,19 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<BrandSalesRVM>> GetBrandSales(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
-                           && (filter.Brand == null || invoice.Item.Brand.Id == filter.Brand)
-                           && invoice.Invoice.Status.Code.ToLower() == "invoiced"
+            var invoices = from ili in context.InvoiceLineItems
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
+                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
+                           && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
+                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new BrandSalesRVM
                            {
-                               AgentCode = invoice.Invoice.SalesOrder.Agent.Code,
-                               AgentName = invoice.Invoice.SalesOrder.Agent.FirstName
-                                         + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName)
-                                         + " " + invoice.Invoice.SalesOrder.Agent.LastName,
-                               AmountD = invoice.UnitPrice * invoice.Quantity,
-                               Brand = invoice.Item.Brand.Name
+                               AgentCode = ili.Invoice.SalesOrder.Agent.Code,
+                               AgentName = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
+                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               Brand = ili.Item.Brand.Name
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
                              orderby invoice.Brand ascending, invoice.AgentCode ascending
@@ -186,44 +167,32 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetBrandSales(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.AgentCode.ToLower().Contains(form.SearchValue)
-                                    || x.AgentName.ToLower().Contains(form.SearchValue)
-                                    || x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.Brand.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.AgentCode,
+                    s.AgentName,
+                    s.Amount,
+                    s.AmountD.ToString(),
+                    s.Brand
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "AgentCode": data = data.OrderBy(s => s.AgentCode); break;
-                        case "AgentName": data = data.OrderBy(s => s.AgentName); break;
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "AgentCode": data = data.OrderByDescending(s => s.AgentCode); break;
-                        case "AgentName": data = data.OrderByDescending(s => s.AgentName); break;
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        default: break;
-                    }
-                }
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -259,27 +228,28 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<BestSellingItemRVM>> GetBestSellingItem(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           let inventory = context.ItemInventories
-                                                  .Where(s => s.ItemId == invoice.Item.Id
-                                                           && s.Warehouse.Code.ToLower().Contains("main"))
-                                                  .Sum(s => (int?)s.Quantity) ?? 0
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
-                           && (filter.Brand == null || invoice.Item.Brand.Id == filter.Brand)
-                           && invoice.Invoice.Status.Code.ToLower() == "invoiced"
+            var invoices = from ili in context.InvoiceLineItems
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           let ii = context.ItemInventories
+                                           .Where(s => s.ItemId == ili.Item.Id
+                                                    && s.Warehouse.Code.ToLower().Contains("main"))
+                                           .Sum(s => (int?)s.Quantity) ?? 0
+                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
+                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
+                           && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
+                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new BestSellingItemRVM
                            {
-                               AmountD = invoice.Quantity * invoice.UnitPrice,
-                               Brand = invoice.Item.Brand.Name,
-                               CurrentQuantityD = inventory,
-                               ItemCode = invoice.Item.Code,
-                               ItemName = invoice.Item.Name,
-                               PartNumber = invoice.Item.PartNumber + "",
-                               QuantityD = invoice.Quantity,
-                               Unit = invoice.Item.Unit.Name,
-                               UnitPriceD = invoice.UnitPrice
+                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               Brand = ili.Item.Brand.Name,
+                               CurrentQuantityD = ii,
+                               ItemCode = ili.Item.Code,
+                               ItemName = ili.Item.Name,
+                               PartNumber = ili.Item.PartNumber + "",
+                               QuantityD = ili.Quantity,
+                               Unit = ili.Item.Unit.Name,
+                               UnitPriceD = ili.UnitPrice
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
                              orderby invoice.Brand ascending, invoice.ItemCode ascending
@@ -318,6 +288,41 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetBestSellingItem(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(s => new[]
+                {
+                    s.Amount,
+                    s.AmountD.ToString(),
+                    s.Brand,
+                    s.CurrentQuantity,
+                    s.CurrentQuantityD.ToString(),
+                    s.ItemCode,
+                    s.ItemName,
+                    s.PartNumber,
+                    s.Quantity,
+                    s.QuantityD.ToString(),
+                    s.Unit,
+                    s.UnitPrice,
+                    s.UnitPriceD.ToString()
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
+                {
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    "CurrentQuantity" => isAsc ? data.OrderBy(s => s.CurrentQuantityD) : data.OrderByDescending(s => s.CurrentQuantityD),
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "UnitPrice" => isAsc ? data.OrderBy(s => s.UnitPriceD) : data.OrderByDescending(s => s.UnitPriceD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
+            }
             //get total quantity of date in table
             totalQuantity = data.Sum(s => s.QuantityD);
             //get total current quantity of data in table
@@ -326,57 +331,6 @@ namespace GMGInventory.Application.Repositories
             totalPrice = data.Sum(s => s.UnitPriceD);
             //get total amount of data in table
             totalAmount = data.Sum(s => s.AmountD);
-            // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
-            {
-                data = data.Where(x => x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.CurrentQuantityD.ToString().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue)
-                                    || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue)
-                                    || x.UnitPriceD.ToString().Contains(form.SearchValue));
-            }
-            // get total count of records after search
-            filterRecord = data.Count();
-            //sort data
-            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
-            {
-                if (form.SortColumnDirection == "asc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "CurrentQuantity": data = data.OrderBy(s => s.CurrentQuantityD); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        case "UnitPrice": data = data.OrderBy(s => s.UnitPriceD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "CurrentQuantity": data = data.OrderByDescending(s => s.CurrentQuantityD); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        case "UnitPrice": data = data.OrderByDescending(s => s.UnitPriceD); break;
-                        default: break;
-                    }
-                }
-            }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -417,32 +371,31 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<CommissionRVM>> GetCommission(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
-                           && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
-                           && (filter.Area == null || invoice.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
-                           && invoice.Invoice.Status.Code.ToLower() == "invoiced"
+            var invoices = from ili in context.InvoiceLineItems
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
+                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
+                           && (filter.Customer == null || ili.Invoice.SalesOrder.Customer.Id == filter.Customer)
+                           && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
+                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new CommissionRVM
                            {
-                               AgentId = invoice.Invoice.SalesOrder.Agent.Id,
-                               AgentCode = invoice.Invoice.SalesOrder.Agent.Code,
-                               Agent = invoice.Invoice.SalesOrder.Agent.FirstName
-                                         + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
-                                         + invoice.Invoice.SalesOrder.Agent.LastName,
-                               Area = invoice.Invoice.SalesOrder.Agent.Area.Name,
-                               InvoiceDateD = invoice.Invoice.InvoiceDate,
-                               InvoiceNumber = invoice.Invoice.InvoiceNumber,
-                               InvoiceAmountD = invoice.UnitPrice * invoice.Quantity,
-                               CommissionRateD = invoice.Invoice.SalesOrder.Customer.CommissionRate != null
-                                               ? invoice.Invoice.SalesOrder.Customer.CommissionRate.Value
-                                               : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
-                               CommissionAmount2D = (invoice.UnitPrice * invoice.Quantity)
-                                                  * (invoice.Invoice.SalesOrder.Customer.CommissionRate != null
-                                                   ? invoice.Invoice.SalesOrder.Customer.CommissionRate.Value
-                                                   : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate) / 100,
-                               Customer = invoice.Invoice.SalesOrder.Customer.Name
+                               AgentId = ili.Invoice.SalesOrder.Agent.Id,
+                               AgentCode = ili.Invoice.SalesOrder.Agent.Code,
+                               Agent = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
+                               Area = ili.Invoice.SalesOrder.Agent.Area.Name,
+                               InvoiceDateD = ili.Invoice.InvoiceDate,
+                               InvoiceNumber = ili.Invoice.InvoiceNumber,
+                               InvoiceAmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               CommissionRateD = ili.Invoice.SalesOrder.Customer.CommissionRate != null
+                                               ? ili.Invoice.SalesOrder.Customer.CommissionRate.Value
+                                               : ili.Invoice.SalesOrder.Agent.Area.CommissionRate,
+                               CommissionAmount2D = ((ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100)
+                                                  * (ili.Invoice.SalesOrder.Customer.CommissionRate != null
+                                                   ? ili.Invoice.SalesOrder.Customer.CommissionRate.Value
+                                                   : ili.Invoice.SalesOrder.Agent.Area.CommissionRate) / 100,
+                               Customer = ili.Invoice.SalesOrder.Customer.Name
                            };
             var invoicelist = await invoices.ToListAsync();
             var grpinvoice = from invoice in invoicelist
@@ -487,54 +440,42 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetCommission(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalInvoice = data.Sum(s => s.InvoiceAmountD);
-            totalCommission = data.Sum(s => s.CommissionAmount2D);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue)
-                                    || x.Customer.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceDateD.ToString().Contains(form.SearchValue)
-                                    || x.InvoiceNumber.ToString().Contains(form.SearchValue)
-                                    || x.CommissionRateD.ToString().Contains(form.SearchValue)
-                                    || x.CommissionAmount2D.ToString().Contains(form.SearchValue)
-                                    || x.InvoiceAmountD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Agent,
+                    s.Customer,
+                    s.InvoiceDate,
+                    s.InvoiceDateD.ToString(),
+                    s.InvoiceNumber,
+                    s.CommissionRate,
+                    s.CommissionRateD.ToString(),
+                    s.CommissionAmount2,
+                    s.CommissionAmount2D.ToString(),
+                    s.InvoiceAmount,
+                    s.InvoiceAmountD.ToString()
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderBy(s => s.Agent); break;
-                        case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDateD); break;
-                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
-                        case "CommissionRate": data = data.OrderBy(s => s.CommissionRateD); break;
-                        case "CommissionAmount": data = data.OrderBy(s => s.CommissionAmount2D); break;
-                        case "InvoiceAmount": data = data.OrderBy(s => s.InvoiceAmountD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderByDescending(s => s.Agent); break;
-                        case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDateD); break;
-                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
-                        case "CommissionRate": data = data.OrderByDescending(s => s.CommissionRateD); break;
-                        case "CommissionAmount": data = data.OrderByDescending(s => s.CommissionAmount2D); break;
-                        case "InvoiceAmount": data = data.OrderByDescending(s => s.InvoiceAmountD); break;
-                        default: break;
-                    }
-                }
+                    "InvoiceDate" => isAsc ? data.OrderBy(s => s.InvoiceDateD) : data.OrderByDescending(s => s.InvoiceDateD),
+                    "CommissionRate" => isAsc ? data.OrderBy(s => s.CommissionRateD) : data.OrderByDescending(s => s.CommissionRateD),
+                    "CommissionAmount" => isAsc ? data.OrderBy(s => s.CommissionAmount2D) : data.OrderByDescending(s => s.CommissionAmount2D),
+                    "InvoiceAmount" => isAsc ? data.OrderBy(s => s.InvoiceAmountD) : data.OrderByDescending(s => s.InvoiceAmountD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total amount of data in table
+            totalInvoice = data.Sum(s => s.InvoiceAmountD);
+            totalCommission = data.Sum(s => s.CommissionAmount2D);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -577,16 +518,17 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<CustomerSalesRankingRVM>> GetCustomerSalesRanking(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.Region == null || (invoice.Invoice.SalesOrder.Customer.Area != null && invoice.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region))
-                           && invoice.Invoice.Status.Code.ToLower() == "invoiced"
+            var invoices = from ili in context.InvoiceLineItems
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId,soli.ItemId}
+                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
+                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.Region == null || (ili.Invoice.SalesOrder.Customer.Area != null && ili.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region))
+                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new CustomerSalesRankingRVM
                            {
-                               AmountD = invoice.Quantity * invoice.UnitPrice,
-                               CustomerCode = invoice.Invoice.SalesOrder.Customer.Code,
-                               CustomerName = invoice.Invoice.SalesOrder.Customer.Name,
+                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               CustomerCode = ili.Invoice.SalesOrder.Customer.Code,
+                               CustomerName = ili.Invoice.SalesOrder.Customer.Name,
                                RankD = 0
                            };
             var grpinvoice = (await invoices.ToListAsync())
@@ -615,44 +557,34 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetCustomerSalesRanking(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.CustomerCode.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || x.RankD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Amount,
+                    s.AmountD.ToString(),
+                    s.CustomerCode,
+                    s.CustomerName,
+                    s.Rank,
+                    s.RankD.ToString()
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "CustomerCode": data = data.OrderBy(s => s.CustomerCode); break;
-                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
-                        case "Rank": data = data.OrderBy(s => s.RankD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "CustomerCode": data = data.OrderByDescending(s => s.CustomerCode); break;
-                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
-                        case "Rank": data = data.OrderByDescending(s => s.RankD); break;
-                        default: break;
-                    }
-                }
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    "Rank" => isAsc ? data.OrderBy(s => s.RankD) : data.OrderByDescending(s => s.RankD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -686,18 +618,19 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<CustomerSalesRVM>> GetCustomerSales(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.Brand == null || invoice.Item.Brand.Id == filter.Brand)
-                           && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
-                           && invoice.Invoice.Status.Code.ToLower() == "invoiced"
+            var invoices = from ili in context.InvoiceLineItems
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
+                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
+                           && (filter.Customer == null || ili.Invoice.SalesOrder.Customer.Id == filter.Customer)
+                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new CustomerSalesRVM
                            {
-                               AmountD = invoice.UnitPrice * invoice.Quantity,
-                               Brand = invoice.Item.Brand.Name,
-                               CustomerCode = invoice.Invoice.SalesOrder.Customer.Code,
-                               CustomerName = invoice.Invoice.SalesOrder.Customer.Name
+                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               Brand = ili.Item.Brand.Name,
+                               CustomerCode = ili.Invoice.SalesOrder.Customer.Code,
+                               CustomerName = ili.Invoice.SalesOrder.Customer.Name
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
                              orderby invoice.CustomerCode ascending, invoice.Brand ascending
@@ -726,44 +659,32 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetCustomerSales(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerCode.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerName.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Amount,
+                    s.AmountD.ToString(),
+                    s.Brand,
+                    s.CustomerCode,
+                    s.CustomerName
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "CustomerCode": data = data.OrderBy(s => s.CustomerCode); break;
-                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "CustomerCode": data = data.OrderByDescending(s => s.CustomerCode); break;
-                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
-                        default: break;
-                    }
-                }
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -799,54 +720,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<DailySalesRVM>> GetDailySales(ListFilterSalesModel filter)
         {
-            //var invoices = from invoice in context.InvoiceLineItems
-            //               where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-            //               && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-            //               && (filter.InvoiceNumberFrom == null || invoice.Invoice.InvoiceNumber.CompareTo(filter.InvoiceNumberFrom) >= 0)
-            //               && (filter.InvoiceNumberTo == null || invoice.Invoice.InvoiceNumber.CompareTo(filter.InvoiceNumberTo) <= 0)
-            //               && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
-            //               select new DailySalesRVM
-            //               {
-            //                   Agent = invoice.Invoice.SalesOrder.Agent.FirstName
-            //                         + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
-            //                         + invoice.Invoice.SalesOrder.Agent.LastName,
-            //                   AmountD = invoice.UnitPrice * invoice.Quantity,
-            //                   //CommissionRateD = invoice.Invoice.SalesOrder.Agent.CommissionRate > 0
-            //                   //                ? invoice.Invoice.SalesOrder.Agent.CommissionRate
-            //                   //                : invoice.Invoice.SalesOrder.Agent.Area.CommissionRate,
-            //                   CustomerCode = invoice.Invoice.SalesOrder.Customer.Code,
-            //                   CustomerName = invoice.Invoice.SalesOrder.Customer.Name,
-            //                   InvoiceDateD = invoice.Invoice.InvoiceDate,
-            //                   InvoiceNumber = invoice.Invoice.InvoiceNumber,
-            //                   BIRInvoiceNumber = invoice.Invoice.ControlNumber,
-            //                   Term = invoice.Invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.Invoice.SalesOrder.Customer.CreditTerm.Name
-            //               };
-            //var grpinvoice = from invoice in await invoices.ToListAsync()
-            //                 orderby invoice.InvoiceDateD ascending, invoice.BIRInvoiceNumber ascending
-            //                 group invoice by new
-            //                 {
-            //                     invoice.Agent,
-            //                     //invoice.CommissionRateD,
-            //                     invoice.CustomerCode,
-            //                     invoice.CustomerName,
-            //                     invoice.InvoiceDateD,
-            //                     invoice.InvoiceNumber,
-            //                     invoice.BIRInvoiceNumber,
-            //                     invoice.Term
-            //                 } into i
-            //                 select new DailySalesRVM
-            //                 {
-            //                     Agent = i.Key.Agent,
-            //                     AmountD = i.Sum(s => s.AmountD),
-            //                     //CommissionRateD = i.Key.CommissionRateD,
-            //                     CustomerCode = i.Key.CustomerCode,
-            //                     CustomerName = i.Key.CustomerName,
-            //                     InvoiceDateD = i.Key.InvoiceDateD,
-            //                     InvoiceNumber = i.Key.InvoiceNumber,
-            //                     BIRInvoiceNumber = i.Key.BIRInvoiceNumber,
-            //                     Term = i.Key.Term
-            //                 };
-            //return grpinvoice.ToList();
 
             var invoices = from invoice in context.Invoices
                            where filter.DateFrom <= invoice.InvoiceDate.Date
@@ -859,7 +732,9 @@ namespace GMGInventory.Application.Repositories
                                Agent = invoice.SalesOrder.Agent.FirstName
                                      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) + " "
                                      + invoice.SalesOrder.Agent.LastName,
-                               AmountD = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
+                               AmountD = (from ili in invoice.InvoiceLineItems
+                                          join soli in invoice.SalesOrder.SalesOrderLineItems on ili.ItemId equals soli.ItemId
+                                          select (decimal?)((ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100)).Sum() ?? 0,
                                CustomerCode = invoice.SalesOrder.Customer.Code,
                                CustomerName = invoice.SalesOrder.Customer.Name,
                                InvoiceDateD = invoice.InvoiceDate,
@@ -882,59 +757,37 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetDailySales(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue)
-                                    || x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.BIRInvoiceNumber.ToLower().Contains(form.SearchValue)
-                                    //|| x.CommissionRateD.ToString().Contains(form.SearchValue)
-                                    || x.CustomerCode.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Term.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Agent,
+                    s.Amount,
+                    s.AmountD.ToString(),
+                    s.BIRInvoiceNumber,
+                    s.CustomerCode,
+                    s.CustomerName,
+                    s.InvoiceDate,
+                    s.InvoiceNumber,
+                    s.Term
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderBy(s => s.Agent); break;
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "BIRInvoiceNumber": data = data.OrderBy(s => s.BIRInvoiceNumber); break;
-                        //case "CommissionRate": data = data.OrderBy(s => s.CommissionRateD); break;
-                        case "CustomerCode": data = data.OrderBy(s => s.CustomerCode); break;
-                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
-                        case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDateD); break;
-                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
-                        case "Term": data = data.OrderBy(s => s.Term); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderByDescending(s => s.Agent); break;
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "BIRInvoiceNumber": data = data.OrderByDescending(s => s.BIRInvoiceNumber); break;
-                        //case "CommissionRate": data = data.OrderByDescending(s => s.CommissionRateD); break;
-                        case "CustomerCode": data = data.OrderByDescending(s => s.CustomerCode); break;
-                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
-                        case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDateD); break;
-                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
-                        case "Term": data = data.OrderByDescending(s => s.Term); break;
-                        default: break;
-                    }
-                }
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    "InvoiceDate" => isAsc ? data.OrderBy(s => s.InvoiceDateD) : data.OrderByDescending(s => s.InvoiceDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -970,59 +823,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<SalesInvoiceRVM>> GetSalesInvoice(ListFilterSalesModel filter)
         {
-            //var invoices = from invoice in context.InvoiceLineItems
-            //               where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-            //               && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-            //               && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
-            //               && (filter.Customer == null || invoice.Invoice.SalesOrder.Customer.Id == filter.Customer)
-            //               && (filter.StatusCode == null || invoice.Invoice.Status.Code == filter.StatusCode)
-            //               && (filter.Region2 == null ||
-            //                  (filter.Region2 == "ML" && (invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "MM"
-            //                                           || invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "LUZ")) ||
-            //                  (filter.Region2 == "VM" && (invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "VIS"
-            //                                           || invoice.Invoice.SalesOrder.Customer.Area.Region.Code == "MIN"))
-            //               )
-            //               select new SalesInvoiceRVM
-            //               {
-            //                   Agent = invoice.Invoice.SalesOrder.Agent.FirstName
-            //                         + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
-            //                         + invoice.Invoice.SalesOrder.Agent.LastName,
-            //                   AgentCode = invoice.Invoice.SalesOrder.Agent.Code,
-            //                   AmountD = invoice.UnitPrice * invoice.Quantity,
-            //                   ControlNumber = invoice.Invoice.ControlNumber,
-            //                   CustomerCode = invoice.Invoice.SalesOrder.Customer.Code,
-            //                   CustomerName = invoice.Invoice.SalesOrder.Customer.Name,
-            //                   InvoiceDateD = invoice.Invoice.InvoiceDate.Date,
-            //                   InvoiceNumber = invoice.Invoice.InvoiceNumber,
-            //                   Status = invoice.Invoice.Status.Code
-            //               };
-            //var grpinvoice = from invoice in await invoices.ToListAsync()
-            //                 orderby invoice.ControlNumber ascending, invoice.InvoiceDateD ascending, invoice.CustomerCode ascending
-            //                 group invoice by new
-            //                 {
-            //                     invoice.Agent,
-            //                     invoice.AgentCode,
-            //                     invoice.ControlNumber,
-            //                     invoice.CustomerCode,
-            //                     invoice.CustomerName,
-            //                     invoice.InvoiceDateD,
-            //                     invoice.InvoiceNumber,
-            //                     invoice.Status
-            //                 } into i
-            //                 select new SalesInvoiceRVM
-            //                 {
-            //                     Agent = i.Key.Agent,
-            //                     AgentCode = i.Key.AgentCode,
-            //                     AmountD = i.Sum(s => s.AmountD),
-            //                     ControlNumber = i.Key.ControlNumber,
-            //                     CustomerCode = i.Key.CustomerCode,
-            //                     CustomerName = i.Key.CustomerName,
-            //                     InvoiceDateD = i.Key.InvoiceDateD,
-            //                     InvoiceNumber = i.Key.InvoiceNumber,
-            //                     Status = i.Key.Status
-            //                 };
-            //return grpinvoice.ToList();
-
 
             var invoices = from invoice in context.Invoices
                            where filter.DateFrom <= invoice.InvoiceDate.Date
@@ -1042,7 +842,9 @@ namespace GMGInventory.Application.Repositories
                                      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) + " "
                                      + invoice.SalesOrder.Agent.LastName,
                                AgentCode = invoice.SalesOrder.Agent.Code,
-                               AmountD = invoice.InvoiceLineItems.Sum(s => s.Quantity * s.UnitPrice),
+                               AmountD = (from ili in invoice.InvoiceLineItems
+                                          join soli in invoice.SalesOrder.SalesOrderLineItems on ili.ItemId equals soli.ItemId
+                                          select (decimal?)((ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100)).Sum() ?? 0,
                                ControlNumber = invoice.ControlNumber,
                                CustomerCode = invoice.SalesOrder.Customer.Code,
                                CustomerName = invoice.SalesOrder.Customer.Name,
@@ -1062,56 +864,37 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetSalesInvoice(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue)
-                                    || x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.ControlNumber.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerCode.ToLower().Contains(form.SearchValue)
-                                    || x.CustomerName.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Status.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Agent,
+                    s.Amount,
+                    s.AmountD.ToString(),
+                    s.ControlNumber,
+                    s.CustomerCode,
+                    s.CustomerName,
+                    s.InvoiceDate,
+                    s.InvoiceNumber,
+                    s.Status
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderBy(s => s.Agent); break;
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "ControlNumber": data = data.OrderBy(s => s.ControlNumber); break;
-                        case "CustomerCode": data = data.OrderBy(s => s.CustomerCode); break;
-                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
-                        case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDateD); break;
-                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
-                        case "Status": data = data.OrderBy(s => s.Status); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderByDescending(s => s.Agent); break;
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "ControlNumber": data = data.OrderByDescending(s => s.ControlNumber); break;
-                        case "CustomerCode": data = data.OrderByDescending(s => s.CustomerCode); break;
-                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
-                        case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDateD); break;
-                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
-                        case "Status": data = data.OrderByDescending(s => s.Status); break;
-                        default: break;
-                    }
-                }
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    "InvoiceDate" => isAsc ? data.OrderBy(s => s.InvoiceDateD) : data.OrderByDescending(s => s.InvoiceDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -1151,21 +934,20 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<SalesAgentAreaRVM>> GetSalesAgentArea(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.Agent == null || invoice.Invoice.SalesOrder.Agent.Id == filter.Agent)
-                           && (filter.Area == null || invoice.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
-                           && invoice.Invoice.Status.Code.ToLower() == "invoiced"
+            var invoices = from ili in context.InvoiceLineItems
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
+                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
+                           && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
+                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new SalesAgentAreaRVM
                            {
-                               AgentId = invoice.Invoice.SalesOrder.Agent.Id,
-                               AgentCode = invoice.Invoice.SalesOrder.Agent.Code,
-                               AgentName = invoice.Invoice.SalesOrder.Agent.FirstName
-                                         + (invoice.Invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.Invoice.SalesOrder.Agent.MiddleName) + " "
-                                         + invoice.Invoice.SalesOrder.Agent.LastName,
-                               Area = invoice.Invoice.SalesOrder.Customer.Area.Name,
-                               SalesD = invoice.UnitPrice * invoice.Quantity
+                               AgentId = ili.Invoice.SalesOrder.Agent.Id,
+                               AgentCode = ili.Invoice.SalesOrder.Agent.Code,
+                               AgentName = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
+                               Area = ili.Invoice.SalesOrder.Customer.Area.Name,
+                               SalesD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100
                            };
 
             var invoicelist = await invoices.ToListAsync();
@@ -1202,47 +984,35 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetSalesAgentArea(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.SalesD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.AgentCode.ToLower().Contains(form.SearchValue)
-                                    || x.AgentName.ToLower().Contains(form.SearchValue)
-                                    || x.Area.ToLower().Contains(form.SearchValue)
-                                    || x.SalesD.ToString().Contains(form.SearchValue)
-                                    || x.PercentSalesD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.AgentCode,
+                    s.AgentName,
+                    s.Area,
+                    s.Sales,
+                    s.SalesD.ToString(),
+                    s.PercentSales,
+                    s.PercentSalesD.ToString()
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "AgentCode": data = data.OrderBy(s => s.AgentCode); break;
-                        case "AgentName": data = data.OrderBy(s => s.AgentName); break;
-                        case "Area": data = data.OrderBy(s => s.Area); break;
-                        case "Sales": data = data.OrderBy(s => s.SalesD); break;
-                        case "PercentSales": data = data.OrderBy(s => s.PercentSalesD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "AgentCode": data = data.OrderByDescending(s => s.AgentCode); break;
-                        case "AgentName": data = data.OrderByDescending(s => s.AgentName); break;
-                        case "Area": data = data.OrderByDescending(s => s.Area); break;
-                        case "Sales": data = data.OrderByDescending(s => s.SalesD); break;
-                        case "PercentSales": data = data.OrderByDescending(s => s.PercentSalesD); break;
-                        default: break;
-                    }
-                }
+                    "Sales" => isAsc ? data.OrderBy(s => s.SalesD) : data.OrderByDescending(s => s.SalesD),
+                    "PercentSales" => isAsc ? data.OrderBy(s => s.PercentSalesD) : data.OrderByDescending(s => s.PercentSalesD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.SalesD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -1280,19 +1050,20 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<SalesReportBasisRVM>> GetSalesReportBasis(ListFilterSalesModel filter)
         {
-            var invoices = from invoice in context.InvoiceLineItems
-                           where filter.DateFrom <= invoice.Invoice.InvoiceDate.Date
-                           && invoice.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && invoice.Invoice.Status.Code.ToLower() == "invoiced"
+            var invoices = from ili in context.InvoiceLineItems
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
+                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new SalesReportBasisRVM
                            {
-                               Code = filter.Basis == "Customer" ? invoice.Invoice.SalesOrder.Customer.Code
-                                    : filter.Basis == "Region" ? invoice.Invoice.SalesOrder.Customer.Area.Region.Code
-                                    : /*filter.Basis == "Brand" ?*/ invoice.Item.Brand.Code,
-                               Name = filter.Basis == "Customer" ? invoice.Invoice.SalesOrder.Customer.Name
-                                    : filter.Basis == "Region" ? invoice.Invoice.SalesOrder.Customer.Area.Region.Name
-                                    : /*filter.Basis == "Brand" ?*/ invoice.Item.Brand.Name,
-                               AmountD = invoice.UnitPrice * invoice.Quantity
+                               Code = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Code
+                                    : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Customer.Area.Region.Code
+                                    : /*filter.Basis == "Brand" ?*/ ili.Item.Brand.Code,
+                               Name = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Name
+                                    : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Customer.Area.Region.Name
+                                    : /*filter.Basis == "Brand" ?*/ ili.Item.Brand.Name,
+                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
                              orderby invoice.AmountD descending
@@ -1319,41 +1090,31 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetSalesReportBasis(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
-                                    || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.AmountD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Code,
+                    s.Name,
+                    s.Amount,
+                    s.AmountD.ToString(),
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderBy(s => s.Code); break;
-                        case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderByDescending(s => s.Code); break;
-                        case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        default: break;
-                    }
-                }
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -1387,8 +1148,8 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<SalesReturnRVM>> GetSalesReturn(ListFilterSalesModel filter)
         {
             var sreturns = from sreturn in context.SalesReturnLineItems
-                           where filter.DateFrom <= (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated).Date
-                           && (sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated).Date <= filter.DateTo
+                           where filter.DateFrom <= sreturn.SalesReturn.ReturnDate.Date
+                           && sreturn.SalesReturn.ReturnDate.Date <= filter.DateTo
                            && (filter.Customer == null || sreturn.SalesReturn.SalesOrder.Customer.Id == filter.Customer)
                            && (filter.Item == null || sreturn.Item.Id == filter.Item || (filter.Item == 0 && sreturn.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                            select new SalesReturnRVM
@@ -1421,78 +1182,49 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetSalesReturn(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total quantity return in table
-            totalQuantity = data.Sum(s => s.QuantityReturnedD);
-            //get total price return in table
-            totalReturn = data.Sum(s => s.PriceReturnedD);
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue)
-                                    || x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.ControlNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Customer.ToLower().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.ItemType.ToLower().Contains(form.SearchValue)
-                                    || x.PriceReturnedD.ToString().Contains(form.SearchValue)
-                                    || x.QuantityReturnedD.ToString().Contains(form.SearchValue)
-                                    || x.ReturnDate.ToLower().Contains(form.SearchValue)
-                                    || x.SINumber.ToLower().Contains(form.SearchValue)
-                                    || x.SRNumber.ToLower().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Agent,
+                    s.Amount,
+                    s.AmountD.ToString(),
+                    s.Brand,
+                    s.ControlNumber,
+                    s.Customer,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.ItemType,
+                    s.PriceReturned,
+                    s.PriceReturnedD.ToString(),
+                    s.QuantityReturned,
+                    s.QuantityReturnedD.ToString(),
+                    s.SINumber,
+                    s.SRNumber,
+                    s.Unit,
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderBy(s => s.Agent); break;
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "ControlNumber": data = data.OrderBy(s => s.ControlNumber); break;
-                        case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderBy(s => s.ItemType); break;
-                        case "PriceReturned": data = data.OrderBy(s => s.PriceReturnedD); break;
-                        case "QuantityReturned": data = data.OrderBy(s => s.QuantityReturnedD); break;
-                        case "ReturnDate": data = data.OrderBy(s => s.ReturnDateD); break;
-                        case "SINumber": data = data.OrderBy(s => s.SINumber); break;
-                        case "SRNumber": data = data.OrderBy(s => s.SRNumber); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderByDescending(s => s.Agent); break;
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "ControlNumber": data = data.OrderByDescending(s => s.ControlNumber); break;
-                        case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderByDescending(s => s.ItemType); break;
-                        case "PriceReturned": data = data.OrderByDescending(s => s.PriceReturnedD); break;
-                        case "QuantityReturned": data = data.OrderByDescending(s => s.QuantityReturnedD); break;
-                        case "ReturnDate": data = data.OrderByDescending(s => s.ReturnDateD); break;
-                        case "SINumber": data = data.OrderByDescending(s => s.SINumber); break;
-                        case "SRNumber": data = data.OrderByDescending(s => s.SRNumber); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        default: break;
-                    }
-                }
+                    "PriceReturned" => isAsc ? data.OrderBy(s => s.PriceReturnedD) : data.OrderByDescending(s => s.PriceReturnedD),
+                    "QuantityReturned" => isAsc ? data.OrderBy(s => s.QuantityReturnedD) : data.OrderByDescending(s => s.QuantityReturnedD),
+                    "ReturnDate" => isAsc ? data.OrderBy(s => s.ReturnDateD) : data.OrderByDescending(s => s.ReturnDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total quantity return in table
+            totalQuantity = data.Sum(s => s.QuantityReturnedD);
+            //get total price return in table
+            totalReturn = data.Sum(s => s.PriceReturnedD);
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -1593,52 +1325,39 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetUnservedItem(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total pending of data in table
-            totalPending = data.Sum(s => s.PendingD);
-            //get total current of data in table
-            totalCurrent = data.Sum(s => s.CurrentD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.CurrentD.ToString().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.PendingD.ToString().Contains(form.SearchValue)
-                                    || x.ReplenishDate.ToLower().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Brand,
+                    s.Current,
+                    s.CurrentD.ToString(),
+                    s.ItemCode,
+                    s.ItemName,
+                    s.Pending,
+                    s.PendingD.ToString(),
+                    s.ReplenishDate
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "Current": data = data.OrderBy(s => s.CurrentD); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "Pending": data = data.OrderBy(s => s.PendingD); break;
-                        case "ReplenishDate": data = data.OrderBy(s => s.ReplenishDateD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "Current": data = data.OrderByDescending(s => s.CurrentD); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "Pending": data = data.OrderByDescending(s => s.PendingD); break;
-                        case "ReplenishDate": data = data.OrderByDescending(s => s.ReplenishDateD); break;
-                        default: break;
-                    }
-                }
+                    "Current" => isAsc ? data.OrderBy(s => s.CurrentD) : data.OrderByDescending(s => s.CurrentD),
+                    "Pending" => isAsc ? data.OrderBy(s => s.PendingD) : data.OrderByDescending(s => s.PendingD),
+                    "ReplenishDate" => isAsc ? data.OrderBy(s => s.ReplenishDateD) : data.OrderByDescending(s => s.ReplenishDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
+            //get total pending of data in table
+            totalPending = data.Sum(s => s.PendingD);
+            //get total current of data in table
+            totalCurrent = data.Sum(s => s.CurrentD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();

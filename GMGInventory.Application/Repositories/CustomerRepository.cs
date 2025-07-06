@@ -34,13 +34,13 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
-                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
+                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
                                    };
-
             var customerPayments = from pay in context.CustomerPaymentDetails
                                    where pay.Invoice.Status.Code.ToLower() == "invoiced"
                                    group pay by pay.Invoice.SalesOrder.Customer.Id into g
@@ -120,11 +120,12 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
-                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
+                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
@@ -213,11 +214,12 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
-                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
+                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
@@ -372,11 +374,12 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
-                                   group inv by inv.Invoice.SalesOrder.Customer.Id into g
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
+                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
@@ -476,9 +479,9 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
-                                    || x.Name.ToLower().Contains(form.SearchValue)
-                                    || x.AgentName.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Name.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.AgentName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.CreditLimit.ToString().Contains(form.SearchValue)
                                     || x.OutstandingBalance.ToString().Contains(form.SearchValue));
             }
@@ -698,9 +701,9 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.AgentName.ToLower().Contains(form.SearchValue)
-                                   || x.Code.ToLower().Contains(form.SearchValue)
-                                   || x.Name.ToLower().Contains(form.SearchValue));
+                data = data.Where(x => x.AgentName.ToLower().Contains(form.SearchValue.ToLower())
+                                   || x.Code.ToLower().Contains(form.SearchValue.ToLower())
+                                   || x.Name.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();

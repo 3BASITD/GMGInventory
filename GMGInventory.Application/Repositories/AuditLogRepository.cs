@@ -47,13 +47,13 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.User.ToLower().Contains(form.SearchValue)
-                                    || x.Type.ToLower().Contains(form.SearchValue)
-                                    || x.TableName.ToLower().Contains(form.SearchValue)
-                                    || x.DateTime.ToLower().Contains(form.SearchValue)
-                                    || x.PrimaryKey.ToString().ToLower().Contains(form.SearchValue)
-                                    || x.OldValues.ToLower().Contains(form.SearchValue)
-                                    || x.NewValues.ToLower().Contains(form.SearchValue));
+                data = data.Where(x => x.User.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Type.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.TableName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DateTime.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.PrimaryKey.ToString().ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.OldValues.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.NewValues.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();

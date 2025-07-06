@@ -43,14 +43,12 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetCreditMemo(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.MemoDate.ToLower().Contains(form.SearchValue)
-                                    || (x.MemoNumber + "").ToLower().Contains(form.SearchValue)
-                                    || x.Customer.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.MemoDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.MemoNumber + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Customer.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.AmountD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -81,6 +79,8 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -138,14 +138,12 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetDebitMemo(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-            //get total amount of data in table
-            totalAmount = data.Sum(s => s.AmountD);
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.MemoDate.ToLower().Contains(form.SearchValue)
-                                    || (x.MemoNumber + "").ToLower().Contains(form.SearchValue)
-                                    || x.Customer.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.MemoDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.MemoNumber + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Customer.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.AmountD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -176,6 +174,8 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            //get total amount of data in table
+            totalAmount = data.Sum(s => s.AmountD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();

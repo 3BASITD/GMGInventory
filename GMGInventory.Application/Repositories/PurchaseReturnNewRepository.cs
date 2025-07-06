@@ -148,7 +148,7 @@ namespace GMGInventory.Application.Repositories
                     s.SINumber,
                     s.Status,
                     s.ReturnDate,
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -364,7 +364,7 @@ namespace GMGInventory.Application.Repositories
                     s.UnitCode,
                     s.UnitCost,
                     s.TotalAmount
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue)));
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();

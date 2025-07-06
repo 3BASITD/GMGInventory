@@ -142,14 +142,14 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
-                                    || x.FirstName.ToLower().Contains(form.SearchValue)
-                                    || x.MiddleName.ToLower().Contains(form.SearchValue)
-                                    || x.LastName.ToLower().Contains(form.SearchValue)
-                                    || x.Area.ToLower().Contains(form.SearchValue)
-                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
-                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
-                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.FirstName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.MiddleName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.LastName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Area.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue.ToLower())
                                     || x.DateModified.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
@@ -239,14 +239,14 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
-                                    || x.FirstName.ToLower().Contains(form.SearchValue)
-                                    || x.MiddleName.ToLower().Contains(form.SearchValue)
-                                    || x.LastName.ToLower().Contains(form.SearchValue)
-                                    || x.Area.ToLower().Contains(form.SearchValue)
-                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
-                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue)
-                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.FirstName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.MiddleName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.LastName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Area.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue.ToLower())
                                     || x.DateModified.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search

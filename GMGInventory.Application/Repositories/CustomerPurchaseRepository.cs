@@ -90,18 +90,18 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue)
-                                    || x.ControlNumber.ToLower().Contains(form.SearchValue)
+                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ControlNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Discount1D.ToString().Contains(form.SearchValue)
                                     || x.Discount2D.ToString().Contains(form.SearchValue)
-                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue)
-                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue)
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue)
-                                    || x.ItemName.ToLower().Contains(form.SearchValue)
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue)
+                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Quantity.ToString().Contains(form.SearchValue)
                                     || x.SellingPriceD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue));
+                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();
