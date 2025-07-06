@@ -394,6 +394,14 @@ namespace GMGInventory.Application.Repositories
                         }
                         else
                         {
+                            itemInventory = new ItemInventory
+                            {
+                                ItemId = item.Item,
+                                Quantity = item.Quantity,
+                                WarehouseId = warehouseId
+                            };
+                            await context.ItemInventories.AddAsync(itemInventory);
+                            await context.SaveChangesAsync(currentUserId);
 
                             var countHistory = new PhysicalCountHistory
                             {

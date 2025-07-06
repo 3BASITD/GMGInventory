@@ -16,30 +16,17 @@
             <div class="card-tools">
                 @if (Model.Status.ToLower() != "cancelled")
                 {
-                    <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
-                        <span class="fas fa-trash"></span> Cancel
-                    </button>
-                    @Model.CurrentUsersDraft
-                    @if (Model.CurrentUsersDraft == true)
+                    @if (userAccess.CanDelete)
                     {
-                        @if (userAccess.CanAdd)
-                        {
-                            <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
-                                <span class="fas fa-save"></span> Save as Draft
-                            </button>
-                            <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
-                                <span class="fas fa-paper-plane"></span> Post
-                            </button>
-                        }
+                        <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
+                            <span class="fas fa-trash"></span> Cancel
+                        </button>
                     }
                     else
                     {
-                        @if (userAccess.CanEdit)
-                        {
-                            <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="update">
-                                <span class="fas fa-save"></span> Update
-                            </button>
-                        }
+                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="top-left" role="tooltip">
+                            <span class="fas fa-trash"></span> Cancel
+                        </button>
                     }
                     @if (userAccess.CanPrint)
                     {
@@ -59,6 +46,60 @@
                         {
                             <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                                 <span class="fas fa-print"></span> Print
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="top-left" role="tooltip">
+                            <span class="fas fa-print"></span> Print
+                        </button>
+                    }
+                    @if (Model.Status.ToLower() == "invoiced")
+                    {
+                        @if (userAccess.CanEdit)
+                        {
+                            <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="update">
+                                <span class="fas fa-save"></span> Update
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                                <span class="fas fa-save"></span> Update
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        @if (userAccess.CanAdd)
+                        {
+                            @if (Model.CurrentUsersDraft == true)
+                            {
+                                <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
+                                    <span class="fas fa-save"></span> Save as Draft
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
+                                    <span class="fas fa-paper-plane"></span> Post
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="You don't own this draft. Only @Model.UserCreated can use this button." data-microtip-position="top-left" role="tooltip">
+                                    <span class="fas fa-save"></span> Save as Draft
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="You don't own this draft. Only @Model.UserCreated can use this button." data-microtip-position="top-left" role="tooltip">
+                                    <span class="fas fa-paper-plane"></span> Post
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="top-left" role="tooltip">
+                                <span class="fas fa-save"></span> Save as Draft
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="top-left" role="tooltip">
+                                <span class="fas fa-paper-plane"></span> Post
                             </button>
                         }
                     }

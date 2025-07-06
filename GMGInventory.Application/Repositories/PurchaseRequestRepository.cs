@@ -231,7 +231,7 @@ namespace GMGInventory.Application.Repositories
                                 StockOnHandD = ii,
                                 QuantityD = request.Quantity,
                                 MaxQuantityD = request.PurchaseRequest.Purpose.Name.ToLower() == "rush order"
-                                             ? ((soli == null ? 0 : soli.Quantity) - (ii + requests))
+                                             ? Math.Max(0, ((soli == null ? 0 : soli.Quantity) - (ii + requests)))
                                              : 1999999,
                                 UnitId = request.Unit != null ? request.Unit.Id
                                        : request.Item != null ? request.Item.Unit.Id

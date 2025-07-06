@@ -109,13 +109,11 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
         {
             var requests = from prli in context.PurchaseRequestLineItems
-                           let poli = context.PurchaseOrderNewLineItems
-                                          .Where(a => a.RequestItemId == prli.Id
-                                                   && a.PurchaseOrder.Status.Name.ToLower() == "approved")
-                                          .Select(a => (int?)a.Quantity)
-                                          .Sum() ?? 0
+                           let ponli = context.PurchaseOrderNewLineItems
+                                              .Where(a => a.RequestItemId == prli.Id
+                                                       && a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                              .ToList()
                            where prli.PurchaseRequestId == RequestId
-                           && poli < prli.Quantity
                            select new JsonPurchaseItemOptionsModel
                            {
                                Id = prli.Id.ToString(),
@@ -126,8 +124,10 @@ namespace GMGInventory.Application.Repositories
                                Quantity = prli.Quantity,
                                Unit = prli.Item == null ? prli.Unit.Name : prli.Item.Unit.Name,
                                UnitId = prli.Item == null ? prli.Unit.Id : prli.Item.Unit.Id,
-                               Served = poli,
-                               Selected = SelectedId != null && prli.Id == SelectedId
+                               Served = ponli.Select(a => (int?)a.Quantity).Sum() ?? 0,
+                               Selected = SelectedId != null && prli.Id == SelectedId,
+                               OrderedOn = ponli.Count() > 0 ? string.Join(", ", ponli.Select(s => s.PurchaseOrder.DocumentNumber)) : "",
+                               Disabled = (ponli.Select(a => (int?)a.Quantity).Sum() ?? 0) >= prli.Quantity
                            };
             return await requests.ToListAsync();
         }
@@ -733,7 +733,7 @@ namespace GMGInventory.Application.Repositories
                         await context.PurchaseOrderNewLineItemNewQuantities.AddAsync(qty);
                         await context.SaveChangesAsync(currentUserId);
 
-                        var itemId = poitem.RequestItem.ItemId;  
+                        var itemId = poitem.RequestItem.ItemId;
 
                         poitem.Quantity = quantity.NewQuantity;
                         context.PurchaseOrderNewLineItems.Update(poitem);

@@ -19,31 +19,50 @@
                     <span class="fas fa-print"></span> Print
                 </button>
             }
+            else
+            {
+                <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="top-left" role="tooltip">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
 
-            @if (Model.Status.ToLower() == "posted")
+            @if (Model.Status.ToLower() == "draft")
+            {
+                @if (userAccess.CanDelete)
+                {
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="DeletePack()">
+                        <span class="fas fa-trash"></span> Delete
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="top-left" role="tooltip">
+                        <span class="fas fa-trash"></span> Delete
+                    </button>
+                }
+                @if (userAccess.CanEdit)
+                {
+                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2" onclick="SavePack('save')">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack('post')">
+                        <span class="fas fa-paper-plane"></span> Post
+                    </button>
+                } else
+                {
+                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                        <span class="fas fa-paper-plane"></span> Post
+                    </button>
+                }
+            } else if (Model.Status.ToLower() == "posted")
             {
                 <a href="@Url.Action("Create", "SalesInvoice")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
                     <span class="fas fa-file-invoice"></span> Start Invoice
                 </a>
             }
-            @if (Model?.Status.ToLower() == "draft")
-            {
-                <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="DeletePack()">
-                    <span class="fas fa-trash"></span> Delete
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm float-right ml-2" onclick="SavePack('save')">
-                    <span class="fas fa-save"></span> Save as Draft
-                </button>
-                <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack('post')">
-                    <span class="fas fa-paper-plane"></span> Post
-                </button>
-            }@*
-            else
-            {
-            <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
-            <span class="fas fa-print"></span> Print
-            </button>
-            }*@
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>

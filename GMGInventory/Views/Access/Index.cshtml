@@ -15,7 +15,13 @@
                     <span class="fas fa-plus"></span> New Role
                 </button>
             }
-            @if (userAccess.CanUploadDownload)
+            else
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="top-left" role="tooltip">
+                    <span class="fas fa-plus"></span> New Role
+                </button>
+            }
+            @* @if (userAccess.CanUploadDownload)
             {
                 <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
                     <span class="fas fa-upload"></span> Upload
@@ -24,6 +30,15 @@
                     <span class="fas fa-download"></span> Download
                 </button>
             }
+            else
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Upload / Download access is required." data-microtip-position="top-left" role="tooltip">
+                    <span class="fas fa-upload"></span> Upload
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Upload / Download access is required." data-microtip-position="top-left" role="tooltip">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            } *@
         </div>
     </div>
     <div class="card-body">
