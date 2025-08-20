@@ -97,7 +97,7 @@ namespace GMGInventory.Controllers
             }
 
             TempData["CompanyLogo"] = Company;
-            ViewData["Items"] = items;
+            ViewData["Items"] = items.OrderBy(s => s.LineNumber).ToList();
             return View(details);
         }
 
@@ -191,7 +191,8 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<PurchaseRequestVM>("Purpose")),
                 new DataColumn(chelper.DisplayName<PurchaseRequestVM>("Region")),
                 new DataColumn(chelper.DisplayName<PurchaseRequestVM>("Status")),
-                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("RequestDate"))
+                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("RequestDate")),
+                new DataColumn(chelper.DisplayName<PurchaseRequestVM>("Remarks"))
             ]);
             var requests = await requestRepository.GetListAsync(filter);
             foreach (var request in requests)
@@ -201,7 +202,8 @@ namespace GMGInventory.Controllers
                             request.Purpose,
                             request.Region,
                             request.Status,
-                            request.RequestDate);
+                            request.RequestDate,
+                            request.Remarks);
             }
 
             using XLWorkbook wb = new();

@@ -26,7 +26,7 @@
                         @Html.DisplayNameFor(model => model.Code)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.Code
+                        @Model.Code
                     </b>
                 </p>
                 <p class="text-sm">
@@ -34,7 +34,7 @@
                         @Html.DisplayNameFor(model => model.RegionName)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.RegionName
+                        @Model.RegionName
                     </b>
                 </p>
                 <p class="text-sm">
@@ -42,7 +42,7 @@
                         @Html.DisplayNameFor(model => model.Term)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.Term
+                        @Model.Term
                     </b>
                 </p>
                 <p class="text-sm">
@@ -50,17 +50,24 @@
                         @Html.DisplayNameFor(model => model.TIN)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.TIN
+                        @if (string.IsNullOrWhiteSpace(Model.TIN))
+                        {
+                            <em>N/A</em>
+                        }
+                        else
+                        {
+                            @Model.TIN
+                        }
                     </b>
                 </p>
-                @if (Model?.UserModified != "-")
+                @if (!string.IsNullOrWhiteSpace(Model.DateModified))
                 {
                     <p class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.DateModified)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.DateModified
+                            @Model.DateModified
                         </b>
                     </p>
                 }
@@ -72,7 +79,7 @@
                         @Html.DisplayNameFor(model => model.Name)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.Name
+                        @Model.Name
                     </b>
                 </p>
                 <p class="text-sm">
@@ -80,7 +87,14 @@
                         @Html.DisplayNameFor(model => model.ContactPerson)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.ContactPerson
+                        @if (string.IsNullOrWhiteSpace(Model.ContactPerson))
+                        {
+                            <em>N/A</em>
+                        }
+                        else
+                        {
+                            @Model.ContactPerson
+                        }
                     </b>
                 </p>
                 <p class="text-sm">
@@ -88,7 +102,7 @@
                         @Html.DisplayNameFor(model => model.CurrencyName)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.CurrencyName
+                        @Model.CurrencyName
                     </b>
                 </p>
                 <p class="text-sm">
@@ -96,13 +110,13 @@
                         @Html.DisplayNameFor(model => model.UserCreated)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.UserCreated
+                        @Model.UserCreated
                     </b>
                 </p>
 
-             
-              
-              
+
+
+
             </div>
             <div class="col-3">
                 <p class="text-sm">
@@ -110,7 +124,7 @@
                         @Html.DisplayNameFor(model => model.AddressLine1)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.AddressLine1
+                        @Model.AddressLine1
                     </b>
                 </p>
                 <p class="text-sm">
@@ -118,7 +132,14 @@
                         @Html.DisplayNameFor(model => model.OfficeTelNo)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.OfficeTelNo
+                        @if (string.IsNullOrWhiteSpace(Model.OfficeTelNo))
+                        {
+                            <em>N/A</em>
+                        }
+                        else
+                        {
+                            @Model.OfficeTelNo
+                        }
                     </b>
                 </p>
                 <p class="text-sm">
@@ -126,7 +147,7 @@
                         @Html.DisplayNameFor(model => model.BusinessStyleName)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.BusinessStyleName
+                        @Model.BusinessStyleName
                     </b>
                 </p>
                 <p class="text-sm">
@@ -134,10 +155,10 @@
                         @Html.DisplayNameFor(model => model.DateCreated)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.DateCreated
+                        @Model.DateCreated
                     </b>
                 </p>
-              
+
             </div>
             <div class="col-3">
                 <p class="text-sm">
@@ -145,7 +166,14 @@
                         @Html.DisplayNameFor(model => model.AddressLine2)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.AddressLine2
+                        @if (string.IsNullOrWhiteSpace(Model.AddressLine2))
+                        {
+                            <em>N/A</em>
+                        }
+                        else
+                        {
+                            @Model.AddressLine2
+                        }
                     </b>
                 </p>
                 <p class="text-sm">
@@ -153,7 +181,14 @@
                         @Html.DisplayNameFor(model => model.MobileNumber)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.MobileNumber
+                        @if (string.IsNullOrWhiteSpace(Model.MobileNumber))
+                        {
+                            <em>N/A</em>
+                        }
+                        else
+                        {
+                            @Model.MobileNumber
+                        }
                     </b>
                 </p>
                 <p class="text-sm">
@@ -161,29 +196,36 @@
                         @Html.DisplayNameFor(model => model.VAT)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.VAT
+                        @if (string.IsNullOrWhiteSpace(Model.VAT))
+                        {
+                            <em>N/A</em>
+                        }
+                        else
+                        {
+                            @Model.VAT
+                        }
                     </b>
                 </p>
 
-                @if (Model?.UserModified != "-")
+                @if (!string.IsNullOrWhiteSpace(Model.UserModified))
                 {
                     <p class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.UserModified)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.UserModified
+                            @Model.UserModified
                         </b>
                     </p>
                 }
-              
+
             </div>
         </div>
         <div class="row">
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <span class="card-title">Supplier Item Register</span>                       
+                        <span class="card-title">Supplier Item Register</span>
                     </div>
                     <div class="card-body">
                         <div class="tab-content">
@@ -193,10 +235,11 @@
                                         <tr>
                                             <th>Item Code</th>
                                             <th>Item Description</th>
-                                            <th>Currency</th>
-                                            <th>Conversion Factor</th>
+                                            <th>Quantity</th>
                                             <th>Unit Cost</th>
-                                            <th>Converted Unit Price</th>
+                                            <th>Total Cost</th>
+                                            <th>Conversion Factor</th>
+                                            <th>Converted Total Cost</th>
                                             <th>Replenish Date</th>
                                         </tr>
                                     </thead>
@@ -221,7 +264,7 @@
                 url: "@Url.Action("GetPurchasesJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = @Model.Id;
                 }
             },
             serverSide: true,
@@ -233,7 +276,6 @@
             },
             columns: [
                 {
-                    orderable: false,
                     data: function (data, type, dataToSet) {
                         if (data.item == null) {
                             return "";
@@ -241,17 +283,18 @@
                             return data.item + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
                         }
                     },
-                    name: "ItemCode",
+                    name: "Item",
                     className: "form-cell"
                 },
                 { data: "itemDescription", name: "ItemDescription" },
-                { data: "currency", name: "Currency" },
-                { data: "conversionFactor", name: "ConversionFactor", className: "text-end" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "unitCost", name: "UnitCost", className: "text-end" },
-                { data: "convertedUnitPrice", name: "ConvertedUnitPrice", className: "text-end" },
+                { data: "totalCost", name: "TotalCost", className: "text-end" },
+                { data: "conversionFactor", name: "ConversionFactor", className: "text-end" },
+                { data: "convertedTotalCost", name: "ConvertedTotalCost", className: "text-end" },
                 { data: "replenishDate", name: "ReplenishDate" }
             ],
-            order: [[6, "desc"]]
+            order: [[5, "desc"]]
         }).on("draw.dt", function () {
         });
     </script>

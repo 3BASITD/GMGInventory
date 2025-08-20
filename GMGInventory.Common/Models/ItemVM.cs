@@ -238,13 +238,13 @@ namespace GMGInventory.Common.Models
         public int QuantityD { get; set; }
         public string UnitCost => string.Format(SystemFormat.StringDecimalComma, UnitCostD);
         public decimal UnitCostD { get; set; }
-        public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
-        public decimal UnitPriceD { get; set; }
+        public string TotalCost => Currency.Split('/')[0].Trim() + " " + string.Format(SystemFormat.StringDecimalComma, TotalCostD);
+        public decimal TotalCostD => UnitCostD * QuantityD;
         public string Currency { get; set; }
         public string ConversionFactor => string.Format(SystemFormat.StringDecimalComma, ConversionFactorD);
         public decimal ConversionFactorD { get; set; }
-        public string ConvertedUnitPrice => string.Format(SystemFormat.StringDecimalComma, ConvertedUnitPriceD);
-        public decimal ConvertedUnitPriceD => Math.Round(UnitPriceD * ConversionFactorD, 2);
+        public string ConvertedTotalCost => "PH₱ " + string.Format(SystemFormat.StringDecimalComma, ConvertedTotalCostD);
+        public decimal ConvertedTotalCostD => Math.Round(TotalCostD / ConversionFactorD, 2);
         public string ReplenishDate => ReplenishDateD.ToString(SystemFormat.StringDateTime);
         public DateTime ReplenishDateD { get; set; }
         public string ReplenishBy { get; set; }

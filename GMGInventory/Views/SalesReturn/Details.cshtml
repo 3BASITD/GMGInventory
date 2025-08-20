@@ -206,7 +206,7 @@
                                         <th>Discount 1</th>
                                         <th>Discount 2</th>
                                         <th>Gross Price</th>
-                                        <th>Extended Price</th>
+                                        <th>Reference Number</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
@@ -293,7 +293,12 @@
             },
             columns: [
                 { data: "reasonOfReturn", name: "ReasonOfReturn" },
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                    },
+                    name: "ItemCode"
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "unit", name: "Unit" },

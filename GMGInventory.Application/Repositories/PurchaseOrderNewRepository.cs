@@ -168,7 +168,8 @@ namespace GMGInventory.Application.Repositories
                               Term = order.Term.Name,
                               DeliveryMode = order.DeliveryMode.Code,
                               Status = order.Status.Code,
-                              OrderDateD = order.OrderDate
+                              OrderDateD = order.OrderDate,
+                              Remarks = order.Remarks
                           };
             return await orderVM.ToListAsync();
         }
@@ -192,7 +193,8 @@ namespace GMGInventory.Application.Repositories
                     s.Term,
                     s.DeliveryMode,
                     s.Status,
-                    s.OrderDate
+                    s.OrderDate,
+                    s.Remarks
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
@@ -272,11 +274,11 @@ namespace GMGInventory.Application.Repositories
                               TermId = order.Term.Id,
                               DeliveryMode = order.DeliveryMode.Name,
                               DeliveryModeId = order.DeliveryMode.Id,
-                              DeliveryAddress = order.DeliveryAddress.AddressLine1,
+                              DeliveryAddress = order.DeliveryAddress.Address + "",
                               DeliveryAddressId = order.DeliveryAddress.Id,
                               DeliveryName = order.DeliveryAddress.Name,
-                              DeliveryContactPerson = order.DeliveryAddress.ContactPerson,
-                              DeliveryContactNumber = order.DeliveryAddress.ContactNumber,
+                              DeliveryContactPerson = order.DeliveryAddress.ContactPerson + "",
+                              DeliveryContactNumber = order.DeliveryAddress.ContactNumber + "",
                               Status = order.Status.Code,
                               OrderDateD = order.OrderDate,
                               Discount1D = order.Discount1,
@@ -344,6 +346,8 @@ namespace GMGInventory.Application.Repositories
                                                                  && a.PurchaseRequest.Id == order.RequestItem.PurchaseRequest.Id)
                                                         .Select(a => a.Quantity)
                                                         .Sum(),
+                              CostUpdateCount = order.PurchaseOrderNewLineItemNewCosts.Count,
+                              QuantityUpdateCount = order.PurchaseOrderNewLineItemNewQuantities.Count
                           };
             return await orderVM.ToListAsync();
         }
@@ -415,7 +419,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<ResponseModel<int>> AddAsync(PurchaseOrderSaveVM form, List<PurchaseOrderLineItemVM> Items)
+        public async Task<ResponseModel<int>> AddAsync(PurchaseOrderSaveVM form, IList<PurchaseOrderLineItemVM> Items)
         {
             var response = new ResponseModel<int>();
 
@@ -560,10 +564,13 @@ namespace GMGInventory.Application.Repositories
 
                     // delete item
                     // get items not in form
-                    var fitems = Items.Select(s => s.Id);
+                    var fitems = Items.Select(s => s.Id).ToList();
                     var ritems = citems.Where(s => fitems.Contains(s.Id) == false);
-                    // remove unavailable items
-                    context.PurchaseOrderNewLineItems.RemoveRange(ritems);
+                    if (ritems.Any())
+                    {
+                        // remove unavailable items
+                        context.PurchaseOrderNewLineItems.RemoveRange(ritems);
+                    }
 
                     await context.SaveChangesAsync(currentUserId);
 
@@ -603,7 +610,8 @@ namespace GMGInventory.Application.Repositories
                 else if (poitem.UnitCost != cost.OldCostD)
                 {
                     response.Status = "Error";
-                    response.Message = "Invalid Old Cost";
+                    response.Message = "Invalid old cost. The old cost should be " + poitem.UnitCost + ", but you are saving it as " + cost.OldCostD + ". Please reload the page and try again.";
+
                 }
                 else
                 {

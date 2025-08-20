@@ -30,7 +30,14 @@
             <td class="left-text">
                 <div class="column center-text">
                     <dl>
-                        <dd>BINA'S AUTO SUPPLY INC</dd>
+                        @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                        {
+                            <dd>BINA'S AUTO SUPPLY INC</dd>
+                        }
+                        else
+                        {
+                            <dd>GMG AUTO PARTS EXPRESS</dd>
+                        }
                         <dt>1034 KUSANG LOOB  STA. CRUZ MANILA</dt>
                         <dt>CONTACT NO: 712-9260 / 0920-909-2787</dt>
                         <dd>SHIPPING LIST</dd>

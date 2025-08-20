@@ -228,7 +228,18 @@
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                 { data: "unitCost", name: "UnitCost", className: "form-cell" },
-                { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
+                { 
+                    data: "totalAmount",
+                    name: "TotalAmount",
+                    className: "form-cell",
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+                            return $("#return-currency").val().split("/")[0].trim() + '&nbsp;' + data;
+                        }
+
+                        return data;
+                    }
+                }
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {
@@ -240,7 +251,7 @@
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 5);
-                columnDTTotalDecimal(api, 8);
+                columnDTTotalDecimal(api, 8, $("#return-currency").val().split("/")[0].trim() + '&nbsp;');
             }
         });
 

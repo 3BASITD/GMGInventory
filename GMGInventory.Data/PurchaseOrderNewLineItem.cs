@@ -7,6 +7,8 @@ namespace GMGInventory.Data
         public PurchaseOrderNewLineItem()
         {
             PurchaseReceivingLineItems = new HashSet<PurchaseReceivingLineItem>();
+            PurchaseOrderNewLineItemNewCosts = new HashSet<PurchaseOrderNewLineItemNewCost>();
+            PurchaseOrderNewLineItemNewQuantities = new HashSet<PurchaseOrderNewLineItemNewQuantity>();
         }
 
         [ForeignKey("PurchaseOrderId")]
@@ -25,5 +27,7 @@ namespace GMGInventory.Data
         public decimal UnitCost { get; set; }
 
         public ICollection<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }
+        public ICollection<PurchaseOrderNewLineItemNewCost> PurchaseOrderNewLineItemNewCosts { get; set; }
+        public ICollection<PurchaseOrderNewLineItemNewQuantity> PurchaseOrderNewLineItemNewQuantities { get; set; }
     }
 }

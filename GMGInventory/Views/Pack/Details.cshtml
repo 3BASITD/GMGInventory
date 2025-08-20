@@ -205,7 +205,8 @@
                 <div class="row">
                     <div class="col-12 col-sm-4">
                         <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Package Number</label>
-                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" readonly />
+                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" />
+                        <label class="fw-normal text-info add-new-box" for="add-box" style="position: absolute; right: 34px; float: right; z-index: 99; top: 30px;">(NEW PACKAGE)</label>
                     </div>
                     <div class="col-12 col-sm-4">
                         <label for="add-type" col-form-label pt-0" style="margin-bottom: 5px;">Package Type</label>
@@ -246,6 +247,10 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <div class="form-check form-switch mt-2" style="position: absolute; left: 0;">
+                    <input class="form-check-input mr-2" type="checkbox" id="hide-completed">
+                    <label class="form-check-label" for="hide-completed">Hide Completed Items</label>
+                </div>
                 <button type="button" class="btn btn-primary btn-add-item">
                     <span class="fas fa-plus"></span> Add
                 </button>
@@ -330,18 +335,42 @@
                 { data: "grossPrice", name: "GrossPrice", className: "text-end" }
             ],
             order: [[1, "asc"]],
-            createdRow: function (row, data, dataIndex) {
-                if (data.remainingQuantityD == 0) {
-                    $(row).addClass("text-muted");
-                } else if (data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
-                    $(row).addClass("text-danger");
-                }
+            // createdRow: function (row, data, dataIndex) {
+            //     if (data.remainingQuantityD == 0) {
+            //         $(row).addClass("text-muted");
+            //     } else if (data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
+            //         $(row).addClass("text-danger");
+            //     }
+            // },
+            drawCallback: function (settings) {
+                var api = this.api();
+                api.rows().every(function () {
+                    var data = this.data();
+                    var row = this.node();
+
+                    if (data.remainingQuantityD == 0) {
+                        $(row).addClass("text-muted");
+                        if ($("#hide-completed").prop("checked")) {
+                            $(row).hide();
+                        } else {
+                            $(row).show();
+                        }
+                    } else if (data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
+                        $(row).addClass("text-danger");
+                    } else {
+                        $(row).removeClass("text-muted text-danger").show(); // reset styles
+                    }
+                });
             }
         });
 
         orderDT.on("draw", function () {
             $(".table-order thead th").removeClass("text-end");
             dtCheckboxes();
+        });
+
+        $("#hide-completed").on("change", function() {
+            orderDT.draw();
         });
 
         $(".createBtn").on("click", function () {
@@ -417,6 +446,8 @@
                 });
                 if (successItem.length > 0) {
                     toastr.success("Added " + successItem.join(", ") + " on Packed Item(s)", "Success");
+
+                    assignNewPackageNumber();
                 }
                 if (alertMessage != "") {
                     toastr.info(alertMessage, "Inventory Quantity");
@@ -586,6 +617,38 @@
             });
         });
 
+        $(".createBtn").on("click", function() {
+            assignNewPackageNumber();
+            $("#add-box").val($("#add-box").attr("max"));
+        });
+
+        function assignNewPackageNumber() {
+            var packageNumbers = itemDT.rows().data().toArray().map(row => parseInt(row.boxNumber));
+            var nextPackageNumber = packageNumbers.length == 0 ? 1 : (Math.max(...packageNumbers) + 1);
+
+            $("#add-box").attr("max", nextPackageNumber);
+            $(".add-new-box").slideDown();
+        }
+
+        $("#add-box").on("change", function() {
+            var max = parseInt($(this).attr('max'));
+            var value = parseInt($(this).val());
+            if (value == max) {
+                $(".add-new-box").slideDown();
+            } else {
+                $(".add-new-box").slideUp();
+            }
+        });
+
+        $("#add-box").on("blur", function() {
+            var max = parseInt($(this).attr('max'));
+            var value = parseInt($(this).val());
+            if (!isNaN(value) && value > max) {
+                $(this).val(max);
+                $(".add-new-box").slideDown();
+            }
+        });
+
         $("#add-quantity").hide();
         $("#add-partial").on("change", function () {
             if ($(this).prop("checked")) {
@@ -686,6 +749,8 @@
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
+                        } else if (data.status == "Error2") {
+                            toastr.error(data.message, "Cannot proceed, Insufficient stock(s) for item(s):");
                         } else {
                             if (data.newRow == -2) {
                                 window.location = "@Url.Action("Index")";

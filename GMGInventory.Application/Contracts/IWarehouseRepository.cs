@@ -6,18 +6,14 @@ namespace GMGInventory.Application.Contracts
     public interface IWarehouseRepository
     {
         Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId);
-        Task<WarehouseViewVM?> GetAsync(int? id);
-        Task<WarehouseFormVM?> GetToEditAsync(int? id);
-        Task<IList<WarehouseViewVM>> GetAllAsync();
-        Task<WarehouseFormVM> AddAsync(WarehouseFormVM itemVM);
-        Task<IList<Warehouse>> GetAllActiveWarehouseAsync(int includeId);
-        Task<bool> IsIdExists(int id);
+        Task<WarehouseVM?> GetWarehouse(int Id);
+        Task<ForDataTables<WarehouseVM>> GetWarehousesDT(DataTablesRequestForm form);
+        Task<ResponseModel> AddAsync(WarehouseVM warehouse);
+        Task<ResponseModel> UpdateAsync(WarehouseVM warehouse);
+        Task<ResponseModel> DeleteDeactivateAsync(int Id);
+        Task<ResponseModel> ReactivateAsync(int Id);
+        Task<ResponseModel> SetMainAsync(int id);
         Task<int?> GetIdAsync(string? Name);
-        Task<bool> IsCodeExists(string code);
-        Task DeleteAsync(int id);
-        Task UpdateAsync(WarehouseFormVM itemVM);
-        Task ReactivateAsync(int id);
-        Task DeactivateAsync(int id);
-        Task<bool> IsInUse(int id);
+        Task<IList<Warehouse>> GetAllActiveWarehouseAsync(int includeId);
     }
 }

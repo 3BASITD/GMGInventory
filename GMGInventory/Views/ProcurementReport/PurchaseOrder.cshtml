@@ -9,17 +9,17 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-             @if (userAccess.CanPrint)
+            @if (userAccess.CanPrint)
             {
                 <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
                     <span class="fas fa-print"></span> Print
-            </button>
+                </button>
             }
-              @if (userAccess.CanUploadDownload)
+            @if (userAccess.CanUploadDownload)
             {
                 <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
                     <span class="fas fa-download"></span> Download
-            </button>
+                </button>
             }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
@@ -51,7 +51,7 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Unit)
                     </th>
-                  
+
                     <th>
                         @Html.DisplayNameFor(model => model.UnitCost)
                     </th>
@@ -118,9 +118,9 @@
                         </div>
                     </div>
                 </div>
-            
+
                 <div class="row">
-                   @*  <div class="col-12 col-sm-6">
+                    @*  <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-unservedQty" class="control-label mb-0">Unserved Quantity</label>
                             <input type="number" min="0" value="0" id="filter-unservedQty" class="form-control form-control-sm" />
@@ -129,7 +129,8 @@
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-status" class="form-label mb-0">Status</label>
-                            <select id="filter-status" style="width:100%" class="custom-select">
+                            <select id="filter-status" style="width:100%" class="form-select form-select-sm">
+                                <option>All</option>
                                 <option>Approved</option>
                                 <option>Disapproved</option>
                                 <option>Submitted</option>
@@ -147,7 +148,7 @@
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="groupby" class="form-label mb-0">Group By</label>
-                            <select id="groupby" style="width:100%" class="custom-select">
+                            <select id="groupby" style="width:100%" class="form-select form-select-sm">
                                 <option value="">None</option>
                                 <option value="supplier">Supplier</option>
                                 <option value="itemDescription">Item</option>
@@ -164,45 +165,64 @@
 </div>
 
 @section Scripts {
-<script>
-    SetDateFilter();
-    function SetDateFilter() {
-        if ($("#filter-to").val() == "") {
+    <script>
+        SetDateFilter();
+        function SetDateFilter() {
+            if ($("#filter-to").val() == "") {
+                if ($("#filter-from").val() == "") {
+                    $("#filter-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter-from").val());
+                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    //dt_from.setMonth(dt_from.getMonth() + 1);
+                    $("#filter-to").val(DateForInput(dt_from));
+                }
+            }
+
             if ($("#filter-from").val() == "") {
-                $("#filter-to").val(DateForInput(new Date()));
-            } else {
-                var dt_from = new Date($("#filter-from").val());
-                dt_from.setFullYear(dt_from.getFullYear() + 1);
-                //dt_from.setMonth(dt_from.getMonth() + 1);
-                $("#filter-to").val(DateForInput(dt_from));
+                var dt_to = new Date($("#filter-to").val());
+                dt_to.setFullYear(dt_to.getFullYear() - 1);
+                //dt_to.setMonth(dt_to.getMonth() - 1);
+                $("#filter-from").val(DateForInput(dt_to));
             }
         }
 
-        if ($("#filter-from").val() == "") {
-            var dt_to = new Date($("#filter-to").val());
-            dt_to.setFullYear(dt_to.getFullYear() - 1);
-            //dt_to.setMonth(dt_to.getMonth() - 1);
-            $("#filter-from").val(DateForInput(dt_to));
-        }
-    }
-
-    $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
         // Load Select2 for Supplier
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Supplier")",
-            success: function (data, status, xhr) {
-                $("#filter-supplier").select2({
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        $("#filter-supplier").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: 'All',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? ("<em class='fw-light'> - " + repo.name + "</em>") : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Supplier")",
+                dataType: 'json',
+                type: "POST",
+                delay: 500,
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterModal")
         });
 
         // Load Select2 for Item
@@ -250,135 +270,135 @@
             dropdownParent: $("#filterModal")
         });
 
-    // Load List on DataTable
-    var purchaseOrderDT = $('.table-purchaseOrder').on('preXhr.dt', function (e, settings, data) {
-        showLoader();
-        }).DataTable({
-            ajax: {
-                url: "@Url.Action("GetPurchaseOrderDT")",
-                type: "POST",
-                data: function (data) {
-                    var itemId = $("#filter-item").val();
-                    if (itemId) {
-                        if (isNaN(itemId)) {
-                            data.Item = 0;
-                            data.ItemKeyword = itemId;
-                        } else {
-                            data.Item = itemId;
+        // Load List on DataTable
+        var purchaseOrderDT = $('.table-purchaseOrder').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+            }).DataTable({
+                ajax: {
+                    url: "@Url.Action("GetPurchaseOrderDT")",
+                    type: "POST",
+                    data: function (data) {
+                        var itemId = $("#filter-item").val();
+                        if (itemId) {
+                            if (isNaN(itemId)) {
+                                data.Item = 0;
+                                data.ItemKeyword = itemId;
+                            } else {
+                                data.Item = itemId;
+                            }
                         }
+
+                        var supplierId = $("#filter-supplier").val();
+                        if (supplierId) data.Supplier = supplierId;
+
+                        data.DateFrom = $("#filter-from").val();
+                        data.DateTo = $("#filter-to").val();
+                        data.Unserved = $('#filter-unserved').is(':checked');
+                        data.Status = $('#filter-status').val();
                     }
+                },
+                processing: true,
+                serverSide: true,
+                filter: true,
+                responsive: true,
+                autoWidth: false,
+                search: {
+                    return: true,
+                },
+                columns: [
+                    { data: "orderDate", name: "orderDate" },
+                    { data: "documentNumber", name: "documentNumber" },
+                    { data: "supplier", name: "supplier" },
+                    { data: "item", name: "item" },
+                    { data: "itemDescription", name: "itemDescription" },
+                    { data: "quantity", name: "quantity", className: "text-end" },
+                    { data: "unit", name: "unit" },
+                    { data: "unitCost", name: "unitCost", className: "text-end" },
+                    { data: "unservedQuantity", name: "unservedQuantity", className: "text-end" },
+                    { data: "unservedAmount", name: "unservedAmount", className: "text-end" }
 
-                    var supplierId = $("#filter-supplier").val();
-                    if (supplierId) data.Supplier = supplierId;
+                ],
 
-                    data.DateFrom = $("#filter-from").val();
-                    data.DateTo = $("#filter-to").val();
-                    data.Unserved = $('#filter-unserved').is(':checked');
-                    data.Status = $('#filter-status').val();
+                footerCallback: function (row, data, start, end, display) {
+                    var json = purchaseOrderDT.ajax.json();
+                    var api = this.api(), data;
+
+                    $(api.column(7).footer()).html(FormatStringDecimal(json.totalAmount));
+                    $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount2));
+                },
+                order: [[0, "desc"]],
+                rowGroup: {
+                    dataSrc: ''
                 }
-            },
-            processing: true,
-            serverSide: true,
-            filter: true,
-            responsive: true,
-            autoWidth: false,
-            search: {
-                return: true,
-            },
-            columns: [
-                { data: "orderDate", name: "orderDate" },
-                { data: "documentNumber", name: "documentNumber" },
-                { data: "supplier", name: "supplier" },
-                { data: "item", name: "item" },
-                { data: "itemDescription", name: "itemDescription" },
-                { data: "quantity", name: "quantity", className: "text-end" },
-                { data: "unit", name: "unit" },
-                { data: "unitCost", name: "unitCost", className: "text-end" },
-                { data: "unservedQuantity", name: "unservedQuantity", className: "text-end" },
-                { data: "unservedAmount", name: "unservedAmount", className: "text-end" }
-
-            ],
-          
-            footerCallback: function (row, data, start, end, display) {
-                var json = purchaseOrderDT.ajax.json();
-                var api = this.api(), data;
-
-                $(api.column(7).footer()).html(FormatStringDecimal(json.totalAmount));
-                $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount2));
-            },
-            order: [[0, "desc"]],
-            rowGroup: {
-                dataSrc: ''
-            }
-        });
-
-    // Load functions upon DataTable load
-        purchaseOrderDT.on("draw", function () {
-            hideLoader();
-
-            $(".table-purchaseOrder thead th").removeClass("text-end");
-        });
-
-        purchaseOrderDT.rowGroup().disable().draw();
-
-        $(".btnFilter").on("click", function () {
-            var groupBy = $("#groupby").val();
-            if (groupBy == '') {
-                purchaseOrderDT.columns().visible(true);
-                purchaseOrderDT.rowGroup().disable().draw();
-            }
-            else {
-                var colIndex = purchaseOrderDT.column(groupBy + ':name').index();
-                purchaseOrderDT.columns().visible(true);
-                purchaseOrderDT.column(colIndex).visible(false);
-
-                purchaseOrderDT.rowGroup().enable().draw();
-                purchaseOrderDT.rowGroup().dataSrc(groupBy);
-            }
-
-            purchaseOrderDT.ajax.reload();
-
-            $("#filterModal").modal("hide");
-        });
-
-        $(".downloadBtn").click(function (e) {
-            var urlQuery = [];
-            urlQuery.push("DateFrom=" + $("#filter-from").val());
-            urlQuery.push("DateTo=" + $("#filter-to").val());
-             urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
-             urlQuery.push("Status=" + $("#filter-status").val());
-
-            if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
-            if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
-            if ($("#groupby").val()) { urlQuery.push("GroupBy=" + $("#groupby").val()); }
-
-            window.location = "@Url.Action("DownloadPurchaseOrder")?" + urlQuery.join("&");
-        });
-
-        $(".printBtn").on("click", function () {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fas fa-print"
             });
-            var urlQuery = [];
-            urlQuery.push("DateFrom=" + $("#filter-from").val());
-            urlQuery.push("DateTo=" + $("#filter-to").val());
-            urlQuery.push("Status=" + $("#filter-status").val());
-            urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
 
-            if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
-            if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
-            if ($("#groupby").val()) { urlQuery.push("GroupBy=" + $("#groupby").val()); }
+        // Load functions upon DataTable load
+            purchaseOrderDT.on("draw", function () {
+                hideLoader();
 
-            setTimeout(function () {
-                let win = window.open('@Url.Action("PrintPurchaseOrder")?' + urlQuery.join("&"), '');
-                var wintimer = setInterval(function () {
-                    if (win.closed) {
-                        clearInterval(wintimer);
-                        hideLoader();
-                    }
-                }, 100);
-            }, 500);
-        });
- </script>
- }
+                $(".table-purchaseOrder thead th").removeClass("text-end");
+            });
+
+            purchaseOrderDT.rowGroup().disable().draw();
+
+            $(".btnFilter").on("click", function () {
+                var groupBy = $("#groupby").val();
+                if (groupBy == '') {
+                    purchaseOrderDT.columns().visible(true);
+                    purchaseOrderDT.rowGroup().disable().draw();
+                }
+                else {
+                    var colIndex = purchaseOrderDT.column(groupBy + ':name').index();
+                    purchaseOrderDT.columns().visible(true);
+                    purchaseOrderDT.column(colIndex).visible(false);
+
+                    purchaseOrderDT.rowGroup().enable().draw();
+                    purchaseOrderDT.rowGroup().dataSrc(groupBy);
+                }
+
+                purchaseOrderDT.ajax.reload();
+
+                $("#filterModal").modal("hide");
+            });
+
+            $(".downloadBtn").click(function (e) {
+                var urlQuery = [];
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+                 urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
+                 urlQuery.push("Status=" + $("#filter-status").val());
+
+                if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
+                if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
+                if ($("#groupby").val()) { urlQuery.push("GroupBy=" + $("#groupby").val()); }
+
+                window.location = "@Url.Action("DownloadPurchaseOrder")?" + urlQuery.join("&");
+            });
+
+            $(".printBtn").on("click", function () {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                var urlQuery = [];
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+                urlQuery.push("Status=" + $("#filter-status").val());
+                urlQuery.push("Unserved=" + $('#filter-unserved').is(':checked'));
+
+                if ($("#filter-supplier").val()) { urlQuery.push("Supplier=" + $("#filter-supplier").val()); }
+                if ($("#filter-item").val()) { urlQuery.push("Item=" + $("#filter-item").val()); }
+                if ($("#groupby").val()) { urlQuery.push("GroupBy=" + $("#groupby").val()); }
+
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("PrintPurchaseOrder")?' + urlQuery.join("&"), '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            });
+    </script>
+}

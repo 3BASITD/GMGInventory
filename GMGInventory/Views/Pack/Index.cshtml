@@ -161,9 +161,6 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-                        //if (data.currentUsersDraft == true) {
-                        //    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
-                        //}
                         if (data.status.toLowerCase() == "posted" && user_access2.canAdd) {
                             actions += '<a href="@Url.Action("Create", "SalesInvoice")/' + data.id + '" class="btn btn-primary btn-xs invoiceBtn" type="button" data-microtip-title="Start Invoice" data-microtip-position="top-left" role="tooltip"><i class="fas fa-file-invoice"></i></a>';
                         }

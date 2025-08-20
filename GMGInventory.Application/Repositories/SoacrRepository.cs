@@ -33,38 +33,16 @@ namespace GMGInventory.Application.Repositories
             {
 
                 var soacr = from soa in context.SOACRs
-                            //let chkamt = (from chk in context.SOACRChecks
-                            //              join pay in context.CustomerPayments on chk.CustomerPaymentId equals pay.Id
-                            //              where pay.SOACRId == soa.Id
-                            //              select (decimal?)chk.CheckAmount).Sum() ?? 0
-                            //let payamt = (from pay in context.CustomerPayments
-                            //              where soa.Id == pay.SOACRId
-                            //              select (decimal?)(pay.BackLoad + pay.CashAdvance + pay.Cash + pay.Discount + pay.OffSet + pay.OverPayment + pay.Tax + pay.TKTSolicitation)).Sum() ?? 0
-                            //let tbramt = (from tbr in context.SOACRLineItemTBRs
-                            //              join sli in context.SOACRLineItems on tbr.SOACRLineItemId equals sli.Id
-                            //              where sli.SOACRId == soa.Id
-                            //              select (decimal?)tbr.Amount).Sum() ?? 0
-                            //let invamt = (from ili in context.InvoiceLineItems
-                            //              join inv in context.Invoices on ili.InvoiceId equals inv.Id
-                            //              join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
-                            //              where sli.SOACRId == soa.Id
-                            //              select (decimal?)(ili.Quantity * ili.UnitPrice)).Sum() ?? 0
                             select new SOACRVM
                             {
                                 Id = soa.Id,
                                 Customer = soa.Customer.Name,
                                 Type = soa.SOACRType.Code,
                                 SOAFromD = soa.SOAFrom,
-                                SOAToD = soa.SOATo,
-                                //TotalAmountD = invamt,
-                                //TBRD = tbramt,
-                                //CreditD = soa.SOACRLineItems.Sum(s => s.CreditAmount),
-                                //DebitD = soa.SOACRLineItems.Sum(s => s.DebitAmount),
-                                //PaidAmountD = payamt + chkamt,
-                                //FreightChargeD = soa.SOACRLineItems.Sum(s => s.FreightCost)
+                                SOAToD = soa.SOATo
                             };
                 var soacrl = await soacr.ToListAsync();
-                foreach(var scl in soacrl)
+                foreach (var scl in soacrl)
                 {
                     var soadetails = await GetSOACRItemsAsync(scl.Id);
                     scl.TotalAmountD = soadetails.Sum(s => s.InvoiceAmountD);
@@ -341,8 +319,10 @@ namespace GMGInventory.Application.Repositories
                               TotalAmountD = (from invli in inv.InvoiceLineItems
                                               join order in context.SalesOrders on invli.Invoice.SalesOrderId equals order.Id
                                               join orderli in context.SalesOrderLineItems on order.Id equals orderli.SalesOrderId
+                                              let discount1 = (100 - orderli.Discount1) / 100
+                                              let discount2 = (100 - orderli.Discount2) / 100
                                               where invli.ItemId == orderli.ItemId
-                                              select (invli.Quantity * invli.UnitPrice * (100 - orderli.Discount1) / 100) * (100 - orderli.Discount2) / 100).Sum()
+                                              select invli.Quantity * invli.UnitPrice * discount1 * discount2).Sum()
                           };
 
             return await invoice.ToListAsync();
@@ -457,13 +437,12 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<SOACRItemsVM>> GetSOACRItemsAsync(int id)
         {
             var soa = from sl in context.SOACRLineItems
-                      let srq = (from srli in context.SalesReturnLineItems
-                                 join ili in context.InvoiceLineItems on srli.InvoiceLineItemId equals ili.Id
-                                 where ili.InvoiceId == sl.InvoiceId
-                                 select (decimal?)srli.Quantity * ili.UnitPrice).Sum() ?? 0
                       let inv = (from ili in sl.Invoice.InvoiceLineItems
-                                 join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
-                                 select (decimal?)((ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100)).Sum() ?? 0
+                                 join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId }
+                                                                      equals new { soli.SalesOrderId, soli.ItemId }
+                                 let discount1 = (100 - soli.Discount1) / 100
+                                 let discount2 = (100 - soli.Discount2) / 100
+                                 select (decimal?)ili.Quantity * ili.UnitPrice * discount1 * discount2).Sum() ?? 0
                       let tbr = context.SOACRLineItemTBRs
                                        .Where(s => s.SOACRLineItemId == sl.Id)
                                        .Sum(s => (decimal?)s.Amount) ?? 0
@@ -478,7 +457,7 @@ namespace GMGInventory.Application.Repositories
                           InvoiceDateD = sl.Invoice.DateCreated,
                           InvoiceNumber = sl.Invoice.InvoiceNumber,
                           ControlNumber = sl.Invoice.ControlNumber,
-                          InvoiceAmountD = inv - srq,
+                          InvoiceAmountD = inv,
                           InvoiceType = sl.Invoice.InvoiceType.Code,
                           InvoiceId = sl.Invoice.Id,
                           TBRD = tbr,
@@ -660,13 +639,12 @@ namespace GMGInventory.Application.Repositories
             foreach (var InvoiceId in payment.InvoiceIds)
             {
                 var soali = from sl in context.SOACRLineItems
-                            let srq = (from srli in context.SalesReturnLineItems
-                                       join ili in context.InvoiceLineItems on srli.InvoiceLineItemId equals ili.Id
-                                       where ili.InvoiceId == sl.InvoiceId
-                                       select (decimal?)srli.Quantity * ili.UnitPrice).Sum() ?? 0
                             let inv = (from ili in sl.Invoice.InvoiceLineItems
-                                       join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
-                                       select (decimal?)((ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100)).Sum() ?? 0
+                                       join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId }
+                                                                            equals new { soli.SalesOrderId, soli.ItemId }
+                                       let discount1 = (100 - soli.Discount1) / 100
+                                       let discount2 = (100 - soli.Discount2) / 100
+                                       select (decimal?)ili.Quantity * ili.UnitPrice * discount1 * discount2).Sum() ?? 0
                             let tbr = context.SOACRLineItemTBRs
                                              .Where(s => s.SOACRLineItemId == sl.Id)
                                              .Sum(s => (decimal?)s.Amount) ?? 0
@@ -676,7 +654,7 @@ namespace GMGInventory.Application.Repositories
                                              .Sum(s => (decimal?)s.PaidAmount) ?? 0
                             where sl.SOACR.Id == payment.SOACRId
                             && sl.InvoiceId == InvoiceId
-                            select inv - srq - tbr - sl.CreditAmount + sl.DebitAmount - pay + sl.FreightCost;
+                            select inv - tbr - sl.CreditAmount + sl.DebitAmount - pay + sl.FreightCost;
 
                 var forPayment = soali.FirstOrDefault();
                 var toPay = 0m;
@@ -766,13 +744,17 @@ namespace GMGInventory.Application.Repositories
             var invoices = from ret in context.SalesReturnLineItems
                            let tbr = context.SOACRLineItemTBRs.Where(s => s.SalesReturnLineItemId == ret.Id).ToList()
                            where (string.IsNullOrWhiteSpace(search) || ret.InvoiceLineItem!.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) || ("tbr".Contains(search.ToLower()) && ret.InvoiceLineItemId == null))
-                           && ret.SalesReturn.SalesOrder.Customer.Id == CustomerId
+                           && ret.SalesReturn.Customer!.Id == CustomerId
+                           let discount1 = (100 - ret.Discount1) / 100
+                           let discount2 = (100 - ret.Discount2) / 100
                            select new SOACRInvoiceTBRVM
                            {
                                Id = ret.Id,
                                Text = ret.SalesReturn.SalesReturnNumber + " (" + (ret.InvoiceLineItem == null ? "TBR" : ret.InvoiceLineItem!.Invoice.InvoiceNumber) + ")",
-                               InvoiceAmount = ret.Quantity * (((100m - ret.Discount1 - ret.Discount2) * ret.SellingPrice) / 100m) - (tbr.Count == 0 ? 0 : tbr.Sum(s => s.Amount))
+                               InvoiceAmount = (ret.Quantity * ret.SellingPrice * discount1 * discount2)
+                                             - (tbr.Count == 0 ? 0 : tbr.Sum(s => s.Amount))
                            };
+
             var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<SOACRInvoiceTBRVM>
             {

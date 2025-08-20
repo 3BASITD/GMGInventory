@@ -256,7 +256,6 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Remaining Quantity")]
         public string RemainingQuantity => string.Format(SystemFormat.StringIntegerComma, RemainingQuantityD);
-        //public int RemainingQuantityD => ServedQuantityD - PackedQuantityD;
         public int RemainingQuantityD { get; set; }
 
         [Display(Name = "Unit")]
@@ -284,7 +283,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Extended Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
-        public decimal GrossPriceD => Math.Round((QuantityD * SellingPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100, 2);
+        public decimal GrossPriceD => Math.Round(QuantityD * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
     }
 
     public class SalesOrderFormVM
@@ -311,6 +310,6 @@ namespace GMGInventory.Common.Models
         public decimal UnitPrice { get; set; }
         public decimal Discount1 { get; set; }
         public decimal Discount2 { get; set; }
-        public decimal GrossPrice => Math.Round((Quantity * UnitPrice * (100 - Discount1) / 100) * (100 - Discount2) / 100, 2);
+        public decimal GrossPrice => Math.Round(Quantity * UnitPrice * (100 - Discount1) / 100 * (100 - Discount2) / 100, 2);
     }
 }

@@ -72,33 +72,21 @@
                     }
                     else
                     {
-                        @if (userAccess.CanAdd)
+                        @if (userAccess.CanEdit)
                         {
-                            @if (Model.CurrentUsersDraft == true)
-                            {
-                                <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
-                                    <span class="fas fa-save"></span> Save as Draft
-                                </button>
-                                <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
-                                    <span class="fas fa-paper-plane"></span> Post
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="You don't own this draft. Only @Model.UserCreated can use this button." data-microtip-position="top-left" role="tooltip">
-                                    <span class="fas fa-save"></span> Save as Draft
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="You don't own this draft. Only @Model.UserCreated can use this button." data-microtip-position="top-left" role="tooltip">
-                                    <span class="fas fa-paper-plane"></span> Post
-                                </button>
-                            }
+                            <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" value="save">
+                                <span class="fas fa-save"></span> Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm float-right ml-2" value="post">
+                                <span class="fas fa-paper-plane"></span> Post
+                            </button>
                         }
                         else
                         {
-                            <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="top-left" role="tooltip">
+                            <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
                                 <span class="fas fa-save"></span> Save as Draft
                             </button>
-                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="top-left" role="tooltip">
+                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
                                 <span class="fas fa-paper-plane"></span> Post
                             </button>
                         }
@@ -818,7 +806,8 @@
                 var print_company = $(this).data("company");
                 var invoice_type_changed = $("#invoice-invoice-type").val() != $("#invoice-invoice-type").data("current-invoice-type");
                 var control_number_changed = $("#invoice-control-number").val() != $("#invoice-control-number").data("current-control-number");
-                var remarks_changed = $("#invoice-remarks").val() != $("#invoice-remarks").data("current-remarks");
+                var remarks_on_data = $("#invoice-remarks").data("current-remarks") == null ? "" : $("#invoice-remarks").data("current-remarks");
+                var remarks_changed = $("#invoice-remarks").val() != remarks_on_data;
 
                 if (invoice_type_changed || control_number_changed || remarks_changed) {
                     if (invoice_type_changed) { $("#invoice-invoice-type").data("current-invoice-type", $("#invoice-invoice-type").val()); }

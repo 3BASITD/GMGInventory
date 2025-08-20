@@ -43,6 +43,9 @@ namespace GMGInventory.Common.Models
         public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDate);
         public string ReturnDate3 => ReturnDateD.ToString(SystemFormat.StringDate3);
         public DateTime ReturnDateD { get; set; }
+
+        [Display(Name = "Remarks")]
+        public string? Remarks { get; set; }
     }
 
     public class PurchaseReturnNewDetailedVM :PurchaseReturnNewVM
@@ -50,15 +53,14 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Currency")]
         public string Currency { get; set; }
+
+        [Display(Name = "Currency Code")]
+        public string CurrencyCode { get; set; }
         public int CurrencyId { get; set; }
 
         [Display(Name = "Currency Rate")]
         public string CurrencyRate => string.Format(SystemFormat.StringDecimalComma, CurrencyRateD);
         public decimal CurrencyRateD { get; set; }
-
-
-        [Display(Name = "Remarks")]
-        public string? Remarks { get; set; }
 
         [Display(Name = "Canvas Summary Reference")]
         public string Reference { get; set; }

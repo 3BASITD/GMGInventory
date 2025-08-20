@@ -66,6 +66,7 @@ namespace GMGInventory.Common.Models
         public int? ResubmitFromId { get; set; }
 
         public string? DisapprovedReason { get; set; }
+        public string? Remarks { get; set; }
 
     }
 
@@ -82,7 +83,6 @@ namespace GMGInventory.Common.Models
         public string PurchaseRequestType { get; set; }
         public string PurchaseOrderType { get; set; }
 
-        public string? Remarks { get; set; }
 
         [Display(Name = "Approved By")]
         public string? ApprovedBy { get; set; }

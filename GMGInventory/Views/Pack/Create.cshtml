@@ -114,7 +114,8 @@
                 <div class="row">
                     <div class="col-12 col-sm-4">
                         <label for="add-box" col-form-label pt-0" style="margin-bottom: 5px;">Package Number</label>
-                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" value="1" readonly="readonly" />
+                        <input type="number" min="1" max="1999999" class="form-control form-control-sm" id="add-box" />
+                        <label class="fw-normal text-info add-new-box" for="add-box" style="position: absolute; right: 34px; float: right; z-index: 99; top: 30px;">(NEW PACKAGE)</label>
                     </div>
                     <div class="col-12 col-sm-4">
                         <label for="add-type" col-form-label pt-0" style="margin-bottom: 5px;">Package Type</label>
@@ -388,6 +389,8 @@
                 });
                 if (successItem.length > 0) {
                     toastr.success("Added " + successItem.join(", ") + " on Packed Item(s)", "Success");
+
+                    assignNewPackageNumber();
                 }
                 if (alertMessage != "") {
                     toastr.info(alertMessage, "Inventory Quantity");
@@ -535,6 +538,38 @@
             });
         });
 
+        $(".createBtn").on("click", function() {
+            assignNewPackageNumber();
+            $("#add-box").val($("#add-box").attr("max"));
+        });
+
+        function assignNewPackageNumber() {
+            var packageNumbers = itemDT.rows().data().toArray().map(row => parseInt(row.boxNumber));
+            var nextPackageNumber = packageNumbers.length == 0 ? 1 : (Math.max(...packageNumbers) + 1);
+
+            $("#add-box").attr("max", nextPackageNumber);
+            $(".add-new-box").slideDown();
+        }
+
+        $("#add-box").on("change", function() {
+            var max = parseInt($(this).attr('max'));
+            var value = parseInt($(this).val());
+            if (value == max) {
+                $(".add-new-box").slideDown();
+            } else {
+                $(".add-new-box").slideUp();
+            }
+        });
+
+        $("#add-box").on("blur", function() {
+            var max = parseInt($(this).attr('max'));
+            var value = parseInt($(this).val());
+            if (!isNaN(value) && value > max) {
+                $(this).val(max);
+                $(".add-new-box").slideDown();
+            }
+        });
+
         $("#add-quantity").hide();
         $("#add-partial").on("change", function () {
             if ($(this).prop("checked")) {
@@ -622,6 +657,8 @@
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
+                        } else if (data.status == "Error2") {
+                            toastr.error(data.message, "Cannot proceed, Insufficient stock(s) for item(s):");
                         } else {
                             window.location = "@Url.Action("Details")/" + data.newRow;
                         }

@@ -51,6 +51,9 @@
                     <th>
                         @Html.DisplayNameFor(model => model.OrderDate)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -306,6 +309,7 @@
                 { data: "deliveryMode", name: "DeliveryMode" },
                 { data: "status", name: "Status" },
                 { data: "orderDate", name: "OrderDate" },
+                { data: "remarks", name: "Remarks" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {

@@ -33,6 +33,11 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 
+
+        [ForeignKey("WarehouseId")]
+        public int? WarehouseId { get; set; }
+        public Warehouse Warehouse { get; set; }
+
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<PackLineItem> PackLineItems { get; set; }
         public ICollection<PackReturn> PackReturns { get; set; }

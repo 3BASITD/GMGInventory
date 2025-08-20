@@ -63,7 +63,7 @@ namespace GMGInventory.Common.Models
     {
         public string Name { get; set; }
         public string Address1 { get; set; }
-        public string Address2 { get; set; }
+        public string? Address2 { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public string CurrencyRate => string.Format("{0:#,##0.00}", CurrencyRateD);
@@ -223,6 +223,7 @@ namespace GMGInventory.Common.Models
         public string Text { get; set; }
         public bool Selected { get; set; }
         public decimal Rate { get; set; }
+        public string Abbreviation { get; set; }
     }
 
     public class Select2Model<T>
@@ -299,6 +300,11 @@ namespace GMGInventory.Common.Models
 
         public int? Status { get; set; }
         public string? StatusCode { get; set; }
+        public string? SortColumn { get; set; }
+        public string? SortColumnDirection { get; set; }
+        public string? SearchValue { get; set; }
+        public int? PageSize { get; set; }
+        public int? PageSkip { get; set; }
 
         public DateTime? DateFrom
         {

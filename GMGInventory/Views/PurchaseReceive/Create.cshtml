@@ -81,7 +81,7 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
-                        <label for="receive-term" class="form-label mb-0">Currency</label>
+                        <label for="receive-currency" class="form-label mb-0">Currency</label>
                         <input type="text" id="receive-currency" name="Currency" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
@@ -283,7 +283,19 @@
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                 { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false : true },
-                { data: "totalAmount", name: "TotalAmount", className: "form-cell", visible: user_accessBasic.canView ? false : true }
+                { 
+                    data: "totalAmount",
+                    name: "TotalAmount",
+                    className: "form-cell",
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+                            return $("#receive-currency").val().split("/")[0].trim() + '&nbsp;' + data;
+                        }
+
+                        return data;
+                    },
+                    visible: user_accessBasic.canView ? false : true
+                }
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {
@@ -294,7 +306,7 @@
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
                 columnDTTotalInteger(api, 4);
-                columnDTTotalDecimal(api, 7);
+                columnDTTotalDecimal(api, 7, $("#receive-currency").val().split("/")[0].trim() + '&nbsp;');
             }
         });
 

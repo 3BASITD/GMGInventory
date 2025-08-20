@@ -125,7 +125,8 @@
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-status" class="form-label mb-0">Status</label>
-                            <select id="filter-status" style="width:100%" class="custom-select">
+                            <select id="filter-status" style="width:100%" class="form-select form-select-sm">
+                                <option>All</option>
                                 <option>Approved</option>
                                 <option>Disapproved</option>
                                 <option>Submitted</option>
@@ -135,7 +136,7 @@
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="groupby" class="form-label mb-0">Group By</label>
-                            <select id="groupby" style="width:100%" class="custom-select">
+                            <select id="groupby" style="width:100%" class="form-select form-select-sm">
                                 <option value="">None</option>
                                 <option value="supplier">Supplier</option>
                                 <option value="itemDescription">Item</option>
@@ -178,20 +179,39 @@
         $("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
         // Load Select2 for Supplier
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Supplier")",
-            success: function (data, status, xhr) {
-                $("#filter-supplier").select2({
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        $("#filter-supplier").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: 'All',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? ("<em class='fw-light'> - " + repo.name + "</em>") : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Supplier")",
+                dataType: 'json',
+                type: "POST",
+                delay: 500,
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterModal")
         });
 
         // Load Select2 for Item

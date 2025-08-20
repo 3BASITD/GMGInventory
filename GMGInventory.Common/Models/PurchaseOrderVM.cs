@@ -91,12 +91,10 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Gross Price")]
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
-        //public decimal NetPriceD => Quantity * (((100m - Discount1D - Discount2D - Discount3D) * UnitPriceD) / 100m);
-        public decimal NetPriceD => Quantity * ComputeDiscount(ComputeDiscount(ComputeDiscount(UnitPriceD, Discount1D), Discount2D), Discount3D);
-        private decimal ComputeDiscount(decimal Amount, decimal Discount)
-        {
-            return (Amount * (100 - Discount)) / 100m;
-        }
+        public decimal NetPriceD => UnitPriceD * Quantity
+                                  * (100 - Discount1D) / 100
+                                  * (100 - Discount2D) / 100
+                                  * (100 - Discount2D) / 100;
     }
 
     public class PurchaseOrderFormVM

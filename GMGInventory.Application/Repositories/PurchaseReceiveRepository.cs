@@ -46,7 +46,8 @@ namespace GMGInventory.Application.Repositories
                                  PONumber = receive.PurchaseOrder.DocumentNumber,
                                  Warehouse = receive.Warehouse.Code,
                                  Status = receive.Status.Code,
-                                 ReceiveDateD = receive.ReceiveDate
+                                 ReceiveDateD = receive.ReceiveDate,
+                                 Remarks = receive.Remarks
                              });
             return await receiveVM.ToListAsync();
         }
@@ -69,7 +70,8 @@ namespace GMGInventory.Application.Repositories
                     s.PONumber,
                     s.Warehouse,
                     s.Status,
-                    s.ReceiveDate
+                    s.ReceiveDate,
+                    s.Remarks
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search

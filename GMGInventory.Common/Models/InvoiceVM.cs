@@ -66,8 +66,6 @@ namespace GMGInventory.Common.Models
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
         //public decimal? BalanceD { get; set; }
         public decimal BalanceD => TotalAmountD - (TBRD ?? 0) - (CreditD ?? 0) + (DebitD ?? 0) - (PaidAmountD ?? 0m) + (FreightChargeD ?? 0);
-
-        public bool CurrentUsersDraft { get; set; }
     }
 
     public class InvoiceDetailsVM
@@ -122,7 +120,6 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Invoice Type")]
         public string InvoiceType { get; set; }
-        public bool CurrentUsersDraft { get; set; }
 
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }
@@ -148,7 +145,7 @@ namespace GMGInventory.Common.Models
         public decimal TotalD { get; set; }
 
         [Display(Name = "Discount %")]
-        public string DiscountPercent => string.Format(SystemFormat.StringDecimalComma, DiscountPercentD) + "%";
+        public string DiscountPercent => string.Format(DiscountPercentD % 1 > 0 ? SystemFormat.StringDecimalComma : SystemFormat.StringIntegerComma, DiscountPercentD) + "%";
 
         public decimal DiscountPercentD { get; set; }
 
@@ -185,11 +182,17 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
 
+        [Display(Name = "Old Item Code")]
+        public string OldItemCode { get; set; }
+
+        [Display(Name = "Part Number")]
+        public string PartNumber { get; set; }
+
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
         [Display(Name = "Quantity")]
-        public string Quantity => string.Format(SystemFormat.StringDecimalComma, QuantityD);
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
         public int QuantityOfPack { get; set; }
 
@@ -202,18 +205,17 @@ namespace GMGInventory.Common.Models
         public string SellingPriceType { get; set; }
 
         [Display(Name = "Discount 1")]
-        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
+        public string Discount1 => string.Format(Discount1D % 1 > 0 ? SystemFormat.StringDecimalComma : SystemFormat.StringIntegerComma, Discount1D);
         public decimal Discount1D { get; set; }
 
         [Display(Name = "Discount 2")]
-        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
+        public string Discount2 => string.Format(Discount2D % 1 > 0 ? SystemFormat.StringDecimalComma : SystemFormat.StringIntegerComma, Discount2D);
         public decimal Discount2D { get; set; }
 
         [Display(Name = "Gross Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
-        //public decimal GrossPriceD => Quantity * (((100m - Discount1D - Discount2D) * NetPriceD) / 100m);
-        public decimal GrossPriceD => Math.Round((QuantityD * NetPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100, 2);
-        //(QuantityD* SellingPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100
+        public decimal GrossPriceD => Math.Round(QuantityD * NetPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
+
         [Display(Name = "Gross Price (No Discount)")]
         public string GrossPriceNoDiscount => string.Format(SystemFormat.StringDecimalComma, GrossPriceNoDiscountD);
         public decimal GrossPriceNoDiscountD => QuantityD * NetPriceD;

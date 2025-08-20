@@ -67,7 +67,10 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Purchase Receiving Basic")] PurchaseReceivingBasic,
         [PageNamesString("Item Basic")] ItemBasic,
         [PageNamesString("Receptacle")] Receptacle,
-        [PageNamesString("Shipping List")] ShippingList
+        [PageNamesString("Shipping List")] ShippingList,
+        [PageNamesString("Tracker Task")] TrackerTask,
+        [PageNamesString("Tracker Comment")] TrackerComment,
+        [PageNamesString("Tracker Error")] TrackerError,
     }
 
     public static class PageNameExtensions

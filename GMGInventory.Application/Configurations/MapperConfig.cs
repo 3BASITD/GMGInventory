@@ -60,13 +60,6 @@ namespace GMGInventory.Application.Configurations
             CreateMap<User, UserInformationVM>().ReverseMap();
             CreateMap<User, UserInformationForUpdateVM>().ReverseMap();
 
-            // Warehouse
-            CreateMap<Warehouse, WarehouseFormVM>().ReverseMap();
-            CreateMap<Warehouse, WarehouseViewVM>()
-                .ForMember(s => s.DateCreated, o => o.MapFrom(a => a.DateCreated.ToString(DateFormat)))
-                .ForMember(s => s.DateModified, o => o.MapFrom(a => a.DateModified == null ? null : a.DateModified.Value.ToString(DateFormat)))
-                .ReverseMap();
-
             // Currency
             CreateMap<Currency, CurrencyVM>().ReverseMap();
             CreateMap<Currency, GenericAuditVM>().ReverseMap();

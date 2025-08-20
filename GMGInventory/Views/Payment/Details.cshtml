@@ -166,6 +166,17 @@
                                     <th>Sales Order No</th>
                                 </tr>
                             </thead>
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th>Total</th>
+                                    <th class="total-invoice">0</th>
+                                    <th class="total-balance">0</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -235,7 +246,13 @@
                 { data: "balanceAmount", name: "BalanceAmount" },
                 { data: "packNo", name: "PackNo" },
                 { data: "salesOrderNo", name: "SalesOrderNo" }
-            ]
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                columnDTTotalDecimal(api, 3);
+                columnDTTotalDecimal(api, 4);
+            }
         });
 
         itemTableInvoice.on("draw", function () {

@@ -13,6 +13,23 @@
     <title>GMGInventory | @title</title>
     <link rel="icon" href="~/images/box.ico" />
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+    <style>
+        @@media print {
+            @@page {
+                margin-left: 1.0in !important;
+                margin-right: 1.0in !important;
+            }
+        }
+
+
+        table.formatted dd, table.formatted strong.detail {
+            font-size: 12px;
+            margin: 5px 0;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+    </style>
 </head>
 <body>
     <table class="formatted">
@@ -150,9 +167,9 @@
                 <td></td>
                 <td></td>
             </tr>
-            @if (itemCount < 23)
+            @if (itemCount < 21)
             {
-                for (var ctr = 2; ctr <= 23 - itemCount; ctr++)
+                for (var ctr = 2; ctr <= 21 - itemCount; ctr++)
                 {
                     <tr>
                         <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>

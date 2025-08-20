@@ -325,7 +325,7 @@
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
             if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
-            if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-custoemr").val()); }
+            if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
             if ($("#filter-status").val()) { urlQuery.push("StatusCode=" + $("#filter-status").val()); }
             if ($("#filter-region").val()) { urlQuery.push("Region2=" + $("#filter-region").val()); }
             window.location = "@Url.Action("DownloadSalesInvoice")?" + urlQuery.join("&");
@@ -340,7 +340,7 @@
             urlQuery.push("DateFrom=" + $("#filter-from").val());
             urlQuery.push("DateTo=" + $("#filter-to").val());
             if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
-            if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-custoemr").val()); }
+            if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
             if ($("#filter-status").val()) { urlQuery.push("StatusCode=" + $("#filter-status").val()); }
             if ($("#filter-region").val()) { urlQuery.push("Region2=" + $("#filter-region").val()); }
             setTimeout(function () {

@@ -28,7 +28,7 @@ namespace GMGInventory.Application.Repositories
                                             .Include(s => s.Brand)
                                             .Include(s => s.Unit)
                         let inventory = context.ItemInventories
-                                               .Where(s => s.ItemId == item.Id && s.Warehouse.Code == "MAIN")
+                                               .Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true)
                                                .Sum(s => (int?)s.Quantity) ?? 0
                         let packedQuantity = context.PackLineItems
                                                     .Where(s => s.ItemId == item.Id)
@@ -108,7 +108,7 @@ namespace GMGInventory.Application.Repositories
                 }
             }
             //get total maintaining quantity of data in table
-            totalQuantityOnHand = data.Sum(s => s.MaintainingQuantityD);
+            totalMaintainingQuantity = data.Sum(s => s.MaintainingQuantityD);
             //get total quantity on hand of data in table
             totalQuantityOnHand = data.Sum(s => s.QuantityOnHandD);
             //pagination

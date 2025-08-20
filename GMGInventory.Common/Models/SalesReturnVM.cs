@@ -51,6 +51,7 @@ namespace GMGInventory.Common.Models
     public class SalesReturnItemVM
     {
         public int Id { get; set; }
+        public int ItemId { get; set; }
 
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
@@ -81,7 +82,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Gross Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
-        public decimal GrossPriceD => Math.Round((Quantity * SellingPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100, 2);
+        public decimal GrossPriceD => Math.Round(Quantity * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
 
         [Display(Name = "Reference Number")]
         public string ReferenceNumber { get; set; }

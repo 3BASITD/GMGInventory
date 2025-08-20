@@ -9,18 +9,18 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-        @if (userAccess.CanPrint)
-        {
-            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
-                <span class="fas fa-print"></span> Print
-            </button>
-        }
-        @if (userAccess.CanUploadDownload)
-        {
-            <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
-                <span class="fas fa-download"></span> Download
-            </button>
-        }
+            @if (userAccess.CanPrint)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                    <span class="fas fa-print"></span> Print
+                </button>
+            }
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -239,26 +239,39 @@
         });
 
         // Load Select2 for Supplier
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Supplier")",
-            success: function (data, status, xhr) {
-                $("#filter-supplier").select2({
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    templateResult: function (repo) {
-                        if (repo.loading) {
-                            return repo.text;
+        $("#filter-supplier").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: 'All',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? ("<em class='fw-light'> - " + repo.name + "</em>") : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Supplier")",
+                dataType: 'json',
+                type: "POST",
+                delay: 500,
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 50) < data.total_count
                         }
-                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#filterModal")
         });
 
         // Load List on DataTable
@@ -357,4 +370,4 @@
             });
         }
     </script>
-    }
+}

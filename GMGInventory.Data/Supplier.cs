@@ -22,22 +22,22 @@ namespace GMGInventory.Data
         public string Name { get; set; }
 
         [Column(TypeName = "nvarchar(12)")]
-        public string TIN { get; set; }
+        public string? TIN { get; set; }
 
         [Column(TypeName = "nvarchar(150)")]
         public string AddressLine1 { get; set; }
 
         [Column(TypeName = "nvarchar(150)")]
-        public string AddressLine2 { get; set; }
+        public string? AddressLine2 { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string OfficeTelNo { get; set; }
+        public string? OfficeTelNo { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string ContactPerson { get; set; }
+        public string? ContactPerson { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string MobileNumber { get; set; }
+        public string? MobileNumber { get; set; }
 
         [Required]
         [ForeignKey("RegionId")]
@@ -60,7 +60,7 @@ namespace GMGInventory.Data
         public Currency Currency { get; set; }
 
         [Column(TypeName = "nvarchar(12)")]
-        public string VAT { get; set; }
+        public string? VAT { get; set; }
         public bool IsActive { get; set; }
 
         public ICollection<PurchaseOrderNew> PurchaseOrderNews { get; set; }

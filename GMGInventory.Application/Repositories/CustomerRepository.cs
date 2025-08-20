@@ -34,12 +34,15 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
-                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
-                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } 
+                                                                       equals new { oli.SalesOrderId, oli.ItemId }
+                                   let discount1 = (100 - oli.Discount1) / 100
+                                   let discount2 = (100 - oli.Discount2) / 100
+                                   group new { inv.Quantity, inv.UnitPrice, discount1, discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2 / 100)) ?? 0
                                    };
             var customerPayments = from pay in context.CustomerPaymentDetails
                                    where pay.Invoice.Status.Code.ToLower() == "invoiced"
@@ -50,13 +53,16 @@ namespace GMGInventory.Application.Repositories
                                        PaymentAmount = g.Sum(s => (decimal?)(s.PaidAmount) ?? 0)
                                    };
 
-            var customerSalesReturns = from sr in context.SalesReturnLineItems
-                                       where sr.InvoiceLineItem.Invoice.Status.Code.ToLower() == "invoiced"
-                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+            var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
+                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
                                            CustomerId = g.Key,
-                                           SalesReturnAmount = g.Sum(s => (decimal?)((s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                           SalesReturnAmount = g.Sum(s => (decimal?)(s.SalesReturnLineItem.Quantity
+                                                                        * s.SalesReturnLineItem.SellingPrice
+                                                                        * (100 - s.SalesReturnLineItem.Discount1) / 100
+                                                                        * (100 - s.SalesReturnLineItem.Discount2) / 100)) ?? 0
                                        };
 
             var customerSOACR = from s in context.SOACRLineItems
@@ -120,12 +126,15 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
-                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
-                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } 
+                                                                       equals new { oli.SalesOrderId, oli.ItemId }
+                                   let discount1 = (100 - oli.Discount1) / 100
+                                   let discount2 = (100 - oli.Discount2) / 100
+                                   group new { inv.Quantity, inv.UnitPrice, discount1, discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2)) ?? 0
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
@@ -137,13 +146,16 @@ namespace GMGInventory.Application.Repositories
                                        PaymentAmount = g.Sum(s => (decimal?)(s.PaidAmount) ?? 0)
                                    };
 
-            var customerSalesReturns = from sr in context.SalesReturnLineItems
-                                       where sr.InvoiceLineItem.Invoice.Status.Code.ToLower() == "invoiced"
-                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+            var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
+                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
                                            CustomerId = g.Key,
-                                           SalesReturnAmount = g.Sum(s => (decimal?)((s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                           SalesReturnAmount = g.Sum(s => (decimal?)(s.SalesReturnLineItem.Quantity
+                                                                        * s.SalesReturnLineItem.SellingPrice
+                                                                        * (100 - s.SalesReturnLineItem.Discount1) / 100
+                                                                        * (100 - s.SalesReturnLineItem.Discount2) / 100)) ?? 0
                                        };
 
             var customerSOACR = from s in context.SOACRLineItems
@@ -215,11 +227,13 @@ namespace GMGInventory.Application.Repositories
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
-                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
+                                   let discount1 = (100 - oli.Discount1) / 100
+                                   let discount2 = (100 - oli.Discount2) / 100
+                                   group new { inv.Quantity, inv.UnitPrice, discount1, discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2)) ?? 0
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
@@ -231,13 +245,16 @@ namespace GMGInventory.Application.Repositories
                                        PaymentAmount = g.Sum(s => (decimal?)(s.PaidAmount) ?? 0)
                                    };
 
-            var customerSalesReturns = from sr in context.SalesReturnLineItems
-                                       where sr.InvoiceLineItem.Invoice.Status.Code.ToLower() == "invoiced"
-                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+            var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
+                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
                                            CustomerId = g.Key,
-                                           SalesReturnAmount = g.Sum(s => (decimal?)((s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                           SalesReturnAmount = g.Sum(s => (decimal?)(s.SalesReturnLineItem.Quantity
+                                                                        * s.SalesReturnLineItem.SellingPrice
+                                                                        * (100 - s.SalesReturnLineItem.Discount1) / 100
+                                                                        * (100 - s.SalesReturnLineItem.Discount2) / 100)) ?? 0
                                        };
 
             var customerSOACR = from s in context.SOACRLineItems
@@ -375,11 +392,13 @@ namespace GMGInventory.Application.Repositories
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
-                                   group new { inv.Quantity, inv.UnitPrice, oli.Discount1, oli.Discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
+                                   let discount1 = (100 - oli.Discount1) / 100
+                                   let discount2 = (100 - oli.Discount2) / 100
+                                   group new { inv.Quantity, inv.UnitPrice, discount1, discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)((s.Quantity * s.UnitPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2)) ?? 0
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
@@ -391,13 +410,16 @@ namespace GMGInventory.Application.Repositories
                                        PaymentAmount = g.Sum(s => (decimal?)(s.PaidAmount) ?? 0)
                                    };
 
-            var customerSalesReturns = from sr in context.SalesReturnLineItems
-                                       where sr.InvoiceLineItem.Invoice.Status.Code.ToLower() == "invoiced"
-                                       group sr by sr.InvoiceLineItem.Invoice.SalesOrder.Customer.Id into g
+            var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
+                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
                                            CustomerId = g.Key,
-                                           SalesReturnAmount = g.Sum(s => (decimal?)((s.Quantity * s.SellingPrice * (100 - s.Discount1) / 100) * (100 - s.Discount2) / 100)) ?? 0
+                                           SalesReturnAmount = g.Sum(s => (decimal?)(s.SalesReturnLineItem.Quantity
+                                                                        * s.SalesReturnLineItem.SellingPrice
+                                                                        * (100 - s.SalesReturnLineItem.Discount1) / 100
+                                                                        * (100 - s.SalesReturnLineItem.Discount2) / 100)) ?? 0
                                        };
 
             var customerSOACR = from s in context.SOACRLineItems
@@ -1005,14 +1027,16 @@ namespace GMGInventory.Application.Repositories
                                                Amount = ili.Quantity * ili.UnitPrice
                                            }).ToList()
                              let totalPayment = cp.BackLoad + cp.CashAdvance + cp.Cash + cp.Discount + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + (cp.SOACRChecks.Sum(s => (decimal?)s.CheckAmount) ?? 0)
-                             let invamttotal = invamt.Sum(s => s.Amount) - soalit.Sum(s => s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - totalPayment
+                             //let invamttotal = invamt.Sum(s => s.Amount) - soalit.Sum(s => s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - totalPayment
+                             let invamttotal = totalPayment - invamt.Sum(s=>s.Amount) + cp.OverPayment
                              where cp.CustomerId == id
                              select new CustomerVM
                              {
                                  AmountPaidD = totalPayment,
                                  CRNo = cp.CRNumber,
                                  PaymentRemarks = cp.Remarks,
-                                 OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
+                                 //OverPaymentD = 0 > invamttotal ? invamttotal * -1 : 0,
+                                 OverPaymentD = invamttotal,
                                  SOANo = cp.SOACRId,
                                  TotalInvoiceAmountD = invamt.Sum(s => s.Amount),
                                  CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
@@ -1105,16 +1129,20 @@ namespace GMGInventory.Application.Repositories
                    {
                        InvoiceNo = inv.InvoiceNumber,
                        InvoicedDateD = inv.InvoiceDate,
-                       InvoicedAmountD = (inv.InvoiceLineItems
-                                             .Sum(s => (decimal?)s.UnitPrice * s.Quantity) ?? 0)
+                       InvoicedAmountD = ((from ili in inv.InvoiceLineItems
+                                         join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
+                                         let discount1 = (100 - soli.Discount1) / 100
+                                         let discount2 = (100 - soli.Discount2) / 100
+                                         select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)
+                                         ).Sum() ?? 0)
                                        - (context.CustomerPaymentDetails
                                                  .Where(s => s.InvoiceId == inv.Id)
                                                  .Sum(s => (decimal?)s.PaidAmount) ?? 0)
-                                       - ((from sr in context.SalesReturnLineItems
-                                           join il in context.InvoiceLineItems on sr.InvoiceLineItemId equals il.Id
-                                           where il.InvoiceId == inv.Id
-                                           select (decimal?)((sr.Quantity * sr.SellingPrice * (100 - sr.Discount1) / 100) * (100 - sr.Discount2) / 100)
-                                         ).Sum() ?? 0)
+                                       - ((from tbr in context.SOACRLineItemTBRs
+                                           let discount1 = (100 - tbr.SalesReturnLineItem.Discount1) / 100
+                                           let discount2 = (100 - tbr.SalesReturnLineItem.Discount2) / 100
+                                           where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Id == inv.Id
+                                           select (decimal?)(tbr.SalesReturnLineItem.Quantity * tbr.SalesReturnLineItem.SellingPrice * discount1 * discount2)).Sum() ?? 0)
                                        - (context.SOACRLineItems
                                                  .Where(s => s.InvoiceId == inv.Id)
                                                  .Sum(s => (decimal?)s.CreditAmount) ?? 0)

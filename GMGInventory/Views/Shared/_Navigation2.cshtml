@@ -700,15 +700,15 @@ else
                                             <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "PurchaseOrder" ? "active" : "")"
                                                asp-area="" asp-controller="ProcurementReport" asp-action="PurchaseOrder">Purchase Order Report</a>
                                         }
-                                        @if (navPages.Contains(PageNames.PurchaseReturnReport.ToEnumString()))
-                                        {
-                                            <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Return" ? "active" : "")"
-                                               asp-area="" asp-controller="ProcurementReport" asp-action="PurchaseReturn">Purchase Return Report</a>
-                                        }
                                         @if (navPages.Contains(PageNames.PurchaseReceivingReport.ToEnumString()))
                                         {
                                             <a class="dropdown-item @(currentController=="ProcurementReport" && currentAction == "Receiving" ? "active" : "")"
                                                asp-area="" asp-controller="ProcurementReport" asp-action="PurchaseReceiving">Purchase Receiving Report</a>
+                                        }
+                                        @if (navPages.Contains(PageNames.PurchaseReturnReport.ToEnumString()))
+                                        {
+                                            <a class="dropdown-item @(currentController == "ProcurementReport" && currentAction == "Return" ? "active" : "")"
+                                               asp-area="" asp-controller="ProcurementReport" asp-action="PurchaseReturn">Purchase Return Report</a>
                                         }
                                     }
                                 </div>

@@ -4,6 +4,7 @@ using GMGInventory.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Dynamic.Core;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -21,6 +22,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<AgentSalesPerItemRVM>> GetAgentSalesPerItem(ListFilterSalesModel filter)
         {
             var invoices = from ili in context.InvoiceLineItems
+                           join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId }
+                                                                equals new { soli.SalesOrderId, soli.ItemId }
+                           let discount1 = (100 - soli.Discount1) / 100
+                           let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
@@ -34,7 +39,7 @@ namespace GMGInventory.Application.Repositories
                                ItemCode = ili.Item.Code,
                                ItemName = ili.Item.Name,
                                ItemType = ili.Item.ItemType.Name,
-                               PriceD = ili.UnitPrice,
+                               PriceD = ili.UnitPrice * discount1 * discount2,
                                QuantityD = ili.Quantity,
                                DateInvoiceD = ili.Invoice.InvoiceDate
                            };
@@ -127,7 +132,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<BrandSalesRVM>> GetBrandSales(ListFilterSalesModel filter)
         {
             var invoices = from ili in context.InvoiceLineItems
-                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} 
+                                                                equals new {soli.SalesOrderId, soli.ItemId}
+                           let discount1 = (100 - soli.Discount1) / 100
+                           let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
@@ -137,7 +145,7 @@ namespace GMGInventory.Application.Repositories
                            {
                                AgentCode = ili.Invoice.SalesOrder.Agent.Code,
                                AgentName = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
-                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                Brand = ili.Item.Brand.Name
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
@@ -229,11 +237,14 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<BestSellingItemRVM>> GetBestSellingItem(ListFilterSalesModel filter)
         {
             var invoices = from ili in context.InvoiceLineItems
-                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} 
+                                                                equals new {soli.SalesOrderId, soli.ItemId}
                            let ii = context.ItemInventories
                                            .Where(s => s.ItemId == ili.Item.Id
-                                                    && s.Warehouse.Code.ToLower().Contains("main"))
+                                                    && s.Warehouse.IsMain == true)
                                            .Sum(s => (int?)s.Quantity) ?? 0
+                           let discount1 = (100 - soli.Discount1) / 100
+                           let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
@@ -241,7 +252,7 @@ namespace GMGInventory.Application.Repositories
                            && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new BestSellingItemRVM
                            {
-                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                Brand = ili.Item.Brand.Name,
                                CurrentQuantityD = ii,
                                ItemCode = ili.Item.Code,
@@ -372,7 +383,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<CommissionRVM>> GetCommission(ListFilterSalesModel filter)
         {
             var invoices = from ili in context.InvoiceLineItems
-                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} 
+                                                                equals new {soli.SalesOrderId, soli.ItemId}
+                           let discount1 = (100 - soli.Discount1) / 100
+                           let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
@@ -387,14 +401,14 @@ namespace GMGInventory.Application.Repositories
                                Area = ili.Invoice.SalesOrder.Agent.Area.Name,
                                InvoiceDateD = ili.Invoice.InvoiceDate,
                                InvoiceNumber = ili.Invoice.InvoiceNumber,
-                               InvoiceAmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               InvoiceAmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                CommissionRateD = ili.Invoice.SalesOrder.Customer.CommissionRate != null
-                                               ? ili.Invoice.SalesOrder.Customer.CommissionRate.Value
+                                               ? ili.Invoice.SalesOrder.Customer.CommissionRate!.Value
                                                : ili.Invoice.SalesOrder.Agent.Area.CommissionRate,
-                               CommissionAmount2D = ((ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100)
+                               CommissionAmount2D = (ili.Quantity * ili.UnitPrice * discount1 * discount2)
                                                   * (ili.Invoice.SalesOrder.Customer.CommissionRate != null
-                                                   ? ili.Invoice.SalesOrder.Customer.CommissionRate.Value
-                                                   : ili.Invoice.SalesOrder.Agent.Area.CommissionRate) / 100,
+                                                  ? ili.Invoice.SalesOrder.Customer.CommissionRate!.Value
+                                                  : ili.Invoice.SalesOrder.Agent.Area.CommissionRate) / 100,
                                Customer = ili.Invoice.SalesOrder.Customer.Name
                            };
             var invoicelist = await invoices.ToListAsync();
@@ -519,14 +533,17 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<CustomerSalesRankingRVM>> GetCustomerSalesRanking(ListFilterSalesModel filter)
         {
             var invoices = from ili in context.InvoiceLineItems
-                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId,soli.ItemId}
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId}
+                                                                equals new {soli.SalesOrderId,soli.ItemId}
+                           let discount1 = (100 - soli.Discount1) / 100
+                           let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Region == null || (ili.Invoice.SalesOrder.Customer.Area != null && ili.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region))
                            && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new CustomerSalesRankingRVM
                            {
-                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                CustomerCode = ili.Invoice.SalesOrder.Customer.Code,
                                CustomerName = ili.Invoice.SalesOrder.Customer.Name,
                                RankD = 0
@@ -619,7 +636,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<CustomerSalesRVM>> GetCustomerSales(ListFilterSalesModel filter)
         {
             var invoices = from ili in context.InvoiceLineItems
-                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} 
+                                                                equals new {soli.SalesOrderId, soli.ItemId}
+                           let discount1 = (100 - soli.Discount1) / 100
+                           let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
@@ -627,7 +647,7 @@ namespace GMGInventory.Application.Repositories
                            && ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new CustomerSalesRVM
                            {
-                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100,
+                               AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                Brand = ili.Item.Brand.Name,
                                CustomerCode = ili.Invoice.SalesOrder.Customer.Code,
                                CustomerName = ili.Invoice.SalesOrder.Customer.Name
@@ -734,7 +754,9 @@ namespace GMGInventory.Application.Repositories
                                      + invoice.SalesOrder.Agent.LastName,
                                AmountD = (from ili in invoice.InvoiceLineItems
                                           join soli in invoice.SalesOrder.SalesOrderLineItems on ili.ItemId equals soli.ItemId
-                                          select (decimal?)((ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100)).Sum() ?? 0,
+                                          let discount1 = (100 - soli.Discount1) / 100
+                                          let discount2 = (100 - soli.Discount2) / 100
+                                          select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)).Sum() ?? 0,
                                CustomerCode = invoice.SalesOrder.Customer.Code,
                                CustomerName = invoice.SalesOrder.Customer.Name,
                                InvoiceDateD = invoice.InvoiceDate,
@@ -801,19 +823,50 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<DailySalesRVM>> FilteredDailySales(ListFilterSalesModel filter)
+        {
+            var data = (await GetDailySales(filter)).AsQueryable();
+            var brand = await context.Brands.Where(s => s.Id == filter.Brand).FirstOrDefaultAsync();
+            if (!string.IsNullOrWhiteSpace(filter.SearchValue))
+            {
+                data = data.Where(s => new[]
+                {
+                    s.Agent,
+                    s.Amount,
+                    s.AmountD.ToString(),
+                    s.BIRInvoiceNumber,
+                    s.CustomerCode,
+                    s.CustomerName,
+                    s.InvoiceDate,
+                    s.InvoiceNumber,
+                    s.Term
+                }.Any(a => a != null && a.ToLower().Contains(filter.SearchValue.ToLower())));
+            }
+            if (!string.IsNullOrEmpty(filter.SortColumn) && !string.IsNullOrEmpty(filter.SortColumnDirection))
+            {
+                bool isAsc = filter.SortColumnDirection == "asc";
+                data = filter.SortColumn switch
+                {
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    "InvoiceDate" => isAsc ? data.OrderBy(s => s.InvoiceDateD) : data.OrderByDescending(s => s.InvoiceDateD),
+                    _ => data.OrderBy(filter.SortColumn + " " + filter.SortColumnDirection)
+                };
+            }
+            return data.ToList();
+        }
+
         public async Task<DailySalesPVM> PrintDailySales(ListFilterSalesModel filter)
         {
-            var items = await GetDailySales(filter);
-            var brand = await context.Brands.Where(s => s.Id == filter.Brand).FirstOrDefaultAsync();
+            var dataList = await FilteredDailySales(filter);
             return new DailySalesPVM
             {
-                Contents = items,
+                Contents = dataList,
                 DateFromD = filter.DateFrom.GetValueOrDefault(),
                 DateToD = filter.DateTo.GetValueOrDefault(),
                 InvoiceNumberFrom = filter.InvoiceNumberFrom == null ? "All" : filter.InvoiceNumberFrom,
                 InvoiceNumberTo = filter.InvoiceNumberTo == null ? "All" : filter.InvoiceNumberTo,
                 Status = filter.StatusCode == null ? "All" : filter.StatusCode,
-                TotalAmountD = items.Sum(s => s.AmountD)
+                TotalAmountD = dataList.Sum(s => s.AmountD)
             };
         }
 
@@ -844,7 +897,9 @@ namespace GMGInventory.Application.Repositories
                                AgentCode = invoice.SalesOrder.Agent.Code,
                                AmountD = (from ili in invoice.InvoiceLineItems
                                           join soli in invoice.SalesOrder.SalesOrderLineItems on ili.ItemId equals soli.ItemId
-                                          select (decimal?)((ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100)).Sum() ?? 0,
+                                          let discount1 = (100 - soli.Discount1) / 100
+                                          let discount2 = (100 - soli.Discount2) / 100
+                                          select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)).Sum() ?? 0,
                                ControlNumber = invoice.ControlNumber,
                                CustomerCode = invoice.SalesOrder.Customer.Code,
                                CustomerName = invoice.SalesOrder.Customer.Name,
@@ -935,7 +990,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<SalesAgentAreaRVM>> GetSalesAgentArea(ListFilterSalesModel filter)
         {
             var invoices = from ili in context.InvoiceLineItems
-                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId}
+                                                                equals new {soli.SalesOrderId, soli.ItemId}
+                           let discount1 = (100 - soli.Discount1) / 100
+                           let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
@@ -947,7 +1005,7 @@ namespace GMGInventory.Application.Repositories
                                AgentCode = ili.Invoice.SalesOrder.Agent.Code,
                                AgentName = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
                                Area = ili.Invoice.SalesOrder.Customer.Area.Name,
-                               SalesD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100
+                               SalesD = ili.Quantity * ili.UnitPrice * discount1 * discount2
                            };
 
             var invoicelist = await invoices.ToListAsync();
@@ -1051,7 +1109,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<SalesReportBasisRVM>> GetSalesReportBasis(ListFilterSalesModel filter)
         {
             var invoices = from ili in context.InvoiceLineItems
-                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId} equals new {soli.SalesOrderId, soli.ItemId}
+                           join soli in context.SalesOrderLineItems on new {ili.Invoice.SalesOrderId, ili.ItemId}
+                                                                equals new {soli.SalesOrderId, soli.ItemId}
+                           let discount1 = (100 - soli.Discount1) / 100
+                           let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && ili.Invoice.Status.Code.ToLower() == "invoiced"
@@ -1063,7 +1124,7 @@ namespace GMGInventory.Application.Repositories
                                Name = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Name
                                     : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Customer.Area.Region.Name
                                     : /*filter.Basis == "Brand" ?*/ ili.Item.Brand.Name,
-                               AmountD = (ili.Quantity * ili.UnitPrice * (100 - soli.Discount1) / 100) * (100 - soli.Discount2) / 100
+                               AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
                              orderby invoice.AmountD descending

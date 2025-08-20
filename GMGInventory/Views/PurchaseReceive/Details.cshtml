@@ -330,15 +330,16 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var user_accessBasic = @Html.Raw(Json.Serialize(userAccessBasic));
+        var ro_data = @Json.Serialize(Model);
 
-        var ro_status = @Json.Serialize(Model?.Status);
+        console.log(ro_data);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemListJson")",
-                data: { purchaseReceiveId: @Model?.Id },
+                data: { purchaseReceiveId: ro_data.id },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -351,7 +352,7 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        if (user_access.canEdit && ro_status.toLowerCase() == "draft") {
+                        if (user_access.canEdit && ro_data.status.toLowerCase() == "draft") {
                             return '<input type="checkbox" class="to-receive" ' + (data.toReceive == true ? 'checked="checked"' : '') +
                                                  (data.toReceiveQuantityD == 0 ? 'disabled' : '') + ' />';
                         } else {
@@ -365,7 +366,7 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (ro_status.toLowerCase() == "draft" && data.toReceive == true) {
+                        if (ro_data.status.toLowerCase() == "draft" && data.toReceive == true) {
                             if (data.quantityD > data.toReceiveQuantityD) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.toReceiveQuantity + ' receiving quantity.</label>';
                             } else if (data.quantityD == 0) {
@@ -382,7 +383,19 @@
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                 { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false : true },
-                { data: "totalAmount", name: "TotalAmount", className: "form-cell", visible: user_accessBasic.canView ? false : true }
+                { 
+                    data: "totalAmount", 
+                    name: "TotalAmount", 
+                    className: "form-cell",
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+                            return ro_data.currency.split("/")[0].trim() + '&nbsp;' + data;
+                        }
+
+                        return data;
+                    },
+                    visible: user_accessBasic.canView ? false : true
+                }
 
             ],
             order: [[1, "asc"]],
@@ -394,7 +407,7 @@
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
                 columnDTTotalInteger(api, 4);
-                columnDTTotalDecimal(api, 7);
+                columnDTTotalDecimal(api, 7, ro_data.currency.split("/")[0].trim() + '&nbsp;');
             }
         });
 
@@ -491,7 +504,7 @@
                         type: "POST",
                         url: "@Url.Action("SaveItemsJson")",
                         data: {
-                            Id: @Model?.Id,
+                            Id: ro_data.id,
                             status: status,
                             items: GetItemsToReceive()
                         },
@@ -532,7 +545,7 @@
                             $.ajax({
                                 url: "@Url.Action("ApproveJson")",
                                 type: "POST",
-                                data: { Id: @Model!.Id },
+                                data: { Id: ro_data.id },
                                 success: function (data, status, xhr) {
                                     if (data.status == "Success") {
                                         window.location.reload();
@@ -565,7 +578,7 @@
                                 url: "@Url.Action("DisapproveJson")",
                                 type: "POST",
                                 data: {
-                                    Id: @Model!.Id,
+                                    Id: ro_data.id,
                                     reason: confirm
                                 },
                                 success: function (data, status, xhr) {
@@ -589,7 +602,7 @@
                         fontawesome: "fas fa-print"
                     });
                     setTimeout(function () {
-                        let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id + '?Company=' + print_company, '');
+                        let win = window.open('@Url.Action("PrintDetails")/' + ro_data.id + '?Company=' + print_company, '');
                         var wintimer = setInterval(function () {
                             if (win.closed) {
                                 clearInterval(wintimer);

@@ -980,7 +980,8 @@
                     itemCode: $("#add-code").select2("data")[0].text,
                     itemName: $("#add-code").select2("data")[0].name,
                     inventoryCount: $("#add-code").select2("data")[0].inventoryCount,
-                    quantity: $("#add-quantity").val() || 0,
+                    quantity: Round2Decimal($("#add-quantity").val() || 0),
+                    quantityD: $("#add-quantity").val() || 0,
                     unit: $("#add-code").select2("data")[0].unit,
                     sellingPrice: Round2Decimal($("#add-unit-price").val() || 0),
                     sellingPriceD: $("#add-unit-price").val() || 0,
@@ -1030,7 +1031,7 @@
                 {
                     data: function (data, type, dataToSet) {
                         if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+                            return '<input type="number" min="0" max="1999999" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         } else {
                             return data.quantity
                         }

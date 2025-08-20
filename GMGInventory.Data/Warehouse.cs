@@ -7,6 +7,7 @@ namespace GMGInventory.Data
         public Warehouse()
         {
             this.ItemInventories = new HashSet<ItemInventory>();
+            this.Packs = new HashSet<Pack>();
             this.PhysicalCountHistories = new HashSet<PhysicalCountHistory>();
             this.PurchaseOrders = new HashSet<PurchaseOrder>();
             this.PurchaseOrderNews = new HashSet<PurchaseOrderNew>();
@@ -23,21 +24,20 @@ namespace GMGInventory.Data
         public string Name { get; set; }
 
         [Column(TypeName = "nvarchar(250)")]
-        public string AddressLine1 { get; set; }
-
-        [Column(TypeName = "nvarchar(250)")]
-        public string? AddressLine2 { get; set; }
+        public string? Address { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
-        public string ContactPerson { get; set; }
+        public string? ContactPerson { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
-        public string ContactNumber { get; set; }
+        public string? ContactNumber { get; set; }
 
+        public bool? IsMain { get; set; }
         public bool IsActive { get; set; }
 
         public ICollection<ItemInventory> ItemInventories { get; set; }
         public ICollection<PhysicalCountHistory> PhysicalCountHistories { get; set; }
+        public ICollection<Pack> Packs { get; set; }
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
         public ICollection<PurchaseOrderNew> PurchaseOrderNews { get; set; }
         public ICollection<PurchaseReceiving> PurchaseReceivings { get; set; }

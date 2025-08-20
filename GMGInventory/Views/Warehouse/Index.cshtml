@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WarehouseViewVM>
+﻿@model IEnumerable<WarehouseVM>
 
 @{
     ViewData["Title"] = "Warehouse";
@@ -11,21 +11,25 @@
         <div class="card-tools">
             @if (userAccess.CanAdd)
             {
-                <a class="btn btn-primary btn-sm float-right" asp-action="Create">
-                    <span class="fas fa-plus"></span> New Warehouse
-                </a>
+                <button type="button" class="btn btn-primary btn-sm float-right btn-add-warehouse">
+                    <i class="fas fa-plus"></i> New Warehouse
+                </button>
             }
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover">
+        <table class="table table-head-fixed table-striped table-hover table-warehouse">
             <thead>
                 <tr>
+                    <th></th>
                     <th>
                         @Html.DisplayNameFor(model => model.Code)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.ContactPerson)
@@ -37,112 +41,413 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model == null)
-                {
-                    <tr><td colspan="5"><p class="text-center m-0">This record is empty</p></td></tr>
-                }
-                else
-                {
-                    @foreach (var warehouse in Model)
-                    {
-                        <tr>
-                            <td>@warehouse.Code</td>
-                            <td>@warehouse.Name</td>
-                            <td>@warehouse.ContactPerson</td>
-                            <td>@warehouse.ContactNumber</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@warehouse.Id" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                    @if (warehouse.IsActive)
-                                    {
-                                        @if (userAccess.CanEdit)
-                                        {
-                                            <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@warehouse.Id" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip">
-                                                <i class="fas fa-pencil-alt"></i>
-                                            </a>
-                                        }
-                                        @if (userAccess.CanDelete)
-                                        {
-                                            <button data-id="@warehouse.Id" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip">
-                                                <i class="far fa-trash-alt"></i>
-                                            </button>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        @if (userAccess.CanAdd || userAccess.CanEdit)
-                                        {
-                                            <button data-id="@warehouse.Id" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        }
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                }
             </tbody>
         </table>
     </div>
 </div>
 
-@if (userAccess.CanDelete)
+@if (userAccess.CanAdd)
 {
-    <form id="deleteWarehouseForm" asp-action="Delete">
-        <input type="hidden" id="deleteWarehouseId" name="Id" />
-    </form>
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Warehouse</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="createForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="create-code" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.Code)</label>
+                                    <input name="Code" id="create-code" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-name" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.Name)</label>
+                                    <input name="Name" id="create-name" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-address" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.Address)</label>
+                                    <input name="Address" id="create-address" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-person" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.ContactPerson)</label>
+                                    <input name="Person" id="create-person" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-number" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.ContactNumber)</label>
+                                    <input name="Number" id="create-number" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 }
-@if (userAccess.CanAdd || userAccess.CanEdit)
+
+@if (userAccess.CanEdit)
 {
-    <form id="reactivateWarehouseForm" asp-action="Reactivate">
-        <input type="hidden" id="reactivateWarehouseId" name="Id" />
-    </form>
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Warehouse</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="edit-code" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.Code)</label>
+                                    <input name="Code" id="edit-code" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-name" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.Name)</label>
+                                    <input name="Name" id="edit-name" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-address" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.Address)</label>
+                                    <input name="Address" id="edit-address" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-person" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.ContactPerson)</label>
+                                    <input name="Person" id="edit-person" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-number" class="control-label mb-0 d-block">@Html.DisplayNameFor(model => model.ContactNumber)</label>
+                                    <input name="Number" id="edit-number" class="form-control form-control-sm" />
+                                </div>
+                                <input type="hidden" id="edit-id" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 }
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        $('.table').DataTable({
-            order: [[0, "desc"]]
+        // Load List on DataTable
+        var warehouseDT = $('.table-warehouse').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetWarehousesDT")",
+                type: "POST",
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        if (data.isMain == true) {
+                            return '<span class="text-success" data-microtip-title="Main Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-home"></i></span>';
+                        } else {
+                            return '';
+                        }
+                    },
+                    name: "IsMain"
+                },
+                { data: "code", name: "Code" },
+                { data: "name", name: "Name" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return !data.address ? '<span class="text-muted">N/A</span>' : data.address;
+                    },
+                    name: "Address"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return !data.contactPerson ? '<span class="text-muted">N/A</span>' : data.contactPerson;
+                    },
+                    name: "ContactPerson"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return !data.contactNumber ? '<span class="text-muted">N/A</span>' : data.contactNumber;
+                    },
+                    name: "ContactNumber"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        if (user_access.canEdit) {
+                            if (data.isActive != true) {
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-warehouse" data-microtip-title="Reactivate Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-check"></i></button>';
+                            } else {
+                                if (data.isMain != true) {
+                                    actions += '<button type="button" class="btn btn-success btn-xs btn-main-warehouse" data-microtip-title="Set Main Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-home"></i></button>';
+                                }
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-update-warehouse" data-microtip-title="Update Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-edit"></i></button>';
+                            }
+                        }
+                        if (user_access.canDelete && data.isActive == true && data.isMain != true) {
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-warehouse" data-microtip-title="Delete / Deactivate Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-trash-alt"></i></button>';
+                        }
+                        return actions + '</div>';
+                    },
+                    className: "form-cell"
+                }
+            ],
+            order: [[1, "desc"]]
         });
-        if (user_access.canDelete) {
-            $('.deleteBtn').click(function (e) {
-                swal({
-                    title: "Delete / Deactivate Warehouse",
-                    text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#deleteWarehouseId').val(id);
-                        $('#deleteWarehouseForm').submit();
+
+        // Load functions upon DataTable load
+        warehouseDT.on("draw", function () {
+            hideLoader();
+
+            if (user_access.canDelete) {
+                $('.btn-remove-warehouse').click(function (e) {
+                    swal({
+                        title: "Delete / Deactivate Warehouse",
+                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = warehouseDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("DeleteDeactivateWarehouse")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        warehouseDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if(user_access.canEdit){
+                $('.btn-main-warehouse').off("click").on("click", function () {
+                    swal({
+                        title: "Set as Main Warehouse",
+                        text: "Are you sure you want to make this record as main warehouse?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = warehouseDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("SetMainWarehouse")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        warehouseDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+
+                $('.btn-update-warehouse').off("click").on("click", function () {
+                    var row_data = warehouseDT.row($(this).parents('tr')).data();
+
+                    $("#edit-id").val(row_data.id);
+                    $("#edit-code").val(row_data.code);
+                    $("#edit-name").val(row_data.name);
+                    $("#edit-address").val(row_data.address);
+                    $("#edit-person").val(row_data.contactPerson);
+                    $("#edit-number").val(row_data.contactNumber);
+
+                    $("#editModal").modal("show");
+                });
+            }
+
+            if (user_access.canAdd || user_access.canEdit) {
+                $('.btn-reactivate-warehouse').click(function (e) {
+                    swal({
+                        title: "Reactivate Warehouse",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = warehouseDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("ReactivateWarehouse")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        warehouseDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        if(user_access.canAdd){
+            $('.btn-add-warehouse').on("click", function () {
+                $("#create-code").val("");
+                $("#create-name").val("");
+                $("#create-address").val("");
+                $("#create-person").val("");
+                $("#create-number").val("");
+
+                $("#createModal").modal("show");
+            });
+
+            // Validation for Add Modal
+            var validateAdd = $("#createForm").validate({
+                rules: {
+                    Code: { required: true, maxlength: 10 },
+                    Name: { required: true, maxlength: 100 },
+                    Address: { maxlength: 250 },
+                    Person: { maxlength: 100 },
+                    Number: { maxlength: 50 }
+                },
+                messages: {
+                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
+                    Address: { maxlength: "Address must not exceed 250 characters." },
+                    Person: { maxlength: "Contact person must not exceed 100 characters." },
+                    Number: { maxlength: "Contact number must not exceed 50 characters." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoAdd();
+                }
+            });
+
+            // Send Add to Controller
+            function DoAdd() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("AddWarehouse")",
+                    data: {
+                        Code: $("#create-code").val(),
+                        Name: $("#create-name").val(),
+                        Address: $("#create-address").val(),
+                        ContactPerson: $("#create-person").val(),
+                        ContactNumber: $("#create-number").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            warehouseDT.ajax.reload();
+                            $("#createModal").modal("hide");
+                            //hideLoader();
+                        }
                     }
                 });
-            });
+            }
         }
-        if (user_access.canAdd || user_access.canEdit) {
-            $('.reactivateBtn').click(function (e) {
-                swal({
-                    title: "Reactivate Warehouse",
-                    text: "Are you sure you want to reactivate this record?",
-                    icon: "info",
-                    buttons: true,
-                    infoMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        var btn = $(this);
-                        var id = btn.data("id");
-                        $('#reactivateWarehouseId').val(id);
-                        $('#reactivateWarehouseForm').submit();
+
+        if(user_access.canEdit){
+            // Validation for Add Modal
+            var validateAdd = $("#editForm").validate({
+                rules: {
+                    Code: { required: true, maxlength: 10 },
+                    Name: { required: true, maxlength: 100 },
+                    Address: { maxlength: 250 },
+                    Person: { maxlength: 100 },
+                    Number: { maxlength: 50 }
+                },
+                messages: {
+                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
+                    Address: { maxlength: "Address must not exceed 250 characters." },
+                    Person: { maxlength: "Contact person must not exceed 100 characters." },
+                    Number: { maxlength: "Contact number must not exceed 50 characters." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoAdd();
+                }
+            });
+
+            // Send Add to Controller
+            function DoAdd() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateWarehouse")",
+                    data: {
+                        Id: $("#edit-id").val(),
+                        Code: $("#edit-code").val(),
+                        Name: $("#edit-name").val(),
+                        Address: $("#edit-address").val(),
+                        ContactPerson: $("#edit-person").val(),
+                        ContactNumber: $("#edit-number").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            warehouseDT.ajax.reload();
+                            $("#editModal").modal("hide");
+                            //hideLoader();
+                        }
                     }
                 });
-            });
+            }
         }
     </script>
 }

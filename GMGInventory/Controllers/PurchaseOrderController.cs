@@ -109,7 +109,7 @@ namespace GMGInventory.Controllers
             }
 
             TempData["CompanyLogo"] = Company;
-            ViewData["Items"] = items;
+            ViewData["Items"] = items.OrderBy(s => s.LineNumber).ToList();
             return View(details);
         }
 
@@ -147,23 +147,23 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddJson(PurchaseOrderSaveVM form, List<PurchaseOrderLineItemVM> items)
+        public async Task<IActionResult> AddJson([FromBody] PurchaseOrderSaveVM form)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            var response = await orderRepository.AddAsync(form, items);
+            var response = await orderRepository.AddAsync(form, form.Items);
             if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
             return Json(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveItemsJson(List<PurchaseOrderLineItemVM> items, int Id, string status)
+        public async Task<IActionResult> SaveItemsJson([FromBody] PurchaseOrderSaveVM form)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            var response = await orderRepository.SaveItemsAsync(items, Id, status);
+            var response = await orderRepository.SaveItemsAsync(form.Items, form.Id, form.Status);
             if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
 
             return Json(response);
@@ -257,7 +257,8 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<PurchaseOrderVM>("Term")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderVM>("DeliveryMode")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderVM>("Status")),
-                new DataColumn(chelper.DisplayName<PurchaseOrderVM>("OrderDate"))
+                new DataColumn(chelper.DisplayName<PurchaseOrderVM>("OrderDate")),
+                new DataColumn(chelper.DisplayName<PurchaseOrderVM>("Remarks"))
             ]);
             var orders = await orderRepository.GetListAsync(filter);
             foreach (var order in orders)
@@ -268,7 +269,8 @@ namespace GMGInventory.Controllers
                             order.Term,
                             order.DeliveryMode,
                             order.Status,
-                            order.OrderDate);
+                            order.OrderDate,
+                            order.Remarks);
             }
 
             using XLWorkbook wb = new();

@@ -48,6 +48,9 @@
                     <th>
                         @Html.DisplayNameFor(model => model.RequestDate)
                     </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Remarks)
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -278,6 +281,7 @@
                 { data: "region", name: "Region" },
                 { data: "status", name: "Status" },
                 { data: "requestDate", name: "RequestDate" },
+                { data: "remarks", name: "Remarks" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {

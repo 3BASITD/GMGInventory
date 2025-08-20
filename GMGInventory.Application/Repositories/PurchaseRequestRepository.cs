@@ -87,7 +87,8 @@ namespace GMGInventory.Application.Repositories
                                        ? firstitem.SalesOrder.Customer.Area.Region.Name
                                        : "",
                                 Status = request.Status.Code,
-                                RequestDateD = request.RequestDate
+                                RequestDateD = request.RequestDate,
+                                Remarks = request.Remarks
                             };
             return await requestVM.ToListAsync();
         }
@@ -109,7 +110,8 @@ namespace GMGInventory.Application.Repositories
                     s.Purpose,
                     s.Region,
                     s.Status,
-                    s.RequestDate
+                    s.RequestDate,
+                    s.Remarks
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
@@ -208,7 +210,7 @@ namespace GMGInventory.Application.Repositories
                             from soli in sg.DefaultIfEmpty()
                             let ii = context.ItemInventories
                                             .Where(s => s.ItemId == request.ItemId 
-                                                     && s.Warehouse.Code.ToLower().Contains("main"))
+                                                     && s.Warehouse.IsMain == true)
                                             .Sum(s => (int?)s.Quantity) ?? 0
                             let requests = context.PurchaseRequestLineItems
                                                   .Where(s => s.SalesOrderId == soli.SalesOrderId

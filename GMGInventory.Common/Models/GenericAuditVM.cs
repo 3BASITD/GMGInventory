@@ -24,10 +24,10 @@ namespace GMGInventory.Common.Models
         public DateTime DateCreatedD { get; set; }
 
         [Display(Name = "User Modified")]
-        public string UserModified { get; set; }
+        public string? UserModified { get; set; }
 
         [Display(Name = "Date Modifed")]
-        public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
+        public string? DateModified => DateModifiedD == null ? null : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
     }
 }

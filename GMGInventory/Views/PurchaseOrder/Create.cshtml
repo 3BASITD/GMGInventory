@@ -79,7 +79,7 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="order-currency-rate" class="form-label mb-0">Currency Rate</label>
-                        <input type="number" value="1" step="0.01" min="0.01" max="1999999" id="order-currency-rate" name="CurrencyRate" class="form-control form-control-sm" />
+                        <input type="number" value="1" step="0.0001" min="0.1" max="1999999" id="order-currency-rate" name="CurrencyRate" class="form-control form-control-sm" />
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6 order-mode-container">
@@ -407,14 +407,28 @@
                     name: "UnitCost",
                     className: "form-cell text-end"
                 },
-                { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
+                {
+                    data: "totalAmount",
+                    name: "TotalAmount",
+                    className: "form-cell",
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+                            return $("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + '&nbsp;' + data;
+                        }
+
+                        return data;
+                    }
+                }
             ],
             order: [[1, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 6);
-                columnDTTotalDecimal(api, 9);
+                if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
+                    columnDTTotalDecimal(api, 9, $("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + '&nbsp;');
+                else
+                    columnDTTotalDecimal(api, 9);
             }
         });
 
@@ -634,6 +648,8 @@
                     minimumResultsForSearch: -1
                 }).on("change", function () {
                     $("#order-currency-rate").val($("#order-currency").select2("data")[0]?.rate);
+                    if (itemDT && itemDT.rows().count() > 0)
+                        itemDT.rows().invalidate().draw();
                 });
             },
             complete: function (xhr, status) {
@@ -1002,7 +1018,10 @@
                         $("#add-unit").val(selected.unit);
                         $("#add-unit").data("Id", selected.unitId);
                         $("#add-unit-cost").val(0);
-                        $("#add-total-amount").val("0.00");
+                        if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
+                            $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' 0.00');
+                        else
+                            $("#add-total-amount").val("0.00");
                     }).off("select2:unselecting").on("select2:unselecting", function () {
                         $("#add-code").val("");
                         $("#add-part").val("");
@@ -1013,7 +1032,10 @@
                         $("#add-unit").val("");
                         $("#add-unit").data("Id", -1);
                         $("#add-unit-cost").val("0.00");
-                        $("#add-total-amount").val("0.00");
+                        if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
+                            $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' 0.00');
+                        else
+                            $("#add-total-amount").val("0.00");
                     });
                 },
                 complete: function (xhr, status) {
@@ -1028,7 +1050,10 @@
             var quantity = $("#add-quantity").val() || 0;
             var cost = $("#add-unit-cost").val() || 0;
 
-            $("#add-total-amount").val(FormatStringDecimal(quantity * cost));
+            if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
+                $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' ' + FormatStringDecimal(quantity * cost));
+            else
+                $("#add-total-amount").val(FormatStringDecimal(quantity * cost));
         }
 
         $("#add-quantity").on("change", function() {
@@ -1074,7 +1099,10 @@
             $("#add-unit2").val("").trigger("change");
             $("#add-unit").data("Id", "");
             $("#add-unit-cost").val("0.00");
-            $("#add-total-amount").val("0.00");
+            if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
+                $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' 0.00');
+            else
+                $("#add-total-amount").val("0.00");
         }
 
         // Validation for Add Item Modal
@@ -1130,7 +1158,8 @@
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
-                if (data.itemDescription == $("#add-name").select2("data")[0].text) {
+                if (data.purchaseRequestId == $("#add-name").select2("data")[0].text
+                 && data.itemDescription == $("#add-pr-number").select2("data")[0].id) {
                     rowIndexes.push(idx);
                 }
                 return false;
@@ -1138,6 +1167,11 @@
             if (rowIndexes.length > 0) {
                 toastr.warning($("#add-name").select2("data")[0].text + " has already been added", "Duplicate");
             } else {
+                var tempTotal = $("#add-total-amount").val();
+
+                if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
+                    tempTotal = $("#add-total-amount").val().replace($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim(), "").trim();
+
                 itemDT.row.add({
                     purchaseOrderId: 0, 
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
@@ -1156,8 +1190,8 @@
                     unitCode: $("#add-unit").val(),
                     unitCost: FormatStringDecimal($("#add-unit-cost").val()),
                     unitCostD: $("#add-unit-cost").val() || 0,
-                    totalAmount: FormatStringDecimal($("#add-total-amount").val()),
-                    totalAmountD: $("#add-total-amount").val() || 0
+                    totalAmount: FormatStringDecimal(tempTotal),
+                    totalAmountD: tempTotal || 0
                 }).draw();
 
                 toastr.success("Added " + $("#add-name").select2("data")[0].text + " on Purchase Order Item(s)", "Success");
@@ -1292,7 +1326,8 @@
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("AddJson")",
-                data: {
+                contentType: 'application/json',
+                data: JSON.stringify({
                     TypeId: $("#order-type").val(),
                     SupplierId: $("#order-supplier").val(),
                     TermsId: $("#order-terms").val(),
@@ -1310,7 +1345,7 @@
                     Discount3: $("#order-discount3").val(),
                     IsVATIncluded: $("#order-vat").prop("checked"),
                     Items: itemDT.rows().data().toArray()
-                },
+                }),
                 success: function (data, status, xhr) {
                     if (data.status == "Error") {
                         toastr.error(data.message, "Error");

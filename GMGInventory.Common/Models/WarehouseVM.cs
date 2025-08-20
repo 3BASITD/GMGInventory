@@ -1,47 +1,30 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GMGInventory.Common.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
 {
     public class WarehouseVM
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
-        [Required]
-        [MaxLength(10)]
         [Display(Name = "Code")]
         public string Code { get; set; }
 
-        [Required]
-        [MaxLength(100)]
         [Display(Name = "Name")]
-        public string Name { get; set; }
+        public string Name { get; set; } 
 
-        [Required]
-        [MaxLength(250)]
-        [Display(Name = "Address Line #1")]
-        public string AddressLine1 { get; set; }
+        [Display(Name = "Address")]
+        public string? Address { get; set; }
 
-        [MaxLength(250)]
-        [Display(Name = "Address Line #2")]
-        public string? AddressLine2 { get; set; }
-
-        [Required]
-        [MaxLength(100)]
         [Display(Name = "Contact Person")]
-        public string ContactPerson { get; set; }
+        public string? ContactPerson { get; set; }
 
-        [Required]
-        [MaxLength(50)]
         [Display(Name = "Contact Number")]
-        public string ContactNumber { get; set; }
-    }
+        public string? ContactNumber { get; set; }
 
-    public class WarehouseFormVM : WarehouseVM
-    {
-    }
+        [Display(Name = "Is Main")]
+        public bool IsMain { get; set; }
 
-    public class WarehouseViewVM : WarehouseVM
-    {
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
 
@@ -49,12 +32,14 @@ namespace GMGInventory.Common.Models
         public string UserCreated { get; set; }
 
         [Display(Name = "Date Created")]
-        public string DateCreated { get; set; }
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDate);
+        public DateTime DateCreatedD { get; set; }
 
         [Display(Name = "User Modified")]
-        public string UserModified { get; set; }
+        public string? UserModified { get; set; }
 
         [Display(Name = "Date Modified")]
-        public string DateModified { get; set; }
+        public string? DateModified => DateModifiedD == null ? null : DateModifiedD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? DateModifiedD { get; set; }
     }
 }

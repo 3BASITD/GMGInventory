@@ -9,7 +9,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class WarehouseController(IAccessRepository accessRepository
-                             , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
+                                   , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
@@ -23,123 +23,74 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Warehouse)).Convert();
 
-            var warehouses = await warehouseRepository.GetAllAsync();
-            return View(warehouses);
+            return View();
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Warehouse)).Convert();
 
-            var warehouse = await warehouseRepository.GetAsync(id);
-            if (warehouse == null)
-            {
-                return NotFound();
-            }
-            var itemFilter = new ItemFilterVM() { WarehouseId = warehouse.Id };
+            var warehouse = await warehouseRepository.GetWarehouse(Id);
+
+            if (warehouse == null) return NotFound();
+
             return View(warehouse);
         }
 
-        public ActionResult Create()
+        [HttpPost]
+        public async Task<JsonResult> GetWarehousesDT()
         {
-            return View();
+            var form = new DataTablesRequestForm(Request.Form);
+            return Json(await warehouseRepository.GetWarehousesDT(form));
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WarehouseFormVM warehouseVM)
+        public async Task<IActionResult> AddWarehouse(WarehouseVM warehouse)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            if (ModelState.IsValid)
-            {
-                if (await warehouseRepository.IsCodeExists(warehouseVM.Code))
-                {
-                    TempData["ErrorMessage"] = "Code already in use";
-                }
-                else
-                {
-                    await warehouseRepository.AddAsync(warehouseVM);
-                    TempData["SuccessMessage"] = "Warehouse successfully created";
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            return View(warehouseVM);
+            var responseModel = await warehouseRepository.AddAsync(warehouse);
+            return Json(responseModel);
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> UpdateWarehouse(WarehouseVM warehouse)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
-            var warehouse = await warehouseRepository.GetToEditAsync(id);
-            if (warehouse == null)
-            {
-                return NotFound();
-            }
-
-            return View(warehouse);
+            var responseModel = await warehouseRepository.UpdateAsync(warehouse);
+            return Json(responseModel);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(WarehouseFormVM warehouseVM)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Edit);
-            if (redirectResult != null) return redirectResult;
-
-            if (ModelState.IsValid)
-            {
-                await warehouseRepository.UpdateAsync(warehouseVM);
-                TempData["SuccessMessage"] = "Warehouse successfully updated";
-                return RedirectToAction(nameof(Index));
-            }
-            return View(warehouseVM);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteDeactivateWarehouse(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Delete);
             if (redirectResult != null) return redirectResult;
-
-            if (await warehouseRepository.IsIdExists(id) != true)
-            {
-                return NotFound();
-            }
-            if (await warehouseRepository.IsInUse(id))
-            {
-                await warehouseRepository.DeactivateAsync(id);
-                TempData["WarningMessage"] = "Warehouse has been deactivated";
-            }
-            else
-            {
-                await warehouseRepository.DeleteAsync(id);
-                TempData["SuccessMessage"] = "Warehouse successfully deleted";
-            }
-            return RedirectToAction(nameof(Index));
+            var responseModel = await warehouseRepository.DeleteDeactivateAsync(Id);
+            return Json(responseModel);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reactivate(int id)
+        public async Task<IActionResult> ReactivateWarehouse(int Id)
         {
             var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Add);
             var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Edit);
             if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
 
-            if (await warehouseRepository.IsIdExists(id) != true)
-            {
-                return NotFound();
-            }
-            await warehouseRepository.ReactivateAsync(id);
-            TempData["SuccessMessage"] = "Warehouse successfully reactivated";
-            return RedirectToAction(nameof(Index));
+            var responseModel = await warehouseRepository.ReactivateAsync(Id);
+
+            return Json(responseModel);
+        }
+
+        public async Task<IActionResult> SetMainWarehouse(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Warehouse, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = await warehouseRepository.SetMainAsync(Id);
+            return Json(responseModel);
         }
     }
 }

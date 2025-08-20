@@ -29,7 +29,7 @@ namespace GMGInventory.Application.Repositories
                                            .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
                                            .FirstOrDefault()
 
-                           where porder.PurchaseOrder.Status.Name.ToLower() == filter.Status.ToLower()
+                           where (filter.Status == null || filter.Status == "" || filter.Status.ToLower() == "all" || porder.PurchaseOrder.Status.Name.ToLower() == filter.Status.ToLower())
                            && filter.DateFrom <= (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date
                            && (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date <= filter.DateTo
                            && (filter.Item == null || pRequest.Item.Id == filter.Item || (filter.Item == 0 && pRequest.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
@@ -171,8 +171,8 @@ namespace GMGInventory.Application.Repositories
                                                 .Where(s => s.OrderItemId == poItems.Id)
                                                 .FirstOrDefault()
 
-                           where preturn.PurchaseReturn.Status.Name.ToLower() == filter.Status.ToLower()
-                            && filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
+                            where (filter.Status == null || filter.Status == "" || filter.Status.ToLower() == "all" || preturn.PurchaseReturn.Status.Name.ToLower() == filter.Status.ToLower())
+                             && filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
                             && (filter.Item == null || preceiving.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceiving.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                             && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
 
@@ -305,8 +305,8 @@ namespace GMGInventory.Application.Repositories
                              let poItems = context.PurchaseOrderNewLineItems
                                                 .Where(s => s.Id == preceive.OrderItemId)
                                                 .FirstOrDefault()
-                             where preceive.PurchaseReceiving.Status.Name.ToLower() == filter.Status.ToLower()
-                             && filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
+                             where (filter.Status == null || filter.Status == "" || filter.Status.ToLower() == "all" || preceive.PurchaseReceiving.Status.Name.ToLower() == filter.Status.ToLower())
+                               && filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
                             && (filter.Item == null || preceive.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceive.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
                             && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
                             select new PurchaseReceivingRVM

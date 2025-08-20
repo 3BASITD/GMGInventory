@@ -39,11 +39,11 @@ namespace GMGInventory.Common.Models
         public string RequestDate => RequestDateD.ToString(SystemFormat.StringDate);
         public string RequestDate3 => RequestDateD.ToString(SystemFormat.StringDate3);
         public DateTime RequestDateD { get; set; }
+        public string? Remarks { get; set; }
     }
 
     public class PurchaseRequestDetailedVM : PurchaseRequestVM
     {
-        public string? Remarks { get; set; }
 
         [Display(Name = "Approved By")]
         public string? ApprovedBy1 { get; set; }

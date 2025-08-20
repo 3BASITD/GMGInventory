@@ -1,12 +1,9 @@
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using GMGInventory.Application.Configurations;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Data;
-using GMGInventory.Helpers;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +15,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     .LogTo(Console.WriteLine));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.ValueCountLimit = int.MaxValue;
+});
 //builder.Services.AddHttpContextAccessor();
 
 //builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -84,6 +85,8 @@ builder.Services.AddScoped(typeof(IShippingRepository), typeof(ShippingRepositor
 builder.Services.AddScoped(typeof(IChequeStatusRepository), typeof(ChequeStatusRepository));
 builder.Services.AddScoped(typeof(IItemLocationRepository), typeof(ItemLocationRepository));
 
+builder.Services.AddScoped(typeof(ITrackerRepository), typeof(TrackerRepository));
+
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 
 builder.Services.AddControllersWithViews();
@@ -99,6 +102,22 @@ builder.Services.AddControllersWithViews();
 //{
 //    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
 //    options.HttpsPort = 5001;
+//});
+
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//    serverOptions.Limits.MaxRequestBodySize = 524288000; // 500MB
+//});
+
+//builder.Services.Configure<FormOptions>(options =>
+//{
+//    options.ValueCountLimit = int.MaxValue;
+//    options.MultipartBodyLengthLimit = 524288000;
+//});
+
+//builder.Services.AddControllers().AddJsonOptions(options =>
+//{
+//    options.JsonSerializerOptions.MaxDepth = 1024;
 //});
 
 var app = builder.Build();

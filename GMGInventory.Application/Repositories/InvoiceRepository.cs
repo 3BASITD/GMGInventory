@@ -157,7 +157,6 @@ namespace GMGInventory.Application.Repositories
                                        + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
                                        + " " + invoice.SalesOrder.Agent.LastName,
                                  ControlNumber = invoice.ControlNumber,
-                                 CurrentUsersDraft = invoice.Status.Name.ToLower() == "invoice draft" && invoice.UserCreated == currentUserId,
                                  CustomerAddress = invoice.SalesOrder
                                                           .Customer
                                                           .ShippingAddresses
@@ -282,7 +281,6 @@ namespace GMGInventory.Application.Repositories
                            select new InvoiceVM
                            {
                                BIRInvoiceNumber = inv.ControlNumber,
-                               CurrentUsersDraft = inv.Status.Name.ToLower() == "invoice draft" && inv.UserCreated == currentUserId,
                                Customer = inv.SalesOrder.Customer.Name,
                                Id = inv.Id,
                                InvoiceDateD = inv.InvoiceDate,
@@ -294,8 +292,10 @@ namespace GMGInventory.Application.Repositories
                                TotalAmountD = (from invli in inv.InvoiceLineItems
                                                join order in context.SalesOrders on invli.Invoice.SalesOrderId equals order.Id
                                                join orderli in context.SalesOrderLineItems on order.Id equals orderli.SalesOrderId
+                                               let discount1 = (100 - orderli.Discount1) / 100
+                                               let discount2 = (100 - orderli.Discount2) / 100
                                                where invli.ItemId == orderli.ItemId
-                                               select (invli.Quantity * invli.UnitPrice * (100 - orderli.Discount1) / 100) * (100 - orderli.Discount2) / 100).Sum(),
+                                               select invli.Quantity * invli.UnitPrice * discount1 * discount2).Sum(),
 
                            };
 
@@ -394,6 +394,8 @@ namespace GMGInventory.Application.Repositories
                              ItemId = item.Id,
                              ItemCode = item.Code,
                              ItemName = item.Name,
+                             OldItemCode = item.OldCode == null || item.OldCode == "" ? "-" : item.OldCode + "",
+                             PartNumber = item.PartNumber == null || item.PartNumber == "" ? "-" : item.PartNumber + "",
                              NetPriceD = invoicel.UnitPrice,
                              QuantityD = invoicel.Quantity,
                              QuantityOfPack = pack,

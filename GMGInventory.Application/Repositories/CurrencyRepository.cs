@@ -44,6 +44,7 @@ namespace GMGInventory.Application.Repositories
                     Id = s.Id.ToString(),
                     Text = s.Name,
                     Rate = s.Rate,
+                    Abbreviation = s.Code,
                     Selected = IncludeId != null && IncludeId == s.Id
                 })
                 .OrderBy(s => s.Text)

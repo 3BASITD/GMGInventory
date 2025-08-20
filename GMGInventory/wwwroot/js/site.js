@@ -419,12 +419,12 @@ function columnDTTotalInteger(api, column) {
     $(api.column(column).footer()).html(FormatStringInteger(total));
 }
 
-function columnDTTotalDecimal(api, column) {
+function columnDTTotalDecimal(api, column, prefix) {
     var total = api.column(column).data().reduce(function (a, b) {
         return cellDTNumberValue(a) + cellDTNumberValue(b);
     }, 0);
 
-    $(api.column(column).footer()).html(FormatStringDecimal(total));
+    $(api.column(column).footer()).html((prefix || "") + FormatStringDecimal(total));
 }
 
 function formatDateEn(date) {
@@ -460,4 +460,25 @@ function checkScroll() {
     //    $(".main-header").removeClass("nav-sticked");
     //}
     //}
+}
+
+function getDTParams(table) {
+    var info = table.page.info();
+    var order = table.order();
+    var search = table.search();
+    var pageSize = table.page.len();
+    var skip = info.start;
+
+    var sortColumnIndex = order[0][0];
+    var sortDirection = order[0][1];
+
+    var sortColumnName = table.settings()[0].aoColumns[sortColumnIndex].name;
+
+    return {
+        SortColumn: sortColumnName,
+        SortColumnDirection: sortDirection,
+        SearchValue: search,
+        PageSize: pageSize,
+        PageSkip: skip
+    };
 }

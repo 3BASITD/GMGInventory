@@ -290,10 +290,16 @@ namespace GMGInventory.Application.Repositories
                 poNumber = string.Format("{0:PO00000000}", previousOrders);
             }
 
-            decimal totalPurchaseAmount = form.Items.Sum(s => (decimal)s.Quantity * ComputeDiscount(ComputeDiscount(ComputeDiscount(s.UnitPrice, s.Discount1), s.Discount2), s.Discount3));
+            decimal totalPurchaseAmount = form.Items.Sum(s =>
+            {
+                decimal discountedPrice = s.UnitPrice
+                    * (100 - s.Discount1) / 100m
+                    * (100 - s.Discount2) / 100m
+                    * (100 - s.Discount3) / 100m;
 
-            //decimal totalPurchaseAmount = form.Items.Sum(s => (decimal)s.Quantity * ((s.UnitPrice * (100 - s.Discount1 - s.Discount2 - s.Discount3)) / 100m));
-            
+                return s.Quantity * discountedPrice;
+            });
+
             if (orderVM == null)
             {
                 orderVM = new PurchaseOrder
@@ -343,50 +349,6 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var citemsVM = context.PurchaseOrderLineItems.Where(s => s.PurchaseOrderId == PurchaseOrderId);
-            /*
-            // add item
-            // check items not in db
-            var items = citemsVM.Select(s => s.ItemId);
-            // add excluding items already available
-            var itemsVM = Items.Where(s => items.Contains(s.Item) == false)
-                               .Select(s => new PurchaseOrderLineItem
-                               {
-                                   Discount1 = s.Discount1,
-                                   Discount2 = s.Discount2,
-                                   Discount3 = s.Discount3,
-                                   ItemId = s.Item,
-                                   PurchaseOrderId = PurchaseOrderId,
-                                   Quantity = s.Quantity,
-                                   UnitPrice = s.UnitPrice
-                               });
-            context.PurchaseOrderLineItems.AddRange(itemsVM);
-
-            // update item
-            // get items available in db
-            var ditems = Items.Where(s => items.Contains(s.Item));
-            foreach (var di in ditems)
-            {
-                // update all available in db
-                var dbitem = await citemsVM.Where(s => s.ItemId == di.Item).FirstAsync();
-                dbitem.Discount1 = di.Discount1;
-                dbitem.Discount2 = di.Discount2;
-                dbitem.Discount3 = di.Discount3;
-                dbitem.Quantity = di.Quantity;
-                dbitem.UnitPrice = di.UnitPrice;
-
-                context.PurchaseOrderLineItems.Update(dbitem);
-            }
-
-            // delete item
-            // get items not in form
-            var fitems = Items.Select(s => s.Item);
-            var ritems = citemsVM.Where(s => fitems.Contains(s.ItemId) == false);
-            // remove unavailable items
-            context.PurchaseOrderLineItems.RemoveRange(ritems);
-
-            await context.SaveChangesAsync(currentUserId);
-            */
-
             context.PurchaseOrderLineItems.RemoveRange(citemsVM);
             
             await context.SaveChangesAsync(currentUserId);
@@ -453,10 +415,6 @@ namespace GMGInventory.Application.Repositories
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 foreach (var item in purchaseOrder.PurchaseOrderLineItems)
                 {
-                    //var warehouseId = await context.Warehouses
-                    //                               .Where(s => s.Code == "MAIN")
-                    //                               .Select(s => s.Id)
-                    //                               .FirstAsync();
                     var inventory = await context.ItemInventories
                                                  .Where(s => s.ItemId == item.ItemId && s.WarehouseId == purchaseOrder.DestinationId)
                                                  .FirstOrDefaultAsync();

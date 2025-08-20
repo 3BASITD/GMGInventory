@@ -442,12 +442,12 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-        var ro_status = @Json.Serialize(Model?.Status);
+        var ro_data = @Json.Serialize(Model);
 
         var itemDT = $('.table-item').DataTable({
             ajax: {
                 url: "@Url.Action("GetItemListJson")",
-                data: { purchaseReturnId: @Model?.Id },
+                data: { purchaseReturnId: ro_data.id },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -460,7 +460,7 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        if (ro_status.toLowerCase() == "draft") {
+                        if (ro_data.status.toLowerCase() == "draft") {
                             return '<input type="checkbox" class="to-return" ' + (data.toReturn == true ? 'checked="checked"' : '') +
                                 (data.toReturnQuantityD == 0 ? 'disabled' : '') + ' />';
                         } else {
@@ -485,7 +485,7 @@
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (ro_status.toLowerCase() == "draft" && data.toReturn == true) {
+                        if (ro_data.status.toLowerCase() == "draft" && data.toReturn == true) {
                             if (data.quantityD > data.toReturnQuantityD) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.toReturnQuantity + ' received quantity.</label>';
                             } else if (data.quantityD == 0) {
@@ -502,7 +502,18 @@
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                 { data: "unitCost", name: "UnitCost", className: "form-cell" },
-                { data: "totalAmount", name: "TotalAmount", className: "form-cell" }
+                { 
+                    data: "totalAmount",
+                    name: "TotalAmount", 
+                    className: "form-cell" ,
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+                            return ro_data.currencyCode.split("/")[0].trim() + '&nbsp;' + data;
+                        }
+
+                        return data;
+                    }
+                }
             ],
             order: [[1, "asc"]],
             createdRow: function (row, data, dataIndex) {
@@ -514,7 +525,7 @@
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 5);
-                columnDTTotalDecimal(api, 8);
+                columnDTTotalDecimal(api, 8, ro_data.currencyCode.split("/")[0].trim() + '&nbsp;');
             }
         });
 
@@ -617,7 +628,7 @@
                         type: "POST",
                         url: "@Url.Action("SaveItemsJson")",
                         data: {
-                            Id: @Model?.Id,
+                            Id: ro_data.id,
                             status: status,
                             items: GetItemsToReturn()
                         },
@@ -646,7 +657,7 @@
                         $.ajax({
                             url: "@Url.Action("ApproveJson")",
                             type: "POST",
-                            data: { Id: @Model!.Id },
+                            data: { Id: ro_data.id },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
                                     window.location.reload();
@@ -679,7 +690,7 @@
                             url: "@Url.Action("DisapproveJson")",
                             type: "POST",
                             data: {
-                                Id: @Model!.Id,
+                                Id: ro_data.id,
                                 reason: confirm
                             },
                             success: function (data, status, xhr) {
@@ -703,7 +714,7 @@
                     fontawesome: "fas fa-print"
                 });
                 setTimeout(function () {
-                    let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id + '?Company=' + print_company, '');
+                    let win = window.open('@Url.Action("PrintDetails")/' + ro_data.id + '?Company=' + print_company, '');
                     var wintimer = setInterval(function () {
                         if (win.closed) {
                             clearInterval(wintimer);

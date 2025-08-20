@@ -174,25 +174,26 @@
                 <td colspan="2">@Model.PurchaseRequestNumber</td>
                 <td rowspan="4"></td>
                 @{
+                    var currency = Model.Currency.Split('/')[0].Trim();
                     var totalD = items.Sum(s => s.TotalAmountD);
-                    var total = Model.Currency + " " + string.Format("{0:#,##0.00}", totalD);
+                    var total = currency + " " + string.Format("{0:#,##0.00}", totalD);
 
                     var discounted1D = totalD * Model.Discount1D / 100;
-                    var discounted1 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted1D);
+                    var discounted1 = currency + " " + string.Format("{0:#,##0.00}", discounted1D);
 
                     totalD = totalD - discounted1D;
 
                     var discounted2D = totalD * Model.Discount2D / 100;
-                    var discounted2 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted2D);
+                    var discounted2 = currency + " " + string.Format("{0:#,##0.00}", discounted2D);
                     totalD = totalD - discounted2D;
 
                     var discounted3D = totalD * Model.Discount3D / 100;
-                    var discounted3 = Model.Currency + " " + string.Format("{0:#,##0.00}", discounted3D);
+                    var discounted3 = currency + " " + string.Format("{0:#,##0.00}", discounted3D);
                     totalD = totalD - discounted3D;
 
                     var vatD = totalD * (decimal)(0.12);
                     var vat = string.Format("{0:#,##0.00}", vatD);
-                    var total2 = Model.Currency + " " + string.Format("{0:#,##0.00}", totalD);
+                    var total2 = currency + " " + string.Format("{0:#,##0.00}", totalD);
                 }
                 <td rowspan="4" style="vertical-align: top;">
                     <span class="sub-col w-50pc d-ib">TOTAL PURCHASE</span>

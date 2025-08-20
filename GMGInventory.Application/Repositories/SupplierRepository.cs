@@ -175,8 +175,8 @@ namespace GMGInventory.Application.Repositories
                                 IsActive = supplier.IsActive,
                                 DateCreatedD = supplier.DateCreated,
                                 DateModifiedD = supplier.DateModified,
-                                UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                                UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
+                                UserCreated = userc.FirstName + " " + userc.LastName,
+                                UserModified = userm == null ? null : (userm.FirstName + " " + userm.LastName)
                             };
             return await suppliers.ToListAsync();
         }
@@ -191,12 +191,12 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Name.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateModified.ToString().Contains(form.SearchValue));
+                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue)
+                                    || x.Name.ToLower().Contains(form.SearchValue)
+                                    || x.UserCreated.ToLower().Contains(form.SearchValue)
+                                    || x.DateCreated.ToLower().Contains(form.SearchValue)
+                                    || (x.UserModified + "").ToLower().Contains(form.SearchValue)
+                                    || (x.DateModified + "").ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -287,21 +287,21 @@ namespace GMGInventory.Application.Repositories
                                   Id = supplier.Id,
                                   Code = supplier.Code,
                                   Name = supplier.Name,
-                                  TIN = string.IsNullOrWhiteSpace(supplier.TIN) ? "N/A" : supplier.TIN,
-                                  AddressLine1 = string.IsNullOrWhiteSpace(supplier.AddressLine1) ? "N/A" : supplier.AddressLine1,
-                                  AddressLine2 = string.IsNullOrWhiteSpace(supplier.AddressLine2) ? "N/A" : supplier.AddressLine2,
-                                  OfficeTelNo = string.IsNullOrWhiteSpace(supplier.OfficeTelNo) ? "N/A" : supplier.OfficeTelNo,
-                                  ContactPerson = string.IsNullOrWhiteSpace(supplier.ContactPerson) ? "N/A" : supplier.ContactPerson,
-                                  MobileNumber = string.IsNullOrWhiteSpace(supplier.MobileNumber) ? "N/A" : supplier.MobileNumber,
-                                  RegionName = supplier.Region == null ? "N/A" : supplier.Region.Name,
-                                  Term = supplier.Term == null ? "N/A" : supplier.Term.Name,
-                                  CurrencyName = supplier.Currency == null ? "N/A" : supplier.Currency.Name,
-                                  BusinessStyleName = supplier.BusinessStyle == null ? "N/A" : supplier.BusinessStyle.Name,
-                                  VAT = string.IsNullOrWhiteSpace(supplier.VAT) ? "N/A" : supplier.VAT,
+                                  TIN = supplier.TIN,
+                                  AddressLine1 = supplier.AddressLine1,
+                                  AddressLine2 = supplier.AddressLine2,
+                                  OfficeTelNo = supplier.OfficeTelNo,
+                                  ContactPerson = supplier.ContactPerson,
+                                  MobileNumber = supplier.MobileNumber,
+                                  RegionName = supplier.Region.Name,
+                                  Term = supplier.Term.Name,
+                                  CurrencyName =  supplier.Currency.Name,
+                                  BusinessStyleName =  supplier.BusinessStyle.Name,
+                                  VAT =  supplier.VAT,
                                   IsActive = supplier.IsActive,
-                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                  UserCreated = userc.FirstName + " " + userc.LastName,
                                   DateCreatedD = supplier.DateCreated,
-                                  UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                                  UserModified = userm == null ? null : (userm.FirstName + " " + userm.LastName),
                                   DateModifiedD = supplier.DateModified,
                               }).FirstOrDefault();
             return supplierVM;
@@ -370,17 +370,17 @@ namespace GMGInventory.Application.Repositories
             {
                 Code = supplierVM.Code,
                 Name = supplierVM.Name,
-                TIN = supplierVM.TIN + "",
+                TIN = supplierVM.TIN,
                 AddressLine1 = supplierVM.AddressLine1,
                 AddressLine2 = supplierVM.AddressLine2,
-                OfficeTelNo = supplierVM.OfficeTelNo + "",
-                ContactPerson = supplierVM.ContactPerson + "",
-                MobileNumber = supplierVM.MobileNumber + "",
+                OfficeTelNo = supplierVM.OfficeTelNo,
+                ContactPerson = supplierVM.ContactPerson,
+                MobileNumber = supplierVM.MobileNumber,
                 RegionId = supplierVM.RegionId,
                 TermId = supplierVM.TermId,
                 CurrencyId = supplierVM.CurrencyId,
                 BusinessStyleId = supplierVM.BusinessStyleId,
-                VAT = supplierVM.VAT + "",
+                VAT = supplierVM.VAT,
                 IsActive = true
             };
             await context.Suppliers.AddAsync(supplier);
@@ -400,17 +400,17 @@ namespace GMGInventory.Application.Repositories
             supplier.Id = supplierVM.Id;
             supplier.Code = supplierVM.Code;
             supplier.Name = supplierVM.Name;
-            supplier.TIN = supplierVM.TIN + "";
+            supplier.TIN = supplierVM.TIN;
             supplier.AddressLine1 = supplierVM.AddressLine1;
             supplier.AddressLine2 = supplierVM.AddressLine2;
-            supplier.OfficeTelNo = supplierVM.OfficeTelNo + "";
-            supplier.ContactPerson = supplierVM.ContactPerson + "";
-            supplier.MobileNumber = supplierVM.MobileNumber + "";
+            supplier.OfficeTelNo = supplierVM.OfficeTelNo;
+            supplier.ContactPerson = supplierVM.ContactPerson;
+            supplier.MobileNumber = supplierVM.MobileNumber;
             supplier.RegionId = supplierVM.RegionId;
             supplier.TermId = supplierVM.TermId;
             supplier.CurrencyId = supplierVM.CurrencyId;
             supplier.BusinessStyleId = supplierVM.BusinessStyleId;
-            supplier.VAT = supplierVM.VAT + "";
+            supplier.VAT = supplierVM.VAT;
             supplier.IsActive = true;
 
             context.Suppliers.Update(supplier);
@@ -419,27 +419,24 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<SupplierDetailPurchaseVM>> GetSupplierPurchaseAsync(int id)
         {
-            var prVM = from pr in context.PurchaseReceivings.Include(s => s.PurchaseReceivingLineItems)
-
-                       join purchaseItem in context.PurchaseOrderNewLineItems on pr.PurchaseOrderId equals purchaseItem.PurchaseOrderId
-                       join purchaseRequest in context.PurchaseRequestLineItems on purchaseItem.RequestItemId equals purchaseRequest.Id
-
-                       join user in userManager.Users on pr.PurchaseOrder.UserCreated equals user.Id
-                       where pr.PurchaseOrder.SupplierId == id && pr.Status.Name.ToLower() == "approved"
-                       select new SupplierDetailPurchaseVM
-                       {
-                           ItemId = purchaseRequest.ItemId,
-                           Item = purchaseRequest.Item.Code,
-                           ItemDescription = purchaseRequest.ItemDescription,
-                           ConversionFactorD = pr.PurchaseOrder.Supplier.Currency.Rate,
-                           Currency = pr.PurchaseOrder.Supplier.Currency.Code,
-                           QuantityD = purchaseItem.Quantity,
-                           ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
-                           ReplenishDateD = pr.ReceiveDate,
-                           UnitCostD = purchaseItem.UnitCost, // tinanggal na sa db
-                           UnitPriceD = purchaseItem.UnitCost
-                       };
-            return await prVM.ToListAsync();
+            var purchasesVM = from poli in context.PurchaseOrderNewLineItems
+                              join prli in context.PurchaseRequestLineItems on poli.RequestItemId equals prli.Id
+                              join user in userManager.Users on poli.PurchaseOrder.UserCreated equals user.Id
+                              where poli.PurchaseOrder.Supplier.Id == id
+                              && poli.PurchaseOrder.Status.Name.ToLower() == "approved"
+                              select new SupplierDetailPurchaseVM
+                              {
+                                  ItemId = prli.Item.Id,
+                                  Item = prli.Item.Code,
+                                  ItemDescription = prli.ItemDescription,
+                                  ConversionFactorD = poli.PurchaseOrder.CurrencyRate,
+                                  Currency = poli.PurchaseOrder.Currency.Code,
+                                  QuantityD = poli.Quantity,
+                                  ReplenishBy = user.FirstName + " " + user.LastName,
+                                  ReplenishDateD = poli.PurchaseOrder.DateCreated,
+                                  UnitCostD = poli.UnitCost * (100 - poli.PurchaseOrder.Discount1) / 100 * (100 - poli.PurchaseOrder.Discount2) / 100,
+                              };
+            return await purchasesVM.ToListAsync();
         }
 
         public async Task<ForDataTables<SupplierDetailPurchaseVM>> GetSupplierPurchaseDTAsync(DataTablesRequestForm form, int id)
@@ -452,17 +449,16 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.ConversionFactorD.ToString().Contains(form.SearchValue)
-                                    || x.ConvertedUnitPriceD.ToString().Contains(form.SearchValue)
-                                    || x.Currency.ToString().Contains(form.SearchValue)
-                                    || x.PurchaseNumber.ToLower().Contains(form.SearchValue.ToLower())
+                data = data.Where(x => x.Item.ToLower().Contains(form.SearchValue)
+                                    || x.ItemDescription.ToLower().Contains(form.SearchValue)
+                                    || x.ConversionFactorD.ToString().Contains(form.SearchValue)
+                                    || x.Currency.ToLower().Contains(form.SearchValue)
+                                    || x.TotalCostD.ToString().Contains(form.SearchValue)
+                                    || x.ConvertedTotalCostD.ToString().Contains(form.SearchValue)
                                     || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.ReplenishBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ReplenishDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UnitCostD.ToString().Contains(form.SearchValue)
-                                    || x.UnitPriceD.ToString().Contains(form.SearchValue)
-                                    || x.Warehouse.ToLower().Contains(form.SearchValue.ToLower()));
+                                    || x.ReplenishBy.ToLower().Contains(form.SearchValue)
+                                    || x.ReplenishDate.ToLower().Contains(form.SearchValue)
+                                    || x.UnitCostD.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -473,16 +469,15 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "ConversionFactor": data = data.OrderBy(s => s.ConversionFactorD); break;
-                        case "ConvertedUnitPrice": data = data.OrderBy(s => s.ConvertedUnitPriceD); break;
+                        case "Item": data = data.OrderBy(s => s.Item); break;
+                        case "ItemDescription": data = data.OrderBy(s => s.ItemDescription); break;
                         case "Currency": data = data.OrderBy(s => s.Currency); break;
-                        case "PurchaseNumber": data = data.OrderBy(s => s.PurchaseNumber); break;
                         case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
+                        case "TotalCost": data = data.OrderBy(s => s.TotalCostD); break;
+                        case "ConvertedTotalCost": data = data.OrderBy(s => s.ConvertedTotalCostD); break;
                         case "ReplenishBy": data = data.OrderBy(s => s.ReplenishBy); break;
                         case "ReplenishDate": data = data.OrderBy(s => s.ReplenishDateD); break;
-                        case "Status": data = data.OrderBy(s => s.Status); break;
                         case "UnitCost": data = data.OrderBy(s => s.UnitCostD); break;
-                        case "Warehouse": data = data.OrderBy(s => s.Warehouse); break;
                         default: break;
                     }
                 }
@@ -490,16 +485,15 @@ namespace GMGInventory.Application.Repositories
                 {
                     switch (form.SortColumn)
                     {
-                        case "ConversionFactor": data = data.OrderByDescending(s => s.ConversionFactorD); break;
-                        case "ConvertedUnitPrice": data = data.OrderByDescending(s => s.ConvertedUnitPriceD); break;
+                        case "Item": data = data.OrderByDescending(s => s.Item); break;
+                        case "ItemDescription": data = data.OrderByDescending(s => s.ItemDescription); break;
                         case "Currency": data = data.OrderByDescending(s => s.Currency); break;
-                        case "PurchaseNumber": data = data.OrderByDescending(s => s.PurchaseNumber); break;
                         case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
+                        case "TotalCost": data = data.OrderByDescending(s => s.TotalCostD); break;
+                        case "ConvertedTotalCost": data = data.OrderByDescending(s => s.ConvertedTotalCostD); break;
                         case "ReplenishBy": data = data.OrderByDescending(s => s.ReplenishBy); break;
                         case "ReplenishDate": data = data.OrderByDescending(s => s.ReplenishDateD); break;
-                        case "Status": data = data.OrderByDescending(s => s.Status); break;
                         case "UnitCost": data = data.OrderByDescending(s => s.UnitCostD); break;
-                        case "Warehouse": data = data.OrderByDescending(s => s.Warehouse); break;
                         default: break;
                     }
                 }

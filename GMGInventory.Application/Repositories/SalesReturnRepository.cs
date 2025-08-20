@@ -151,6 +151,7 @@ namespace GMGInventory.Application.Repositories
                              Discount2D = rturn.Discount2,
                              Id = rturn.Id,
                              ReasonOfReturn = rturn.ReasonOfReturn.Name,
+                             ItemId = rturn.Item.Id,
                              ItemCode = rturn.Item.Code,
                              ItemName = rturn.Item.Name,
                              Quantity = rturn.Quantity,
@@ -200,7 +201,7 @@ namespace GMGInventory.Application.Repositories
                     await context.SaveChangesAsync(currentUserId);
 
                     var warehouseId = await context.Warehouses
-                                                   .Where(s => s.Code.ToLower().Contains("main"))
+                                                   .Where(s => s.IsMain == true)
                                                    .Select(s => s.Id)
                                                    .FirstAsync();
 

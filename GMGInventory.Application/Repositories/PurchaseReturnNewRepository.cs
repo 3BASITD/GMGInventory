@@ -123,7 +123,8 @@ namespace GMGInventory.Application.Repositories
                                DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,
                                SINumber = retrn.PurchaseReceive.SalesInvoiceNumber,
                                Status = retrn.Status.Code,
-                               ReturnDateD = retrn.ReturnDate
+                               ReturnDateD = retrn.ReturnDate,
+                               Remarks = retrn.Remarks
                            };
             return await returnVM.ToListAsync();
         }
@@ -148,6 +149,7 @@ namespace GMGInventory.Application.Repositories
                     s.SINumber,
                     s.Status,
                     s.ReturnDate,
+                    s.Remarks
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
@@ -209,6 +211,7 @@ namespace GMGInventory.Application.Repositories
                               Supplier = retrn.PurchaseReceive.PurchaseOrder.Supplier.Name,
                               CurrencyId = retrn.PurchaseReceive.PurchaseOrder.Currency.Id,
                               Currency = retrn.PurchaseReceive.PurchaseOrder.Currency.Name,
+                              CurrencyCode = retrn.PurchaseReceive.PurchaseOrder.Currency.Code,
                               CurrencyRateD = retrn.PurchaseReceive.PurchaseOrder.CurrencyRate,
                               Warehouse = retrn.PurchaseReceive.Warehouse.Name,
                               DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,

@@ -902,11 +902,17 @@
             //}
             $("#tbr-invoice").select2().empty();
             $("#tbr-invoice").select2({
+                language: {
+                    noResults: function () {
+                        return 'No available sales return found for @Model.Customer';
+                    }
+                },
                 ajax: {
                     url: "@Url.Action("GetInvoiceTBR")",
                     dataType: 'json',
                     type: "POST",
                     delay: 500,
+                    placeholder: "Select sales return",
                     data: function (params) {
                         return {
                             search: params.term,
@@ -1303,6 +1309,6 @@
         });
         }
     </script>
-	}
+}
 
 

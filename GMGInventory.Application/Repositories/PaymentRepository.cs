@@ -47,8 +47,8 @@ namespace GMGInventory.Application.Repositories
                              let chkamt = (from chk in context.SOACRChecks
                                            where chk.CustomerPaymentId == cp.Id
                                            select (decimal?)chk.CheckAmount).Sum() ?? 0
-                             let payamt = cp.BackLoad + cp.CashAdvance + cp.Cash  + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + chkamt //+ cp.Discount
-                             let invamttotal = invamt - sliamt - tbramt - payamt 
+                             let payamt = cp.BackLoad + cp.CashAdvance + cp.Cash + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + chkamt //+ cp.Discount
+                             let invamttotal = invamt - sliamt - tbramt - payamt
                              where cp.Id == id
                              select new PaymentVM
                              {
@@ -56,7 +56,7 @@ namespace GMGInventory.Application.Repositories
                                  CRNumber = cp.CRNumber,
                                  SOANo = cp.SOACRId,
                                  CustomerName = cp.Customer.Name,
-                                 OverPaymentD =  cp.OverPayment, //0 > invamttotal ? invamttotal * -1 : 0,
+                                 OverPaymentD = cp.OverPayment, //0 > invamttotal ? invamttotal * -1 : 0,
                                  TaxD = cp.Tax,
                                  DiscountD = cp.Discount,
                                  TKTD = cp.TKTSolicitation,
@@ -84,8 +84,12 @@ namespace GMGInventory.Application.Repositories
                                    let invamt = (from ili in context.InvoiceLineItems
                                                  join inv in context.Invoices on ili.InvoiceId equals inv.Id
                                                  join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
+                                                 join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId }
+                                                                                      equals new { soli.SalesOrderId, soli.ItemId }
+                                                 let discount1 = (100 - soli.Discount1) / 100
+                                                 let discount2 = (100 - soli.Discount2) / 100
                                                  where sli.SOACRId == cp.SOACRId
-                                                 select (decimal?)ili.Quantity * ili.UnitPrice).Sum() ?? 0
+                                                 select (decimal?)ili.Quantity * ili.UnitPrice * discount1 * discount2).Sum() ?? 0
                                    //let invamt = (from paydetails in context.CustomerPaymentDetails
                                    //              where paydetails.CustomerPayment.Id == cp.Id
                                    //              select (decimal?)paydetails.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice)).FirstOrDefault() ?? 0
@@ -93,9 +97,10 @@ namespace GMGInventory.Application.Repositories
                                    let chkamt = (from chk in context.SOACRChecks
                                                  where chk.CustomerPaymentId == cp.Id
                                                  select (decimal?)chk.CheckAmount).Sum() ?? 0
-                                   let payamt = cp.BackLoad + cp.CashAdvance + cp.Cash  + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + chkamt // + cp.Discount
-                                   let invamttotal = invamt - tbramt 
-                                   let overpaytotal = invamt - tbramt + sliamt - payamt 
+                                   let payamt = cp.BackLoad + cp.CashAdvance + cp.Cash + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + chkamt + cp.Discount
+                                   let invamttotal = invamt - tbramt + sliamt
+                                   //let overpaytotal = invamt - tbramt + sliamt - payamt 
+                                   let overpaytotal = Math.Max(0, payamt - invamttotal) + cp.OverPayment
 
                                    join user in userManager.Users on cp.UserCreated equals user.Id
                                    select new PaymentVM
@@ -106,7 +111,8 @@ namespace GMGInventory.Application.Repositories
                                        CustomerName = cp.Customer.Name,
                                        TotalInvoiceAmountD = invamttotal,
                                        AmountPaidD = payamt,
-                                       OverPaymentD =  0 > overpaytotal + cp.Discount ? overpaytotal * -1 + cp.Discount: 0,
+                                       //OverPaymentD =  0 > overpaytotal + cp.Discount ? overpaytotal * -1 + cp.Discount: 0,
+                                       OverPaymentD = overpaytotal,
                                        TransactionDateD = cp.DateCreated,
                                        CreatedBy = user.FirstName + " " + user.LastName,
                                        Remarks = cp.Remarks
@@ -298,16 +304,22 @@ namespace GMGInventory.Application.Repositories
 
             var payment = from pay in context.CustomerPaymentDetails
                           let paid = context.CustomerPaymentDetails
-                                            .Where(s=>s.InvoiceId == pay.InvoiceId)
-                                            .Sum(s=>(decimal?) s.PaidAmount) ?? 0
+                                            .Where(s => s.InvoiceId == pay.InvoiceId)
+                                            .Sum(s => (decimal?)s.PaidAmount) ?? 0
+                          let inv = (from ili in pay.Invoice.InvoiceLineItems
+                                     join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId }
+                                                                          equals new { soli.SalesOrderId, soli.ItemId }
+                                     let discount1 = (100 - soli.Discount1) / 100
+                                     let discount2 = (100 - soli.Discount2) / 100
+                                     select (decimal?)ili.Quantity * ili.UnitPrice * discount1 * discount2).Sum() ?? 0
                           where pay.CustomerPayment.Id == id
                           select new PaymentVM
                           {
                               InvoiceNumber = pay.Invoice.InvoiceNumber,
                               InvoiceDateD = pay.Invoice.InvoiceDate,
                               InvoiceType = pay.Invoice.InvoiceType.Name,
-                              InvoiceAmountD = pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice),
-                              BalanceAmountD = Math.Max(0, pay.Invoice.InvoiceLineItems.Sum(a => a.Quantity * a.UnitPrice) - paid),
+                              InvoiceAmountD = inv,
+                              BalanceAmountD = Math.Max(0, inv - paid),
                               PackNo = pay.Invoice.Pack.Id,
                               SalesOrderNo = pay.Invoice.SalesOrder.SalesOrderNumber
                           };

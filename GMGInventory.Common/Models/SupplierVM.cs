@@ -20,22 +20,22 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
 
         [StringLength(12)]
-        public string TIN { get; set; }
+        public string? TIN { get; set; }
 
         [StringLength(150)]
         public string AddressLine1 { get; set; }
 
         [StringLength(150)]
-        public string AddressLine2 { get; set; }
+        public string? AddressLine2 { get; set; }
 
         [StringLength(100)]
-        public string OfficeTelNo { get; set; }
+        public string? OfficeTelNo { get; set; }
 
         [StringLength(100)]
-        public string ContactPerson { get; set; }
+        public string? ContactPerson { get; set; }
         [StringLength(100)]
         [Display(Name = "Mobile Number")]
-        public string MobileNumber { get; set; }        
+        public string? MobileNumber { get; set; }        
 
         [Required]
         [Display(Name = "Region")]
@@ -69,7 +69,7 @@ namespace GMGInventory.Common.Models
     public class SupplierViewVM : GenericAuditVM
     {
         [StringLength(12)]
-        public string TIN { get; set; }
+        public string? TIN { get; set; }
 
         [StringLength(150)]
         [Display(Name = "Address Line 1")]
@@ -78,19 +78,19 @@ namespace GMGInventory.Common.Models
 
         [StringLength(150)]
         [Display(Name = "Address Line 2")]
-        public string AddressLine2 { get; set; }
+        public string? AddressLine2 { get; set; }
 
         [StringLength(100)]
         [Display(Name = "Office Tel No")]
-        public string OfficeTelNo { get; set; }
+        public string? OfficeTelNo { get; set; }
 
         [StringLength(100)]
         [Display(Name = "Contact Person")]
-        public string ContactPerson { get; set; }
+        public string? ContactPerson { get; set; }
 
         [StringLength(100)]
         [Display(Name = "Mobile Number")]
-        public string MobileNumber { get; set; }
+        public string? MobileNumber { get; set; }
 
         [Required]
         [Display(Name = "Region")]
@@ -134,13 +134,13 @@ namespace GMGInventory.Common.Models
         public int QuantityD { get; set; }
         public string UnitCost => string.Format(SystemFormat.StringDecimalComma, UnitCostD);
         public decimal UnitCostD { get; set; }
-        public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
-        public decimal UnitPriceD { get; set; }
+        public string TotalCost => Currency.Split('/')[0].Trim() + " " + string.Format(SystemFormat.StringDecimalComma, TotalCostD);
+        public decimal TotalCostD => UnitCostD * QuantityD;
         public string Currency { get; set; }
         public string ConversionFactor => string.Format(SystemFormat.StringDecimalComma, ConversionFactorD);
         public decimal ConversionFactorD { get; set; }
-        public string ConvertedUnitPrice => string.Format(SystemFormat.StringDecimalComma, ConvertedUnitPriceD);
-        public decimal ConvertedUnitPriceD => Math.Round(UnitPriceD * ConversionFactorD, 2);
+        public string ConvertedTotalCost => "PH₱ " + string.Format(SystemFormat.StringDecimalComma, ConvertedTotalCostD);
+        public decimal ConvertedTotalCostD => Math.Round(TotalCostD / ConversionFactorD, 2);
         public string ReplenishDate => ReplenishDateD.ToString(SystemFormat.StringDateTime);
         public DateTime ReplenishDateD { get; set; }
         public string ReplenishBy { get; set; }

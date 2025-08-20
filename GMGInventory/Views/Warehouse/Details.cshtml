@@ -1,4 +1,4 @@
-﻿@model WarehouseViewVM
+﻿@model WarehouseVM
 
 @{
     ViewData["Title"] = "Warehouse Details";
@@ -13,15 +13,6 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (Model?.IsActive == true)
-            {
-                @if (userAccess.CanEdit)
-                {
-                    <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Edit" asp-route-id="@Model?.Id">
-                        <span class="fas fa-edit"></span> Edit Warehouse
-                    </a>
-                }
-            }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
@@ -35,7 +26,7 @@
                         @Html.DisplayNameFor(model => model.Code)
                     </span>
                     <b class="d-block">
-                        @Model?.Code
+                        @Model.Code
                     </b>
                 </p>
                 <p class="text-sm">
@@ -43,25 +34,54 @@
                         @Html.DisplayNameFor(model => model.Name)
                     </span>
                     <b class="d-block">
-                        @Model?.Name
+                        @Model.Name
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.IsActive)
+                    </span>
+                    <b class="d-block">
+                        @if (Model.IsActive == true)
+                        {
+                            <span class="fas fa-check text-success"></span>
+                        }
+                        else
+                        {
+                            <span class="fas fa-times text-danger"></span>
+                        }
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.IsMain)
+                    </span>
+                    <b class="d-block">
+                        @if (Model.IsMain == true)
+                        {
+                            <span class="fas fa-check text-success"></span>
+                        }
+                        else
+                        {
+                            <span class="fas fa-times text-danger"></span>
+                        }
                     </b>
                 </p>
             </div>
             <div class="col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AddressLine1)
+                        @Html.DisplayNameFor(model => model.Address)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.AddressLine1) ? "-" : Model?.AddressLine1)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.AddressLine2)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.AddressLine2) ? "-" : Model?.AddressLine2)
+                        @if (string.IsNullOrWhiteSpace(Model.Address))
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                        else
+                        {
+                            @Model.Address
+                        }
                     </b>
                 </p>
                 <p class="text-sm">
@@ -69,7 +89,14 @@
                         @Html.DisplayNameFor(model => model.ContactPerson)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "-" : Model?.ContactPerson)
+                        @if (string.IsNullOrWhiteSpace(Model.ContactPerson))
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                        else
+                        {
+                            @Model.ContactPerson
+                        }
                     </b>
                 </p>
                 <p class="text-sm">
@@ -77,7 +104,14 @@
                         @Html.DisplayNameFor(model => model.ContactNumber)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.ContactNumber) ? "-" : Model?.ContactNumber)
+                        @if (string.IsNullOrWhiteSpace(Model.ContactNumber))
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                        else
+                        {
+                            @Model.ContactNumber
+                        }
                     </b>
                 </p>
             </div>
@@ -87,7 +121,7 @@
                         @Html.DisplayNameFor(model => model.UserCreated)
                     </span>
                     <b class="d-block">
-                        @Model?.UserCreated
+                        @Model.UserCreated
                     </b>
                 </p>
                 <p class="text-sm">
@@ -95,7 +129,7 @@
                         @Html.DisplayNameFor(model => model.DateCreated)
                     </span>
                     <b class="d-block">
-                        @Model?.DateCreated
+                        @Model.DateCreated
                     </b>
                 </p>
                 <p class="text-sm">
@@ -103,7 +137,14 @@
                         @Html.DisplayNameFor(model => model.UserModified)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.UserModified) ? "-" : Model?.UserModified)
+                        @if (string.IsNullOrWhiteSpace(Model.UserModified))
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                        else
+                        {
+                            @Model.UserModified
+                        }
                     </b>
                 </p>
                 <p class="text-sm">
@@ -111,7 +152,14 @@
                         @Html.DisplayNameFor(model => model.DateModified)
                     </span>
                     <b class="d-block">
-                        @(Model?.DateModified ?? "-")
+                        @if (string.IsNullOrWhiteSpace(Model.DateModified))
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                        else
+                        {
+                            @Model.DateModified
+                        }
                     </b>
                 </p>
             </div>
@@ -177,6 +225,8 @@
 
 @section Scripts {
     <script>
+        var warehouse_data = @Html.Raw(Json.Serialize(Model));
+
         $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             var selectedTab = e.currentTarget.dataset.bsTarget;
             if (selectedTab == "#nav-items") itemDT.ajax.reload();
@@ -190,7 +240,7 @@
                 url: "@Url.Action("GetListJson", "Item")",
                 type: "POST",
                 data: function (data) {
-                    data.WarehouseId = @Model?.Id;
+                    data.WarehouseId = warehouse_data.id
                 },
             },
             serverSide: true,
@@ -219,8 +269,8 @@
             ajax: {
                 url: "@Url.Action("GetWarehouseTransferJson", "Transfer")",
                 data: function (data) {
-                    data.warehouseId = @Model?.Id
-                        },
+                    data.warehouseId = warehouse_data.id
+                },
                 type: "POST",
             },
             serverSide: true,

@@ -25,7 +25,6 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Status")]
         public string Status { get; set; }
-        public bool CurrentUsersDraft { get; set; }
     }
 
     public class PackDetailsVM
@@ -110,7 +109,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Extended Price")]
         public string ExtendedPrice => string.Format(SystemFormat.StringDecimalComma, ExtendedPriceD);
-        public decimal ExtendedPriceD => Math.Round((Quantity * SellingPriceD * (100 - Discount1D) / 100) * (100 - Discount2D) / 100, 2);
+        public decimal ExtendedPriceD => Math.Round(Quantity * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
 
         public int SalesOrderLineItemId { get; set; }
     }

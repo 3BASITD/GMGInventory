@@ -533,7 +533,7 @@ namespace GMGInventory.Controllers
                 //new DataColumn(chelper.DisplayName<DailySalesRVM>("CommissionRate")),
                 new DataColumn(chelper.DisplayName<DailySalesRVM>("Amount"))
             });
-            var sales = await reportSalesRepository.GetDailySales(filter);
+            var sales = await reportSalesRepository.FilteredDailySales(filter);
             foreach (var sale in sales)
             {
                 dt.Rows.Add(sale.InvoiceDate,
@@ -770,7 +770,7 @@ namespace GMGInventory.Controllers
         #region Sales Return
         public async Task<IActionResult> SalesReturn()
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturnListingReport, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             return View();
@@ -778,7 +778,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> PrintSalesReturn(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.Print);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturnListingReport, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
 
             return View(await reportSalesRepository.PrintSalesReturn(filter));
@@ -787,7 +787,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> GetSalesReturnDT(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturnListingReport, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
@@ -796,7 +796,7 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DownloadSalesReturn(ListFilterSalesModel filter)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.UploadDownload);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturnListingReport, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new DataTable("Sales Return Listing");

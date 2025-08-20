@@ -62,6 +62,9 @@ namespace GMGInventory.Common.Models
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
         public string OrderDate3 => OrderDateD.ToString(SystemFormat.StringDate3);
         public DateTime OrderDateD { get; set; }
+
+        [Display(Name = "Remarks")]
+        public string? Remarks { get; set; }
     }
 
     public class PurchaseOrderNewDetailedVM : PurchaseOrderNewVM
@@ -94,9 +97,6 @@ namespace GMGInventory.Common.Models
         public string DeliveryName { get; set; }
         public string DeliveryContactPerson { get; set; }
         public string DeliveryContactNumber { get; set; }
-
-        [Display(Name = "Remarks")]
-        public string? Remarks { get; set; }
 
         [Display(Name = "Canvas Summary Reference")]
         public string Reference { get; set; }
@@ -138,6 +138,7 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseOrderSaveVM
     {
+        public int Id { get; set; }
         public int TypeId { get; set; }
         public int SupplierId { get; set; }
         public int TermsId { get; set; }
@@ -156,7 +157,7 @@ namespace GMGInventory.Common.Models
 
         public bool IsVATIncluded { get; set; }
 
-        public PurchaseOrderLineItemVM Items { get; set; }
+        public IList<PurchaseOrderLineItemVM> Items { get; set; }
     }
 
     public class PurchaseOrderLineItemVM
@@ -209,5 +210,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Total Amount")]
         public string TotalAmount => string.Format("{0:#,##0.00}", TotalAmountD);
         public decimal TotalAmountD => QuantityD * UnitCostD;
+
+        public int CostUpdateCount { get; set; }
+        public int QuantityUpdateCount { get; set; }
     }
 }
