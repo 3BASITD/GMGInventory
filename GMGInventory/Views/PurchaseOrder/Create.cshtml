@@ -976,12 +976,12 @@
                                 return repo.text;
                             }
                             return $(
-                                "<strong>" +
-                                (repo.itemCode != null ? repo.itemCode + " - " : "") +
-                                repo.text + "</strong><br />" +
+                                "<strong>" + repo.text + "</strong><br />" +
                                 "<small>" +
                                 "Requested Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
-                                (repo.disabled ? ("Already Ordered On: " + repo.orderedOn) : ("Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit)) +
+                                (repo.disabled ? ("Already Ordered On: " + repo.orderedOn)
+                                               : ("Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit + "<br />" +
+                                                  "Latest Cost from Approved PO: " + (repo.previousCost || "none"))) +
                                 "</small>"
                             );
                         },
@@ -1017,7 +1017,7 @@
                         $(".add-quantity-warning").text("");
                         $("#add-unit").val(selected.unit);
                         $("#add-unit").data("Id", selected.unitId);
-                        $("#add-unit-cost").val(0);
+                        $("#add-unit-cost").val(selected.previousCostD);
                         if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
                             $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' 0.00');
                         else

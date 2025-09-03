@@ -1,7 +1,7 @@
-﻿@model IEnumerable<PurchaseOrderNewVM>
+﻿@model IEnumerable<TaskVM>
 
 @{
-    ViewData["Title"] = "Purchase Order";
+    ViewData["Title"] = "Task Tracker";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -11,287 +11,502 @@
         <div class="card-tools">
             @if (userAccess.CanAdd)
             {
-                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
-                    <span class="fas fa-plus"></span> New Purchase Order
-                </a>
-            }
-            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-                <span class="fas fa-filter"></span> Filter
-            </button>
-            @if (userAccess.CanUploadDownload)
-            {
-                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
-                    <span class="fas fa-download"></span> Download
+                <button class="btn btn-primary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <span class="emoji">➕</span>New Task
                 </button>
             }
+            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="emoji">🔍</span>Filter
+            </button>
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-head-fixed table-striped table-hover table-order">
+        <table class="table table-head-fixed table-striped table-hover table-tasks">
             <thead>
                 <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => model.DocumentNumber)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Type)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Supplier)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Term)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.DeliveryMode)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Status)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.OrderDate)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Remarks)
-                    </th>
+                    <th>Module</th>
+                    <th>Summary</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Assignee</th>
                     <th></th>
                 </tr>
             </thead>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
 
 <!-- Filter Modal -->
 <div class="modal fade" id="filterModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Filter Table</h5>
+                <h5 class="modal-title">Filter List</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12">
                         <div class="form-group">
-                            <label for="filter-type" class="form-label mb-0">Type</label>
-                            <select id="filter-type" style="width:100%">
-                                <option></option>
+                            <label for="filter-status" class="form-label mb-0">Status</label>
+                            <select id="filter-status" style="width:100%">
                             </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label for="filter-mode" class="form-label mb-0">Delivery Mode</label>
-                            <select id="filter-mode" style="width:100%"></select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label for="filter-supplier" class="form-label mb-0">Supplier</label>
-                            <select id="filter-supplier" style="width:100%"></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label for="filter-from" class="form-label mb-0">Order Date From</label>
-                            <input type="date" id="filter-from" class="form-control form-control-sm" />
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label for="filter-to" class="form-label mb-0">Order Date To</label>
-                            <input type="date" id="filter-to" class="form-control form-control-sm" />
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
-                            <label for="filter-status" class="form-label mb-0">Status</label>
-                            <select id="filter-status" style="width:100%"></select>
+                            <label for="filter-priority" class="form-label mb-0">Priority</label>
+                            <select id="filter-priority" style="width:100%">
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()">
+                    <span class="emoji">🎛️</span> Apply Filter
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+@if (userAccess.CanAdd)
+{
+    <div class="modal fade" id="addModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Task</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="add-module" class="form-label mb-0">Module</label>
+                                <input type="text" id="add-module" name="Module" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="add-summary" class="form-label mb-0">Summary</label>
+                                <input type="text" id="add-summary" name="Summary" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="add-priority" class="form-label mb-0">Priority</label>
+                                <select id="add-priority" name="Priority" style="width:100%">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label form="add-assignee" class="form-label mb-0">Assignee</label>
+                                <select id="add-assignee" name="Assignee" class="form-select form-select-sm" style="width:100%">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label form="add-function" class="form-label mb-0">Function</label>
+                                <textarea id="add-function" name="Function"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label form="add-behavior" class="form-label mb-0">Behavior</label>
+                                <textarea id="add-behavior" name="Behavior"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="add-access" class="form-label mb-0">Access Control</label>
+                                <input type="text" id="add-access" name="Access" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    @* <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="add-duedate" class="form-label mb-0">Due Date</label>
+                            <input type="date" id="add-duedate" name="DueDate" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div> *@
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="AddTask()">
+                        <span class="emoji">➕</span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (userAccess.CanEdit)
+{
+    <div class="modal fade" id="editModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update New Task</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-module" class="form-label mb-0">Module</label>
+                                <input type="text" id="edit-module" name="Module" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-summary" class="form-label mb-0">Summary</label>
+                                <input type="text" id="edit-summary" name="Summary" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="edit-priority" class="form-label mb-0">Priority</label>
+                                <select id="edit-priority" name="Priority" style="width:100%">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label form="edit-assignee" class="form-label mb-0">Assignee</label>
+                                <select id="edit-assignee" name="Assignee" class="form-select form-select-sm" style="width:100%">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label form="edit-function" class="form-label mb-0">Function</label>
+                                <textarea id="edit-function" name="Function"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label form="edit-behavior" class="form-label mb-0">Behavior</label>
+                                <textarea id="edit-behavior" name="Behavior"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label form="edit-access" class="form-label mb-0">Access Control</label>
+                                <input type="text" id="edit-access" name="Access" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    @* <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="edit-duedate" class="form-label mb-0">Due Date</label>
+                            <input type="date" id="edit-duedate" name="DueDate" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div> *@
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="EditTask()">
+                        <span class="emoji">✏️</span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
+        const statusOptions = [
+            { id: "OPEN", text: "OPEN", emoji: "🟢", desc: "Newly created issue, not yet started" },
+            { id: "DOING", text: "DOING", emoji: "🔄", desc: "Work is ongoing" },
+            { id: "TESTING", text: "TESTING", emoji: "🧪", desc: "Deployed for QA / UAT testing" },
+            { id: "INCOMPLETE", text: "INCOMPLETE", emoji: "❌", desc: "Failed due to incomplete or incorrect work" },
+            { id: "FOR PRODUCTION", text: "FOR PRODUCTION", emoji: "📦", desc: "Ready for production rollout" },
+            { id: "ON PRODUCTION", text: "ON PRODUCTION", emoji: "🚀", desc: "Successfully deployed to production" },
+            { id: "ACTIVE ISSUE", text: "ACTIVE ISSUE", emoji: "⚠️", desc: "Still has unresolved problems" }
+        ];
 
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
-
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetTypeOptions")",
-            beforeSend: function (xhr, error) {
-                showBatchLoader("type");
+        $('#filter-status').select2({
+            allowClear: true,
+            placeholder: 'ALL',
+            data: statusOptions,
+            minimumResultsForSearch: -1,
+            templateResult: function (repo) {
+                if (repo.loading) return repo.text;
+                return $(
+                    "<span class='me-1'>" + repo.emoji + "</span>" +
+                    "<strong>" + repo.text + "</strong><br />" +
+                    "<em class='fw-light ms-1'>" + repo.desc + "</em>"
+                );
             },
-            success: function (data, status, xhr) {
-                $("#filter-type").select2({
-                            minimumResultsForSearch: -1,
-                    allowClear: true,
-                    placeholder: "ALL",
-                    data: data
-                }).on("select2:select", function () {
-                    loadSupplier();
-                });
+            templateSelection: function (repo) {
+                if (!repo.id) return "ALL";
+                return $("<span class='emoji me-1'>" + repo.emoji + "</span><span>" + repo.text + "</span>");
             },
-            complete: function (xhr, status) {
-                $("#filter-type").val(null).trigger("change");
-                loadSupplier();
-                hideBatchLoader("type");
-            }
+            dropdownParent: $("#filterModal")
         });
 
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetDeliveryModeOptions")",
-            beforeSend: function (xhr, error) {
-                showBatchLoader("mode");
+        $('#filter-status').val(null).trigger('change');
+
+        const priorityOptions = [
+            { id: "LOW", text: "LOW", emoji: "🟩", desc: "Nice-to-have or non-urgent task, minimal impact if delayed" },
+            { id: "MEDIUM", text: "MEDIUM", emoji: "🟨", desc: "Important task, should be done soon but not blocking" },
+            { id: "HIGH", text: "HIGH", emoji: "🟧", desc: "Urgent and critical task, must be prioritized immediately" }
+        ];
+
+        $('#filter-priority').select2({
+            allowClear: true,
+            placeholder: 'ALL',
+            data: priorityOptions,
+            minimumResultsForSearch: -1,
+            templateResult: function (repo) {
+                if (repo.loading) return repo.text;
+                return $(
+                    "<span class='emoji me-1'>" + repo.emoji + "</span>" +
+                    "<strong>" + repo.text + "</strong><br />" +
+                    "<em class='fw-light ms-1'>" + repo.desc + "</em>"
+                );
             },
-            success: function (data, status, xhr) {
-                $("#filter-mode").select2({
-                    minimumResultsForSearch: -1,
-                    allowClear: true,
-                    placeholder: "ALL",
-                    data: data
-                });
+            templateSelection: function (repo) {
+                if (!repo.id) return "ALL";
+                return $("<span class='emoji me-1'>" + repo.emoji + "</span><span>" + repo.text + "</span>");
             },
-            complete: function (xhr, status) {
-                $("#filter-mode").val(null).trigger("change");
-                hideBatchLoader("mode");
-            }
+            dropdownParent: $("#filterModal")
         });
 
-        // Load supplier for select2
-        function loadSupplier() {
-            if ($.fn.select2 && $("#filter-supplier").hasClass("select2-hidden-accessible")) {
-                $("#filter-supplier").select2("destroy");
-                $("#filter-supplier").empty();
-            }
+        $('#filter-priority').val(null).trigger('change');
 
-            var isLocal = null, isForeign = null;
-            if ($.fn.select2 && $("#filter-type").hasClass("select2-hidden-accessible")) {
-                var typeText = $("#filter-type").select2("data")[0]?.text.toLowerCase() || "";
-                isLocal = typeText.includes("purchase order") == false ? null : typeText != "international purchase order";
-                isForeign = typeText.includes("purchase order") == false ? null : typeText != "local purchase order";
-            }
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Supplier")",
-                data: {
-                    IsLocal: isLocal,
-                    IsForeign: isForeign
+        if (user_access.canAdd) SetPriorityOption("#add-priority", "#addModal");
+        if (user_access.canEdit) SetPriorityOption("#edit-priority", "#editModal");
+        function SetPriorityOption(element, modal) {
+            $(element).select2({
+                data: priorityOptions,
+                minimumResultsForSearch: -1,
+                templateResult: function (repo) {
+                    if (repo.loading) return repo.text;
+                    return $(
+                        "<span class='emoji me-1'>" + repo.emoji + "</span>" +
+                        "<strong>" + repo.text + "</strong><br />" +
+                        "<em class='fw-light ms-1'>" + repo.desc + "</em>"
+                    );
                 },
-                beforeSend: function (xhr, error) {
-                    showBatchLoader("supplier");
+                templateSelection: function (repo) {
+                    return $("<span class='emoji me-1'>" + repo.emoji + "</span><span>" + repo.text + "</span>");
                 },
-                success: function (data, status, xhr) {
-                    $("#filter-supplier").select2({
-                        minimumInputLength: -1,
-                        allowClear: true,
-                        placeholder: "ALL",
-                        templateResult: function (repo) {
-                            if (repo.loading) {
-                                return repo.text;
-                            }
-                            return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
-                        },
-                        data: data
-                    });
-                },
-                complete: function (xhr, status) {
-                    $("#filter-supplier").val(null).trigger("change");
-                    hideBatchLoader("supplier");
-                }
+                dropdownParent: $(modal)
             });
         }
 
-        // Load status for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "PurchaseStatus")",
-            beforeSend: function (xhr, error) {
-                showBatchLoader("status");
-            },
-            success: function (data, status, xhr) {
-                $("#filter-status").select2({
-                    minimumResultsForSearch: -1,
-                    allowClear: true,
-                    placeholder: "ALL",
-                    data: data
-                });
-            },
-            complete: function (xhr, status) {
-                $("#filter-status").val(null).trigger("change");
-                hideBatchLoader("status");
+        if (user_access.canAdd) SetUserOption("#add-assignee", "#addModal");
+        if (user_access.canEdit) SetUserOption("#edit-assignee", "#editModal");
+        function SetUserOption(element, modal){
+            $(element).select2({
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $(
+                        "<strong>" + repo.text + "</strong> " +
+                        (repo.text != repo.name
+                            ? "<em class='fw-light'> - " + repo.name + "</em>"
+                            : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions2", "User")",
+                    dataType: 'json',
+                    type: "POST",
+                    delay: 500,
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 50) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                dropdownParent: $(modal)
+            });
+        }
+
+        const trackerEditor = (selector, entity, height, placeholder) => ({
+            placeholder: placeholder,
+            height: height,
+            toolbar: [
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['insert', user_access.canUploadDownload
+                         ? ['link', 'picture', 'table', 'hr']
+                         : ['link', 'table', 'hr']],
+                ['view', ['fullscreen', 'codeview']]
+            ],
+            callbacks: {
+                onImageUpload: function (files) {
+                    if(user_access.canUploadDownload)
+                        [...files].forEach(file => uploadImage(selector, file, entity));
+                },
+                onMediaDelete: function ($target) {
+                    $target.remove();
+                }
             }
         });
+        
+        if(user_access.canUploadDownload) {
+            function uploadImage(selector, file, entity) {
+                let data = new FormData();
+                data.append("File", file);
+                data.append("Entity", entity);
 
-        $(".btnFilter").on("click", function () {
-            orderDT.ajax.reload();
-            $("#filterModal").modal("hide");
+                $.ajax({
+                    url: '@Url.Action("UploadImage", "Tracker")',
+                    type: "POST",
+                    data: data,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        if (data.status === "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            $(selector).summernote('insertImage',
+                                '/images/DevTask/' + data.newRow,
+                                function ($image) {
+                                    $image.css('width', $image.width() * 0.25);
+                                }
+                            );
+                        }
+                    }
+                });
+            }
+        }
+
+        if (user_access.canAdd) 
+        {
+            $('#add-function').summernote(trackerEditor('#add-function', "Task", 300, ""));
+            $('#add-behavior').summernote(trackerEditor('#add-behavior', "Task", 300, ""));
+        }
+        if (user_access.canEdit)
+        {
+            $('#edit-function').summernote(trackerEditor('#edit-function', "Task", 300, ""));
+            $('#edit-behavior').summernote(trackerEditor('#edit-behavior', "Task", 300, ""));
+        }
+
+        $(document).on("click", ".clickable-image", function () {
+            var src = $(this).attr("src");
+            var modalHtml = `
+                <div class="modal fade" id="imageModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+                        <div class="modal-content bg-dark">
+                            <div class="modal-body d-flex justify-content-center align-items-center">
+                                <img src="${src}" class="img-fluid" />
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            $("body").append(modalHtml);
+            var modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            modal.show();
+
+            $('#imageModal').on('hidden.bs.modal', function () {
+                $(this).remove();
+            });
         });
 
-        var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("orderdt");
+        const priorityLookup = Object.fromEntries(priorityOptions.map(opt => [opt.id, opt]));
+        const statusLookup = Object.fromEntries(statusOptions.map(opt => [opt.id, opt]));
+
+        var appliedFilters;
+
+        var taskDT = $('.table-tasks').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
         }).DataTable({
-        //         stateSave: true,
-        //         stateSaveParams: function (settings, data) {
-        //     data.customFilters = {
-        //         selectVal: $('#yourSelect').val(),
-        //         inputVal: $('#yourInput').val()
-        //     };
-        // },
-        // stateLoadParams: function (settings, data) {
-        //     if (data.customFilters) {
-        //         $('#yourSelect').val(data.customFilters.selectVal).trigger('change');
-        //         $('#yourInput').val(data.customFilters.inputVal);
-        //     }
-        // },
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.customFilters = {
+                    statusVal: appliedFilters.status,
+                    priorityVal: appliedFilters.priority
+                };
+            },
+            stateLoadParams: function (settings, data) {
+                if (data.customFilters) {
+                    $('#filter-status').val(data.customFilters.statusVal).trigger('change');
+                    $('#filter-priority').val(data.customFilters.priorityVal).trigger('change');
+
+                    appliedFilters = {
+                        status: data.customFilters.statusVal,
+                        priority: data.customFilters.priorityVal
+                    };
+                }
+            },
             ajax: {
-                url: "@Url.Action("GetListDTJson")",
+                url: "@Url.Action("GetTasksDT")",
                 type: "POST",
                 data: function (data) {
-                    data.TypeId = $("#filter-type").val();
-                    data.ModeId = $("#filter-mode").val();
-                    data.SupplierId = $("#filter-supplier").val();
-                    data.DateFrom = $("#filter-from").val();
-                    data.DateTo = $("#filter-to").val();
-                    data.StatusId = $("#filter-status").val();
+                    data.Status = $("#filter-status").val();
+                    data.Priority = $("#filter-priority").val();
                 }
             },
             serverSide: true,
@@ -302,60 +517,333 @@
                 return: true,
             },
             columns: [
-                { data: "documentNumber", name: "DocumentNumber" },
-                { data: "type", name: "Type" },
-                { data: "supplier", name: "Supplier" },
-                { data: "term", name: "Term" },
-                { data: "deliveryMode", name: "DeliveryMode" },
+                { data: "module", name: "Module" },
+                { data: "summary", name: "Summary" },
                 { data: "status", name: "Status" },
-                { data: "orderDate", name: "OrderDate" },
-                { data: "remarks", name: "Remarks" },
+                {
+                    data: "priority",
+                    name: "Priority",
+                    render: function (data) {
+                        const opt = priorityLookup[data] || {};
+                        return opt.emoji ? `${opt.emoji} ${opt.text}` : data;
+                    }
+                },
+                { data: "assignee", name: "Assignee" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
-                        if (data.status.toLowerCase() == "draft" && data.orderBy == $("#current-user-nickname").val()) {
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><span class="emoji">🔍</span></a>';
+                        if (data.modifyExpiration && data.status.toLowerCase() == "open") {
+                            if (user_access.canEdit) {
+                                actions += '<button class="btn btn-warning btn-xs" type="button" onclick="ShowEditTask(this)" data-microtip-title="Edit Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="top-left" role="tooltip"><span class="emoji">✏️</span></button>';
+                            }
                             if (user_access.canDelete) {
-                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                actions += '<button class="btn btn-danger btn-xs" type="button" onclick="DeleteTask(this)" data-microtip-title="Delete Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="top-left" role="tooltip"><span class="emoji">🗑️</span></button>';
                             }
                         }
-                        return actions + "</div>";
+                        if (data.status.toLowerCase() == "open" || data.status.toLowerCase() == "doing" || data.status.toLowerCase() == "incomplete") {
+                            if (user_access.canEdit) {
+                                if(data.priority.toLowerCase() != "low") {
+                                    actions += '<button class="btn btn-light text-dark btn-xs" type="button" onclick="DecreasePriority(this)" data-microtip-title="Decrease Priority.\nButton is only available for task with Open, Doing or Incomplete status." data-microtip-position="top-left" role="tooltip"><span class="emoji">▼</span></button>';
+                                }
+                                if(data.priority.toLowerCase() != "high") {
+                                    actions += '<button class="btn btn-light text-dark btn-xs" type="button" onclick="IncreasePriority(this)" data-microtip-title="Increase Priority.\nButton is only available for task with Open, Doing or Incomplete status." data-microtip-position="top-left" role="tooltip"><span class="emoji">▲</span></button>';
+                                }
+                            }
+                        }
+                        actions += '</div>';
+                        if(data.issueCount > 0) {
+                            actions += '<span class="badge bg-danger text-bg-danger ml-3">' + data.issueCount + ' Issue(s)</span>';
+                        }
+                        return actions;
                     }
                 }
             ],
-            order: [[6, "desc"]],
+            order: [[2, "asc"]],
             createdRow: function (row, data, dataIndex) {
-                if (data.status.toLowerCase() == 'resubmitted') {
-                    $(row).addClass('text-muted');
-                } else if (data.status.toLowerCase() == 'disapproved') {
-                    $(row).addClass('table-danger');
-                    $(row).find('td:eq(5)').addClass('text-danger');
-                } else if (data.status.toLowerCase() == 'approved') {
-                    $(row).addClass('table-success');
-                    $(row).find('td:eq(5)').addClass('text-success');
-                }
+                const statusClassMap = {
+                    "doing": "table-primary",
+                    "testing": "table-warning",
+                    "incomplete": "table-danger",
+                    "for production": "table-info",
+                    "on production": "table-success"
+                };
+
+                const cls = statusClassMap[data.status?.toLowerCase()];
+                if (cls) $(row).addClass(cls);
+            },
+            footerCallback: function (row, data, start, end, display) {
+                var json = taskDT.ajax.json();
+                var api = this.api(), data;
+
+                $(api.column(2).footer()).html(`
+                    OPEN: ${json.additionalData.openCount}<br />
+                    DOING: ${json.additionalData.doingCount}<br />
+                    TESTING: ${json.additionalData.testingCount}<br />
+                    INCOMPLETE: ${json.additionalData.incompleteCount}<br />
+                    FOR PRODUCTION: ${json.additionalData.forProductionCount}<br />
+                    ON PRODUCTION: ${json.additionalData.onProductionCount}
+                `);
+                $(api.column(3).footer()).html(`
+                    <span class="emoji">🟩</span> LOW: ${json.additionalData.lowCount}<br />
+                    <span class="emoji">🟨</span> MEDIUM: ${json.additionalData.mediumCount}<br />
+                    <span class="emoji">🟧</span> HIGH: ${json.additionalData.highCount}
+                `);
             }
         });
 
-        orderDT.on("draw", function () {
-            hideBatchLoader("orderdt");
+        taskDT.on("draw", function () {
+            hideLoader();
         });
 
-        if (user_access.canUploadDownload) {
-            $(".downloadBtn").click(function (e) {
-                var urlQuery = [];
-                if ($("#filter-type").val()) { urlQuery.push("TypeId=" + $("#filter-type").val()); }
-                if ($("#filter-mode").val()) { urlQuery.push("ModeId=" + $("#filter-mode").val()); }
-                if ($("#filter-supplier").val()) { urlQuery.push("SupplierId=" + $("#filter-supplier").val()); }
-                if ($("#filter-status").val()) { urlQuery.push("StatusId=" + $("#filter-status").val()); }
+        $('#filterModal').on('show.bs.modal', function () {
+            $('#filter-status').val(appliedFilters.status).trigger('change');
+            $('#filter-priority').val(appliedFilters.priority).trigger('change');
+        }).on('hidden.bs.modal', function () {
+            $('#filter-status').val(appliedFilters.status).trigger('change');
+            $('#filter-priority').val(appliedFilters.priority).trigger('change');
+        });
 
-                urlQuery.push("DateFrom=" + $("#filter-from").val());
-                urlQuery.push("DateTo=" + $("#filter-to").val());
+        function ApplyFilter() {
+            appliedFilters.status = $('#filter-status').val();
+            appliedFilters.priority = $('#filter-priority').val();
 
+            taskDT.ajax.reload();
+        }
 
-                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
-            });
+        function ApplyCleanFilter() {
+            $('#filter-status').val(null).trigger('change');
+            $('#filter-priority').val(null).trigger('change');
+
+            appliedFilters.status = $('#filter-status').val();
+            appliedFilters.priority = $('#filter-priority').val();
+
+            taskDT.ajax.reload();
+        }
+
+        if(user_access.canAdd){
+            function AddTask() {
+                var a_module = $("#add-module").val();
+                var a_summary = $("#add-summary").val();
+                var a_function = $('#add-function').summernote('code');
+                var a_behavior = $('#add-behavior').summernote('code');
+                var a_access = $("#add-access").val();
+                var a_priority = $('#add-priority').val();
+                var a_assignee = $("#add-assignee").val();
+                var error_msg = "";
+
+                if(!a_module) error_msg += "<li>Please enter Module</li>";
+                else if(a_module.length > 100) error_msg += "<li>Module must not exceed 100 characters.</li>";
+                if(!a_summary) error_msg += "<li>Please enter Summary</li>";
+                else if(a_summary.length > 100) error_msg += "<li>Summary must not exceed 100 characters.</li>";
+                if(!a_function) error_msg += "<li>Please enter a message in Function</li>";
+                else if(a_function.length < 20) error_msg += "<li>Function must be atleasst 20 characters.</li>";
+                if(!a_behavior) error_msg += "<li>Please enter a message in Behavior</li>";
+                else if(a_behavior.length < 10) error_msg += "<li>Behavior must be atleasst 10 characters.</li>";
+                if(!a_access) error_msg += "<li>Please enter a message in Access Control</li>";
+                else if(a_access.length < 10) error_msg += "<li>Access Control must be atleasst 10 characters.</li>";
+                if(!a_priority) error_msg += "<li>Please select a priority</li>";
+                if(!a_assignee) error_msg += "<li>Please select an assignee</li>";
+
+                if(error_msg) {
+                    toastr.warning("<ul class='mb-0'>" + error_msg + "</ul>", "Form Validation");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("AddTask")",
+                        data: {
+                            Module: $("#add-module").val(),
+                            Summary: $("#add-summary").val(),
+                            Function: $('#add-function').summernote('code'),
+                            Behavior: $('#add-behavior').summernote('code'),
+                            AccessControl: $("#add-access").val(),
+                            Status: "OPEN",
+                            Priority: $("#add-priority").val(),
+                            Assignee: $("#add-assignee").val(),
+                            DueDate: $("#add-duedate").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                ApplyCleanFilter();
+                                $("#add-module").val("");
+                                $("#add-summary").val("");
+                                $("#add-description").summernote("code", "");
+                                $("#addModal").modal("hide");
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        if(user_access.canEdit){
+            function ShowEditTask(task) {
+                var row = $(task).parents("tr");
+                var rowData = taskDT.row(row).data();
+
+                $("#edit-module").data("Id", rowData.id);
+                $("#edit-module").val(rowData.module);
+                $("#edit-summary").val(rowData.summary);
+                $("#edit-priority").val(rowData.priority).trigger("change");
+                var selectedAssignee = new Option(rowData.assignee, rowData.assigneeId, true, true);
+                $("#edit-assignee").append(selectedAssignee).trigger('change');
+                $("#edit-function").summernote("code", rowData.function);
+                $("#edit-behavior").summernote("code", rowData.behavior);
+                $("#edit-access").val(rowData.accessControl);
+
+                $("#editModal").modal("show");
+            }
+
+            function EditTask() {
+                var e_module = $("#edit-module").val();
+                var e_summary = $("#edit-summary").val();
+                var e_function = $('#edit-function').summernote('code');
+                var e_behavior = $('#edit-behavior').summernote('code');
+                var e_access = $("#edit-access").val();
+                var e_priority = $('#edit-priority').val();
+                var e_assignee = $("#edit-assignee").val();
+                var error_msg = "";
+
+                if(!e_module) error_msg += "<li>Please enter Module</li>";
+                else if(e_module.length > 100) error_msg += "<li>Module must not exceed 100 characters.</li>";
+                if(!e_summary) error_msg += "<li>Please enter Summary</li>";
+                else if(e_summary.length > 100) error_msg += "<li>Summary must not exceed 100 characters.</li>";
+                if(!e_function) error_msg += "<li>Please enter a message in Function</li>";
+                else if(e_function.length < 20) error_msg += "<li>Function must be atleasst 20 characters.</li>";
+                if(!e_behavior) error_msg += "<li>Please enter a message in Behavior</li>";
+                else if(e_behavior.length < 10) error_msg += "<li>Behavior must be atleasst 10 characters.</li>";
+                if(!e_access) error_msg += "<li>Please enter a message in Access Control</li>";
+                else if(e_access.length < 10) error_msg += "<li>Access Control must be atleasst 10 characters.</li>";
+                if(!e_priority) error_msg += "<li>Please select a priority</li>";
+                if(!e_assignee) error_msg += "<li>Please select an assignee</li>";
+
+                if(error_msg) {
+                    toastr.warning("<ul class='mb-0'>" + error_msg + "</ul>", "Form Validation");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("UpdateTask")",
+                        data: {
+                            Id: $("#edit-module").data("Id"),
+                            Module: $("#edit-module").val(),
+                            Summary: $("#edit-summary").val(),
+                            Function: $('#edit-function').summernote('code'),
+                            Behavior: $('#edit-behavior').summernote('code'),
+                            AccessControl: $("#edit-access").val(),
+                            Status: "OPEN",
+                            Priority: $("#edit-priority").val(),
+                            Assignee: $("#edit-assignee").val(),
+                            DueDate: $("#edit-duedate").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                taskDT.ajax.reload();
+                                $("#editModal").modal("hide");
+                            }
+                        }
+                    });
+                }
+            }
+            function DecreasePriority(task) {
+                swal({
+                    title: "Decrease Task Priority",
+                    text: "Are you sure you want to decrease the current priority of this record?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var row = $(task).parents("tr");
+                        var rowData = taskDT.row(row).data();
+
+                        $.ajax({
+                            url: "@Url.Action("DecreaseTaskPriority", "Tracker")",
+                            type: "POST",
+                            data: {
+                                Id: rowData.id,
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    taskDT.ajax.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            function IncreasePriority(task) {
+                swal({
+                    title: "Increase Task Priority",
+                    text: "Are you sure you want to increase the current priority of this record?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var row = $(task).parents("tr");
+                        var rowData = taskDT.row(row).data();
+
+                        $.ajax({
+                            url: "@Url.Action("IncreaseTaskPriority", "Tracker")",
+                            type: "POST",
+                            data: {
+                                Id: rowData.id,
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    taskDT.ajax.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        if(user_access.canDelete){
+            function DeleteTask(task) {
+                swal({
+                    title: "Delete Task",
+                    text: "Are you sure you want to delete this record? Deletion is only allowed from the time of creation up to 24 hours.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var row = $(task).parents("tr");
+                        var rowData = taskDT.row(row).data();
+
+                        $.ajax({
+                            url: "@Url.Action("DeleteTask", "Tracker")",
+                            type: "POST",
+                            data: {
+                                Id: rowData.id,
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    taskDT.ajax.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
         }
     </script>
 }

@@ -666,7 +666,7 @@ namespace GMGInventory.Application.Repositories
             item.PartNumber = itemVM.PartNumber + "";
             item.Size = itemVM.Size + "";
 
-            context.Items.Update(item);
+            //context.Items.Update(item);
             await context.SaveChangesAsync(currentUserId);
         }
 
@@ -707,7 +707,7 @@ namespace GMGInventory.Application.Repositories
             var inventory = context.ItemInventories.Where(s => s.Id == id).First();
             var oldQuantity = inventory.Quantity;
             inventory.Quantity = quantity;
-            context.ItemInventories.Update(inventory);
+            //context.ItemInventories.Update(inventory);
             await context.SaveChangesAsync(currentUserId);
 
             var countHistory = new PhysicalCountHistory
@@ -781,7 +781,7 @@ namespace GMGInventory.Application.Repositories
                 price.RetailSellingPrice = retailPrice;
                 price.NetSellingPrice = netPrice;
 
-                context.ItemPrices.Update(price);
+                //context.ItemPrices.Update(price);
             }
             else
             {

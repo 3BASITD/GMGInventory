@@ -1109,7 +1109,10 @@
                                     "<strong>" + repo.text + "</strong><br />" +
                                     "<small>" +
                                     "Requested Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
-                                    (repo.disabled ? ("Already Ordered On: " + repo.orderedOn) : ("Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit)) +
+                                    (repo.disabled ? ("Already Ordered On: " + repo.orderedOn) 
+                                                   : ("Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit + "<br />" +
+                                                      "Latest Cost from Approved PO: " + (repo.previousCost || "none"))) +
+                                    "<br />"  +
                                     "</small>"
                                 );
                             },
@@ -1124,7 +1127,7 @@
                             $(".add-quantity-warning").text("");
                             $("#add-unit").val(selected.unit);
                             $("#add-unit").data("Id", selected.unitId);
-                            $("#add-unit-cost").val(0);
+                            $("#add-unit-cost").val(selected.previousCostD);
                             $("#add-total-amount").val("0.00");
                         }).on("select2:unselecting", function () {
                             $("#add-code").val("");

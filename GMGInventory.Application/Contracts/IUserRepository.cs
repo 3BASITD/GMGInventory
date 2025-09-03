@@ -5,7 +5,8 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IUserRepository
     {
-        Task<IList<JsonOptionsModel>> GetOptions2(string? IncludeId);
+        Task<IList<JsonOptionsModel>> GetOptions(string? IncludeId);
+        Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page);
         Task<IList<UserInformationVM>> GetUsersInformationVMAsync();
         Task<UserInformationVM> GetUserInformationVMAsync(string name);
         Task<UserInformationVM?> GetUserInformationVMByIdAsync(string id);

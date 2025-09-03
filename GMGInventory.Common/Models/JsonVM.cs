@@ -18,6 +18,15 @@ namespace GMGInventory.Common.Models
         public int TotalQuantity2 { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TotalAmount2 { get; set; }
+        public IList<T> AdditionalData { get; set; }
+    }
+    public class ForDataTables<TData, TAdditional>
+    {
+        public string? Draw { get; set; }
+        public int RecordsTotal { get; set; }
+        public int RecordsFiltered { get; set; }
+        public IList<TData> Data { get; set; }
+        public TAdditional AdditionalData { get; set; }
     }
 
     public class DataTablesRequestForm
@@ -123,6 +132,11 @@ namespace GMGInventory.Common.Models
         public bool Selected { get; set; } = false;
     }
 
+    public class JsonNameStatusOptionsModel : JsonNameOptionsModel
+    {
+        public string Status { get; set; }
+    }
+
     public class JsonCodeOptionsModel
     {
         public string Id { get; set; }
@@ -158,6 +172,15 @@ namespace GMGInventory.Common.Models
         public bool Selected { get; set; } = false;
         public string? OrderedOn { get; set; }
         public bool Disabled { get; set; }
+        public string? PreviousCost => PreviousCurrency == null || PreviousCurrencyRateD == null || PreviousCostD == null
+                                     ? null
+                                     : (PreviousCurrency.Split('/')[0].Trim() + " " + string.Format(SystemFormat.StringDecimalComma, PreviousCostD)
+                                      + (PreviousCurrency.Split('/')[0].Trim() == "PH₱"
+                                       ? ""
+                                       : " = PH₱ " + string.Format(SystemFormat.StringDecimalComma, Math.Round(PreviousCostD.Value / PreviousCurrencyRateD.Value, 2))));
+        public string? PreviousCurrency { get; set; }
+        public decimal? PreviousCurrencyRateD { get; set; }
+        public decimal? PreviousCostD { get; set; }
     }
 
     public class JsonCustomerOptionsModel
@@ -268,7 +291,7 @@ namespace GMGInventory.Common.Models
         public int? Item { get; set; }
         public string? ItemKeyword { get; set; }
         public int? Supplier { get; set; }
-       // public int UnservedQty { get; set; }
+        // public int UnservedQty { get; set; }
         public bool Unserved { get; set; }
 
         public new string Status { get; set; }

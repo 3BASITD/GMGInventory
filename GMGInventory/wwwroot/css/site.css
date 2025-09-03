@@ -507,3 +507,65 @@ a.btn-details-print {
     pointer-events: auto !important;
     cursor: not-allowed !important;
 }
+
+.emoji {
+    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+    font-variant-emoji: emoji; /* browsers that support it */
+    line-height: 1;
+    display: inline-block;
+}
+
+.nav-link .emoji {
+    font-size: 22px;
+}
+
+.card-title .emoji {
+    margin-right: .4rem;
+    font-size: 22px;
+}
+
+table.dataTable.table-striped tbody tr:nth-of-type(2n+1) {
+    background-color: inherit !important; /* cancel AdminLTE */
+}
+
+.timeline {
+    border-left: 3px solid #dee2e6;
+    position: relative;
+}
+
+.timeline-item {
+    padding-left: 25px;
+}
+
+.timeline-marker {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    position: absolute;
+    left: -7px;
+    top: 16px;
+}
+
+.card-body .nav-item {
+    font-size: 14px;
+}
+
+    .card-body .nav-item .emoji {
+        font-size: 14px;
+        margin-right: 5px;
+    }
+
+body .bg-invert {
+    /*background-color: #212529 !important;*/
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    color: #f8f9fa !important;
+}
+
+body.dark-mode .bg-invert {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+.note-editor .note-placeholder {
+    white-space: pre-line;
+}

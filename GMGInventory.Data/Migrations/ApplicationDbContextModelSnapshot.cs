@@ -847,6 +847,42 @@ namespace GMGInventory.Data.Migrations
                             PageId = 64,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 65,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 65,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 66,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 66,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 67,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 67,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -5228,58 +5264,11 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("Suppliers");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.Tracker_Attachment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("CommentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ErrorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("TaskId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserCreated")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserModified")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommentId");
-
-                    b.HasIndex("ErrorId");
-
-                    b.HasIndex("TaskId");
-
-                    b.ToTable("TrackerAttachments");
-                });
-
             modelBuilder.Entity("GMGInventory.Data.Tracker_Comment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -5291,8 +5280,8 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -5308,15 +5297,16 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("TrackerComments");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.Tracker_Error", b =>
+            modelBuilder.Entity("GMGInventory.Data.Tracker_Issue", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateFixed")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateModified")
@@ -5326,8 +5316,15 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("FixedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("FixedBy")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Replication")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Severity")
                         .IsRequired()
@@ -5337,12 +5334,12 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
+                    b.Property<string>("Summary")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -5355,33 +5352,57 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("TaskId");
 
-                    b.ToTable("TrackerErrors");
+                    b.ToTable("TrackerIssues");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Tracker_Task", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("AccessControl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AssignedToId")
+                    b.Property<string>("ApprovedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AssigneeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Behavior")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DateApproved")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateDisapproved")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
+                    b.Property<string>("DisapproveReason")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisapprovedById")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Function")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Priority")
                         .IsRequired()
@@ -5391,7 +5412,7 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Summary")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
@@ -5404,49 +5425,41 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedToId");
+                    b.HasIndex("ApprovedById");
+
+                    b.HasIndex("AssigneeId");
+
+                    b.HasIndex("DisapprovedById");
 
                     b.ToTable("TrackerTasks");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Tracker_TaskHistory", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DateModified")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NewPriority")
+                    b.Property<string>("EntityName")
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("NewStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("OldPriority")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("OldStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -6044,13 +6057,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b251342d-e75b-4c2a-8f26-156cd204f15a",
+                            ConcurrencyStamp = "333413ba-107b-4624-ae53-ad27c5a249c4",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE2Ar5yaqooLSHwx3EW1TaEsOD+nx+ZYf6z/hVr5IpVa1tt88XRz5G7IRNqwZASyjw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFfU7eqcHp50pXR2/VJZBbwJwUIW33unLWBmk1rThC2+VmW+Uleg9SdobMAxB9OtEQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5a02a6fd-ce7d-4b31-a7d7-11f7c176b597",
+                            SecurityStamp = "9bdafa7f-9092-4f87-abad-46447fbd779f",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6065,13 +6078,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "19f39153-ada0-45fd-a7c9-1514eb895ebf",
+                            ConcurrencyStamp = "9e2b9673-8b9a-4ba5-aa14-992999433694",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP4pmip/wy3Pd1DLlaHn0m3tEaEwPYorgwl380bRQHS3aAStg15rIWnDETgS/traCA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDquIkgCw0N0oP4NGF6gi7DghAzEF+4HEYOQrW/0L9ZBboPn9WIjysoDd5w4A92oHA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c3f47389-c3fc-4083-85ec-9736a68a0080",
+                            SecurityStamp = "16b7dd94-1b3a-49bb-880a-cd0c87aefacc",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -7219,27 +7232,6 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Term");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.Tracker_Attachment", b =>
-                {
-                    b.HasOne("GMGInventory.Data.Tracker_Comment", "Comment")
-                        .WithMany("Attachments")
-                        .HasForeignKey("CommentId");
-
-                    b.HasOne("GMGInventory.Data.Tracker_Error", "Error")
-                        .WithMany("Attachments")
-                        .HasForeignKey("ErrorId");
-
-                    b.HasOne("GMGInventory.Data.Tracker_Task", "Task")
-                        .WithMany("Attachments")
-                        .HasForeignKey("TaskId");
-
-                    b.Navigation("Comment");
-
-                    b.Navigation("Error");
-
-                    b.Navigation("Task");
-                });
-
             modelBuilder.Entity("GMGInventory.Data.Tracker_Comment", b =>
                 {
                     b.HasOne("GMGInventory.Data.Tracker_Task", "Task")
@@ -7251,10 +7243,10 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.Tracker_Error", b =>
+            modelBuilder.Entity("GMGInventory.Data.Tracker_Issue", b =>
                 {
                     b.HasOne("GMGInventory.Data.Tracker_Task", "Task")
-                        .WithMany("Errors")
+                        .WithMany("Issues")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -7264,13 +7256,25 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Tracker_Task", b =>
                 {
-                    b.HasOne("GMGInventory.Data.User", "AssignedTo")
-                        .WithMany()
-                        .HasForeignKey("AssignedToId")
+                    b.HasOne("GMGInventory.Data.User", "ApprovedBy")
+                        .WithMany("TrackerTaskApprover")
+                        .HasForeignKey("ApprovedById");
+
+                    b.HasOne("GMGInventory.Data.User", "Assignee")
+                        .WithMany("TrackerTaskAssignee")
+                        .HasForeignKey("AssigneeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AssignedTo");
+                    b.HasOne("GMGInventory.Data.User", "DisapprovedBy")
+                        .WithMany("TrackerTaskDispprover")
+                        .HasForeignKey("DisapprovedById");
+
+                    b.Navigation("ApprovedBy");
+
+                    b.Navigation("Assignee");
+
+                    b.Navigation("DisapprovedBy");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Tracker_TaskHistory", b =>
@@ -7728,25 +7732,13 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseReturns");
                 });
 
-            modelBuilder.Entity("GMGInventory.Data.Tracker_Comment", b =>
-                {
-                    b.Navigation("Attachments");
-                });
-
-            modelBuilder.Entity("GMGInventory.Data.Tracker_Error", b =>
-                {
-                    b.Navigation("Attachments");
-                });
-
             modelBuilder.Entity("GMGInventory.Data.Tracker_Task", b =>
                 {
-                    b.Navigation("Attachments");
-
                     b.Navigation("Comments");
 
-                    b.Navigation("Errors");
-
                     b.Navigation("Histories");
+
+                    b.Navigation("Issues");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.TransferItem", b =>
@@ -7801,6 +7793,12 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseReturnApprover");
 
                     b.Navigation("PurchaseReturnDisapprover");
+
+                    b.Navigation("TrackerTaskApprover");
+
+                    b.Navigation("TrackerTaskAssignee");
+
+                    b.Navigation("TrackerTaskDispprover");
                 });
 #pragma warning restore 612, 618
         }

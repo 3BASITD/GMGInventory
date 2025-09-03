@@ -34,15 +34,17 @@
         {
             <div class="card card-default">
                 <div class="card-header">
-                    <span class="card-title">@ViewData["Title"]</span>
+                    <span class="card-title">
+                        <span class="emoji" aria-hidden="true">👤</span>@ViewData["Title"]
+                    </span>
                     @if (activeUser.IsActive)
                     {
                         <div class="card-tools">
                             <a class="btn btn-secondary btn-sm float-right" asp-action="Password">
-                                <span class="fas fa-edit"></span> Change Password
+                                <span class="emoji">📝</span>Change Password
                             </a>
                             <a class="btn btn-primary btn-sm float-right mr-2" asp-action="Update">
-                                <span class="fas fa-edit"></span> Update Information
+                                <span class="emoji">🔑</span>Update Information
                             </a>
                         </div>
                     }
@@ -80,7 +82,9 @@
             {
                 <div class="card card-default">
                     <div class="card-header">
-                        <span class="card-title">Theme</span>
+                        <span class="card-title">
+                            <span class="emoji" aria-hidden="true">🎨</span>Theme
+                            </span>
                     </div>
                     <div class="card-body">
                         <form id="themeForm" asp-action="ChangeTheme">
@@ -94,12 +98,40 @@
                     </div>
                 </div>
             }
+
+            <div class="card card-warning">
+                <div class="card-header">
+                    <span class="card-title">
+                        <span class="emoji" aria-hidden="true">&#9881;&#65039;</span> Development Tracker
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p>
+                        This section is provided to give visibility into the ongoing development of the system.
+                    </p>
+                    <ul>
+                        <li><span class="emoji">📋</span> <strong>View and manage tasks</strong> – see which tasks are open, in progress, or finished.</li>
+                        <li><span class="emoji">🐞</span> <strong>Report errors on a task</strong> – if something isn’t working, log the problem and link it to the right task.</li>
+                        <li><span class="emoji">💬</span> <strong>Add comments</strong> – share notes, questions, or feedback on any task.</li>
+                        <li><span class="emoji">📊</span> <strong>Follow progress updates</strong> – track how tasks, fixes, and discussions are moving forward.</li>
+                        <li><span class="emoji">🖼️</span> <strong>Attach images</strong> – upload screenshots or photos to explain issues or ideas more clearly.</li>
+                    </ul>
+                    <div class="text-center mt-3">
+                        <a class="btn btn-info" asp-action="Index" asp-controller="Tracker">
+                            <span class="emoji">📋</span> Go to Development Tracker
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         }
     </div>
     <div class="col-6">
         <div class="card card-default">
             <div class="card-header">
-                <span class="card-title">List of Access</span>
+                <span class="card-title">
+                    <span class="emoji" aria-hidden="true">🔑</span>List of Access
+                </span>
             </div>
             <div class="card-body">
                 <table class="table table-head-fixed table-striped table-hover table-access">
@@ -108,46 +140,47 @@
                             <th>Page Group</th>
                             <th>
                                 <span data-microtip-title="Order Number" data-microtip-position="bottom" role="tooltip">
-                                    <i class="fas fa-layer-group"></i>
+                                    <span class="emoji">📚</span>
                                 </span>
                             </th>
                             <th>Name</th>
                             <th>
                                 <span data-microtip-title="Can View" data-microtip-position="bottom" role="tooltip">
-                                    <i class="fas fa-eye"></i>
+                                    <span class="emoji">👁️</span>
                                 </span>
                             </th>
                             <th>
                                 <span data-microtip-title="Can Add" data-microtip-position="bottom" role="tooltip">
-                                    <i class="fas fa-plus"></i>
+                                    <span class="emoji">➕</span>
                                 </span>
                             </th>
                             <th>
                                 <span data-microtip-title="Can Edit" data-microtip-position="bottom" role="tooltip">
-                                    <i class="fas fa-edit"></i>
+                                    <span class="emoji">✏️</span>
                                 </span>
                             </th>
                             <th>
                                 <span data-microtip-title="Can Delete" data-microtip-position="bottom" role="tooltip">
-                                    <i class="fas fa-trash-alt"></i>
+                                    <span class="emoji">🗑️</span>
                                 </span>
                             </th>
                             <th>
                                 <span data-microtip-title="Can Approve / Disapprove" data-microtip-position="bottom" role="tooltip">
-                                    <i class="fas fa-thumbs-up"></i>
+                                    <span class="emoji">👍</span>
                                 </span>
                             </th>
                             <th>
                                 <span data-microtip-title="Can Upload&#13; / Download" data-microtip-position="bottom" role="tooltip">
-                                    <i class="fas fa-file-download"></i>
+                                    <span class="emoji">📤📥</span>
                                 </span>
                             </th>
                             <th>
                                 <span data-microtip-title="Can Print" data-microtip-position="bottom" role="tooltip">
-                                    <i class="fas fa-print"></i>
+                                    <span class="emoji">🖨️</span>
                                 </span>
                             </th>
                         </tr>
+
                     </thead>
                 </table>
             </div>
@@ -159,7 +192,9 @@
     <div class="col-12">
         <div class="card card-default">
             <div class="card-header">
-                <span class="card-title">Audit Logs (Latest 100)</span>
+                <span class="card-title">
+                    <span class="emoji" aria-hidden="true">🕒</span>Audit Logs (Latest 100)
+                </span>
             </div>
             <div class="card-body">
                 <table class="table table-head-fixed table-striped table-hover table-logs">

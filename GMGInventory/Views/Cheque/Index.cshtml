@@ -502,7 +502,7 @@
         // Load Select2 User
         $.ajax({
             type: "POST",
-            url: "@Url.Action("GetOptions2", "User")",
+            url: "@Url.Action("GetOptions", "User")",
             success: function (data, status, xhr) {
                 $("#filter-createdBy").select2({
                     data: data,

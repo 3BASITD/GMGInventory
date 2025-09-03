@@ -223,9 +223,8 @@ namespace GMGInventory.Data
         public DbSet<Status> Statuses { get; set; }
         //public DbSet<StockCard> StockCards { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
-        public DbSet<Tracker_Attachment> TrackerAttachments { get; set; }
         public DbSet<Tracker_Comment> TrackerComments { get; set; }
-        public DbSet<Tracker_Error> TrackerErrors { get; set; }
+        public DbSet<Tracker_Issue> TrackerIssues { get; set; }
         public DbSet<Tracker_Task> TrackerTasks { get; set; }
         public DbSet<Tracker_TaskHistory> TrackerHistories { get; set; }
         public DbSet<TransferItem> TransferItems { get; set; }

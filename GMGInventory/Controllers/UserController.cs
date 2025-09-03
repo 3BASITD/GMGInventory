@@ -21,9 +21,15 @@ namespace GMGInventory.Controllers
             var users = await userRepository.GetUsersInformationVMAsync();
             return View(users);
         }
-        public async Task<IActionResult> GetOptions2(string? IncludeId)
+
+        public async Task<IActionResult> GetOptions(string? IncludeId)
         {
-            return Json(await userRepository.GetOptions2(IncludeId));
+            return Json(await userRepository.GetOptions(IncludeId));
+        }
+
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await userRepository.GetOptions2(search, page));
         }
 
         public async Task<IActionResult> Details(string id)

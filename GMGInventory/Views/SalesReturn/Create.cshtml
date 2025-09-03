@@ -368,7 +368,7 @@
                     if (repo.loading) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong><br /><small>BIR Invoice Number: " + repo.name + "</small>");
+                    return $("<strong>" + repo.text + (repo.status.toLowerCase() == "draft" ? " (DRAFT)" : "") + "</strong><br /><small>BIR Invoice Number: " + repo.name + "</small>");
                 },
                 ajax: {
                     url: "@Url.Action("GetInvoiceBySalesOrder", "SalesInvoice")",

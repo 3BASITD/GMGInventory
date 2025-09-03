@@ -461,7 +461,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId, bool forPack = false)
+        public async Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId)
         {
             var itemVM = await (from order in context.SalesOrderLineItems
                                                      .Include(s => s.Item)
@@ -487,8 +487,6 @@ namespace GMGInventory.Application.Repositories
                                                                        && s.ItemId == order.ItemId)
                                                               .Sum(s => (int?)s.Quantity) ?? 0
                                 where order.SalesOrderId == salesOrderId
-                                //&& ((order.Quantity != order.PackedQuantity && forPack == true) || forPack == false)
-                                && ((order.Quantity != invoicedQuantity && forPack == true) || forPack == false)
                                 select new SalesOrderItemVM
                                 {
                                     Discount1D = order.Discount1,

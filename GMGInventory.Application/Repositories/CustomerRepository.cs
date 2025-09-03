@@ -1128,6 +1128,7 @@ namespace GMGInventory.Application.Repositories
                    select new CustomerVM
                    {
                        InvoiceNo = inv.InvoiceNumber,
+                       BIRInvoiceNo = inv.ControlNumber,
                        InvoicedDateD = inv.InvoiceDate,
                        InvoicedAmountD = ((from ili in inv.InvoiceLineItems
                                          join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
@@ -1171,6 +1172,7 @@ namespace GMGInventory.Application.Repositories
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
                 data = data.Where(x => x.InvoiceNo.ToString().Contains(form.SearchValue)
+                                    || x.BIRInvoiceNo.ToString().Contains(form.SearchValue)
                                     || x.InvoicedDateD.ToString().Contains(form.SearchValue)
                                     || x.InvoicedAmount.ToString().Contains(form.SearchValue));
             }
@@ -1184,6 +1186,7 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "InvoiceNo": data = data.OrderBy(s => s.InvoiceNo); break;
+                        case "BIRInvoiceNo": data = data.OrderBy(s => s.BIRInvoiceNo); break;
                         case "InvoicedDate": data = data.OrderBy(s => s.InvoicedDateD); break;
                         case "InvoicedAmount": data = data.OrderBy(s => s.InvoicedAmount); break;
                         default: break;
@@ -1194,6 +1197,7 @@ namespace GMGInventory.Application.Repositories
                     switch (form.SortColumn)
                     {
                         case "InvoiceNo": data = data.OrderByDescending(s => s.InvoiceNo); break;
+                        case "BIRInvoiceNo": data = data.OrderByDescending(s => s.BIRInvoiceNo); break;
                         case "InvoicedDate": data = data.OrderByDescending(s => s.InvoicedDateD); break;
                         case "InvoicedAmount": data = data.OrderByDescending(s => s.InvoicedAmount); break;
                         default: break;

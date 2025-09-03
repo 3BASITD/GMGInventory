@@ -40,8 +40,11 @@
             else if (xhr.status === 503)
                 toastr.error("The service is temporarily unavailable. Please check back shortly.", "503 Service Unavailable");
             else {
-                toastr.error(xhr.responseJSON.error, xhr.status + " " + xhr.statusText);
                 console.error(xhr);
+                if (!xhr.responseJSON)
+                    toastr.error(xhr.responseJSON.error, xhr.status + " " + xhr.statusText);
+                else
+                    toastr.error("There seems to be a problem loading some data. Please reload the page and try again.", "Unknown Error");
             }
             hideLoader();
         }
@@ -153,6 +156,30 @@
         return this.optional(element) || (param[0] <= val && val <= param[1]);
     }, "Please enter a value between {0} and {1}.");
 
+    $.validator.addMethod("summernoteRequired", function (value, element) {
+        if (typeof value !== "string") return false;
+        var text = $('<div>').html(value).text().trim();
+        //var code = $(element).summernote('code');
+        //var text = $('<div>').html(code).text().trim();
+        return text.length > 0;
+    }, "This field is required");
+
+    $.validator.addMethod("summernoteMinLength", function (value, element, param) {
+        if (typeof value !== "string") return false;
+        var text = $('<div>').html(value).text().trim();
+    //var code = $(element).summernote('code');
+    //var text = $('<div>').html(code).text().trim();
+        return text.length >= param;
+    }, "Please enter at least {0} characters");
+
+    $.validator.addMethod("summernoteMaxLength", function (value, element, param) {
+        if (typeof value !== "string") return false;
+        var text = $('<div>').html(value).text().trim();
+    //var code = $(element).summernote('code');
+    //var text = $('<div>').html(code).text().trim();
+        return text.length <= param;
+    }, "Please enter no more than {0} characters");
+
     //$('.mask-decimal').mask('9,999,999.00', {
     //    reverse: true
     //});
@@ -198,6 +225,8 @@ $.validator.setDefaults({
     errorPlacement: function (error, element) {
         if (element.hasClass("select2-hidden-accessible")) {
             error.insertAfter(element.siblings(".select2"));
+        } else if (element.hasClass("summernote")) {
+            error.insertAfter(element.next('.note-editor'));
         } else {
             error.insertAfter(element);
         }

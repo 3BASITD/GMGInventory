@@ -265,6 +265,7 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var pack_data = @Json.Serialize(Model);
 
         // Load Select2 Pack Type
         $.ajax({
@@ -280,10 +281,10 @@
 
         var orderDT = $('.table-order').DataTable({
             ajax: {
-                url: "@Url.Action("GetItemsForPackJson", "SalesOrder")",
+                url: "@Url.Action("GetItemsJson", "SalesOrder")",
                 data: {
-                    salesOrderId: @Model?.SalesOrderId
-                                                },
+                    salesOrderId: pack_data.salesOrderId
+                },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -491,7 +492,7 @@
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
-                data: { packId: @Model?.Id },
+                data: { packId: pack_data.id },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -741,8 +742,8 @@
                     type: "POST",
                     url: "@Url.Action("UpdateJson")",
                     data: {
-                        Id: @Model?.Id,
-                        SalesOrderId: @Model?.SalesOrderId,
+                        Id: pack_data.id,
+                        SalesOrderId: pack_data.salesOrderId,
                         Items: itemsToPack,
                         SavingAs: savingAs
                     },
@@ -769,7 +770,7 @@
                 fontawesome: "fas fa-print"
             });
             setTimeout(function () {
-                let win = window.open('@Url.Action("PrintDetails")/' + @Model?.Id, '');
+                let win = window.open('@Url.Action("PrintDetails")/' + pack_data.id, '');
                 var wintimer = setInterval(function () {
                     if (win.closed) {
                         clearInterval(wintimer);

@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
     <link rel="stylesheet" href="~/lib/microtip/microtip.css" />
     <link rel="stylesheet" href="~/lib/swiper-11.1.14/package/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs5.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -59,23 +60,48 @@
                     }
                 </div>
 
+                @{ var newIcon = false; }
                 <ul class="navbar-nav navbar-no-expand ml-auto">
                     <li class="nav-item dropdown">
                         <a id="menuOption" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">
-                            <i class="fas fa-cog"></i>
+                            @if (newIcon)
+                            {
+                                <span class="emoji">🎛️</span>
+                            }
+                            else
+                            {
+
+                                <i class="fas fa-cog"></i>
+                            }
                             <span class="sticked-hide">OPTIONS</span>
                         </a>
                         <ul aria-labelledby="menuOption" class="dropdown-menu dropdown-menu-option mt-md-3 border-0 shadow">
                             <li>
                                 <a class="dropdown-item" asp-area="" asp-controller="Profile" asp-action="Index">
-                                    <i class="nav-icon fas fa-user"></i>
+                                    @if (newIcon)
+                                    {
+                                        <span class="emoji">👤</span>
+                                    }
+                                    else
+                                    {
+
+                                        <i class="nav-icon fas fa-user"></i>
+                                    }
                                     Profile
                                 </a>
                             </li>
                             <li class="dropdown-divider"></li>
                             <li class="bg-gradient-danger">
                                 <a href="#" class="dropdown-item" id="logout-link">
-                                    <i class="nav-icon fas fa-power-off"></i>
+                                    @if (newIcon)
+                                    {
+                                        <span class="emoji">⏻</span>
+                                    }
+                                    else
+                                    {
+
+                                        <i class="nav-icon fas fa-power-off"></i>
+                                    }
                                     Logout
                                 </a>
                             </li>
@@ -181,6 +207,7 @@
     <script src="~/lib/jquery-mask/jquery.mask.js"></script>
     <script src="~/lib/jquery-number-2.1.6/jquery.number.min.js"></script>
     <script src="~/lib/swiper-11.1.14/package/swiper-bundle.min.js"></script>
+    <script src="~/lib//summernote/summernote-bs5.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>

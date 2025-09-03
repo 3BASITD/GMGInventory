@@ -155,7 +155,7 @@ namespace GMGInventory.Application.Repositories
                              ItemCode = rturn.Item.Code,
                              ItemName = rturn.Item.Name,
                              Quantity = rturn.Quantity,
-                             ReferenceNumber = rturn.InvoiceLineItemId == null ? "TBR" : rturn.InvoiceLineItem!.Invoice.ControlNumber,
+                             ReferenceNumber = rturn.InvoiceLineItemId == null ? "TBR" : (rturn.InvoiceLineItem!.Invoice.ControlNumber + (rturn.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "draft" ? " (DRAFT)" : "")),
                              Unit = rturn.Item.Unit.Code
                          };
             return await itemVM.ToListAsync();

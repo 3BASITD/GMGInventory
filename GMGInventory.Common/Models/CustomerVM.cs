@@ -163,6 +163,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Invoice No")]
         public string InvoiceNo { get; set; }
 
+        [Display(Name = "BIR Invoice No")]
+        public string BIRInvoiceNo { get; set; }
+
         [Display(Name = "Over Payment")]
         public string OverPayment => string.Format(SystemFormat.StringDecimalComma, OverPaymentD);
         public decimal? OverPaymentD { get; set; }

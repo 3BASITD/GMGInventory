@@ -563,10 +563,12 @@
                 };
                 if (itemDT.rows().data().length != 0) {
                     var firstItem = itemDT.row(0).data();
-                    if (firstItem.sellingPriceType != forInvoice.sellingPriceType || firstItem.discount1 != forInvoice.discount1 || firstItem.discount2 != forInvoice.discount2) {
-                        toastr.error("You can only add an item with the same data of the first added item. " + firstItem.sellingPriceType + " Selling Price, " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
+                /*if (firstItem.sellingPriceType != rowdata.sellingPriceType || firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
+                            toastr.error("You can only add an item with the same data of the first added item. " + firstItem.sellingPriceType + " Selling Price, " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
+                }*/ if (firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
+                        toastr.error("You can only add an item with the same data of the first added item. " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
                     } else {
-                        itemDT.row.add(forInvoice).draw();
+                        itemDT.row.add(rowdata).draw();
                         packDT.row($(this).parents('tr')).remove().draw();
                         toastr.success("Added " + forInvoice.itemCode + " on Invoice Item(s)", "Success");
                     }

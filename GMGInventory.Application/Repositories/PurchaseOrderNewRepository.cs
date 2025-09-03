@@ -113,6 +113,17 @@ namespace GMGInventory.Application.Repositories
                                               .Where(a => a.RequestItemId == prli.Id
                                                        && a.PurchaseOrder.Status.Name.ToLower() == "approved")
                                               .ToList()
+                           let prevorder = context.PurchaseOrderNewLineItems
+                                                  .Where(a => a.RequestItem.ItemId == prli.ItemId
+                                                           && a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                                  .OrderByDescending(a => a.DateCreated)
+                                                  .Select(a=> new
+                                                  {
+                                                      Cost = a.UnitCost,
+                                                      Currency = a.PurchaseOrder.Currency.Code,
+                                                      CurrencyRate = a.PurchaseOrder.Currency.Rate
+                                                  })
+                                                  .FirstOrDefault()
                            where prli.PurchaseRequestId == RequestId
                            select new JsonPurchaseItemOptionsModel
                            {
@@ -127,7 +138,10 @@ namespace GMGInventory.Application.Repositories
                                Served = ponli.Select(a => (int?)a.Quantity).Sum() ?? 0,
                                Selected = SelectedId != null && prli.Id == SelectedId,
                                OrderedOn = ponli.Count() > 0 ? string.Join(", ", ponli.Select(s => s.PurchaseOrder.DocumentNumber)) : "",
-                               Disabled = (ponli.Select(a => (int?)a.Quantity).Sum() ?? 0) >= prli.Quantity
+                               Disabled = (ponli.Select(a => (int?)a.Quantity).Sum() ?? 0) >= prli.Quantity,
+                               PreviousCurrency = prevorder == null ? null : prevorder.Currency,
+                               PreviousCurrencyRateD = prevorder == null ? null : prevorder.CurrencyRate,
+                               PreviousCostD = prevorder == null ? null : prevorder.Cost
                            };
             return await requests.ToListAsync();
         }

@@ -105,7 +105,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonNameOptionsModel>> GetInvoiceBySalesOrder(string search, int page, int? salesOrderId)
+        public async Task<Select2Model<JsonNameStatusOptionsModel>> GetInvoiceBySalesOrder(string search, int page, int? salesOrderId)
         {
             var invoices = from invoice in context.Invoices
                            where (salesOrderId == null
@@ -114,14 +114,15 @@ namespace GMGInventory.Application.Repositories
                               || invoice.InvoiceNumber.ToLower().Contains(search.ToLower())
                               || invoice.ControlNumber.ToLower().Contains(search.ToLower()))
                            orderby invoice.ControlNumber ascending
-                           select new JsonNameOptionsModel
+                           select new JsonNameStatusOptionsModel
                            {
                                Id = invoice.Id.ToString(),
                                Text = invoice.InvoiceNumber,
-                               Name = invoice.ControlNumber
+                               Name = invoice.ControlNumber,
+                               Status = invoice.Status.Code
                            };
             var invoicesFiltered = await invoices.Skip((page - 1) * 50).Take(50).ToListAsync();
-            return new Select2Model<JsonNameOptionsModel>
+            return new Select2Model<JsonNameStatusOptionsModel>
             {
                 //incomplete_results = false,
                 items = invoicesFiltered,
@@ -658,7 +659,7 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
-                    await DeleteInvoiceItems(form, true);
+                    //await DeleteInvoiceItems(form, true);
                     if (await context.Agents.AnyAsync(s => s.Id == form.Agent))
                     {
                         var so = await context.SalesOrders.Where(s => s.Id == invoice.SalesOrderId).FirstOrDefaultAsync();
@@ -684,7 +685,46 @@ namespace GMGInventory.Application.Repositories
                     context.Invoices.Update(invoice);
                     await context.SaveChangesAsync(currentUserId);
 
-                    await AddInvoiceItems(invoice.Id, invoice.SalesOrderId, form);
+                    //await AddInvoiceItems(invoice.Id, invoice.SalesOrderId, form);
+                    var soitems = context.SalesOrderLineItems.Where(s => s.Id == invoice.SalesOrderId);
+                    var citems = context.InvoiceLineItems.Where(s => s.InvoiceId == invoice.Id);
+                    // add item
+                    // check items not in db
+                    var items = citems.Select(s => s.ItemId);
+                    // add excluding items already available
+                    var newitems = from i in form.Items
+                                   join s in context.SalesOrderLineItems on i.Item equals s.ItemId
+                                   where items.Contains(i.Item) == false
+                                   && s.SalesOrderId == invoice.SalesOrderId
+                                   select new InvoiceLineItem
+                                   {
+                                       InvoiceId = invoice.Id,
+                                       ItemId = i.Item,
+                                       Quantity = i.Quantity,
+                                       UnitPrice = s.SellingPrice
+                                       };
+                    context.InvoiceLineItems.AddRange(newitems);
+
+                    // update item
+                    // get items available in db
+                    var existitems = form.Items.Where(s => items.Contains(s.Item));
+                    foreach (var ei in existitems)
+                    {
+                        // update all available in db
+                        var dbitem = await citems.Where(s => s.ItemId == ei.Item).FirstAsync();
+                        dbitem.Quantity = ei.Quantity;
+
+                        context.InvoiceLineItems.Update(dbitem);
+                    }
+
+                    // delete item
+                    // get items not in form
+                    var fitems = form.Items.Select(s => s.Item);
+                    var ritems = citems.Where(s => fitems.Contains(s.Id) == false);
+                    // remove unavailable items
+                    context.InvoiceLineItems.RemoveRange(ritems);
+
+
                     return form.SavingAs == "post" ? -2 : invoice.Id;
                 }
             }

@@ -1,28 +1,32 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
-    public class Tracker_TaskHistory: BaseEntity
+    public class Tracker_TaskHistory
     {
         public Tracker_TaskHistory()
         {
         }
 
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         [ForeignKey("TaskId")]
-        public int TaskId { get; set; }
+        public Guid TaskId { get; set; }
         public Tracker_Task Task { get; set; }
 
 
         [Column(TypeName = "nvarchar(20)")]
-        public string OldStatus { get; set; }
+        public string ActionType { get; set; }
 
         [Column(TypeName = "nvarchar(20)")]
-        public string NewStatus { get; set; }
+        public string EntityName { get; set; }
+        public string Description { get; set; }
 
-        [Column(TypeName = "nvarchar(20)")]
-        public string OldPriority { get; set; }
+        [Column(TypeName = "nvarchar(450)")]
+        public string UserCreated { get; set; }
 
-        [Column(TypeName = "nvarchar(20)")]
-        public string NewPriority { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

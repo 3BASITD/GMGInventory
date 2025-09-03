@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Views\Payment\" />
+    <Folder Include="wwwroot\lib\summernote\" />
   </ItemGroup>
 
   <ItemGroup>

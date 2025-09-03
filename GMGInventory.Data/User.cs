@@ -16,6 +16,9 @@ namespace GMGInventory.Data
             this.PurchaseRequestDisapprover = new HashSet<PurchaseRequest>();
             this.PurchaseReturnApprover = new HashSet<PurchaseReturnNew>();
             this.PurchaseReturnDisapprover = new HashSet<PurchaseReturnNew>();
+            this.TrackerTaskAssignee = new HashSet<Tracker_Task>();
+            this.TrackerTaskApprover = new HashSet<Tracker_Task>();
+            this.TrackerTaskDispprover = new HashSet<Tracker_Task>();
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -66,5 +69,14 @@ namespace GMGInventory.Data
 
         [InverseProperty(nameof(PurchaseReturnNew.Disapprover))]
         public ICollection<PurchaseReturnNew> PurchaseReturnDisapprover { get; set; }
+
+        [InverseProperty(nameof(Tracker_Task.Assignee))]
+        public ICollection<Tracker_Task> TrackerTaskAssignee { get; set; }
+
+        [InverseProperty(nameof(Tracker_Task.ApprovedBy))]
+        public ICollection<Tracker_Task> TrackerTaskApprover { get; set; }
+
+        [InverseProperty(nameof(Tracker_Task.DisapprovedBy))]
+        public ICollection<Tracker_Task> TrackerTaskDispprover { get; set; }
     }
 }

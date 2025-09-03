@@ -223,7 +223,7 @@
 
         var orderDT = $('.table-order').DataTable({
             ajax: {
-                url: "@Url.Action("GetItemsForPackJson", "SalesOrder")",
+                url: '@Url.Action("GetItemsJson", "SalesOrder")',
                 data: { salesOrderId: $("#salesOrderId").val() },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));

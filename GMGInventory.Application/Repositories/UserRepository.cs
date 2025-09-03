@@ -3,6 +3,7 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ namespace GMGInventory.Application.Repositories
                               , IMapper mapper) : IUserRepository
     {
 
-        public async Task<IList<JsonOptionsModel>> GetOptions2(string? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(string? IncludeId)
         {
             return await userManager.Users
                 .Where(s => s.IsActive || s.Id == IncludeId)
@@ -27,6 +28,29 @@ namespace GMGInventory.Application.Repositories
                 })
                 .OrderBy(s => s.Text)
                 .ToListAsync();
+        }
+
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
+        {
+            var users = from user in userManager.Users
+                         where string.IsNullOrWhiteSpace(search)
+                            || user.UserName.ToLower().Contains(search.ToLower())
+                            || (user.FirstName + "").ToLower().Contains(search.ToLower())
+                            || (user.LastName + "").ToLower().Contains(search.ToLower())
+                        orderby user.UserName ascending
+                         select new JsonNameOptionsModel
+                         {
+                             Id = user.Id.ToString(),
+                             Text = user.UserName,
+                             Name = user.FirstName + " " + user.LastName
+                         };
+            var usersFiltered = await users.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = usersFiltered,
+                total_count = users.Count()
+            };
         }
 
         public async Task<IList<UserInformationVM>> GetUsersInformationVMAsync()

@@ -50,7 +50,8 @@
         font-weight: var(--microtip-font-weight, normal);
         text-transform: var(--microtip-text-transform, none);
         padding: .5em 1em;
-        white-space: nowrap;
+        /*white-space: nowrap;*/
+        white-space: pre;
         box-sizing: content-box;
     }
 

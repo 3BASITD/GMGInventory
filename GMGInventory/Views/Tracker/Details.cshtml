@@ -1,460 +1,488 @@
-﻿@model PurchaseOrderNewDetailedVM
+﻿@using Microsoft.AspNetCore.Html
+@model TaskDetailsVM
 
 @{
-    ViewData["Title"] = "Purchase Order Details";
-    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    ViewData["Title"] = "Task";
+    var taskUserAccess = (ViewsAccessVM)ViewData["TaskUserAccess"]!;
+    var commentUserAccess = (ViewsAccessVM)ViewData["CommentUserAccess"]!;
+    var issueUserAccess = (ViewsAccessVM)ViewData["IssueUserAccess"]!;
+}
+
+@functions {
+    public IHtmlContent RenderActionButton(string label, string emoji, string btnClass, bool canAct, string? tooltipCanAct, string tooltipCantAct, string? onclick)
+    {
+        var button = new TagBuilder("button");
+        button.Attributes["type"] = "button";
+        button.AddCssClass($"btn btn-sm {btnClass}");
+
+
+        if (!canAct)
+        {
+            button.AddCssClass("ui-state-disabled");
+            button.Attributes["data-microtip-title"] = tooltipCantAct;
+            button.Attributes["data-microtip-position"] = "top-left";
+            button.Attributes["role"] = "tooltip";
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(tooltipCanAct))
+            {
+                button.Attributes["data-microtip-title"] = tooltipCanAct;
+                button.Attributes["data-microtip-position"] = "top-left";
+                button.Attributes["role"] = "tooltip";
+            }
+            if (!string.IsNullOrWhiteSpace(onclick))
+            {
+                button.Attributes["onclick"] = onclick;
+            }
+        }
+
+        button.InnerHtml.AppendHtml($"<span class=\"emoji\">{emoji}</span> {label}");
+        return button;
+    }
 }
 
 @section Breadcrumb {
-    <li class="breadcrumb-item"><a asp-controller="PurchaseOrder" asp-action="Index">Purchase Orders</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Tracker" asp-action="Index">Task Tracker</a></li>
 }
 
-<div class="card card-default">
+<div class="card @(Model.Status.Equals("doing", StringComparison.OrdinalIgnoreCase) ? "card-primary"
+                           : Model.Status.Equals("testing", StringComparison.OrdinalIgnoreCase) ? "card-warning"
+                           : Model.Status.Equals("incomplete", StringComparison.OrdinalIgnoreCase) ? "card-danger"
+                           : Model.Status.Equals("for production", StringComparison.OrdinalIgnoreCase) ? "card-info"
+                           : Model.Status.Equals("on production", StringComparison.OrdinalIgnoreCase) ? "card-success"
+                           : "card-default") card-for-task">
     <div class="card-header">
-        <span class="card-title po-title">@ViewData["Title"]</span>
-        <div class="card-tools">
-            @if (userAccess.CanPrint)
+        <span class="card-title"><span class="emoji">📋</span><span class="text-muted">&#91;@Model.Module&#93;</span> <strong>@Model.Summary</strong></span>
+        <div class="card-tools details-tools-container">
+            @if (Model.Status.Equals("open", StringComparison.OrdinalIgnoreCase))
             {
-                <div class="dropdown float-right ml-2">
-                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="fas fa-print"></span> Print
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
-                        <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
-                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
-                    </ul>
-                </div>
+                @* @if (!string.IsNullOrWhiteSpace(Model.ModifyExpiration))
+                {
+                    @RenderActionButton("Edit", "✏️", "btn-info ml-2", taskUserAccess.CanEdit, "Button expires in " + Model.ModifyExpiration, "Edit access is required.", "EditTask()")
+                    @RenderActionButton("Delete", "🗑️", "btn-danger ml-2", taskUserAccess.CanDelete, "Button expires in " + Model.ModifyExpiration, "Delete access is required.", "DeleteTask()")
+                } *@
+                @RenderActionButton("Start Doing", "🔄", "btn-primary ml-2", taskUserAccess.CanEdit, null, "Edit access is required.", "StartTask()")
             }
-            else
+            else if (Model.Status.Equals("doing", StringComparison.OrdinalIgnoreCase))
             {
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="top-left" role="tooltip">
-                    <span class="fas fa-print"></span> Print
-                </button>
+                @RenderActionButton("Deploy for Testing", "🧪", "btn-warning  ml-2", taskUserAccess.CanEdit, null, "Edit access is required.", "TestTask()")
             }
-            @if (Model.Status.ToLower() == "draft")
+            else if (Model.Status.Equals("testing", StringComparison.OrdinalIgnoreCase))
             {
-                @if (userAccess.CanEdit)
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
-                            <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
-                            <span class="fas fa-paper-plane"></span> Submit
-                        </button>
-                }
+                @RenderActionButton("Accept", "✅", "btn-success  ml-2", taskUserAccess.CanApproveDisapprove && Model.IsAssignee == false, null, "Approve / Disapprove access is required and should not be the Assignee.", "AcceptTask()")
+                @RenderActionButton("Reject", "❌", "btn-danger  ml-2", taskUserAccess.CanApproveDisapprove && Model.IsAssignee == false, null, "Approve / Disapprove access is required and should not be the Assignee.", "RejectTask()")
             }
-            else if (Model.Status.ToLower() == "submitted"
-            && string.IsNullOrWhiteSpace(Model.ApprovedBy))
+            else if (Model.Status.Equals("incomplete", StringComparison.OrdinalIgnoreCase))
             {
-                @if (userAccess.CanApproveDisapprove)
-                {
-                    <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
-                        <span class="fas fa-check"></span> Approve
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                        <span class="fas fa-times"></span> Disapprove
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="top-left" role="tooltip">
-                        <span class="fas fa-check"></span> Approve
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="top-left" role="tooltip">
-                        <span class="fas fa-times"></span> Disapprove
-                        </button>
-                }
+                @RenderActionButton("Fix", "🔧", "btn-primary  ml-2", taskUserAccess.CanEdit, null, "Edit access is required.", "FixTask()")
             }
-            else if (Model.Status.ToLower() == "disapproved"
-            && !string.IsNullOrWhiteSpace(Model.DisapprovedBy)
-            && Model.ResubmitId == null)
+            else if (Model.Status.Equals("for production", StringComparison.OrdinalIgnoreCase))
             {
-                @if (userAccess.CanAdd)
-                {
-                    <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </a>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="top-left" role="tooltip">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </button>
-                }
+                @RenderActionButton("Deploy in Production", "🔧", "btn-primary  ml-2", taskUserAccess.CanEdit, null, "Edit access is required.", "ProdTask()")
             }
-            <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                <span class="fas fa-arrow-left"></span> Back to List
+            <a class="btn btn-light text-dark btn-sm float-right ml-2" asp-controller="Tracker" asp-action="Details" asp-route-id="@Model.NextTaskId">
+                <span class="emoji">⏵</span>
+            </a>
+            <a class="btn btn-light text-dark btn-sm float-right ml-2" asp-controller="Tracker" asp-action="Details" asp-route-id="@Model.PreviousTaskId">
+                <span class="emoji">⏴</span>
+            </a>
+            <a class="btn btn-light text-dark btn-sm float-right ml-2" asp-action="Index">
+                <span class="emoji">🔙</span> Back to List
             </a>
         </div>
     </div>
     <div class="card-body">
-        @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) || Model.ResubmitFromId != null)
-        {
-            <div class="row">
-                @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
-                {
-                    <div class="col-12">
-                        <div class="alert alert-danger text-sm" role="alert">
-                            <strong>Reason of Disapproval:</strong>
-                            @(string.IsNullOrWhiteSpace(Model.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
-                        </div>
-                    </div>
-                }
-                @if (Model.ResubmitId != null || Model.ResubmitFromId != null)
-                {
-                    <div class="col-12">
-                        <div class="alert alert-info text-sm" role="alert">
-                            <strong>Resubmit Details:</strong>
-                            @if (Model.ResubmitId != null)
-                            {
-                                <div>This has been resubmitted. <a href="@Url.Action("Details", "PurchaseOrder", new {Id = Model.ResubmitId})" class="alert-link">View new details</a>.</div>
-                            }
-                            @if (Model.ResubmitFromId != null)
-                            {
-                                <div>This is a resubmission. <a href="@Url.Action("Details", "PurchaseOrder", new {Id = Model.ResubmitFromId})" class="alert-link">View previous details</a>.</div>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
-        }
         <div class="row">
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DocumentNumber)
-                    </span>
-                    <b class="d-block">
-                        @Model.DocumentNumber
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Type)
-                    </span>
-                    <b class="d-block">
-                        @Model.Type
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.RequestPurpose)
-                    </span>
-                    <b class="d-block">
-                        @Model.RequestPurpose
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Supplier)
-                    </span>
-                    <b class="d-block">
-                        @Model.Supplier
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Term)
-                    </span>
-                    <b class="d-block">
-                        @Model.Term
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Currency)
-                    </span>
-                    <b class="d-block">
-                        @Model.Currency
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.CurrencyRate)
-                    </span>
-                    <b class="d-block">
-                        @Model.CurrencyRate
-                    </b>
-                </p>
-            </div>
-            @if (new[] {
-            "non-automotive",
-            "local purchase order",
-            "international purchase order"
-            }.Contains(Model.Type?.ToLower()))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.DeliveryMode)
-                        </span>
-                        <b class="d-block">
-                            @Model.DeliveryMode
-                        </b>
-                    </p>
-                </div>
-            }
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DeliveryAddress)
-                    </span>
-                    <b class="d-block">
-                        @if(string.IsNullOrWhiteSpace(Model.DeliveryAddress))
-                        {
-                            <em class="text-muted">N/A</em>
-                        } else
-                        {
-                            @Model.DeliveryAddress
-                        }
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.OrderDate)
-                    </span>
-                    <b class="d-block">
-                        @Model.OrderDate
-                    </b>
-                </p>
-            </div>
-            @if (new[] {
-            "local purchase order",
-            "international purchase order"
-            }.Contains(Model.Type?.ToLower()))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Reference)
-                        </span>
-                        <b class="d-block">
-                            @(Model.Reference ?? "-")
-                        </b>
-                    </p>
-                </div>
-            }
-            @if (!new[] {
-            "maintenance & repair"
-            }.Contains(Model.Type?.ToLower()))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Discount1)
-                        </span>
-                        <b class="d-block">
-                            @(Model.Discount1 ?? "-")
-                        </b>
-                    </p>
-                </div>
-            }
-            @if (new[] {
-            "local purchase order"
-            }.Contains(Model.Type?.ToLower()))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Discount2)
-                        </span>
-                        <b class="d-block">
-                            @(Model.Discount2 ?? "-")
-                        </b>
-                    </p>
-                </div>
-
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Discount3)
-                        </span>
-                        <b class="d-block">
-                            @(Model.Discount3 ?? "-")
-                        </b>
-                    </p>
-                </div>
-            }
-
-            @if (!new[] {
-            "maintenance & repair"
-            }.Contains(Model.Type?.ToLower()))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.IsVATIncluded)
-                        </span>
-                        <b class="d-block">
-                            @Model.IsVATIncluded
-                        </b>
-                    </p>
-                </div>
-            }
-
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Remarks)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)
-                    </b>
-                </p>
-            </div>
-            @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.ApprovedBy)
-                        </span>
-                        <b class="d-block">
-                            @Model.ApprovedBy
-                        </b>
-                    </p>
-                </div>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.DisapprovedBy)
-                        </span>
-                        <b class="d-block">
-                            @Model.DisapprovedBy
-                        </b>
-                    </p>
-                </div>
-            }
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Status)
-                    </span>
-                    <b class="d-block" id="request-status">
-                        @Model.Status
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.UserCreated)
-                    </span>
-                    <b class="d-block" id="request-status">
-                        @Model.UserCreated
-                    </b>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DateCreated)
-                    </span>
-                    <b class="d-block" id="request-status">
-                        @Model.DateCreated
-                    </b>
-                </p>
-            </div>
-            @if (!string.IsNullOrWhiteSpace(Model.UserModified))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.UserModified)
-                        </span>
-                        <b class="d-block">
-                            @Model.UserModified
-                        </b>
-                    </p>
-                </div>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.DateModified))
-            {
-                <div class="col-12 col-md-4 col-sm-6">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.DateModified)
-                        </span>
-                        <b class="d-block">
-                            @Model.DateModified
-                        </b>
-                    </p>
-                </div>
-            }
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <span class="card-title">Purchase Request Item(s)</span>
-                        @if (Model!.Status.ToLower() == "draft" && userAccess.CanAdd)
-                        {
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                    <span class="fas fa-plus"></span> Add Item
-                                </button>
+            <div class="col-12 col-lg-8">
+                <div class="card card-default">
+                    <div class="card-body">
+                        <div class="container">
+                            <div class="row mb-2 details-display-reason @(string.IsNullOrWhiteSpace(Model.DisapproveReason) ? "d-none" : "")">
+                                <div class="col-12">
+                                    <div class="alert alert-danger" role="alert">
+                                        <strong>Reason of Disapproval</strong>
+                                        <div id="details-reason">
+                                            @Html.Raw(Model.DisapproveReason)
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        }
+                            <div class="row mb-2 pb-2 border-bottom">
+                                <div class="col-12">
+                                    <span class="text-muted">Function</span>
+                                    <div id="details-function">
+                                        @Html.Raw(Model.Function)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-2 pb-2 border-bottom">
+                                <div class="col-12">
+                                    <span class="text-muted">Behavior</span>
+                                    <div id="details-behavior">
+                                        @Html.Raw(Model.Behavior)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <span class="text-muted">Access Control</span>
+                                    <div id="details-access">
+                                        @Html.Raw(Model.AccessControl)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-info">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link px-3 active" id="nav-history-tab" role="tab"
+                                    data-bs-toggle="tab" data-bs-target="#nav-history"
+                                    aria-controls="nav-history" aria-selected="true">
+                                    <span class="emoji">🕓</span>History
+                                </a>
+                            </li>
+                            @if (commentUserAccess.CanView)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link px-3" id="nav-comment-tab" role="tab"
+                                        data-bs-toggle="tab" data-bs-target="#nav-comment"
+                                        aria-controls="nav-comment" aria-selected="true">
+                                        <span class="emoji">💬</span>Comment
+                                        <span class="comment-counter badge rounded-pill bg-invert ml-2 px-2@(Model.CommentCount == 0 ? " d-none" : "")">@Model.CommentCount</span>
+                                    </a>
+                                </li>
+                            }
+                            @if (issueUserAccess.CanView)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link px-3" id="nav-issue-tab" role="tab"
+                                        data-bs-toggle="tab" data-bs-target="#nav-issue"
+                                        aria-controls="nav-issue" aria-selected="true">
+                                        <span class="emoji">🐞</span>Issue
+                                        <span class="issue-counter badge rounded-pill bg-danger ml-2 px-2@(Model.IssueCount == 0 ? " d-none" : "")">@Model.IssueCount</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
                     </div>
                     <div class="card-body">
-                        <table class="table table-head-fixed table-striped table-hover table-item">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>#</th>
-                                    <th>Purchase Request Ref#</th>
-                                    <th>Item Code</th>
-                                    <th>Part Number</th>
-                                    <th>Item Description</th>
-                                    <th>Quantity</th>
-                                    <th>Unit</th>
-                                    <th>Unit Cost</th>
-                                    <th>Total Amount</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>Total</th>
-                                    <th class="total-quantity">0</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th class="total-amount">0</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="nav-history" role="tabpanel"
+                                    aria-labelledby="nav-history-tab">
+                                <div class="container history-container timeline py-2">
+                                    @foreach (var History in Model.Histories)
+                                    {
+                                        <div class="timeline-item mb-3 position-relative">
+                                            <div class="timeline-marker bg-gradient-gray"></div>
+                                            <div class="ms-5">
+                                                <p class="mb-1">@History.Description</p>
+                                                <p class="mb-0 text-muted small">@History.CreatedBy performed this action on @History.DateCreated</p>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            @if (commentUserAccess.CanView)
+                            {
+                                <div class="tab-pane fade" id="nav-comment" role="tabpanel" aria-labelledby="nav-comment-tab">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                @RenderActionButton("New Comment", "📩", "btn-secondary w-100", commentUserAccess.CanAdd, null, "Add access is required.", "ShowAddComment()")
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="container comment-container pt-3">
+                                        @if (Model.Comments.Count() > 0)
+                                        {
+                                            @foreach (var Comment in Model.Comments)
+                                            {
+                                                <div class="card card-default">
+                                                    @if (!string.IsNullOrWhiteSpace(Comment.ModifyExpiration))
+                                                    {
+                                                        <div class="card-header">
+                                                            <div class="card-tools">
+                                                                @RenderActionButton("Edit", "✏️", "btn-info ml-2", commentUserAccess.CanEdit, "Button expires in " + Comment.ModifyExpiration, "Edit access is required.", "ShowEditComment(" + Json.Serialize(Comment) + ")")
+                                                                @RenderActionButton("Delete", "🗑️", "btn-danger ml-2", commentUserAccess.CanDelete, "Button expires in " + Comment.ModifyExpiration, "Delete access is required.", "DeleteComment(" + Json.Serialize(Comment) + ")")
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    <div class="card-body">
+                                                        <div class="row mb-2">
+                                                            <div class="col-12">
+                                                                @Html.Raw(Comment.Content)
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mt-3 d-flex gap-2">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="card-footer text-muted small">
+                                                        <div class="row">
+                                                            @if (!string.IsNullOrWhiteSpace(Comment.ModifiedBy) || Comment.DateModifiedD != null)
+                                                            {
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">👤</span>Created By: @Comment.CreatedBy</p>
+                                                                    <p class="mb-1"><span class="emoji">📅</span>Date Created: @Comment.DateCreated</p>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">✏️</span>Modified By: @Comment.ModifiedBy</p>
+                                                                    <p class="mb-1"><span class="emoji">📅</span>Date Modified: @Comment.DateModified</p>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">👤</span>Created By: @Comment.CreatedBy</p>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">📅</span>Date Created: @Comment.DateCreated</p>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <em class="text-center text-muted">No comment(s) yet</em>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            @if (issueUserAccess.CanView)
+                            {
+                                <div class="tab-pane fade" id="nav-issue" role="tabpanel" aria-labelledby="nav-issue-tab">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                @RenderActionButton("New Issue", "📛", "btn-secondary w-100", issueUserAccess.CanAdd, null, "Add access is required.", "ShowAddIssue()")
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="container issue-container py-2">
+                                        @if (Model.Issues.Count() > 0)
+                                        {
+                                            @foreach (var Issue in Model.Issues)
+                                            {
+                                                <div class="card card-default">
+                                                    <div class="card-header">
+                                                        <span class="card-title">@Issue.Summary</span>
+                                                        <div class="card-tools">
+                                                            @if (Issue.Status.Equals("reopened", StringComparison.OrdinalIgnoreCase))
+                                                            {
+                                                                @RenderActionButton("Start Doing", "🔄", "btn-primary ml-2", issueUserAccess.CanEdit, null, "Edit access is required.", "StartIssue(" + Json.Serialize(Issue) + ")")
+                                                            }
+                                                            else if (Issue.Status.Equals("open", StringComparison.OrdinalIgnoreCase))
+                                                            {
+                                                                @RenderActionButton("Start Doing", "🔄", "btn-primary ml-2", issueUserAccess.CanEdit, null, "Edit access is required.", "StartIssue(" + Json.Serialize(Issue) + ")")
+                                                                if (!string.IsNullOrWhiteSpace(Issue.ModifyExpiration))
+                                                                {
+                                                                    @RenderActionButton("Edit", "✏️", "btn-info ml-2", issueUserAccess.CanEdit, "Button expires in " + Issue.ModifyExpiration, "Edit access is required.", "ShowEditIssue(" + Json.Serialize(Issue) + ")")
+                                                                    @RenderActionButton("Delete", "🗑️", "btn-danger ml-2", issueUserAccess.CanDelete, "Button expires in " + Issue.ModifyExpiration, "Delete access is required.", "DeleteIssue(" + Json.Serialize(Issue) + ")")
+                                                                }
+                                                            }
+                                                            else if (Issue.Status.Equals("doing", StringComparison.OrdinalIgnoreCase))
+                                                            {
+                                                                @RenderActionButton("Mark as Fixed", "✅", "btn-success ml-2", issueUserAccess.CanEdit, null, "Edit access is required.", "FixedIssue(" + Json.Serialize(Issue) + ")")
+                                                            }
+                                                            else if (Issue.Status.Equals("fixed", StringComparison.OrdinalIgnoreCase))
+                                                            {
+                                                                @RenderActionButton("Reopen", "🔄", "btn-warning ml-2", issueUserAccess.CanEdit, null, "Edit access is required.", "ReopenIssue(" + Json.Serialize(Issue) + ")")
+                                                            }
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="card-body">
+                                                        <div class="row mb-2">
+                                                            <div class="col-md-6">
+                                                                <strong>Status:</strong> @Issue.Status
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <strong>Severity:</strong>
+                                                                @if (Model.Priority.ToLower() == "critical")
+                                                                {
+                                                                    <span class="emoji">🟥</span>
+                                                                    <text>CRITICAL</text>
+                                                                }
+                                                                else if (Model.Priority.ToLower() == "high")
+                                                                {
+                                                                    <span class="emoji">🟧</span>
+                                                                    <text>HIGH</text>
+                                                                }
+                                                                else if (Model.Priority.ToLower() == "medium")
+                                                                {
+                                                                    <span class="emoji">🟨</span>
+                                                                    <text>MEDIUM</text>
+                                                                }
+                                                                else if (Model.Priority.ToLower() == "medium")
+                                                                {
+                                                                    <span class="emoji">🟩</span>
+                                                                    <text>LOW</text>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="emoji">⬜</span>
+                                                                    <text>TRIVIAL</text>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span class="text-muted">Description</span>
+                                                            <div>
+                                                                @Html.Raw(Issue.Description)
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span class="text-muted">Steps to Replicate</span>
+                                                            <div>
+                                                                @Html.Raw(Issue.Replication)
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span class="text-muted">Solution</span>
+                                                            <div>
+                                                                @if (string.IsNullOrWhiteSpace(Issue.Resolution))
+                                                                {
+                                                                    <p class="text-muted">Not yet provided</p>
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.Raw(Issue.Resolution)
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mt-3 d-flex gap-2">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="card-footer text-muted small">
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <p class="mb-1"><span class="emoji">👤</span>Created By: @Issue.CreatedBy</p>
+                                                                <p class="mb-1"><span class="emoji">📅</span>Date Created: @Issue.DateCreated</p>
+                                                            </div>
+                                                            @if (!string.IsNullOrWhiteSpace(Issue.ModifiedBy) || Issue.DateModifiedD != null)
+                                                            {
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">✏️</span>Modified By: @Issue.ModifiedBy</p>
+                                                                    <p class="mb-1"><span class="emoji">📅</span>Date Modified: @Issue.DateModified</p>
+                                                                </div>
+                                                            }
+                                                            <div class="col-md-4">
+                                                                <p class="mb-1">
+                                                                    <span class="emoji">✅</span>Fixed By:
+                                                                    @if (string.IsNullOrWhiteSpace(Issue.FixedBy))
+                                                                    {
+                                                                        @Html.Raw("<span class=\"text-muted\">Not yet fixed</span>")
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @Html.Raw(Issue.FixedBy)
+                                                                    }
+                                                                </p>
+                                                                <p class="mb-1">
+                                                                    <span class="emoji">📅</span>Date Fixed:
+                                                                    @if (Issue.DateFixedD == null)
+                                                                    {
+                                                                        @Html.Raw("<span class=\"text-muted\">Not yet fixed</span>")
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @Html.Raw(Issue.DateFixed)
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <em class="text-center text-muted">No issue(s) found</em>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="card card-default">
+                    <div class="card-body">
+                        <div class="container">
+                            <div class="row mb-2">
+                                <div class="col-sm-5 text-muted">Status</div>
+                                <div id="details-status" class="col-sm-7">
+                                    @Model.Status
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 text-muted">Priority</div>
+                                <div id="details-priority" class="col-sm-7">
+                                    @if (Model.Priority.ToLower() == "high")
+                                    {
+                                        <span class="emoji">🟧</span>
+                                        <text>HIGH</text>
+                                    }
+                                    else if (Model.Priority.ToLower() == "medium")
+                                    {
+                                        <span class="emoji">🟨</span>
+                                        <text>MEDIUM</text>
+                                    }
+                                    else
+                                    {
+                                        <span class="emoji">🟩</span>
+                                        <text>LOW</text>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 text-muted">Assignee</div>
+                                <div id="details-assignee" class="col-sm-7">@Model.Assignee</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 text-muted">Created By</div>
+                                <div id="details-created-by" class="col-sm-7">@Model.CreatedBy</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 text-muted">Date Created</div>
+                                <div id="details-created-date" class="col-sm-7">@Model.DateCreated</div>
+                            </div>
+                            <div class="row detail-modified-by-display mb-2 @(string.IsNullOrWhiteSpace(Model.ModifiedBy) ? "d-none" : "")">
+                                <div class="col-sm-5 text-muted">Modified By</div>
+                                <div id="details-modified-by" class="col-sm-7">@Model.ModifiedBy</div>
+                            </div>
+                            <div class="row detail-modified-date-display mb-2 @(string.IsNullOrWhiteSpace(Model.DateModified) ? "d-none" : "")">
+                                <div class="col-sm-5 text-muted">Date Modified</div>
+                                <div id="details-modified-date" class="col-sm-7">@Model.DateModified</div>
+                            </div>
+                            <div class="row detail-approved-by-display mb-2 @(string.IsNullOrWhiteSpace(Model.ApprovedBy) ? "d-none" : "")">
+                                <div class="col-sm-5 text-muted">Tested & Approved By</div>
+                                <div id="details-approved-by" class="col-sm-7">@Model.ApprovedBy</div>
+                            </div>
+                            <div class="row detail-approved-date-display mb-2 @(string.IsNullOrWhiteSpace(Model.DateApproved) ? "d-none" : "")">
+                                <div class="col-sm-5 text-muted">Date Approved</div>
+                                <div id="details-approved-date" class="col-sm-7">@Model.DateApproved</div>
+                            </div>
+                            <div class="row detail-disapproved-by-display mb-2 @(string.IsNullOrWhiteSpace(Model.DisapprovedBy) ? "d-none" : "")">
+                                <div class="col-sm-5 text-muted">Tested & Disapproved By</div>
+                                <div id="details-disapproved-by" class="col-sm-7">@Model.DisapprovedBy</div>
+                            </div>
+                            <div class="row detail-disapproved-date-display mb-2 @(string.IsNullOrWhiteSpace(Model.DateDisapproved) ? "d-none" : "")">
+                                <div class="col-sm-5 text-muted">Date Disapproved</div>
+                                <div id="details-disapproved-date" class="col-sm-7">@Model.DateDisapproved</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -462,1130 +490,769 @@
     </div>
 </div>
 
-@if (userAccess.CanAdd)
+@if (commentUserAccess.CanAdd)
 {
-    <!-- Purchase Order Item Modal -->
-    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="addCommentModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Purchase Order Item</h5>
+                    <h5 class="modal-title">New Comment</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="form-item">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12 col-sm-6 add-so-number-container">
-                                <div class="form-group">
-                                    <label for="add-pr-number" class="form-label mb-0">Purchase Request Ref#</label>
-                                    <select id="add-pr-number" name="PRNumber" style="width: 100%;">
-                                        <option></option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 add-code-container">
-                                <div class="form-group">
-                                    <label for="add-code" class="form-label mb-0">Item Code</label>
-                                    <input type="text" id="add-code" name="Code" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 add-part-container">
-                                <div class="form-group">
-                                    <label for="add-part" class="form-label mb-0">Part Number</label>
-                                    <input type="text" id="add-part" name="PartNumber" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 add-name-container">
-                                <div class="form-group">
-                                    <label for="add-name" class="form-label mb-0">Item Name</label>
-                                    <select id="add-name" name="Name" style="width: 100%;">
-                                        <option></option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 add-quantity-container">
-                                <div class="form-group">
-                                    <label for="add-quantity" class="form-label mb-0">Quantity</label>
-                                    <input type="number" min="0" max="1999999" step="1" id="add-quantity" name="Quantity" class="form-control form-control-sm" />
-                                    <label class="text-warning text-xs fw-lighter fst-italic m-0 add-quantity-warning"></label>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 add-unit-container">
-                                <div class="form-group">
-                                    <label for="add-unit" class="form-label mb-0">Unit</label>
-                                    <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 add-unit-cost-container">
-                                <div class="form-group">
-                                    <label for="add-unit-cost" class="form-label mb-0">Unit Cost</label>
-                                    <input type="number" step="0.01" id="add-unit-cost" name="UnitCost" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 add-total-amount-container">
-                                <div class="form-group">
-                                    <label for="add-total-amount" class="form-label mb-0">Total Amount</label>
-                                    <input type="text" id="add-total-amount" name="TotalAmount" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="add-comment-content" class="form-label mb-0">Comment</label>
+                                <textarea id="add-comment-content"></textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-add">
-                            <span class="fas fa-plus"></span> Add
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="AddComment()">
+                        <span class="emoji">📩</span> Send
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 }
 
-
-@if (userAccess.CanEdit)
+@if (commentUserAccess.CanEdit)
 {
-    <!-- Cost Modal Update Cost of already Approved Purchase Order -->
-    <div class="modal fade" id="costModal" role="dialog" aria-labelledby="costModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Update Cost of already Approved Purchase Order</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="form-cost">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="cost-item" class="form-label mb-0">Item Description</label>
-                                    <input type="text" id="cost-item" name="Item" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="cost-old" class="form-label mb-0">Old (Ordered) Unit Cost</label>
-                                    <input type="text" id="cost-old" name="OldCode" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="cost-new" class="form-label mb-0">New (Received) Unit Cost</label>
-                                    <input type="number" min="0" max="1999999" step="0.01" id="cost-new" name="NewCost" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="cost-quantity" class="form-label mb-0">Quantity</label>
-                                    <input type="text" id="cost-quantity" name="Quantity" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="cost-total" class="form-label mb-0">Total Amount</label>
-                                    <input type="text" id="cost-total" name="Total" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="cost-remarks" class="form-label mb-0">Remarks</label>
-                                    <input type="text" id="cost-remarks" name="Remarks" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-info btn-cost-history">
-                            <span class="fas fa-history"></span> History
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <span class="fas fa-edit"></span> Update
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Cost Modal Update Cost History -->
-    <div class="modal fade" id="costHistoryModal" role="dialog" aria-labelledby="costHistoryModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal fade" id="editCommentModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Update Cost History for <span class="cost-item-history"></span></h5>
+                    <h5 class="modal-title">Update Comment</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                    <div class="modal-body">
-                        <table class="table table-striped table-hover table-cost-history">
-                            <thead>
-                                <tr>
-                                    <th>Previous Cost</th>
-                                    <th>New Cost</th>
-                                    <th>Remarks</th>
-                                    <th>Created By</th>
-                                    <th>Date Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
-            </div>
-        </div>
-    </div>
-
-     <!-- Quantity Modal Update Quantity of already Approved Purchase Order -->
-    <div class="modal fade" id="quantityModal" role="dialog" aria-labelledby="quantityModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Update Quantity of already Approved Purchase Order</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="form-quantity">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="quantity-item" class="form-label mb-0">Item Description</label>
-                                    <input type="text" id="quantity-item" name="Item" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="quantity-old" class="form-label mb-0">Old (Ordered) Quantity</label>
-                                    <input type="text" id="quantity-old" name="OldQuantity" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="quantity-new" class="form-label mb-0">New (Received) Quantity</label>
-                                    <input type="number" min="0" max="1999999" step="1" id="quantity-new" name="NewQuantity" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="quantity-cost" class="form-label mb-0">Cost</label>
-                                    <input type="text" id="quantity-cost" name="Cost" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="quantity-total" class="form-label mb-0">Total Amount</label>
-                                    <input type="text" id="quantity-total" name="Total" class="form-control form-control-sm" readonly="readonly" />
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="quantity-remarks" class="form-label mb-0">Remarks</label>
-                                    <input type="text" id="quantity-remarks" name="Remarks" class="form-control form-control-sm" />
-                                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-comment-content" class="form-label mb-0">Comment</label>
+                                <textarea id="edit-comment-content"></textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-info btn-quantity-history">
-                            <span class="fas fa-history"></span> History
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <span class="fas fa-edit"></span> Update
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="EditComment()">
+                        <span class="emoji">✏️</span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    
-      <!-- Quantity Modal Update Quantity History -->
-    <div class="modal fade" id="quantityHistoryModal" role="dialog" aria-labelledby="quantityHistoryModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+}
+
+@if (issueUserAccess.CanAdd)
+{
+    <div class="modal fade" id="addIssueModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Update Quantity History for <span class="quantity-item-history"></span></h5>
+                    <h5 class="modal-title">New Issue</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                    <div class="modal-body">
-                        <table class="table table-striped table-hover table-quantity-history">
-                            <thead>
-                                <tr>
-                                    <th>Previous Quantity</th>
-                                    <th>New Quantity</th>
-                                    <th>Remarks</th>
-                                    <th>Created By</th>
-                                    <th>Date Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="add-issue-summary" class="form-label mb-0">Summary <em class="text-muted fw-lighter">(Provide a short and clear title for the issue.)</em></label>
+                                <input type="text" id="add-issue-summary" name="Summary" class="form-control form-control-sm" />
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="add-issue-description" class="form-label mb-0">Description <em class="text-muted fw-lighter">(Clearly explain the actual result compared to the expected result.)</em></label>
+                                <textarea id="add-issue-description" name="Description"></textarea>
+                            </div>
+                        </div>
                     </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="add-issue-replication" class="form-label mb-0">Steps to Replicate <em class="text-muted fw-lighter">(Please list the steps you performed, in order, so that the developer can reproduce the same issue.)</em></label>
+                                <textarea id="add-issue-replication" name="Replication"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="add-issue-severity" class="form-label mb-0">Severity <em class="text-muted fw-lighter">(Indicate how serious the issue is and how much it affects expected results or usability.)</em></label>
+                                <select id="add-issue-severity" name="Severity" style="width:100%">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="AddIssue()">
+                        <span class="emoji">➕</span>Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+}
 
-  
+@if (issueUserAccess.CanEdit)
+{
+    <div class="modal fade" id="editIssueModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Issue</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-issue-summary" class="form-label mb-0">Summary</label>
+                                <input type="text" id="edit-issue-summary" name="Summary" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-issue-description" class="form-label mb-0">Description <em class="text-muted fw-lighter">(Clearly explain the actual result compared to the expected result.)</em></label>
+                                <textarea id="edit-issue-description" name="Description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-issue-replication" class="form-label mb-0">Steps to Replicate <em class="text-muted fw-lighter">(Please list the steps you performed, in order, so that the developer can reproduce the same issue.)</em></label>
+                                <textarea id="edit-issue-replication" name="Replication"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="edit-issue-severity" class="form-label mb-0">Severity <em class="text-muted fw-lighter">(Indicate how serious the issue is and how much it affects expected results or usability.)</em></label>
+                                <select id="edit-issue-severity" name="Severity" style="width:100%">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="EditIssue()">
+                        <span class="emoji">✏️</span> Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @section Scripts {
     <script>
-        var user_access = @Html.Raw(Json.Serialize(userAccess));
-        var po_data = @Json.Serialize(Model);
+        var task_user_access = @Html.Raw(Json.Serialize(taskUserAccess));
+        var comment_user_access = @Html.Raw(Json.Serialize(commentUserAccess));
+        var issue_user_access = @Html.Raw(Json.Serialize(issueUserAccess));
+        var task_data = @Json.Serialize(Model);
 
-        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
-        }).DataTable({
-            ajax: {
-                url: "@Url.Action("GetItemListJson")",
-                data: { purchaseOrderId: po_data.id },
-                dataSrc: function (json) {
-                    return JSON.parse(JSON.stringify(json));
-                },
-                type: "POST",
-            },
-            filter: true,
-            responsive: true,
-            autoWidth: false,
-            columns: [
-                {
-                    orderable: false,
-                    data: function (data, type, dataToSet) {
-                        var actions = '<div class="btn-group" role="group">';
-                        if (po_data.status.toLowerCase() == "draft") {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
-                        }
-                        return actions + '</div>';
-                    },
-                    className: "form-cell"
-                },
-                { data: "lineNumber", name: "LineNumber", className: "form-cell" },
-                { data: "purchaseRequestNumber", name: "PurchaseRequestNumber", className: "form-cell" },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (data.itemId == null || data.itemCode == null) {
-                            return "-";
-                        } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
-                        }
-                    },
-                    name: "ItemCode",
-                    className: "form-cell"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        return data.itemPartNumber == null || data.itemPartNumber.trim() == "" ? "-" : data.itemPartNumber;
-                    },
-                    name: "ItemPartNumber",
-                    className: "form-cell"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (po_data.status.toLowerCase() == "draft" 
-                         && po_data.requestType.toLowerCase() == "non-automotive" 
-                         && po_data.requestPurpose.toLowerCase() == "one-time purchase") {
-                            if (data.itemDescription == "") {
-                                return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description is required.</label>';
-                            } else if (data.itemDescription.length > 100) {
-                                return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description must not exceed 100 characters.</label>';
-                            } else {
-                                return '<textarea class="form-control form-control-sm expandable-textarea description" style="width: 100%;">' + data.itemDescription + '</textarea>';
-                            }
-                        } else {
-                            return data.itemDescription;
-                        }
-                    },
-                    name: "ItemDescription",
-                    className: "form-cell" },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (po_data.status.toLowerCase() == "draft") {
-                            if (data.quantityD > data.unorderedQuantityD) {
-                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-warning" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Order higher than ' + data.unorderedQuantity  + ' unordered quantity.</label>';
-                            } else if (data.quantityD == 0) {
-                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Nothing to request.</label>';
-                            } else {
-                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
-                            }
-                        } else {
-                            return data.quantity;
-                        }
-                    },
-                    name: "Quantity",
-                    className: "form-cell text-end"
-                },
-                { data: "unitCode", name: "UnitCode", className: "form-cell" },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (po_data.status.toLowerCase() == "draft") {
-                            return '<input type="number" min="0" max="1999999" step="0.01" value="' + data.unitCostD + '" class="form-control form-control-sm cost" style="width: 100%;" />';
-                        } else {
-                            return data.unitCost;
-                        }
-                    },
-                    name: "UnitCost",
-                    className: "form-cell text-end"
-                },
-                {
-                    data: "totalAmount",
-                    name: "TotalAmount", 
-                    className: "form-cell",
-                    render: function (data, type, row) {
-                        if (type === 'display') {
-                            return po_data.currency.split("/")[0].trim() + '&nbsp;' + data;
-                        }
+        const severityOptions = [
+            { id: "TRIVIAL", text: "TRIVIAL", emoji: "⬜", desc: "Cosmetic issue, typo, small UI glitch" },
+            { id: "LOW", text: "LOW", emoji: "🟩", desc: "Minor problem, doesn’t affect functionality" },
+            { id: "MEDIUM", text: "MEDIUM", emoji: "🟨", desc: "Noticeable issue, workaround exists" },
+            { id: "HIGH", text: "HIGH", emoji: "🟧", desc: "Major feature broken, serious impact" },
+            { id: "CRITICAL", text: "CRITICAL", emoji: "🟥", desc: "System crash, data loss, blocking release" }
+        ];
 
-                        return data;
-                    }
+        if (issue_user_access.canAdd) {
+            $('#add-issue-severity').select2({
+                data: severityOptions,
+                minimumResultsForSearch: -1,
+                templateResult: function (repo) {
+                    if (repo.loading) return repo.text;
+                    return $(
+                        "<span class='me-1'>" + repo.emoji + "</span>" +
+                        "<strong>" + repo.text + "</strong>" +
+                        "<em class='fw-light ms-1'> - " + repo.desc + "</em>"
+                    );
                 },
-                {
-                    orderable: false,
-                    data: function (data, type, dataToSet) {
-                        var actions = '<div class="btn-group" role="group">';
-                        if (po_data.status.toLowerCase() == "approved") {
-                            if(!user_access.canEdit || data.quantityUpdateCount > 2) {
-                                actions += '<button type="button" class="btn btn-warning btn-xs btn-history-quantity" data-microtip-title="Update Quantity History" data-microtip-position="left" role="tooltip"><i class="fas fa-history"></i></button>';
-                            } else {
-                                actions += '<button type="button" class="btn btn-warning btn-xs btn-update-quantity" data-microtip-title="Update Quantity" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                            }
-                            if(!user_access.canEdit || data.costUpdateCount > 2) {
-                                actions += '<button type="button" class="btn btn-info btn-xs btn-history-cost ml-2" data-microtip-title="Update Cost History" data-microtip-position="left" role="tooltip"><i class="fas fa-history"></i></button>';
-                            } else {
-                                actions += '<button type="button" class="btn btn-info btn-xs btn-update-cost ml-2" data-microtip-title="Update Cost" data-microtip-position="left" role="tooltip"><i class="fas fa-money-bill-wave"></i></button>';
-                            }
-                        }
-                        return actions + '</div>';
-                    },
-                    className: "form-cell"
+                templateSelection: function (repo) {
+                    return repo.emoji + " " + repo.text;
                 },
+                dropdownParent: $("#addIssueModal")
+            });
+        }
+
+        if (issue_user_access.canEdit) {
+            $('#edit-issue-severity').select2({
+                data: severityOptions,
+                minimumResultsForSearch: -1,
+                templateResult: function (repo) {
+                    if (repo.loading) return repo.text;
+                    return $(
+                        "<span class='me-1'>" + repo.emoji + "</span>" +
+                        "<strong>" + repo.text + "</strong>" +
+                        "<em class='fw-light ms-1'> - " + repo.desc + "</em>"
+                    );
+                },
+                templateSelection: function (repo) {
+                    return repo.emoji + " " + repo.text;
+                },
+                dropdownParent: $("#editIssueModal")
+            });
+        }
+
+        const trackerEditor = (selector, entity, height, placeholder) => ({
+            placeholder: placeholder,
+            height: height,
+            toolbar: [
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['insert', task_user_access.canUploadDownload || comment_user_access.canUploadDownload || issue_user_access.canUploadDownload
+                         ? ['link', 'picture', 'table', 'hr']
+                         : ['link', 'table', 'hr']],
+                ['view', ['fullscreen', 'codeview']],
             ],
-            order: [[1, "asc"]],
-            footerCallback: function (row, data, start, end, display) {
-                var api = this.api(), data;
-
-                columnDTTotalInteger(api, 6);
-                columnDTTotalDecimal(api, 9, po_data.currency.split("/")[0].trim() + '&nbsp;');
-            }
-        });
-
-        itemDT.on("draw", function () {
-            hideLoader();
-
-            $(".table-item thead th").removeClass("form-cell");
-            $(".table-item thead th").removeClass("text-end");
-
-            if (user_access.canAdd) {
-                $(".btn-remove-item").off("click").on("click", function () {
-                    itemDT.row($(this).parents('tr')).remove().draw();
-                });
-
-                itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    var rowData = this.data();
-                    if (rowData.lineNumber == 1)
-                        $(this.node()).find(".btn-up-item").hide();
-                    else
-                        $(this.node()).find(".btn-up-item").show();
-
-                    if (rowData.lineNumber == Math.max.apply(Math, itemDT.column(1).data().toArray()))
-                        $(this.node()).find(".btn-down-item").hide();
-                    else
-                        $(this.node()).find(".btn-down-item").show();
-                });
-
-                $(".btn-up-item").off("click").on("click", function () {
-                    var row = $(this).parents('tr');
-                    var rowData = itemDT.row(row).data();
-
-                    var currentLineNumber = rowData.lineNumber;
-                    var newLineNumber = currentLineNumber - 1;
-
-                    var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
-                        return itemDT.row(index).data().lineNumber == newLineNumber;
-                    });
-
-                    if (targetRowIndex != undefined) {
-                        var targetRowData = itemDT.row(targetRowIndex).data();
-                        targetRowData.lineNumber = currentLineNumber;
-                        itemDT.row(targetRowIndex).data(targetRowData);
-                    }
-
-                    rowData.lineNumber = newLineNumber;
-                    itemDT.row(row).data(rowData);
-
-                    itemDT.draw();
-                });
-
-                $(".btn-down-item").off("click").on("click", function () {
-                    var row = $(this).parents('tr');
-                    var rowData = itemDT.row(row).data();
-                    var currentLineNumber = rowData.lineNumber;
-                    var newLineNumber = currentLineNumber + 1;
-
-                    var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
-                        return itemDT.row(index).data().lineNumber == newLineNumber;
-                    });
-
-                    if (targetRowIndex != undefined) {
-                        var targetRowData = itemDT.row(targetRowIndex).data();
-                        targetRowData.lineNumber = currentLineNumber;
-                        itemDT.row(targetRowIndex).data(targetRowData);
-                    }
-
-                    rowData.lineNumber = newLineNumber;
-                    itemDT.row(row).data(rowData);
-
-                    itemDT.draw();
-                });
-
-                if (po_data.status.toLowerCase() == "draft" 
-                 && po_data.requestType.toLowerCase() == "non-automotive" 
-                 && po_data.requestPurpose.toLowerCase() == "one-time purchase") {
-                    $(".description").off("change").on("change", function () {
-                        var row = itemDT.row($(this).closest('tr'));
-                        var rowData = row.data();
-
-                        rowData.itemDescription = $(row.node()).find(".description").val();
-
-                        row.data(rowData).draw(false);
-                    });
+            callbacks: {
+                onImageUpload: function (files) {
+                    if(task_user_access.canUploadDownload || comment_user_access.canUploadDownload || issue_user_access.canUploadDownload)
+                        [...files].forEach(file => uploadImage(selector, file, entity));
+                },
+                onMediaDelete: function ($target) {
+                    $target.remove();
                 }
-
-                $(".quantity, .cost").off("change").on("change", function () {
-                    var row = itemDT.row($(this).closest('tr'));
-                    var rowData = row.data();
-
-                    var quantityValue = parseFloat($(row.node()).find(".quantity").val()) || 0;
-                    var costValue = parseFloat($(row.node()).find(".cost").val()) || 0;
-
-                    var totalValue = quantityValue * costValue;
-
-                    rowData.quantity = FormatStringInteger(quantityValue);
-                    rowData.quantityD = quantityValue;
-                    rowData.unitCost = FormatStringDecimal(costValue);
-                    rowData.unitCostD = costValue;
-                    rowData.totalAmount = FormatStringDecimal(totalValue);
-                    rowData.totalAmountD = totalValue;
-
-                    row.data(rowData).draw(false);
-                });
-            }
-
-            if (user_access.canEdit) {
-                $(".btn-update-cost").off("click").on("click", function () {
-                    var row = $(this).parents('tr');
-                    var rowData = itemDT.row(row).data();
-
-                    $("#cost-item").val(rowData.itemDescription);
-                    $("#cost-item").data("POItemId", rowData.id);
-                    $("#cost-old").val(rowData.unitCost);
-                    $("#cost-new").val(rowData.unitCostD);
-                    $("#cost-quantity").val(rowData.quantity);
-                    $("#cost-total").val(po_data.currency.split("/")[0].trim() + " " + rowData.totalAmount);
-                    $("#cost-remarks").val("");
-
-                    $("#costModal").modal("show");
-                });
-
-                $(".btn-update-quantity").off("click").on("click", function () {
-                    var row = $(this).parents('tr');
-                    var rowData = itemDT.row(row).data();
-
-                    $("#quantity-item").val(rowData.itemDescription);
-                    $("#quantity-item").data("POItemId", rowData.id);
-                    $("#quantity-old").val(rowData.quantity);
-                    $("#quantity-new").val(rowData.quantity);
-                    $("#quantity-cost").val(rowData.unitCost);
-                    $("#quantity-total").val(po_data.currency.split("/")[0].trim() + " " + rowData.totalAmount);
-                    $("#quantity-remarks").val("");
-
-                    $("#quantityModal").modal("show");
-                });
-            
-                $(".btn-history-cost").off("click").on("click", function() {
-                    var row = $(this).parents('tr');
-                    var rowData = itemDT.row(row).data();
-                    
-                    $("#cost-item").val(rowData.itemDescription);
-                    $("#cost-item").data("POItemId", rowData.id);
-                    HistoryCost()
-                });
-            
-                $(".btn-history-quantity").off("click").on("click", function() {
-                    var row = $(this).parents('tr');
-                    var rowData = itemDT.row(row).data();
-                    
-                    $("#quantity-item").val(rowData.itemDescription);
-                    $("#quantity-item").data("POItemId", rowData.id);
-                    HistoryQuantity();
-                });
             }
         });
 
-        if (user_access.canAdd) {
+        if(task_user_access.canUploadDownload || comment_user_access.canUploadDownload || issue_user_access.canUploadDownload) {
+            function uploadImage(selector, file, entity) {
+                let data = new FormData();
+                data.append("File", file);
+                data.append("Entity", entity);
+
+                $.ajax({
+                    url: '@Url.Action("UploadImage", "Tracker")',
+                    type: "POST",
+                    data: data,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        if (data.status === "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            $(selector).summernote('insertImage',
+                                '/images/DevTask/' + data.newRow,
+                                function ($image) {
+                                    $image.css('width', $image.width() * 0.25);
+                                }
+                            );
+                        }
+                    }
+                });
+            }
+        }
+
+        if (comment_user_access.canAdd)
+            $('#add-comment-content').summernote(trackerEditor('#add-comment-content', "Comment", 300, ""));
+        if (comment_user_access.canEdit)
+            $('#edit-comment-content').summernote(trackerEditor('#edit-comment-content', "Comment", 300, ""));
+        if (issue_user_access.canAdd) {
+            $('#add-issue-description').summernote(trackerEditor('#add-issue-description', "Issue", 150, "Behaves like this\n\nInstead of like this"));
+            $('#add-issue-replication').summernote(trackerEditor('#add-issue-replication', "Issue", 150, "Step 1\nStep 2\nStep 3\n\nSteps until issue appears"));
+        }
+        if (issue_user_access.canEdit) {
+            $('#edit-issue-description').summernote(trackerEditor('#edit-issue-description', "Issue", 150, "Behaves like this\n\nInstead of like this"));
+            $('#edit-issue-replication').summernote(trackerEditor('#edit-issue-replication', "Issue", 150, "Step 1\nStep 2\nStep 3\n\nSteps until issue appears"));
+        }
+
+        function JSRenderActionButton(label, emoji, btnClass, canAct, tooltipCanAct, tooltipCantAct, onclick) {
+            var button = $(`<button type="button" class="btn btn-sm ${btnClass}"></button>`);
+
+            if (!canAct) {
+                button.addClass("ui-state-disabled");
+                button.attr("data-microtip-title", tooltipCantAct);
+                button.attr("data-microtip-position", "top-left");
+                button.attr("role", "tooltip");
+            } else {
+                button.removeClass("ui-state-disabled");
+                if (tooltipCanAct) {
+                    button.attr("data-microtip-title", tooltipCanAct);
+                    button.attr("data-microtip-position", "top-left");
+                    button.attr("role", "tooltip");
+                } else {
+                    button.removeAttr("data-microtip-title");
+                    button.removeAttr("data-microtip-position");
+                    button.removeAttr("role");
+                }
+                if (onclick) {
+                    button.on("click", onclick);
+                }
+            }
+
+            button.html(`<span class="emoji">${emoji}</span> ${label}`);
+            return button;
+        }
+
+
+        function LoadDetails() {
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetPurchaseRequestOptions")",
+                url: '@Url.Action("DetailsJson", "Tracker")',
                 data: {
-                    RequestTypeId: po_data.requestTypeId,
-                    RequestPurposeId: po_data.requestPurposeId
+                    Id: task_data.id
                 },
-                success: function (data, status, xhr) {
-                    $("#add-pr-number").select2({
-                        data: data,
-                        minimumInputLength: -1,
-                        placeholder: "<empty>",
-                        language: {
-                            noResults: function () {
-                                return "No request found";
-                            }
-                        },
-                        dropdownParent: $("#addModal")
-                    }).on("select2:select", function () {
-                        loadAllItemsOptions();
-                    });
+                success: function (data) {
+                    $(".card-for-task").removeClass("card-primary card-warning card-danger card-info card-success card-default");
+
+                    const $tools = $(".details-tools-container");
+
+                    $tools.html("");
+
+                    if (data.status.toLowerCase() == "open") {
+                        $(".card-for-task").addClass("card-default");
+                        // if (data.modifyExpiration) {
+                        //     $tools.append(JSRenderActionButton("Edit", "✏️", "btn-info ml-2", task_user_access.canEdit, "Button expires in " + data.modifyExpiration, "Edit access is required.", null));
+                        //     $tools.append(JSRenderActionButton("Delete", "🗑️", "btn-danger ml-2", task_user_access.canDelete, "Button expires in " + data.modifyExpiration, "Delete access is required.", null));
+                        // }
+                        $tools.append(JSRenderActionButton("Start Doing", "🔄", "btn-primary ml-2", task_user_access.canEdit, null, "Edit access is required.", () => StartTask()));
+                    } else if (data.status.toLowerCase() == "doing") {
+                        $(".card-for-task").addClass("card-primary");
+                        $tools.append(JSRenderActionButton("Deploy for Testing", "🧪", "btn-warning ml-2", task_user_access.canEdit, null, "Edit access is required.", () => TestTask()));
+                    } else if (data.status.toLowerCase() == "testing") {
+                        $(".card-for-task").addClass("card-warning");
+                        $tools.append(JSRenderActionButton("Accept", "✅", "btn-success ml-2", task_user_access.canApproveDisapprove &&  data.isAssignee == false, null, "Approve / Disapprove access is required and should not be the Assignee.", () => AcceptTask()));
+                        $tools.append(JSRenderActionButton("Reject", "❌", "btn-danger ml-2", task_user_access.canApproveDisapprove &&  data.isAssignee == false, null, "Approve / Disapprove access is required and should not be the Assignee.", () => RejectTask()));
+                    } else if (data.status.toLowerCase() == "incomplete") {
+                        $(".card-for-task").addClass("card-danger");
+                        $tools.append(JSRenderActionButton("Fix", "🔧", "btn-primary ml-2", task_user_access.canEdit, null, "Edit access is required.", () => FixTask()));
+                    } else if (data.status.toLowerCase() == "for production") {
+                        $(".card-for-task").addClass("card-info");
+                        $tools.append(JSRenderActionButton("Deploy in Production", "🔧", "btn-primary ml-2", task_user_access.canEdit, null, "Edit access is required.", () => ProdTask()));
+                    } else if (data.status.toLowerCase() == "on production") {
+                        $(".card-for-task").addClass("card-success");
+                    }
+
+                    $tools.append(`
+                    <a href="Tracker/Details/${data.nextTaskId}" class="btn btn-light text-dark btn-sm float-right ml-2">
+                        <span class="emoji">⏵</span>
+                    </a>
+                    <a href="Tracker/Details/${data.previousTaskId}" class="btn btn-light text-dark btn-sm float-right ml-2">
+                        <span class="emoji">⏴</span>
+                    </a>
+                    <a href="@Url.Action("Index", "Tracker")" class="btn btn-light text-dark btn-sm float-right ml-2">
+                        <span class="emoji">🔙</span> Back to List
+                    </a>`);
+                    
+                    $("#details-function").html(data.function);
+                    $("#details-behavior").html(data.behavior);
+                    $("#details-access").html(data.accessControl);
+                    $("#details-status").html(data.status);
+                    $("#details-priority").html(data.priority.toLowerCase() == "high" ? '<span class="emoji">🟧</span> HIGH'
+                                              : data.priority.toLowerCase() == "medium" ? '<span class="emoji">🟨</span> MEDIUM'
+                                              : '<span class="emoji">🟩</span> LOW');
+                    $("#details-assignee").html(data.assignee);
+                    $("#details-created-by").html(data.createdBy);
+                    $("#details-created-date").html(data.dateCreated);
+
+                    if(data.modifiedBy) {
+                        $("#details-modified-by").html(data.modifiedBy);
+                        $(".detail-modified-by-display").removeClass("d-none");
+                    } else {
+                        $(".detail-modified-by-display").addClass("d-none");
+                    }
+                    if(data.dateModified) {
+                        $("#details-modified-date").html(data.dateModified)
+                        $(".detail-modified-date-display").removeClass("d-none");
+                    } else {
+                        $(".detail-modified-date-display").addClass("d-none");
+                    }
+                    if(data.approvedBy) {
+                        $("#details-approved-by").html(data.approvedBy);
+                        $(".detail-approved-by-display").removeClass("d-none");
+                    } else {
+                        $(".detail-approved-by-display").addClass("d-none");
+                    }
+                    if(data.dateApproved) {
+                        $("#details-approved-date").html(data.dateApproved)
+                        $(".detail-approved-date-display").removeClass("d-none");
+                    } else {
+                        $(".detail-approved-date-display").addClass("d-none");
+                    }
+                    if(data.disapproveReason) {
+                        $("#details-reason").html(data.disapproveReason);
+                        $(".details-display-reason").removeClass("d-none");
+                    } else {
+                        $(".details-display-reason").addClass("d-none");
+                    }
+                    if(data.disapprovedBy) {
+                        $("#details-disapproved-by").html(data.disapprovedBy);
+                        $(".detail-disapproved-by-display").removeClass("d-none");
+                    } else {
+                        $(".detail-disapproved-by-display").addClass("d-none");
+                    }
+                    if(data.dateDisapproved) {
+                        $("#details-disapproved-date").html(data.dateDisapproved)
+                        $(".detail-disapproved-date-display").removeClass("d-none");
+                    } else {
+                        $(".detail-disapproved-date-display").addClass("d-none");
+                    }
                 }
             });
+        }
 
-            loadAllItemsOptions();
-            function loadAllItemsOptions() {
-                if ($.fn.select2 && $("#add-name").hasClass("select2-hidden-accessible")) {
-                    $("#add-name").select2("destroy");
-                    $("#add-name").empty();
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetPurchaseRequestItemOptions")",
-                    data: {
-                        RequestId: function () {
-                            return $("#add-pr-number").val();
-                        }
-                    },
-                    success: function (data, status, xhr) {
-                        $("#add-name").select2({
-                            data: data,
-                            minimumResultsForSearch: -1,
-                            placeholder: "<empty>",
-                            allowClear: true,
-                            language: {
-                                noResults: function () {
-                                    return "No unordered items found";
-                                }
-                            },
-                            templateResult: function (repo) {
-                                if (repo.loading) {
-                                    return repo.text;
-                                }
-                                return $(
-                                    "<strong>" + repo.text + "</strong><br />" +
-                                    "<small>" +
-                                    "Requested Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
-                                    (repo.disabled ? ("Already Ordered On: " + repo.orderedOn) : ("Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit)) +
-                                    "</small>"
-                                );
-                            },
-                            dropdownParent: $("#addModal")
-                        }).on("select2:select", function () {
-                            var selected = $(this).select2("data")[0];
-                            $("#add-code").val(selected.itemCode);
-                            $("#add-part").val(selected.partNumber);
-                            $("#add-quantity").val(selected.unorderedQuantity);
-                            $("#add-quantity").data("max", selected.unorderedQuantity);
-                            $(".add-quantity-warning").toggle(false);
-                            $(".add-quantity-warning").text("");
-                            $("#add-unit").val(selected.unit);
-                            $("#add-unit").data("Id", selected.unitId);
-                            $("#add-unit-cost").val(0);
-                            $("#add-total-amount").val("0.00");
-                        }).on("select2:unselecting", function () {
-                            $("#add-code").val("");
-                            $("#add-part").val("");
-                            $("#add-quantity").val(0);
-                            $("#add-quantity").data("max", 0);
-                            $(".add-quantity-warning").toggle(false);
-                            $(".add-quantity-warning").text("");
-                            $("#add-unit").val("");
-                            $("#add-unit").data("Id", -1);
-                            $("#add-unit-cost").val("0.00");
-                            $("#add-total-amount").val("0.00");
-                        });
-                    },
-                    complete: function (xhr, status) {
-                        $("#add-name").val("").trigger("change");
+        function UpdateTask(options) {
+            swal({
+                title: options.title,
+                text: options.text,
+                icon: "info",
+                content: options.content || null,
+                buttons: true
+            }).then((confirm) => {
+                if (!confirm) return;
+
+                let extraData = {};
+                if (options.requiresReason) {
+                    let reason = $('#task-rejection').summernote('code');
+                    if (!reason || reason === "<p><br></p>") {
+                        swal("Error", "Please enter reason of rejection", "error");
+                        return;
                     }
+                    extraData.DisapproveReason = reason;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UpdateTask", "Tracker")',
+                    data: {
+                        Id: task_data.id,
+                        Summary: task_data.summary,
+                        Description: task_data.description,
+                        Status: options.status,
+                        Priority: task_data.priority,
+                        Assignee: task_data.assigneeId,
+                        DueDate: task_data.dueDateD,
+                        ...extraData
+                    },
+                    success: function (data) {
+                        if (data.status === "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            LoadDetails();
+                            LoadHistories();
+                            $("#editModal").modal("hide");
+                        }
+                    }
+                });
+            });
+        }
+
+        if (task_user_access.canEdit) {
+            function StartTask() {
+                UpdateTask({
+                    title: "Task Start Doing",
+                    text: "Start doing this task",
+                    status: "DOING"
                 });
             }
 
-            $("#add-quantity").on("change keyup", recomputeAddForm);
-            $("#add-unit-cost").on("change keyup", recomputeAddForm);
-            function recomputeAddForm() {
-                var quantity = $("#add-quantity").val() || 0;
-                var cost = $("#add-unit-cost").val() || 0;
-
-                $("#add-total-amount").val(FormatStringDecimal(quantity * cost));
+            function TestTask() {
+                UpdateTask({
+                    title: "Task Test",
+                    text: "Mark this task as deployed on Test Instance",
+                    status: "TESTING"
+                });
             }
 
-            $("#add-quantity").on("change", function() {
-                var quantity = parseInt($(this).val());
-                var max_quantity = parseInt($(this).attr("data-max-quantity"));
-                if(quantity > max_quantity) {
-                    $(".add-quantity-warning").toggle(true);
-                    $(".add-quantity-warning").text("Order higher than " + max_quantity + " unordered quantity.");
-                } else {
-                    $(".add-quantity-warning").toggle(false);
-                    $(".add-quantity-warning").text("");
-                }
-            });
+            function AcceptTask() {
+                UpdateTask({
+                    title: "Task Accept",
+                    text: "Accept the Task to deploy on Production.",
+                    status: "FOR PRODUCTION"
+                });
+            }
 
+            function RejectTask() {
+                var content = document.createElement("div");
+                var textarea = document.createElement("textarea");
+                textarea.id = "task-rejection";
+                content.appendChild(textarea);
+
+                UpdateTask({
+                    title: "Task Reject",
+                    text: "Reject the Task to deploy on Production.",
+                    status: "INCOMPLETE",
+                    content: content,
+                    requiresReason: true
+                });
+
+                setTimeout(() => {
+                    $('#task-rejection').summernote({
+                        placeholder: "Reason of Rejection",
+                        height: 100,
+                        toolbar: [
+                            ['font', ['bold', 'italic', 'underline', 'clear']],
+                            ['fontsize', ['fontsize']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link']],
+                            ['view', ['fullscreen', 'codeview']]
+                        ],
+                        callbacks: {
+                            onInit: function () {
+                                $('#task-rejection').next('.note-editor')
+                                                    .find('.note-editable')
+                                                    .css('text-align', 'left');
+                            }
+                        }
+                    });
+                }, 200);
+            }
+
+            function FixTask() {
+                UpdateTask({
+                    title: "Task Fix",
+                    text: "Start fixing the rejected part",
+                    status: "DOING"
+                });
+            }
+
+            function ProdTask() {
+                UpdateTask({
+                    title: "Task Production",
+                    text: "Task is deployed into Production",
+                    status: "ON PRODUCTION"
+                });
+            }
+        }
+
+        function LoadHistories() {
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetOptions", "Unit")",
-                success: function (data, status, xhr) {
-                    $("#add-unit2").select2({
-                        data: data,
-                        minimumResultsForSearch: -1,
-                        placeholder: "<empty>",
-                        dropdownParent: $("#addModal")
-                    }).on("change", function () {
-                        $("#add-unit").val($("#add-unit2").select2("data")[0].text);
-                        $("#add-unit").data("Id", $("#add-unit2").select2("data")[0].id);
-                    });
-                }
-            });
-
-            $(".createBtn").on("click", clearItemForm);
-
-            function clearItemForm() {
-                $("#add-pr-number").val(null).trigger("change");
-                $("#add-code").val("");
-                $("#add-part").val("");
-                $("#add-name").html("");
-                $("#add-quantity").val("0");
-                $(".add-quantity-warning").toggle(false);
-                $(".add-quantity-warning").text("");
-                $("#add-unit").val("");
-                $("#add-unit").data("Id", "");
-                $("#add-unit-cost").val("0.00");
-                $("#add-total-amount").val("0.00");
-            }
-
-            // Validation for Add Item Modal
-            var validateAdd = $("#form-item").validate({
-                rules: {
-                    PRNumber: {
-                        required: true// function () { return checkIfRequired("SONumber"); }
-                    },
-                    Name: {
-                        required: true,// function () { return checkIfRequired("Name"); },
-                        maxlength: 100
-                    },
-                    Quantity: {
-                        required: true,// function () { return checkIfRequired("Quantity"); },
-                        number: true,
-                        isNotZero: true,
-                        // max: function () {
-                        //     return $("#add-quantity").data("max");
-                        // }
-                    },
-                    UnitCost: {
-                        required: true,// function () { return checkIfRequired("Purpose"); },
-                        number: true
-                    }
+                url: '@Url.Action("GetHistories", "Tracker")',
+                data: {
+                    TaskId: task_data.id
                 },
-                messages: {
-                    PRNumber: {
-                        required: "Please select a Purchase Request Reference Number."
-                    },
-                    Name: {
-                        required: "Please select an Item.",
-                        maxlength: "Name must not exceed 100 characters."
-                    },
-                    Quantity: {
-                        required: "Please enter a quantity.",
-                        number: "Please enter a valid number.",
-                        isNotZero: "Can not request an item with 0 quantity."
-                    },
-                    UnitCost: {
-                        required: "Please enter the unit cost.",
-                        number: "Please enter a valid number."
-                    }
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    AddItem();
+                success: function (data) {
+                    $(".history-container").html("");
+                        $.each(data, function (i, v) {
+                            $(".history-container").append(`
+                                            <div class="timeline-item mb-3 position-relative">
+                                                <div class="timeline-marker bg-black"></div>
+                                                <div class="ms-5">
+                                                    <p class="mb-1">${v.description}</p>
+                                                    <p class="mb-0 text-muted small">${v.createdBy} performed this action on ${v.dateCreated}</p>
+                                                </div>
+                                            </div>`);
+                        });
                 }
             });
+        }
 
-            function AddItem() {
-                var rowIndexes = [];
-                itemDT.rows(function (idx, data, node) {
-                    if (data.itemDescription == $("#add-name").select2("data")[0].text
-                     && data.purchaseRequestId == $("#add-pr-number").select2("data")[0].id) {
-                        rowIndexes.push(idx);
-                    }
-                    return false;
-                });
-                if (rowIndexes.length > 0) {
-                    toastr.warning($("#add-name").select2("data")[0].text + " has already been added", "Duplicate");
-                } else {
-                    itemDT.row.add({
-                        purchaseOrderId: po_data.id,
-                        lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
-                        purchaseRequestId: $("#add-pr-number").select2("data")[0].id,
-                        purchaseRequestNumber: $("#add-pr-number").select2("data")[0].text,
-                        requestItemId: $("#add-name").select2("data")[0].id,
-                        itemId: $("#add-name").select2("data")[0].itemId,
-                        itemCode: $("#add-name").select2("data")[0].itemCode,
-                        itemPartNumber: $("#add-name").select2("data")[0].partNumber,
-                        itemDescription: $("#add-name").select2("data")[0].text,
-                        quantity: FormatStringInteger($("#add-quantity").val()),
-                        quantityD: $("#add-quantity").val() || 0,
-                        unorderedQuantity: FormatStringInteger($("#add-quantity").data("max")),
-                        unorderedQuantityD: $("#add-quantity").data("max") || 0,
-                        unitId: $("#add-unit").data("Id"),
-                        unitCode: $("#add-unit").val(),
-                        unitCost: FormatStringDecimal($("#add-unit-cost").val()),
-                        unitCostD: $("#add-unit-cost").val() || 0,
-                        totalAmount: FormatStringDecimal($("#add-total-amount").val()),
-                        totalAmountD: $("#add-total-amount").val() || 0
-                    }).draw();
-
-                    toastr.success("Added " + $("#add-name").select2("data")[0].text + " on Purchase Order Item(s)", "Success");
-                    clearItemForm();
-                }
-            }
-
-            $(".btn-details-save").on("click", function () {
-                SaveRequest("Draft");
-            });
-
-            $(".btn-details-submit").on("click", function () {
-                SaveRequest("Submitted");
-            });
-
-            function SaveRequest(status) {
-                var items = itemDT.data();
-                if (items.length == 0) {
-                    toastr.warning("No item to request. Add an item to the list to continue", "Warning");
-                } else if (items.filter(s => parseInt(s.quantity) == 0).length > 0) {
-                    toastr.warning("Some items have 0 quantity. Can't request an item with 0 quantity", "Warning");
-                } else if (itemDT.rows().nodes().to$().find('.is-invalid').length) {
-                    toastr.warning("Some items have invalid inputs. Please fix it first", "Warning");
-                } else if (items.filter(s => parseInt(s.quantityD) > parseInt(s.maxQuantityD)).length > 0) {
-                    swal({
-                        title: "Purchase Order Quantity",
-                        text: "Some of the quantity has exceeded unordered quantity. Continue this purchase order?",
-                        icon: "warning",
-                        buttons: true,
-                        dangerMode: true
-                    }).then((confirm) => {
-                        if (confirm != null) {
-                            DoSaveOrder(status);
-                        }
-                    });
-                } else {
-                    DoSaveOrder(status);
-                }
-            }
-
-            function DoSaveOrder(status) {
+        if (comment_user_access.canView) {
+            function LoadComments() {
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("SaveItemsJson")",
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        Id: po_data.id,
-                        Status: status,
-                        Items: itemDT.rows().data().toArray()
-                    }),
-                    success: function (data, status, xhr) {
-                        if (data.status == "Success") {
-                            window.location.reload();
-                        } else {
-                            toastr.error(data.message, data.status);
+                    url: '@Url.Action("GetComments", "Tracker")',
+                    data: {
+                        TaskId: task_data.id
+                    },
+                    success: function (data) {
+                        $(".comment-container").html("");
+                        $(".comment-counter").text(data.length);
+                        if(data.length > 0){
+                            $.each(data, function (i, v) {
+                                const $card = $(`
+                                                    <div class="card card-default">
+                                                        <div class="card-header">
+                                                            <div class="card-tools"></div>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div class="row mb-2">
+                                                                <div class="col-12">
+                                                                    ${v.content}
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mt-3 d-flex gap-2">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card-footer text-muted small">
+                                                            <div class="row">
+                                                                ${ (v.modifiedBy || v.dateModified) ? `
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">👤</span>Created By: ${v.createdBy}</p>
+                                                                    <p class="mb-1"><span class="emoji">📅</span>Date Created: ${v.dateCreated}</p>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">✏️</span>Modified By: ${v.modifiedBy}</p>
+                                                                    <p class="mb-1"><span class="emoji">📅</span>Date Modified: ${v.dateModified}</p>
+                                                                </div>`
+                                                                : `
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">👤</span>Created By: ${v.createdBy}</p>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <p class="mb-1"><span class="emoji">📅</span>Date Created: ${v.dateCreated}</p>
+                                                                </div>`
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>`);
+
+                                const $tools = $card.find('.card-tools');
+                                if (v.modifyExpiration) {
+                                    $tools.append(JSRenderActionButton("Edit", "✏️", "btn-info ml-2", comment_user_access.canEdit, "Edit Comment.\nButton will expire in " + v.modifyExpiration, "Edit access is required.", () => ShowEditComment(v)));
+                                    $tools.append(JSRenderActionButton("Delete", "🗑️", "btn-danger ml-2", comment_user_access.canDelete, "Delete Comment.\nButton will expire in " + v.modifyExpiration, "Delete access is required.", () => DeleteComment(v)));
+                                } else {
+                                    $tools.closest(".card-header").remove();
+                                }
+
+                                $(".comment-container").append($card);
+                            });
+                            $(".comment-counter").removeClass("d-none");
+                        }
+                        else
+                        {
+                            $(".comment-container").append('<em class="text-center text-muted">No comment(s) yet</em>');
+                            $(".comment-counter").addClass("d-none");
                         }
                     }
                 });
             }
         }
 
-        if (user_access.canEdit) {
-            $("#cost-new").on("change", function() {
-                var new_cost = parseFloat($("#cost-new").val().replace(",",""));
-                $("#cost-total").val(po_data.currency.split("/")[0].trim() + " " + FormatStringDecimal(new_cost * parseInt($("#cost-quantity").val().replace(",", ""))));
-            });
+        if (comment_user_access.canAdd) {
+            function ShowAddComment() {
+                $("#addCommentModal").modal("show");
+            }
 
-              $("#quantity-new").on("change", function() {
-                var new_quantity = parseInt($("#quantity-new").val());
-                $("#quantity-total").val(po_data.currency.split("/")[0].trim() + " " + FormatStringDecimal(new_quantity * parseFloat($("#quantity-cost").val().replace(",", ""))));
-            });
-            
-            
-            // Validation for Cost Modal
-            var validateCost = $("#form-cost").validate({
-                rules: {
-                    NewCost: {
-                        required: true,
-                        notEqualTo: "#cost-old"
-                    },
-                    Remarks: {
-                        required: true,
-                        maxlength: 500
-                    }
-                },
-                messages: {
-                    NewCost: {
-                        required: "Please enter the new Cost.",
-                        notEqualTo: "Please enter new Cost different to the old Cost"
-                    },
-                    Remarks: {
-                        required: "Please enter a Remarks.",
-                        maxlength: "Remarks must not exceed 500 characters."
-                    }
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    UpdateCost();
+            function AddComment() {
+                var content = $("#add-comment-content").val();
+                var error_msg = "";
+
+                if(!content) error_msg += "<li>Please enter a Comment</li>";
+                else if(content.length < 20) error_msg += "<li>Comment must be atleast 20 characters.</li>";
+
+                if(error_msg) {
+                    toastr.warning("<ul class='mb-0'>" + error_msg + "</ul>", "Form Validation");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("AddComment", "Tracker")',
+                        data: {
+                            TaskId: task_data.id,
+                            Content: $("#add-comment-content").val()
+                        },
+                        success: function (data) {
+                            if (data.status == "Success") {
+                                $("#addCommentModal").modal("hide");
+                                $("#add-comment-content").summernote('code', '');
+                                LoadHistories();
+                                LoadComments();
+                                toastr.success(data.message, data.status);
+                            } else {
+                                toastr.error(data.message, data.status);
+                            }
+                        }
+                    });
                 }
-            });
-
-            function UpdateCost() {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("UpdateCostJson")",
-                    data: {
-                        POItemId: $("#cost-item").data("POItemId"),
-                        OldCostD: parseFloat($("#cost-old").val().replace(",", "")),
-                        NewCostD: parseFloat($("#cost-new").val().replace(",", "")),
-                        Remarks: $("#cost-remarks").val()
-                    },
-                    success: function (data, status, xhr) {
-                        if (data.status == "Success") {
-                            //window.location.reload();
-                            toastr.success(data.message, data.status);
-                            itemDT.ajax.reload();
-                            $("#costModal").modal("hide");
-                        } else {
-                            toastr.error(data.message, data.status);
-                        }
-                    }
-                });
             }
-            
-            $(".btn-cost-history").on("click", HistoryCost);
-
-            function HistoryCost() {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetCostUpdateListJson")",
-                    data: {
-                        OrderItemId: $("#cost-item").data("POItemId")
-                    },
-                    beforeSend: function (xhr, error) {
-                        $(".cost-item-history").text($("#cost-item").val());
-                        $(".table-cost-history tbody").html("");
-                    },
-                    success: function (data, status, xhr) {
-                        $.each(data, function (i, v) {
-                            $(".table-cost-history tbody").append(
-                                "<tr>" +
-                                    "<td>" + v.oldCost + "</td>" +
-                                    "<td>" + po_data.currency.split("/")[0].trim() + " " + v.newCost + "</td>" +
-                                    "<td>" + v.remarks + "</td>" +
-                                    "<td>" + v.userCreated + "</td>" +
-                                    "<td>" + v.dateCreated + "</td>" +
-                                "</tr>"
-                            );
-                        });
-                        if(data.length == 0) {
-                            $(".table-cost-history tbody").append(
-                                "<tr>" +
-                                    "<td colspan='5' class='text-center'>No change for cost have been made</td>" +
-                                "</tr>"
-                            );
-                        }
-                    },
-                    complete: function (xhr, status) {
-                        $("#costModal").modal("hide");
-                        $("#costHistoryModal").modal("show");
-                    }
-                });
-            }
-
-
-               // Validation for Quantity Modal
-            var validateQuantity = $("#form-quantity").validate({
-                rules: {
-                    NewQuantity: {
-                        required: true,
-                        notEqualTo: "#quantity-old"
-                    },
-                    Remarks: {
-                        required: true,
-                        maxlength: 500
-                    }
-                },
-                messages: {
-                    NewCost: {
-                        required: "Please enter the new Quantity.",
-                        notEqualTo: "Please enter new Quantity different to the old Quantity"
-                    },
-                    Remarks: {
-                        required: "Please enter a Remarks.",
-                        maxlength: "Remarks must not exceed 500 characters."
-                    }
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    UpdateQuantity();
-                }
-            });
-
-            function UpdateQuantity() {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("UpdateQuantityJson")",
-                    data: {
-                        POItemId: $("#quantity-item").data("POItemId"),
-                        OldQuantity: parseFloat($("#quantity-old").val()),
-                        NewQuantity: parseFloat($("#quantity-new").val()),
-                        Remarks: $("#quantity-remarks").val()
-                    },
-                    success: function (data, status, xhr) {
-                        if (data.status == "Success") {
-                            //window.location.reload();
-                            toastr.success(data.message, data.status);
-                            itemDT.ajax.reload();
-                            $("#quantityModal").modal("hide");
-                        } else {
-                            toastr.error(data.message, data.status);
-                        }
-                    }
-                });
-            }
-
-            function HistoryQuantity() {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetQuantityUpdateListJson")",
-                    data: {
-                        OrderItemId: $("#quantity-item").data("POItemId")
-                    },
-                    beforeSend: function (xhr, error) {
-                        $(".quantity-item-history").text($("#quantity-item").val());
-                        $(".table-quantity-history tbody").html("");
-                    },
-                    success: function (data, status, xhr) {
-                        $.each(data, function (i, v) {
-                            $(".table-quantity-history tbody").append(
-                                "<tr>" +
-                                    "<td>" + v.oldQuantity + "</td>" +
-                                    "<td>" + v.newQuantity + "</td>" +
-                                    "<td>" + v.remarks + "</td>" +
-                                    "<td>" + v.userCreated + "</td>" +
-                                    "<td>" + v.dateCreated + "</td>" +
-                                "</tr>"
-                            );
-                        });
-                        if(data.length == 0) {
-                            $(".table-quantity-history tbody").append(
-                                "<tr>" +
-                                    "<td colspan='5' class='text-center'>No change for quantity have been made</td>" +
-                                "</tr>"
-                            );
-                        }
-                    },
-                    complete: function (xhr, status) {
-                        $("#quantityModal").modal("hide");
-                        $("#quantityHistoryModal").modal("show");
-                    }
-                });
-            }
-
-            $(".btn-quantity-history").on("click", HistoryQuantity);
         }
 
-        if (user_access.canApproveDisapprove) {
-            $('.btn-details-approve').click(function (e) {
+        if(comment_user_access.canEdit) {
+            function ShowEditComment(comment) {
+                $("#editCommentModal").modal("show");
+                $("#edit-comment-content").data("Id", comment.id);
+                $("#edit-comment-content").summernote("code", comment.content);
+            }
+
+            function EditComment() {
+                var content = $("#edit-comment-content").val();
+                var error_msg = "";
+
+                if(!content) error_msg += "<li>Please enter a Comment</li>";
+                else if(content.length < 20) error_msg += "<li>Comment must be atleast 20 characters.</li>";
+
+                if(error_msg) {
+                    toastr.warning("<ul class='mb-0'>" + error_msg + "</ul>", "Form Validation");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("UpdateComment", "Tracker")",
+                        data: {
+                            Id: $("#edit-comment-content").data("Id"),
+                            TaskId: task_data.id,
+                            Content: $("#edit-comment-content").summernote("code")
+                        },
+                        success: function (data) {
+                            if (data.status == "Success") {
+                                $("#editCommentModal").modal("hide");
+                                $("#edit-comment-content").summernote("code", "");
+                                LoadHistories();
+                                LoadComments();
+                                toastr.success(data.message, data.status);
+                            } else {
+                                toastr.error(data.message, data.status);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        if (comment_user_access.canDelete) {
+            function DeleteComment(comment) {
                 swal({
-                    title: "Approve Purchase Order",
-                    text: "Continue to approve this purchase order?",
-                    icon: "success",
+                    title: "Delete Comment",
+                    text: "Are you sure you want to delete this record? Deletion is only allowed from the time of creation up to 1 hour.",
+                    icon: "warning",
                     buttons: true,
-                    successMode: true
+                    dangerMode: true
                 }).then((confirm) => {
                     if (confirm) {
                         $.ajax({
-                            url: "@Url.Action("ApproveJson")",
-                            type: "POST",
-                            data: { Id: po_data.id },
-                            success: function (data, status, xhr) {
-                                if (data.status == "Success") {
-                                    window.location.reload();
-                                } else {
-                                    toastr.error(data.message, data.status);
-                                }
-                            }
-                        });
-                    }
-                });
-            });
-
-            $('.btn-details-disapprove').click(function (e) {
-                swal({
-                    title: "Disapprove Purchase Order",
-                    text: "Continue to disapprove this purchase order?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                    content: {
-                        element: "input",
-                        attributes: {
-                            placeholder: "Reason for Disapproving",
-                            type: "text"
-                        }
-                    }
-                }).then((confirm) => {
-                    if (confirm != null) {
-                        $.ajax({
-                            url: "@Url.Action("DisapproveJson")",
+                            url: "@Url.Action("DeleteComment", "Tracker")",
                             type: "POST",
                             data: {
-                                Id: po_data.id,
-                                reason: confirm
+                                Id: comment.id,
+                                TaskId: task_data.id
                             },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
-                                    window.location.reload();
+                                    LoadHistories();
+                                    LoadComments();
+                                    toastr.success(data.message, data.status);
                                 } else {
                                     toastr.error(data.message, data.status);
                                 }
@@ -1593,26 +1260,378 @@
                         });
                     }
                 });
-            });
+            }
         }
 
-        if (user_access.canPrint) {
-            $(".btn-details-print").on("click", function () {
-                var print_company = $(this).data("company");
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesome: "fas fa-print"
-                });
-                setTimeout(function () {
-                    let win = window.open('@Url.Action("PrintDetails")/' + po_data.id + '?Company=' + print_company, '');
-                    var wintimer = setInterval(function () {
-                        if (win.closed) {
-                            clearInterval(wintimer);
-                            hideLoader();
+        if (issue_user_access.canView) {
+            function LoadIssues() {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetIssues", "Tracker")',
+                    data: {
+                        TaskId: task_data.id
+                    },
+                    success: function (data) {
+                        $(".issue-container").html("");
+                        $(".issue-counter").text(data.filter(x => x.status.toLowerCase() != "fixed").length);
+                        if(data.length > 0){
+                            $.each(data, function (i, v) {
+                                const priorityMap = {
+                                    critical: '🟥 CRITICAL',
+                                    high: '🟧 HIGH',
+                                    medium: '🟨 MEDIUM',
+                                    low: '🟩 LOW'
+                                };
+
+                                const severity = priorityMap[v.priority?.toLowerCase()] || '⬜ TRIVIAL';
+
+                                const $card = $(`
+                                    <div class="card card-default">
+                                        <div class="card-header">
+                                            <span class="card-title">${v.summary}</span>
+                                            <div class="card-tools"></div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row mb-2">
+                                                <div class="col-md-6"><strong>Status:</strong> ${v.status}</div>
+                                                <div class="col-md-6"><strong>Severity:</strong> <span class="emoji">${severity.split(' ')[0]}</span> ${severity.split(' ')[1]}</div>
+                                            </div>
+                                            <div class="mb-2"><span class="text-muted">Description</span><div>${v.description}</div></div>
+                                            <div class="mb-2"><span class="text-muted">Steps to Replicate</span><div>${v.replication}</div></div>
+                                            <div class="mb-2"><span class="text-muted">Solution</span><div>${v.resolution || '<p class="text-muted">Not yet provided</p>'}</div></div>
+                                            <div class="mt-3 d-flex gap-2"></div>
+                                        </div>
+                                        <div class="card-footer text-muted small">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <p class="mb-1"><span class="emoji">👤</span>Created By: ${v.createdBy}</p>
+                                                    <p class="mb-1"><span class="emoji">📅</span>Date Created: ${v.dateCreated}</p>
+                                                </div>
+                                                ${ (v.modifiedBy || v.dateModified) ? `
+                                                <div class="col-md-4">
+                                                    <p class="mb-1"><span class="emoji">✏️</span>Modified By: ${v.modifiedBy}</p>
+                                                    <p class="mb-1"><span class="emoji">📅</span>Date Modified: ${v.dateModified}</p>
+                                                </div>`
+                                                : ``
+                                                }
+                                                <div class="col-md-4">
+                                                    <p class="mb-1"><span class="emoji">✅</span>Fixed By: ${v.fixedBy || '<span class="text-muted">Not yet fixed</span>'}</p>
+                                                    <p class="mb-1"><span class="emoji">📅</span>Date Fixed: ${v.dateFixed || '<span class="text-muted">Not yet fixed</span>'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+
+                                const $tools = $card.find('.card-tools');
+                                const status = v.status.toLowerCase();
+                                if (status === 'reopened') {
+                                    $tools.append(JSRenderActionButton("Start Doing", "🔄", "btn-primary ml-2", issue_user_access.canEdit, null, "Edit access is required.", () => StartIssue(v)));
+                                } else if (status === 'open') {
+                                    $tools.append(JSRenderActionButton("Start Doing", "🔄", "btn-primary ml-2", issue_user_access.canEdit, null, "Edit access is required.", () => StartIssue(v)));
+                                    if (v.modifyExpiration) {
+                                        $tools.append(JSRenderActionButton("Edit", "✏️", "btn-info ml-2", issue_user_access.canEdit, "Edit Comment.\nButton is only available for task with Open status.\nButton will expire in " + v.modifyExpiration, "Edit access is required.", () => ShowEditIssue(v)));
+                                        $tools.append(JSRenderActionButton("Delete", "🗑️", "btn-danger ml-2", issue_user_access.canDelete, "Delete Comment.\nButton is only available for task with Open status.\nButton will expire in " + v.modifyExpiration, "Delete access is required.", () => DeleteIssue(v)));
+                                    }
+                                } else if (status === 'doing') {
+                                    $tools.append(JSRenderActionButton("Mark as Fixed", "✅", "btn-success ml-2", issue_user_access.canEdit, null, "Edit access is required.", () => FixedIssue(v)));
+                                } else if (status === 'fixed') {
+                                    $tools.append(JSRenderActionButton("Reopen", "🔄", "btn-warning ml-2", issue_user_access.canEdit, null, "Edit access is required.", () => ReopenIssue(v)));
+                                }
+
+                                $(".issue-container").append($card);
+                            });
+
+                            $(".issue-counter").removeClass("d-none");
                         }
-                    }, 100);
-                }, 500);
-            });
+                        else
+                        {
+                            $(".issue-container").append('<em class="text-center text-muted">No issue(s) found</em>');
+                            $(".issue-counter").addClass("d-none");
+                        }
+                    }
+                });
+            }
+        }
+
+        if(issue_user_access.canAdd) {
+            function ShowAddIssue() {
+                $("#addIssueModal").modal("show");
+            }
+
+            function AddIssue() {
+                var summary = $("#add-issue-summary").val();
+                var description = $($('#add-issue-description').summernote('code')).text();
+                var replication = $($('#add-issue-replication').summernote('code')).text();
+                var error_msg = "";
+
+                if(!summary) error_msg += "<li>Please enter Summary</li>";
+                else if(summary.length > 100) error_msg += "<li>Summary must not exceed 100 characters.</li>";
+                if(!description) error_msg += "<li>Please enter a message in Description</li>";
+                else if(description.length < 20) error_msg += "<li>Description must be atleasst 20 characters.</li>";
+                if(!replication) error_msg += "<li>Please enter a message in Replication</li>";
+                else if(replication.length < 20) error_msg += "<li>Replication must be atleasst 20 characters.</li>";
+
+                if(error_msg) {
+                    toastr.warning("<ul class='mb-0'>" + error_msg + "</ul>", "Form Validation");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("AddIssue", "Tracker")",
+                        data: {
+                            TaskId: task_data.id,
+                            Summary: $("#add-issue-summary").val(),
+                            Description: $('#add-issue-description').summernote('code'),
+                            Replication: $("#add-issue-replication").summernote('code'),
+                            Severity: $("#add-issue-severity").val(),
+                            Status: "OPEN",
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                LoadHistories();
+                                LoadIssues();
+                                $("#addIssueModal").modal("hide");
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        if (issue_user_access.canEdit) {
+            function ShowEditIssue(issue) {
+                $("#editIssueModal").modal("show");
+                $("#edit-issue-summary").data("Id", issue.id);
+                $("#edit-issue-summary").val(issue.summary);
+                $("#edit-issue-description").summernote("code", issue.description);
+                $("#edit-issue-replication").summernote("code", issue.replication);
+                $("#edit-issue-severity").val(issue.severity).trigger("change");
+            }
+
+            function EditIssue() {
+                var description = $($('#edit-issue-description').summernote('code')).text();
+                var replication = $($('#edit-issue-replication').summernote('code')).text();
+                var error_msg = "";
+
+                if(!description) error_msg += "<li>Please enter a message in Description</li>";
+                else if(description.length < 20) error_msg += "<li>Description must be atleasst 20 characters.</li>";
+                if(!replication) error_msg += "<li>Please enter a message in Replication</li>";
+                else if(replication.length < 20) error_msg += "<li>Replication must be atleasst 20 characters.</li>";
+
+                if(error_msg) {
+                    toastr.warning("<ul class='mb-0'>" + error_msg + "</ul>", "Form Validation");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("UpdateIssue", "Tracker")",
+                        data: {
+                            Id: $("#edit-issue-summary").data("Id"),
+                            TaskId: task_data.id,
+                            Description: $('#edit-issue-description').summernote('code'),
+                            Replication: $("#edit-issue-replication").summernote('code'),
+                            Severity: $("#edit-issue-severity").val(),
+                            Status: "OPEN",
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                LoadHistories();
+                                LoadIssues();
+                                $("#editIssueModal").modal("hide");
+                            }
+                        }
+                    });
+                }
+            }
+
+            function StartIssue(issue) {
+                swal({
+                    title: "Issue Start Doing",
+                    text: "Start doing this issue",
+                    icon: "info",
+                    buttons: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("UpdateIssue", "Tracker")",
+                            type: "POST",
+                            data: {
+                                Id: issue.id,
+                                Summary: issue.summary,
+                                TaskId: task_data.id,
+                                Description: issue.description,
+                                Replication: issue.replication,
+                                Severity: issue.severity,
+                                Status: "DOING"
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    LoadHistories();
+                                    LoadIssues();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            function FixedIssue(issue) {
+                var content = document.createElement("div");
+
+                var textarea = document.createElement("textarea");
+                textarea.id = "issue-fixed-resolution";
+                // textarea.className = "swal-content__textarea";
+                content.appendChild(textarea);
+
+                var inputDate = document.createElement("input");
+                inputDate.type = "date";
+                inputDate.id = "issue-fixed-date";
+                inputDate.className = "swal-content__input";
+                inputDate.style.marginTop = "15px";
+                inputDate.value = DateForInput(new Date());
+                content.appendChild(inputDate);
+
+                swal({
+                    title: "Issue Fix",
+                    text: "Mark this issue as Fixed.",
+                    icon: "info",
+                    content: content,
+                    buttons: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var text = $('#issue-fixed-resolution').summernote('code');
+                        var date = document.getElementById("issue-fixed-date").value;
+
+                        if (!text || text === "<p><br></p>" || !date) {
+                            swal("Error", "Please enter both fields", "error");
+                            return;
+                        }
+
+                        $.ajax({
+                            url: "@Url.Action("UpdateIssue", "Tracker")",
+                            type: "POST",
+                            data: {
+                                Id: issue.id,
+                                TaskId: task_data.id,
+                                Summary: issue.summary,
+                                Description: issue.description,
+                                Replication: issue.replication,
+                                Severity: issue.severity,
+                                Resolution: text,
+                                DateFixed: date,
+                                Status: "FIXED"
+                            },
+                            success: function (data) {
+                                if (data.status == "Success") {
+                                    LoadHistories();
+                                    LoadIssues();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                setTimeout(() => {
+                    $('#issue-fixed-resolution').summernote({
+                        placeholder: "Resolution",
+                        height: 100,
+                        toolbar: [
+                            ['font', ['bold', 'italic', 'underline', 'clear']],
+                            ['fontsize', ['fontsize']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link']],
+                            ['view', ['fullscreen', 'codeview']]
+                        ],
+                        callbacks: {
+                            onInit: function() {
+                                $('#issue-fixed-resolution').next('.note-editor')
+                                                            .find('.note-editable')
+                                                            .css('text-align', 'left');
+                            }
+                        }
+                    });
+                }, 200);
+            }
+
+
+            function ReopenIssue(issue) {
+                swal({
+                    title: "Issue Reopen",
+                    text: "Mark this issue as Reopened Issue.",
+                    icon: "info",
+                    buttons: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("UpdateIssue", "Tracker")",
+                            type: "POST",
+                            data: {
+                                Id: issue.id,
+                                TaskId: task_data.id,
+                                Summary: issue.summary,
+                                Description: issue.description,
+                                Replication: issue.replication,
+                                Severity: issue.severity,
+                                Resolution: null,
+                                DateFixed: null,
+                                Status: "REOPENED"
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    LoadHistories();
+                                    LoadIssues();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        if (issue_user_access.canDelete) {
+            function DeleteIssue(issue) {
+                swal({
+                    title: "Delete Issue",
+                    text: "Are you sure you want to delete this record? Deletion is only allowed from the time of creation up to 24 hours.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("DeleteIssue", "Tracker")",
+                            type: "POST",
+                            data: {
+                                Id: issue.id,
+                                TaskId: task_data.id
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    LoadHistories();
+                                    LoadIssues();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
         }
     </script>
 }

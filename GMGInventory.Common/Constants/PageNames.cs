@@ -70,7 +70,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Shipping List")] ShippingList,
         [PageNamesString("Tracker Task")] TrackerTask,
         [PageNamesString("Tracker Comment")] TrackerComment,
-        [PageNamesString("Tracker Error")] TrackerError,
+        [PageNamesString("Tracker Issue")] TrackerIssue,
     }
 
     public static class PageNameExtensions
